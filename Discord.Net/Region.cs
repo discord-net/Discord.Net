@@ -1,32 +1,12 @@
-﻿using System;
-
-namespace Discord
+﻿namespace Discord
 {
-	public enum Region
+	public static class Region
 	{
-		US_West,
-		US_East,
-		Singapore,
-		London,
-		Sydney,
-		Amsterdam
-	}
-
-	internal static class RegionConverter
-	{
-		public static string Convert(Region region)
-		{
-			switch (region)
-			{
-				case Region.US_West: return "us-west";
-				case Region.US_East: return "us-east";
-				case Region.Singapore: return "singapore";
-				case Region.London: return "london";
-				case Region.Sydney: return "sydney";
-				case Region.Amsterdam: return "amsterdam";
-				default:
-					throw new ArgumentOutOfRangeException("Unknown server region");
-			}
-		}
-	}
+		public const string US_West = "us-west";
+		public const string US_East = "us-east";
+        public const string Singapore = "singapore";
+        public const string London = "london";
+        public const string Sydney = "sydney";
+		public const string Amsterdam = "amsterdam";
+    }
 }

@@ -212,7 +212,7 @@ namespace Discord
 			_isClosing = false;
 		}
 
-		public Task CreateServer(string name, Region region)
+		public Task CreateServer(string name, string region)
 		{
 			CheckReady();
 			return DiscordAPI.CreateServer(name, region, _httpOptions);

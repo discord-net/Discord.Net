@@ -25,9 +25,9 @@ namespace Discord.API
 			return Http.Post(Endpoints.AuthLogout, options);
 		}
 
-		public static Task CreateServer(string name, Region region, HttpOptions options)
+		public static Task CreateServer(string name, string region, HttpOptions options)
 		{
-			var request = new CreateServerRequest { Name = name, Region = RegionConverter.Convert(region) };
+			var request = new CreateServerRequest { Name = name, Region = region };
 			return Http.Post(Endpoints.Servers, request, options);
 		}
 		public static Task DeleteServer(string id, HttpOptions options)
