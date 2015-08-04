@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net", "Discord.Net\Discord.Net.csproj", "{8D23F61B-723C-4966-859D-1119B28BCF19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1DDC89B5-2A88-45E5-A743-7A43E6B5C4B3}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D23F61B-723C-4966-859D-1119B28BCF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D23F61B-723C-4966-859D-1119B28BCF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D23F61B-723C-4966-859D-1119B28BCF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D23F61B-723C-4966-859D-1119B28BCF19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
