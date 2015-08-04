@@ -2,9 +2,9 @@
 
 namespace Discord.Models
 {
-	public class User
+	public sealed class User
 	{
-		protected readonly DiscordClient _client;
+		private readonly DiscordClient _client;
 
 		public string Id { get; }
 		public string Name { get; internal set; }
@@ -34,7 +34,6 @@ namespace Discord.Models
 		public override string ToString()
 		{
 			return Name;
-			//return Name + " (" + Id + ")";
 		}
 	}
 }

@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace Discord.Models
 {
-	public class Server
+	public sealed class Server
 	{
-		protected readonly DiscordClient _client;
+		private readonly DiscordClient _client;
 
 		public string Id { get; }
 		public string Name { get; internal set; }
@@ -22,13 +22,13 @@ namespace Discord.Models
 		public User Owner { get { return _client.GetUser(OwnerId); } }
 
 		internal ConcurrentDictionary<string, bool> _members;
-		[JsonIgnore]
 		public IEnumerable<string> MemberIds { get { return _members.Keys; } }
+		[JsonIgnore]
 		public IEnumerable<User> Members { get { return _members.Keys.Select(x => _client.GetUser(x)); } }
 
 		internal ConcurrentDictionary<string, bool> _channels;
-		[JsonIgnore]
 		public IEnumerable<string> ChannelIds { get { return _channels.Keys; } }
+		[JsonIgnore]
 		public IEnumerable<Channel> Channels { get { return _channels.Keys.Select(x => _client.GetChannel(x)); } }
 
 		//Not Implemented
@@ -47,7 +47,6 @@ namespace Discord.Models
 		public override string ToString()
 		{
 			return Name;
-			//return Name + " (" + Id + ")";
 		}
 	}
 }

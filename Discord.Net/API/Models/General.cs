@@ -128,4 +128,14 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "channel_id")]
 		public string ChannelId;
 	}
+
+	internal class Role
+	{
+		[JsonProperty(PropertyName = "permissions")]
+		public int Permissions;
+		[JsonProperty(PropertyName = "name")]
+		public string Name;
+		[JsonProperty(PropertyName = "id")]
+		public string Id;
+	}
 }

@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Role = Discord.Models.Role;
 
 namespace Discord
 {
@@ -107,15 +108,23 @@ namespace Discord
 							RaiseChannelDestroyed(channel);
 						}
 						break;
+					case "CHANNEL_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.ChannelUpdate>();
+							var channel = DeleteChannel(data.Id);
+							RaiseChannelUpdated(channel);
+						}
+						break;
 
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>();
-                            var user = UpdateUser(data.User);
+							var user = UpdateUser(data.User);
 							var server = GetServer(data.GuildId);
 							server._members[user.Id] = true;
-                        }
+							RaiseMemberAdded(user, server);
+						}
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
@@ -123,22 +132,56 @@ namespace Discord
 							var user = UpdateUser(data.User);
 							var server = GetServer(data.GuildId);
 							server._members[user.Id] = true;
+							RaiseMemberRemoved(user, server);
+						}
+						break;
+					case "GUILD_MEMBER_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>();
+							var user = UpdateUser(data.User);
+							var server = GetServer(data.GuildId);
+							RaiseMemberUpdated(user, server);
 						}
 						break;
 
-					//Users
-					case "PRESENCE_UPDATE":
+					//Roles
+					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>();
-							var user = UpdateUser(data);
-							RaisePresenceUpdated(user);
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
+							var role = UpdateRole(data);
+							RaiseRoleCreated(role);
 						}
 						break;
-					case "VOICE_STATE_UPDATE":
+					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>();
-							var user = GetUser(data.UserId); //TODO: Don't ignore this
-							RaiseVoiceStateUpdated(user);
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>();
+							var role = GetRole(data.RoleId, data.GuildId);
+							RaiseRoleDeleted(role);
+						}
+						break;
+					case "GUILD_ROLE_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
+							var role = UpdateRole(data);
+							RaiseRoleUpdated(role);
+						}
+						break;
+
+					//Roles
+					case "GUILD_BAN_ADD":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
+							var user = UpdateUser(data.User);
+							var server = GetServer(data.GuildId);
+							RaiseBanAdded(user, server);
+						}
+						break;
+					case "GUILD_BAN_REMOVE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
+							var user = UpdateUser(data.User);
+							var server = GetServer(data.GuildId);
+							RaiseBanRemoved(user, server);
 						}
 						break;
 
@@ -170,6 +213,22 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.MessageAck>();
 							var msg = GetMessage(data.MessageId, data.ChannelId);
 							RaiseMessageAcknowledged(msg);
+						}
+						break;
+
+					//Statuses
+					case "PRESENCE_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>();
+							var user = UpdateUser(data);
+							RaisePresenceUpdated(user);
+						}
+						break;
+					case "VOICE_STATE_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>();
+							var user = GetUser(data.UserId); //TODO: Don't ignore this
+							RaiseVoiceStateUpdated(user);
 						}
 						break;
 					case "TYPING_START":
@@ -271,7 +330,7 @@ namespace Discord
 			_users.TryGetValue(id, out user);
 			return user;
 		}
-		private User UpdateUser(UserInfo model)
+		private User UpdateUser(UserInfo model, bool addNew = true)
 		{
 			var user = GetUser(model.Id) ?? new User(model.Id, this);
 			
@@ -291,7 +350,8 @@ namespace Discord
 				user.Status = extendedModel.Status;
             }
 
-			_users[model.Id] = user;
+			if (addNew)
+				_users[model.Id] = user;
 			return user;
 		}
 
@@ -302,7 +362,7 @@ namespace Discord
 			_servers.TryGetValue(id, out server);
 			return server;
 		}
-		private Server UpdateServer(ServerInfo model)
+		private Server UpdateServer(ServerInfo model, bool addNew = true)
 		{
 			var server = GetServer(model.Id) ?? new Server(model.Id, this);
 			
@@ -321,17 +381,18 @@ namespace Discord
 
 				foreach (var channel in extendedModel.Channels)
 				{
-					UpdateChannel(channel, model.Id);
+					UpdateChannel(channel, model.Id, addNew);
 					server._channels[channel.Id] = true;
 				}
 				foreach (var membership in extendedModel.Members)
 				{
-					UpdateUser(membership.User);
+					UpdateUser(membership.User, addNew);
 					server._members[membership.User.Id] = true;
                 }
 			}
 
-			_servers[model.Id] = server;
+			if (addNew)
+				_servers[model.Id] = server;
 			return server;
 		}
 
@@ -342,7 +403,7 @@ namespace Discord
 			_channels.TryGetValue(id, out channel);
 			return channel;
 		}
-		private Channel UpdateChannel(ChannelInfo model, string serverId)
+		private Channel UpdateChannel(ChannelInfo model, string serverId, bool addNew = true)
 		{
 			var channel = GetChannel(model.Id) ?? new Channel(model.Id, serverId, this);
 
@@ -352,7 +413,8 @@ namespace Discord
 			channel.RecipientId = model.Recipient?.Id;
 			channel.Type = model.Type;
 
-			_channels[model.Id] = channel;
+			if (addNew)
+				_channels[model.Id] = channel;
 			return channel;
 		}
 		private Channel DeleteChannel(string id)
@@ -370,24 +432,33 @@ namespace Discord
 		private ChatMessageReference GetMessage(string id, string channelId)
 		{
 			if (id == null || channelId == null) return null;
-			var msg = new ChatMessageReference(id, this);
-
-			msg.ChannelId = channelId;
-
-			return msg;
+			return new ChatMessageReference(id, channelId, this);
 		}
-		private ChatMessage UpdateMessage(WebSocketEvents.MessageCreate model)
+		private ChatMessage UpdateMessage(WebSocketEvents.MessageCreate model, bool addNew = true)
 		{
-			return new ChatMessage(model.Id, this)
+			return new ChatMessage(model.Id, model.ChannelId, this)
 			{
 				Attachments = model.Attachments,
-				ChannelId = model.ChannelId,
 				Text = model.Content,
 				Embeds = model.Embeds,
 				IsMentioningEveryone = model.IsMentioningEveryone,
 				IsTTS = model.IsTextToSpeech,
 				UserId = model.Author.Id,
 				Timestamp = model.Timestamp
+			};
+		}
+
+		private Role GetRole(string id, string serverId)
+		{
+			if (id == null || serverId == null) return null;
+			return new Role(id, serverId, this);
+		}
+		private Role UpdateRole(WebSocketEvents.GuildRoleCreateUpdate role, bool addNew = true)
+		{
+			return new Role(role.Role.Id, role.GuildId, this)
+			{
+				Name = role.Role.Name,
+				Permissions = role.Role.Permissions
 			};
 		}
 

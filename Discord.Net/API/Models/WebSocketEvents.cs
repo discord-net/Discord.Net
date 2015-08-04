@@ -30,19 +30,22 @@ namespace Discord.API.Models
 
 		internal sealed class ChannelCreate : ChannelInfo { }
 		internal sealed class ChannelDelete : ChannelInfo { }
+		internal sealed class ChannelUpdate : ChannelInfo { }
 
-		internal sealed class GuildMemberAdd
+		internal sealed class GuildMemberAdd : GuildMemberUpdate
+		{
+			[JsonProperty(PropertyName = "joined_at")]
+			public DateTime JoinedAt;
+		}
+		internal class GuildMemberUpdate
 		{
 			[JsonProperty(PropertyName = "user")]
 			public UserInfo User;
 			[JsonProperty(PropertyName = "roles")]
 			public object[] Roles;
-			[JsonProperty(PropertyName = "joined_at")]
-			public DateTime JoinedAt;
 			[JsonProperty(PropertyName = "guild_id")]
 			public string GuildId;
 		}
-
 		internal sealed class GuildMemberRemove
 		{
 			[JsonProperty(PropertyName = "user")]
@@ -50,6 +53,37 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "guild_id")]
 			public string GuildId;
 		}
+
+		internal sealed class GuildRoleCreateUpdate
+		{
+			[JsonProperty(PropertyName = "role")]
+			public Role Role;
+			[JsonProperty(PropertyName = "guild_id")]
+			public string GuildId;
+		}
+		internal sealed class GuildRoleDelete
+		{
+			[JsonProperty(PropertyName = "role_id")]
+			public string RoleId;
+			[JsonProperty(PropertyName = "guild_id")]
+			public string GuildId;
+		}
+
+		internal sealed class GuildBanAddRemove
+		{
+			[JsonProperty(PropertyName = "user")]
+			public UserInfo User;
+			[JsonProperty(PropertyName = "guild_id")]
+			public string GuildId;
+		}
+		internal sealed class GuildBanRemove
+		{
+			[JsonProperty(PropertyName = "user_id")]
+			public string UserId;
+			[JsonProperty(PropertyName = "guild_id")]
+			public string GuildId;
+		}
+
 		internal sealed class UserUpdate : SelfUserInfo { }
 		internal sealed class PresenceUpdate : PresenceUserInfo { }
 		internal sealed class VoiceStateUpdate

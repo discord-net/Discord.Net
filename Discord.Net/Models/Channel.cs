@@ -2,9 +2,9 @@
 
 namespace Discord.Models
 {
-	public class Channel
+	public sealed class Channel
 	{
-		protected readonly DiscordClient _client;
+		private readonly DiscordClient _client;
 		private string _name;
 
 		public string Id { get; }
@@ -12,8 +12,7 @@ namespace Discord.Models
 
 		public bool IsPrivate { get; internal set; }
 		public string Type { get; internal set; }
-
-		[JsonIgnore]
+		
 		public string ServerId { get; }
 		[JsonIgnore]
 		public Server Server { get { return ServerId != null ? _client.GetServer(ServerId) : null; } }
@@ -35,7 +34,6 @@ namespace Discord.Models
 		public override string ToString()
 		{
 			return Name;
-			//return Name + " (" + Id + ")";
 		}
 	}
 }
