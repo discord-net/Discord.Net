@@ -33,4 +33,4 @@ await client.AcceptInvite("channel-invite-code");
 
 # Remarks
 
-Due to current Discord restrictions, the client is unable to private message users unless both they and the client's account are members of the same server.
+Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
