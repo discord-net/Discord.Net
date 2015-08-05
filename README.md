@@ -1,7 +1,7 @@
 # Discord.Net
 A .Net API Wrapper for the Discord client (http://discordapp.com).
 
-## This is an alpha build!
+## This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
 Discord.Net is also in early development so several functions may be unstable or not work at all.
 
