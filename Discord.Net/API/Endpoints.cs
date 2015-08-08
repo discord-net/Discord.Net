@@ -18,19 +18,21 @@
 
 		// /api/guilds
 		public static readonly string Servers = $"{BaseApi}/guilds";
-		public static string Server(string id) { return $"{Servers}/{id}"; }
+		public static string Server(string id) => $"{Servers}/{id}";
+		public static string ServerMember(string serverId, string userId) => $"{Servers}/{serverId}/members/{userId}";
+		public static string ServerBan(string serverId, string userId) => $"{Servers}/{serverId}/bans/{userId}";
 
-		// /api/guilds
+		// /api/invites
 		public static readonly string Invites = $"{BaseApi}/invite";
-		public static string Invite(string id) { return $"{Invites}/{id}"; }
+		public static string Invite(string id) => $"{Invites}/{id}";
 
 		// /api/channels
 		public static readonly string Channels = $"{BaseApi}/channels";
-		public static string Channel(string id) { return $"{Channels}/{id}"; }
-        public static string ChannelTyping(string id) { return $"{Channels}/{id}/typing"; }
-        public static string ChannelMessages(string id) { return $"{Channels}/{id}/messages"; }
-		public static string ChannelMessages(string id, int limit) { return $"{Channels}/{id}/messages?limit={limit}"; }
-        public static string ChannelInvites(string id) { return $"{Channels}/{id}/invites"; }
+		public static string Channel(string id) => $"{Channels}/{id}";
+        public static string ChannelTyping(string id) => $"{Channels}/{id}/typing";
+        public static string ChannelMessages(string id) => $"{Channels}/{id}/messages";
+		public static string ChannelMessages(string id, int limit) => $"{Channels}/{id}/messages?limit={limit}";
+        public static string ChannelInvites(string id) => $"{Channels}/{id}/invites";
 
 		//  /api/voice
 		public static readonly string Voice = $"{BaseApi}/voice";

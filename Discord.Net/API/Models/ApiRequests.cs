@@ -50,5 +50,16 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "mentions")]
 			public string[] Mentions;
 		}
+
+		public class SetMemberMute
+		{
+			[JsonProperty(PropertyName = "mute")]
+			public bool Mute;
+		}
+		public class SetMemberDeaf
+		{
+			[JsonProperty(PropertyName = "deaf")]
+			public bool Deaf;
+		}
 	}
 }

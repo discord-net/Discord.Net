@@ -30,32 +30,63 @@ namespace Discord.Helpers
 #else
 		private const bool _isDebug = false;
 #endif
-
-		//GET
-		internal static async Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
+		
+		internal static Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
 			where ResponseT : class
-		{
-			string requestJson = JsonConvert.SerializeObject(data);
-			string responseJson = await SendRequest("GET", path, requestJson, options, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
-#if DEBUG
-			CheckResponse(responseJson, response);
-#endif
-			return response;
-		}
-		internal static async Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
+			=> Send<ResponseT>("GET", path, data, options);
+		internal static Task<string> Get(string path, object data, HttpOptions options)
+			=> Send("GET", path, data, options);
+		internal static Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
 			where ResponseT : class
-		{
-			string responseJson = await SendRequest("GET", path, null, options, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
-#if DEBUG
-			CheckResponse(responseJson, response);
-#endif
-			return response;
-		}
+			=> Send<ResponseT>("GET", path, null, options);
+		internal static Task<string> Get(string path, HttpOptions options)
+			=> Send("GET", path, null, options);
+		
+		internal static Task<ResponseT> Post<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("POST", path, data, options);
+		internal static Task<string> Post(string path, object data, HttpOptions options)
+			=> Send("POST", path, data, options);
+		internal static Task<ResponseT> Post<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("POST", path, null, options);
+		internal static Task<string> Post(string path, HttpOptions options)
+			=> Send("POST", path, null, options);
+		
+		internal static Task<ResponseT> Put<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PUT", path, data, options);
+		internal static Task<string> Put(string path, object data, HttpOptions options)
+			=> Send("PUT", path, data, options);
+		internal static Task<ResponseT> Put<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PUT", path, null, options);
+		internal static Task<string> Put(string path, HttpOptions options)
+			=> Send("PUT", path, null, options);
 
-		//POST
-		internal static async Task<ResponseT> Post<ResponseT>(string path, object data, HttpOptions options)
+		internal static Task<ResponseT> Patch<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PATCH", path, data, options);
+		internal static Task<string> Patch(string path, object data, HttpOptions options)
+			=> Send("PATCH", path, data, options);
+		internal static Task<ResponseT> Patch<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PATCH", path, null, options);
+		internal static Task<string> Patch(string path, HttpOptions options)
+			=> Send("PATCH", path, null, options);
+
+		internal static Task<ResponseT> Delete<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("DELETE", path, data, options);
+		internal static Task<string> Delete(string path, object data, HttpOptions options)
+			=> Send("DELETE", path, data, options);
+		internal static Task<ResponseT> Delete<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("DELETE", path, null, options);
+		internal static Task<string> Delete(string path, HttpOptions options)
+			=> Send("DELETE", path, null, options);
+
+		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, object data, HttpOptions options)
 			where ResponseT : class
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
@@ -66,7 +97,7 @@ namespace Discord.Helpers
 #endif
 			return response;
 		}
-		internal static async Task<string> Post(string path, object data, HttpOptions options)
+		internal static async Task<string> Send(string method, string path, object data, HttpOptions options)
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
 			string responseJson = await SendRequest("POST", path, requestJson, options, _isDebug);
@@ -75,7 +106,7 @@ namespace Discord.Helpers
 #endif
 			return responseJson;
 		}
-		internal static async Task<ResponseT> Post<ResponseT>(string path, HttpOptions options)
+		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, HttpOptions options)
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest("POST", path, null, options, true);
@@ -85,29 +116,9 @@ namespace Discord.Helpers
 #endif
 			return response;
 		}
-		internal static async Task<string> Post(string path, HttpOptions options)
+		internal static async Task<string> Send(string method, string path, HttpOptions options)
 		{
 			string responseJson = await SendRequest("POST", path, null, options, _isDebug);
-#if DEBUG
-			CheckEmptyResponse(responseJson);
-#endif
-			return responseJson;
-		}
-
-		//DELETE
-		internal static async Task<ResponseT> Delete<ResponseT>(string path, HttpOptions options)
-			where ResponseT : class
-		{
-			string responseJson = await SendRequest("DELETE", path, null, options, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
-#if DEBUG
-			CheckResponse(responseJson, response);
-#endif
-			return response;
-		}
-		internal static async Task<string> Delete(string path, HttpOptions options)
-		{
-			string responseJson = await SendRequest("DELETE", path, null, options, _isDebug);
 #if DEBUG
 			CheckEmptyResponse(responseJson);
 #endif

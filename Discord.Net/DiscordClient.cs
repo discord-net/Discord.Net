@@ -26,18 +26,23 @@ namespace Discord
 
 		public IEnumerable<User> Users { get { return _users; } }
 		private AsyncCache<User, API.Models.UserReference> _users;
+		public User GetUser(string id) => _users[id];
 
 		public IEnumerable<Server> Servers { get { return _servers; } }
 		private AsyncCache<Server, API.Models.ServerReference> _servers;
+		public Server GetServer(string id) => _servers[id];
 
 		public IEnumerable<Channel> Channels { get { return _channels; } }
 		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
+		public Channel GetChannel(string id) => _channels[id];
 
 		public IEnumerable<Message> Messages { get { return _messages; } }
 		private AsyncCache<Message, API.Models.MessageReference> _messages;
+		public Message GetMessage(string id) => _messages[id];
 
 		public IEnumerable<Role> Roles { get { return _roles; } }
 		private AsyncCache<Role, API.Models.Role> _roles;
+		public Role GetRole(string id) => _roles[id];
 
 		public bool IsConnected { get { return _isReady; } }
 
@@ -267,14 +272,14 @@ namespace Discord
 					case "GUILD_ROLE_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = UpdateRole(data);
+							var role = _roles.Update(data.Role.Id, data.Role);
 							RaiseRoleCreated(role);
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = UpdateRole(data);
+							var role = _roles.Update(data.Role.Id, data.Role);
 							RaiseRoleUpdated(role);
 						}
 						break;
@@ -412,15 +417,38 @@ namespace Discord
 			return _servers.Update(response.Id, response);
 		}
 		public Task<Server> LeaveServer(Server server)
-		{
-			return LeaveServer(server.Id);
-		}
+			=> LeaveServer(server.Id);
 		public async Task<Server> LeaveServer(string id)
 		{
 			CheckReady();
 			await DiscordAPI.LeaveServer(id, _httpOptions);
 			return _servers.Remove(id);
 		}
+
+		//Bans
+		public Task Ban(Server server, User user)
+			=> Ban(server.Id, user.Id);
+		public Task Ban(Server server, string userId)
+			=> Ban(server.Id, userId);
+		public Task Ban(string server, User user)
+			=> Ban(server, user.Id);
+		public Task Ban(string serverId, string userId)
+		{
+			CheckReady();
+			return DiscordAPI.Ban(serverId, userId, _httpOptions);
+		}
+		public Task Unban(Server server, User user)
+			=> Unban(server.Id, user.Id);
+		public Task Unban(Server server, string userId)
+			=> Unban(server.Id, userId);
+		public Task Unban(string server, User user)
+			=> Unban(server, user.Id);
+		public Task Unban(string serverId, string userId)
+		{
+			CheckReady();
+			return DiscordAPI.Unban(serverId, userId, _httpOptions);
+		}
+
 
 		//Invites
 		public Task<Invite> CreateInvite(Server server, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
@@ -503,34 +531,53 @@ namespace Discord
 			}
 		}
 
-		public Server GetServer(string id)
+		//Voice
+		public Task Mute(Server server, User user)
+			=> Mute(server.Id, user.Id);
+		public Task Mute(Server server, string userId)
+			=> Mute(server.Id, userId);
+		public Task Mute(string server, User user)
+			=> Mute(server, user.Id);
+		public Task Mute(string serverId, string userId)
 		{
-			return _servers[id];
+			CheckReady();
+			return DiscordAPI.Mute(serverId, userId, _httpOptions);
 		}
-		public Channel GetChannel(string id)
+
+		public Task Unmute(Server server, User user)
+			=> Unmute(server.Id, user.Id);
+		public Task Unmute(Server server, string userId)
+			=> Unmute(server.Id, userId);
+		public Task Unmute(string server, User user)
+			=> Unmute(server, user.Id);
+		public Task Unmute(string serverId, string userId)
 		{
-			return _channels[id];
+			CheckReady();
+			return DiscordAPI.Unmute(serverId, userId, _httpOptions);
 		}
-		public User GetUser(string id)
+
+		public Task Deafen(Server server, User user)
+			=> Deafen(server.Id, user.Id);
+		public Task Deafen(Server server, string userId)
+			=> Deafen(server.Id, userId);
+		public Task Deafen(string server, User user)
+			=> Deafen(server, user.Id);
+		public Task Deafen(string serverId, string userId)
 		{
-			return _users[id];
+			CheckReady();
+			return DiscordAPI.Deafen(serverId, userId, _httpOptions);
 		}
-		public Models.Message GetMessage(string id)
+
+		public Task Undeafen(Server server, User user)
+			=> Undeafen(server.Id, user.Id);
+		public Task Undeafen(Server server, string userId)
+			=> Undeafen(server.Id, userId);
+		public Task Undeafen(string server, User user)
+			=> Undeafen(server, user.Id);
+		public Task Undeafen(string serverId, string userId)
 		{
-			return _messages[id];
-		}
-		public Role GetRole(string id)
-		{
-			return _roles[id];
-		}
-		
-		private Role UpdateRole(WebSocketEvents.GuildRoleCreateUpdate role, bool addNew = true)
-		{
-			return new Role(role.Role.Id, role.GuildId, this)
-			{
-				Name = role.Role.Name,
-				Permissions = role.Role.Permissions
-			};
+			CheckReady();
+			return DiscordAPI.Undeafen(serverId, userId, _httpOptions);
 		}
 
 		private void CheckReady()

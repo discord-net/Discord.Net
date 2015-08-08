@@ -43,6 +43,20 @@ namespace Discord.API
 			return Http.Get<APIResponses.GetMessages[]>(Endpoints.ChannelMessages(channelId, 50), options);
 		}
 
+		//Members
+		public static Task Kick(string serverId, string memberId, HttpOptions options)
+		{
+			return Http.Delete(Endpoints.ServerMember(serverId, memberId), options);
+		}
+		public static Task Ban(string serverId, string memberId, HttpOptions options)
+		{
+			return Http.Put(Endpoints.ServerBan(serverId, memberId), options);
+		}
+		public static Task Unban(string serverId, string memberId, HttpOptions options)
+		{
+			return Http.Delete(Endpoints.ServerBan(serverId, memberId), options);
+		}
+
 		//Invites
 		public static Task<APIResponses.CreateInvite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass, HttpOptions options)
 		{
@@ -82,5 +96,25 @@ namespace Discord.API
 		{
 			return Http.Get<APIResponses.GetIce>(Endpoints.VoiceIce, options);
 		}
-    }
+		public static Task Mute(string serverId, string memberId, HttpOptions options)
+		{
+			var request = new APIRequests.SetMemberMute { Mute = true };
+			return Http.Patch(Endpoints.ServerMember(serverId, memberId), options);
+		}
+		public static Task Unmute(string serverId, string memberId, HttpOptions options)
+		{
+			var request = new APIRequests.SetMemberMute { Mute = false };
+			return Http.Patch(Endpoints.ServerMember(serverId, memberId), options);
+		}
+		public static Task Deafen(string serverId, string memberId, HttpOptions options)
+		{
+			var request = new APIRequests.SetMemberDeaf { Deaf = true };
+			return Http.Patch(Endpoints.ServerMember(serverId, memberId), options);
+		}
+		public static Task Undeafen(string serverId, string memberId, HttpOptions options)
+		{
+			var request = new APIRequests.SetMemberDeaf { Deaf = false };
+			return Http.Patch(Endpoints.ServerMember(serverId, memberId), options);
+		}
+	}
 }

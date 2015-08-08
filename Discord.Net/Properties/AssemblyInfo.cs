@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 [assembly: AssemblyTitle("Discord.Net")]
-[assembly: AssemblyDescription("A .Net API wrapper for the Discord client")]
+[assembly: AssemblyDescription("A .Net API wrapper for the Discord client.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RogueException")]
 [assembly: AssemblyProduct("Discord.Net")]
