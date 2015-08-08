@@ -407,6 +407,12 @@ namespace Discord
 			_isClosing = true;
 			await _webSocket.DisconnectAsync();
 			_isClosing = false;
+
+			_channels.Clear();
+			_messages.Clear();
+			_roles.Clear();
+			_servers.Clear();
+			_users.Clear();
 		}
 
 		//Servers
