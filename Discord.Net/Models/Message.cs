@@ -3,8 +3,13 @@ using System;
 
 namespace Discord.Models
 {
-	public sealed class ChatMessage : ChatMessageReference
+	public sealed class Message
 	{
+		private readonly DiscordClient _client;
+
+		public string Id { get; }
+		public string ChannelId { get; }
+
 		public bool IsMentioningEveryone { get; internal set; }
 		public bool IsTTS { get; internal set; }
 		public string Text { get; internal set; }
@@ -18,10 +23,12 @@ namespace Discord.Models
 		public object[] Attachments { get; internal set; }
 		public object[] Embeds { get; internal set; }
 
-		internal ChatMessage(string id, string channelId, DiscordClient client)
-			: base(id, channelId, client)
+		internal Message(string id, string channelId, DiscordClient client)
 		{
-		}
+			Id = id;
+			ChannelId = channelId;
+			_client = client;
+        }
 
 		public override string ToString()
 		{

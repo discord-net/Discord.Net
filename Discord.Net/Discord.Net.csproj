@@ -45,13 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\Models\General.cs" />
-    <Compile Include="API\Models\ApiRequests.cs" />
+    <Compile Include="API\Models\Common.cs" />
+    <Compile Include="API\Models\APIRequests.cs" />
     <Compile Include="API\Endpoints.cs" />
+    <Compile Include="API\Models\APIResponses.cs" />
     <Compile Include="API\Models\WebSocketCommands.cs" />
+    <Compile Include="Helpers\AsyncCache.cs" />
+    <Compile Include="Models\Invite.cs" />
     <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\ChatMessageReference.cs" />
-    <Compile Include="Models\ChatMessage.cs" />
+    <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Channel.cs" />
     <Compile Include="DiscordWebSocket.Events.cs" />
     <Compile Include="Helpers\Http.cs" />

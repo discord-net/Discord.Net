@@ -11,7 +11,6 @@ namespace Discord
 			public readonly string Message;
 			internal LogMessageEventArgs(string msg) { Message = msg; }
 		}
-
 		public event EventHandler<LogMessageEventArgs> DebugMessage;
 		private void RaiseOnDebugMessage(string message)
 		{
@@ -26,7 +25,6 @@ namespace Discord
 			if (Connected != null)
 				Connected(this, EventArgs.Empty);
 		}
-
 		public event EventHandler Disconnected;
 		private void RaiseDisconnected()
 		{
@@ -34,12 +32,12 @@ namespace Discord
 				Disconnected(this, EventArgs.Empty);
 		}
 
-		public event EventHandler LoggedIn;
+		/*public event EventHandler LoggedIn;
 		private void RaiseLoggedIn()
 		{
 			if (LoggedIn != null)
 				LoggedIn(this, EventArgs.Empty);
-		}
+		}*/
 
 		//Server
 		public sealed class ServerEventArgs : EventArgs
@@ -54,7 +52,6 @@ namespace Discord
 			if (ServerCreated != null)
 				ServerCreated(this, new ServerEventArgs(server));
 		}
-
 		public event EventHandler<ServerEventArgs> ServerDestroyed;
 		private void RaiseServerDestroyed(Server server)
 		{
@@ -75,14 +72,12 @@ namespace Discord
 			if (ChannelCreated != null)
 				ChannelCreated(this, new ChannelEventArgs(channel));
 		}
-
 		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
 		private void RaiseChannelDestroyed(Channel channel)
 		{
 			if (ChannelDestroyed != null)
 				ChannelDestroyed(this, new ChannelEventArgs(channel));
 		}
-
 		public event EventHandler<ChannelEventArgs> ChannelUpdated;
 		private void RaiseChannelUpdated(Channel channel)
 		{
@@ -98,40 +93,32 @@ namespace Discord
 		}
 
 		//Message
-		public sealed class MessageCreateEventArgs : EventArgs
-		{
-			public readonly ChatMessage Message;
-			internal MessageCreateEventArgs(ChatMessage msg) { Message = msg; }
-		}
 		public sealed class MessageEventArgs : EventArgs
 		{
-			public readonly ChatMessageReference Message;
-			internal MessageEventArgs(ChatMessageReference msg) { Message = msg; }
+			public readonly Message Message;
+			internal MessageEventArgs(Message msg) { Message = msg; }
 		}
 
-		public event EventHandler<MessageCreateEventArgs> MessageCreated;
-		private void RaiseMessageCreated(ChatMessage msg)
+		public event EventHandler<MessageEventArgs> MessageCreated;
+		private void RaiseMessageCreated(Message msg)
 		{
 			if (MessageCreated != null)
-				MessageCreated(this, new MessageCreateEventArgs(msg));
+				MessageCreated(this, new MessageEventArgs(msg));
 		}
-
 		public event EventHandler<MessageEventArgs> MessageDeleted;
-		private void RaiseMessageDeleted(ChatMessageReference msg)
+		private void RaiseMessageDeleted(Message msg)
 		{
 			if (MessageDeleted != null)
 				MessageDeleted(this, new MessageEventArgs(msg));
 		}
-
 		public event EventHandler<MessageEventArgs> MessageUpdated;
-		private void RaiseMessageUpdated(ChatMessageReference msg)
+		private void RaiseMessageUpdated(Message msg)
 		{
 			if (MessageUpdated != null)
 				MessageUpdated(this, new MessageEventArgs(msg));
 		}
-
 		public event EventHandler<MessageEventArgs> MessageAcknowledged;
-		private void RaiseMessageAcknowledged(ChatMessageReference msg)
+		private void RaiseMessageAcknowledged(Message msg)
 		{
 			if (MessageAcknowledged != null)
 				MessageAcknowledged(this, new MessageEventArgs(msg));
@@ -150,14 +137,12 @@ namespace Discord
 			if (RoleCreated != null)
 				RoleCreated(this, new RoleEventArgs(role));
 		}
-
 		public event EventHandler<RoleEventArgs> RoleUpdated;
 		private void RaiseRoleDeleted(Role role)
 		{
 			if (RoleDeleted != null)
 				RoleDeleted(this, new RoleEventArgs(role));
 		}
-
 		public event EventHandler<RoleEventArgs> RoleDeleted;
 		private void RaiseRoleUpdated(Role role)
 		{
@@ -183,7 +168,6 @@ namespace Discord
 			if (BanAdded != null)
 				BanAdded(this, new BanEventArgs(user, server));
 		}
-
 		public event EventHandler<BanEventArgs> BanRemoved;
 		private void RaiseBanRemoved(User user, Server server)
 		{
@@ -209,14 +193,12 @@ namespace Discord
 			if (MemberAdded != null)
 				MemberAdded(this, new MemberEventArgs(user, server));
 		}
-
 		public event EventHandler<MemberEventArgs> MemberRemoved;
 		private void RaiseMemberRemoved(User user, Server server)
 		{
 			if (MemberRemoved != null)
 				MemberRemoved(this, new MemberEventArgs(user, server));
 		}
-
 		public event EventHandler<MemberEventArgs> MemberUpdated;
 		private void RaiseMemberUpdated(User user, Server server)
 		{
@@ -242,19 +224,36 @@ namespace Discord
 			if (PresenceUpdated != null)
 				PresenceUpdated(this, new UserEventArgs(user));
 		}
-
 		public event EventHandler<UserEventArgs> VoiceStateUpdated;
 		private void RaiseVoiceStateUpdated(User user)
 		{
 			if (VoiceStateUpdated != null)
 				VoiceStateUpdated(this, new UserEventArgs(user));
 		}
-
 		public event EventHandler<UserTypingEventArgs> UserTyping;
 		private void RaiseUserTyping(User user, Channel channel)
 		{
 			if (UserTyping != null)
 				UserTyping(this, new UserTypingEventArgs(user, channel));
+		}
+
+		//Voice
+		public sealed class VoiceServerUpdatedEventArgs : EventArgs
+		{
+			public readonly Server Server;
+			public readonly string Endpoint;
+			internal VoiceServerUpdatedEventArgs(Server server, string endpoint)
+			{
+				Server = server;
+				Endpoint = endpoint;
+			}
+		}
+
+		public event EventHandler<VoiceServerUpdatedEventArgs> VoiceServerUpdated;
+		private void RaiseVoiceServerUpdated(Server server, string endpoint)
+		{
+			if (VoiceServerUpdated != null)
+				VoiceServerUpdated(this, new VoiceServerUpdatedEventArgs(server, endpoint));
 		}
 	}
 }

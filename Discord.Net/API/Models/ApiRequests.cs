@@ -6,61 +6,49 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Models
 {
-	public class AuthFingerprintResponse
+	internal static class APIRequests
 	{
-		[JsonProperty(PropertyName = "fingerprint")]
-		public string Fingerprint;
-	}
+		public class AuthRegisterRequest
+		{
+			[JsonProperty(PropertyName = "fingerprint")]
+			public string Fingerprint;
+			[JsonProperty(PropertyName = "username")]
+			public string Username;
+		}
+		public class AuthLogin
+		{
+			[JsonProperty(PropertyName = "email")]
+			public string Email;
+			[JsonProperty(PropertyName = "password")]
+			public string Password;
+		}
 
-	public class AuthRegisterRequest
-	{
-		[JsonProperty(PropertyName = "fingerprint")]
-		public string Fingerprint;
-		[JsonProperty(PropertyName = "username")]
-		public string Username;
-	}
-	public class AuthRegisterResponse : AuthLoginResponse { }
+		public class CreateServer
+		{
+			[JsonProperty(PropertyName = "name")]
+			public string Name;
+			[JsonProperty(PropertyName = "region")]
+			public string Region;
+		}
 
-	public class AuthLoginRequest
-	{
-		[JsonProperty(PropertyName = "email")]
-		public string Email;
-		[JsonProperty(PropertyName = "password")]
-		public string Password;
-	}
-	public class AuthLoginResponse
-	{
-		[JsonProperty(PropertyName = "token")]
-		public string Token;
-	}
+		public class CreateInvite
+		{
+			[JsonProperty(PropertyName = "max_age")]
+			public int MaxAge;
+			[JsonProperty(PropertyName = "max_uses")]
+			public int MaxUses;
+			[JsonProperty(PropertyName = "temporary")]
+			public bool IsTemporary;
+			[JsonProperty(PropertyName = "xkcdpass")]
+			public bool HasXkcdPass;
+		}
 
-	public class CreateServerRequest
-	{
-		[JsonProperty(PropertyName = "name")]
-		public string Name;
-		[JsonProperty(PropertyName = "region")]
-		public string Region;
-	}
-
-	public class GetInviteResponse
-	{
-		[JsonProperty(PropertyName = "inviter")]
-		public UserInfo Inviter;
-		[JsonProperty(PropertyName = "guild")]
-		public ServerInfo Server;
-		[JsonProperty(PropertyName = "channel")]
-		public ChannelInfo Channel;
-		[JsonProperty(PropertyName = "code")]
-		public string Code;
-		[JsonProperty(PropertyName = "xkcdpass")]
-		public string XkcdPass;
-	}
-
-	public class SendMessageRequest
-	{
-		[JsonProperty(PropertyName = "content")]
-		public string Content;
-		[JsonProperty(PropertyName = "mentions")]
-		public string[] Mentions;
+		public class SendMessage
+		{
+			[JsonProperty(PropertyName = "content")]
+			public string Content;
+			[JsonProperty(PropertyName = "mentions")]
+			public string[] Mentions;
+		}
 	}
 }

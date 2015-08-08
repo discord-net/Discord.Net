@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -24,47 +25,93 @@ namespace Discord.Helpers
 	internal static class Http
 	{
 		private static readonly RequestCachePolicy _cachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+#if DEBUG
+		private const bool _isDebug = true;
+#else
+		private const bool _isDebug = false;
+#endif
 
+		//GET
 		internal static async Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
 			where ResponseT : class
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
 			string responseJson = await SendRequest("GET", path, requestJson, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
 		internal static async Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest("GET", path, null, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
 
+		//POST
 		internal static async Task<ResponseT> Post<ResponseT>(string path, object data, HttpOptions options)
 			where ResponseT : class
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
 			string responseJson = await SendRequest("POST", path, requestJson, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
-		internal static Task Post(string path, object data, HttpOptions options)
+		internal static async Task<string> Post(string path, object data, HttpOptions options)
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
-			return SendRequest("POST", path, requestJson, options, false);
+			string responseJson = await SendRequest("POST", path, requestJson, options, _isDebug);
+#if DEBUG
+			CheckEmptyResponse(responseJson);
+#endif
+			return responseJson;
 		}
 		internal static async Task<ResponseT> Post<ResponseT>(string path, HttpOptions options)
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest("POST", path, null, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
-		internal static Task Post(string path, HttpOptions options)
+		internal static async Task<string> Post(string path, HttpOptions options)
 		{
-			return SendRequest("POST", path, null, options, false);
+			string responseJson = await SendRequest("POST", path, null, options, _isDebug);
+#if DEBUG
+			CheckEmptyResponse(responseJson);
+#endif
+			return responseJson;
 		}
 
-		internal static Task Delete(string path, HttpOptions options)
+		//DELETE
+		internal static async Task<ResponseT> Delete<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
 		{
-			return SendRequest("DELETE", path, null, options, false);
+			string responseJson = await SendRequest("DELETE", path, null, options, true);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
+		}
+		internal static async Task<string> Delete(string path, HttpOptions options)
+		{
+			string responseJson = await SendRequest("DELETE", path, null, options, _isDebug);
+#if DEBUG
+			CheckEmptyResponse(responseJson);
+#endif
+			return responseJson;
 		}
 
 		private static async Task<string> SendRequest(string method, string path, string data, HttpOptions options, bool hasResponse)
@@ -124,6 +171,7 @@ namespace Discord.Helpers
 				else
 					return null;
 			}
+
 		}
 
 		private static Stream GetDecoder(string contentEncoding, MemoryStream encodedStream)
@@ -138,5 +186,21 @@ namespace Discord.Helpers
 					throw new ArgumentOutOfRangeException("Unknown encoding: " + contentEncoding);
 			}
 		}
+
+#if DEBUG
+		private static void CheckResponse<T>(string json, T obj)
+		{
+			/*JToken token = JToken.Parse(json);
+			JToken token2 = JToken.FromObject(obj);
+			if (!JToken.DeepEquals(token, token2))
+				throw new Exception("API check failed: Objects do not match.");*/
+		}
+
+		private static void CheckEmptyResponse(string json)
+		{
+			if (!string.IsNullOrEmpty(json))
+				throw new Exception("API check failed: Response is not empty.");
+		}
+#endif
 	}
 }
