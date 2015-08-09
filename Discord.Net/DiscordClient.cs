@@ -3,10 +3,12 @@ using Discord.API.Models;
 using Discord.Helpers;
 using Discord.Models;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using Message = Discord.Models.Message;
 using Role = Discord.Models.Role;
 
 namespace Discord
@@ -19,26 +21,149 @@ namespace Discord
 		private HttpOptions _httpOptions;
 		private bool _isClosing, _isReady;
 
-		public string SelfId { get; private set; }
-		public User Self { get { return GetUser(SelfId); } }
+		public string UserId { get; private set; }
+		public User User { get { return _users[UserId]; } }
 
-		public IEnumerable<User> Users { get { return _users.Values; } }
-		private ConcurrentDictionary<string, User> _users;
+		public IEnumerable<User> Users { get { return _users; } }
+		private AsyncCache<User, API.Models.UserReference> _users;
+		public User GetUser(string id) => _users[id];
 
-		public IEnumerable<Server> Servers { get { return _servers.Values; } }
-		private ConcurrentDictionary<string, Server> _servers;
+		public IEnumerable<Server> Servers { get { return _servers; } }
+		private AsyncCache<Server, API.Models.ServerReference> _servers;
+		public Server GetServer(string id) => _servers[id];
 
-		public IEnumerable<Channel> Channels { get { return _channels.Values; } }
-		private ConcurrentDictionary<string, Channel> _channels;
+		public IEnumerable<Channel> Channels { get { return _channels; } }
+		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
+		public Channel GetChannel(string id) => _channels[id];
+
+		public IEnumerable<Message> Messages { get { return _messages; } }
+		private AsyncCache<Message, API.Models.MessageReference> _messages;
+		public Message GetMessage(string id) => _messages[id];
+
+		public IEnumerable<Role> Roles { get { return _roles; } }
+		private AsyncCache<Role, API.Models.Role> _roles;
+		public Role GetRole(string id) => _roles[id];
+
+		public bool IsConnected { get { return _isReady; } }
 
 		public DiscordClient()
 		{
 			string version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			_httpOptions = new HttpOptions { UserAgent = $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)" };
 
-			_users = new ConcurrentDictionary<string, User>();
-			_servers = new ConcurrentDictionary<string, Server>();
-			_channels = new ConcurrentDictionary<string, Channel>();
+			_servers = new AsyncCache<Server, API.Models.ServerReference>(
+				(key, parentKey) => new Server(key, this),
+				(server, model) =>
+				{
+					server.Name = model.Name;
+					if (model is ExtendedServerInfo)
+					{
+						var extendedModel = model as ExtendedServerInfo;
+						server.AFKChannelId = extendedModel.AFKChannelId;
+						server.AFKTimeout = extendedModel.AFKTimeout;
+						server.JoinedAt = extendedModel.JoinedAt ?? DateTime.MinValue;
+						server.OwnerId = extendedModel.OwnerId;
+						server.Presence = extendedModel.Presence;
+						server.Region = extendedModel.Region;
+						server.VoiceStates = extendedModel.VoiceStates;
+
+						foreach (var role in extendedModel.Roles)
+							_roles.Update(role.Id, model.Id, role);
+						foreach (var channel in extendedModel.Channels)
+						{
+							_channels.Update(channel.Id, model.Id, channel);
+							if (channel.Type == "text")
+							{
+								try
+								{
+									var messages = DiscordAPI.GetMessages(channel.Id, _httpOptions).Result.OrderBy(x => x.Timestamp);
+                                    foreach (var message in messages)
+									{
+										var msg = _messages.Update(message.Id, message.ChannelId, message);
+										if (msg.User != null)
+											msg.User.UpdateActivity(message.Timestamp);
+									}
+								}
+								catch { } //Bad Permissions?
+							}
+						}
+						foreach (var membership in extendedModel.Members)
+						{
+							_users.Update(membership.User.Id, membership.User);
+							server.AddMember(membership.User.Id);
+						}
+					}
+				},
+				server => { }
+			);
+
+			_channels = new AsyncCache<Channel, API.Models.ChannelReference>(
+				(key, parentKey) => new Channel(key, parentKey, this),
+				(channel, model) =>
+				{
+					channel.Name = model.Name;
+					channel.Type = model.Type;
+					if (model is ChannelInfo)
+					{
+						var extendedModel = model as ChannelInfo;
+						channel.PermissionOverwrites = extendedModel.PermissionOverwrites;
+						channel.RecipientId = extendedModel.Recipient?.Id;
+					}
+				},
+				channel => { });
+			_messages = new AsyncCache<Message, API.Models.MessageReference>(
+				(key, parentKey) => new Message(key, parentKey, this),
+				(message, model) =>
+				{
+					if (model is API.Models.Message)
+					{
+						var extendedModel = model as API.Models.Message;
+                        message.Attachments = extendedModel.Attachments;
+						message.Text = extendedModel.Content;
+						message.Embeds = extendedModel.Embeds;
+						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
+						message.IsTTS = extendedModel.IsTextToSpeech;
+						message.UserId = extendedModel.Author.Id;
+						message.Timestamp = extendedModel.Timestamp;
+                    }
+					if (model is WebSocketEvents.MessageUpdate)
+					{
+						var extendedModel = model as WebSocketEvents.MessageUpdate;
+						message.Embeds = extendedModel.Embeds;
+					}
+				},
+				message => { }
+			);
+			_roles = new AsyncCache<Role, API.Models.Role>(
+				(key, parentKey) => new Role(key, parentKey, this),
+				(role, model) => 
+				{
+					role.Permissions = model.Permissions;
+				},
+				role => { }
+			);
+			_users = new AsyncCache<User, API.Models.UserReference>(
+				(key, parentKey) => new User(key, this),
+				(user, model) =>
+				{
+					user.Avatar = model.Avatar;
+					user.Discriminator = model.Discriminator;
+					user.Name = model.Username;
+					if (model is SelfUserInfo)
+					{
+						var extendedModel = model as SelfUserInfo;
+						user.Email = extendedModel.Email;
+						user.IsVerified = extendedModel.IsVerified;
+					}
+					if (model is PresenceUserInfo)
+					{
+						var extendedModel = model as PresenceUserInfo;
+						user.GameId = extendedModel.GameId;
+						user.Status = extendedModel.Status;
+					}
+				},
+				user => { }
+			);
 
 			_webSocket = new DiscordWebSocket();
 			_webSocket.Connected += (s,e) => RaiseConnected();
@@ -65,14 +190,12 @@ namespace Discord
 							_channels.Clear();
 							_users.Clear();
 
-							SelfId = data.User.Id;
-							UpdateUser(data.User);
+							UserId = data.User.Id;
+							_users.Update(data.User.Id, data.User);
 							foreach (var server in data.Guilds)
-								UpdateServer(server);
+								_servers.Update(server.Id, server);
 							foreach (var channel in data.PrivateChannels)
-								UpdateChannel(channel as ChannelInfo, null);
-
-							RaiseLoggedIn();
+								_channels.Update(channel.Id, null, channel);
 						}
 						break;
 
@@ -80,15 +203,15 @@ namespace Discord
 					case "GUILD_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildCreate>();
-							var server = UpdateServer(data);
+							var server = _servers.Update(data.Id, data);
 							RaiseServerCreated(server);
 						}
 						break;
 					case "GUILD_DELETE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildDelete>();
-							Server server;
-							if (_servers.TryRemove(data.Id, out server))
+							var server = _servers.Remove(data.Id);
+							if (server != null)
 								RaiseServerDestroyed(server);
 						}
 						break;
@@ -97,22 +220,23 @@ namespace Discord
 					case "CHANNEL_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.ChannelCreate>();
-							var channel = UpdateChannel(data, null);
+							var channel = _channels.Update(data.Id, data.GuildId, data);
 							RaiseChannelCreated(channel);
-						}
-						break;
-					case "CHANNEL_DELETE":
-						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelDelete>();
-							var channel = DeleteChannel(data.Id);
-							RaiseChannelDestroyed(channel);
 						}
 						break;
 					case "CHANNEL_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.ChannelUpdate>();
-							var channel = DeleteChannel(data.Id);
+							var channel = _channels.Update(data.Id, data.GuildId, data);
 							RaiseChannelUpdated(channel);
+						}
+						break;
+					case "CHANNEL_DELETE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.ChannelDelete>();
+							var channel = _channels.Remove(data.Id);
+							if (channel != null)
+								RaiseChannelDestroyed(channel);
 						}
 						break;
 
@@ -120,27 +244,27 @@ namespace Discord
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>();
-							var user = UpdateUser(data.User);
-							var server = GetServer(data.GuildId);
+							var user = _users.Update(data.User.Id, data.User);
+							var server = _servers[data.GuildId];
 							server._members[user.Id] = true;
 							RaiseMemberAdded(user, server);
-						}
-						break;
-					case "GUILD_MEMBER_REMOVE":
-						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>();
-							var user = UpdateUser(data.User);
-							var server = GetServer(data.GuildId);
-							server._members[user.Id] = true;
-							RaiseMemberRemoved(user, server);
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>();
-							var user = UpdateUser(data.User);
-							var server = GetServer(data.GuildId);
+							var user = _users.Update(data.User.Id, data.User);
+							var server = _servers[data.GuildId];
 							RaiseMemberUpdated(user, server);
+						}
+						break;
+					case "GUILD_MEMBER_REMOVE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>();
+							var user = _users.Update(data.User.Id, data.User);
+                            var server = _servers[data.GuildId];
+							if (server != null && server.RemoveMember(user.Id))
+								RaiseMemberRemoved(user, server);
 						}
 						break;
 
@@ -148,40 +272,42 @@ namespace Discord
 					case "GUILD_ROLE_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = UpdateRole(data);
+							var role = _roles.Update(data.Role.Id, data.Role);
 							RaiseRoleCreated(role);
-						}
-						break;
-					case "GUILD_ROLE_DELETE":
-						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>();
-							var role = GetRole(data.RoleId, data.GuildId);
-							RaiseRoleDeleted(role);
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = UpdateRole(data);
+							var role = _roles.Update(data.Role.Id, data.Role);
 							RaiseRoleUpdated(role);
 						}
 						break;
+					case "GUILD_ROLE_DELETE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>();
+							var role = _roles.Remove(data.RoleId);
+							if (role != null)
+								RaiseRoleDeleted(role);
+						}
+						break;
 
-					//Roles
+					//Bans
 					case "GUILD_BAN_ADD":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
-							var user = UpdateUser(data.User);
-							var server = GetServer(data.GuildId);
+							var user = _users.Update(data.User.Id, data.User);
+							var server = _servers[data.GuildId];
 							RaiseBanAdded(user, server);
 						}
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
-							var user = UpdateUser(data.User);
-							var server = GetServer(data.GuildId);
-							RaiseBanRemoved(user, server);
+							var user = _users.Update(data.User.Id, data.User);
+							var server = _servers[data.GuildId];
+							if (server != null && server.RemoveBan(user.Id))
+								RaiseBanRemoved(user, server);
 						}
 						break;
 
@@ -189,7 +315,7 @@ namespace Discord
 					case "MESSAGE_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageCreate>();
-							var msg = UpdateMessage(data);
+							var msg = _messages.Update(data.Id, data.ChannelId, data);
 							msg.User.UpdateActivity(data.Timestamp);
 							RaiseMessageCreated(msg);
 						}
@@ -197,21 +323,21 @@ namespace Discord
 					case "MESSAGE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageUpdate>();
-							var msg = GetMessage(data.Id, data.ChannelId);
+							var msg = _messages.Update(data.Id, data);
 							RaiseMessageUpdated(msg);
 						}
 						break;
 					case "MESSAGE_DELETE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageDelete>();
-							var msg = GetMessage(data.MessageId, data.ChannelId);
-							RaiseMessageDeleted(msg);
+							var msg = GetMessage(data.MessageId);
+							_messages.Remove(msg.Id);
 						}
 						break;
 					case "MESSAGE_ACK":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageAck>();
-							var msg = GetMessage(data.MessageId, data.ChannelId);
+							var msg = GetMessage(data.MessageId);
 							RaiseMessageAcknowledged(msg);
 						}
 						break;
@@ -220,25 +346,36 @@ namespace Discord
 					case "PRESENCE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>();
-							var user = UpdateUser(data);
+							var user = _users.Update(data.Id, data);
 							RaisePresenceUpdated(user);
 						}
 						break;
 					case "VOICE_STATE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>();
-							var user = GetUser(data.UserId); //TODO: Don't ignore this
+							var user = _users[data.UserId]; //TODO: Don't ignore this
 							RaiseVoiceStateUpdated(user);
 						}
 						break;
 					case "TYPING_START":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.TypingStart>();
-							var channel = GetChannel(data.ChannelId);
-							var user = GetUser(data.UserId);
+							var channel = _channels[data.ChannelId];
+							var user = _users[data.UserId];
 							RaiseUserTyping(user, channel);
 						}
 						break;
+
+					//Voice
+					case "VOICE_SERVER_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.VoiceServerUpdate>();
+							var server = _servers[data.ServerId];
+							RaiseVoiceServerUpdated(server, data.Endpoint);
+						}
+						break;
+
+					//Others
 					default:
 						RaiseOnDebugMessage("Unknown WebSocket message type: " + e.Type);
 						break;
@@ -247,6 +384,7 @@ namespace Discord
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 		}
 
+		//Auth
 		public async Task Connect(string email, string password)
 		{
             _isClosing = false;
@@ -269,23 +407,98 @@ namespace Discord
 			_isClosing = true;
 			await _webSocket.DisconnectAsync();
 			_isClosing = false;
+
+			_channels.Clear();
+			_messages.Clear();
+			_roles.Clear();
+			_servers.Clear();
+			_users.Clear();
 		}
 
-		public Task CreateServer(string name, string region)
+		//Servers
+		public async Task<Server> CreateServer(string name, string region)
 		{
 			CheckReady();
-			return DiscordAPI.CreateServer(name, region, _httpOptions);
+			var response = await DiscordAPI.CreateServer(name, region, _httpOptions);
+			return _servers.Update(response.Id, response);
 		}
-		public Task DeleteServer(string id)
+		public Task<Server> LeaveServer(Server server)
+			=> LeaveServer(server.Id);
+		public async Task<Server> LeaveServer(string id)
 		{
 			CheckReady();
-			return DiscordAPI.DeleteServer(id, _httpOptions);
+			await DiscordAPI.LeaveServer(id, _httpOptions);
+			return _servers.Remove(id);
 		}
 
-		public Task<GetInviteResponse> GetInvite(string id)
+		//Bans
+		public Task Ban(Server server, User user)
+			=> Ban(server.Id, user.Id);
+		public Task Ban(Server server, string userId)
+			=> Ban(server.Id, userId);
+		public Task Ban(string server, User user)
+			=> Ban(server, user.Id);
+		public Task Ban(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.GetInvite(id, _httpOptions);
+			return DiscordAPI.Ban(serverId, userId, _httpOptions);
+		}
+		public Task Unban(Server server, User user)
+			=> Unban(server.Id, user.Id);
+		public Task Unban(Server server, string userId)
+			=> Unban(server.Id, userId);
+		public Task Unban(string server, User user)
+			=> Unban(server, user.Id);
+		public Task Unban(string serverId, string userId)
+		{
+			CheckReady();
+			return DiscordAPI.Unban(serverId, userId, _httpOptions);
+		}
+
+
+		//Invites
+		public Task<Invite> CreateInvite(Server server, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		{
+			return CreateInvite(server.DefaultChannelId, maxAge, maxUses, isTemporary, hasXkcdPass);
+		}
+		public Task<Invite> CreateInvite(Channel channel, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		{
+			return CreateInvite(channel, maxAge, maxUses, isTemporary, hasXkcdPass);
+		}
+        public async Task<Invite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		{
+			CheckReady();
+			var response = await DiscordAPI.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass, _httpOptions);
+			_channels.Update(response.Channel.Id, response.Server.Id, response.Channel);
+			_servers.Update(response.Server.Id, response.Server);
+			_users.Update(response.Inviter.Id, response.Inviter);
+			return new Invite(response.Code, response.XkcdPass, this)
+			{
+				ChannelId = response.Channel.Id,
+				InviterId = response.Inviter.Id,
+				ServerId = response.Server.Id,
+				IsRevoked = response.IsRevoked,
+				IsTemporary = response.IsTemporary,
+				MaxAge = response.MaxAge,
+				MaxUses = response.MaxUses,
+				Uses = response.Uses
+			};
+		}
+        public async Task<Invite> GetInvite(string id)
+		{
+			CheckReady();
+			var response = await DiscordAPI.GetInvite(id, _httpOptions);
+			return new Invite(response.Code, response.XkcdPass, this)
+			{
+				ChannelId = response.Channel.Id,
+				InviterId = response.Inviter.Id,
+				ServerId = response.Server.Id
+			};
+		}
+		public Task AcceptInvite(Invite invite)
+		{
+			CheckReady();
+			return DiscordAPI.AcceptInvite(invite.Code, _httpOptions);
 		}
 		public async Task AcceptInvite(string id)
 		{
@@ -302,6 +515,7 @@ namespace Discord
 			await DiscordAPI.DeleteInvite(response.Code, _httpOptions);
 		}
 
+		//Chat
 		public Task SendMessage(string channelId, string text)
 		{
 			return SendMessage(channelId, text, new string[0]);
@@ -323,143 +537,53 @@ namespace Discord
 			}
 		}
 
-		public User GetUser(string id)
+		//Voice
+		public Task Mute(Server server, User user)
+			=> Mute(server.Id, user.Id);
+		public Task Mute(Server server, string userId)
+			=> Mute(server.Id, userId);
+		public Task Mute(string server, User user)
+			=> Mute(server, user.Id);
+		public Task Mute(string serverId, string userId)
 		{
-			if (id == null) return null;
-			User user = null;
-			_users.TryGetValue(id, out user);
-			return user;
-		}
-		private User UpdateUser(UserInfo model, bool addNew = true)
-		{
-			var user = GetUser(model.Id) ?? new User(model.Id, this);
-			
-			user.Avatar = model.Avatar;
-			user.Discriminator = model.Discriminator;
-			user.Name = model.Username;
-			if (model is SelfUserInfo)
-			{
-				var extendedModel = model as SelfUserInfo;
-				user.Email = extendedModel.Email;
-				user.IsVerified = extendedModel.IsVerified;
-			}
-			if (model is PresenceUserInfo)
-			{
-				var extendedModel = model as PresenceUserInfo;
-				user.GameId = extendedModel.GameId;
-				user.Status = extendedModel.Status;
-            }
-
-			if (addNew)
-				_users[model.Id] = user;
-			return user;
+			CheckReady();
+			return DiscordAPI.Mute(serverId, userId, _httpOptions);
 		}
 
-		public Server GetServer(string id)
+		public Task Unmute(Server server, User user)
+			=> Unmute(server.Id, user.Id);
+		public Task Unmute(Server server, string userId)
+			=> Unmute(server.Id, userId);
+		public Task Unmute(string server, User user)
+			=> Unmute(server, user.Id);
+		public Task Unmute(string serverId, string userId)
 		{
-			if (id == null) return null;
-			Server server = null;
-			_servers.TryGetValue(id, out server);
-			return server;
-		}
-		private Server UpdateServer(ServerInfo model, bool addNew = true)
-		{
-			var server = GetServer(model.Id) ?? new Server(model.Id, this);
-			
-			server.Name = model.Name;
-			if (model is ExtendedServerInfo)
-			{
-				var extendedModel = model as ExtendedServerInfo;
-				server.AFKChannelId = extendedModel.AFKChannelId;
-				server.AFKTimeout = extendedModel.AFKTimeout;
-				server.JoinedAt = extendedModel.JoinedAt;
-				server.OwnerId = extendedModel.OwnerId;
-				server.Presence = extendedModel.Presence;
-				server.Region = extendedModel.Region;
-				server.Roles = extendedModel.Roles;
-				server.VoiceStates = extendedModel.VoiceStates;
-
-				foreach (var channel in extendedModel.Channels)
-				{
-					UpdateChannel(channel, model.Id, addNew);
-					server._channels[channel.Id] = true;
-				}
-				foreach (var membership in extendedModel.Members)
-				{
-					UpdateUser(membership.User, addNew);
-					server._members[membership.User.Id] = true;
-                }
-			}
-
-			if (addNew)
-				_servers[model.Id] = server;
-			return server;
+			CheckReady();
+			return DiscordAPI.Unmute(serverId, userId, _httpOptions);
 		}
 
-		public Channel GetChannel(string id)
+		public Task Deafen(Server server, User user)
+			=> Deafen(server.Id, user.Id);
+		public Task Deafen(Server server, string userId)
+			=> Deafen(server.Id, userId);
+		public Task Deafen(string server, User user)
+			=> Deafen(server, user.Id);
+		public Task Deafen(string serverId, string userId)
 		{
-			if (id == null) return null;
-			Channel channel = null;
-			_channels.TryGetValue(id, out channel);
-			return channel;
-		}
-		private Channel UpdateChannel(ChannelInfo model, string serverId, bool addNew = true)
-		{
-			var channel = GetChannel(model.Id) ?? new Channel(model.Id, serverId, this);
-
-			channel.Name = model.Name;
-			channel.IsPrivate = model.IsPrivate;
-			channel.PermissionOverwrites = model.PermissionOverwrites;
-			channel.RecipientId = model.Recipient?.Id;
-			channel.Type = model.Type;
-
-			if (addNew)
-				_channels[model.Id] = channel;
-			return channel;
-		}
-		private Channel DeleteChannel(string id)
-		{
-			Channel channel = null;
-			if (_channels.TryRemove(id, out channel))
-			{
-				bool ignored;
-				channel.Server._channels.TryRemove(id, out ignored);
-			}
-			return channel;			
-        }
-
-		//TODO: Temporary measure, unsure if we want to store these or not.
-		private ChatMessageReference GetMessage(string id, string channelId)
-		{
-			if (id == null || channelId == null) return null;
-			return new ChatMessageReference(id, channelId, this);
-		}
-		private ChatMessage UpdateMessage(WebSocketEvents.MessageCreate model, bool addNew = true)
-		{
-			return new ChatMessage(model.Id, model.ChannelId, this)
-			{
-				Attachments = model.Attachments,
-				Text = model.Content,
-				Embeds = model.Embeds,
-				IsMentioningEveryone = model.IsMentioningEveryone,
-				IsTTS = model.IsTextToSpeech,
-				UserId = model.Author.Id,
-				Timestamp = model.Timestamp
-			};
+			CheckReady();
+			return DiscordAPI.Deafen(serverId, userId, _httpOptions);
 		}
 
-		private Role GetRole(string id, string serverId)
+		public Task Undeafen(Server server, User user)
+			=> Undeafen(server.Id, user.Id);
+		public Task Undeafen(Server server, string userId)
+			=> Undeafen(server.Id, userId);
+		public Task Undeafen(string server, User user)
+			=> Undeafen(server, user.Id);
+		public Task Undeafen(string serverId, string userId)
 		{
-			if (id == null || serverId == null) return null;
-			return new Role(id, serverId, this);
-		}
-		private Role UpdateRole(WebSocketEvents.GuildRoleCreateUpdate role, bool addNew = true)
-		{
-			return new Role(role.Role.Id, role.GuildId, this)
-			{
-				Name = role.Role.Name,
-				Permissions = role.Role.Permissions
-			};
+			CheckReady();
+			return DiscordAPI.Undeafen(serverId, userId, _httpOptions);
 		}
 
 		private void CheckReady()
@@ -467,5 +591,12 @@ namespace Discord
 			if (!_isReady)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
         }
+		public void Block()
+		{
+			//Blocking call for console apps
+			//TODO: Improve this
+			while (!_isClosing)
+				Thread.Sleep(1000);
+		}
 	}
 }

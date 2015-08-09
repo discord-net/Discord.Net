@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -24,47 +25,104 @@ namespace Discord.Helpers
 	internal static class Http
 	{
 		private static readonly RequestCachePolicy _cachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
-
-		internal static async Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
+#if DEBUG
+		private const bool _isDebug = true;
+#else
+		private const bool _isDebug = false;
+#endif
+		
+		internal static Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
 			where ResponseT : class
-		{
-			string requestJson = JsonConvert.SerializeObject(data);
-			string responseJson = await SendRequest("GET", path, requestJson, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
-		}
-		internal static async Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
+			=> Send<ResponseT>("GET", path, data, options);
+		internal static Task<string> Get(string path, object data, HttpOptions options)
+			=> Send("GET", path, data, options);
+		internal static Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
 			where ResponseT : class
-		{
-			string responseJson = await SendRequest("GET", path, null, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
-		}
+			=> Send<ResponseT>("GET", path, null, options);
+		internal static Task<string> Get(string path, HttpOptions options)
+			=> Send("GET", path, null, options);
+		
+		internal static Task<ResponseT> Post<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("POST", path, data, options);
+		internal static Task<string> Post(string path, object data, HttpOptions options)
+			=> Send("POST", path, data, options);
+		internal static Task<ResponseT> Post<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("POST", path, null, options);
+		internal static Task<string> Post(string path, HttpOptions options)
+			=> Send("POST", path, null, options);
+		
+		internal static Task<ResponseT> Put<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PUT", path, data, options);
+		internal static Task<string> Put(string path, object data, HttpOptions options)
+			=> Send("PUT", path, data, options);
+		internal static Task<ResponseT> Put<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PUT", path, null, options);
+		internal static Task<string> Put(string path, HttpOptions options)
+			=> Send("PUT", path, null, options);
 
-		internal static async Task<ResponseT> Post<ResponseT>(string path, object data, HttpOptions options)
+		internal static Task<ResponseT> Patch<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PATCH", path, data, options);
+		internal static Task<string> Patch(string path, object data, HttpOptions options)
+			=> Send("PATCH", path, data, options);
+		internal static Task<ResponseT> Patch<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("PATCH", path, null, options);
+		internal static Task<string> Patch(string path, HttpOptions options)
+			=> Send("PATCH", path, null, options);
+
+		internal static Task<ResponseT> Delete<ResponseT>(string path, object data, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("DELETE", path, data, options);
+		internal static Task<string> Delete(string path, object data, HttpOptions options)
+			=> Send("DELETE", path, data, options);
+		internal static Task<ResponseT> Delete<ResponseT>(string path, HttpOptions options)
+			where ResponseT : class
+			=> Send<ResponseT>("DELETE", path, null, options);
+		internal static Task<string> Delete(string path, HttpOptions options)
+			=> Send("DELETE", path, null, options);
+
+		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, object data, HttpOptions options)
 			where ResponseT : class
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
 			string responseJson = await SendRequest("POST", path, requestJson, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
-		internal static Task Post(string path, object data, HttpOptions options)
+		internal static async Task<string> Send(string method, string path, object data, HttpOptions options)
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
-			return SendRequest("POST", path, requestJson, options, false);
+			string responseJson = await SendRequest("POST", path, requestJson, options, _isDebug);
+#if DEBUG
+			CheckEmptyResponse(responseJson);
+#endif
+			return responseJson;
 		}
-		internal static async Task<ResponseT> Post<ResponseT>(string path, HttpOptions options)
+		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, HttpOptions options)
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest("POST", path, null, options, true);
-			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
+#if DEBUG
+			CheckResponse(responseJson, response);
+#endif
+			return response;
 		}
-		internal static Task Post(string path, HttpOptions options)
+		internal static async Task<string> Send(string method, string path, HttpOptions options)
 		{
-			return SendRequest("POST", path, null, options, false);
-		}
-
-		internal static Task Delete(string path, HttpOptions options)
-		{
-			return SendRequest("DELETE", path, null, options, false);
+			string responseJson = await SendRequest("POST", path, null, options, _isDebug);
+#if DEBUG
+			CheckEmptyResponse(responseJson);
+#endif
+			return responseJson;
 		}
 
 		private static async Task<string> SendRequest(string method, string path, string data, HttpOptions options, bool hasResponse)
@@ -124,6 +182,7 @@ namespace Discord.Helpers
 				else
 					return null;
 			}
+
 		}
 
 		private static Stream GetDecoder(string contentEncoding, MemoryStream encodedStream)
@@ -138,5 +197,21 @@ namespace Discord.Helpers
 					throw new ArgumentOutOfRangeException("Unknown encoding: " + contentEncoding);
 			}
 		}
+
+#if DEBUG
+		private static void CheckResponse<T>(string json, T obj)
+		{
+			/*JToken token = JToken.Parse(json);
+			JToken token2 = JToken.FromObject(obj);
+			if (!JToken.DeepEquals(token, token2))
+				throw new Exception("API check failed: Objects do not match.");*/
+		}
+
+		private static void CheckEmptyResponse(string json)
+		{
+			if (!string.IsNullOrEmpty(json))
+				throw new Exception("API check failed: Response is not empty.");
+		}
+#endif
 	}
 }

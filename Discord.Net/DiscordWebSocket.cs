@@ -22,11 +22,13 @@ namespace Discord
 		private ConcurrentQueue<byte[]> _sendQueue;
 		private int _heartbeatInterval;
 		private DateTime _lastHeartbeat;
+		private AutoResetEvent _connectWaitOnLogin;
 
 		public async Task ConnectAsync(string url, HttpOptions options)
 		{
 			await DisconnectAsync();
 
+			_connectWaitOnLogin = new AutoResetEvent(false);
 			_sendQueue = new ConcurrentQueue<byte[]>();
 
 			_webSocket = new ClientWebSocket();
@@ -62,7 +64,9 @@ namespace Discord
 			msg.Payload.Properties["$referrer"] = "";
 			msg.Payload.Properties["$referring_domain"] = "";
 			SendMessage(msg, cancelToken);
-		}
+
+			_connectWaitOnLogin.WaitOne();
+        }
 		public async Task DisconnectAsync()
 		{
 			if (_webSocket != null)
@@ -112,6 +116,8 @@ namespace Discord
 								SendMessage(new WebSocketCommands.KeepAlive(), cancelToken);
 							}
 							RaiseGotEvent(msg.Type, msg.Payload as JToken);
+							if (msg.Type == "READY")
+								_connectWaitOnLogin.Set();
 							break;
 						default:
 							RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
