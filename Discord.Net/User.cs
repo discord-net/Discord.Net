@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord.Models
+namespace Discord
 {
 	public sealed class User
 	{

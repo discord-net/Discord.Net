@@ -106,7 +106,7 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "channels")]
 		public ChannelInfo[] Channels;
 		[JsonProperty(PropertyName = "joined_at")]
-		public DateTime JoinedAt;
+		public DateTime? JoinedAt;
 		[JsonProperty(PropertyName = "members")]
 		public MembershipInfo[] Members;
 		[JsonProperty(PropertyName = "owner_id")]

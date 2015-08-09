@@ -49,10 +49,9 @@
     <Compile Include="API\Models\ApiRequests.cs" />
     <Compile Include="API\Endpoints.cs" />
     <Compile Include="API\Models\WebSocketCommands.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\ChatMessageReference.cs" />
-    <Compile Include="Models\ChatMessage.cs" />
-    <Compile Include="Models\Channel.cs" />
+    <Compile Include="Role.cs" />
+    <Compile Include="ChatMessage.cs" />
+    <Compile Include="Channel.cs" />
     <Compile Include="DiscordWebSocket.Events.cs" />
     <Compile Include="Helpers\Http.cs" />
     <Compile Include="API\DiscordAPI.cs" />
@@ -62,8 +61,8 @@
     <Compile Include="DiscordClient.Events.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordWebSocket.cs" />
-    <Compile Include="Models\Server.cs" />
-    <Compile Include="Models\User.cs" />
+    <Compile Include="Server.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
