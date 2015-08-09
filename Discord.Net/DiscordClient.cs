@@ -1,15 +1,12 @@
 ﻿using Discord.API;
 using Discord.API.Models;
 using Discord.Helpers;
-using Discord.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Message = Discord.Models.Message;
-using Role = Discord.Models.Role;
 
 namespace Discord
 {

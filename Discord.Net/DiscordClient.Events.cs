@@ -1,5 +1,4 @@
-﻿using Discord.Models;
-using System;
+﻿using System;
 
 namespace Discord
 {

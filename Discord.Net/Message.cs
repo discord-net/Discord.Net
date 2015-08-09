@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Discord.Models
+namespace Discord
 {
 	public sealed class Message
 	{

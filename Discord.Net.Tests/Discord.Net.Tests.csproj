@@ -51,8 +51,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ChannelTests.cs" />
+    <Compile Include="Credentials.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net\Discord.Net.csproj">
