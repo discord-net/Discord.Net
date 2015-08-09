@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Models;
+using System;
 
 namespace Discord
 {
@@ -97,35 +98,40 @@ namespace Discord
 		}
 
 		//Message
-		public sealed class MessageEventArgs : EventArgs
+		public sealed class MessageCreateEventArgs : EventArgs
 		{
 			public readonly ChatMessage Message;
-			internal MessageEventArgs(ChatMessage msg) { Message = msg; }
+			internal MessageCreateEventArgs(ChatMessage msg) { Message = msg; }
+		}
+		public sealed class MessageEventArgs : EventArgs
+		{
+			public readonly ChatMessageReference Message;
+			internal MessageEventArgs(ChatMessageReference msg) { Message = msg; }
 		}
 
-		public event EventHandler<MessageEventArgs> MessageCreated;
+		public event EventHandler<MessageCreateEventArgs> MessageCreated;
 		private void RaiseMessageCreated(ChatMessage msg)
 		{
 			if (MessageCreated != null)
-				MessageCreated(this, new MessageEventArgs(msg));
+				MessageCreated(this, new MessageCreateEventArgs(msg));
 		}
 
 		public event EventHandler<MessageEventArgs> MessageDeleted;
-		private void RaiseMessageDeleted(ChatMessage msg)
+		private void RaiseMessageDeleted(ChatMessageReference msg)
 		{
 			if (MessageDeleted != null)
 				MessageDeleted(this, new MessageEventArgs(msg));
 		}
 
 		public event EventHandler<MessageEventArgs> MessageUpdated;
-		private void RaiseMessageUpdated(ChatMessage msg)
+		private void RaiseMessageUpdated(ChatMessageReference msg)
 		{
 			if (MessageUpdated != null)
 				MessageUpdated(this, new MessageEventArgs(msg));
 		}
 
 		public event EventHandler<MessageEventArgs> MessageAcknowledged;
-		private void RaiseMessageAcknowledged(ChatMessage msg)
+		private void RaiseMessageAcknowledged(ChatMessageReference msg)
 		{
 			if (MessageAcknowledged != null)
 				MessageAcknowledged(this, new MessageEventArgs(msg));

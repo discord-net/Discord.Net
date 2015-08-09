@@ -1,11 +1,13 @@
 ﻿using Discord.API;
 using Discord.API.Models;
 using Discord.Helpers;
+using Discord.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Role = Discord.Models.Role;
 
 namespace Discord
 {
@@ -370,7 +372,7 @@ namespace Discord
 				var extendedModel = model as ExtendedServerInfo;
 				server.AFKChannelId = extendedModel.AFKChannelId;
 				server.AFKTimeout = extendedModel.AFKTimeout;
-				server.JoinedAt = extendedModel.JoinedAt ?? DateTime.MinValue;
+				server.JoinedAt = extendedModel.JoinedAt;
 				server.OwnerId = extendedModel.OwnerId;
 				server.Presence = extendedModel.Presence;
 				server.Region = extendedModel.Region;
@@ -418,7 +420,7 @@ namespace Discord
 		private Channel DeleteChannel(string id)
 		{
 			Channel channel = null;
-			if (_channels.TryRemove(id, out channel) && !channel.IsPrivate)
+			if (_channels.TryRemove(id, out channel))
 			{
 				bool ignored;
 				channel.Server._channels.TryRemove(id, out ignored);
@@ -427,10 +429,10 @@ namespace Discord
         }
 
 		//TODO: Temporary measure, unsure if we want to store these or not.
-		private ChatMessage GetMessage(string id, string channelId)
+		private ChatMessageReference GetMessage(string id, string channelId)
 		{
 			if (id == null || channelId == null) return null;
-			return new ChatMessage(id, channelId, this);
+			return new ChatMessageReference(id, channelId, this);
 		}
 		private ChatMessage UpdateMessage(WebSocketEvents.MessageCreate model, bool addNew = true)
 		{

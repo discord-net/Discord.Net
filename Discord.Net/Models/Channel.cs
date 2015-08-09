@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord
+namespace Discord.Models
 {
 	public sealed class Channel
 	{

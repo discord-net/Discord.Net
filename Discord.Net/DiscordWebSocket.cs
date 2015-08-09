@@ -114,14 +114,14 @@ namespace Discord
 							RaiseGotEvent(msg.Type, msg.Payload as JToken);
 							break;
 						default:
-							RaiseOnDebugMessage("Warning: Unknown WebSocket operation ID: " + msg.Operation);
+							RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
 							break;
 					}
 
 					builder.Clear();
 				}
 			}
-			catch (Exception ex) { RaiseOnDebugMessage($"Error: {ex.Message}"); }
+			catch { }
 			finally { _cancelToken.Cancel(); }
 		}
 
