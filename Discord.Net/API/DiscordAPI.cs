@@ -77,10 +77,10 @@ namespace Discord.API
 		}
 		
 		//Chat
-		public static Task SendMessage(string channelId, string message, string[] mentions, HttpOptions options)
+		public static Task<APIResponses.SendMessage> SendMessage(string channelId, string message, string[] mentions, HttpOptions options)
 		{
 			var request = new APIRequests.SendMessage { Content = message, Mentions = mentions };
-			return Http.Post(Endpoints.ChannelMessages(channelId), request, options);
+			return Http.Post<APIResponses.SendMessage>(Endpoints.ChannelMessages(channelId), request, options);
 		}
 		public static Task SendIsTyping(string channelId, HttpOptions options)
 		{

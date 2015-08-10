@@ -31,11 +31,6 @@ namespace Discord.Helpers
 		private const bool _isDebug = false;
 #endif
 		
-		internal static Task<ResponseT> Get<ResponseT>(string path, object data, HttpOptions options)
-			where ResponseT : class
-			=> Send<ResponseT>("GET", path, data, options);
-		internal static Task<string> Get(string path, object data, HttpOptions options)
-			=> Send("GET", path, data, options);
 		internal static Task<ResponseT> Get<ResponseT>(string path, HttpOptions options)
 			where ResponseT : class
 			=> Send<ResponseT>("GET", path, null, options);
@@ -89,7 +84,7 @@ namespace Discord.Helpers
 		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, object data, HttpOptions options)
 			where ResponseT : class
 		{
-			string requestJson = JsonConvert.SerializeObject(data);
+			string requestJson = data != null ? JsonConvert.SerializeObject(data) : null;
 			string responseJson = await SendRequest(method, path, requestJson, options, true);
 			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
 #if DEBUG
@@ -99,26 +94,8 @@ namespace Discord.Helpers
 		}
 		internal static async Task<string> Send(string method, string path, object data, HttpOptions options)
 		{
-			string requestJson = JsonConvert.SerializeObject(data);
+			string requestJson = data != null ? JsonConvert.SerializeObject(data) : null;
 			string responseJson = await SendRequest(method, path, requestJson, options, _isDebug);
-#if DEBUG
-			CheckEmptyResponse(responseJson);
-#endif
-			return responseJson;
-		}
-		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, HttpOptions options)
-			where ResponseT : class
-		{
-			string responseJson = await SendRequest(method, path, null, options, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
-#if DEBUG
-			CheckResponse(responseJson, response);
-#endif
-			return response;
-		}
-		internal static async Task<string> Send(string method, string path, HttpOptions options)
-		{
-			string responseJson = await SendRequest(method, path, null, options, _isDebug);
 #if DEBUG
 			CheckEmptyResponse(responseJson);
 #endif

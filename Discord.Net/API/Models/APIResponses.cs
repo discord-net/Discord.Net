@@ -56,6 +56,7 @@ namespace Discord.API.Models
 		}
 		public class AcceptInvite : GetInvite { }
 
+		public class SendMessage : Message { }
 		public class GetMessages : Message { }
 
 		public class GetRegions

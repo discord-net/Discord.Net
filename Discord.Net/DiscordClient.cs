@@ -521,14 +521,18 @@ namespace Discord
 		{
 			CheckReady();
 			if (text.Length <= 2000)
-				await DiscordAPI.SendMessage(channelId, text, mentions, _httpOptions);
+			{
+				var msg = await DiscordAPI.SendMessage(channelId, text, mentions, _httpOptions);
+				_messages.Update(msg.Id, msg);
+            }
 			else
 			{
 				int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
 				for (int i = 0; i < blockCount; i++)
 				{
 					int index = i * MaxMessageSize;
-                    await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
+					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
+					_messages.Update(msg.Id, msg);
 					await Task.Delay(1000);
 				}
 			}
