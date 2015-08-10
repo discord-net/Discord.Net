@@ -90,7 +90,7 @@ namespace Discord.Helpers
 			where ResponseT : class
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
-			string responseJson = await SendRequest("POST", path, requestJson, options, true);
+			string responseJson = await SendRequest(method, path, requestJson, options, true);
 			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
 #if DEBUG
 			CheckResponse(responseJson, response);
@@ -100,7 +100,7 @@ namespace Discord.Helpers
 		internal static async Task<string> Send(string method, string path, object data, HttpOptions options)
 		{
 			string requestJson = JsonConvert.SerializeObject(data);
-			string responseJson = await SendRequest("POST", path, requestJson, options, _isDebug);
+			string responseJson = await SendRequest(method, path, requestJson, options, _isDebug);
 #if DEBUG
 			CheckEmptyResponse(responseJson);
 #endif
@@ -109,7 +109,7 @@ namespace Discord.Helpers
 		internal static async Task<ResponseT> Send<ResponseT>(string method, string path, HttpOptions options)
 			where ResponseT : class
 		{
-			string responseJson = await SendRequest("POST", path, null, options, true);
+			string responseJson = await SendRequest(method, path, null, options, true);
 			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
 #if DEBUG
 			CheckResponse(responseJson, response);
@@ -118,7 +118,7 @@ namespace Discord.Helpers
 		}
 		internal static async Task<string> Send(string method, string path, HttpOptions options)
 		{
-			string responseJson = await SendRequest("POST", path, null, options, _isDebug);
+			string responseJson = await SendRequest(method, path, null, options, _isDebug);
 #if DEBUG
 			CheckEmptyResponse(responseJson);
 #endif
