@@ -53,7 +53,7 @@ namespace Discord.Net.Tests
 		[TestMethod]
 		public void TestCreateVoiceRoom()
 			=> TestCreateRoom(ChannelTypes.Voice);
-        private void TestCreateRoom(string type)
+		private void TestCreateRoom(string type)
 		{
 			Channel channel = null;
 			string name = $"test_{_random.Next()}";
@@ -92,7 +92,7 @@ namespace Discord.Net.Tests
 			EventHandler<TArgs> handler = (s, e) =>
 			{
 				if (test != null)
-					result = test(s, e);
+					result |= test(s, e);
 				else
 					result = true;
 			};
