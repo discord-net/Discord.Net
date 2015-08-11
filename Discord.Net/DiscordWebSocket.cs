@@ -15,6 +15,7 @@ namespace Discord
 	{
 		private const int ReceiveChunkSize = 4096;
 		private const int SendChunkSize = 4096;
+		private const int ReadyTimeout = 5000; //Max time in milliseconds between connecting to Discord and receiving a READY event
 
 		private volatile ClientWebSocket _webSocket;
 		private volatile CancellationTokenSource _cancelToken;
@@ -65,7 +66,8 @@ namespace Discord
 			msg.Payload.Properties["$referring_domain"] = "";
 			SendMessage(msg, cancelToken);
 
-			_connectWaitOnLogin.WaitOne();
+			if (!_connectWaitOnLogin.WaitOne(ReadyTimeout))
+				throw new Exception("No reply from Discord server");
         }
 		public async Task DisconnectAsync()
 		{

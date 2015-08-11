@@ -9,7 +9,8 @@ namespace Discord.Net.Tests
 	[TestClass]
 	public class Tests
 	{
-		private DiscordClient _bot1, _bot2;
+		private const int EventTimeout = 5000; //Max time in milliseconds to wait for an event response from our test actions
+        private DiscordClient _bot1, _bot2;
 		private Server _testServer;
 		private Channel _testServerChannel;
 		private Random _random;
@@ -29,6 +30,7 @@ namespace Discord.Net.Tests
 			Task.WaitAll(_bot1.Servers.Select(x => _bot1.LeaveServer(x)).ToArray());
 			Task.WaitAll(_bot2.Servers.Select(x => _bot2.LeaveServer(x)).ToArray());
 
+			//Create new server and invite other bot to it
 			_testServer = _bot1.CreateServer("Discord.Net Testbed", Regions.US_East).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _bot1.CreateInvite(_testServer, 60, 1, false, false).Result;
@@ -99,7 +101,7 @@ namespace Discord.Net.Tests
 
 			addEvent(handler);
 			action();
-			trigger.WaitOne(5000);
+			trigger.WaitOne(EventTimeout);
 			removeEvent(handler);
 
 			Assert.AreEqual(true, result, msg);
