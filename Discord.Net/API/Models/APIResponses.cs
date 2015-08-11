@@ -7,7 +7,6 @@ using System;
 
 namespace Discord.API.Models
 {
-
 	internal static class APIResponses
 	{
 		public class AuthFingerprint

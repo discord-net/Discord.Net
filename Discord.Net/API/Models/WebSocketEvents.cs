@@ -9,7 +9,7 @@ namespace Discord.API.Models
 {
 	internal static class WebSocketEvents
 	{
-		internal sealed class Ready
+		public sealed class Ready
 		{
 			[JsonProperty(PropertyName = "user")]
 			public SelfUserInfo User;
@@ -26,74 +26,74 @@ namespace Discord.API.Models
 		}
 
 		//Servers
-		internal sealed class GuildCreate : ExtendedServerInfo { }
-		internal sealed class GuildDelete : ExtendedServerInfo { }
+		public sealed class GuildCreate : ExtendedServerInfo { }
+		public sealed class GuildDelete : ExtendedServerInfo { }
 
 		//Channels
-		internal sealed class ChannelCreate : ChannelInfo { }
-		internal sealed class ChannelDelete : ChannelInfo { }
-		internal sealed class ChannelUpdate : ChannelInfo { }
+		public sealed class ChannelCreate : ChannelInfo { }
+		public sealed class ChannelDelete : ChannelInfo { }
+		public sealed class ChannelUpdate : ChannelInfo { }
 
 		//Memberships
-		internal abstract class GuildMemberEvent
+		public abstract class GuildMemberEvent
 		{
 			[JsonProperty(PropertyName = "user")]
 			public UserReference User;
 			[JsonProperty(PropertyName = "guild_id")]
 			public string GuildId;
 		}
-		internal sealed class GuildMemberAdd : GuildMemberEvent
+		public sealed class GuildMemberAdd : GuildMemberEvent
 		{
 			[JsonProperty(PropertyName = "joined_at")]
 			public DateTime JoinedAt;
 			[JsonProperty(PropertyName = "roles")]
 			public object[] Roles;
 		}
-		internal sealed class GuildMemberUpdate : GuildMemberEvent
+		public sealed class GuildMemberUpdate : GuildMemberEvent
 		{
 			[JsonProperty(PropertyName = "roles")]
 			public object[] Roles;
 		}
-		internal sealed class GuildMemberRemove : GuildMemberEvent { }
+		public sealed class GuildMemberRemove : GuildMemberEvent { }
 
 		//Roles
-		internal abstract class GuildRoleEvent
+		public abstract class GuildRoleEvent
 		{
 			[JsonProperty(PropertyName = "guild_id")]
 			public string GuildId;
 		}
-		internal sealed class GuildRoleCreateUpdate : GuildRoleEvent
+		public sealed class GuildRoleCreateUpdate : GuildRoleEvent
 		{
 			[JsonProperty(PropertyName = "role")]
 			public Role Role;
 		}
-		internal sealed class GuildRoleDelete : GuildRoleEvent
+		public sealed class GuildRoleDelete : GuildRoleEvent
 		{
 			[JsonProperty(PropertyName = "role_id")]
 			public string RoleId;
 		}
 
 		//Bans
-		internal abstract class GuildBanEvent
+		public abstract class GuildBanEvent
 		{
 			[JsonProperty(PropertyName = "guild_id")]
 			public string GuildId;
 		}
-		internal sealed class GuildBanAddRemove : GuildBanEvent
+		public sealed class GuildBanAddRemove : GuildBanEvent
 		{
 			[JsonProperty(PropertyName = "user")]
 			public UserReference User;
 		}
-		internal sealed class GuildBanRemove : GuildBanEvent
+		public sealed class GuildBanRemove : GuildBanEvent
 		{
 			[JsonProperty(PropertyName = "user_id")]
 			public string UserId;
 		}
 
 		//User
-		internal sealed class UserUpdate : SelfUserInfo { }
-		internal sealed class PresenceUpdate : PresenceUserInfo { }
-		internal sealed class VoiceStateUpdate
+		public sealed class UserUpdate : SelfUserInfo { }
+		public sealed class PresenceUpdate : PresenceUserInfo { }
+		public sealed class VoiceStateUpdate
 		{
 			[JsonProperty(PropertyName = "user_id")]
 			public string UserId;
@@ -116,15 +116,15 @@ namespace Discord.API.Models
 		}
 
 		//Chat
-		internal sealed class MessageCreate : Message { }
-		internal sealed class MessageUpdate : MessageReference
+		public sealed class MessageCreate : Message { }
+		public sealed class MessageUpdate : MessageReference
 		{
 			[JsonProperty(PropertyName = "embeds")]
 			public object[] Embeds;
 		}
-		internal sealed class MessageDelete : MessageReference { }
-		internal sealed class MessageAck : MessageReference { }
-		internal sealed class TypingStart
+		public sealed class MessageDelete : MessageReference { }
+		public sealed class MessageAck : MessageReference { }
+		public sealed class TypingStart
 		{
 			[JsonProperty(PropertyName = "user_id")]
 			public string UserId;
@@ -135,7 +135,7 @@ namespace Discord.API.Models
 		}
 
 		//Voice
-		internal sealed class VoiceServerUpdate
+		public sealed class VoiceServerUpdate
 		{
 			[JsonProperty(PropertyName = "guild_id")]
 			public string ServerId;

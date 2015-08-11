@@ -12,8 +12,6 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
-		private const int MaxMessageSize = 2000;
-
         private DiscordWebSocket _webSocket;
 		private HttpOptions _httpOptions;
 		private bool _isClosing, _isReady;
@@ -513,11 +511,13 @@ namespace Discord
 		}
 
 		//Chat
+		public Task SendMessage(Channel channel, string text)
+			=> SendMessage(channel.Id, text, new string[0]);
 		public Task SendMessage(string channelId, string text)
-		{
-			return SendMessage(channelId, text, new string[0]);
-		}
-		public async Task SendMessage(string channelId, string text, string[] mentions)
+			=> SendMessage(channelId, text, new string[0]);
+		public Task SendMessage(Channel channel, string text, string[] mentions)
+			=> SendMessage(channel, text, mentions);
+        public async Task SendMessage(string channelId, string text, string[] mentions)
 		{
 			CheckReady();
 			if (text.Length <= 2000)
@@ -527,10 +527,10 @@ namespace Discord
             }
 			else
 			{
-				int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
+				int blockCount = (int)Math.Ceiling(text.Length / (double)DiscordAPI.MaxMessageSize);
 				for (int i = 0; i < blockCount; i++)
 				{
-					int index = i * MaxMessageSize;
+					int index = i * DiscordAPI.MaxMessageSize;
 					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
 					_messages.Update(msg.Id, msg);
 					await Task.Delay(1000);

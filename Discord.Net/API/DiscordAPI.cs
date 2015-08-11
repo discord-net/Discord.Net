@@ -6,6 +6,8 @@ namespace Discord.API
 {
 	internal static class DiscordAPI
 	{
+		public const int MaxMessageSize = 2000;
+
 		//Auth
 		public static async Task<APIResponses.AuthRegister> LoginAnonymous(string username, HttpOptions options)
 		{

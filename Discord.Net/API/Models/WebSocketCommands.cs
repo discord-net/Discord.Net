@@ -10,12 +10,12 @@ namespace Discord.API.Models
 {
 	internal static class WebSocketCommands
 	{
-		internal sealed class KeepAlive : WebSocketMessage<int>
+		public sealed class KeepAlive : WebSocketMessage<int>
 		{
 			private static DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			public KeepAlive() : base(1, (int)(DateTime.UtcNow - epoch).TotalMilliseconds) { }
 		}
-		internal sealed class Login : WebSocketMessage<Login.Data>
+		public sealed class Login : WebSocketMessage<Login.Data>
 		{
 			public Login() : base(2) { }
 			public class Data
@@ -26,7 +26,7 @@ namespace Discord.API.Models
 				public Dictionary<string, string> Properties = new Dictionary<string, string>();
 			}
 		}
-		internal sealed class UpdateStatus : WebSocketMessage<UpdateStatus.Data>
+		public sealed class UpdateStatus : WebSocketMessage<UpdateStatus.Data>
 		{
 			public UpdateStatus() : base(3) { }
 			public class Data
