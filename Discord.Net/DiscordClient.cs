@@ -4,6 +4,7 @@ using Discord.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +52,12 @@ namespace Discord
 				(server, model) =>
 				{
 					server.Name = model.Name;
-					if (model is ExtendedServerInfo)
+					if (!server.Channels.Any()) //Assume a default channel exists with the same id as the server. Not sure if this is safe?
+					{
+						var defaultChannel = new ChannelReference() { Id = server.DefaultChannelId, GuildId = server.Id };
+						_channels.Update(defaultChannel.Id, defaultChannel.GuildId, defaultChannel);
+					}
+                    if (model is ExtendedServerInfo)
 					{
 						var extendedModel = model as ExtendedServerInfo;
 						server.AFKChannelId = extendedModel.AFKChannelId;
@@ -422,7 +428,12 @@ namespace Discord
 		public async Task<Server> LeaveServer(string id)
 		{
 			CheckReady();
-			await DiscordAPI.LeaveServer(id, _httpOptions);
+			try
+			{
+				await DiscordAPI.LeaveServer(id, _httpOptions);
+			}
+			//Happens if the room was destroyed as we try to leave it
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) {}
 			return _servers.Remove(id);
 		}
 
