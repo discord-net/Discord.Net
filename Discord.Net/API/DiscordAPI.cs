@@ -24,9 +24,7 @@ namespace Discord.API
 			return response;
 		}
 		public static Task Logout(HttpOptions options)
-		{
-			return Http.Post(Endpoints.AuthLogout, options);
-		}
+			=> Http.Post(Endpoints.AuthLogout, options);
 
 		//Servers
 		public static Task<APIResponses.CreateServer> CreateServer(string name, string region, HttpOptions options)
@@ -35,29 +33,26 @@ namespace Discord.API
 			return Http.Post<APIResponses.CreateServer>(Endpoints.Servers, request, options);
         }
 		public static Task LeaveServer(string id, HttpOptions options)
-		{
-			return Http.Delete<APIResponses.DeleteServer>(Endpoints.Server(id), options);
-		}
+			=> Http.Delete<APIResponses.DeleteServer>(Endpoints.Server(id), options);
 
 		//Channels
-		public static Task<APIResponses.GetMessages[]> GetMessages(string channelId, HttpOptions options)
+        public static Task<APIResponses.CreateChannel> CreateChannel(string serverId, string name, string channelType, HttpOptions options)
 		{
-			return Http.Get<APIResponses.GetMessages[]>(Endpoints.ChannelMessages(channelId, 50), options);
+			var request = new APIRequests.CreateChannel { Name = name, Type = channelType };
+			return Http.Post<APIResponses.CreateChannel>(Endpoints.ServerChannels(serverId), request, options);
 		}
+		public static Task<APIResponses.DestroyChannel> DestroyChannel(string channelId, HttpOptions options)
+			=> Http.Delete<APIResponses.DestroyChannel>(Endpoints.Channel(channelId), options);
+		public static Task<APIResponses.GetMessages[]> GetMessages(string channelId, HttpOptions options)
+			=> Http.Get<APIResponses.GetMessages[]>(Endpoints.ChannelMessages(channelId, 50), options);
 
 		//Members
 		public static Task Kick(string serverId, string memberId, HttpOptions options)
-		{
-			return Http.Delete(Endpoints.ServerMember(serverId, memberId), options);
-		}
+			=> Http.Delete(Endpoints.ServerMember(serverId, memberId), options);
 		public static Task Ban(string serverId, string memberId, HttpOptions options)
-		{
-			return Http.Put(Endpoints.ServerBan(serverId, memberId), options);
-		}
+			=> Http.Put(Endpoints.ServerBan(serverId, memberId), options);
 		public static Task Unban(string serverId, string memberId, HttpOptions options)
-		{
-			return Http.Delete(Endpoints.ServerBan(serverId, memberId), options);
-		}
+			=> Http.Delete(Endpoints.ServerBan(serverId, memberId), options);
 
 		//Invites
 		public static Task<APIResponses.CreateInvite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass, HttpOptions options)
@@ -66,17 +61,11 @@ namespace Discord.API
             return Http.Post<APIResponses.CreateInvite>(Endpoints.ChannelInvites(channelId), request, options);
 		}
 		public static Task<APIResponses.GetInvite> GetInvite(string id, HttpOptions options)
-		{
-			return Http.Get<APIResponses.GetInvite>(Endpoints.Invite(id), options);
-		}
+			=> Http.Get<APIResponses.GetInvite>(Endpoints.Invite(id), options);
 		public static Task AcceptInvite(string id, HttpOptions options)
-		{
-			return Http.Post<APIResponses.AcceptInvite>(Endpoints.Invite(id), options);
-		}
+			=> Http.Post<APIResponses.AcceptInvite>(Endpoints.Invite(id), options);
 		public static Task DeleteInvite(string id, HttpOptions options)
-		{
-			return Http.Delete(Endpoints.Invite(id), options);
-		}
+			=> Http.Delete(Endpoints.Invite(id), options);
 		
 		//Chat
 		public static Task<APIResponses.SendMessage> SendMessage(string channelId, string message, string[] mentions, HttpOptions options)
@@ -85,19 +74,13 @@ namespace Discord.API
 			return Http.Post<APIResponses.SendMessage>(Endpoints.ChannelMessages(channelId), request, options);
 		}
 		public static Task SendIsTyping(string channelId, HttpOptions options)
-		{
-			return Http.Post(Endpoints.ChannelTyping(channelId), options);
-		}
+			=> Http.Post(Endpoints.ChannelTyping(channelId), options);
 
 		//Voice
 		public static Task<APIResponses.GetRegions[]> GetVoiceRegions(HttpOptions options)
-		{
-			return Http.Get<APIResponses.GetRegions[]>(Endpoints.VoiceRegions, options);
-		}
+			=> Http.Get<APIResponses.GetRegions[]>(Endpoints.VoiceRegions, options);
 		public static Task<APIResponses.GetIce> GetVoiceIce(HttpOptions options)
-		{
-			return Http.Get<APIResponses.GetIce>(Endpoints.VoiceIce, options);
-		}
+			=> Http.Get<APIResponses.GetIce>(Endpoints.VoiceIce, options);
 		public static Task Mute(string serverId, string memberId, HttpOptions options)
 		{
 			var request = new APIRequests.SetMemberMute { Mute = true };

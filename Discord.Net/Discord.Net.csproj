@@ -50,6 +50,7 @@
     <Compile Include="API\Endpoints.cs" />
     <Compile Include="API\Models\APIResponses.cs" />
     <Compile Include="API\Models\WebSocketCommands.cs" />
+    <Compile Include="ChannelTypes.cs" />
     <Compile Include="Helpers\AsyncCache.cs" />
     <Compile Include="Invite.cs" />
     <Compile Include="Role.cs" />
@@ -60,7 +61,7 @@
     <Compile Include="API\DiscordAPI.cs" />
     <Compile Include="API\Models\WebSocketEvents.cs" />
     <Compile Include="DiscordClient.cs" />
-    <Compile Include="Region.cs" />
+    <Compile Include="Regions.cs" />
     <Compile Include="DiscordClient.Events.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordWebSocket.cs" />

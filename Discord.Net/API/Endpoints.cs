@@ -19,6 +19,7 @@
 		// /api/guilds
 		public static readonly string Servers = $"{BaseApi}/guilds";
 		public static string Server(string id) => $"{Servers}/{id}";
+		public static string ServerChannels(string serverId) => $"{Servers}/{serverId}/channels";
 		public static string ServerMember(string serverId, string userId) => $"{Servers}/{serverId}/members/{userId}";
 		public static string ServerBan(string serverId, string userId) => $"{Servers}/{serverId}/bans/{userId}";
 

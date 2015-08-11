@@ -24,6 +24,9 @@ namespace Discord.API.Models
 		public class CreateServer : ServerInfo { }
 		public class DeleteServer : ServerInfo { }
 
+		public class CreateChannel : ChannelInfo { }
+		public class DestroyChannel : ChannelInfo { }
+
 		public class CreateInvite : GetInvite
 		{
 			[JsonProperty(PropertyName = "max_age")]

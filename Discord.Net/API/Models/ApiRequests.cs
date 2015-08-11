@@ -31,6 +31,14 @@ namespace Discord.API.Models
 			public string Region;
 		}
 
+		public class CreateChannel
+		{
+			[JsonProperty(PropertyName = "name")]
+			public string Name;
+			[JsonProperty(PropertyName = "type")]
+			public string Type;
+		}
+
 		public class CreateInvite
 		{
 			[JsonProperty(PropertyName = "max_age")]

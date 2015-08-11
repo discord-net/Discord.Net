@@ -73,7 +73,7 @@ namespace Discord
 						foreach (var channel in extendedModel.Channels)
 						{
 							_channels.Update(channel.Id, model.Id, channel);
-							if (channel.Type == "text")
+							if (channel.Type == ChannelTypes.Text)
 							{
 								try
 								{
@@ -435,6 +435,24 @@ namespace Discord
 			//Happens if the room was destroyed as we try to leave it
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) {}
 			return _servers.Remove(id);
+		}
+
+		//Channels
+		public Task<Channel> CreateChannel(Server server, string name, string region)
+			=> CreateChannel(server.Id, name, region);
+        public async Task<Channel> CreateChannel(string serverId, string name, string region)
+		{
+			CheckReady();
+			var response = await DiscordAPI.CreateChannel(serverId, name, region, _httpOptions);
+			return _channels.Update(response.Id, response);
+		}
+		public Task<Channel> DestroyChannel(Channel channel)
+			=> DestroyChannel(channel.Id);
+        public async Task<Channel> DestroyChannel(string channelId)
+		{
+			CheckReady();
+			var response = await DiscordAPI.DestroyChannel(channelId, _httpOptions);
+			return _channels.Remove(response.Id);
 		}
 
 		//Bans

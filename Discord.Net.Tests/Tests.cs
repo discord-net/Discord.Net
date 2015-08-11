@@ -29,7 +29,7 @@ namespace Discord.Net.Tests
 			Task.WaitAll(_bot1.Servers.Select(x => _bot1.LeaveServer(x)).ToArray());
 			Task.WaitAll(_bot2.Servers.Select(x => _bot2.LeaveServer(x)).ToArray());
 
-			_testServer = _bot1.CreateServer("Discord.Net Testbed", Region.US_East).Result;
+			_testServer = _bot1.CreateServer("Discord.Net Testbed", Regions.US_East).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _bot1.CreateInvite(_testServer, 60, 1, false, false).Result;
 			_bot2.AcceptInvite(invite).Wait();
@@ -48,17 +48,22 @@ namespace Discord.Net.Tests
         }
 
 		[TestMethod]
-		public void TestCreateRoom()
+		public void TestCreateTextRoom()
+			=> TestCreateRoom(ChannelTypes.Text);
+		[TestMethod]
+		public void TestCreateVoiceRoom()
+			=> TestCreateRoom(ChannelTypes.Voice);
+        private void TestCreateRoom(string type)
 		{
-			Channel channel;
+			Channel channel = null;
 			string name = $"test_{_random.Next()}";
 			AssertEvent<DiscordClient.ChannelEventArgs>(
 				"ChannelCreated event never received",
-				() => channel = _bot1.CreateChannel(_testServerChannel, name),
+				() => channel = _bot1.CreateChannel(_testServer, name, type).Result,
 				x => _bot2.ChannelCreated += x,
 				x => _bot2.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
-			
+
 			AssertEvent<DiscordClient.ChannelEventArgs>(
 				"ChannelDestroyed event never received",
 				() => _bot1.DestroyChannel(channel),

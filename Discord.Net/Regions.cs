@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public static class Region
+	public static class Regions
 	{
 		public const string US_West = "us-west";
 		public const string US_East = "us-east";
