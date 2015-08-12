@@ -208,6 +208,13 @@ namespace Discord
 							RaiseServerCreated(server);
 						}
 						break;
+					case "GUILD_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.GuildUpdate>();
+							var server = _servers.Update(data.Id, data);
+							RaiseServerUpdated(server);
+						}
+						break;
 					case "GUILD_DELETE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildDelete>();

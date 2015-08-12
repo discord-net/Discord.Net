@@ -57,6 +57,12 @@ namespace Discord
 			if (ServerDestroyed != null)
 				ServerDestroyed(this, new ServerEventArgs(server));
 		}
+		public event EventHandler<ServerEventArgs> ServerUpdated;
+		private void RaiseServerUpdated(Server server)
+		{
+			if (ServerUpdated != null)
+				ServerUpdated(this, new ServerEventArgs(server));
+		}
 
 		//Channel
 		public sealed class ChannelEventArgs : EventArgs
