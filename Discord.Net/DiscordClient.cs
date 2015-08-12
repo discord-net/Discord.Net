@@ -13,7 +13,10 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
-        private DiscordWebSocket _webSocket;
+		public const int ReconnectDelay = 1000; //Time in milliseconds to wait after an unexpected disconnect before retrying
+		public const int FailedReconnectDelay = 10000; //Time in milliseconds to wait after a failed reconnect attempt
+
+		private DiscordWebSocket _webSocket;
 		private HttpOptions _httpOptions;
 		private bool _isClosing, _isReady;
 
@@ -172,10 +175,19 @@ namespace Discord
 			{
 				//Reconnect if we didn't cause the disconnect
 				RaiseDisconnected();
-				if (!_isClosing)
+				while (!_isClosing)
 				{
-					await Task.Delay(1000);
-					await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, _httpOptions);
+					try
+					{
+						await Task.Delay(ReconnectDelay);
+						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, _httpOptions);
+						break;
+					}
+					catch (Exception)
+					{
+						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
+						await Task.Delay(FailedReconnectDelay);
+					}
 				}
 			};
 			_webSocket.GotEvent += (s, e) =>
