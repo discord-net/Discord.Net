@@ -31,13 +31,6 @@ namespace Discord
 				Disconnected(this, EventArgs.Empty);
 		}
 
-		/*public event EventHandler LoggedIn;
-		private void RaiseLoggedIn()
-		{
-			if (LoggedIn != null)
-				LoggedIn(this, EventArgs.Empty);
-		}*/
-
 		//Server
 		public sealed class ServerEventArgs : EventArgs
 		{

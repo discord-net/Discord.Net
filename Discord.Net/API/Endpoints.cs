@@ -18,15 +18,16 @@
 
 		// /api/channels
 		public static readonly string Channels = $"{BaseApi}/channels";
-		public static string Channel(string id) => $"{Channels}/{id}";
-		public static string ChannelTyping(string id) => $"{Channels}/{id}/typing";
-		public static string ChannelMessages(string id) => $"{Channels}/{id}/messages";
-		public static string ChannelMessages(string id, int limit) => $"{Channels}/{id}/messages?limit={limit}";
-		public static string ChannelInvites(string id) => $"{Channels}/{id}/invites";
+		public static string Channel(string channelId) => $"{Channels}/{channelId}";
+		public static string ChannelTyping(string channelId) => $"{Channels}/{channelId}/typing";
+		public static string ChannelMessages(string channelId) => $"{Channels}/{channelId}/messages";
+		public static string ChannelMessages(string channelId, int limit) => $"{Channels}/{channelId}/messages?limit={limit}";
+		public static string ChannelMessage(string channelId, string msgId) => $"{Channels}/{channelId}/messages/{msgId}";
+		public static string ChannelInvites(string channelId) => $"{Channels}/{channelId}/invites";
 
 		// /api/guilds
 		public static readonly string Servers = $"{BaseApi}/guilds";
-		public static string Server(string id) => $"{Servers}/{id}";
+		public static string Server(string serverId) => $"{Servers}/{serverId}";
 		public static string ServerChannels(string serverId) => $"{Servers}/{serverId}/channels";
 		public static string ServerMember(string serverId, string userId) => $"{Servers}/{serverId}/members/{userId}";
 		public static string ServerBan(string serverId, string userId) => $"{Servers}/{serverId}/bans/{userId}";

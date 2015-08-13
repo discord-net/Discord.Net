@@ -80,6 +80,8 @@ namespace Discord.API
 		}
 		public static Task SendIsTyping(string channelId, HttpOptions options)
 			=> Http.Post(Endpoints.ChannelTyping(channelId), options);
+		public static Task DeleteMessage(string channelId, string msgId, HttpOptions options)
+			=> Http.Delete(Endpoints.ChannelMessage(channelId, msgId), options);
 
 		//Voice
 		public static Task<APIResponses.GetRegions[]> GetVoiceRegions(HttpOptions options)

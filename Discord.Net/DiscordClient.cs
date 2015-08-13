@@ -591,7 +591,7 @@ namespace Discord
 			if (text.Length <= 2000)
 			{
 				var msg = await DiscordAPI.SendMessage(channelId, text, mentions, _httpOptions);
-				_messages.Update(msg.Id, msg);
+				_messages.Update(msg.Id, channelId, msg);
             }
 			else
 			{
@@ -604,6 +604,17 @@ namespace Discord
 					await Task.Delay(1000);
 				}
 			}
+		}
+
+		public Task DeleteMessage(Message msg)
+			=> DeleteMessage(msg.ChannelId, msg.Id);
+		public async Task DeleteMessage(string channelId, string msgId)
+		{
+			try
+			{
+				await DiscordAPI.DeleteMessage(channelId, msgId, _httpOptions);
+			}
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		//Voice
