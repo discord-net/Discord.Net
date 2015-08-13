@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.API;
+using System;
 
 namespace Discord
 {
@@ -9,7 +10,8 @@ namespace Discord
 		public string Id { get; }
 		public string Name { get; internal set; }
 
-		public string Avatar { get; internal set; }
+		public string AvatarId { get; internal set; }
+		public string AvatarUrl { get { return Endpoints.UserAvatar(Id, AvatarId); } }
 		public string Discriminator { get; internal set; }
 		public string Email { get; internal set; }
 		public bool IsVerified { get; internal set; } = true;

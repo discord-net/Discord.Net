@@ -25,30 +25,25 @@ namespace Discord
 
 		public IEnumerable<User> Users { get { return _users; } }
 		private AsyncCache<User, API.Models.UserReference> _users;
-		public User GetUser(string id) => _users[id];
 
 		public IEnumerable<Server> Servers { get { return _servers; } }
 		private AsyncCache<Server, API.Models.ServerReference> _servers;
-		public Server GetServer(string id) => _servers[id];
 
 		public IEnumerable<Channel> Channels { get { return _channels; } }
 		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
-		public Channel GetChannel(string id) => _channels[id];
 
 		public IEnumerable<Message> Messages { get { return _messages; } }
 		private AsyncCache<Message, API.Models.MessageReference> _messages;
-		public Message GetMessage(string id) => _messages[id];
 
 		public IEnumerable<Role> Roles { get { return _roles; } }
 		private AsyncCache<Role, API.Models.Role> _roles;
-		public Role GetRole(string id) => _roles[id];
 
 		public bool IsConnected { get { return _isReady; } }
 
 		public DiscordClient()
 		{
 			string version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-			_httpOptions = new HttpOptions { UserAgent = $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)" };
+			_httpOptions = new HttpOptions($"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
 
 			_servers = new AsyncCache<Server, API.Models.ServerReference>(
 				(key, parentKey) => new Server(key, this),
@@ -60,7 +55,7 @@ namespace Discord
 						var defaultChannel = new ChannelReference() { Id = server.DefaultChannelId, GuildId = server.Id };
 						_channels.Update(defaultChannel.Id, defaultChannel.GuildId, defaultChannel);
 					}
-                    if (model is ExtendedServerInfo)
+					if (model is ExtendedServerInfo)
 					{
 						var extendedModel = model as ExtendedServerInfo;
 						server.AFKChannelId = extendedModel.AFKChannelId;
@@ -81,7 +76,7 @@ namespace Discord
 								try
 								{
 									var messages = DiscordAPI.GetMessages(channel.Id, _httpOptions).Result.OrderBy(x => x.Timestamp);
-                                    foreach (var message in messages)
+									foreach (var message in messages)
 									{
 										var msg = _messages.Update(message.Id, message.ChannelId, message);
 										if (msg.User != null)
@@ -122,14 +117,14 @@ namespace Discord
 					if (model is API.Models.Message)
 					{
 						var extendedModel = model as API.Models.Message;
-                        message.Attachments = extendedModel.Attachments;
+						message.Attachments = extendedModel.Attachments;
 						message.Text = extendedModel.Content;
 						message.Embeds = extendedModel.Embeds;
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
 						message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
-                    }
+					}
 					if (model is WebSocketEvents.MessageUpdate)
 					{
 						var extendedModel = model as WebSocketEvents.MessageUpdate;
@@ -140,7 +135,7 @@ namespace Discord
 			);
 			_roles = new AsyncCache<Role, API.Models.Role>(
 				(key, parentKey) => new Role(key, parentKey, this),
-				(role, model) => 
+				(role, model) =>
 				{
 					role.Permissions = model.Permissions;
 				},
@@ -150,7 +145,7 @@ namespace Discord
 				(key, parentKey) => new User(key, this),
 				(user, model) =>
 				{
-					user.Avatar = model.Avatar;
+					user.AvatarId = model.Avatar;
 					user.Discriminator = model.Discriminator;
 					user.Name = model.Username;
 					if (model is SelfUserInfo)
@@ -170,8 +165,8 @@ namespace Discord
 			);
 
 			_webSocket = new DiscordWebSocket();
-			_webSocket.Connected += (s,e) => RaiseConnected();
-			_webSocket.Disconnected += async (s,e) =>
+			_webSocket.Connected += (s, e) => RaiseConnected();
+			_webSocket.Disconnected += async (s, e) =>
 			{
 				//Reconnect if we didn't cause the disconnect
 				RaiseDisconnected();
@@ -282,7 +277,7 @@ namespace Discord
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>();
 							var user = _users.Update(data.User.Id, data.User);
-                            var server = _servers[data.GuildId];
+							var server = _servers[data.GuildId];
 							if (server != null && server.RemoveMember(user.Id))
 								RaiseMemberRemoved(user, server);
 						}
@@ -405,6 +400,62 @@ namespace Discord
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 		}
 
+		//Collections
+		public User GetUser(string id) => _users[id];
+		public User FindUser(string name)
+		{
+			return _users
+				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.FirstOrDefault();
+		}
+		public User FindUser(string name, string discriminator)
+		{
+			return _users
+				.Where(x => 
+					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+					x.Discriminator == discriminator
+                )
+				.FirstOrDefault();
+		}
+		public User FindChannelUser(Channel channel, string name)
+			=> FindChannelUser(channel, name);
+        public User FindChannelUser(string channelId, string name)
+		{
+			return _users
+				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.FirstOrDefault();
+		}
+
+		public Server GetServer(string id) => _servers[id];
+		public Server FindServer(string name)
+		{
+			return _servers
+				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.FirstOrDefault();
+		}
+
+		public Channel GetChannel(string id) => _channels[id];
+		public Channel FindChannel(string name)
+		{
+			return _channels
+				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.FirstOrDefault();
+		}
+		public Channel FindChannel(Server server, string name)
+			=> FindChannel(server.Id, name);
+        public Channel FindChannel(string serverId, string name)
+		{
+			return _channels
+				.Where(x =>
+					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+					x.ServerId == serverId
+				)
+				.FirstOrDefault();
+		}
+
+		public Message GetMessage(string id) => _messages[id];
+		public Role GetRole(string id) => _roles[id];
+
 		//Auth
 		public async Task Connect(string email, string password)
 		{
@@ -513,7 +564,6 @@ namespace Discord
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
-
 
 		//Invites
 		public Task<Invite> CreateInvite(Server server, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)

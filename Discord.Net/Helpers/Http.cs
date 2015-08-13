@@ -11,12 +11,13 @@ namespace Discord.Helpers
 {
 	internal class HttpOptions
 	{
-		public string UserAgent, Token;
+		public readonly string UserAgent;
+		public string Token;
 		public CookieContainer Cookies;
 
-		public HttpOptions(string userAgent = null)
+		public HttpOptions(string userAgent)
 		{
-			UserAgent = userAgent ?? "DiscordAPI";
+			UserAgent = userAgent;
 			Cookies = new CookieContainer(1);
 		}
 	}
@@ -103,8 +104,6 @@ namespace Discord.Helpers
 
 		private static async Task<string> SendRequest(string method, string path, string data, HttpOptions options, bool hasResponse)
 		{
-			options = options ?? new HttpOptions();
-
 			//Create Request
 			HttpWebRequest request = WebRequest.CreateHttp(path);
 			request.Accept = "*/*";
