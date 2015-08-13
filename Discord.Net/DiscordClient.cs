@@ -418,7 +418,7 @@ namespace Discord
 				.FirstOrDefault();
 		}
 		public User FindChannelUser(Channel channel, string name)
-			=> FindChannelUser(channel, name);
+			=> FindChannelUser(channel.Id, name);
         public User FindChannelUser(string channelId, string name)
 		{
 			return _users
