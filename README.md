@@ -35,3 +35,5 @@ await client.AcceptInvite("channel-invite-code");
  
 ### Related Projects
 [DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
+[Discord.js](https://github.com/hydrabolt/discord.js) - Javascript/Node API wrapper for Discord
+[node-discord](https://github.com/izy521/node-discord) - Javascript/Node API wrapper for Discord
