@@ -71,7 +71,7 @@ namespace Discord
         }
 		public async Task DisconnectAsync()
 		{
-			if (_webSocket != null)
+			if (_tasks != null)
 			{
 				_cancelToken.Cancel();
 				await _tasks;

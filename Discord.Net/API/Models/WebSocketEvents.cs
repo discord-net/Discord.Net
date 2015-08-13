@@ -27,7 +27,7 @@ namespace Discord.API.Models
 
 		//Servers
 		public sealed class GuildCreate : ExtendedServerInfo { }
-		public sealed class GuildUpdate : ExtendedServerInfo { }
+		public sealed class GuildUpdate : ServerInfo { }
 		public sealed class GuildDelete : ExtendedServerInfo { }
 
 		//Channels
