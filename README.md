@@ -1,9 +1,9 @@
 # Discord.Net v0.2
-A .Net API Wrapper for the Discord client (http://discordapp.com).
+An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 ### This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
-Discord.Net is also in early development so several functions may be unstable or not work at all.
+Discord.Net itself is also in early development so several functions may be unstable or not work at all.
 
 ### Features
 - Login/Logout (with credentials or anonymous)
@@ -34,5 +34,5 @@ await client.AcceptInvite("channel-invite-code");
  
 ### Related Projects
 - [DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
-- [Discord.js](https://github.com/hydrabolt/discord.js) - Javascript/Node API wrapper for Discord
+- [discord.js](https://github.com/hydrabolt/discord.js) - Javascript/Node API wrapper for Discord
 - [node-discord](https://github.com/izy521/node-discord) - Javascript/Node API wrapper for Discord
