@@ -351,7 +351,8 @@ namespace Discord
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageDelete>();
 							var msg = GetMessage(data.MessageId);
-							_messages.Remove(msg.Id);
+							if (msg != null)
+								_messages.Remove(msg.Id);
 						}
 						break;
 					case "MESSAGE_ACK":
@@ -464,9 +465,9 @@ namespace Discord
 			var response = await DiscordAPI.CreateChannel(serverId, name, region, _httpOptions);
 			return _channels.Update(response.Id, response);
 		}
-		public Task<Channel> CreatePMChannel(User user, string name, string region)
-			=> CreateChannel(user.Id, name, region);
-		public async Task<Channel> CreatePMChannel(string recipientId, string name, string region)
+		public Task<Channel> CreatePMChannel(User user)
+			=> CreatePMChannel(user.Id);
+		public async Task<Channel> CreatePMChannel(string recipientId)
 		{
 			CheckReady();
 			var response = await DiscordAPI.CreatePMChannel(UserId, recipientId, _httpOptions);
