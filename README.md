@@ -10,13 +10,12 @@ Discord.Net is also in early development so several functions may be unstable or
 - Accepting/Creating/Deleting Invites (standard or human readable)
 - Receiving/Sending Messages
 - Creating/Destroying Servers
-- Creating/Destroying Channels
+- Creating/Destroying Channels (text, void or PM)
 - Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen Users
 - Several Discord Events
 
 ### Upcoming
 - Modifying User/Channel/Server Settings
-- Sending Private Messages (Replies are supported, starting a new private chat currently is not)
 
 ### Example (Echo Client)
 ```
