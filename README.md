@@ -1,11 +1,11 @@
 # Discord.Net v0.2
 A .Net API Wrapper for the Discord client (http://discordapp.com).
 
-## This is an alpha!
+### This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
 Discord.Net is also in early development so several functions may be unstable or not work at all.
 
-# Features
+### Features
 - Login/Logout (with credentials or anonymous)
 - Accepting/Creating/Deleting Invites (standard or human readable)
 - Receiving/Sending Messages
@@ -14,11 +14,11 @@ Discord.Net is also in early development so several functions may be unstable or
 - Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen Users
 - Several Discord Events
 
-# Upcoming
+### Upcoming
 - Modifying User/Channel/Server Settings
 - Sending Private Messages (Replies are supported, starting a new private chat currently is not)
 
-# Example (Echo Client)
+### Example (Echo Client)
 ```
 var client = new DiscordClient();
 client.MessageCreated += (s, e) =>
@@ -29,7 +29,9 @@ await client.Connect("discordtest@email.com", "Password123");
 await client.AcceptInvite("channel-invite-code");
 ```
 
-# Known Issues
-
+### Known Issues
 - Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
-- Caches do not currently clean up when their entries are no longer referenced, and there is no cap to the message cache. For now, connecting and disconnecting will clear all caches.
+- Caches do not currently clean up when their entries are no longer referenced, and there is no cap to the message cache. For now, disconencting and reconnecting will clear all caches.
+ 
+### Related Projects
+[DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
