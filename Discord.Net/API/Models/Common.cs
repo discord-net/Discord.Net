@@ -101,6 +101,8 @@ namespace Discord.API.Models
 		public string EmbedChannelId;
 		[JsonProperty(PropertyName = "embed_enabled")]
 		public bool EmbedEnabled;
+		[JsonProperty(PropertyName = "icon")]
+		public string Icon;
 		[JsonProperty(PropertyName = "joined_at")]
 		public DateTime? JoinedAt;
 		[JsonProperty(PropertyName = "owner_id")]
