@@ -34,4 +34,6 @@ await client.AcceptInvite("channel-invite-code");
 - Caches do not currently clean up when their entries are no longer referenced, and there is no cap to the message cache. For now, disconencting and reconnecting will clear all caches.
  
 ### Related Projects
-[DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
+- [DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
+- [Discord.js](https://github.com/hydrabolt/discord.js) - Javascript/Node API wrapper for Discord
+- [node-discord](https://github.com/izy521/node-discord) - Javascript/Node API wrapper for Discord
