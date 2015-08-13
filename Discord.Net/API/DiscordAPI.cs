@@ -41,6 +41,11 @@ namespace Discord.API
 			var request = new APIRequests.CreateChannel { Name = name, Type = channelType };
 			return Http.Post<APIResponses.CreateChannel>(Endpoints.ServerChannels(serverId), request, options);
 		}
+		public static Task<APIResponses.CreateChannel> CreatePMChannel(string myId, string recipientId, HttpOptions options)
+		{
+			var request = new APIRequests.CreatePMChannel { RecipientId = recipientId };
+			return Http.Post<APIResponses.CreateChannel>(Endpoints.UserChannels(myId), request, options);
+		}
 		public static Task<APIResponses.DestroyChannel> DestroyChannel(string channelId, HttpOptions options)
 			=> Http.Delete<APIResponses.DestroyChannel>(Endpoints.Channel(channelId), options);
 		public static Task<APIResponses.GetMessages[]> GetMessages(string channelId, HttpOptions options)

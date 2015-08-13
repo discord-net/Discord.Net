@@ -31,7 +31,7 @@ namespace Discord.Net.Tests
 			Task.WaitAll(_bot2.Servers.Select(x => _bot2.LeaveServer(x)).ToArray());
 
 			//Create new server and invite other bot to it
-			_testServer = _bot1.CreateServer("Discord.Net Testbed", Regions.US_East).Result;
+			_testServer = _bot1.CreateServer("Discord.Net Testing", Regions.US_East).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _bot1.CreateInvite(_testServer, 60, 1, false, false).Result;
 			_bot2.AcceptInvite(invite).Wait();

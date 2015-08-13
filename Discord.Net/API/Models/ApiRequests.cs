@@ -38,6 +38,11 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "type")]
 			public string Type;
 		}
+		public class CreatePMChannel
+		{
+			[JsonProperty(PropertyName = "recipient_id")]
+			public string RecipientId;
+		}
 
 		public class CreateInvite
 		{

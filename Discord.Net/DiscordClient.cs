@@ -444,16 +444,15 @@ namespace Discord
 		}
 		public Task<Server> LeaveServer(Server server)
 			=> LeaveServer(server.Id);
-		public async Task<Server> LeaveServer(string id)
+		public async Task<Server> LeaveServer(string serverId)
 		{
 			CheckReady();
 			try
 			{
-				await DiscordAPI.LeaveServer(id, _httpOptions);
+				await DiscordAPI.LeaveServer(serverId, _httpOptions);
 			}
-			//Happens if the room was destroyed as we try to leave it
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) {}
-			return _servers.Remove(id);
+			return _servers.Remove(serverId);
 		}
 
 		//Channels
@@ -465,13 +464,25 @@ namespace Discord
 			var response = await DiscordAPI.CreateChannel(serverId, name, region, _httpOptions);
 			return _channels.Update(response.Id, response);
 		}
+		public Task<Channel> CreatePMChannel(User user, string name, string region)
+			=> CreateChannel(user.Id, name, region);
+		public async Task<Channel> CreatePMChannel(string recipientId, string name, string region)
+		{
+			CheckReady();
+			var response = await DiscordAPI.CreatePMChannel(UserId, recipientId, _httpOptions);
+			return _channels.Update(response.Id, response);
+		}
 		public Task<Channel> DestroyChannel(Channel channel)
 			=> DestroyChannel(channel.Id);
         public async Task<Channel> DestroyChannel(string channelId)
 		{
 			CheckReady();
-			var response = await DiscordAPI.DestroyChannel(channelId, _httpOptions);
-			return _channels.Remove(response.Id);
+			try
+			{
+				var response = await DiscordAPI.DestroyChannel(channelId, _httpOptions);
+			}
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
+			return _channels.Remove(channelId);
 		}
 
 		//Bans
@@ -492,10 +503,14 @@ namespace Discord
 			=> Unban(server.Id, userId);
 		public Task Unban(string server, User user)
 			=> Unban(server, user.Id);
-		public Task Unban(string serverId, string userId)
+		public async Task Unban(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Unban(serverId, userId, _httpOptions);
+			try
+			{
+				await DiscordAPI.Unban(serverId, userId, _httpOptions);
+			}
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 
@@ -553,9 +568,13 @@ namespace Discord
 		public async Task DeleteInvite(string id)
 		{
 			CheckReady();
-			//Check if this is a human-readable link and get its ID
-			var response = await DiscordAPI.GetInvite(id, _httpOptions);
-			await DiscordAPI.DeleteInvite(response.Code, _httpOptions);
+			try
+			{
+				//Check if this is a human-readable link and get its ID
+				var response = await DiscordAPI.GetInvite(id, _httpOptions);
+				await DiscordAPI.DeleteInvite(response.Code, _httpOptions);
+			}
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		//Chat
