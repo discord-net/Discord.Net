@@ -23,13 +23,14 @@ namespace Discord
 		private ConcurrentQueue<byte[]> _sendQueue;
 		private int _heartbeatInterval;
 		private DateTime _lastHeartbeat;
-		private AutoResetEvent _connectWaitOnLogin;
+		private AutoResetEvent _connectWaitOnLogin, _connectWaitOnLogin2;
 
 		public async Task ConnectAsync(string url, HttpOptions options)
 		{
 			await DisconnectAsync();
 
 			_connectWaitOnLogin = new AutoResetEvent(false);
+			_connectWaitOnLogin2 = new AutoResetEvent(false);
 			_sendQueue = new ConcurrentQueue<byte[]>();
 
 			_webSocket = new ClientWebSocket();
@@ -66,8 +67,9 @@ namespace Discord
 			msg.Payload.Properties["$referring_domain"] = "";
 			SendMessage(msg, cancelToken);
 
-			if (!_connectWaitOnLogin.WaitOne(ReadyTimeout))
+			if (!_connectWaitOnLogin.WaitOne(ReadyTimeout)) //Pre-Event
 				throw new Exception("No reply from Discord server");
+			_connectWaitOnLogin2.WaitOne(); //Post-Event
         }
 		public async Task DisconnectAsync()
 		{
@@ -116,10 +118,11 @@ namespace Discord
 								_heartbeatInterval = payload.HeartbeatInterval;
 								SendMessage(new WebSocketCommands.UpdateStatus(), cancelToken);
 								SendMessage(new WebSocketCommands.KeepAlive(), cancelToken);
-							}
+								_connectWaitOnLogin.Set(); //Pre-Event
+                            }
 							RaiseGotEvent(msg.Type, msg.Payload as JToken);
 							if (msg.Type == "READY")
-								_connectWaitOnLogin.Set();
+								_connectWaitOnLogin2.Set(); //Post-Event
 							break;
 						default:
 							RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);

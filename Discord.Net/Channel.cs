@@ -24,6 +24,7 @@ namespace Discord
 		public string RecipientId { get; internal set; }
 		public User Recipient { get { return _client.GetUser(RecipientId); } }
 
+		[JsonIgnore]
 		public IEnumerable<Message> Messages { get { return _client.Messages.Where(x => x.ChannelId == Id); } }
 
 		//Not Implemented

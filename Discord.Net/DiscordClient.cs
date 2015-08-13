@@ -343,7 +343,7 @@ namespace Discord
 					case "MESSAGE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.MessageUpdate>();
-							var msg = _messages.Update(data.Id, data);
+							var msg = _messages.Update(data.Id, data.ChannelId, data);
 							RaiseMessageUpdated(msg);
 						}
 						break;
@@ -600,7 +600,7 @@ namespace Discord
 				{
 					int index = i * DiscordAPI.MaxMessageSize;
 					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
-					_messages.Update(msg.Id, msg);
+					_messages.Update(msg.Id, channelId, msg);
 					await Task.Delay(1000);
 				}
 			}
