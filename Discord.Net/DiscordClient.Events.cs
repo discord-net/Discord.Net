@@ -176,32 +176,27 @@ namespace Discord
 		//Member
 		public sealed class MemberEventArgs : EventArgs
 		{
-			public readonly User User;
-			public readonly Server Server;
-			internal MemberEventArgs(User user, Server server)
-			{
-				User = user;
-				Server = server;
-			}
+			public readonly Membership Membership;
+			internal MemberEventArgs(Membership membership) { Membership = membership; }
 		}
 
 		public event EventHandler<MemberEventArgs> MemberAdded;
-		private void RaiseMemberAdded(User user, Server server)
+		private void RaiseMemberAdded(Membership membership, Server server)
 		{
 			if (MemberAdded != null)
-				MemberAdded(this, new MemberEventArgs(user, server));
+				MemberAdded(this, new MemberEventArgs(membership));
 		}
 		public event EventHandler<MemberEventArgs> MemberRemoved;
-		private void RaiseMemberRemoved(User user, Server server)
+		private void RaiseMemberRemoved(Membership membership, Server server)
 		{
 			if (MemberRemoved != null)
-				MemberRemoved(this, new MemberEventArgs(user, server));
+				MemberRemoved(this, new MemberEventArgs(membership));
 		}
 		public event EventHandler<MemberEventArgs> MemberUpdated;
-		private void RaiseMemberUpdated(User user, Server server)
+		private void RaiseMemberUpdated(Membership membership, Server server)
 		{
 			if (MemberUpdated != null)
-				MemberUpdated(this, new MemberEventArgs(user, server));
+				MemberUpdated(this, new MemberEventArgs(membership));
 		}
 
 		//Status

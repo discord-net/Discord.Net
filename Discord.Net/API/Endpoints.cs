@@ -3,6 +3,7 @@
 	internal static class Endpoints
 	{
 		public static readonly string BaseUrl = "discordapp.com";
+		public static readonly string BaseShortUrl = "discord.gg";
 		public static readonly string BaseHttps = $"https://{BaseUrl}";
 
 		// /api
@@ -49,5 +50,8 @@
 		//Web Sockets
 		public static readonly string BaseWss = "wss://" + BaseUrl;
 		public static readonly string WebSocket_Hub = $"{BaseWss}/hub";
+
+		//Website
+		public static string InviteUrl(string code) => $"{BaseShortUrl}/{code}";
     }
 }

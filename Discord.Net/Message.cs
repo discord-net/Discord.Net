@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -13,6 +15,10 @@ namespace Discord
 		public bool IsTTS { get; internal set; }
 		public string Text { get; internal set; }
 		public DateTime Timestamp { get; internal set; }
+
+		public string[] MentionIds { get; internal set; }
+		[JsonIgnore]
+		public IEnumerable<User> Mentions { get { return MentionIds.Select(x => _client.GetUser(x)).Where(x => x != null); } }
 
 		public string ChannelId { get; }
 		[JsonIgnore]

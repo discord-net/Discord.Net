@@ -18,6 +18,7 @@ namespace Discord
 		internal Role(string id, string serverId, DiscordClient client)
 		{
 			Id = id;
+			ServerId = serverId;
 			_client = client;
 		}
 

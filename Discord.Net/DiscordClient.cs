@@ -71,7 +71,7 @@ namespace Discord
 						foreach (var channel in extendedModel.Channels)
 						{
 							_channels.Update(channel.Id, model.Id, channel);
-							if (channel.Type == ChannelTypes.Text)
+							/*if (channel.Type == ChannelTypes.Text)
 							{
 								try
 								{
@@ -84,12 +84,12 @@ namespace Discord
 									}
 								}
 								catch { } //Bad Permissions?
-							}
+							}*/
 						}
 						foreach (var membership in extendedModel.Members)
 						{
 							_users.Update(membership.User.Id, membership.User);
-							server.AddMember(membership.User.Id);
+							server.AddMember(new Membership(server.Id, membership.User.Id, membership.JoinedAt, this) { RoleIds = membership.Roles, IsMuted = membership.IsMuted, IsDeafened = membership.IsDeaf });
 						}
 					}
 				},
@@ -118,12 +118,13 @@ namespace Discord
 					{
 						var extendedModel = model as API.Models.Message;
 						message.Attachments = extendedModel.Attachments;
-						message.Text = extendedModel.Content;
 						message.Embeds = extendedModel.Embeds;
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
-						message.UserId = extendedModel.Author.Id;
+						message.MentionIds = extendedModel.Mentions.Select(x => x.Id).ToArray();
+                        message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
+						message.Text = extendedModel.Content;
 					}
 					if (model is WebSocketEvents.MessageUpdate)
 					{
@@ -137,8 +138,9 @@ namespace Discord
 				(key, parentKey) => new Role(key, parentKey, this),
 				(role, model) =>
 				{
+					role.Name = model.Name;
 					role.Permissions = model.Permissions;
-				},
+                },
 				role => { }
 			);
 			_users = new AsyncCache<User, API.Models.UserReference>(
@@ -153,13 +155,13 @@ namespace Discord
 						var extendedModel = model as SelfUserInfo;
 						user.Email = extendedModel.Email;
 						user.IsVerified = extendedModel.IsVerified;
-					}
+                    }
 					if (model is PresenceUserInfo)
 					{
 						var extendedModel = model as PresenceUserInfo;
 						user.GameId = extendedModel.GameId;
 						user.Status = extendedModel.Status;
-					}
+                    }
 				},
 				user => { }
 			);
@@ -261,8 +263,9 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>();
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.GuildId];
-							server._members[user.Id] = true;
-							RaiseMemberAdded(user, server);
+							var membership = new Membership(server.Id, data.User.Id, data.JoinedAt, this) { RoleIds = data.Roles };
+                            server.AddMember(membership);
+							RaiseMemberAdded(membership, server);
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
@@ -270,7 +273,10 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>();
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.GuildId];
-							RaiseMemberUpdated(user, server);
+							var membership = server.GetMembership(data.User.Id);
+							if (membership != null)
+								membership.RoleIds = data.Roles;
+							RaiseMemberUpdated(membership, server);
 						}
 						break;
 					case "GUILD_MEMBER_REMOVE":
@@ -278,8 +284,12 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>();
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.GuildId];
-							if (server != null && server.RemoveMember(user.Id))
-								RaiseMemberRemoved(user, server);
+							if (server != null)
+							{
+								var membership = server.RemoveMember(user.Id);
+								if (membership != null)
+									RaiseMemberRemoved(membership, server);
+							}
 						}
 						break;
 
@@ -287,14 +297,14 @@ namespace Discord
 					case "GUILD_ROLE_CREATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = _roles.Update(data.Role.Id, data.Role);
+							var role = _roles.Update(data.Role.Id, data.GuildId, data.Role);
 							RaiseRoleCreated(role);
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = _roles.Update(data.Role.Id, data.Role);
+							var role = _roles.Update(data.Role.Id, data.GuildId, data.Role);
 							RaiseRoleUpdated(role);
 						}
 						break;
@@ -454,7 +464,9 @@ namespace Discord
 		}
 
 		public Role GetRole(string id) => _roles[id];
-		public Role FindRole(string name)
+		public Role FindRole(Server server, string name)
+			=> FindRole(server.Id, name);
+        public Role FindRole(string serverId, string name)
 		{
 			return _roles
 				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
@@ -515,13 +527,13 @@ namespace Discord
 		}
 
 		//Channels
-		public Task<Channel> CreateChannel(Server server, string name, string region)
-			=> CreateChannel(server.Id, name, region);
-        public async Task<Channel> CreateChannel(string serverId, string name, string region)
+		public Task<Channel> CreateChannel(Server server, string name, string type)
+			=> CreateChannel(server.Id, name, type);
+        public async Task<Channel> CreateChannel(string serverId, string name, string type)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreateChannel(serverId, name, region, _httpOptions);
-			return _channels.Update(response.Id, response);
+			var response = await DiscordAPI.CreateChannel(serverId, name, type, _httpOptions);
+			return _channels.Update(response.Id, serverId, response);
 		}
 		public Task<Channel> CreatePMChannel(User user)
 			=> CreatePMChannel(user.Id);

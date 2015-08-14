@@ -117,7 +117,7 @@ namespace Discord.API.Models
 		public class Membership
 		{
 			[JsonProperty(PropertyName = "roles")]
-			public object[] Roles;
+			public string[] Roles;
 			[JsonProperty(PropertyName = "mute")]
 			public bool IsMuted;
 			[JsonProperty(PropertyName = "deaf")]

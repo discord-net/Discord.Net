@@ -48,12 +48,12 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "joined_at")]
 			public DateTime JoinedAt;
 			[JsonProperty(PropertyName = "roles")]
-			public object[] Roles;
+			public string[] Roles;
 		}
 		public sealed class GuildMemberUpdate : GuildMemberEvent
 		{
 			[JsonProperty(PropertyName = "roles")]
-			public object[] Roles;
+			public string[] Roles;
 		}
 		public sealed class GuildMemberRemove : GuildMemberEvent { }
 

@@ -10,6 +10,8 @@ namespace Discord
 		public bool IsRevoked, IsTemporary;
 		public readonly string Code, XkcdPass;
 
+		public string Url { get { return API.Endpoints.InviteUrl(XkcdPass ?? Code); } }
+
 		public string InviterId { get; internal set; }
 		[JsonIgnore]
 		public User Inviter { get { return _client.GetUser(InviterId); } }

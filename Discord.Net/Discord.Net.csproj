@@ -55,6 +55,7 @@
     <Compile Include="ChannelTypes.cs" />
     <Compile Include="Helpers\AsyncCache.cs" />
     <Compile Include="Invite.cs" />
+    <Compile Include="Membership.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Channel.cs" />
