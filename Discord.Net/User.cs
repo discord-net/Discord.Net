@@ -1,4 +1,5 @@
 ﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
 
 namespace Discord
@@ -13,7 +14,9 @@ namespace Discord
 		public string AvatarId { get; internal set; }
 		public string AvatarUrl { get { return Endpoints.UserAvatar(Id, AvatarId); } }
 		public string Discriminator { get; internal set; }
+		[JsonIgnore]
 		public string Email { get; internal set; }
+		[JsonIgnore]
 		public bool IsVerified { get; internal set; } = true;
 		public string GameId { get; internal set; }
 		public string Status { get; internal set; }

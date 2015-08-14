@@ -453,8 +453,15 @@ namespace Discord
 				.FirstOrDefault();
 		}
 
-		public Message GetMessage(string id) => _messages[id];
 		public Role GetRole(string id) => _roles[id];
+		public Role FindRole(string name)
+		{
+			return _roles
+				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.FirstOrDefault();
+		}
+
+		public Message GetMessage(string id) => _messages[id];
 
 		//Auth
 		public async Task Connect(string email, string password)
