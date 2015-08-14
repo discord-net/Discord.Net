@@ -1,4 +1,4 @@
-# Discord.Net v0.3
+# Discord.Net v0.3.1
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 ### This is an alpha!
