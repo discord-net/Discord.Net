@@ -665,30 +665,33 @@ namespace Discord
 		}
 
 		//Chat
-		public Task SendMessage(Channel channel, string text)
+		public Task<Message[]> SendMessage(Channel channel, string text)
 			=> SendMessage(channel.Id, text, new string[0]);
-		public Task SendMessage(string channelId, string text)
+		public Task<Message[]> SendMessage(string channelId, string text)
 			=> SendMessage(channelId, text, new string[0]);
-		public Task SendMessage(Channel channel, string text, string[] mentions)
+		public Task<Message[]> SendMessage(Channel channel, string text, string[] mentions)
 			=> SendMessage(channel, text, mentions);
-        public async Task SendMessage(string channelId, string text, string[] mentions)
+        public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
 		{
 			CheckReady();
+			
 			if (text.Length <= 2000)
 			{
 				var msg = await DiscordAPI.SendMessage(channelId, text, mentions, _httpOptions);
-				_messages.Update(msg.Id, channelId, msg);
+				return new Message[] { _messages.Update(msg.Id, channelId, msg) };
             }
 			else
 			{
 				int blockCount = (int)Math.Ceiling(text.Length / (double)DiscordAPI.MaxMessageSize);
+				Message[] result = new Message[blockCount];
 				for (int i = 0; i < blockCount; i++)
 				{
 					int index = i * DiscordAPI.MaxMessageSize;
 					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
-					_messages.Update(msg.Id, channelId, msg);
+					result[i] = _messages.Update(msg.Id, channelId, msg);
 					await Task.Delay(1000);
 				}
+				return result;
 			}
 		}
 
@@ -714,13 +717,16 @@ namespace Discord
 
 		public Task DeleteMessage(Message msg)
 			=> DeleteMessage(msg.ChannelId, msg.Id);
-		public async Task DeleteMessage(string channelId, string msgId)
+		public async Task<Message> DeleteMessage(string channelId, string msgId)
 		{
 			try
 			{
 				await DiscordAPI.DeleteMessage(channelId, msgId, _httpOptions);
+				return _messages.Remove(msgId);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
+			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
+			return null;
 		}
 
 		//Voice
