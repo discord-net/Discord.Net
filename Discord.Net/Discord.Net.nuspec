@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/RogueException/Discord.Net</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial NuGet alpha release</releaseNotes>
+    <releaseNotes></releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Discord DiscordApp</tags>
   </metadata>
