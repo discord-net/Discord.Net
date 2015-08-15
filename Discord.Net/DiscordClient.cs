@@ -21,24 +21,24 @@ namespace Discord
 		private bool _isClosing, _isReady;
 
 		public string UserId { get; private set; }
-		public User User { get { return _users[UserId]; } }
+		public User User => _users[UserId];
 
-		public IEnumerable<User> Users { get { return _users; } }
+		public IEnumerable<User> Users => _users;
 		private AsyncCache<User, API.Models.UserReference> _users;
 
-		public IEnumerable<Server> Servers { get { return _servers; } }
+		public IEnumerable<Server> Servers => _servers;
 		private AsyncCache<Server, API.Models.ServerReference> _servers;
 
-		public IEnumerable<Channel> Channels { get { return _channels; } }
+		public IEnumerable<Channel> Channels => _channels;
 		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
 
-		public IEnumerable<Message> Messages { get { return _messages; } }
+		public IEnumerable<Message> Messages => _messages;
 		private AsyncCache<Message, API.Models.MessageReference> _messages;
 
-		public IEnumerable<Role> Roles { get { return _roles; } }
+		public IEnumerable<Role> Roles => _roles;
 		private AsyncCache<Role, API.Models.Role> _roles;
 
-		public bool IsConnected { get { return _isReady; } }
+		public bool IsConnected => _isReady;
 
 		public DiscordClient()
 		{

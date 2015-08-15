@@ -18,20 +18,20 @@ namespace Discord
 		public string Region { get; internal set; }
 		
 		public string OwnerId { get; internal set; }
-		public User Owner { get { return _client.GetUser(OwnerId); } }
-		public bool IsOwner { get { return _client.UserId == OwnerId; } }
+		public User Owner => _client.GetUser(OwnerId);
+		public bool IsOwner => _client.UserId == OwnerId;
 		
-		public string DefaultChannelId { get { return Id; } }
-		public Channel DefaultChannel { get { return _client.GetChannel(DefaultChannelId); } }
+		public string DefaultChannelId => Id;
+		public Channel DefaultChannel =>_client.GetChannel(DefaultChannelId);
 
 		internal ConcurrentDictionary<string, Membership> _members;
-		public IEnumerable<Membership> Members { get { return _members.Values; } }
+		public IEnumerable<Membership> Members => _members.Values;
 
 		internal ConcurrentDictionary<string, bool> _bans;
-		public IEnumerable<User> Bans { get { return _bans.Keys.Select(x => _client.GetUser(x)); } }
+		public IEnumerable<User> Bans => _bans.Keys.Select(x => _client.GetUser(x));
 
-		public IEnumerable<Channel> Channels { get { return _client.Channels.Where(x => x.ServerId == Id); } }
-		public IEnumerable<Role> Roles { get { return _client.Roles.Where(x => x.ServerId == Id); } }
+		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.ServerId == Id);
+		public IEnumerable<Role> Roles => _client.Roles.Where(x => x.ServerId == Id);
 
 		//Not Implemented
 		public object Presence { get; internal set; }

@@ -12,7 +12,7 @@ namespace Discord
 		public string Name { get; internal set; }
 
 		public string AvatarId { get; internal set; }
-		public string AvatarUrl { get { return Endpoints.UserAvatar(Id, AvatarId); } }
+		public string AvatarUrl => Endpoints.UserAvatar(Id, AvatarId);
 		public string Discriminator { get; internal set; }
 		[JsonIgnore]
 		public string Email { get; internal set; }

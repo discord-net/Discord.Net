@@ -18,15 +18,15 @@ namespace Discord
 
 		public string[] MentionIds { get; internal set; }
 		[JsonIgnore]
-		public IEnumerable<User> Mentions { get { return MentionIds.Select(x => _client.GetUser(x)).Where(x => x != null); } }
+		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.GetUser(x)).Where(x => x != null);
 
 		public string ChannelId { get; }
 		[JsonIgnore]
-		public Channel Channel { get { return _client.GetChannel(ChannelId); } }
+		public Channel Channel => _client.GetChannel(ChannelId);
 
 		public string UserId { get; internal set; }
 		[JsonIgnore]
-		public User User { get { return _client.GetUser(UserId); } }
+		public User User => _client.GetUser(UserId);
 		
 		//Not Implemented
 		public object[] Attachments { get; internal set; }

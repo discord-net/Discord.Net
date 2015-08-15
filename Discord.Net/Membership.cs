@@ -14,13 +14,13 @@ namespace Discord
 		public bool IsDeafened { get; internal set; }
 
 		public string ServerId { get; }
-		public Server Server { get { return _client.GetServer(ServerId); } }
+		public Server Server => _client.GetServer(ServerId);
 
 		public string UserId { get; }
-		public User User { get { return _client.GetUser(UserId); } }
+		public User User => _client.GetUser(UserId);
 		
 		public string[] RoleIds { get; internal set; }
-		public IEnumerable<Role> Roles { get { return RoleIds.Select(x => _client.GetRole((string)x)); } }
+		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.GetRole(x));
 
 		public Membership(string serverId, string userId, DateTime joinedAt, DiscordClient client)
 		{

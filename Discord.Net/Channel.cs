@@ -18,14 +18,14 @@ namespace Discord
 		
 		public string ServerId { get; }
 		[JsonIgnore]
-		public Server Server { get { return ServerId != null ? _client.GetServer(ServerId) : null; } }
+		public Server Server => ServerId != null ? _client.GetServer(ServerId) : null;
 
 		[JsonIgnore]
 		public string RecipientId { get; internal set; }
-		public User Recipient { get { return _client.GetUser(RecipientId); } }
+		public User Recipient =>  _client.GetUser(RecipientId);
 
 		[JsonIgnore]
-		public IEnumerable<Message> Messages { get { return _client.Messages.Where(x => x.ChannelId == Id); } }
+		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.ChannelId == Id);
 
 		//Not Implemented
 		public object[] PermissionOverwrites { get; internal set; }
