@@ -106,7 +106,8 @@ namespace Discord
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
 						message.MentionIds = extendedModel.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
-                        message.UserId = extendedModel.Author.Id;
+						if (extendedModel.Author != null)
+							message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
 						message.Text = extendedModel.Content;
 					}
@@ -399,6 +400,9 @@ namespace Discord
 		}
 		public User FindUser(string name, string discriminator)
 		{
+			if (name.StartsWith("@"))
+				name = name.Substring(1);
+
 			return _users
 				.Where(x => 
 					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
@@ -410,6 +414,9 @@ namespace Discord
 			=> FindChannelUser(channel.Id, name);
         public User FindChannelUser(string channelId, string name)
 		{
+			if (name.StartsWith("@"))
+				name = name.Substring(1);
+
 			return _users
 				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
 				.FirstOrDefault();
@@ -426,6 +433,9 @@ namespace Discord
 		public Channel GetChannel(string id) => _channels[id];
 		public Channel FindChannel(string name)
 		{
+			if (name.StartsWith("#"))
+				name = name.Substring(1);
+
 			return _channels
 				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
 				.FirstOrDefault();
@@ -434,6 +444,9 @@ namespace Discord
 			=> FindChannel(server.Id, name);
         public Channel FindChannel(string serverId, string name)
 		{
+			if (name.StartsWith("#"))
+				name = name.Substring(1);
+
 			return _channels
 				.Where(x =>
 					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
