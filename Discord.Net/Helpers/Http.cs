@@ -157,7 +157,6 @@ namespace Discord.Helpers
 				else
 					return null;
 			}
-
 		}
 
 		private static Stream GetDecoder(string contentEncoding, MemoryStream encodedStream)

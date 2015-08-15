@@ -69,23 +69,7 @@ namespace Discord
 						foreach (var role in extendedModel.Roles)
 							_roles.Update(role.Id, model.Id, role);
 						foreach (var channel in extendedModel.Channels)
-						{
 							_channels.Update(channel.Id, model.Id, channel);
-							/*if (channel.Type == ChannelTypes.Text)
-							{
-								try
-								{
-									var messages = DiscordAPI.GetMessages(channel.Id, _httpOptions).Result.OrderBy(x => x.Timestamp);
-									foreach (var message in messages)
-									{
-										var msg = _messages.Update(message.Id, message.ChannelId, message);
-										if (msg.User != null)
-											msg.User.UpdateActivity(message.Timestamp);
-									}
-								}
-								catch { } //Bad Permissions?
-							}*/
-						}
 						foreach (var membership in extendedModel.Members)
 						{
 							_users.Update(membership.User.Id, membership.User);
@@ -125,11 +109,6 @@ namespace Discord
                         message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
 						message.Text = extendedModel.Content;
-					}
-					if (model is WebSocketEvents.MessageUpdate)
-					{
-						var extendedModel = model as WebSocketEvents.MessageUpdate;
-						message.Embeds = extendedModel.Embeds;
 					}
 				},
 				message => { }
@@ -474,6 +453,31 @@ namespace Discord
 		}
 
 		public Message GetMessage(string id) => _messages[id];
+		public Task<Message[]> DownloadMessages(Channel channel, int count)
+			=> DownloadMessages(channel.Id, count);
+        public async Task<Message[]> DownloadMessages(string channelId, int count)
+		{
+			Channel channel = GetChannel(channelId);
+			if (channel != null && channel.Type == ChannelTypes.Text)
+			{
+				try
+				{
+					var msgs = await DiscordAPI.GetMessages(channel.Id, count, _httpOptions);
+					return msgs.OrderBy(x => x.Timestamp)
+						.Select(x =>
+						{
+							var msg = _messages.Update(x.Id, x.ChannelId, x);
+							var user = msg.User;
+							if (user != null)
+								user.UpdateActivity(x.Timestamp);
+							return msg;
+						})
+						.ToArray();
+				}
+				catch { } //Bad Permissions?
+			}
+			return null;
+		}
 
 		//Auth
 		public async Task Connect(string email, string password)

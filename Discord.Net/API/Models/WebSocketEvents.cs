@@ -118,11 +118,7 @@ namespace Discord.API.Models
 
 		//Chat
 		public sealed class MessageCreate : Message { }
-		public sealed class MessageUpdate : MessageReference
-		{
-			[JsonProperty(PropertyName = "embeds")]
-			public object[] Embeds;
-		}
+		public sealed class MessageUpdate : Message { }
 		public sealed class MessageDelete : MessageReference { }
 		public sealed class MessageAck : MessageReference { }
 		public sealed class TypingStart

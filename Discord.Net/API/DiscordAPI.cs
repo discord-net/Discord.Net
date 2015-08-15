@@ -48,8 +48,8 @@ namespace Discord.API
 		}
 		public static Task<APIResponses.DestroyChannel> DestroyChannel(string channelId, HttpOptions options)
 			=> Http.Delete<APIResponses.DestroyChannel>(Endpoints.Channel(channelId), options);
-		public static Task<APIResponses.GetMessages[]> GetMessages(string channelId, HttpOptions options)
-			=> Http.Get<APIResponses.GetMessages[]>(Endpoints.ChannelMessages(channelId, 50), options);
+		public static Task<APIResponses.GetMessages[]> GetMessages(string channelId, int count, HttpOptions options)
+			=> Http.Get<APIResponses.GetMessages[]>(Endpoints.ChannelMessages(channelId, count), options);
 
 		//Members
 		public static Task Kick(string serverId, string memberId, HttpOptions options)
