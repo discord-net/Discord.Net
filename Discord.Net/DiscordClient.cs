@@ -105,7 +105,7 @@ namespace Discord
 						message.Embeds = extendedModel.Embeds;
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
-						message.MentionIds = extendedModel.Mentions.Select(x => x.Id).ToArray();
+						message.MentionIds = extendedModel.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
                         message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
 						message.Text = extendedModel.Content;
