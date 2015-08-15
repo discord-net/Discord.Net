@@ -118,7 +118,7 @@ namespace Discord
 				(role, model) =>
 				{
 					role.Name = model.Name;
-					role.Permissions = model.Permissions;
+					role.Permissions.RawValue = (uint)model.Permissions;
                 },
 				role => { }
 			);
