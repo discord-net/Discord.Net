@@ -679,6 +679,26 @@ namespace Discord
 			}
 		}
 
+		public Task EditMessage(Message message, string text)
+			=> EditMessage(message.ChannelId, message.Id, text, new string[0]);
+		public Task EditMessage(Channel channel, string messageId, string text)
+			=> EditMessage(channel.Id, messageId, text, new string[0]);
+		public Task EditMessage(string channelId, string messageId, string text)
+			=> EditMessage(channelId, messageId, text, new string[0]);
+		public Task EditMessage(Message message, string text, string[] mentions)
+			=> EditMessage(message.ChannelId, message.Id, text, mentions);
+		public Task EditMessage(Channel channel, string messageId, string text, string[] mentions)
+			=> EditMessage(channel.Id, messageId, text, mentions);
+		public async Task EditMessage(string channelId, string messageId, string text, string[] mentions)
+		{
+			CheckReady();
+			if (text.Length > DiscordAPI.MaxMessageSize)
+				text = text.Substring(0, DiscordAPI.MaxMessageSize);
+
+			var msg = await DiscordAPI.EditMessage(channelId, messageId, text, mentions, _httpOptions);
+			_messages.Update(msg.Id, channelId, msg);
+		}
+
 		public Task DeleteMessage(Message msg)
 			=> DeleteMessage(msg.ChannelId, msg.Id);
 		public async Task DeleteMessage(string channelId, string msgId)

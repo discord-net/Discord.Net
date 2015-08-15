@@ -78,6 +78,11 @@ namespace Discord.API
 			var request = new APIRequests.SendMessage { Content = message, Mentions = mentions };
 			return Http.Post<APIResponses.SendMessage>(Endpoints.ChannelMessages(channelId), request, options);
 		}
+		public static Task<APIResponses.EditMessage> EditMessage(string channelId, string messageId, string message, string[] mentions, HttpOptions options)
+		{
+			var request = new APIRequests.EditMessage { Content = message, Mentions = mentions };
+			return Http.Patch<APIResponses.EditMessage>(Endpoints.ChannelMessage(channelId, messageId), request, options);
+		}
 		public static Task SendIsTyping(string channelId, HttpOptions options)
 			=> Http.Post(Endpoints.ChannelTyping(channelId), options);
 		public static Task DeleteMessage(string channelId, string msgId, HttpOptions options)

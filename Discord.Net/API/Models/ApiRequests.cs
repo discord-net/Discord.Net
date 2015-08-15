@@ -63,6 +63,7 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "mentions")]
 			public string[] Mentions;
 		}
+		public class EditMessage : SendMessage { }
 
 		public class SetMemberMute
 		{
