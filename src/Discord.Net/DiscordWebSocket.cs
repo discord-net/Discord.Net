@@ -25,7 +25,7 @@ namespace Discord
 		private DateTime _lastHeartbeat;
 		private AutoResetEvent _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public async Task ConnectAsync(string url, bool autoLogin, HttpOptions options)
+		public async Task ConnectAsync(string url, bool autoLogin)
 		{
 			await DisconnectAsync();
 
@@ -58,12 +58,12 @@ namespace Discord
 			});
 
 			if (autoLogin)
-				Login(options);
+				Login();
         }
-		public void Login(HttpOptions options)
+		public void Login()
 		{
 			WebSocketCommands.Login msg = new WebSocketCommands.Login();
-			msg.Payload.Token = options.Token;
+			msg.Payload.Token = Http.Token;
 			msg.Payload.Properties["$os"] = "";
 			msg.Payload.Properties["$browser"] = "";
 			msg.Payload.Properties["$device"] = "Discord.Net";

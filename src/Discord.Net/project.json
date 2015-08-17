@@ -24,5 +24,8 @@
 				"Newtonsoft.Json": "7.0.1"
 			}
 		}
+	},
+	"dependencies": {
+		"Microsoft.Net.Http": "2.2.22"
 	}
 }

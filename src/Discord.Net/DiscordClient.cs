@@ -17,7 +17,6 @@ namespace Discord
 		public const int FailedReconnectDelay = 10000; //Time in milliseconds to wait after a failed reconnect attempt
 
 		private DiscordWebSocket _webSocket;
-		private HttpOptions _httpOptions;
 		private bool _isReady;
 
 		public string UserId { get; private set; }
@@ -45,8 +44,6 @@ namespace Discord
 		public DiscordClient()
 		{
 			_isStopping = new ManualResetEventSlim(false);
-            string version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-			_httpOptions = new HttpOptions($"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
 
 			_servers = new AsyncCache<Server, API.Models.ServerReference>(
 				(key, parentKey) => new Server(key, this),
@@ -160,7 +157,7 @@ namespace Discord
 					try
 					{
 						await Task.Delay(ReconnectDelay);
-						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true, _httpOptions);
+						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
 						break;
 					}
 					catch (Exception)
@@ -413,15 +410,26 @@ namespace Discord
                 )
 				.FirstOrDefault();
 		}
-		public User FindChannelUser(Channel channel, string name)
-			=> FindChannelUser(channel.Id, name);
-        public User FindChannelUser(string channelId, string name)
+		public Membership FindMember(string serverId, string name)
+			=> FindMember(GetServer(serverId), name);
+        public Membership FindMember(Server server, string name)
 		{
+			if (server == null)
+				return null;
+
+			if (name.StartsWith("<@") && name.EndsWith(">"))
+			{
+				var user = GetUser(name.Substring(2, name.Length - 3));
+				if (user == null)
+					return null;
+				return server.GetMembership(user.Id);
+            }
+
 			if (name.StartsWith("@"))
 				name = name.Substring(1);
 
-			return _users
-				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
+			return server.Members
+				.Where(x => string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 
@@ -436,9 +444,11 @@ namespace Discord
 		public Channel GetChannel(string id) => _channels[id];
 		public Channel FindChannel(string name)
 		{
+			if (name.StartsWith("<#") && name.EndsWith(">"))
+				return GetChannel(name.Substring(2, name.Length - 3));
+
 			if (name.StartsWith("#"))
 				name = name.Substring(1);
-
 			return _channels
 				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
@@ -447,9 +457,11 @@ namespace Discord
 			=> FindChannel(server.Id, name);
         public Channel FindChannel(string serverId, string name)
 		{
+			if (name.StartsWith("<#") && name.EndsWith(">"))
+				return GetChannel(name.Substring(2, name.Length - 3));
+
 			if (name.StartsWith("#"))
 				name = name.Substring(1);
-
 			return _channels
 				.Where(x =>
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
@@ -478,7 +490,7 @@ namespace Discord
 			{
 				try
 				{
-					var msgs = await DiscordAPI.GetMessages(channel.Id, count, _httpOptions);
+					var msgs = await DiscordAPI.GetMessages(channel.Id, count);
 					return msgs.OrderBy(x => x.Timestamp)
 						.Select(x =>
 						{
@@ -501,13 +513,13 @@ namespace Discord
 			_isStopping.Reset();
 
 			//Open websocket while we wait for login response
-			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false, _httpOptions);
-			var response = await DiscordAPI.Login(email, password, _httpOptions);
-			_httpOptions.Token = response.Token;
+			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false);
+			var response = await DiscordAPI.Login(email, password);
+			Http.Token = response.Token;
 
 			//Wait for websocket to finish connecting, then send token
 			await socketTask;
-			_webSocket.Login(_httpOptions);
+			_webSocket.Login();
 
 			_isReady = true;
         }
@@ -516,13 +528,13 @@ namespace Discord
 			_isStopping.Reset();
 
 			//Open websocket while we wait for login response
-			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false, _httpOptions);
-			var response = await DiscordAPI.LoginAnonymous(username, _httpOptions);
-			_httpOptions.Token = response.Token;
+			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false);
+			var response = await DiscordAPI.LoginAnonymous(username);
+			Http.Token = response.Token;
 
 			//Wait for websocket to finish connecting, then send token
 			await socketTask;
-			_webSocket.Login(_httpOptions);
+			_webSocket.Login();
 
 			_isReady = true;
 		}
@@ -543,7 +555,7 @@ namespace Discord
 		public async Task<Server> CreateServer(string name, string region)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreateServer(name, region, _httpOptions);
+			var response = await DiscordAPI.CreateServer(name, region);
 			return _servers.Update(response.Id, response);
 		}
 		public Task<Server> LeaveServer(Server server)
@@ -553,7 +565,7 @@ namespace Discord
 			CheckReady();
 			try
 			{
-				await DiscordAPI.LeaveServer(serverId, _httpOptions);
+				await DiscordAPI.LeaveServer(serverId);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) {}
 			return _servers.Remove(serverId);
@@ -565,7 +577,7 @@ namespace Discord
         public async Task<Channel> CreateChannel(string serverId, string name, string type)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreateChannel(serverId, name, type, _httpOptions);
+			var response = await DiscordAPI.CreateChannel(serverId, name, type);
 			return _channels.Update(response.Id, serverId, response);
 		}
 		public Task<Channel> CreatePMChannel(User user)
@@ -573,7 +585,7 @@ namespace Discord
 		public async Task<Channel> CreatePMChannel(string recipientId)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreatePMChannel(UserId, recipientId, _httpOptions);
+			var response = await DiscordAPI.CreatePMChannel(UserId, recipientId);
 			return _channels.Update(response.Id, response);
 		}
 		public Task<Channel> DestroyChannel(Channel channel)
@@ -583,7 +595,7 @@ namespace Discord
 			CheckReady();
 			try
 			{
-				var response = await DiscordAPI.DestroyChannel(channelId, _httpOptions);
+				var response = await DiscordAPI.DestroyChannel(channelId);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 			return _channels.Remove(channelId);
@@ -599,7 +611,7 @@ namespace Discord
 		public Task Ban(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Ban(serverId, userId, _httpOptions);
+			return DiscordAPI.Ban(serverId, userId);
 		}
 		public Task Unban(Server server, User user)
 			=> Unban(server.Id, user.Id);
@@ -612,7 +624,7 @@ namespace Discord
 			CheckReady();
 			try
 			{
-				await DiscordAPI.Unban(serverId, userId, _httpOptions);
+				await DiscordAPI.Unban(serverId, userId);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
@@ -629,7 +641,7 @@ namespace Discord
         public async Task<Invite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass, _httpOptions);
+			var response = await DiscordAPI.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass);
 			_channels.Update(response.Channel.Id, response.Server.Id, response.Channel);
 			_servers.Update(response.Server.Id, response.Server);
 			_users.Update(response.Inviter.Id, response.Inviter);
@@ -648,7 +660,7 @@ namespace Discord
         public async Task<Invite> GetInvite(string id)
 		{
 			CheckReady();
-			var response = await DiscordAPI.GetInvite(id, _httpOptions);
+			var response = await DiscordAPI.GetInvite(id);
 			return new Invite(response.Code, response.XkcdPass, this)
 			{
 				ChannelId = response.Channel.Id,
@@ -659,14 +671,14 @@ namespace Discord
 		public Task AcceptInvite(Invite invite)
 		{
 			CheckReady();
-			return DiscordAPI.AcceptInvite(invite.Code, _httpOptions);
+			return DiscordAPI.AcceptInvite(invite.Code);
 		}
 		public async Task AcceptInvite(string id)
 		{
 			CheckReady();
 			//Check if this is a human-readable link and get its ID
-			var response = await DiscordAPI.GetInvite(id, _httpOptions);
-			await DiscordAPI.AcceptInvite(response.Code, _httpOptions);
+			var response = await DiscordAPI.GetInvite(id);
+			await DiscordAPI.AcceptInvite(response.Code);
 		}
 		public async Task DeleteInvite(string id)
 		{
@@ -674,8 +686,8 @@ namespace Discord
 			try
 			{
 				//Check if this is a human-readable link and get its ID
-				var response = await DiscordAPI.GetInvite(id, _httpOptions);
-				await DiscordAPI.DeleteInvite(response.Code, _httpOptions);
+				var response = await DiscordAPI.GetInvite(id);
+				await DiscordAPI.DeleteInvite(response.Code);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
 		}
@@ -693,7 +705,7 @@ namespace Discord
 			
 			if (text.Length <= 2000)
 			{
-				var msg = await DiscordAPI.SendMessage(channelId, text, mentions, _httpOptions);
+				var msg = await DiscordAPI.SendMessage(channelId, text, mentions);
 				return new Message[] { _messages.Update(msg.Id, channelId, msg) };
             }
 			else
@@ -703,7 +715,7 @@ namespace Discord
 				for (int i = 0; i < blockCount; i++)
 				{
 					int index = i * DiscordAPI.MaxMessageSize;
-					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, _httpOptions);
+					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions);
 					result[i] = _messages.Update(msg.Id, channelId, msg);
 					await Task.Delay(1000);
 				}
@@ -727,7 +739,7 @@ namespace Discord
 			if (text.Length > DiscordAPI.MaxMessageSize)
 				text = text.Substring(0, DiscordAPI.MaxMessageSize);
 
-			var msg = await DiscordAPI.EditMessage(channelId, messageId, text, mentions, _httpOptions);
+			var msg = await DiscordAPI.EditMessage(channelId, messageId, text, mentions);
 			_messages.Update(msg.Id, channelId, msg);
 		}
 
@@ -737,7 +749,7 @@ namespace Discord
 		{
 			try
 			{
-				await DiscordAPI.DeleteMessage(channelId, msgId, _httpOptions);
+				await DiscordAPI.DeleteMessage(channelId, msgId);
 				return _messages.Remove(msgId);
 			}
 			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
@@ -755,7 +767,7 @@ namespace Discord
 		public Task Mute(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Mute(serverId, userId, _httpOptions);
+			return DiscordAPI.Mute(serverId, userId);
 		}
 
 		public Task Unmute(Server server, User user)
@@ -767,7 +779,7 @@ namespace Discord
 		public Task Unmute(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Unmute(serverId, userId, _httpOptions);
+			return DiscordAPI.Unmute(serverId, userId);
 		}
 
 		public Task Deafen(Server server, User user)
@@ -779,7 +791,7 @@ namespace Discord
 		public Task Deafen(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Deafen(serverId, userId, _httpOptions);
+			return DiscordAPI.Deafen(serverId, userId);
 		}
 
 		public Task Undeafen(Server server, User user)
@@ -791,7 +803,7 @@ namespace Discord
 		public Task Undeafen(string serverId, string userId)
 		{
 			CheckReady();
-			return DiscordAPI.Undeafen(serverId, userId, _httpOptions);
+			return DiscordAPI.Undeafen(serverId, userId);
 		}
 
 		private void CheckReady()
