@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8D71A857-879A-4A10-859E-5FF824ED6688}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Discord.Net</RootNamespace>
+    <AssemblyName>Discord.Net</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Discord.Net\API\DiscordAPI.cs">
+      <Link>API\DiscordAPI.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Endpoints.cs">
+      <Link>API\Endpoints.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\APIRequests.cs">
+      <Link>API\Models\APIRequests.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\APIResponses.cs">
+      <Link>API\Models\APIResponses.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\Common.cs">
+      <Link>API\Models\Common.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\WebSocketCommands.cs">
+      <Link>API\Models\WebSocketCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\WebSocketEvents.cs">
+      <Link>API\Models\WebSocketEvents.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Channel.cs">
+      <Link>Channel.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\ChannelTypes.cs">
+      <Link>ChannelTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.cs">
+      <Link>DiscordClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
+      <Link>DiscordClient.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordWebSocket.cs">
+      <Link>DiscordWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordWebSocket.Events.cs">
+      <Link>DiscordWebSocket.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
+      <Link>Helpers\AsyncCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\Http.cs">
+      <Link>Helpers\Http.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Invite.cs">
+      <Link>Invite.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Membership.cs">
+      <Link>Membership.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Message.cs">
+      <Link>Message.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Regions.cs">
+      <Link>Regions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Role.cs">
+      <Link>Role.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Server.cs">
+      <Link>Server.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\User.cs">
+      <Link>User.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

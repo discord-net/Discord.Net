@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Net.Cache;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,18 +12,15 @@ namespace Discord.Helpers
 	{
 		public readonly string UserAgent;
 		public string Token;
-		public CookieContainer Cookies;
 
 		public HttpOptions(string userAgent)
 		{
 			UserAgent = userAgent;
-			Cookies = new CookieContainer(1);
 		}
 	}
 
 	internal static class Http
 	{
-		private static readonly RequestCachePolicy _cachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
 #if DEBUG
 		private const bool _isDebug = true;
 #else
@@ -107,12 +103,13 @@ namespace Discord.Helpers
 			//Create Request
 			HttpWebRequest request = WebRequest.CreateHttp(path);
 			request.Accept = "*/*";
+			request.Method = method;
+			request.Proxy = null;
 			request.Headers[HttpRequestHeader.AcceptLanguage] = "en-US;q=0.8";
 			request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
-			request.CachePolicy = _cachePolicy;
-			request.CookieContainer = options.Cookies;
-			request.Method = method;
-			request.UserAgent = options.UserAgent;
+			request.Headers[HttpRequestHeader.UserAgent] = options.UserAgent;
+			request.Headers[HttpRequestHeader.Authorization] = options.Token;
+			//request.UserAgent = options.UserAgent;
 
 			//Add Payload
 			if (data != null)
@@ -140,18 +137,35 @@ namespace Discord.Helpers
 							largeBuffer.Write(smallBuffer, 0, bytesRead);
 
 						//Do we need to decompress?
-						if (!string.IsNullOrEmpty(response.ContentEncoding))
+						string encoding = response.Headers[HttpResponseHeader.ContentEncoding];
+						if (!string.IsNullOrEmpty(encoding))
 						{
 							largeBuffer.Position = 0;
-							using (var decoder = GetDecoder(response.ContentEncoding, largeBuffer))
+							using (var decoder = GetDecoder(encoding, largeBuffer))
 							using (var decodedStream = new MemoryStream())
 							{
 								decoder.CopyTo(decodedStream);
+#if !DOTNET
 								return Encoding.UTF8.GetString(decodedStream.GetBuffer(), 0, (int)decodedStream.Length);
+#else
+								ArraySegment<byte> buffer;
+								if (!decodedStream.TryGetBuffer(out buffer))
+									throw new InvalidOperationException("Failed to get response buffer.");
+								return Encoding.UTF8.GetString(buffer.Array, buffer.Offset, (int)decodedStream.Length);
+#endif
 							}
 						}
 						else
+						{
+#if !DOTNET
 							return Encoding.UTF8.GetString(largeBuffer.GetBuffer(), 0, (int)largeBuffer.Length);
+#else
+							ArraySegment<byte> buffer;
+							if (!largeBuffer.TryGetBuffer(out buffer))
+								throw new InvalidOperationException("Failed to get response buffer.");
+							return Encoding.UTF8.GetString(buffer.Array, buffer.Offset, (int)largeBuffer.Length);
+#endif
+						}
 					}
 				}
 				else

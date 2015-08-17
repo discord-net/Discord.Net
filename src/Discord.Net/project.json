@@ -1,0 +1,28 @@
+﻿{
+	"version": "0.3.3-*",
+	"description": "An unofficial .Net API wrapper for the Discord client.",
+	"authors": [ "RogueException" ],
+	"tags": [ "discord", "discordapp" ],
+	"projectUrl": "https://github.com/RogueException/Discord.Net",
+	"licenseUrl": "http://opensource.org/licenses/MIT",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/RogueException/Discord.Net"
+	},
+	"compilationOptions": {
+		"warningsAsErrors": true
+	},
+	"frameworks": {
+		"dotnet": {
+			"dependencies": {
+				"System.Collections.Concurrent": "4.0.10",
+				"System.IO.Compression": "4.0.0-beta-23109",
+				"System.Net.Requests": "4.0.10-beta-23109",
+				"System.Net.WebSockets.Client": "4.0.0-beta-23109",
+				"System.Runtime": "4.0.20",
+				"Microsoft.CSharp": "4.0.0",
+				"Newtonsoft.Json": "7.0.1"
+			}
+		}
+	}
+}

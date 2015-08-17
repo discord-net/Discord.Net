@@ -25,7 +25,7 @@ namespace Discord
 		private DateTime _lastHeartbeat;
 		private AutoResetEvent _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public async Task ConnectAsync(string url, HttpOptions options)
+		public async Task ConnectAsync(string url, bool autoLogin, HttpOptions options)
 		{
 			await DisconnectAsync();
 
@@ -34,7 +34,6 @@ namespace Discord
 			_sendQueue = new ConcurrentQueue<byte[]>();
 
 			_webSocket = new ClientWebSocket();
-			_webSocket.Options.Cookies = options.Cookies;
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
 
 			_cancelToken = new CancellationTokenSource();
@@ -58,6 +57,11 @@ namespace Discord
 				RaiseDisconnected();
 			});
 
+			if (autoLogin)
+				Login(options);
+        }
+		public void Login(HttpOptions options)
+		{
 			WebSocketCommands.Login msg = new WebSocketCommands.Login();
 			msg.Payload.Token = options.Token;
 			msg.Payload.Properties["$os"] = "";
@@ -65,12 +69,14 @@ namespace Discord
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			msg.Payload.Properties["$referrer"] = "";
 			msg.Payload.Properties["$referring_domain"] = "";
-			SendMessage(msg, cancelToken);
+			SendMessage(msg, _cancelToken.Token);
 
 			if (!_connectWaitOnLogin.WaitOne(ReadyTimeout)) //Pre-Event
 				throw new Exception("No reply from Discord server");
 			_connectWaitOnLogin2.WaitOne(); //Post-Event
-        }
+
+			RaiseConnected();
+		}
 		public async Task DisconnectAsync()
 		{
 			if (_tasks != null)
@@ -82,8 +88,6 @@ namespace Discord
 
 		private async Task ReceiveAsync()
 		{
-			RaiseConnected();
-
 			var cancelToken = _cancelToken.Token;
 			var buffer = new byte[ReceiveChunkSize];
 			var builder = new StringBuilder();

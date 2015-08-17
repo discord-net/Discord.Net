@@ -3,17 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net", "Discord.Net\Discord.Net.csproj", "{8D23F61B-723C-4966-859D-1119B28BCF19}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8D7989F0-66CE-4DBB-8230-D8C811E9B1D7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1DDC89B5-2A88-45E5-A743-7A43E6B5C4B3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6317A2E6-8E36-4C3E-949B-3F10EC888AB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1BE8AF3F-3CFD-433F-A380-D294A4F617C1}"
 	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		LICENSE = LICENSE
-		README.md = README.md
+		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Tests", "Discord.Net.Tests\Discord.Net.Tests.csproj", "{855D6B1D-847B-42DA-BE6A-23683EA89511}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Tests", "test\Discord.Net.Tests\Discord.Net.Tests.csproj", "{855D6B1D-847B-42DA-BE6A-23683EA89511}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net", "src\Discord.Net\Discord.Net.xproj", "{ACFB060B-EC8A-4926-B293-04C01E17EE23}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Commands", "src\Discord.Net.Commands\Discord.Net.Commands.xproj", "{19793545-EF89-48F4-8100-3EBAAD0A9141}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net45", "net45", "{B47C4063-C4EB-46AA-886D-B868DA1BF0A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net", "src\Discord.Net.Net45\Discord.Net.csproj", "{8D71A857-879A-4A10-859E-5FF824ED6688}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Commands", "src\Discord.Net.Commands.Net45\Discord.Net.Commands.csproj", "{1B5603B4-6F8F-4289-B945-7BAAE523D740}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{EA68EBE2-51C8-4440-9EF7-D633C90A5D35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,16 +32,37 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8D23F61B-723C-4966-859D-1119B28BCF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D23F61B-723C-4966-859D-1119B28BCF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D23F61B-723C-4966-859D-1119B28BCF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D23F61B-723C-4966-859D-1119B28BCF19}.Release|Any CPU.Build.0 = Release|Any CPU
 		{855D6B1D-847B-42DA-BE6A-23683EA89511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{855D6B1D-847B-42DA-BE6A-23683EA89511}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{855D6B1D-847B-42DA-BE6A-23683EA89511}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{855D6B1D-847B-42DA-BE6A-23683EA89511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACFB060B-EC8A-4926-B293-04C01E17EE23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACFB060B-EC8A-4926-B293-04C01E17EE23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACFB060B-EC8A-4926-B293-04C01E17EE23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACFB060B-EC8A-4926-B293-04C01E17EE23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19793545-EF89-48F4-8100-3EBAAD0A9141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19793545-EF89-48F4-8100-3EBAAD0A9141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19793545-EF89-48F4-8100-3EBAAD0A9141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19793545-EF89-48F4-8100-3EBAAD0A9141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B5603B4-6F8F-4289-B945-7BAAE523D740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B5603B4-6F8F-4289-B945-7BAAE523D740}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B5603B4-6F8F-4289-B945-7BAAE523D740}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B5603B4-6F8F-4289-B945-7BAAE523D740}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{855D6B1D-847B-42DA-BE6A-23683EA89511} = {6317A2E6-8E36-4C3E-949B-3F10EC888AB9}
+		{ACFB060B-EC8A-4926-B293-04C01E17EE23} = {EA68EBE2-51C8-4440-9EF7-D633C90A5D35}
+		{19793545-EF89-48F4-8100-3EBAAD0A9141} = {EA68EBE2-51C8-4440-9EF7-D633C90A5D35}
+		{B47C4063-C4EB-46AA-886D-B868DA1BF0A0} = {8D7989F0-66CE-4DBB-8230-D8C811E9B1D7}
+		{8D71A857-879A-4A10-859E-5FF824ED6688} = {B47C4063-C4EB-46AA-886D-B868DA1BF0A0}
+		{1B5603B4-6F8F-4289-B945-7BAAE523D740} = {B47C4063-C4EB-46AA-886D-B868DA1BF0A0}
+		{EA68EBE2-51C8-4440-9EF7-D633C90A5D35} = {8D7989F0-66CE-4DBB-8230-D8C811E9B1D7}
 	EndGlobalSection
 EndGlobal

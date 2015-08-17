@@ -197,3 +197,4 @@ FakesAssemblies/
 
 #Custom
 Credentials.cs
+project.lock.json

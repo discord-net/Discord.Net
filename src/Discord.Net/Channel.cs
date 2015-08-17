@@ -11,7 +11,7 @@ namespace Discord
 		public string Id { get; }
 
 		private string _name;
-		public string Name { get { return !IsPrivate ? _name : '@' + Recipient.Name; }  internal set { _name = value; } }
+		public string Name { get { return !IsPrivate ? $"#{_name}" : $"@{Recipient.Name}"; }  internal set { _name = value; } }
 
 		public bool IsPrivate { get;  }
 		public string Type { get; internal set; }

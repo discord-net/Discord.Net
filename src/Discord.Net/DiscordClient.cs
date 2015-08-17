@@ -18,7 +18,7 @@ namespace Discord
 
 		private DiscordWebSocket _webSocket;
 		private HttpOptions _httpOptions;
-		private bool _isClosing, _isReady;
+		private bool _isReady;
 
 		public string UserId { get; private set; }
 		public User User => _users[UserId];
@@ -38,11 +38,14 @@ namespace Discord
 		public IEnumerable<Role> Roles => _roles;
 		private AsyncCache<Role, API.Models.Role> _roles;
 
+		private ManualResetEventSlim _isStopping;
+
 		public bool IsConnected => _isReady;
 
 		public DiscordClient()
 		{
-			string version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
+			_isStopping = new ManualResetEventSlim(false);
+            string version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			_httpOptions = new HttpOptions($"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
 
 			_servers = new AsyncCache<Server, API.Models.ServerReference>(
@@ -152,12 +155,12 @@ namespace Discord
 			{
 				//Reconnect if we didn't cause the disconnect
 				RaiseDisconnected();
-				while (!_isClosing)
+				while (!_isStopping.IsSet)
 				{
 					try
 					{
 						await Task.Delay(ReconnectDelay);
-						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, _httpOptions);
+						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true, _httpOptions);
 						break;
 					}
 					catch (Exception)
@@ -395,7 +398,7 @@ namespace Discord
 		public User FindUser(string name)
 		{
 			return _users
-				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 		public User FindUser(string name, string discriminator)
@@ -405,7 +408,7 @@ namespace Discord
 
 			return _users
 				.Where(x => 
-					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
 					x.Discriminator == discriminator
                 )
 				.FirstOrDefault();
@@ -418,7 +421,7 @@ namespace Discord
 				name = name.Substring(1);
 
 			return _users
-				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 
@@ -426,7 +429,7 @@ namespace Discord
 		public Server FindServer(string name)
 		{
 			return _servers
-				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 
@@ -437,7 +440,7 @@ namespace Discord
 				name = name.Substring(1);
 
 			return _channels
-				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 		public Channel FindChannel(Server server, string name)
@@ -449,7 +452,7 @@ namespace Discord
 
 			return _channels
 				.Where(x =>
-					string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
 					x.ServerId == serverId
 				)
 				.FirstOrDefault();
@@ -461,7 +464,7 @@ namespace Discord
         public Role FindRole(string serverId, string name)
 		{
 			return _roles
-				.Where(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))
+				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 		}
 
@@ -495,26 +498,39 @@ namespace Discord
 		//Auth
 		public async Task Connect(string email, string password)
 		{
-            _isClosing = false;
+			_isStopping.Reset();
+
+			//Open websocket while we wait for login response
+			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false, _httpOptions);
 			var response = await DiscordAPI.Login(email, password, _httpOptions);
 			_httpOptions.Token = response.Token;
-			await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, _httpOptions);
+
+			//Wait for websocket to finish connecting, then send token
+			await socketTask;
+			_webSocket.Login(_httpOptions);
+
 			_isReady = true;
         }
 		public async Task ConnectAnonymous(string username)
 		{
-			_isClosing = false;
+			_isStopping.Reset();
+
+			//Open websocket while we wait for login response
+			Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false, _httpOptions);
 			var response = await DiscordAPI.LoginAnonymous(username, _httpOptions);
 			_httpOptions.Token = response.Token;
-			await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, _httpOptions);
+
+			//Wait for websocket to finish connecting, then send token
+			await socketTask;
+			_webSocket.Login(_httpOptions);
+
 			_isReady = true;
 		}
 		public async Task Disconnect()
 		{
 			_isReady = false;
-			_isClosing = true;
+			_isStopping.Set();
 			await _webSocket.DisconnectAsync();
-			_isClosing = false;
 
 			_channels.Clear();
 			_messages.Clear();
@@ -783,12 +799,14 @@ namespace Discord
 			if (!_isReady)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
         }
+
+		/// <summary>
+		/// Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications.
+		/// </summary>
+		/// <returns></returns>
 		public void Block()
 		{
-			//Blocking call for console apps
-			//TODO: Improve this
-			while (!_isClosing)
-				Thread.Sleep(1000);
+			_isStopping.Wait();
 		}
 	}
 }
