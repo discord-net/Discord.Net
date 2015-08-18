@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -381,6 +380,13 @@ namespace Discord
 						}
 						break;
 
+					//Settings
+					case "USER_SETTINGS_UPDATE":
+						{
+							//TODO: Process this
+						}
+						break;
+
 					//Others
 					default:
 						RaiseOnDebugMessage("Unknown WebSocket message type: " + e.Type);
@@ -508,7 +514,17 @@ namespace Discord
 		}
 
 		//Auth
-		public async Task Connect(string email, string password)
+		public async Task<string> Connect(string token)
+		{
+			_isStopping.Reset();
+			
+			Http.Token = token;
+			await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
+
+			_isReady = true;
+			return token;
+		}
+		public async Task<string> Connect(string email, string password)
 		{
 			_isStopping.Reset();
 
@@ -522,8 +538,20 @@ namespace Discord
 			_webSocket.Login();
 
 			_isReady = true;
-        }
-		public async Task ConnectAnonymous(string username)
+			return response.Token;
+		}
+		public async Task<string> Connect(string email, string password, string token)
+		{
+			try
+			{
+				return await Connect(token);
+			}
+			catch (InvalidOperationException) //Bad Token
+			{
+				return await Connect(email, password);
+			}
+		}
+		public async Task<string> ConnectAnonymous(string username)
 		{
 			_isStopping.Reset();
 
@@ -537,6 +565,7 @@ namespace Discord
 			_webSocket.Login();
 
 			_isReady = true;
+			return response.Token;
 		}
 		public async Task Disconnect()
 		{

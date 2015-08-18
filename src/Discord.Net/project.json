@@ -24,6 +24,7 @@
 		"dnxcore50": {
 			"dependencies": {
 				"System.Collections.Concurrent": "4.0.10",
+				"System.Diagnostics.Debug": "4.0.10",
 				"System.IO.Compression": "4.0.0",
 				"System.Linq": "4.0.0",
 				"System.Net.Requests": "4.0.10",
