@@ -1,6 +1,8 @@
 # Discord.Net v0.3.1
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
+Join the discussion for this library and other API wrappers at https://discord.gg/0SBTUU1wZTV9JAsL.
+
 ### This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
 Discord.Net itself is also in early development so several functions may be unstable or not work at all.
@@ -13,6 +15,7 @@ Discord.Net itself is also in early development so several functions may be unst
 - Creating/Destroying Channels (text, void or PM)
 - Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen Users
 - Several Discord Events
+- Supports both .Net 4.5, DNX 4.5, and DNX Core 5.0
 
 ### Upcoming
 - Modifying User/Channel/Server Settings
@@ -31,8 +34,3 @@ await client.AcceptInvite("channel-invite-code");
 ### Known Issues
 - Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
 - Caches do not currently clean up when their entries are no longer referenced, and there is no cap to the message cache. For now, disconencting and reconnecting will clear all caches.
- 
-### Related Projects
-- [DiscordBot](https://github.com/RogueException/DiscordBot) - A basic Discord.Net extension to add command and whitelist support.
-- [discord.js](https://github.com/hydrabolt/discord.js) - Javascript/Node API wrapper for Discord
-- [node-discord](https://github.com/izy521/node-discord) - Javascript/Node API wrapper for Discord
