@@ -1,5 +1,5 @@
 ﻿{
-	"version": "0.2.0-*",
+	"version": "0.2.1-*",
 	"description": "A small Discord.Net extension to make bot creation easier.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
@@ -13,10 +13,11 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": ""
+		"Discord.Net": "0.4.0"
 	},
 	"frameworks": {
-		"dotnet": {
+		"net45": { },
+		"dnxcore50": {
 			"dependencies": {
 				"System.Runtime": "4.0.20",
 				"Microsoft.CSharp": "4.0.0"
