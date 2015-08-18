@@ -13,10 +13,11 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.4.0"
+		"Discord.Net": "0.4.1"
 	},
 	"frameworks": {
 		"net45": { },
+		"dnx451": { },
 		"dnxcore50": {
 			"dependencies": {
 				"System.Runtime": "4.0.20",
