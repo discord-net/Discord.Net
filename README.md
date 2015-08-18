@@ -1,4 +1,4 @@
-# Discord.Net v0.4.0
+# Discord.Net v0.4.1
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Join the discussion for this library and other API wrappers at https://discord.gg/0SBTUU1wZTV9JAsL.
