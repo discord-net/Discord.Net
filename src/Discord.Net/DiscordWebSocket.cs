@@ -24,6 +24,7 @@ namespace Discord
 		private int _heartbeatInterval;
 		private DateTime _lastHeartbeat;
 		private AutoResetEvent _connectWaitOnLogin, _connectWaitOnLogin2;
+		private bool _isConnected;
 
 		public async Task ConnectAsync(string url, bool autoLogin)
 		{
@@ -54,7 +55,11 @@ namespace Discord
 				_cancelToken = null;
 				_tasks = null;
 
-				RaiseDisconnected();
+				if (_isConnected)
+				{
+					_isConnected = false;
+					RaiseDisconnected();
+                }
 			});
 
 			if (autoLogin)
@@ -75,6 +80,7 @@ namespace Discord
 				throw new Exception("No reply from Discord server");
 			_connectWaitOnLogin2.WaitOne(); //Post-Event
 
+			_isConnected = true;
 			RaiseConnected();
 		}
 		public async Task DisconnectAsync()
