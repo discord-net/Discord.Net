@@ -1,7 +1,7 @@
 # Discord.Net v0.4.1
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
-Join the discussion for this library and other API wrappers at https://discord.gg/0SBTUU1wZTV9JAsL.
+[Join the discussion](https://discord.gg/0SBTUU1wZTVjAMPx) on Discord.
 
 ### This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
@@ -15,10 +15,11 @@ Discord.Net itself is also in early development so several functions may be unst
 - Creating/Destroying Channels (text, void or PM)
 - Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen Users
 - Several Discord Events
-- Supports both .Net 4.5, DNX 4.5, and DNX Core 5.0
+- Supports .Net 4.5, DNX 4.5.1, and DNX Core 5.0
 
-### Upcoming
-- Modifying User/Channel/Server Settings
+### NuGet Packages
+- [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
+- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
 ### Example (Echo Client)
 ```
