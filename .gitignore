@@ -196,5 +196,5 @@ FakesAssemblies/
 *.opt
 
 #Custom
-Credentials.cs
 project.lock.json
+/test/Discord.Net.Tests/config.json

@@ -22,11 +22,11 @@ namespace Discord.Helpers
 		static Http()
 		{
 			_client = new HttpClient();
-			_client.DefaultRequestHeaders.Add("Accept", "*/*");
-			_client.DefaultRequestHeaders.Add("Accept-language", "en-US;q=0.8");
+			_client.DefaultRequestHeaders.Add("accept", "*/*");
+			_client.DefaultRequestHeaders.Add("accept-language", "en-US;q=0.8");
 
 			string version = typeof(Http).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-			_client.DefaultRequestHeaders.Add("User-agent", $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
+			_client.DefaultRequestHeaders.Add("user-agent", $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
 		}
 
 		private static string _token;
@@ -36,7 +36,9 @@ namespace Discord.Helpers
 			set
 			{
 				_token = value;
-				_client.DefaultRequestHeaders.Add("Authorization", _token);
+				_client.DefaultRequestHeaders.Remove("authorization");
+				if (_token != null)
+					_client.DefaultRequestHeaders.Add("authorization", _token);
 			}
 		}
 
@@ -130,19 +132,6 @@ namespace Discord.Helpers
 				var response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
 				return await response.Content.ReadAsStringAsync();
             }
-		}
-
-		private static Stream GetDecoder(string contentEncoding, MemoryStream encodedStream)
-		{
-			switch (contentEncoding)
-			{
-				case "gzip":
-					return new GZipStream(encodedStream, CompressionMode.Decompress, true);
-				case "deflate":
-					return new DeflateStream(encodedStream, CompressionMode.Decompress, true);
-				default:
-					throw new ArgumentOutOfRangeException("Unknown encoding: " + contentEncoding);
-			}
 		}
 
 #if DEBUG

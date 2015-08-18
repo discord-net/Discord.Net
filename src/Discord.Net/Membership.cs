@@ -26,8 +26,8 @@ namespace Discord
 		{
 			ServerId = serverId;
 			UserId = userId;
-			_client = client;
 			JoinedAt = joinedAt;
-        }
+			_client = client;
+		}
 	}
 }

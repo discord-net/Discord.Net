@@ -10,21 +10,24 @@ namespace Discord.Net.Tests
 	public class Tests
 	{
 		private const int EventTimeout = 5000; //Max time in milliseconds to wait for an event response from our test actions
-        private DiscordClient _bot1, _bot2;
-		private Server _testServer;
-		private Channel _testServerChannel;
-		private Random _random;
 
-		[TestInitialize]
-		public void Initialize()
+		private static Settings _settings;
+        private static DiscordClient _bot1, _bot2;
+		private static Server _testServer;
+		private static Channel _testServerChannel;
+		private static Random _random;
+
+		[ClassInitialize]
+		public static void Initialize(TestContext testContext)
 		{
+			_settings = Settings.Load();
 			_random = new Random();
 
 			_bot1 = new DiscordClient();
 			_bot2 = new DiscordClient();
 
-			_bot1.Connect(Settings.Test1_Username, Settings.Test1_Password).Wait();
-			_bot2.Connect(Settings.Test2_Username, Settings.Test2_Password).Wait();
+			_bot1.Connect(_settings.User1.Email, _settings.User1.Password).Wait();
+			_bot2.Connect(_settings.User2.Email, _settings.User2.Password).Wait();
 
 			//Cleanup existing servers
 			Task.WaitAll(_bot1.Servers.Select(x => _bot1.LeaveServer(x)).ToArray());
@@ -58,10 +61,10 @@ namespace Discord.Net.Tests
 		private void TestCreateRoom(string type)
 		{
 			Channel channel = null;
-			string name = $"test_{_random.Next()}";
+			string name = $"#test_{_random.Next()}";
 			AssertEvent<DiscordClient.ChannelEventArgs>(
 				"ChannelCreated event never received",
-				() => channel = _bot1.CreateChannel(_testServer, name, type).Result,
+				() => channel = _bot1.CreateChannel(_testServer, name.Substring(1), type).Result,
 				x => _bot2.ChannelCreated += x,
 				x => _bot2.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
@@ -74,8 +77,8 @@ namespace Discord.Net.Tests
 				(s, e) => e.Channel.Name == name);
 		}
 
-		[TestCleanup]
-		public void Cleanup()
+		[ClassCleanup]
+		public static void Cleanup()
 		{
 			if (_bot1.IsConnected)
 				Task.WaitAll(_bot1.Servers.Select(x => _bot1.LeaveServer(x)).ToArray());
@@ -86,22 +89,25 @@ namespace Discord.Net.Tests
 			_bot2.Disconnect().Wait();
 		}
 
-		private void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+		private static void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
-			ManualResetEvent trigger = new ManualResetEvent(false);
+			ManualResetEventSlim trigger = new ManualResetEventSlim(false);
 			bool result = false;
 
 			EventHandler<TArgs> handler = (s, e) =>
 			{
 				if (test != null)
+				{
 					result |= test(s, e);
+					trigger.Set();
+                }
 				else
 					result = true;
 			};
 
 			addEvent(handler);
 			action();
-			trigger.WaitOne(EventTimeout);
+			trigger.Wait(EventTimeout);
 			removeEvent(handler);
 
 			Assert.AreEqual(true, result, msg);
