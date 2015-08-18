@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.IO;
-using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Reflection;
+using System.Diagnostics;
+using System.Net;
 
 namespace Discord.Helpers
 {
@@ -21,9 +21,14 @@ namespace Discord.Helpers
 
 		static Http()
 		{
-			_client = new HttpClient();
+			_client = new HttpClient(new HttpClientHandler
+			{
+				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+				UseCookies = false,
+				PreAuthenticate = false //We do auth ourselves
+			});
 			_client.DefaultRequestHeaders.Add("accept", "*/*");
-			_client.DefaultRequestHeaders.Add("accept-language", "en-US;q=0.8");
+			_client.DefaultRequestHeaders.Add("accept-encoding", "gzip, deflate");
 
 			string version = typeof(Http).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			_client.DefaultRequestHeaders.Add("user-agent", $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
@@ -115,23 +120,36 @@ namespace Discord.Helpers
 
 		private static async Task<string> SendRequest(HttpMethod method, string path, string data, bool hasResponse)
 		{
-			//Create Request
+#if DEBUG
+			Stopwatch stopwatch = Stopwatch.StartNew();
+#endif			
 			HttpRequestMessage msg = new HttpRequestMessage(method, path);
-
-			//Add Payload
+			
 			if (data != null)
 				msg.Content = new StringContent(data, Encoding.UTF8, "application/json");
 
-			if (!hasResponse)
+			string result;
+			HttpResponseMessage response;
+			if (hasResponse)
 			{
-				await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
-				return null;
+				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
+				if (!response.IsSuccessStatusCode)
+					throw new InvalidOperationException($"The server responded with error {(int)response.StatusCode}.");
+				result = await response.Content.ReadAsStringAsync();
 			}
 			else
 			{
-				var response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
-				return await response.Content.ReadAsStringAsync();
-            }
+				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
+				if (!response.IsSuccessStatusCode)
+					throw new InvalidOperationException($"The server responded with error {(int)response.StatusCode}.");
+				result = null;
+			}
+
+#if DEBUG
+			stopwatch.Stop();
+			Debug.WriteLine($"{method} {path}: {Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2)}ms");
+#endif
+            return result;
 		}
 
 #if DEBUG
