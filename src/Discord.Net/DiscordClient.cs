@@ -596,7 +596,7 @@ namespace Discord
 			{
 				await DiscordAPI.LeaveServer(serverId);
 			}
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) {}
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) {}
 			return _servers.Remove(serverId);
 		}
 
@@ -626,7 +626,7 @@ namespace Discord
 			{
 				var response = await DiscordAPI.DestroyChannel(channelId);
 			}
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			return _channels.Remove(channelId);
 		}
 
@@ -655,7 +655,7 @@ namespace Discord
 			{
 				await DiscordAPI.Unban(serverId, userId);
 			}
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		//Invites
@@ -718,7 +718,7 @@ namespace Discord
 				var response = await DiscordAPI.GetInvite(id);
 				await DiscordAPI.DeleteInvite(response.Code);
 			}
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		//Chat
@@ -781,8 +781,8 @@ namespace Discord
 				await DiscordAPI.DeleteMessage(channelId, msgId);
 				return _messages.Remove(msgId);
 			}
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound) { }
-			catch (WebException ex) when ((ex.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
 			return null;
 		}
 

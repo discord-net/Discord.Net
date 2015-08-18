@@ -134,14 +134,14 @@ namespace Discord.Helpers
 			{
 				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
 				if (!response.IsSuccessStatusCode)
-					throw new InvalidOperationException($"The server responded with error {(int)response.StatusCode}.");
+					throw new HttpException(response.StatusCode);
 				result = await response.Content.ReadAsStringAsync();
 			}
 			else
 			{
 				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
 				if (!response.IsSuccessStatusCode)
-					throw new InvalidOperationException($"The server responded with error {(int)response.StatusCode}.");
+					throw new HttpException(response.StatusCode);
 				result = null;
 			}
 

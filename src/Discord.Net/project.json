@@ -14,13 +14,20 @@
 	},
 
 	"dependencies": {
-		"Newtonsoft.Json": "7.0.1",
-		"Microsoft.Net.Http": "2.2.22"
+		"Newtonsoft.Json": "7.0.1"
 	},
 
 	"frameworks": {
-		"net45": { },
-		"dnx451": { },
+		"net45": {
+			"dependencies": {
+				"Microsoft.Net.Http": "2.2.22"
+			}
+		},
+		"dnx451": {
+			"dependencies": {
+				"Microsoft.Net.Http": "2.2.22"
+			}
+		},
 		"dnxcore50": {
 			"dependencies": {
 				"System.Collections.Concurrent": "4.0.10",
@@ -33,4 +40,4 @@
 			}
 		}
 	}
-}
+	}
