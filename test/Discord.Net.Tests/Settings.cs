@@ -6,11 +6,12 @@ namespace Discord.Net.Tests
 	internal class Settings
 	{
 		private const string path = "../../config.json";
-		public static Settings Load()
+		public static readonly Settings Instance;
+		static Settings()
 		{
 			if (!File.Exists(path))
-				throw new FileNotFoundException("config.json is missing, rename config.json.example and add data for two separate unused accounts for testing.");
-            return JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
+				throw new FileNotFoundException("config.json is missing, rename config.json.example and add credentials for three separate unused accounts for testing.");
+			Instance = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
 		}
 
 		public class Account
@@ -25,5 +26,7 @@ namespace Discord.Net.Tests
 		public Account User1 { get; set; }
 		[JsonProperty("user2")]
 		public Account User2 { get; set; }
+		[JsonProperty("user3")]
+		public Account User3 { get; set; }
 	}
 }
