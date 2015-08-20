@@ -13,7 +13,7 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.4.1"
+		"Discord.Net": "0.4.2"
 	},
 	"frameworks": {
 		"net45": { },
