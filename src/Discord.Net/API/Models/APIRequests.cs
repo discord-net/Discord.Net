@@ -75,5 +75,31 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "deaf")]
 			public bool Deaf;
 		}
+
+		public class ChangeUsername
+		{
+			[JsonProperty(PropertyName = "username")]
+			public string Username;
+			[JsonProperty(PropertyName = "email")]
+			public string CurrentEmail;
+			[JsonProperty(PropertyName = "password")]
+			public string CurrentPassword;
+		}
+		public class ChangeEmail
+		{
+			[JsonProperty(PropertyName = "email")]
+			public string Email;
+			[JsonProperty(PropertyName = "password")]
+			public string CurrentPassword;
+		}
+		public class ChangePassword
+		{
+			[JsonProperty(PropertyName = "new_password")]
+			public string NewPassword;
+			[JsonProperty(PropertyName = "email")]
+			public string CurrentEmail;
+			[JsonProperty(PropertyName = "password")]
+			public string CurrentPassword;
+		}
 	}
 }

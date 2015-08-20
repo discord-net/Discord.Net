@@ -89,6 +89,12 @@ namespace Discord
 			public readonly User User;
 			internal UserEventArgs(User user) { User = user; }
 		}
+		public event EventHandler<UserEventArgs> UserUpdated;
+		private void RaiseUserUpdated(User user)
+		{
+			if (UserUpdated != null)
+				UserUpdated(this, new UserEventArgs(user));
+		}
 
 		//Message
 		public sealed class MessageEventArgs : EventArgs

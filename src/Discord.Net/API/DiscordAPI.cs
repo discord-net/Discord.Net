@@ -112,5 +112,23 @@ namespace Discord.API
 			var request = new APIRequests.SetMemberDeaf { Deaf = false };
 			return Http.Patch(Endpoints.ServerMember(serverId, memberId));
 		}
+
+		//Profile
+		public static Task<SelfUserInfo> ChangeUsername(string newUsername, string currentEmail, string currentPassword)
+		{
+			var request = new APIRequests.ChangeUsername { Username = newUsername, CurrentEmail = currentEmail, CurrentPassword = currentPassword };
+			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
+		}
+		public static Task<SelfUserInfo> ChangeEmail(string newEmail, string currentPassword)
+		{
+			var request = new APIRequests.ChangeEmail { Email = newEmail, CurrentPassword = currentPassword };
+			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
+		}
+		public static Task<SelfUserInfo> ChangePassword(string newPassword, string currentEmail, string currentPassword)
+		{
+			var request = new APIRequests.ChangePassword { NewPassword = newPassword, CurrentEmail = currentEmail, CurrentPassword = currentPassword };
+			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
+		}
+
 	}
 }

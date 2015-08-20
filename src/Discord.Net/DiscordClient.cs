@@ -381,6 +381,13 @@ namespace Discord
 						break;
 
 					//Settings
+					case "USER_UPDATE":
+						{
+							var data = e.Event.ToObject<WebSocketEvents.UserUpdate>();
+							var user = _users.Update(data.Id, data);
+							RaiseUserUpdate(user);
+						}
+						break;
 					case "USER_SETTINGS_UPDATE":
 						{
 							//TODO: Process this
@@ -844,6 +851,27 @@ namespace Discord
 			return DiscordAPI.Undeafen(serverId, userId);
 		}
 
+		//Profile
+		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
+		{
+			CheckReady();
+			var response = await DiscordAPI.ChangeUsername(newName, currentEmail, currentPassword);
+			_users.Update(response.Id, response);
+        }
+		public async Task ChangeEmail(string newEmail, string currentPassword)
+		{
+			CheckReady();
+			var response = await DiscordAPI.ChangeEmail(newEmail, currentPassword);
+			_users.Update(response.Id, response);
+		}
+		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
+		{
+			CheckReady();
+			var response = await DiscordAPI.ChangePassword(newPassword, currentEmail, currentPassword);
+			_users.Update(response.Id, response);
+		}
+
+		//Helpers
 		private void CheckReady()
 		{
 			if (!_isReady)

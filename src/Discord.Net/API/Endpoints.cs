@@ -40,7 +40,8 @@
 
 		// /api/users
 		public static readonly string Users = $"{BaseApi}/users";
-		public static string UserChannels(string userId) => $"{Users}/{userId}/channels";
+		public static string UserMe => $"{Users}/@me";
+        public static string UserChannels(string userId) => $"{Users}/{userId}/channels";
 		public static string UserAvatar(string userId, string avatarId) => $"{Users}/{userId}/avatars/{avatarId}.jpg";
 
 		// /api/voice
