@@ -3,6 +3,7 @@ using Discord.API.Models;
 using Discord.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -100,7 +101,19 @@ namespace Discord
 					if (model is API.Models.Message)
 					{
 						var extendedModel = model as API.Models.Message;
-						message.Attachments = extendedModel.Attachments;
+						if (extendedModel.Attachments != null)
+						{
+							message.Attachments = extendedModel.Attachments.Select(x => new Message.Attachment
+							{
+								Id = x.Id,
+								Url = x.Url,
+								ProxyUrl = x.ProxyUrl,
+								Size = x.Size,
+								Filename = x.Filename
+							}).ToArray();
+						}
+						else
+							extendedModel.Attachments = null;
 						message.Embeds = extendedModel.Embeds;
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
@@ -801,6 +814,18 @@ namespace Discord
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
 			return null;
 		}
+
+		public Task SendFile(Channel channel, string path)
+			=> SendFile(channel.Id, path);
+		public Task SendFile(string channelId, string path)
+			=> SendFile(channelId, File.OpenRead(path), Path.GetFileName(path));
+		public Task SendFile(Channel channel, Stream stream, string filename = null)
+			=> SendFile(channel.Id, stream, filename);
+		public Task SendFile(string channelId, Stream stream, string filename = null)
+		{
+			return DiscordAPI.SendFile(channelId, stream, filename);
+		}
+
 
 		//Voice
 		public Task Mute(Server server, User user)

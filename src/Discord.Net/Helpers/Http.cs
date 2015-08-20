@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Diagnostics;
 using System.Net;
+using System.IO;
+using System.Globalization;
 
 namespace Discord.Helpers
 {
@@ -55,9 +57,9 @@ namespace Discord.Helpers
 		
 		internal static Task<ResponseT> Post<ResponseT>(string path, object data)
 			where ResponseT : class
-			=> Send<ResponseT>(HttpMethod.Post, path, data);
+			=> Send<ResponseT>(HttpMethod.Post, path, AsJson(data));
 		internal static Task<string> Post(string path, object data)
-			=> Send(HttpMethod.Post, path, data);
+			=> Send(HttpMethod.Post, path, AsJson(data));
 		internal static Task<ResponseT> Post<ResponseT>(string path)
 			where ResponseT : class
 			=> Send<ResponseT>(HttpMethod.Post, path, null);
@@ -66,9 +68,9 @@ namespace Discord.Helpers
 		
 		internal static Task<ResponseT> Put<ResponseT>(string path, object data)
 			where ResponseT : class
-			=> Send<ResponseT>(HttpMethod.Put, path, data);
+			=> Send<ResponseT>(HttpMethod.Put, path, AsJson(data));
 		internal static Task<string> Put(string path, object data)
-			=> Send(HttpMethod.Put, path, data);
+			=> Send(HttpMethod.Put, path, AsJson(data));
 		internal static Task<ResponseT> Put<ResponseT>(string path)
 			where ResponseT : class
 			=> Send<ResponseT>(HttpMethod.Put, path, null);
@@ -77,9 +79,9 @@ namespace Discord.Helpers
 
 		internal static Task<ResponseT> Patch<ResponseT>(string path, object data)
 			where ResponseT : class
-			=> Send<ResponseT>(_patch, path, data);
+			=> Send<ResponseT>(_patch, path, AsJson(data));
 		internal static Task<string> Patch(string path, object data)
-			=> Send(_patch, path, data);
+			=> Send(_patch, path, AsJson(data));
 		internal static Task<ResponseT> Patch<ResponseT>(string path)
 			where ResponseT : class
 			=> Send<ResponseT>(_patch, path, null);
@@ -88,49 +90,52 @@ namespace Discord.Helpers
 
 		internal static Task<ResponseT> Delete<ResponseT>(string path, object data)
 			where ResponseT : class
-			=> Send<ResponseT>(HttpMethod.Delete, path, data);
+			=> Send<ResponseT>(HttpMethod.Delete, path, AsJson(data));
 		internal static Task<string> Delete(string path, object data)
-			=> Send(HttpMethod.Delete, path, data);
+			=> Send(HttpMethod.Delete, path, AsJson(data));
 		internal static Task<ResponseT> Delete<ResponseT>(string path)
 			where ResponseT : class
 			=> Send<ResponseT>(HttpMethod.Delete, path, null);
 		internal static Task<string> Delete(string path)
 			=> Send(HttpMethod.Delete, path, null);
 
-		internal static async Task<ResponseT> Send<ResponseT>(HttpMethod method, string path, object data)
+		internal static Task<ResponseT> File<ResponseT>(string path, Stream stream, string filename = null)
+			where ResponseT : class
+			=> Send<ResponseT>(HttpMethod.Post, path, AsFormData(stream, filename));
+		internal static Task<string> File(string path, Stream stream, string filename = null)
+			=> Send(HttpMethod.Post, path, AsFormData(stream, filename));
+
+		private static async Task<ResponseT> Send<ResponseT>(HttpMethod method, string path, HttpContent content)
 			where ResponseT : class
 		{
-			string requestJson = data != null ? JsonConvert.SerializeObject(data) : null;
-			string responseJson = await SendRequest(method, path, requestJson, true);
+			string responseJson = await SendRequest(method, path, content, true);
 			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
 #if DEBUG
 			CheckResponse(responseJson, response);
 #endif
 			return response;
 		}
-		internal static async Task<string> Send(HttpMethod method, string path, object data)
+		private static async Task<string> Send(HttpMethod method, string path, HttpContent content)
 		{
-			string requestJson = data != null ? JsonConvert.SerializeObject(data) : null;
-			string responseJson = await SendRequest(method, path, requestJson, _isDebug);
+			string responseJson = await SendRequest(method, path, content, _isDebug);
 #if DEBUG
 			CheckEmptyResponse(responseJson);
 #endif
 			return responseJson;
 		}
 
-		private static async Task<string> SendRequest(HttpMethod method, string path, string data, bool hasResponse)
+		private static async Task<string> SendRequest(HttpMethod method, string path, HttpContent content, bool hasResponse)
 		{
 #if DEBUG
 			Stopwatch stopwatch = Stopwatch.StartNew();
 #endif			
 			HttpRequestMessage msg = new HttpRequestMessage(method, path);
-			
-			if (data != null)
-				msg.Content = new StringContent(data, Encoding.UTF8, "application/json");
+			if (content != null)
+				msg.Content = content;
 
 			string result;
 			HttpResponseMessage response;
-			if (hasResponse)
+            if (hasResponse)
 			{
 				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
 				if (!response.IsSuccessStatusCode)
@@ -167,5 +172,16 @@ namespace Discord.Helpers
 				throw new Exception("API check failed: Response is not empty.");
 		}
 #endif
+
+		private static StringContent AsJson(object obj)
+		{
+			return new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
+		}
+		private static MultipartFormDataContent AsFormData(Stream stream, string filename)
+		{
+			var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+			content.Add(new StreamContent(stream), "file", filename);
+			return content;
+		}
 	}
 }

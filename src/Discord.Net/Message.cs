@@ -7,6 +7,15 @@ namespace Discord
 {
 	public sealed class Message
 	{
+		public struct Attachment
+		{
+			public string Id;
+			public string Url;
+			public string ProxyUrl;
+			public int Size;
+			public string Filename;
+		}
+
 		private readonly DiscordClient _client;
 
 		public string Id { get; }
@@ -15,6 +24,7 @@ namespace Discord
 		public bool IsTTS { get; internal set; }
 		public string Text { get; internal set; }
 		public DateTime Timestamp { get; internal set; }
+		public Attachment[] Attachments { get; internal set; }
 
 		public string[] MentionIds { get; internal set; }
 		[JsonIgnore]
@@ -29,7 +39,6 @@ namespace Discord
 		public User User => _client.GetUser(UserId);
 		
 		//Not Implemented
-		public object[] Attachments { get; internal set; }
 		public object[] Embeds { get; internal set; }
 
 		internal Message(string id, string channelId, DiscordClient client)

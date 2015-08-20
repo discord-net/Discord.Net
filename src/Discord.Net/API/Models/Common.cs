@@ -150,6 +150,20 @@ namespace Discord.API.Models
 	}
 	internal class Message : MessageReference
 	{
+		public class Attachment
+		{
+			[JsonProperty(PropertyName = "id")]
+			public string Id;
+			[JsonProperty(PropertyName = "url")]
+			public string Url;
+			[JsonProperty(PropertyName = "proxy_url")]
+			public string ProxyUrl;
+			[JsonProperty(PropertyName = "size")]
+			public int Size;
+			[JsonProperty(PropertyName = "filename")]
+			public string Filename;
+		}
+
 		[JsonProperty(PropertyName = "tts")]
 		public bool IsTextToSpeech;
 		[JsonProperty(PropertyName = "mention_everyone")]
@@ -159,9 +173,9 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "mentions")]
 		public UserReference[] Mentions;
 		[JsonProperty(PropertyName = "embeds")]
-		public object[] Embeds;
+		public object[] Embeds; //TODO: Parse this
 		[JsonProperty(PropertyName = "attachments")]
-		public object[] Attachments;
+		public Attachment[] Attachments;
 		[JsonProperty(PropertyName = "content")]
 		public string Content;
 		[JsonProperty(PropertyName = "author")]

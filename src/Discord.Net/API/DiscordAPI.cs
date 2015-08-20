@@ -1,5 +1,6 @@
 ﻿using Discord.API.Models;
 using Discord.Helpers;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.API
@@ -86,6 +87,8 @@ namespace Discord.API
 			=> Http.Post(Endpoints.ChannelTyping(channelId));
 		public static Task DeleteMessage(string channelId, string msgId)
 			=> Http.Delete(Endpoints.ChannelMessage(channelId, msgId));
+		public static Task SendFile(string channelId, Stream stream, string filename = null)
+			=> Http.File<APIResponses.SendMessage>(Endpoints.ChannelMessages(channelId), stream, filename);
 
 		//Voice
 		public static Task<APIResponses.GetRegions[]> GetVoiceRegions()
@@ -129,6 +132,5 @@ namespace Discord.API
 			var request = new APIRequests.ChangePassword { NewPassword = newPassword, CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
 		}
-
 	}
 }
