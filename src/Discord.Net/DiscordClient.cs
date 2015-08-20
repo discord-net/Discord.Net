@@ -385,7 +385,7 @@ namespace Discord
 						{
 							var data = e.Event.ToObject<WebSocketEvents.UserUpdate>();
 							var user = _users.Update(data.Id, data);
-							RaiseUserUpdate(user);
+							RaiseUserUpdated(user);
 						}
 						break;
 					case "USER_SETTINGS_UPDATE":
