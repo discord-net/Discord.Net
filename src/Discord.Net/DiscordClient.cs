@@ -705,6 +705,15 @@ namespace Discord
 		public async Task AcceptInvite(string id)
 		{
 			CheckReady();
+			
+			//Remove Url Parts
+			if (id.StartsWith(Endpoints.BaseShortHttps))
+				id = id.Substring(Endpoints.BaseShortHttps.Length);
+			if (id.Length > 0 && id[0] == '/')
+				id = id.Substring(1);
+			if (id.Length > 0 && id[id.Length - 1] == '/')
+				id = id.Substring(0, id.Length - 1);
+
 			//Check if this is a human-readable link and get its ID
 			var response = await DiscordAPI.GetInvite(id);
 			await DiscordAPI.AcceptInvite(response.Code);
