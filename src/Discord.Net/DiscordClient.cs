@@ -582,7 +582,8 @@ namespace Discord
 		}
 
 		//Auth
-		public async Task<string> Connect(string token)
+		/// <summary> Connects to the Discord server with the provided token. </summary>
+		public async Task Connect(string token)
 		{
 			_isStopping.Reset();
 			
@@ -590,8 +591,9 @@ namespace Discord
 			await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
 
 			_isReady = true;
-			return token;
 		}
+		/// <summary> Connects to the Discord server with the provided email and password. </summary>
+		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
 		{
 			_isStopping.Reset();
@@ -608,17 +610,22 @@ namespace Discord
 			_isReady = true;
 			return response.Token;
 		}
+		/// <summary> Connects to the Discord server with the provided token, and will fall back to username and password. </summary>
+		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password, string token)
 		{
 			try
 			{
-				return await Connect(token);
+				await Connect(token);
+				return token;
 			}
 			catch (InvalidOperationException) //Bad Token
 			{
 				return await Connect(email, password);
 			}
 		}
+		/// <summary> Connects to the Discord server as an anonymous user with the provided username. </summary>
+		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> ConnectAnonymous(string username)
 		{
 			_isStopping.Reset();
@@ -635,6 +642,7 @@ namespace Discord
 			_isReady = true;
 			return response.Token;
 		}
+		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public async Task Disconnect()
 		{
 			_isReady = false;
@@ -649,14 +657,17 @@ namespace Discord
 		}
 
 		//Servers
+		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
 		public async Task<Server> CreateServer(string name, string region)
 		{
 			CheckReady();
 			var response = await DiscordAPI.CreateServer(name, region);
 			return _servers.Update(response.Id, response);
 		}
+		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
 		public Task<Server> LeaveServer(Server server)
 			=> LeaveServer(server.Id);
+		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
 		public async Task<Server> LeaveServer(string serverId)
 		{
 			CheckReady();
@@ -669,25 +680,31 @@ namespace Discord
 		}
 
 		//Channels
+		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
 		public Task<Channel> CreateChannel(Server server, string name, string type)
 			=> CreateChannel(server.Id, name, type);
-        public async Task<Channel> CreateChannel(string serverId, string name, string type)
+		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
+		public async Task<Channel> CreateChannel(string serverId, string name, string type)
 		{
 			CheckReady();
 			var response = await DiscordAPI.CreateChannel(serverId, name, type);
 			return _channels.Update(response.Id, serverId, response);
 		}
+		/// <summary> Creates a new private channel with the provided user. </summary>
 		public Task<Channel> CreatePMChannel(User user)
 			=> CreatePMChannel(user.Id);
-		public async Task<Channel> CreatePMChannel(string recipientId)
+		/// <summary> Creates a new private channel with the provided user. </summary>
+		public async Task<Channel> CreatePMChannel(string userId)
 		{
 			CheckReady();
-			var response = await DiscordAPI.CreatePMChannel(UserId, recipientId);
+			var response = await DiscordAPI.CreatePMChannel(UserId, userId);
 			return _channels.Update(response.Id, response);
 		}
+		/// <summary> Destroys the provided channel. </summary>
 		public Task<Channel> DestroyChannel(Channel channel)
 			=> DestroyChannel(channel.Id);
-        public async Task<Channel> DestroyChannel(string channelId)
+		/// <summary> Destroys the provided channel. </summary>
+		public async Task<Channel> DestroyChannel(string channelId)
 		{
 			CheckReady();
 			try
@@ -699,23 +716,31 @@ namespace Discord
 		}
 
 		//Bans
+		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(Server server, User user)
 			=> Ban(server.Id, user.Id);
+		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(Server server, string userId)
 			=> Ban(server.Id, userId);
+		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(string server, User user)
 			=> Ban(server, user.Id);
+		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(string serverId, string userId)
 		{
 			CheckReady();
 			return DiscordAPI.Ban(serverId, userId);
 		}
+		/// <summary> Unbans a user from the provided server. </summary>
 		public Task Unban(Server server, User user)
 			=> Unban(server.Id, user.Id);
+		/// <summary> Unbans a user from the provided server. </summary>
 		public Task Unban(Server server, string userId)
 			=> Unban(server.Id, userId);
+		/// <summary> Unbans a user from the provided server. </summary>
 		public Task Unban(string server, User user)
 			=> Unban(server, user.Id);
+		/// <summary> Unbans a user from the provided server. </summary>
 		public async Task Unban(string serverId, string userId)
 		{
 			CheckReady();
@@ -727,15 +752,30 @@ namespace Discord
 		}
 
 		//Invites
+		/// <summary> Creates a new invite to the default channel of the provided server. </summary>
+		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
+		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
 		public Task<Invite> CreateInvite(Server server, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
 		{
 			return CreateInvite(server.DefaultChannelId, maxAge, maxUses, isTemporary, hasXkcdPass);
 		}
+		/// <summary> Creates a new invite to the provided channel. </summary>
+		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
+		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
 		public Task<Invite> CreateInvite(Channel channel, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
 		{
 			return CreateInvite(channel, maxAge, maxUses, isTemporary, hasXkcdPass);
 		}
-        public async Task<Invite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		/// <summary> Creates a new invite to the provided channel. </summary>
+		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
+		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
+		public async Task<Invite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
 		{
 			CheckReady();
 			var response = await DiscordAPI.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass);
@@ -754,7 +794,9 @@ namespace Discord
 				Uses = response.Uses
 			};
 		}
-        public async Task<Invite> GetInvite(string id)
+		/// <summary> Gets more info about the provided invite. </summary>
+		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
+		public async Task<Invite> GetInvite(string id)
 		{
 			CheckReady();
 			var response = await DiscordAPI.GetInvite(id);
@@ -765,11 +807,13 @@ namespace Discord
 				ServerId = response.Server.Id
 			};
 		}
+		/// <summary> Accepts the provided invite. </summary>
 		public Task AcceptInvite(Invite invite)
 		{
 			CheckReady();
 			return DiscordAPI.AcceptInvite(invite.Code);
 		}
+		/// <summary> Accepts the provided invite. </summary>
 		public async Task AcceptInvite(string id)
 		{
 			CheckReady();
@@ -786,6 +830,7 @@ namespace Discord
 			var response = await DiscordAPI.GetInvite(id);
 			await DiscordAPI.AcceptInvite(response.Code);
 		}
+		/// <summary> Deletes the provided invite. </summary>
 		public async Task DeleteInvite(string id)
 		{
 			CheckReady();
@@ -799,13 +844,19 @@ namespace Discord
 		}
 
 		//Chat
+		/// <summary> Sends a message to the provided channel. </summary>
 		public Task<Message[]> SendMessage(Channel channel, string text)
 			=> SendMessage(channel.Id, text, new string[0]);
+		/// <summary> Sends a message to the provided channel. </summary>
 		public Task<Message[]> SendMessage(string channelId, string text)
 			=> SendMessage(channelId, text, new string[0]);
+		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
 		public Task<Message[]> SendMessage(Channel channel, string text, string[] mentions)
 			=> SendMessage(channel.Id, text, mentions);
-        public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
+		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
 		{
 			CheckReady();
 			
@@ -829,16 +880,25 @@ namespace Discord
 			}
 		}
 
+		/// <summary> Edits a message the provided message. </summary>
 		public Task EditMessage(Message message, string text)
 			=> EditMessage(message.ChannelId, message.Id, text, new string[0]);
+		/// <summary> Edits a message the provided message. </summary>
 		public Task EditMessage(Channel channel, string messageId, string text)
 			=> EditMessage(channel.Id, messageId, text, new string[0]);
+		/// <summary> Edits a message the provided message. </summary>
 		public Task EditMessage(string channelId, string messageId, string text)
 			=> EditMessage(channelId, messageId, text, new string[0]);
+		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
 		public Task EditMessage(Message message, string text, string[] mentions)
 			=> EditMessage(message.ChannelId, message.Id, text, mentions);
+		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
 		public Task EditMessage(Channel channel, string messageId, string text, string[] mentions)
 			=> EditMessage(channel.Id, messageId, text, mentions);
+		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
 		public async Task EditMessage(string channelId, string messageId, string text, string[] mentions)
 		{
 			CheckReady();
@@ -849,8 +909,10 @@ namespace Discord
 			_messages.Update(msg.Id, channelId, msg);
 		}
 
+		/// <summary> Deletes the provided message. </summary>
 		public Task DeleteMessage(Message msg)
 			=> DeleteMessage(msg.ChannelId, msg.Id);
+		/// <summary> Deletes the provided message. </summary>
 		public async Task<Message> DeleteMessage(string channelId, string msgId)
 		{
 			try
@@ -863,12 +925,18 @@ namespace Discord
 			return null;
 		}
 
+		/// <summary> Sends a file to the provided channel. </summary>
 		public Task SendFile(Channel channel, string path)
 			=> SendFile(channel.Id, path);
+		/// <summary> Sends a file to the provided channel. </summary>
 		public Task SendFile(string channelId, string path)
 			=> SendFile(channelId, File.OpenRead(path), Path.GetFileName(path));
+		/// <summary> Reads a stream and sends it to the provided channel as a file. </summary>
+		/// <remarks> It is highly recommended that this stream be cached in memory or on disk, or the request may time out. </remarks>
 		public Task SendFile(Channel channel, Stream stream, string filename = null)
 			=> SendFile(channel.Id, stream, filename);
+		/// <summary> Reads a stream and sends it to the provided channel as a file. </summary>
+		/// <remarks> It is highly recommended that this stream be cached in memory or on disk, or the request may time out. </remarks>
 		public Task SendFile(string channelId, Stream stream, string filename = null)
 		{
 			return DiscordAPI.SendFile(channelId, stream, filename);
@@ -876,48 +944,64 @@ namespace Discord
 
 
 		//Voice
+		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, User user)
 			=> Mute(server.Id, user.Id);
+		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, string userId)
 			=> Mute(server.Id, userId);
+		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(string server, User user)
 			=> Mute(server, user.Id);
+		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(string serverId, string userId)
 		{
 			CheckReady();
 			return DiscordAPI.Mute(serverId, userId);
 		}
 
+		/// <summary> Unmutes a user on the provided server. </summary>
 		public Task Unmute(Server server, User user)
 			=> Unmute(server.Id, user.Id);
+		/// <summary> Unmutes a user on the provided server. </summary>
 		public Task Unmute(Server server, string userId)
 			=> Unmute(server.Id, userId);
+		/// <summary> Unmutes a user on the provided server. </summary>
 		public Task Unmute(string server, User user)
 			=> Unmute(server, user.Id);
+		/// <summary> Unmutes a user on the provided server. </summary>
 		public Task Unmute(string serverId, string userId)
 		{
 			CheckReady();
 			return DiscordAPI.Unmute(serverId, userId);
 		}
 
+		/// <summary> Deafens a user on the provided server. </summary>
 		public Task Deafen(Server server, User user)
 			=> Deafen(server.Id, user.Id);
+		/// <summary> Deafens a user on the provided server. </summary>
 		public Task Deafen(Server server, string userId)
 			=> Deafen(server.Id, userId);
+		/// <summary> Deafens a user on the provided server. </summary>
 		public Task Deafen(string server, User user)
 			=> Deafen(server, user.Id);
+		/// <summary> Deafens a user on the provided server. </summary>
 		public Task Deafen(string serverId, string userId)
 		{
 			CheckReady();
 			return DiscordAPI.Deafen(serverId, userId);
 		}
 
+		/// <summary> Undeafens a user on the provided server. </summary>
 		public Task Undeafen(Server server, User user)
 			=> Undeafen(server.Id, user.Id);
+		/// <summary> Undeafens a user on the provided server. </summary>
 		public Task Undeafen(Server server, string userId)
 			=> Undeafen(server.Id, userId);
+		/// <summary> Undeafens a user on the provided server. </summary>
 		public Task Undeafen(string server, User user)
 			=> Undeafen(server, user.Id);
+		/// <summary> Undeafens a user on the provided server. </summary>
 		public Task Undeafen(string serverId, string userId)
 		{
 			CheckReady();
@@ -925,18 +1009,21 @@ namespace Discord
 		}
 
 		//Profile
+		/// <summary> Changes your username to newName. </summary>
 		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
 		{
 			CheckReady();
 			var response = await DiscordAPI.ChangeUsername(newName, currentEmail, currentPassword);
 			_users.Update(response.Id, response);
         }
+		/// <summary> Changes your email to newEmail. </summary>
 		public async Task ChangeEmail(string newEmail, string currentPassword)
 		{
 			CheckReady();
 			var response = await DiscordAPI.ChangeEmail(newEmail, currentPassword);
 			_users.Update(response.Id, response);
 		}
+		/// <summary> Changes your password to newPassword. </summary>
 		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
 		{
 			CheckReady();
