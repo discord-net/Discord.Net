@@ -11,36 +11,52 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient
 	{
-		public const int ReconnectDelay = 1000; //Time in milliseconds to wait after an unexpected disconnect before retrying
-		public const int FailedReconnectDelay = 10000; //Time in milliseconds to wait after a failed reconnect attempt
-
 		private DiscordWebSocket _webSocket;
-		private bool _isReady;
+		private ManualResetEventSlim _isStopping;
 
+		/// <summary> Returns the User object for the current logged in user. </summary>
+		public User User { get; private set; }
 		public string UserId { get; private set; }
-		public User User => _users[UserId];
 
+		/// <summary> Returns a collection of all users the client can see across all servers. </summary>
+		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<User> Users => _users;
 		private AsyncCache<User, API.Models.UserReference> _users;
 
+		/// <summary> Returns a collection of all servers the client is a member of. </summary>
+		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Server> Servers => _servers;
 		private AsyncCache<Server, API.Models.ServerReference> _servers;
 
+		/// <summary> Returns a collection of all channels the client can see across all servers. </summary>
+		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Channel> Channels => _channels;
 		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
 
+		/// <summary> Returns a collection of all messages the client has in cache. </summary>
+		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Message> Messages => _messages;
 		private AsyncCache<Message, API.Models.MessageReference> _messages;
 
+		/// <summary> Returns a collection of all roles the client can see across all servers. </summary>
+		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Role> Roles => _roles;
 		private AsyncCache<Role, API.Models.Role> _roles;
 
-		private ManualResetEventSlim _isStopping;
-
+		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
 		public bool IsConnected => _isReady;
+		private bool _isReady;
 
+		/// <summary> Gets or sets the time (in milliseconds) to wait after an unexpected disconnect before reconnecting. </summary>
+		public int ReconnectDelay { get; set; } = 1000;
+		/// <summary> Gets or sets the time (in milliseconds) to wait after an reconnect fails before retrying. </summary>
+		public int FailedReconnectDelay { get; set; } = 10000;
+
+		
+		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient()
 		{
 			_isStopping = new ManualResetEventSlim(false);
@@ -50,7 +66,7 @@ namespace Discord
 				(server, model) =>
 				{
 					server.Name = model.Name;
-					if (!server.Channels.Any()) //Assume a default channel exists with the same id as the server. Not sure if this is safe?
+					if (!server.Channels.Any()) //A default channel always exists with the same id as the server.
 					{
 						var defaultChannel = new ChannelReference() { Id = server.DefaultChannelId, GuildId = server.Id };
 						_channels.Update(defaultChannel.Id, defaultChannel.GuildId, defaultChannel);
@@ -173,8 +189,9 @@ namespace Discord
 						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
 						break;
 					}
-					catch (Exception)
+					catch (Exception ex)
 					{
+						RaiseOnDebugMessage($"Reconnect Failed: {ex.Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(FailedReconnectDelay);
 					}
@@ -194,7 +211,7 @@ namespace Discord
 							_users.Clear();
 
 							UserId = data.User.Id;
-							_users.Update(data.User.Id, data.User);
+							User = _users.Update(data.User.Id, data.User);
 							foreach (var server in data.Guilds)
 								_servers.Update(server.Id, server);
 							foreach (var channel in data.PrivateChannels)
@@ -416,101 +433,131 @@ namespace Discord
 			};
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 		}
+		
 
-		//Collections
+		/// <summary> Returns the user with the specified id, or null if none was found. </summary>
 		public User GetUser(string id) => _users[id];
-		public User FindUser(string name)
-		{
-			return _users
-				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
-		}
-		public User FindUser(string name, string discriminator)
+		/// <summary> Returns the user with the specified name and discriminator, or null if none was found. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public User GetUser(string name, string discriminator)
 		{
 			if (name.StartsWith("@"))
 				name = name.Substring(1);
 
 			return _users
-				.Where(x => 
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
-					x.Discriminator == discriminator
-                )
-				.FirstOrDefault();
-		}
-		public Membership FindMember(string serverId, string name)
-			=> FindMember(GetServer(serverId), name);
-        public Membership FindMember(Server server, string name)
-		{
-			if (server == null)
-				return null;
-
-			if (name.StartsWith("<@") && name.EndsWith(">"))
-			{
-				var user = GetUser(name.Substring(2, name.Length - 3));
-				if (user == null)
-					return null;
-				return server.GetMembership(user.Id);
-            }
-
-			if (name.StartsWith("@"))
-				name = name.Substring(1);
-
-			return server.Members
-				.Where(x => string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
-		}
-
-		public Server GetServer(string id) => _servers[id];
-		public Server FindServer(string name)
-		{
-			return _servers
-				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
-		}
-
-		public Channel GetChannel(string id) => _channels[id];
-		public Channel FindChannel(string name)
-		{
-			if (name.StartsWith("<#") && name.EndsWith(">"))
-				return GetChannel(name.Substring(2, name.Length - 3));
-
-			if (name.StartsWith("#"))
-				name = name.Substring(1);
-			return _channels
-				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
-		}
-		public Channel FindChannel(Server server, string name)
-			=> FindChannel(server.Id, name);
-        public Channel FindChannel(string serverId, string name)
-		{
-			if (name.StartsWith("<#") && name.EndsWith(">"))
-				return GetChannel(name.Substring(2, name.Length - 3));
-
-			if (name.StartsWith("#"))
-				name = name.Substring(1);
-			return _channels
 				.Where(x =>
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
-					x.ServerId == serverId
+					x.Discriminator == discriminator
 				)
 				.FirstOrDefault();
 		}
-
-		public Role GetRole(string id) => _roles[id];
-		public Role FindRole(Server server, string name)
-			=> FindRole(server.Id, name);
-        public Role FindRole(string serverId, string name)
+		/// <summary> Returns all users with the specified name. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		/*public IEnumerable<User> FindUsers(string name)
 		{
-			return _roles
-				.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
+			if (name.StartsWith("@"))
+			{
+				string name2 = name.Substring(1);
+				return _users.Where(x => 
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+			}
+			else
+			{
+				return _users.Where(x => 
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+			}
+		}*/
+		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Membership> FindUsers(string serverId, string name)
+			=> FindUsers(GetServer(serverId), name);
+		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		public IEnumerable<Membership> FindUsers(Server server, string name)
+		{
+			if (server == null)
+				return new Membership[0];
+
+			if (name.StartsWith("@"))
+			{
+				string name2 = name.Substring(1);
+				return server.Members.Where(x =>
+				{
+					var user = x.User;
+					return string.Equals(user.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(user.Name, name2, StringComparison.OrdinalIgnoreCase);
+				});
+			}
+			else
+			{
+				return server.Members.Where(x =>
+					string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase));
+			}
 		}
 
+		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
+		public Server GetServer(string id) => _servers[id];
+		/// <summary> Returns all servers with the specified name. </summary>
+		/// <remarks> Search is case-insensitive. </remarks>
+		public IEnumerable<Server> FindServers(string name)
+		{
+			return _servers.Where(x => 
+				string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+		}
+
+		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
+		public Channel GetChannel(string id) => _channels[id];
+		/// <summary> Returns all channels with the specified server and name. </summary>
+		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Channel> FindChannels(Server server, string name)
+			=> FindChannels(server.Id, name);
+		/// <summary> Returns all channels with the specified server and name. </summary>
+		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Channel> FindChannels(string serverId, string name)
+		{
+			if (name.StartsWith("#"))
+			{
+				string name2 = name.Substring(1);
+				return _channels.Where(x => x.ServerId == serverId &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+			}
+			else
+			{
+				return _channels.Where(x => x.ServerId == serverId &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+			}
+		}
+
+		/// <summary> Returns the role with the specified id, or null if none was found. </summary>
+		public Role GetRole(string id) => _roles[id];
+		/// <summary> Returns all roles with the specified server and name. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Role> FindRoles(Server server, string name)
+			=> FindRoles(server.Id, name);
+		/// <summary> Returns all roles with the specified server and name. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Role> FindRoles(string serverId, string name)
+		{
+			if (name.StartsWith("@"))
+			{
+				string name2 = name.Substring(1);
+				return _roles.Where(x => x.ServerId == serverId &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+			}
+			else
+			{
+				return _roles.Where(x => x.ServerId == serverId &&
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+			}
+		}
+
+		/// <summary> Returns the message with the specified id, or null if none was found. </summary>
 		public Message GetMessage(string id) => _messages[id];
-		public Task<Message[]> DownloadMessages(Channel channel, int count)
+
+		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
+		public Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null)
 			=> DownloadMessages(channel.Id, count);
-        public async Task<Message[]> DownloadMessages(string channelId, int count)
+		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
+		public async Task<Message[]> DownloadMessages(string channelId, int count, string beforeMessageId = null)
 		{
 			Channel channel = GetChannel(channelId);
 			if (channel != null && channel.Type == ChannelTypes.Text)
