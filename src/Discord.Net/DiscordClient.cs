@@ -1092,10 +1092,7 @@ namespace Discord
 			return text;
         }
 
-		/// <summary>
-		/// Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications.
-		/// </summary>
-		/// <returns></returns>
+		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
 		public void Block()
 		{
 			_isStopping.Wait();
