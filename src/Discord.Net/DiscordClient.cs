@@ -528,7 +528,7 @@ namespace Discord
 						})
 						.ToArray();
 				}
-				catch { } //Bad Permissions?
+				catch (HttpException) { } //Bad Permissions?
 			}
 			return null;
 		}
