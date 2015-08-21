@@ -466,7 +466,7 @@ namespace Discord
 		}
 		/// <summary> Returns all users with the specified name across all servers. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		/*public IEnumerable<User> FindUsers(string name)
+		public IEnumerable<User> FindUsers(string name)
 		{
 			if (name.StartsWith("@"))
 			{
@@ -479,7 +479,7 @@ namespace Discord
 				return _users.Where(x => 
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
-		}*/
+		}
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public IEnumerable<Membership> FindUsers(string serverId, string name)
