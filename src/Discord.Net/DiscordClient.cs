@@ -756,7 +756,7 @@ namespace Discord
 		public Task<Message[]> SendMessage(string channelId, string text)
 			=> SendMessage(channelId, text, new string[0]);
 		public Task<Message[]> SendMessage(Channel channel, string text, string[] mentions)
-			=> SendMessage(channel, text, mentions);
+			=> SendMessage(channel.Id, text, mentions);
         public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
 		{
 			CheckReady();
