@@ -106,10 +106,23 @@ namespace Discord
 					{
 						var extendedModel = model as ChannelInfo;
 						channel.PermissionOverwrites = extendedModel.PermissionOverwrites;
-						channel.RecipientId = extendedModel.Recipient?.Id;
+						if (extendedModel.IsPrivate)
+						{
+							var user = _users.Update(extendedModel.Recipient.Id, extendedModel.Recipient);
+                            channel.RecipientId = user.Id;
+							user.PrivateChannelId = channel.Id;
+						}
 					}
 				},
-				channel => { });
+				channel => 
+				{
+					if (channel.IsPrivate)
+					{
+						var user = channel.Recipient;
+						if (user.PrivateChannelId == channel.Id)
+							user.PrivateChannelId = null;
+					}
+				});
 			_messages = new AsyncCache<Message, API.Models.MessageReference>(
 				(key, parentKey) => new Message(key, parentKey, this),
 				(message, model) =>
@@ -451,7 +464,7 @@ namespace Discord
 				)
 				.FirstOrDefault();
 		}
-		/// <summary> Returns all users with the specified name. </summary>
+		/// <summary> Returns all users with the specified name across all servers. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		/*public IEnumerable<User> FindUsers(string name)
 		{
@@ -506,6 +519,17 @@ namespace Discord
 
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
 		public Channel GetChannel(string id) => _channels[id];
+		/// <summary> Returns a private channel with the provided user. </summary>
+		public Task<Channel> GetPMChannel(string userId, bool createIfNotExists = false)
+			=> GetPMChannel(_users[userId], createIfNotExists);
+		/// <summary> Returns a private channel with the provided user. </summary>
+		public async Task<Channel> GetPMChannel(User user, bool createIfNotExists = false)
+		{
+			var channel = user.PrivateChannel;
+			if (channel == null && createIfNotExists)
+				await CreatePMChannel(user);
+            return channel;
+		}
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
 		public IEnumerable<Channel> FindChannels(Server server, string name)
