@@ -811,7 +811,7 @@ namespace Discord
 		public Task AcceptInvite(Invite invite)
 		{
 			CheckReady();
-			return DiscordAPI.AcceptInvite(invite.Code);
+			return DiscordAPI.AcceptInvite(invite.Id);
 		}
 		/// <summary> Accepts the provided invite. </summary>
 		public async Task AcceptInvite(string id)
