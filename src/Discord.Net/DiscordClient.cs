@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace Discord
 	{
 		private DiscordWebSocket _webSocket;
 		private ManualResetEventSlim _isStopping;
+		private readonly Regex _userRegex, _channelRegex;
+		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
@@ -60,6 +63,27 @@ namespace Discord
 		public DiscordClient()
 		{
 			_isStopping = new ManualResetEventSlim(false);
+
+			_userRegex = new Regex(@"<@\d+?>", RegexOptions.Compiled);
+			_channelRegex = new Regex(@"<#\d+?>", RegexOptions.Compiled);
+			_userRegexEvaluator = new MatchEvaluator(e =>
+			{				
+				string id = e.Value.Substring(2, e.Value.Length - 3);
+				var user = _users[id];
+				if (user != null)
+					return '@' + user.Name;
+				else //User not found
+					return e.Value;
+			});
+			_channelRegexEvaluator = new MatchEvaluator(e =>
+			{
+				string id = e.Value.Substring(2, e.Value.Length - 3);
+				var channel = _channels[id];
+				if (channel != null)
+					return channel.Name;
+				else //Channel not found
+					return e.Value;
+			});
 
 			_servers = new AsyncCache<Server, API.Models.ServerReference>(
 				(key, parentKey) => new Server(key, this),
@@ -148,10 +172,10 @@ namespace Discord
 						message.IsTTS = extendedModel.IsTextToSpeech;
 						message.MentionIds = extendedModel.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
 						message.IsMentioningMe = message.MentionIds.Contains(UserId);
+						message.RawText = extendedModel.Content;
+						message.Timestamp = extendedModel.Timestamp;
 						if (extendedModel.Author != null)
 							message.UserId = extendedModel.Author.Id;
-						message.Timestamp = extendedModel.Timestamp;
-						message.Text = extendedModel.Content;
 					}
 				},
 				message => { }
@@ -1060,6 +1084,12 @@ namespace Discord
 		{
 			if (!_isReady)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
+		}
+		internal string CleanMessageText(string text)
+		{
+			text = _userRegex.Replace(text, _userRegexEvaluator);
+			text = _channelRegex.Replace(text, _channelRegexEvaluator);
+			return text;
         }
 
 		/// <summary>

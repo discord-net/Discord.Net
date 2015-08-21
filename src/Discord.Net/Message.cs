@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Discord
 {
 	public sealed class Message
 	{
+
 		public struct Attachment
 		{
 			public string Id;
@@ -17,7 +20,8 @@ namespace Discord
 		}
 
 		private readonly DiscordClient _client;
-
+		private string _cleanText;
+		
 		/// <summary> Returns the unique identifier for this message. </summary>
 		public string Id { get; }
 
@@ -28,8 +32,11 @@ namespace Discord
 		public bool IsMentioningEveryone { get; internal set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; internal set; }
-		/// <summary> Returns the content of this message. </summary>
-		public string Text { get; internal set; }
+		/// <summary> Returns the raw content of this message as it was received from the server.. </summary>
+		public string RawText { get; internal set; }
+		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
+		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
+		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.CleanMessageText(RawText));
 		/// <summary> Returns the timestamp of this message. </summary>
 		public DateTime Timestamp { get; internal set; }
 		/// <summary> Returns the attachments included in this message. </summary>
@@ -68,5 +75,5 @@ namespace Discord
 		{
 			return User.ToString() + ": " + Text;
 		}
-	}
+    }
 }
