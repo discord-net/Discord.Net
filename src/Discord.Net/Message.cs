@@ -20,6 +20,7 @@ namespace Discord
 
 		public string Id { get; }
 
+		public bool IsMentioningMe { get; internal set; }
 		public bool IsMentioningEveryone { get; internal set; }
 		public bool IsTTS { get; internal set; }
 		public string Text { get; internal set; }

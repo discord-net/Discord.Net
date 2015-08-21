@@ -118,6 +118,7 @@ namespace Discord
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
 						message.MentionIds = extendedModel.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
+						message.IsMentioningMe = message.MentionIds.Contains(UserId);
 						if (extendedModel.Author != null)
 							message.UserId = extendedModel.Author.Id;
 						message.Timestamp = extendedModel.Timestamp;
