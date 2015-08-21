@@ -88,9 +88,6 @@
     <Compile Include="..\Discord.Net\Helpers\Http.cs">
       <Link>Helpers\Http.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\HttpException.cs">
-      <Link>Helpers\HttpException.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Invite.cs">
       <Link>Invite.cs</Link>
     </Compile>
@@ -112,6 +109,7 @@
     <Compile Include="..\Discord.Net\User.cs">
       <Link>User.cs</Link>
     </Compile>
+    <Compile Include="HttpException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
