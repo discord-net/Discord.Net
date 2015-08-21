@@ -20,6 +20,7 @@ namespace Discord
 		public bool IsVerified { get; internal set; } = true;
 		public string GameId { get; internal set; }
 		public string Status { get; internal set; }
+		public string Mention { get { return $"<@{Id}>"; } }
 
 		public DateTime LastActivity { get; private set; }
 
