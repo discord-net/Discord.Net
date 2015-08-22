@@ -150,7 +150,11 @@ namespace Discord
 								QueueMessage(new WebSocketCommands.KeepAlive());
 								_connectWaitOnLogin.Set(); //Pre-Event
                             }
-							RaiseGotEvent(msg.Type, msg.Payload as JToken);
+							try
+							{
+								RaiseGotEvent(msg.Type, msg.Payload as JToken);
+							}
+							catch { } //Don't allow user exceptions to affect our state
 							if (msg.Type == "READY")
 								_connectWaitOnLogin2.Set(); //Post-Event
 							break;
