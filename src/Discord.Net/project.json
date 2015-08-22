@@ -9,8 +9,12 @@
 		"type": "git",
 		"url": "git://github.com/RogueException/Discord.Net"
 	},
-	"compilationOptions": {
-		"warningsAsErrors": true
+	"configurations": {
+		"FullDebug": {
+			"compilationOptions": {
+				"define": ["DEBUG","TRACE","TEST_RESPONSES"]
+			}
+		}
 	},
 
 	"dependencies": {

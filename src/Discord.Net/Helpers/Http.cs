@@ -4,25 +4,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Reflection;
-using System.Diagnostics;
 using System.Net;
 using System.IO;
 using System.Globalization;
+
+#if TEST_RESPONSES
+using System.Diagnostics;
+using JsonErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+#endif
 
 namespace Discord.Helpers
 {
 	internal static class Http
 	{
-#if DEBUG
+#if TEST_RESPONSES
 		private const bool _isDebug = true;
 #else
 		private const bool _isDebug = false;
 #endif
 		private static readonly HttpClient _client;
-		private static readonly HttpMethod _patch = new HttpMethod("PATCH"); //Not sure why this isn't a default...
+		private static readonly HttpMethod _patch;
+		private static readonly JsonSerializerSettings _settings;
 
 		static Http()
 		{
+			_patch = new HttpMethod("PATCH"); //Not sure why this isn't a default...
+
 			_client = new HttpClient(new HttpClientHandler
 			{
 				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
@@ -34,7 +41,13 @@ namespace Discord.Helpers
 
 			string version = typeof(Http).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			_client.DefaultRequestHeaders.Add("user-agent", $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
-		}
+
+			_settings = new JsonSerializerSettings();
+#if TEST_RESPONSES
+			_settings.CheckAdditionalContent = true;
+			_settings.MissingMemberHandling = MissingMemberHandling.Error;
+#endif
+        }
 
 		private static string _token;
 		public static string Token
@@ -109,16 +122,13 @@ namespace Discord.Helpers
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest(method, path, content, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson);
-#if DEBUG
-			CheckResponse(responseJson, response);
-#endif
+			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson, _settings);
 			return response;
 		}
 		private static async Task<string> Send(HttpMethod method, string path, HttpContent content)
 		{
 			string responseJson = await SendRequest(method, path, content, _isDebug);
-#if DEBUG
+#if TEST_RESPONSES
 			CheckEmptyResponse(responseJson);
 #endif
 			return responseJson;
@@ -126,46 +136,40 @@ namespace Discord.Helpers
 
 		private static async Task<string> SendRequest(HttpMethod method, string path, HttpContent content, bool hasResponse)
 		{
-#if DEBUG
+#if TEST_RESPONSES
 			Stopwatch stopwatch = Stopwatch.StartNew();
-#endif			
-			HttpRequestMessage msg = new HttpRequestMessage(method, path);
-			if (content != null)
-				msg.Content = content;
-
+#endif
 			string result;
-			HttpResponseMessage response;
-            if (hasResponse)
+			using (HttpRequestMessage msg = new HttpRequestMessage(method, path))
 			{
-				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
-				if (!response.IsSuccessStatusCode)
-					throw new HttpException(response.StatusCode);
-				result = await response.Content.ReadAsStringAsync();
-			}
-			else
-			{
-				response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
-				if (!response.IsSuccessStatusCode)
-					throw new HttpException(response.StatusCode);
-				result = null;
+				if (content != null)
+					msg.Content = content;
+
+				HttpResponseMessage response;
+				if (hasResponse)
+				{
+					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
+					if (!response.IsSuccessStatusCode)
+						throw new HttpException(response.StatusCode);
+					result = await response.Content.ReadAsStringAsync();
+				}
+				else
+				{
+					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
+					if (!response.IsSuccessStatusCode)
+						throw new HttpException(response.StatusCode);
+					result = null;
+				}
 			}
 
-#if DEBUG
+#if TEST_RESPONSES
 			stopwatch.Stop();
 			Debug.WriteLine($"{method} {path}: {Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2)}ms");
 #endif
-            return result;
+			return result;
 		}
 
-#if DEBUG
-		private static void CheckResponse<T>(string json, T obj)
-		{
-			/*JToken token = JToken.Parse(json);
-			JToken token2 = JToken.FromObject(obj);
-			if (!JToken.DeepEquals(token, token2))
-				throw new Exception("API check failed: Objects do not match.");*/
-		}
-
+#if TEST_RESPONSES
 		private static void CheckEmptyResponse(string json)
 		{
 			if (!string.IsNullOrEmpty(json))
