@@ -10,7 +10,6 @@ using System.Globalization;
 
 #if TEST_RESPONSES
 using System.Diagnostics;
-using JsonErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 #endif
 
 namespace Discord.Helpers

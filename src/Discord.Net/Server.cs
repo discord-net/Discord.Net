@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Helpers;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +39,9 @@ namespace Discord
 		/// <summary> Returns the default channel for this server. </summary>
 		public Channel DefaultChannel =>_client.GetChannel(DefaultChannelId);
 
-		internal ConcurrentDictionary<string, Membership> _members;
+		internal AsyncCache<Membership, API.Models.MemberInfo> _members;
 		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Membership> Members => _members.Values;
+		public IEnumerable<Membership> Members => _members;
 
 		internal ConcurrentDictionary<string, bool> _bans;
 		/// <summary> Returns a collection of all users banned on this server. </summary>
@@ -54,38 +55,59 @@ namespace Discord
 		/// <summary> Returns a collection of all roles within this server. </summary>
 		public IEnumerable<Role> Roles => _client.Roles.Where(x => x.ServerId == Id);
 
-		//TODO: Not Implemented
-		/// <summary> Not implemented, stored for reference. </summary>
-		public object Presence { get; internal set; }
-		//TODO: Not Implemented
-		/// <summary> Not implemented, stored for reference. </summary>
-		public object[] VoiceStates { get; internal set; }
-
 		internal Server(string id, DiscordClient client)
 		{
 			Id = id;
 			_client = client;
-			_members = new ConcurrentDictionary<string, Membership>();
 			_bans = new ConcurrentDictionary<string, bool>();
+			_members = new AsyncCache<Membership, API.Models.MemberInfo>(
+				(key, parentKey) => new Membership(parentKey, key, _client),
+				(member, model) =>
+				{
+					if (model is API.Models.PresenceMemberInfo)
+					{
+						var extendedModel = model as API.Models.PresenceMemberInfo;
+						member.Status = extendedModel.Status;
+						member.GameId = extendedModel.GameId;
+					}
+					if (model is API.Models.VoiceMemberInfo)
+					{
+						var extendedModel = model as API.Models.VoiceMemberInfo;
+						member.VoiceChannelId = extendedModel.ChannelId;
+						member.IsDeafened = extendedModel.IsDeafened;
+						member.IsMuted = extendedModel.IsMuted;
+						member.IsSelfDeafened = extendedModel.IsSelfDeafened;
+						member.IsSelfMuted = extendedModel.IsSelfMuted;
+						member.IsSuppressed = extendedModel.IsSuppressed;
+						member.SessionId = extendedModel.SessionId;
+						member.Token = extendedModel.Token;
+					}
+					if (model is API.Models.RoleMemberInfo)
+					{
+						var extendedModel = model as API.Models.RoleMemberInfo;
+						member.IsDeafened = extendedModel.IsDeafened;
+						member.IsMuted = extendedModel.IsMuted;
+						member.RoleIds = extendedModel.Roles;
+						if (extendedModel.JoinedAt.HasValue)
+							member.JoinedAt = extendedModel.JoinedAt.Value;
+					}
+                }
+			);
 		}
 
-		internal void AddMember(Membership membership)
+		internal Membership UpdateMember(API.Models.MemberInfo membership)
 		{
-			_members[membership.UserId] = membership;
+			return _members.Update(membership.User?.Id ?? membership.UserId, Id, membership);
 		}
 		internal Membership RemoveMember(string userId)
 		{
-			Membership result = null;
-			_members.TryRemove(userId, out result);
-			return result;
+			return _members.Remove(userId);
 		}
 		public Membership GetMembership(User user)
 			=> GetMember(user.Id);
         public Membership GetMember(string userId)
 		{
-			Membership result = null;
-			_members.TryGetValue(userId, out result);
-			return result;
+			return _members[userId];
 		}
 
 		internal void AddBan(string banId)

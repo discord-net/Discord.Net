@@ -11,12 +11,24 @@ namespace Discord.API.Models
 	{
 		public sealed class Ready
 		{
+			public sealed class ReadStateInfo
+			{
+				[JsonProperty(PropertyName = "id")]
+				public string ChannelId;
+				[JsonProperty(PropertyName = "mention_count")]
+				public int MentionCount;
+				[JsonProperty(PropertyName = "last_message_id")]
+				public string LastMessageId;
+			}
+
+			[JsonProperty(PropertyName = "v")]
+			public int Version;
 			[JsonProperty(PropertyName = "user")]
 			public SelfUserInfo User;
 			[JsonProperty(PropertyName = "session_id")]
 			public string SessionId;
 			[JsonProperty(PropertyName = "read_state")]
-			public object[] ReadState;
+			public ReadStateInfo[] ReadState;
 			[JsonProperty(PropertyName = "guilds")]
 			public ExtendedServerInfo[] Guilds;
 			[JsonProperty(PropertyName = "private_channels")]
@@ -36,32 +48,15 @@ namespace Discord.API.Models
 		public sealed class ChannelUpdate : ChannelInfo { }
 
 		//Memberships
-		public abstract class GuildMemberEvent
-		{
-			[JsonProperty(PropertyName = "user")]
-			public UserReference User;
-			[JsonProperty(PropertyName = "guild_id")]
-			public string GuildId;
-		}
-		public sealed class GuildMemberAdd : GuildMemberEvent
-		{
-			[JsonProperty(PropertyName = "joined_at")]
-			public DateTime JoinedAt;
-			[JsonProperty(PropertyName = "roles")]
-			public string[] Roles;
-		}
-		public sealed class GuildMemberUpdate : GuildMemberEvent
-		{
-			[JsonProperty(PropertyName = "roles")]
-			public string[] Roles;
-		}
-		public sealed class GuildMemberRemove : GuildMemberEvent { }
+		public sealed class GuildMemberAdd : RoleMemberInfo { }
+		public sealed class GuildMemberUpdate : RoleMemberInfo { }
+		public sealed class GuildMemberRemove : MemberInfo { }
 
 		//Roles
 		public abstract class GuildRoleEvent
 		{
 			[JsonProperty(PropertyName = "guild_id")]
-			public string GuildId;
+			public string ServerId;
 		}
 		public sealed class GuildRoleCreateUpdate : GuildRoleEvent
 		{
@@ -78,7 +73,7 @@ namespace Discord.API.Models
 		public abstract class GuildBanEvent
 		{
 			[JsonProperty(PropertyName = "guild_id")]
-			public string GuildId;
+			public string ServerId;
 		}
 		public sealed class GuildBanAddRemove : GuildBanEvent
 		{
@@ -93,28 +88,8 @@ namespace Discord.API.Models
 
 		//User
 		public sealed class UserUpdate : SelfUserInfo { }
-		public sealed class PresenceUpdate : PresenceUserInfo { }
-		public sealed class VoiceStateUpdate
-		{
-			[JsonProperty(PropertyName = "user_id")]
-			public string UserId;
-			[JsonProperty(PropertyName = "guild_id")]
-			public string GuildId;
-			[JsonProperty(PropertyName = "channel_id")]
-			public string ChannelId;
-			[JsonProperty(PropertyName = "suppress")]
-			public bool IsSuppressed;
-			[JsonProperty(PropertyName = "session_id")]
-			public string SessionId;
-			[JsonProperty(PropertyName = "self_mute")]
-			public bool IsSelfMuted;
-			[JsonProperty(PropertyName = "self_deaf")]
-			public bool IsSelfDeafened;
-			[JsonProperty(PropertyName = "mute")]
-			public bool IsMuted;
-			[JsonProperty(PropertyName = "deaf")]
-			public bool IsDeafened;
-		}
+		public sealed class PresenceUpdate : PresenceMemberInfo { }
+		public sealed class VoiceStateUpdate : VoiceMemberInfo { }
 
 		//Chat
 		public sealed class MessageCreate : Message { }

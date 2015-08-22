@@ -97,6 +97,9 @@
     <Compile Include="..\Discord.Net\Message.cs">
       <Link>Message.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\PackedPermissions.cs">
+      <Link>PackedPermissions.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Regions.cs">
       <Link>Regions.cs</Link>
     </Compile>

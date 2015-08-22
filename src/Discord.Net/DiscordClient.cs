@@ -1,6 +1,7 @@
 ﻿using Discord.API;
 using Discord.API.Models;
 using Discord.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,10 +20,13 @@ namespace Discord
 		private ManualResetEventSlim _isStopping;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
+		private readonly JsonSerializer _serializer;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
+		/// <summary> Returns the id of the current logged in user. </summary>
 		public string UserId { get; private set; }
+		public string SessionId { get; private set; }
 
 		/// <summary> Returns a collection of all users the client can see across all servers. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
@@ -64,6 +68,12 @@ namespace Discord
 		{
 			_isStopping = new ManualResetEventSlim(false);
 
+			_serializer = new JsonSerializer();
+#if TEST_RESPONSES
+			_serializer.CheckAdditionalContent = true;
+			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
+#endif
+
 			_userRegex = new Regex(@"<@\d+?>", RegexOptions.Compiled);
 			_channelRegex = new Regex(@"<#\d+?>", RegexOptions.Compiled);
 			_userRegexEvaluator = new MatchEvaluator(e =>
@@ -90,11 +100,7 @@ namespace Discord
 				(server, model) =>
 				{
 					server.Name = model.Name;
-					if (!server.Channels.Any()) //A default channel always exists with the same id as the server.
-					{
-						var defaultChannel = new ChannelReference() { Id = server.DefaultChannelId, GuildId = server.Id };
-						_channels.Update(defaultChannel.Id, defaultChannel.GuildId, defaultChannel);
-					}
+					_channels.Update(server.DefaultChannelId, server.Id, null);
 					if (model is ExtendedServerInfo)
 					{
 						var extendedModel = model as ExtendedServerInfo;
@@ -102,9 +108,7 @@ namespace Discord
 						server.AFKTimeout = extendedModel.AFKTimeout;
 						server.JoinedAt = extendedModel.JoinedAt ?? DateTime.MinValue;
 						server.OwnerId = extendedModel.OwnerId;
-						server.Presence = extendedModel.Presence;
 						server.Region = extendedModel.Region;
-						server.VoiceStates = extendedModel.VoiceStates;
 
 						foreach (var role in extendedModel.Roles)
 							_roles.Update(role.Id, model.Id, role);
@@ -113,11 +117,13 @@ namespace Discord
 						foreach (var membership in extendedModel.Members)
 						{
 							_users.Update(membership.User.Id, membership.User);
-							var newMember = new Membership(server.Id, membership.User.Id, membership.JoinedAt, this);
-							newMember.Update(membership);
-							server.AddMember(newMember);
+							server.UpdateMember(membership);
 						}
-					}
+						foreach (var membership in extendedModel.VoiceStates)
+							server.UpdateMember(membership);
+						foreach (var membership in extendedModel.Presences)
+							server.UpdateMember(membership);
+                    }
 				},
 				server => { }
 			);
@@ -131,13 +137,27 @@ namespace Discord
 					if (model is ChannelInfo)
 					{
 						var extendedModel = model as ChannelInfo;
-						channel.PermissionOverwrites = extendedModel.PermissionOverwrites;
+						channel.Position = extendedModel.Position;
+
 						if (extendedModel.IsPrivate)
 						{
 							var user = _users.Update(extendedModel.Recipient.Id, extendedModel.Recipient);
-                            channel.RecipientId = user.Id;
+							channel.RecipientId = user.Id;
 							user.PrivateChannelId = channel.Id;
 						}
+
+						if (extendedModel.PermissionOverwrites != null)
+						{
+							channel.PermissionOverwrites = extendedModel.PermissionOverwrites.Select(x => new Channel.PermissionOverwrite
+							{
+								Type = x.Type,
+								Id = x.Id,
+								Deny = new PackedPermissions(x.Deny),
+								Allow = new PackedPermissions(x.Allow)
+							}).ToArray();
+						}
+						else
+							channel.PermissionOverwrites = null;
 					}
 				},
 				channel => 
@@ -170,8 +190,41 @@ namespace Discord
 							}).ToArray();
 						}
 						else
-							extendedModel.Attachments = null;
-						message.Embeds = extendedModel.Embeds;
+							message.Attachments = new Message.Attachment[0];
+						if (extendedModel.Embeds != null)
+						{
+							message.Embeds = extendedModel.Embeds.Select(x =>
+							{
+								var embed = new Message.Embed
+								{
+									Url = x.Url,
+									Type = x.Type,
+									Description = x.Description,
+									Title = x.Title
+								};
+								if (x.Provider != null)
+								{
+									embed.Provider = new Message.EmbedProvider
+									{
+										Url = x.Provider.Url,
+										Name = x.Provider.Name
+									};
+								}
+								if (x.Thumbnail != null)
+								{
+									embed.Thumbnail = new Message.File
+									{
+										Url = x.Thumbnail.Url,
+										ProxyUrl = x.Thumbnail.ProxyUrl,
+										Width = x.Thumbnail.Width,
+										Height = x.Thumbnail.Height
+									};
+								}
+								return embed;
+							}).ToArray();
+						}
+						else
+							message.Embeds = new Message.Embed[0];
 						message.IsMentioningEveryone = extendedModel.IsMentioningEveryone;
 						message.IsTTS = extendedModel.IsTextToSpeech;
 						message.MentionIds = extendedModel.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
@@ -207,12 +260,6 @@ namespace Discord
 						user.Email = extendedModel.Email;
 						user.IsVerified = extendedModel.IsVerified;
                     }
-					if (model is PresenceUserInfo)
-					{
-						var extendedModel = model as PresenceUserInfo;
-						user.GameId = extendedModel.GameId;
-						user.Status = extendedModel.Status;
-                    }
 				},
 				user => { }
 			);
@@ -246,101 +293,104 @@ namespace Discord
 					//Global
 					case "READY": //Resync
 						{
-							var data = e.Event.ToObject<WebSocketEvents.Ready>();
+							var data = e.Event.ToObject<WebSocketEvents.Ready>(_serializer);
 
 							_servers.Clear();
 							_channels.Clear();
 							_users.Clear();
 
 							UserId = data.User.Id;
+							SessionId = data.SessionId;
 							User = _users.Update(data.User.Id, data.User);
 							foreach (var server in data.Guilds)
 								_servers.Update(server.Id, server);
 							foreach (var channel in data.PrivateChannels)
 								_channels.Update(channel.Id, null, channel);
-						}
+                        }
 						break;
 
 					//Servers
 					case "GUILD_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildCreate>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildCreate>(_serializer);
 							var server = _servers.Update(data.Id, data);
-							RaiseServerCreated(server);
+							try { RaiseServerCreated(server); } catch { }
 						}
 						break;
 					case "GUILD_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildUpdate>(_serializer);
 							var server = _servers.Update(data.Id, data);
-							RaiseServerUpdated(server);
+							try { RaiseServerUpdated(server); } catch { }
 						}
 						break;
 					case "GUILD_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildDelete>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildDelete>(_serializer);
 							var server = _servers.Remove(data.Id);
 							if (server != null)
-								RaiseServerDestroyed(server);
+								try { RaiseServerDestroyed(server); } catch { }
 						}
 						break;
 
 					//Channels
 					case "CHANNEL_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelCreate>();
+							var data = e.Event.ToObject<WebSocketEvents.ChannelCreate>(_serializer);
 							var channel = _channels.Update(data.Id, data.GuildId, data);
-							RaiseChannelCreated(channel);
+							try { RaiseChannelCreated(channel); } catch { }
 						}
 						break;
 					case "CHANNEL_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.ChannelUpdate>(_serializer);
 							var channel = _channels.Update(data.Id, data.GuildId, data);
-							RaiseChannelUpdated(channel);
+							try { RaiseChannelUpdated(channel); } catch { }
 						}
 						break;
 					case "CHANNEL_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelDelete>();
+							var data = e.Event.ToObject<WebSocketEvents.ChannelDelete>(_serializer);
 							var channel = _channels.Remove(data.Id);
 							if (channel != null)
-								RaiseChannelDestroyed(channel);
+								try { RaiseChannelDestroyed(channel); } catch { }
 						}
 						break;
 
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
-							var server = _servers[data.GuildId];
-							var membership = new Membership(server.Id, data.User.Id, data.JoinedAt, this) { RoleIds = data.Roles };
-                            server.AddMember(membership);
-							RaiseMemberAdded(membership, server);
+							var server = _servers[data.ServerId];
+							if (server != null)
+							{
+								var member = server.UpdateMember(data);
+								try { RaiseMemberAdded(member); } catch { }
+							}
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
-							var server = _servers[data.GuildId];
-							var membership = server.GetMember(data.User.Id);
-							if (membership != null)
-								membership.RoleIds = data.Roles;
-							RaiseMemberUpdated(membership, server);
+							var server = _servers[data.ServerId];
+							if (server != null)
+							{
+								var member = server.UpdateMember(data);
+								try { RaiseMemberUpdated(member); } catch { }
+							}
 						}
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>();
-							var user = _users.Update(data.User.Id, data.User);
-							var server = _servers[data.GuildId];
+							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>(_serializer);
+							var server = _servers[data.ServerId];
 							if (server != null)
 							{
-								var membership = server.RemoveMember(user.Id);
-								if (membership != null)
-									RaiseMemberRemoved(membership, server);
+								var member = server.RemoveMember(data.UserId);
+								if (member != null)
+									try { RaiseMemberRemoved(member); } catch { }
 							}
 						}
 						break;
@@ -348,121 +398,138 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = _roles.Update(data.Role.Id, data.GuildId, data.Role);
-							RaiseRoleCreated(role);
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>(_serializer);
+							var role = _roles.Update(data.Role.Id, data.ServerId, data.Role);
+							try { RaiseRoleCreated(role); } catch { }
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>();
-							var role = _roles.Update(data.Role.Id, data.GuildId, data.Role);
-							RaiseRoleUpdated(role);
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>(_serializer);
+							var role = _roles.Update(data.Role.Id, data.ServerId, data.Role);
+							try { RaiseRoleUpdated(role); } catch { }
 						}
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>(_serializer);
 							var role = _roles.Remove(data.RoleId);
 							if (role != null)
-								RaiseRoleDeleted(role);
+								try { RaiseRoleDeleted(role); } catch { }
 						}
 						break;
 
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
-							var server = _servers[data.GuildId];
-							RaiseBanAdded(user, server);
+							var server = _servers[data.ServerId];
+							try { RaiseBanAdded(user, server); } catch { }
 						}
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>();
+							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
-							var server = _servers[data.GuildId];
+							var server = _servers[data.ServerId];
 							if (server != null && server.RemoveBan(user.Id))
-								RaiseBanRemoved(user, server);
+							{
+								try { RaiseBanRemoved(user, server); } catch { }
+							}
 						}
 						break;
 
 					//Messages
 					case "MESSAGE_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageCreate>();
+							var data = e.Event.ToObject<WebSocketEvents.MessageCreate>(_serializer);
 							var msg = _messages.Update(data.Id, data.ChannelId, data);
 							msg.User.UpdateActivity(data.Timestamp);
-							RaiseMessageCreated(msg);
+							try { RaiseMessageCreated(msg); } catch { }
 						}
 						break;
 					case "MESSAGE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.MessageUpdate>(_serializer);
 							var msg = _messages.Update(data.Id, data.ChannelId, data);
-							RaiseMessageUpdated(msg);
+							try { RaiseMessageUpdated(msg); } catch { }
 						}
 						break;
 					case "MESSAGE_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageDelete>();
+							var data = e.Event.ToObject<WebSocketEvents.MessageDelete>(_serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
+							{
 								_messages.Remove(msg.Id);
+								try { RaiseMessageDeleted(msg); } catch { }
+							}
 						}
 						break;
 					case "MESSAGE_ACK":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageAck>();
+							var data = e.Event.ToObject<WebSocketEvents.MessageAck>(_serializer);
 							var msg = GetMessage(data.MessageId);
-							RaiseMessageAcknowledged(msg);
+							if (msg != null)
+								try { RaiseMessageAcknowledged(msg); } catch { }
 						}
 						break;
 
 					//Statuses
 					case "PRESENCE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>();
-							var user = _users.Update(data.Id, data);
-							RaisePresenceUpdated(user);
+							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>(_serializer);
+							var user = _users.Update(data.User.Id, data.User);
+							var server = _servers[data.ServerId];
+							if (server != null)
+							{
+								var member = server.UpdateMember(data);
+								try { RaisePresenceUpdated(member); } catch { }
+							}
 						}
 						break;
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>();
-							var member = GetMember(data.GuildId, data.UserId);
-							if (member != null)
+							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>(_serializer);
+							var server = _servers[data.ServerId];
+							if (server != null)
 							{
-								member.Update(data);
-								RaiseVoiceStateUpdated(member);
+								var member = server.UpdateMember(data);
+								if (member != null)
+									try { RaiseVoiceStateUpdated(member); } catch { }
 							}
 						}
 						break;
 					case "TYPING_START":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.TypingStart>();
+							var data = e.Event.ToObject<WebSocketEvents.TypingStart>(_serializer);
 							var channel = _channels[data.ChannelId];
 							var user = _users[data.UserId];
-							RaiseUserTyping(user, channel);
+							if (user != null)
+							{
+								user.UpdateActivity(DateTime.UtcNow);
+								if (channel != null)
+									try { RaiseUserTyping(user, channel); } catch { }
+							}
 						}
 						break;
 
 					//Voice
 					case "VOICE_SERVER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.VoiceServerUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.VoiceServerUpdate>(_serializer);
 							var server = _servers[data.ServerId];
-							RaiseVoiceServerUpdated(server, data.Endpoint);
+							try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
 						}
 						break;
 
 					//Settings
 					case "USER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.UserUpdate>();
+							var data = e.Event.ToObject<WebSocketEvents.UserUpdate>(_serializer);
 							var user = _users.Update(data.Id, data);
-							RaiseUserUpdated(user);
+							try { RaiseUserUpdated(user); } catch { }
 						}
 						break;
 					case "USER_SETTINGS_UPDATE":

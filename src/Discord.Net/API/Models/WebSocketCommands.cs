@@ -22,6 +22,8 @@ namespace Discord.API.Models
 			{
 				[JsonProperty(PropertyName = "token")]
 				public string Token;
+				[JsonProperty(PropertyName = "v")]
+				public int Version = 2;
 				[JsonProperty(PropertyName = "properties")]
 				public Dictionary<string, string> Properties = new Dictionary<string, string>();
 			}

@@ -18,6 +18,11 @@ namespace Discord
 		public bool IsSuppressed { get; internal set; }
 
 		public string SessionId { get; internal set; }
+		public string Token { get; internal set; }
+		/// <summary> Returns the id for the game this user is currently playing. </summary>
+		public string GameId { get; internal set; }
+		/// <summary> Returns the current status for this user. </summary>
+		public string Status { get; internal set; }
 
 		public string ServerId { get; }
 		public Server Server => _client.GetServer(ServerId);
@@ -31,29 +36,11 @@ namespace Discord
 		public string[] RoleIds { get; internal set; }
 		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.GetRole(x));
 
-		public Membership(string serverId, string userId, DateTime joinedAt, DiscordClient client)
+		public Membership(string serverId, string userId, DiscordClient client)
 		{
 			ServerId = serverId;
 			UserId = userId;
-			JoinedAt = joinedAt;
 			_client = client;
-		}
-
-		internal void Update(ExtendedServerInfo.Membership data)
-		{
-			IsDeafened = data.IsDeaf;
-			IsMuted = data.IsMuted;
-			RoleIds = data.Roles;
-		}
-		internal void Update(WebSocketEvents.VoiceStateUpdate data)
-		{
-			VoiceChannelId = data.ChannelId;
-			IsDeafened = data.IsDeafened;
-			IsMuted = data.IsMuted;
-			IsSelfDeafened = data.IsSelfDeafened;
-			IsSelfMuted = data.IsSelfMuted;
-			IsSuppressed = data.IsSuppressed;
-			SessionId = data.SessionId;
 		}
 	}
 }

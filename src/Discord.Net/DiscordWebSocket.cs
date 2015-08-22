@@ -98,7 +98,8 @@ namespace Discord
 			{
 				throw new InvalidOperationException("Bad Token");
 			}
-			_connectWaitOnLogin2.Wait(cancelToken); //Waiting on READY handler
+			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
+			catch (OperationCanceledException) { return; }
 
 			_isConnected = true;
 			RaiseConnected();
@@ -150,11 +151,7 @@ namespace Discord
 								QueueMessage(new WebSocketCommands.KeepAlive());
 								_connectWaitOnLogin.Set(); //Pre-Event
                             }
-							try
-							{
-								RaiseGotEvent(msg.Type, msg.Payload as JToken);
-							}
-							catch { } //Don't allow user exceptions to affect our state
+							RaiseGotEvent(msg.Type, msg.Payload as JToken);
 							if (msg.Type == "READY")
 								_connectWaitOnLogin2.Set(); //Post-Event
 							break;

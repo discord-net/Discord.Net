@@ -187,19 +187,19 @@ namespace Discord
 		}
 
 		public event EventHandler<MemberEventArgs> MemberAdded;
-		private void RaiseMemberAdded(Membership membership, Server server)
+		private void RaiseMemberAdded(Membership membership)
 		{
 			if (MemberAdded != null)
 				MemberAdded(this, new MemberEventArgs(membership));
 		}
 		public event EventHandler<MemberEventArgs> MemberRemoved;
-		private void RaiseMemberRemoved(Membership membership, Server server)
+		private void RaiseMemberRemoved(Membership membership)
 		{
 			if (MemberRemoved != null)
 				MemberRemoved(this, new MemberEventArgs(membership));
 		}
 		public event EventHandler<MemberEventArgs> MemberUpdated;
-		private void RaiseMemberUpdated(Membership membership, Server server)
+		private void RaiseMemberUpdated(Membership membership)
 		{
 			if (MemberUpdated != null)
 				MemberUpdated(this, new MemberEventArgs(membership));
@@ -217,11 +217,11 @@ namespace Discord
 			}
 		}
 
-		public event EventHandler<UserEventArgs> PresenceUpdated;
-		private void RaisePresenceUpdated(User user)
+		public event EventHandler<MemberEventArgs> PresenceUpdated;
+		private void RaisePresenceUpdated(Membership member)
 		{
 			if (PresenceUpdated != null)
-				PresenceUpdated(this, new UserEventArgs(user));
+				PresenceUpdated(this, new MemberEventArgs(member));
 		}
 		public event EventHandler<MemberEventArgs> VoiceStateUpdated;
 		private void RaiseVoiceStateUpdated(Membership member)

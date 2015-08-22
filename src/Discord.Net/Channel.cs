@@ -4,8 +4,16 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Channel
+    public sealed class Channel
 	{
+		public sealed class PermissionOverwrite
+		{
+			public string Type { get; internal set; }
+			public string Id { get; internal set; }
+			public PackedPermissions Deny { get; internal set; }
+			public PackedPermissions Allow { get; internal set; }
+		}
+
 		private readonly DiscordClient _client;
 
 		/// <summary> Returns the unique identifier for this channel. </summary>
@@ -15,8 +23,10 @@ namespace Discord
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get { return !IsPrivate ? $"#{_name}" : $"@{Recipient.Name}"; }  internal set { _name = value; } }
 
+		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
+		public int Position { get; internal set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
-		public bool IsPrivate { get;  }
+		public bool IsPrivate { get; }
 		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
 		public string Type { get; internal set; }
 
@@ -37,9 +47,8 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.ChannelId == Id);
 
-		//TODO: Not Implemented
-		/// <summary> Not implemented, stored for reference. </summary>
-		public object[] PermissionOverwrites { get; internal set; }
+		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
+		public PermissionOverwrite[] PermissionOverwrites { get; internal set; }
 
 		internal Channel(string id, string serverId, DiscordClient client)
 		{

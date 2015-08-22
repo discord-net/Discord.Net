@@ -27,10 +27,6 @@ namespace Discord
 		/// <summary> Returns if the email for this user has been verified. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		public bool IsVerified { get; internal set; }
-		/// <summary> Returns the id for the game this user is currently playing. </summary>
-		public string GameId { get; internal set; }
-		/// <summary> Returns the current status for this user. </summary>
-		public string Status { get; internal set; }
 
 		/// <summary> Returns the string "&lt;@Id&gt;" to be used as a shortcut when including mentions in text. </summary>
 		public string Mention { get { return $"<@{Id}>"; } }

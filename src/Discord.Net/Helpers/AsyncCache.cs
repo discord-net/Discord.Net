@@ -14,7 +14,7 @@ namespace Discord.Helpers
 		private readonly Action<TValue, TModel> _onUpdate;
 		private readonly Action<TValue> _onRemove;
 
-		public AsyncCache(Func<string, string, TValue> onCreate, Action<TValue, TModel> onUpdate, Action<TValue> onRemove)
+		public AsyncCache(Func<string, string, TValue> onCreate, Action<TValue, TModel> onUpdate, Action<TValue> onRemove = null)
 		{
 			_dictionary = new ConcurrentDictionary<string, TValue>();
 			_onCreate = onCreate;
@@ -49,7 +49,8 @@ namespace Discord.Helpers
 				isNew = !_dictionary.TryGetValue(key, out value);
                 if (isNew)
 					value = _onCreate(key, parentKey);
-				_onUpdate(value, model);
+				if (model != null)
+					_onUpdate(value, model);
 				if (isNew)
 				{
 					//If this fails, repeat as an update instead of an add
@@ -68,7 +69,11 @@ namespace Discord.Helpers
 		{
 			TValue value = null;
 			if (_dictionary.TryRemove(key, out value))
+			{
+				if (_onRemove != null)
+					_onRemove(value);
 				return value;
+			}
 			else
 				return null;
 		}

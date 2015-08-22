@@ -51,12 +51,51 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "verified")]
 		public bool IsVerified;
 	}
-	internal class PresenceUserInfo : UserReference
+	internal class MemberInfo
+	{
+		[JsonProperty(PropertyName = "user_id")]
+		public string UserId;
+		[JsonProperty(PropertyName = "user")]
+		public UserReference User;
+		[JsonProperty(PropertyName = "guild_id")]
+		public string ServerId;
+	}
+	internal class PresenceMemberInfo : MemberInfo
 	{
 		[JsonProperty(PropertyName = "game_id")]
 		public string GameId;
 		[JsonProperty(PropertyName = "status")]
 		public string Status;
+	}
+	internal class VoiceMemberInfo : MemberInfo
+	{
+		[JsonProperty(PropertyName = "channel_id")]
+		public string ChannelId;
+		[JsonProperty(PropertyName = "suppress")]
+		public bool IsSuppressed;
+		[JsonProperty(PropertyName = "session_id")]
+		public string SessionId;
+		[JsonProperty(PropertyName = "self_mute")]
+		public bool IsSelfMuted;
+		[JsonProperty(PropertyName = "self_deaf")]
+		public bool IsSelfDeafened;
+		[JsonProperty(PropertyName = "mute")]
+		public bool IsMuted;
+		[JsonProperty(PropertyName = "deaf")]
+		public bool IsDeafened;
+		[JsonProperty(PropertyName = "token")]
+		public string Token;
+	}
+	internal class RoleMemberInfo : MemberInfo
+	{
+		[JsonProperty(PropertyName = "mute")]
+		public bool IsMuted;
+		[JsonProperty(PropertyName = "deaf")]
+		public bool IsDeafened;
+		[JsonProperty(PropertyName = "joined_at")]
+		public DateTime? JoinedAt;
+		[JsonProperty(PropertyName = "roles")]
+		public string[] Roles;
 	}
 
 	//Channels
@@ -73,12 +112,26 @@ namespace Discord.API.Models
 	}
 	internal class ChannelInfo : ChannelReference
 	{
+		public sealed class PermissionOverwrite
+		{
+			[JsonProperty(PropertyName = "type")]
+			public string Type;
+			[JsonProperty(PropertyName = "id")]
+			public string Id;
+			[JsonProperty(PropertyName = "deny")]
+			public uint Deny;
+			[JsonProperty(PropertyName = "allow")]
+			public uint Allow;
+		}
+
 		[JsonProperty(PropertyName = "last_message_id")]
 		public string LastMessageId;
 		[JsonProperty(PropertyName = "is_private")]
 		public bool IsPrivate;
+		[JsonProperty(PropertyName = "position")]
+		public int Position;
 		[JsonProperty(PropertyName = "permission_overwrites")]
-		public object[] PermissionOverwrites;
+		public PermissionOverwrite[] PermissionOverwrites;
 		[JsonProperty(PropertyName = "recipient")]
 		public UserReference Recipient;
 	}
@@ -114,28 +167,14 @@ namespace Discord.API.Models
 	}
 	internal class ExtendedServerInfo : ServerInfo
 	{
-		public class Membership
-		{
-			[JsonProperty(PropertyName = "roles")]
-			public string[] Roles;
-			[JsonProperty(PropertyName = "mute")]
-			public bool IsMuted;
-			[JsonProperty(PropertyName = "deaf")]
-			public bool IsDeaf;
-			[JsonProperty(PropertyName = "joined_at")]
-			public DateTime JoinedAt;
-			[JsonProperty(PropertyName = "user")]
-			public UserReference User;
-		}
-
 		[JsonProperty(PropertyName = "channels")]
 		public ChannelInfo[] Channels;
 		[JsonProperty(PropertyName = "members")]
-		public Membership[] Members;
-		[JsonProperty(PropertyName = "presence")]
-		public object[] Presence;
+		public RoleMemberInfo[] Members;
+		[JsonProperty(PropertyName = "presences")]
+		public PresenceMemberInfo[] Presences;
 		[JsonProperty(PropertyName = "voice_states")]
-		public object[] VoiceStates;
+		public VoiceMemberInfo[] VoiceStates;
 	}
 
 	//Messages
@@ -150,7 +189,7 @@ namespace Discord.API.Models
 	}
 	internal class Message : MessageReference
 	{
-		public class Attachment
+		public sealed class Attachment
 		{
 			[JsonProperty(PropertyName = "id")]
 			public string Id;
@@ -167,6 +206,40 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "height")]
 			public int Height;
 		}
+		public sealed class Embed
+		{
+			public sealed class ProviderInfo
+			{
+				[JsonProperty(PropertyName = "url")]
+				public string Url;
+				[JsonProperty(PropertyName = "name")]
+				public string Name;
+			}
+			public sealed class ThumbnailInfo
+			{
+				[JsonProperty(PropertyName = "url")]
+				public string Url;
+				[JsonProperty(PropertyName = "proxy_url")]
+				public string ProxyUrl;
+				[JsonProperty(PropertyName = "width")]
+				public int Width;
+				[JsonProperty(PropertyName = "height")]
+				public int Height;
+			}
+
+			[JsonProperty(PropertyName = "url")]
+			public string Url;
+			[JsonProperty(PropertyName = "type")]
+			public string Type;
+			[JsonProperty(PropertyName = "title")]
+			public string Title;
+			[JsonProperty(PropertyName = "description")]
+			public string Description;
+			[JsonProperty(PropertyName = "provider")]
+			public ProviderInfo Provider;
+			[JsonProperty(PropertyName = "thumbnail")]
+			public ThumbnailInfo Thumbnail;
+		}
 
 		[JsonProperty(PropertyName = "tts")]
 		public bool IsTextToSpeech;
@@ -179,7 +252,7 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "mentions")]
 		public UserReference[] Mentions;
 		[JsonProperty(PropertyName = "embeds")]
-		public object[] Embeds; //TODO: Parse this
+		public Embed[] Embeds; //TODO: Parse this
 		[JsonProperty(PropertyName = "attachments")]
 		public Attachment[] Attachments;
 		[JsonProperty(PropertyName = "content")]
