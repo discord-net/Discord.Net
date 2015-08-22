@@ -113,7 +113,9 @@ namespace Discord
 						foreach (var membership in extendedModel.Members)
 						{
 							_users.Update(membership.User.Id, membership.User);
-							server.AddMember(new Membership(server.Id, membership.User.Id, membership.JoinedAt, this) { RoleIds = membership.Roles, IsMuted = membership.IsMuted, IsDeafened = membership.IsDeaf });
+							var newMember = new Membership(server.Id, membership.User.Id, membership.JoinedAt, this);
+							newMember.Update(membership);
+							server.AddMember(newMember);
 						}
 					}
 				},
@@ -320,7 +322,7 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>();
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.GuildId];
-							var membership = server.GetMembership(data.User.Id);
+							var membership = server.GetMember(data.User.Id);
 							if (membership != null)
 								membership.RoleIds = data.Roles;
 							RaiseMemberUpdated(membership, server);
@@ -426,8 +428,12 @@ namespace Discord
 					case "VOICE_STATE_UPDATE":
 						{
 							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>();
-							var user = _users[data.UserId]; //TODO: Don't ignore this
-							RaiseVoiceStateUpdated(user);
+							var member = GetMember(data.GuildId, data.UserId);
+							if (member != null)
+							{
+								member.Update(data);
+								RaiseVoiceStateUpdated(member);
+							}
 						}
 						break;
 					case "TYPING_START":
@@ -504,13 +510,31 @@ namespace Discord
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
 		}
-		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Membership> FindUsers(string serverId, string name)
-			=> FindUsers(GetServer(serverId), name);
+
+		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
+		public Membership GetMember(string serverId, User user)
+			=> GetMember(_servers[serverId], user.Id);
+		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
+		public Membership GetMember(string serverId, string userId)
+			=> GetMember(_servers[serverId], userId);
+		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
+		public Membership GetMember(Server server, User user)
+			=> GetMember(server, user.Id);
+		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
+		public Membership GetMember(Server server, string userId)
+		{
+			if (server == null)
+				return null;
+			return server.GetMember(userId);
+		}
+
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<Membership> FindUsers(Server server, string name)
+		public IEnumerable<Membership> FindMembers(string serverId, string name)
+			=> FindMembers(GetServer(serverId), name);
+		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		public IEnumerable<Membership> FindMembers(Server server, string name)
 		{
 			if (server == null)
 				return new Membership[0];

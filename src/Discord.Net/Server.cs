@@ -80,8 +80,8 @@ namespace Discord
 			return result;
 		}
 		public Membership GetMembership(User user)
-			=> GetMembership(user.Id);
-        public Membership GetMembership(string userId)
+			=> GetMember(user.Id);
+        public Membership GetMember(string userId)
 		{
 			Membership result = null;
 			_members.TryGetValue(userId, out result);

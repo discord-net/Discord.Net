@@ -223,11 +223,11 @@ namespace Discord
 			if (PresenceUpdated != null)
 				PresenceUpdated(this, new UserEventArgs(user));
 		}
-		public event EventHandler<UserEventArgs> VoiceStateUpdated;
-		private void RaiseVoiceStateUpdated(User user)
+		public event EventHandler<MemberEventArgs> VoiceStateUpdated;
+		private void RaiseVoiceStateUpdated(Membership member)
 		{
 			if (VoiceStateUpdated != null)
-				VoiceStateUpdated(this, new UserEventArgs(user));
+				VoiceStateUpdated(this, new MemberEventArgs(member));
 		}
 		public event EventHandler<UserTypingEventArgs> UserTyping;
 		private void RaiseUserTyping(User user, Channel channel)
