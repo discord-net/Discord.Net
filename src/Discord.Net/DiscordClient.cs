@@ -164,7 +164,9 @@ namespace Discord
 								Url = x.Url,
 								ProxyUrl = x.ProxyUrl,
 								Size = x.Size,
-								Filename = x.Filename
+								Filename = x.Filename,
+								Width = x.Width,
+								Height = x.Height
 							}).ToArray();
 						}
 						else
@@ -176,6 +178,7 @@ namespace Discord
 						message.IsMentioningMe = message.MentionIds.Contains(UserId);
 						message.RawText = extendedModel.Content;
 						message.Timestamp = extendedModel.Timestamp;
+						message.EditedTimestamp = extendedModel.EditedTimestamp;
 						if (extendedModel.Author != null)
 							message.UserId = extendedModel.Author.Id;
 					}

@@ -162,6 +162,10 @@ namespace Discord.API.Models
 			public int Size;
 			[JsonProperty(PropertyName = "filename")]
 			public string Filename;
+			[JsonProperty(PropertyName = "width")]
+			public int Width;
+			[JsonProperty(PropertyName = "height")]
+			public int Height;
 		}
 
 		[JsonProperty(PropertyName = "tts")]
@@ -170,6 +174,8 @@ namespace Discord.API.Models
 		public bool IsMentioningEveryone;
 		[JsonProperty(PropertyName = "timestamp")]
 		public DateTime Timestamp;
+		[JsonProperty(PropertyName = "edited_timestamp")]
+		public DateTime? EditedTimestamp;
 		[JsonProperty(PropertyName = "mentions")]
 		public UserReference[] Mentions;
 		[JsonProperty(PropertyName = "embeds")]

@@ -2,21 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Discord
 {
 	public sealed class Message
 	{
-
-		public struct Attachment
+		public class Attachment
 		{
-			public string Id;
-			public string Url;
-			public string ProxyUrl;
-			public int Size;
-			public string Filename;
+			/// <summary> Unique identifier for this file. </summary>
+			public string Id { get; internal set; }
+			/// <summary> Download url for this file. </summary>
+			public string Url { get; internal set; }
+			/// <summary> Preview url for this file. </summary>
+			public string ProxyUrl { get; internal set; }
+			/// <summary> Width of the this file, if it is an image. </summary>
+			public int? Width { get; internal set; }
+			/// <summary> Height of this file, if it is an image. </summary>
+			public int? Height { get; internal set; }
+			/// <summary> Size, in bytes, of this file file. </summary>
+			public int Size { get; internal set; }
+			/// <summary> Filename of this file. </summary>
+			public string Filename { get; internal set; }
 		}
 
 		private readonly DiscordClient _client;
@@ -37,8 +43,10 @@ namespace Discord
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
 		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.CleanMessageText(RawText));
-		/// <summary> Returns the timestamp of this message. </summary>
+		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; internal set; }
+		/// <summary> Returns the timestamp for when this message was last edited. </summary>
+		public DateTime? EditedTimestamp { get; internal set; }
 		/// <summary> Returns the attachments included in this message. </summary>
 		public Attachment[] Attachments { get; internal set; }
 
