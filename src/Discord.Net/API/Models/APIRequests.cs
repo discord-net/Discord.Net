@@ -62,6 +62,8 @@ namespace Discord.API.Models
 			public string Content;
 			[JsonProperty(PropertyName = "mentions")]
 			public string[] Mentions;
+			[JsonProperty(PropertyName = "nonce")]
+			public string Nonce;
 		}
 		public class EditMessage : SendMessage { }
 

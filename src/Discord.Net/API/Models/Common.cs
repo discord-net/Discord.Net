@@ -60,6 +60,13 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "guild_id")]
 		public string ServerId;
 	}
+	internal class InitialMemberInfo : RoleMemberInfo
+	{
+		[JsonProperty(PropertyName = "mute")]
+		public bool IsMuted;
+		[JsonProperty(PropertyName = "deaf")]
+		public bool IsDeafened;
+	}
 	internal class PresenceMemberInfo : MemberInfo
 	{
 		[JsonProperty(PropertyName = "game_id")]
@@ -88,10 +95,6 @@ namespace Discord.API.Models
 	}
 	internal class RoleMemberInfo : MemberInfo
 	{
-		[JsonProperty(PropertyName = "mute")]
-		public bool IsMuted;
-		[JsonProperty(PropertyName = "deaf")]
-		public bool IsDeafened;
 		[JsonProperty(PropertyName = "joined_at")]
 		public DateTime? JoinedAt;
 		[JsonProperty(PropertyName = "roles")]
@@ -170,7 +173,7 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "channels")]
 		public ChannelInfo[] Channels;
 		[JsonProperty(PropertyName = "members")]
-		public RoleMemberInfo[] Members;
+		public InitialMemberInfo[] Members;
 		[JsonProperty(PropertyName = "presences")]
 		public PresenceMemberInfo[] Presences;
 		[JsonProperty(PropertyName = "voice_states")]
@@ -259,6 +262,8 @@ namespace Discord.API.Models
 		public string Content;
 		[JsonProperty(PropertyName = "author")]
 		public UserReference Author;
+		[JsonProperty(PropertyName = "nonce")]
+		public string Nonce;
 	}
 
 	//Roles

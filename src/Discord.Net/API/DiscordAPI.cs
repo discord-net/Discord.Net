@@ -73,9 +73,9 @@ namespace Discord.API
 			=> Http.Delete(Endpoints.Invite(id));
 		
 		//Chat
-		public static Task<APIResponses.SendMessage> SendMessage(string channelId, string message, string[] mentions)
+		public static Task<APIResponses.SendMessage> SendMessage(string channelId, string message, string[] mentions, string nonce)
 		{
-			var request = new APIRequests.SendMessage { Content = message, Mentions = mentions };
+			var request = new APIRequests.SendMessage { Content = message, Mentions = mentions, Nonce = nonce };
 			return Http.Post<APIResponses.SendMessage>(Endpoints.ChannelMessages(channelId), request);
 		}
 		public static Task<APIResponses.EditMessage> EditMessage(string channelId, string messageId, string message, string[] mentions)

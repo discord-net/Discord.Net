@@ -85,11 +85,15 @@ namespace Discord
 					if (model is API.Models.RoleMemberInfo)
 					{
 						var extendedModel = model as API.Models.RoleMemberInfo;
-						member.IsDeafened = extendedModel.IsDeafened;
-						member.IsMuted = extendedModel.IsMuted;
 						member.RoleIds = extendedModel.Roles;
 						if (extendedModel.JoinedAt.HasValue)
 							member.JoinedAt = extendedModel.JoinedAt.Value;
+					}
+					if (model is API.Models.InitialMemberInfo)
+					{
+						var extendedModel = model as API.Models.InitialMemberInfo;
+						member.IsDeafened = extendedModel.IsDeafened;
+						member.IsMuted = extendedModel.IsMuted;
 					}
                 }
 			);

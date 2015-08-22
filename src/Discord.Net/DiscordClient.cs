@@ -21,6 +21,7 @@ namespace Discord
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
 		private readonly JsonSerializer _serializer;
+		private readonly Random _rand;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
@@ -66,6 +67,7 @@ namespace Discord
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient()
 		{
+			_rand = new Random();
 			_isStopping = new ManualResetEventSlim(false);
 
 			_serializer = new JsonSerializer();
@@ -1004,7 +1006,8 @@ namespace Discord
 			
 			if (text.Length <= 2000)
 			{
-				var msg = await DiscordAPI.SendMessage(channelId, text, mentions);
+				var nonce = GenerateNonce();
+				var msg = await DiscordAPI.SendMessage(channelId, text, mentions, nonce);
 				return new Message[] { _messages.Update(msg.Id, channelId, msg) };
             }
 			else
@@ -1014,7 +1017,8 @@ namespace Discord
 				for (int i = 0; i < blockCount; i++)
 				{
 					int index = i * DiscordAPI.MaxMessageSize;
-					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions);
+					var nonce = GenerateNonce();
+					var msg = await DiscordAPI.SendMessage(channelId, text.Substring(index, Math.Min(2000, text.Length - index)), mentions, nonce);
 					result[i] = _messages.Update(msg.Id, channelId, msg);
 					await Task.Delay(1000);
 				}
@@ -1185,6 +1189,11 @@ namespace Discord
 			text = _channelRegex.Replace(text, _channelRegexEvaluator);
 			return text;
         }
+		private string GenerateNonce()
+		{
+			lock (_rand)
+				return _rand.Next(0, int.MaxValue).ToString();
+		}
 
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
 		public void Block()
