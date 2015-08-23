@@ -19,6 +19,7 @@ namespace Discord
 	{
 		private readonly DiscordClientConfig _config;
 		private readonly DiscordTextWebSocket _webSocket;
+		private readonly DiscordVoiceWebSocket _voiceWebSocket;
 		private readonly ManualResetEventSlim _blockEvent;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
@@ -26,12 +27,8 @@ namespace Discord
 		private readonly Random _rand;
 
 		private volatile CancellationTokenSource _disconnectToken;
-		private volatile Task _tasks;
-
-#if !DNXCORE50
-		private readonly DiscordVoiceWebSocket _voiceWebSocket;
-		private string _currentVoiceServer, _currentVoiceToken;
-#endif
+		private volatile Task _tasks;		
+		private string _currentVoiceServerId, _currentVoiceEndpoint, _currentVoiceToken;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
@@ -64,6 +61,9 @@ namespace Discord
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Role> Roles => _roles;
 		private readonly AsyncCache<Role, API.Models.Role> _roles;
+		
+		public string CurrentVoiceServerId { get { return _currentVoiceEndpoint != null ? _currentVoiceToken : null; } }
+		public Server CurrentVoiceServer => _servers[CurrentVoiceServerId];
 
 		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
 		public bool IsConnected => _isConnected;
@@ -306,34 +306,15 @@ namespace Discord
 				}
 			};
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
-
-#if !DNXCORE50
+			
 			_voiceWebSocket = new DiscordVoiceWebSocket(_config.WebSocketInterval);
-			_voiceWebSocket.Connected += (s, e) => RaiseConnected();
-			_voiceWebSocket.Disconnected += async (s, e) =>
+			_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
+			_voiceWebSocket.Disconnected += (s, e) =>
 			{
-				//Reconnect if we didn't cause the disconnect
-				RaiseDisconnected();
-				while (!_disconnectToken.IsCancellationRequested)
-				{
-					try
-					{
-						await Task.Delay(_config.ReconnectDelay);
-						await _voiceWebSocket.ConnectAsync(Endpoints.WebSocket_Hub);
-						if (_currentVoiceServer != null)
-							await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId, _currentVoiceToken);
-						break;
-					}
-					catch (Exception ex)
-					{
-						RaiseOnDebugMessage($"Reconnect Failed: {ex.Message}");
-						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_config.FailedReconnectDelay);
-					}
-				}
+				//TODO: Reconnect if we didn't cause the disconnect
+				RaiseVoiceDisconnected();
 			};
 			_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
-#endif
 
 #pragma warning disable CS1998 //Disable unused async keyword warning
 			_webSocket.GotEvent += async (s, e) =>
@@ -587,16 +568,14 @@ namespace Discord
 							var server = _servers[data.ServerId];
 							server.VoiceServer = data.Endpoint;
                             try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
-
-#if !DNXCORE50
-							if (data.ServerId == _currentVoiceServer)
+							
+							if (data.ServerId == _currentVoiceServerId)
 							{
-								_currentVoiceServer = data.Endpoint;
+								_currentVoiceEndpoint = data.Endpoint.Split(':')[0];
 								_currentVoiceToken = data.Token;
-								await _voiceWebSocket.ConnectAsync(_currentVoiceServer);
-								await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId, _currentVoiceToken);
+								await _voiceWebSocket.ConnectAsync("wss://" + _currentVoiceEndpoint);
+								await _voiceWebSocket.Login(_currentVoiceServerId, UserId, SessionId, _currentVoiceToken);
 							}
-#endif
 						}
 						break;
 
@@ -666,7 +645,6 @@ namespace Discord
 			}
 			catch { }
 		}
-
 
 		/// <summary> Returns the user with the specified id, or null if none was found. </summary>
 		public User GetUser(string id) => _users[id];
@@ -918,9 +896,7 @@ namespace Discord
 				_tasks = _tasks.ContinueWith(async x =>
 				{
 					await _webSocket.DisconnectAsync();
-#if !DNXCORE50
 					await _voiceWebSocket.DisconnectAsync();
-#endif
 
 					//Clear send queue
 					Message ignored;
@@ -1252,6 +1228,29 @@ namespace Discord
 
 
 		//Voice
+		public Task JoinVoice(Server server, Channel channel)
+			=> JoinVoice(server.Id, channel.Id);
+		public Task JoinVoice(Server server, string channelId)
+			=> JoinVoice(server.Id, channelId);
+		public Task JoinVoice(string serverId, Channel channel)
+			=> JoinVoice(serverId, channel.Id);
+		public async Task JoinVoice(string serverId, string channelId)
+		{
+			await LeaveVoice();
+			_currentVoiceServerId = serverId;
+			_webSocket.JoinVoice(serverId, channelId);
+		}
+
+		public async Task LeaveVoice()
+		{
+			await _voiceWebSocket.DisconnectAsync();
+			if (_currentVoiceEndpoint != null)
+				_webSocket.LeaveVoice();
+			_currentVoiceEndpoint = null;
+			_currentVoiceServerId = null;
+			_currentVoiceToken = null;
+        }
+
 		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, User user)
 			=> Mute(server.Id, user.Id);

@@ -43,6 +43,8 @@ namespace Discord
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
 			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
 
+			OnConnect();
+
 			_tasks = Task.WhenAll(CreateTasks(cancelToken))
 			.ContinueWith(x =>
 			{
@@ -57,6 +59,8 @@ namespace Discord
 				//Clear send queue
 				byte[] ignored;
 				while (_sendQueue.TryDequeue(out ignored)) { }
+
+				OnDisconnect();
 
 				if (_isConnected)
 				{
@@ -75,6 +79,8 @@ namespace Discord
 				try { await _tasks; } catch (NullReferenceException) { }
 			}
 		}
+		protected virtual void OnConnect() { }
+		protected virtual void OnDisconnect() { }
 
 		protected void SetConnected()
 		{
@@ -117,8 +123,7 @@ namespace Discord
 					}
 					while (!result.EndOfMessage);
 
-					var msg = JsonConvert.DeserializeObject<WebSocketMessage>(builder.ToString());
-					ProcessMessage(msg);
+					ProcessMessage(builder.ToString());
 
 					builder.Clear();
 				}
@@ -152,8 +157,8 @@ namespace Discord
 			finally { _disconnectToken.Cancel(); }
 		}
 
-		protected abstract void ProcessMessage(WebSocketMessage msg);
-		protected abstract WebSocketMessage GetKeepAlive();
+		protected abstract void ProcessMessage(string json);
+		protected abstract object GetKeepAlive();
 
         protected void QueueMessage(object message)
 		{

@@ -249,6 +249,18 @@ namespace Discord
 		}
 
 		//Voice
+		public event EventHandler VoiceConnected;
+		private void RaiseVoiceConnected()
+		{
+			if (VoiceConnected != null)
+				VoiceConnected(this, EventArgs.Empty);
+		}
+		public event EventHandler VoiceDisconnected;
+		private void RaiseVoiceDisconnected()
+		{
+			if (VoiceDisconnected != null)
+				VoiceDisconnected(this, EventArgs.Empty);
+		}
 		public sealed class VoiceServerUpdatedEventArgs : EventArgs
 		{
 			public readonly Server Server;

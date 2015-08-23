@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Net;
 using System.IO;
 using System.Globalization;
+using Discord.API;
 
 #if TEST_RESPONSES
 using System.Diagnostics;
@@ -23,7 +24,9 @@ namespace Discord.Helpers
 #endif
 		private static readonly HttpClient _client;
 		private static readonly HttpMethod _patch;
+#if TEST_RESPONSES
 		private static readonly JsonSerializerSettings _settings;
+#endif
 
 		static Http()
 		{
@@ -41,12 +44,12 @@ namespace Discord.Helpers
 			string version = typeof(Http).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			_client.DefaultRequestHeaders.Add("user-agent", $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)");
 
-			_settings = new JsonSerializerSettings();
 #if TEST_RESPONSES
+			_settings = new JsonSerializerSettings();
 			_settings.CheckAdditionalContent = true;
 			_settings.MissingMemberHandling = MissingMemberHandling.Error;
 #endif
-        }
+		}
 
 		private static string _token;
 		public static string Token
@@ -121,14 +124,18 @@ namespace Discord.Helpers
 			where ResponseT : class
 		{
 			string responseJson = await SendRequest(method, path, content, true);
-			var response = JsonConvert.DeserializeObject<ResponseT>(responseJson, _settings);
-			return response;
+#if TEST_RESPONSES
+			if (path.StartsWith(Endpoints.BaseApi))
+				return JsonConvert.DeserializeObject<ResponseT>(responseJson, _settings);
+#endif
+			return JsonConvert.DeserializeObject<ResponseT>(responseJson);
 		}
 		private static async Task<string> Send(HttpMethod method, string path, HttpContent content)
 		{
 			string responseJson = await SendRequest(method, path, content, _isDebug);
 #if TEST_RESPONSES
-			CheckEmptyResponse(responseJson);
+			if (path.StartsWith(Endpoints.BaseApi))
+				CheckEmptyResponse(responseJson);
 #endif
 			return responseJson;
 		}

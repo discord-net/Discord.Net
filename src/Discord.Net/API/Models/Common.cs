@@ -8,30 +8,6 @@ using System;
 
 namespace Discord.API.Models
 {
-	internal class WebSocketMessage
-	{
-		[JsonProperty(PropertyName = "op")]
-		public int Operation;
-		[JsonProperty(PropertyName = "t")]
-		public string Type;
-		[JsonProperty(PropertyName = "d")]
-		public object Payload;
-	}
-	internal abstract class WebSocketMessage<T> : WebSocketMessage
-		where T : new()
-	{
-		public WebSocketMessage() { Payload = new T(); }
-		public WebSocketMessage(int op) { Operation = op; Payload = new T(); }
-		public WebSocketMessage(int op, T payload) { Operation = op; Payload = payload; }
-
-		[JsonIgnore]
-		public new T Payload
-		{
-			get { if (base.Payload is JToken) { base.Payload = (base.Payload as JToken).ToObject<T>(); } return (T)base.Payload; }
-			set { base.Payload = value; }
-		}
-	}
-
 	//Users
 	internal class UserReference
 	{
@@ -83,9 +59,9 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "session_id")]
 		public string SessionId;
 		[JsonProperty(PropertyName = "self_mute")]
-		public bool IsSelfMuted;
+		public bool? IsSelfMuted;
 		[JsonProperty(PropertyName = "self_deaf")]
-		public bool IsSelfDeafened;
+		public bool? IsSelfDeafened;
 		[JsonProperty(PropertyName = "mute")]
 		public bool IsMuted;
 		[JsonProperty(PropertyName = "deaf")]

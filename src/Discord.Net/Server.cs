@@ -54,6 +54,10 @@ namespace Discord
 
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.ServerId == Id);
+		/// <summary> Returns a collection of all channels within this server. </summary>
+		public IEnumerable<Channel> TextChannels => _client.Channels.Where(x => x.ServerId == Id && x.Type == ChannelTypes.Text);
+		/// <summary> Returns a collection of all channels within this server. </summary>
+		public IEnumerable<Channel> VoiceChannels => _client.Channels.Where(x => x.ServerId == Id && x.Type == ChannelTypes.Voice);
 		/// <summary> Returns a collection of all roles within this server. </summary>
 		public IEnumerable<Role> Roles => _client.Roles.Where(x => x.ServerId == Id);
 
@@ -78,8 +82,10 @@ namespace Discord
 						member.VoiceChannelId = extendedModel.ChannelId;
 						member.IsDeafened = extendedModel.IsDeafened;
 						member.IsMuted = extendedModel.IsMuted;
-						member.IsSelfDeafened = extendedModel.IsSelfDeafened;
-						member.IsSelfMuted = extendedModel.IsSelfMuted;
+						if (extendedModel.IsSelfDeafened.HasValue)
+							member.IsSelfDeafened = extendedModel.IsSelfDeafened.Value;
+						if (extendedModel.IsSelfMuted.HasValue)
+							member.IsSelfMuted = extendedModel.IsSelfMuted.Value;
 						member.IsSuppressed = extendedModel.IsSuppressed;
 						member.SessionId = extendedModel.SessionId;
 						member.Token = extendedModel.Token;

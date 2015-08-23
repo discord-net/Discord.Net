@@ -1,9 +1,11 @@
 ﻿using Discord.API.Models;
 using Discord.Helpers;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSocketMessage = Discord.API.Models.TextWebSocketCommands.WebSocketMessage;
 
 namespace Discord
 {
@@ -51,22 +53,25 @@ namespace Discord
 			SetConnected();
 		}
 
-		protected override void ProcessMessage(WebSocketMessage msg)
+		protected override void ProcessMessage(string json)
 		{
+			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			switch (msg.Operation)
 			{
 				case 0:
-					if (msg.Type == "READY")
 					{
-						var payload = (msg.Payload as JToken).ToObject<TextWebSocketEvents.Ready>();
-						_heartbeatInterval = payload.HeartbeatInterval;
-						QueueMessage(new TextWebSocketCommands.UpdateStatus());
-						QueueMessage(new TextWebSocketCommands.KeepAlive());
-						_connectWaitOnLogin.Set(); //Pre-Event
+						if (msg.Type == "READY")
+						{
+							var payload = (msg.Payload as JToken).ToObject<TextWebSocketEvents.Ready>();
+							_heartbeatInterval = payload.HeartbeatInterval;
+							QueueMessage(new TextWebSocketCommands.UpdateStatus());
+							QueueMessage(GetKeepAlive());
+							_connectWaitOnLogin.Set(); //Pre-Event
+						}
+						RaiseGotEvent(msg.Type, msg.Payload as JToken);
+						if (msg.Type == "READY")
+							_connectWaitOnLogin2.Set(); //Post-Event
 					}
-					RaiseGotEvent(msg.Type, msg.Payload as JToken);
-					if (msg.Type == "READY")
-						_connectWaitOnLogin2.Set(); //Post-Event
 					break;
 				default:
 					RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
@@ -74,7 +79,7 @@ namespace Discord
 			}
 		}
 
-		protected override WebSocketMessage GetKeepAlive()
+		protected override object GetKeepAlive()
 		{
 			return new TextWebSocketCommands.KeepAlive();
         }

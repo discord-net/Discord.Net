@@ -3,13 +3,34 @@
 #pragma warning disable CS0169
 
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Discord.API.Models
 {
 	internal static class VoiceWebSocketCommands
 	{
+		public class WebSocketMessage
+		{
+			[JsonProperty(PropertyName = "op")]
+			public int Operation;
+			[JsonProperty(PropertyName = "d")]
+			public object Payload;
+		}
+		internal abstract class WebSocketMessage<T> : WebSocketMessage
+			where T : new()
+		{
+			public WebSocketMessage() { Payload = new T(); }
+			public WebSocketMessage(int op) { Operation = op; Payload = new T(); }
+			public WebSocketMessage(int op, T payload) { Operation = op; Payload = payload; }
+
+			[JsonIgnore]
+			public new T Payload
+			{
+				get { if (base.Payload is JToken) { base.Payload = (base.Payload as JToken).ToObject<T>(); } return (T)base.Payload; }
+				set { base.Payload = value; }
+			}
+		}
+
 		public sealed class KeepAlive : WebSocketMessage<object>
 		{
 			public KeepAlive() : base(3, null) { }
@@ -29,12 +50,12 @@ namespace Discord.API.Models
 				public string Token;
 			}
 		}
-		public sealed class Login2 : WebSocketMessage<Login.Data>
+		public sealed class Login2 : WebSocketMessage<Login2.Data>
 		{
 			public Login2() : base(1) { }
 			public class Data
 			{
-				public class PCData
+				public class SocketInfo
 				{
 					[JsonProperty(PropertyName = "address")]
 					public string Address;
@@ -45,8 +66,8 @@ namespace Discord.API.Models
 				}
 				[JsonProperty(PropertyName = "protocol")]
 				public string Protocol = "udp";
-				[JsonProperty(PropertyName = "token")]
-				public string Token;
+				[JsonProperty(PropertyName = "data")]
+				public SocketInfo SocketData = new SocketInfo();
 			}
 		}
 	}
