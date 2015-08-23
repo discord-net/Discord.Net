@@ -30,7 +30,7 @@ namespace Discord
 
 #if !DNXCORE50
 		private readonly DiscordVoiceWebSocket _voiceWebSocket;
-		private string _currentVoiceServer;
+		private string _currentVoiceServer, _currentVoiceToken;
 #endif
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
@@ -320,7 +320,8 @@ namespace Discord
 					{
 						await Task.Delay(_config.ReconnectDelay);
 						await _voiceWebSocket.ConnectAsync(Endpoints.WebSocket_Hub);
-						await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId);
+						if (_currentVoiceServer != null)
+							await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId, _currentVoiceToken);
 						break;
 					}
 					catch (Exception ex)
@@ -334,7 +335,8 @@ namespace Discord
 			_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
 #endif
 
-			_webSocket.GotEvent += (s, e) =>
+#pragma warning disable CS1998 //Disable unused async keyword warning
+			_webSocket.GotEvent += async (s, e) =>
 			{
 				switch (e.Type)
 				{
@@ -583,7 +585,18 @@ namespace Discord
 						{
 							var data = e.Event.ToObject<TextWebSocketEvents.VoiceServerUpdate>(_serializer);
 							var server = _servers[data.ServerId];
-							try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
+							server.VoiceServer = data.Endpoint;
+                            try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
+
+#if !DNXCORE50
+							if (data.ServerId == _currentVoiceServer)
+							{
+								_currentVoiceServer = data.Endpoint;
+								_currentVoiceToken = data.Token;
+								await _voiceWebSocket.ConnectAsync(_currentVoiceServer);
+								await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId, _currentVoiceToken);
+							}
+#endif
 						}
 						break;
 
@@ -608,7 +621,8 @@ namespace Discord
 				}
 			};
 		}
-		
+#pragma warning restore CS1998 //Restore unused async keyword warning
+
 		private async Task SendAsync()
 		{
 			var cancelToken = _disconnectToken.Token;

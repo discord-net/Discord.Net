@@ -39,5 +39,20 @@ namespace Discord.API.Models
 				public string GameId;
 			}
 		}
+		public sealed class JoinVoice : WebSocketMessage<JoinVoice.Data>
+		{
+			public JoinVoice() : base(4) { }
+			public class Data
+			{
+				[JsonProperty(PropertyName = "guild_id")]
+				public string ServerId;
+				[JsonProperty(PropertyName = "channel_id")]
+				public string ChannelId;
+				[JsonProperty(PropertyName = "self_mute")]
+				public string SelfMute;
+				[JsonProperty(PropertyName = "self_deaf")]
+				public string SelfDeaf;
+			}
+		}
 	}
 }

@@ -78,5 +78,18 @@ namespace Discord
 		{
 			return new TextWebSocketCommands.KeepAlive();
         }
+
+		public void JoinVoice(string serverId, string channelId)
+		{
+			var joinVoice = new TextWebSocketCommands.JoinVoice();
+			joinVoice.Payload.ServerId = serverId;
+			joinVoice.Payload.ChannelId = channelId;
+            QueueMessage(joinVoice);
+		}
+		public void LeaveVoice()
+		{
+			var joinVoice = new TextWebSocketCommands.JoinVoice();
+			QueueMessage(joinVoice);
+		}
 	}
 }

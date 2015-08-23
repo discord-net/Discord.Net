@@ -82,7 +82,6 @@ namespace Discord
 		public DateTime? EditedTimestamp { get; internal set; }
 		/// <summary> Returns the attachments included in this message. </summary>
 		public Attachment[] Attachments { get; internal set; }
-		//TODO: Not Implemented
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; internal set; }
 
@@ -103,6 +102,8 @@ namespace Discord
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
 		public User User => _client.GetUser(UserId);
+		/// <summary> Returns true if the current user created this message. </summary>
+		public bool IsAuthor => _client.UserId == UserId;
 
 		internal Message(string id, string channelId, DiscordClient client)
 		{

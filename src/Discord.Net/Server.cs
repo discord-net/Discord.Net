@@ -21,6 +21,8 @@ namespace Discord
 		public DateTime JoinedAt { get; internal set; }
 		/// <summary> Returns the region for this server (see Regions). </summary>
 		public string Region { get; internal set; }
+		/// <summary> Returns the endpoint for this server's voice server. </summary>
+		internal string VoiceServer { get; set; }
 
 		/// <summary> Returns the id of the user that first created this server. </summary>
 		public string OwnerId { get; internal set; }

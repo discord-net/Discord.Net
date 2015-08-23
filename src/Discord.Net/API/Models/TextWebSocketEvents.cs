@@ -112,6 +112,8 @@ namespace Discord.API.Models
 			public string ServerId;
 			[JsonProperty(PropertyName = "endpoint")]
 			public string Endpoint;
+			[JsonProperty(PropertyName = "token")]
+			public string Token;
 		}
 	}
 }

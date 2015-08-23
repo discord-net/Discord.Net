@@ -37,7 +37,7 @@ namespace Discord
 				Task.Factory.StartNew(WatcherAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Result
 			}.Concat(base.CreateTasks(cancelToken)).ToArray();
 		}
-		public async Task Login(string serverId, string userId, string sessionId)
+		public async Task Login(string serverId, string userId, string sessionId, string token)
 		{
 			var cancelToken = _disconnectToken.Token;
 
@@ -47,10 +47,10 @@ namespace Discord
 			string ip = await Http.Get("http://ipinfo.io/ip");
 
 			VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
-			msg.Payload.Token = Http.Token;
 			msg.Payload.ServerId = serverId;
-			msg.Payload.UserId = userId;
 			msg.Payload.SessionId = sessionId;
+			msg.Payload.Token = token;
+			msg.Payload.UserId = userId;
 			await SendMessage(msg, cancelToken);
 
 			try
