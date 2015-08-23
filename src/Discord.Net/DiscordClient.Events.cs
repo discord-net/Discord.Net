@@ -127,6 +127,12 @@ namespace Discord
 			if (MessageRead != null)
 				MessageRead(this, new MessageEventArgs(msg));
 		}
+		public event EventHandler<MessageEventArgs> MessageSent;
+		private void RaiseMessageSent(Message msg)
+		{
+			if (MessageSent != null)
+				MessageSent(this, new MessageEventArgs(msg));
+		}
 
 		//Role
 		public sealed class RoleEventArgs : EventArgs

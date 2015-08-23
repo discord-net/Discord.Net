@@ -26,12 +26,14 @@ namespace Discord
 			public string Title { get; internal set; }
 			/// <summary> Summary of this embed. </summary>
 			public string Description { get; internal set; }
+			/// <summary> Returns information about the author of this embed. </summary>
+			public EmbedReference Author { get; internal set; }
 			/// <summary> Returns information about the providing website of this embed. </summary>
-			public EmbedProvider Provider { get; internal set; }
+			public EmbedReference Provider { get; internal set; }
 			/// <summary> Returns the thumbnail of this embed. </summary>
 			public File Thumbnail { get; internal set; }
 		}
-		public sealed class EmbedProvider
+		public sealed class EmbedReference
 		{
 			/// <summary> URL of this embed provider. </summary>
 			public string Url { get; internal set; }
@@ -53,8 +55,10 @@ namespace Discord
 		private readonly DiscordClient _client;
 		private string _cleanText;
 		
-		/// <summary> Returns the unique identifier for this message. </summary>
-		public string Id { get; }
+		/// <summary> Returns the global unique identifier for this message. </summary>
+		public string Id { get; internal set; }
+		/// <summary> Returns the local unique identifier for this message. </summary>
+		public string Nonce { get; internal set; }
 
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
@@ -63,6 +67,10 @@ namespace Discord
 		public bool IsMentioningEveryone { get; internal set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; internal set; }
+		/// <summary> Returns true if the message is still in the outgoing message queue. </summary>
+		public bool IsQueued { get; internal set; }
+		/// <summary> Returns true if the message was rejected by the server. </summary>
+		public bool HasFailed { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server.. </summary>
 		public string RawText { get; internal set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>

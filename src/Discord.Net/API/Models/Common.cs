@@ -211,7 +211,7 @@ namespace Discord.API.Models
 		}
 		public sealed class Embed
 		{
-			public sealed class ProviderInfo
+			public sealed class Reference
 			{
 				[JsonProperty(PropertyName = "url")]
 				public string Url;
@@ -238,8 +238,10 @@ namespace Discord.API.Models
 			public string Title;
 			[JsonProperty(PropertyName = "description")]
 			public string Description;
+			[JsonProperty(PropertyName = "author")]
+			public Reference Author;
 			[JsonProperty(PropertyName = "provider")]
-			public ProviderInfo Provider;
+			public Reference Provider;
 			[JsonProperty(PropertyName = "thumbnail")]
 			public ThumbnailInfo Thumbnail;
 		}

@@ -76,6 +76,9 @@
     <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
       <Link>DiscordClient.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
+      <Link>DiscordClientConfig.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordWebSocket.cs">
       <Link>DiscordWebSocket.cs</Link>
     </Compile>

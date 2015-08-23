@@ -33,8 +33,20 @@ namespace Discord.Helpers
 				return value;
 			}
 		}
-		
-		public TValue Update(string key, TModel model)
+
+		public TValue Add(string key, TValue obj)
+		{
+			_dictionary[key] = obj;
+			return obj;
+		}
+		public TValue Remap(string oldKey, string newKey)
+		{
+			var obj = Remove(oldKey);
+			if (obj != null)
+				Add(newKey, obj);
+			return obj;
+		}
+        public TValue Update(string key, TModel model)
 		{
 			return Update(key, null, model);
 		}

@@ -14,8 +14,7 @@
 		public bool General_BanMembers => ((_rawValue >> 1) & 0x1) == 1;
 		/// <summary> If True, a user may kick users from the server. </summary>
 		public bool General_KickMembers => ((_rawValue >> 2) & 0x1) == 1;
-		/// <summary> If True, a user adjust roles. </summary>
-		/// <remarks> Having this permission effectively gives all the others as a user may add them to themselves. </remarks>
+		/// <summary> If True, a user may adjust roles. This also bypasses all other permissions, granting all the others. </summary>
 		public bool General_ManageRoles => ((_rawValue >> 3) & 0x1) == 1;
 		/// <summary> If True, a user may create, delete and modify channels. </summary>
 		public bool General_ManageChannels => ((_rawValue >> 4) & 0x1) == 1;

@@ -21,13 +21,14 @@ namespace Discord
 		private volatile CancellationTokenSource _disconnectToken;
 		private volatile Task _tasks;
 		private ConcurrentQueue<byte[]> _sendQueue;
-		private int _heartbeatInterval;
+		private int _heartbeatInterval, _sendInterval;
 		private DateTime _lastHeartbeat;
 		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 		private bool _isConnected;
 
-		public DiscordWebSocket()
+		public DiscordWebSocket(int interval)
 		{
+			_sendInterval = interval;
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
 			
@@ -186,7 +187,7 @@ namespace Discord
 					}
 					while (_sendQueue.TryDequeue(out bytes))
 						await SendMessage(bytes, cancelToken);
-					await Task.Delay(100);
+					await Task.Delay(_sendInterval);
 				}
 			}
 			catch { }
