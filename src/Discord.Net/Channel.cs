@@ -21,7 +21,7 @@ namespace Discord
 
 		private string _name;
 		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get { return !IsPrivate ? $"#{_name}" : $"@{Recipient.Name}"; }  internal set { _name = value; } }
+		public string Name { get { return !IsPrivate ? $"{_name}" : $"@{Recipient.Name}"; }  internal set { _name = value; } }
 
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
 		public int Position { get; internal set; }

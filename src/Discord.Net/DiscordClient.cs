@@ -26,7 +26,6 @@ namespace Discord
 		private readonly JsonSerializer _serializer;
 		private readonly Random _rand;
 
-		private volatile CancellationTokenSource _disconnectToken;
 		private volatile Task _tasks;		
 		private string _currentVoiceServerId, _currentVoiceEndpoint, _currentVoiceToken;
 
@@ -68,7 +67,13 @@ namespace Discord
 		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
 		public bool IsConnected => _isConnected;
 		private bool _isConnected;
-		
+
+		private volatile CancellationTokenSource _disconnectToken;
+		/// <summary> Returns true if this client was requested to disconnect. </summary>
+		public bool IsClosing => _disconnectToken.IsCancellationRequested;
+		/// <summary> Returns a cancel token that is triggered when a disconnect is requested. </summary>
+		public CancellationToken CloseToken => _disconnectToken.Token;
+
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 		{
@@ -1228,20 +1233,20 @@ namespace Discord
 
 
 		//Voice
-		public Task JoinVoice(Server server, Channel channel)
-			=> JoinVoice(server.Id, channel.Id);
-		public Task JoinVoice(Server server, string channelId)
-			=> JoinVoice(server.Id, channelId);
-		public Task JoinVoice(string serverId, Channel channel)
-			=> JoinVoice(serverId, channel.Id);
-		public async Task JoinVoice(string serverId, string channelId)
+		public Task JoinVoiceServer(Server server, Channel channel)
+			=> JoinVoiceServer(server.Id, channel.Id);
+		public Task JoinVoiceServer(Server server, string channelId)
+			=> JoinVoiceServer(server.Id, channelId);
+		public Task JoinVoiceServer(string serverId, Channel channel)
+			=> JoinVoiceServer(serverId, channel.Id);
+		public async Task JoinVoiceServer(string serverId, string channelId)
 		{
-			await LeaveVoice();
+			await LeaveVoiceServer();
 			_currentVoiceServerId = serverId;
 			_webSocket.JoinVoice(serverId, channelId);
 		}
 
-		public async Task LeaveVoice()
+		public async Task LeaveVoiceServer()
 		{
 			await _voiceWebSocket.DisconnectAsync();
 			if (_currentVoiceEndpoint != null)
