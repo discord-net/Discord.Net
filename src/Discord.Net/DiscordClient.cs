@@ -1123,7 +1123,8 @@ namespace Discord
 					});
 					msg.IsQueued = true;
 					msg.Nonce = nonce;
-					_pendingMessages.Enqueue(msg);
+					result[i] = msg;
+                    _pendingMessages.Enqueue(msg);
 				}
 				else
 				{
