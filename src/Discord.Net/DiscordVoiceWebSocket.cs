@@ -1,5 +1,4 @@
-﻿//#if !DNXCORE50
-using Discord.API.Models;
+﻿using Discord.API.Models;
 using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -64,7 +63,6 @@ namespace Discord
 			msg.Payload.Token = token;
 			msg.Payload.UserId = userId;
 			await SendMessage(msg, cancelToken);
-			System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(msg));
 
 			try
 			{
@@ -127,7 +125,6 @@ namespace Discord
 		protected override void ProcessMessage(string json)
 		{
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
-			System.Diagnostics.Debug.WriteLine(">>> " + JsonConvert.SerializeObject(msg));
 			switch (msg.Operation)
 			{
 				case 2:
@@ -141,16 +138,12 @@ namespace Discord
 						login2.Payload.SocketData.Mode = payload.Modes.Last();
 						login2.Payload.SocketData.Port = (_udp.Client.LocalEndPoint as IPEndPoint).Port;
 						QueueMessage(login2);
-
-						System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(login2));
 					}
 					break;
 				case 4:
 					{
 						var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.JoinServer>();
 						QueueMessage(GetKeepAlive());
-
-						System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(GetKeepAlive()));
 						_connectWaitOnLogin.Set();
 					}
 					break;
@@ -161,7 +154,8 @@ namespace Discord
 		}
 		private void ProcessUdpMessage(UdpReceiveResult msg)
 		{
-		}
+			System.Diagnostics.Debug.WriteLine($"Got {msg.Buffer.Length} bytes from {msg.RemoteEndPoint}.");
+        }
 
 		protected override object GetKeepAlive()
 		{
@@ -169,4 +163,3 @@ namespace Discord
 		}
 	}
 }
-//#endif
