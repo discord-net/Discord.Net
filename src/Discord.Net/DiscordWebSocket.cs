@@ -58,7 +58,6 @@ namespace Discord
 				_webSocket = null;
 				_disconnectToken.Dispose();
 				_disconnectToken = null;
-				_tasks = null;
 
 				//Clear send queue
 				byte[] ignored;
@@ -69,6 +68,8 @@ namespace Discord
 					_isConnected = false;
 					RaiseDisconnected();
 				}
+
+				_tasks = null;
 			});
 
 			if (autoLogin)
@@ -109,8 +110,8 @@ namespace Discord
 		{
 			if (_tasks != null)
 			{
-				_disconnectToken.Cancel();
-				await _tasks;
+				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
+				try { await _tasks; } catch (NullReferenceException) { }
 			}
 		}
 

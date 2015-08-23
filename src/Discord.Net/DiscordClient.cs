@@ -66,7 +66,7 @@ namespace Discord
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 		{
-			_blockEvent = new ManualResetEventSlim(false);
+			_blockEvent = new ManualResetEventSlim(true);
 
 			_config = config ?? new DiscordClientConfig();
             _rand = new Random();
@@ -278,7 +278,7 @@ namespace Discord
 
 			_webSocket = new DiscordWebSocket(_config.WebSocketInterval);
 			_webSocket.Connected += (s, e) => RaiseConnected();
-			_webSocket.Disconnected += async (s, e) =>
+			_webSocket.Disconnected += async (s, e) => 
 			{
 				//Reconnect if we didn't cause the disconnect
 				RaiseDisconnected();
@@ -869,13 +869,6 @@ namespace Discord
 				{
 					await _webSocket.DisconnectAsync();
 
-					//Do not clean up until all tasks have ended
-					_webSocket.Dispose();
-					_webSocket = null;
-					_blockEvent.Dispose();
-					_blockEvent = null;
-					_tasks = null;
-
 					//Clear send queue
 					Message ignored;
 					while (_pendingMessages.TryDequeue(out ignored)) { }
@@ -885,7 +878,10 @@ namespace Discord
 					_roles.Clear();
 					_servers.Clear();
 					_users.Clear();
-				});
+
+					_blockEvent.Set();
+					_tasks = null;
+				}).Unwrap();
 				_isConnected = true;
 			}
 			else
@@ -895,10 +891,11 @@ namespace Discord
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public async Task Disconnect()
 		{
-			_blockEvent.Set();
-
 			if (_tasks != null)
-				await _tasks;
+			{
+				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
+				try { await _tasks; } catch (NullReferenceException) { }
+			}
 		}
 
 		//Servers
