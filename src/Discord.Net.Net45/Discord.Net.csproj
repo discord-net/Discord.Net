@@ -58,11 +58,17 @@
     <Compile Include="..\Discord.Net\API\Models\Common.cs">
       <Link>API\Models\Common.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\WebSocketCommands.cs">
-      <Link>API\Models\WebSocketCommands.cs</Link>
+    <Compile Include="..\Discord.Net\API\Models\TextWebSocketCommands.cs">
+      <Link>API\Models\TextWebSocketCommands.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\WebSocketEvents.cs">
-      <Link>API\Models\WebSocketEvents.cs</Link>
+    <Compile Include="..\Discord.Net\API\Models\TextWebSocketEvents.cs">
+      <Link>API\Models\TextWebSocketEvents.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketCommands.cs">
+      <Link>API\Models\VoiceWebSocketCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketEvents.cs">
+      <Link>API\Models\VoiceWebSocketEvents.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Channel.cs">
       <Link>Channel.cs</Link>
@@ -79,6 +85,15 @@
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordTextWebSocket.cs">
+      <Link>DiscordTextWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordTextWebSocket.Events.cs">
+      <Link>DiscordTextWebSocket.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordVoiceWebSocket.cs">
+      <Link>DiscordVoiceWebSocket.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordWebSocket.cs">
       <Link>DiscordWebSocket.cs</Link>
     </Compile>
@@ -90,6 +105,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Http.cs">
       <Link>Helpers\Http.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\HttpException.cs">
+      <Link>HttpException.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Invite.cs">
       <Link>Invite.cs</Link>
@@ -115,7 +133,6 @@
     <Compile Include="..\Discord.Net\User.cs">
       <Link>User.cs</Link>
     </Compile>
-    <Compile Include="HttpException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

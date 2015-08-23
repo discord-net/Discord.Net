@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Models
 {
-	internal static class WebSocketCommands
+	internal static class TextWebSocketCommands
 	{
 		public sealed class KeepAlive : WebSocketMessage<int>
 		{

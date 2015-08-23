@@ -17,15 +17,21 @@ namespace Discord
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient
 	{
-		private DiscordClientConfig _config;
-		private DiscordWebSocket _webSocket;
-		private ManualResetEventSlim _blockEvent;
-		private volatile CancellationTokenSource _disconnectToken;
-		private volatile Task _tasks;
+		private readonly DiscordClientConfig _config;
+		private readonly DiscordTextWebSocket _webSocket;
+		private readonly ManualResetEventSlim _blockEvent;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
 		private readonly JsonSerializer _serializer;
 		private readonly Random _rand;
+
+		private volatile CancellationTokenSource _disconnectToken;
+		private volatile Task _tasks;
+
+#if !DNXCORE50
+		private readonly DiscordVoiceWebSocket _voiceWebSocket;
+		private string _currentVoiceServer;
+#endif
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
@@ -276,7 +282,7 @@ namespace Discord
 				user => { }
 			);
 
-			_webSocket = new DiscordWebSocket(_config.WebSocketInterval);
+			_webSocket = new DiscordTextWebSocket(_config.WebSocketInterval);
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) => 
 			{
@@ -287,7 +293,8 @@ namespace Discord
 					try
 					{
 						await Task.Delay(_config.ReconnectDelay);
-						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
+						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+						await _webSocket.Login();
 						break;
 					}
 					catch (Exception ex)
@@ -298,6 +305,35 @@ namespace Discord
 					}
 				}
 			};
+			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
+
+#if !DNXCORE50
+			_voiceWebSocket = new DiscordVoiceWebSocket(_config.WebSocketInterval);
+			_voiceWebSocket.Connected += (s, e) => RaiseConnected();
+			_voiceWebSocket.Disconnected += async (s, e) =>
+			{
+				//Reconnect if we didn't cause the disconnect
+				RaiseDisconnected();
+				while (!_disconnectToken.IsCancellationRequested)
+				{
+					try
+					{
+						await Task.Delay(_config.ReconnectDelay);
+						await _voiceWebSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+						await _voiceWebSocket.Login(_currentVoiceServer, UserId, SessionId);
+						break;
+					}
+					catch (Exception ex)
+					{
+						RaiseOnDebugMessage($"Reconnect Failed: {ex.Message}");
+						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
+						await Task.Delay(_config.FailedReconnectDelay);
+					}
+				}
+			};
+			_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
+#endif
+
 			_webSocket.GotEvent += (s, e) =>
 			{
 				switch (e.Type)
@@ -305,7 +341,7 @@ namespace Discord
 					//Global
 					case "READY": //Resync
 						{
-							var data = e.Event.ToObject<WebSocketEvents.Ready>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.Ready>(_serializer);
 
 							_servers.Clear();
 							_channels.Clear();
@@ -324,21 +360,21 @@ namespace Discord
 					//Servers
 					case "GUILD_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildCreate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildCreate>(_serializer);
 							var server = _servers.Update(data.Id, data);
 							try { RaiseServerCreated(server); } catch { }
 						}
 						break;
 					case "GUILD_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildUpdate>(_serializer);
 							var server = _servers.Update(data.Id, data);
 							try { RaiseServerUpdated(server); } catch { }
 						}
 						break;
 					case "GUILD_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildDelete>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildDelete>(_serializer);
 							var server = _servers.Remove(data.Id);
 							if (server != null)
 								try { RaiseServerDestroyed(server); } catch { }
@@ -348,21 +384,21 @@ namespace Discord
 					//Channels
 					case "CHANNEL_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelCreate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.ChannelCreate>(_serializer);
 							var channel = _channels.Update(data.Id, data.GuildId, data);
 							try { RaiseChannelCreated(channel); } catch { }
 						}
 						break;
 					case "CHANNEL_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.ChannelUpdate>(_serializer);
 							var channel = _channels.Update(data.Id, data.GuildId, data);
 							try { RaiseChannelUpdated(channel); } catch { }
 						}
 						break;
 					case "CHANNEL_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.ChannelDelete>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.ChannelDelete>(_serializer);
 							var channel = _channels.Remove(data.Id);
 							if (channel != null)
 								try { RaiseChannelDestroyed(channel); } catch { }
@@ -372,7 +408,7 @@ namespace Discord
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberAdd>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildMemberAdd>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.ServerId];
 							if (server != null)
@@ -384,7 +420,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildMemberUpdate>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.ServerId];
 							if (server != null)
@@ -396,7 +432,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildMemberRemove>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildMemberRemove>(_serializer);
 							var server = _servers[data.ServerId];
 							if (server != null)
 							{
@@ -410,21 +446,21 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildRoleCreateUpdate>(_serializer);
 							var role = _roles.Update(data.Role.Id, data.ServerId, data.Role);
 							try { RaiseRoleCreated(role); } catch { }
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleCreateUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildRoleCreateUpdate>(_serializer);
 							var role = _roles.Update(data.Role.Id, data.ServerId, data.Role);
 							try { RaiseRoleUpdated(role); } catch { }
 						}
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildRoleDelete>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildRoleDelete>(_serializer);
 							var role = _roles.Remove(data.RoleId);
 							if (role != null)
 								try { RaiseRoleDeleted(role); } catch { }
@@ -434,7 +470,7 @@ namespace Discord
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildBanAddRemove>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.ServerId];
 							try { RaiseBanAdded(user, server); } catch { }
@@ -442,7 +478,7 @@ namespace Discord
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.GuildBanAddRemove>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.GuildBanAddRemove>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.ServerId];
 							if (server != null && server.RemoveBan(user.Id))
@@ -455,7 +491,7 @@ namespace Discord
 					//Messages
 					case "MESSAGE_CREATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageCreate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.MessageCreate>(_serializer);
 							Message msg = null;
 							bool wasLocal = _config.UseMessageQueue && data.Author.Id == UserId && data.Nonce != null;
                             if (wasLocal)
@@ -478,14 +514,14 @@ namespace Discord
 						break;
 					case "MESSAGE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.MessageUpdate>(_serializer);
 							var msg = _messages.Update(data.Id, data.ChannelId, data);
 							try { RaiseMessageUpdated(msg); } catch { }
 						}
 						break;
 					case "MESSAGE_DELETE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageDelete>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.MessageDelete>(_serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
 							{
@@ -496,7 +532,7 @@ namespace Discord
 						break;
 					case "MESSAGE_ACK":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.MessageAck>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.MessageAck>(_serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
 								try { RaiseMessageRead(msg); } catch { }
@@ -506,7 +542,7 @@ namespace Discord
 					//Statuses
 					case "PRESENCE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.PresenceUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.PresenceUpdate>(_serializer);
 							var user = _users.Update(data.User.Id, data.User);
 							var server = _servers[data.ServerId];
 							if (server != null)
@@ -518,7 +554,7 @@ namespace Discord
 						break;
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.VoiceStateUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.VoiceStateUpdate>(_serializer);
 							var server = _servers[data.ServerId];
 							if (server != null)
 							{
@@ -530,7 +566,7 @@ namespace Discord
 						break;
 					case "TYPING_START":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.TypingStart>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.TypingStart>(_serializer);
 							var channel = _channels[data.ChannelId];
 							var user = _users[data.UserId];
 							if (user != null)
@@ -545,7 +581,7 @@ namespace Discord
 					//Voice
 					case "VOICE_SERVER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.VoiceServerUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.VoiceServerUpdate>(_serializer);
 							var server = _servers[data.ServerId];
 							try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
 						}
@@ -554,7 +590,7 @@ namespace Discord
 					//Settings
 					case "USER_UPDATE":
 						{
-							var data = e.Event.ToObject<WebSocketEvents.UserUpdate>(_serializer);
+							var data = e.Event.ToObject<TextWebSocketEvents.UserUpdate>(_serializer);
 							var user = _users.Update(data.Id, data);
 							try { RaiseUserUpdated(user); } catch { }
 						}
@@ -571,7 +607,6 @@ namespace Discord
 						break;
 				}
 			};
-			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 		}
 		
 		private async Task SendAsync()
@@ -822,8 +857,9 @@ namespace Discord
 			{
 				try
 				{
+					await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
 					Http.Token = token;
-					await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, true);
+					await _webSocket.Login();
 					success = true;
 				}
 				catch (InvalidOperationException) //Bad Token
@@ -835,27 +871,27 @@ namespace Discord
 			if (!success && password != null) //Email/Password login
 			{
 				//Open websocket while we wait for login response
-				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false);
+				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
 				var response = await DiscordAPI.Login(emailOrUsername, password);
 				await socketTask;
 
 				//Wait for websocket to finish connecting, then send token
 				token = response.Token;
                 Http.Token = token;
-				_webSocket.Login();
+				await _webSocket.Login();
 				success = true;
 			}
 			if (!success && password == null) //Anonymous login
 			{
 				//Open websocket while we wait for login response
-				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub, false);
+				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
 				var response = await DiscordAPI.LoginAnonymous(emailOrUsername);
 				await socketTask;
 
 				//Wait for websocket to finish connecting, then send token
 				token = response.Token;
 				Http.Token = token;
-				_webSocket.Login();
+				await _webSocket.Login();
 				success = true;
 			}
 			if (success)
@@ -868,6 +904,9 @@ namespace Discord
 				_tasks = _tasks.ContinueWith(async x =>
 				{
 					await _webSocket.DisconnectAsync();
+#if !DNXCORE50
+					await _voiceWebSocket.DisconnectAsync();
+#endif
 
 					//Clear send queue
 					Message ignored;

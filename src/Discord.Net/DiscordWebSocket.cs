@@ -1,5 +1,4 @@
 ﻿using Discord.API.Models;
-using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,31 +10,29 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed partial class DiscordWebSocket : IDisposable
+	internal abstract partial class DiscordWebSocket : IDisposable
 	{
 		private const int ReceiveChunkSize = 4096;
 		private const int SendChunkSize = 4096;
-		private const int ReadyTimeout = 2500; //Max time in milliseconds between connecting to Discord and receiving a READY event
+
+		protected volatile CancellationTokenSource _disconnectToken;
+		protected int _heartbeatInterval;
+		protected readonly int _sendInterval;
 
 		private volatile ClientWebSocket _webSocket;
-		private volatile CancellationTokenSource _disconnectToken;
 		private volatile Task _tasks;
 		private ConcurrentQueue<byte[]> _sendQueue;
-		private int _heartbeatInterval, _sendInterval;
 		private DateTime _lastHeartbeat;
-		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 		private bool _isConnected;
 
 		public DiscordWebSocket(int interval)
 		{
 			_sendInterval = interval;
-			_connectWaitOnLogin = new ManualResetEventSlim(false);
-			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
-			
+
 			_sendQueue = new ConcurrentQueue<byte[]>();
 		}
 
-		public async Task ConnectAsync(string url, bool autoLogin)
+		public async Task ConnectAsync(string url)
 		{
 			await DisconnectAsync();
 
@@ -46,9 +43,7 @@ namespace Discord
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
 			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
 
-			_tasks = Task.WhenAll(
-				await Task.Factory.StartNew(ReceiveAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default),
-				await Task.Factory.StartNew(SendAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default))
+			_tasks = Task.WhenAll(CreateTasks(cancelToken))
 			.ContinueWith(x =>
 			{
 				//Do not clean up until both tasks have ended
@@ -71,40 +66,6 @@ namespace Discord
 
 				_tasks = null;
 			});
-
-			if (autoLogin)
-				Login();
-        }
-		public void Login()
-		{
-			var cancelToken = _disconnectToken.Token;
-
-			_connectWaitOnLogin.Reset();
-			_connectWaitOnLogin2.Reset();
-
-			WebSocketCommands.Login msg = new WebSocketCommands.Login();
-			msg.Payload.Token = Http.Token;
-			msg.Payload.Properties["$os"] = "";
-			msg.Payload.Properties["$browser"] = "";
-			msg.Payload.Properties["$device"] = "Discord.Net";
-			msg.Payload.Properties["$referrer"] = "";
-			msg.Payload.Properties["$referring_domain"] = "";
-			SendMessage(msg, _disconnectToken.Token);
-
-			try
-			{
-				if (!_connectWaitOnLogin.Wait(ReadyTimeout, cancelToken)) //Waiting on READY message
-					throw new Exception("No reply from Discord server");
-			}
-			catch (OperationCanceledException)
-			{
-				throw new InvalidOperationException("Bad Token");
-			}
-			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
-			catch (OperationCanceledException) { return; }
-
-			_isConnected = true;
-			RaiseConnected();
 		}
 		public async Task DisconnectAsync()
 		{
@@ -113,6 +74,21 @@ namespace Discord
 				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
 				try { await _tasks; } catch (NullReferenceException) { }
 			}
+		}
+
+		protected void SetConnected()
+		{
+			_isConnected = true;
+			RaiseConnected();
+		}
+
+		protected virtual Task[] CreateTasks(CancellationToken cancelToken)
+		{
+			return new Task[]
+			{
+				Task.Factory.StartNew(ReceiveAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Result,
+				Task.Factory.StartNew(SendAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Result
+			};
 		}
 
 		private async Task ReceiveAsync()
@@ -142,25 +118,7 @@ namespace Discord
 					while (!result.EndOfMessage);
 
 					var msg = JsonConvert.DeserializeObject<WebSocketMessage>(builder.ToString());
-					switch (msg.Operation)
-					{
-						case 0:
-							if (msg.Type == "READY")
-							{
-								var payload = (msg.Payload as JToken).ToObject<WebSocketEvents.Ready>();
-								_heartbeatInterval = payload.HeartbeatInterval;
-								QueueMessage(new WebSocketCommands.UpdateStatus());
-								QueueMessage(new WebSocketCommands.KeepAlive());
-								_connectWaitOnLogin.Set(); //Pre-Event
-                            }
-							RaiseGotEvent(msg.Type, msg.Payload as JToken);
-							if (msg.Type == "READY")
-								_connectWaitOnLogin2.Set(); //Post-Event
-							break;
-						default:
-							RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
-							break;
-					}
+					ProcessMessage(msg);
 
 					builder.Clear();
 				}
@@ -168,11 +126,10 @@ namespace Discord
 			catch { }
 			finally { _disconnectToken.Cancel(); }
 		}
-
 		private async Task SendAsync()
 		{
 			var cancelToken = _disconnectToken.Token;
-            try
+			try
 			{
 				byte[] bytes;
 				while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
@@ -182,7 +139,7 @@ namespace Discord
 						DateTime now = DateTime.UtcNow;
 						if ((now - _lastHeartbeat).TotalMilliseconds > _heartbeatInterval)
 						{
-							await SendMessage(new WebSocketCommands.KeepAlive(), cancelToken);
+							await SendMessage(GetKeepAlive(), cancelToken);
 							_lastHeartbeat = now;
 						}
 					}
@@ -195,15 +152,17 @@ namespace Discord
 			finally { _disconnectToken.Cancel(); }
 		}
 
-		private void QueueMessage(object message)
+		protected abstract void ProcessMessage(WebSocketMessage msg);
+		protected abstract WebSocketMessage GetKeepAlive();
+
+        protected void QueueMessage(object message)
 		{
 			var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 			_sendQueue.Enqueue(bytes);
 		}
-
-		private Task SendMessage(object message, CancellationToken cancelToken)
+		protected Task SendMessage(object message, CancellationToken cancelToken)
 			=> SendMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), cancelToken);
-		private async Task SendMessage(byte[] message, CancellationToken cancelToken)
+		protected async Task SendMessage(byte[] message, CancellationToken cancelToken)
 		{
 			var frameCount = (int)Math.Ceiling((double)message.Length / SendChunkSize);
 

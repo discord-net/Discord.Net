@@ -16,6 +16,12 @@ namespace Discord
 			if (DebugMessage != null)
 				DebugMessage(this, new LogMessageEventArgs(message));
 		}
+		public event EventHandler<LogMessageEventArgs> VoiceDebugMessage;
+		private void RaiseOnVoiceDebugMessage(string message)
+		{
+			if (VoiceDebugMessage != null)
+				VoiceDebugMessage(this, new LogMessageEventArgs(message));
+		}
 
 		//General
 		public event EventHandler Connected;

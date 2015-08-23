@@ -3,11 +3,10 @@
 #pragma warning disable CS0169
 
 using Newtonsoft.Json;
-using System;
 
 namespace Discord.API.Models
 {
-	internal static class WebSocketEvents
+	internal static class TextWebSocketEvents
 	{
 		public sealed class Ready
 		{
