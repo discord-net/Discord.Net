@@ -121,11 +121,11 @@ namespace Discord
 			if (MessageUpdated != null)
 				MessageUpdated(this, new MessageEventArgs(msg));
 		}
-		public event EventHandler<MessageEventArgs> MessageAcknowledged;
-		private void RaiseMessageAcknowledged(Message msg)
+		public event EventHandler<MessageEventArgs> MessageRead;
+		private void RaiseMessageRead(Message msg)
 		{
-			if (MessageAcknowledged != null)
-				MessageAcknowledged(this, new MessageEventArgs(msg));
+			if (MessageRead != null)
+				MessageRead(this, new MessageEventArgs(msg));
 		}
 
 		//Role

@@ -474,7 +474,7 @@ namespace Discord
 							var data = e.Event.ToObject<WebSocketEvents.MessageAck>(_serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
-								try { RaiseMessageAcknowledged(msg); } catch { }
+								try { RaiseMessageRead(msg); } catch { }
 						}
 						break;
 
