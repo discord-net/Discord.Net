@@ -424,7 +424,7 @@ namespace Discord
 							var server = _servers[data.ServerId];
 							if (server != null)
 							{
-								var member = server.RemoveMember(data.UserId);
+								var member = server.RemoveMember(data.User.Id);
 								if (member != null)
 									try { RaiseMemberRemoved(member); } catch { }
 							}
