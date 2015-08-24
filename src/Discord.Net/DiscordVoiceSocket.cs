@@ -10,6 +10,10 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketMessage = Discord.API.Models.VoiceWebSocketCommands.WebSocketMessage;
+using System.Text;
+#if !DNXCORE50
+using Opus.Net;
+#endif
 
 namespace Discord
 {
@@ -23,13 +27,24 @@ namespace Discord
 		private byte[] _secretKey;
 		private string _mode;
 		private bool _isFirst;
+		private ushort _sequence;
+		private uint _ssrc;
+		private long _startTicks;
+		private readonly Random _rand = new Random();
+
+#if !DNXCORE50
+		private OpusEncoder _encoder;
+#endif
 
 		public DiscordVoiceSocket(int timeout, int interval)
 			: base(timeout, interval)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_sendQueue = new ConcurrentQueue<byte[]>();
-        }
+#if !DNXCORE50
+			_encoder = OpusEncoder.Create(24000, 1, Application.Voip);
+#endif
+		}
 
 		protected override void OnConnect()
 		{
@@ -58,7 +73,7 @@ namespace Discord
 
 			_connectWaitOnLogin.Reset();
 
-			_myIp = (await Http.Get("http://ipinfo.io/ip")).Trim();
+			_sequence = 0;
 
 			VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
 			msg.Payload.ServerId = serverId;
@@ -138,13 +153,18 @@ namespace Discord
 						//_mode = payload.Modes.LastOrDefault();
 						_mode = "plain";
                         _udp.Connect(_endpoint);
-						var ssrc = payload.SSRC;
+						lock(_rand)
+						{
+							_sequence = (ushort)_rand.Next(0, ushort.MaxValue);
+							_startTicks = DateTime.UtcNow.Ticks - _rand.Next();
+						}
+						_ssrc = payload.SSRC;
 
 						_sendQueue.Enqueue(new byte[70] {
-							(byte)((ssrc >> 24) & 0xFF),
-							(byte)((ssrc >> 16) & 0xFF),
-							(byte)((ssrc >> 8) & 0xFF),
-							(byte)((ssrc >> 0) & 0xFF),
+							(byte)((_ssrc >> 24) & 0xFF),
+							(byte)((_ssrc >> 16) & 0xFF),
+							(byte)((_ssrc >> 8) & 0xFF),
+							(byte)((_ssrc >> 0) & 0xFF),
 							0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 							0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 							0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
@@ -179,6 +199,8 @@ namespace Discord
 
 					int port = buffer[68] | buffer[69] << 8;
 
+					_myIp = Encoding.ASCII.GetString(buffer, 4, 70 - 6).TrimEnd('\0');
+
 					var login2 = new VoiceWebSocketCommands.Login2();
 					login2.Payload.Protocol = "udp";
 					login2.Payload.SocketData.Address = _myIp;
@@ -189,7 +211,7 @@ namespace Discord
 				else
 				{
 					//Parse RTP Data
-					if (length < 12)
+					/*if (length < 12)
 						throw new Exception($"Unexpected message length. Expected >= 12, got {length}.");
 
 					byte flags = buffer[0];
@@ -227,10 +249,37 @@ namespace Discord
 						byte[] newBuffer = new byte[buffer.Length - 12];
 						Buffer.BlockCopy(buffer, 12, newBuffer, 0, newBuffer.Length);
 						buffer = newBuffer;
-					}
+					}*/
+
+					//TODO: Use Voice Data
 				}
 			}
         }
+
+#if !DNXCORE50
+		public void SendWAV(byte[] buffer, int count)
+		{
+			int encodedLength;
+			buffer = _encoder.Encode(buffer, count, out encodedLength);
+			byte[] packet = new byte[12 + encodedLength];
+			Buffer.BlockCopy(buffer, 0, packet, 12, encodedLength);
+
+			ushort sequence = _sequence++;
+			long timestamp = (DateTime.UtcNow.Ticks - _startTicks) >> 2; //200ns resolution
+            packet[0] = 0x80; //Flags;
+			packet[1] = 0x78; //Payload Type
+			packet[2] = (byte)((sequence >> 8) & 0xFF);
+			packet[3] = (byte)((sequence >> 0) & 0xFF);
+			packet[4] = (byte)((timestamp >> 24) & 0xFF);
+			packet[5] = (byte)((timestamp >> 16) & 0xFF);
+			packet[6] = (byte)((timestamp >> 8) & 0xFF);
+			packet[7] = (byte)((timestamp >> 0) & 0xFF);
+			packet[8] = (byte)((_ssrc >> 24) & 0xFF);
+			packet[9] = (byte)((_ssrc >> 16) & 0xFF);
+			packet[10] = (byte)((_ssrc >> 8) & 0xFF);
+			packet[11] = (byte)((_ssrc >> 0) & 0xFF);
+		}
+#endif
 
 		protected override object GetKeepAlive()
 		{

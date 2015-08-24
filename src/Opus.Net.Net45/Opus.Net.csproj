@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8D71A857-879A-4A10-859E-5FF824ED6688}</ProjectGuid>
+    <ProjectGuid>{114C8C10-7354-4EC3-819A-33E83AA57768}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Discord.Net</RootNamespace>
@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>2</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,103 +50,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net\API\DiscordAPI.cs">
-      <Link>API\DiscordAPI.cs</Link>
+    <Compile Include="..\Opus.Net\API.cs">
+      <Link>API.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Endpoints.cs">
-      <Link>API\Endpoints.cs</Link>
+    <Compile Include="..\Opus.Net\OpusDecoder.cs">
+      <Link>OpusDecoder.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\APIRequests.cs">
-      <Link>API\Models\APIRequests.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\APIResponses.cs">
-      <Link>API\Models\APIResponses.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\Common.cs">
-      <Link>API\Models\Common.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\TextWebSocketCommands.cs">
-      <Link>API\Models\TextWebSocketCommands.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\TextWebSocketEvents.cs">
-      <Link>API\Models\TextWebSocketEvents.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketCommands.cs">
-      <Link>API\Models\VoiceWebSocketCommands.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketEvents.cs">
-      <Link>API\Models\VoiceWebSocketEvents.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Channel.cs">
-      <Link>Channel.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\ChannelTypes.cs">
-      <Link>ChannelTypes.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.cs">
-      <Link>DiscordClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
-      <Link>DiscordClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
-      <Link>DiscordClientConfig.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordTextWebSocket.cs">
-      <Link>DiscordTextWebSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordTextWebSocket.Events.cs">
-      <Link>DiscordTextWebSocket.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordVoiceSocket.cs">
-      <Link>DiscordVoiceSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocket.cs">
-      <Link>DiscordWebSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocket.Events.cs">
-      <Link>DiscordWebSocket.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
-      <Link>Helpers\AsyncCache.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\Http.cs">
-      <Link>Helpers\Http.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\HttpException.cs">
-      <Link>HttpException.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Invite.cs">
-      <Link>Invite.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Membership.cs">
-      <Link>Membership.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Message.cs">
-      <Link>Message.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\PackedPermissions.cs">
-      <Link>PackedPermissions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Regions.cs">
-      <Link>Regions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Role.cs">
-      <Link>Role.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Server.cs">
-      <Link>Server.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\User.cs">
-      <Link>User.cs</Link>
+    <Compile Include="..\Opus.Net\OpusEncoder.cs">
+      <Link>OpusEncoder.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Opus.Net.Net45\Opus.Net.csproj">
-      <Project>{114c8c10-7354-4ec3-819a-33e83aa57768}</Project>
-      <Name>Opus.Net</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Baseclass.Contrib.Nuget.Output.1.0.0\build\net40\Baseclass.Contrib.Nuget.Output.targets" Condition="Exists('..\..\packages\Baseclass.Contrib.Nuget.Output.1.0.0\build\net40\Baseclass.Contrib.Nuget.Output.targets')" />

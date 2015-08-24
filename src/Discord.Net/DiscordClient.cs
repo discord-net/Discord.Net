@@ -1320,6 +1320,13 @@ namespace Discord
 			return DiscordAPI.Undeafen(serverId, userId);
 		}
 
+#if !DNXCORE50
+		public void SendVoiceWAV(byte[] buffer, int count)
+		{
+			_voiceWebSocket.SendWAV(buffer, count);
+		}
+#endif
+
 		//Profile
 		/// <summary> Changes your username to newName. </summary>
 		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
@@ -1360,7 +1367,7 @@ namespace Discord
 		private string GenerateNonce()
 		{
 			lock (_rand)
-				return _rand.Next(0, int.MaxValue).ToString();
+				return _rand.Next().ToString();
 		}
 
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
