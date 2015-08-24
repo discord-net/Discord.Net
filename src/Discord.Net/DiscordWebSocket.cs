@@ -53,8 +53,7 @@ namespace Discord
 			OnConnect();
 
 			_lastHeartbeat = DateTime.UtcNow;
-			_tasks = Task.WhenAll(CreateTasks(cancelToken))
-			.ContinueWith(x =>
+			_tasks = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
 			{
 				//Do not clean up until both tasks have ended
 				_heartbeatInterval = 0;
@@ -96,12 +95,12 @@ namespace Discord
 			RaiseConnected();
 		}
 
-		protected virtual Task[] CreateTasks(CancellationToken cancelToken)
+		protected virtual Task[] CreateTasks()
 		{
 			return new Task[]
 			{
-				Task.Factory.StartNew(ReceiveAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Result,
-				Task.Factory.StartNew(SendAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Result
+				ReceiveAsync(),
+				SendAsync()
 			};
 		}
 
@@ -132,8 +131,7 @@ namespace Discord
 					while (!result.EndOfMessage);
 
 					//TODO: Remove this
-					if (this is DiscordVoiceSocket)
-						System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
+					System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
 					await ProcessMessage(builder.ToString());
 
 					builder.Clear();
@@ -161,7 +159,7 @@ namespace Discord
 					}
 					while (_sendQueue.TryDequeue(out bytes))
 						await SendMessage(bytes, cancelToken);
-					await Task.Delay(_sendInterval);
+					await Task.Delay(_sendInterval, cancelToken);
 				}
 			}
 			catch { }
@@ -174,16 +172,14 @@ namespace Discord
         protected void QueueMessage(object message)
 		{
 			//TODO: Remove this
-			if (this is DiscordVoiceSocket)
-				System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
+			System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
             var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 			_sendQueue.Enqueue(bytes);
 		}
 		protected Task SendMessage(object message, CancellationToken cancelToken)
 		{
 			//TODO: Remove this
-			if (this is DiscordVoiceSocket)
-				System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
+			System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
 			return SendMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), cancelToken);
 		}
 		protected async Task SendMessage(byte[] message, CancellationToken cancelToken)
