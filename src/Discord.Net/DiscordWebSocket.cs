@@ -129,9 +129,10 @@ namespace Discord
 
 					}
 					while (!result.EndOfMessage);
-
-					//TODO: Remove this
+					
+#if DEBUG
 					System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
+#endif
 					await ProcessMessage(builder.ToString());
 
 					builder.Clear();
@@ -171,15 +172,17 @@ namespace Discord
 
         protected void QueueMessage(object message)
 		{
-			//TODO: Remove this
+#if DEBUG
 			System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
-            var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+#endif
+			var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 			_sendQueue.Enqueue(bytes);
 		}
 		protected Task SendMessage(object message, CancellationToken cancelToken)
 		{
-			//TODO: Remove this
+#if DEBUG
 			System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
+#endif
 			return SendMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), cancelToken);
 		}
 		protected async Task SendMessage(byte[] message, CancellationToken cancelToken)
@@ -201,7 +204,7 @@ namespace Discord
 			}
 		}
 
-		#region IDisposable Support
+#region IDisposable Support
 		private bool _isDisposed = false;
 
 		public void Dispose()
@@ -212,6 +215,6 @@ namespace Discord
 				_isDisposed = true;
 			}
 		}
-		#endregion
+#endregion
 	}
 }

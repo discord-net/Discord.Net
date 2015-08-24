@@ -247,7 +247,7 @@ namespace Discord
 #if !DNXCORE50
 		private void ProcessUdpMessage(UdpReceiveResult msg)
 		{
-			if (msg.Buffer.Length > 0 && msg.RemoteEndPoint.Equals(_endpoint))
+            if (msg.Buffer.Length > 0 && msg.RemoteEndPoint.Equals(_endpoint))
 			{
 				byte[] buffer = msg.Buffer;
 				int length = msg.Buffer.Length;
