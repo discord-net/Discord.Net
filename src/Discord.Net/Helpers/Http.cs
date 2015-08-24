@@ -1,17 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Reflection;
-using System.Net;
+using System.Diagnostics;
 using System.IO;
 using System.Globalization;
-using Discord.API;
-
-#if TEST_RESPONSES
-using System.Diagnostics;
-#endif
+using System.Net.Http;
+using System.Net;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Discord.Helpers
 {
