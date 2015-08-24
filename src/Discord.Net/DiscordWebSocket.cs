@@ -55,19 +55,19 @@ namespace Discord
 			_lastHeartbeat = DateTime.UtcNow;
 			_tasks = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
 			{
-				//Do not clean up until both tasks have ended
-				_heartbeatInterval = 0;
-				_lastHeartbeat = DateTime.MinValue;
-				_webSocket.Dispose();
-				_webSocket = null;
+				//Do not clean up until all tasks have ended
+				OnDisconnect();
+
 				_disconnectToken.Dispose();
 				_disconnectToken = null;
 
 				//Clear send queue
+				_heartbeatInterval = 0;
+				_lastHeartbeat = DateTime.MinValue;
+				_webSocket.Dispose();
+				_webSocket = null;
 				byte[] ignored;
 				while (_sendQueue.TryDequeue(out ignored)) { }
-
-				OnDisconnect();
 
 				if (_isConnected)
 				{
@@ -106,7 +106,10 @@ namespace Discord
 
 		private async Task ReceiveAsync()
 		{
-			var cancelToken = _disconnectToken.Token;
+			var cancelSource = _disconnectToken;
+			var cancelToken = cancelSource.Token;
+			await Task.Yield();
+
 			var buffer = new byte[ReceiveChunkSize];
 			var builder = new StringBuilder();
 
@@ -117,7 +120,7 @@ namespace Discord
 					WebSocketReceiveResult result;
 					do
 					{
-						result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _disconnectToken.Token);
+						result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
 
 						if (result.MessageType == WebSocketMessageType.Close)
 						{
@@ -139,11 +142,14 @@ namespace Discord
 				}
 			}
 			catch { }
-			finally { _disconnectToken.Cancel(); }
+			finally { cancelSource.Cancel(); }
 		}
 		private async Task SendAsync()
 		{
-			var cancelToken = _disconnectToken.Token;
+			var cancelSource = _disconnectToken;
+			var cancelToken = cancelSource.Token;
+			await Task.Yield();
+
 			try
 			{
 				byte[] bytes;
@@ -164,7 +170,7 @@ namespace Discord
 				}
 			}
 			catch { }
-			finally { _disconnectToken.Cancel(); }
+			finally { cancelSource.Cancel(); }
 		}
 
 		protected abstract Task ProcessMessage(string json);

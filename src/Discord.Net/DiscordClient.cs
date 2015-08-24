@@ -1328,6 +1328,12 @@ namespace Discord
 		{
 			_voiceWebSocket.SendPCMFrame(data, count);
 		}
+
+		/// <summary> Clears the PCM buffer. </summary>
+		public void ClearVoicePCM()
+		{
+			_voiceWebSocket.ClearPCMFrames();
+		}
 #endif
 
 		//Profile
