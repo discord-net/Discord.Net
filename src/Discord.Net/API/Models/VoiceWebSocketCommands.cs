@@ -70,5 +70,16 @@ namespace Discord.API.Models
 				public SocketInfo SocketData = new SocketInfo();
 			}
 		}
+		public sealed class IsTalking : WebSocketMessage<IsTalking.Data>
+		{
+			public IsTalking() : base(5) { }
+			public class Data
+			{
+				[JsonProperty(PropertyName = "delay")]
+				public int Delay;
+				[JsonProperty(PropertyName = "speaking")]
+				public bool IsSpeaking;
+			}
+		}
 	}
 }

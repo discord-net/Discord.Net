@@ -287,7 +287,7 @@ namespace Discord
 				user => { }
 			);
 
-			_webSocket = new DiscordTextWebSocket(_config.ConnectionTimeout, _config.WebSocketInterval);
+			_webSocket = new DiscordTextWebSocket(this, _config.ConnectionTimeout, _config.WebSocketInterval);
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) => 
 			{
@@ -312,7 +312,7 @@ namespace Discord
 			};
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 			
-			_voiceWebSocket = new DiscordVoiceSocket(_config.VoiceConnectionTimeout, _config.WebSocketInterval);
+			_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval);
 			_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
 			_voiceWebSocket.Disconnected += (s, e) =>
 			{
@@ -1321,9 +1321,12 @@ namespace Discord
 		}
 
 #if !DNXCORE50
-		public void SendVoiceWAV(byte[] buffer, int count)
+		/// <summary> Sends a PCM frame to the voice server. </summary>
+		/// <param name="data">PCM frame to send.</param>
+		/// <param name="count">Number of bytes in this frame. </param>
+		public void SendVoicePCM(byte[] data, int count)
 		{
-			_voiceWebSocket.SendWAV(buffer, count);
+			_voiceWebSocket.SendPCMFrame(data, count);
 		}
 #endif
 

@@ -10,28 +10,28 @@ namespace Opus.Net
 	internal class API
 	{
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr opus_encoder_create(int Fs, int channels, int application, out IntPtr error);
+		public static extern IntPtr opus_encoder_create(int Fs, int channels, int application, out Error error);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void opus_encoder_destroy(IntPtr encoder);
+		public static extern void opus_encoder_destroy(IntPtr encoder);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int opus_encode(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
+		public static extern int opus_encode(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
+
+		/*[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr opus_decoder_create(int Fs, int channels, out Errors error);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr opus_decoder_create(int Fs, int channels, out IntPtr error);
+		public static extern void opus_decoder_destroy(IntPtr decoder);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void opus_decoder_destroy(IntPtr decoder);
+		public static extern int opus_decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size, int decode_fec);*/
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int opus_decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size, int decode_fec);
+		public static extern int opus_encoder_ctl(IntPtr st, Ctl request, int value);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, int value);
-
-		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, out int value);
+		public static extern int opus_encoder_ctl(IntPtr st, Ctl request, out int value);
 	}
 
 	public enum Ctl : int
@@ -45,23 +45,26 @@ namespace Opus.Net
 	/// <summary>
 	/// Supported coding modes.
 	/// </summary>
-	public enum Application
+	public enum Application : int
 	{
 		/// <summary>
-		/// Best for most VoIP/videoconference applications where listening quality and intelligibility matter most.
+		/// Gives best quality at a given bitrate for voice signals. It enhances the input signal by high-pass filtering and emphasizing formants and harmonics. 
+		/// Optionally it includes in-band forward error correction to protect against packet loss. Use this mode for typical VoIP applications. 
+		/// Because of the enhancement, even at high bitrates the output may sound different from the input.
 		/// </summary>
 		Voip = 2048,
 		/// <summary>
-		/// Best for broadcast/high-fidelity application where the decoded audio should be as close as possible to input.
+		/// Gives best quality at a given bitrate for most non-voice signals like music. 
+		/// Use this mode for music and mixed (music/voice) content, broadcast, and applications requiring less than 15 ms of coding delay.
 		/// </summary>
 		Audio = 2049,
 		/// <summary>
-		/// Only use when lowest-achievable latency is what matters most. Voice-optimized modes cannot be used.
+		/// Low-delay mode that disables the speech-optimized mode in exchange for slightly reduced delay. 
 		/// </summary>
 		Restricted_LowLatency = 2051
 	}
 
-	public enum Errors
+	public enum Error : int
 	{
 		/// <summary>
 		/// No error.

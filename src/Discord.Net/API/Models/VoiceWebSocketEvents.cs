@@ -27,5 +27,15 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "mode")]
 			public string Mode;
 		}
+
+		public sealed class IsTalking
+		{
+			[JsonProperty(PropertyName = "user_id")]
+			public string UserId;
+			[JsonProperty(PropertyName = "ssrc")]
+			public uint SSRC;
+			[JsonProperty(PropertyName = "speaking")]
+			public bool IsSpeaking;
+		}
 	}
 }

@@ -17,6 +17,7 @@ namespace Discord
 		private const int ReceiveChunkSize = 4096;
 		private const int SendChunkSize = 4096;
 
+		protected readonly DiscordClient _client;
 		protected volatile CancellationTokenSource _disconnectToken;
 		protected int _timeout, _heartbeatInterval;
 		protected readonly int _sendInterval;
@@ -28,9 +29,10 @@ namespace Discord
 		private DateTime _lastHeartbeat;
 		private bool _isConnected;
 
-		public DiscordWebSocket(int timeout, int interval)
+		public DiscordWebSocket(DiscordClient client, int timeout, int interval)
 		{
-			_timeout = timeout;
+			_client = client;
+            _timeout = timeout;
 			_sendInterval = interval;
 
 			_sendQueue = new ConcurrentQueue<byte[]>();

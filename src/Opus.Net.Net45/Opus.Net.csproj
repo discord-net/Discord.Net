@@ -53,9 +53,6 @@
     <Compile Include="..\Opus.Net\API.cs">
       <Link>API.cs</Link>
     </Compile>
-    <Compile Include="..\Opus.Net\OpusDecoder.cs">
-      <Link>OpusDecoder.cs</Link>
-    </Compile>
     <Compile Include="..\Opus.Net\OpusEncoder.cs">
       <Link>OpusEncoder.cs</Link>
     </Compile>

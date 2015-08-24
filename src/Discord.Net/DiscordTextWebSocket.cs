@@ -13,8 +13,8 @@ namespace Discord
 	{
 		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public DiscordTextWebSocket(int timeout, int interval)
-			: base(timeout, interval)
+		public DiscordTextWebSocket(DiscordClient client, int timeout, int interval)
+			: base(client, timeout, interval)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
