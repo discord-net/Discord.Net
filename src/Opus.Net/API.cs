@@ -9,37 +9,28 @@ namespace Opus.Net
 {
 	internal class API
 	{
-		static API()
-		{
-			if (LoadLibrary(Environment.Is64BitProcess ? "lib/x64/opus.dll" : "lib/x86/opus.dll") == IntPtr.Zero)
-				throw new FileNotFoundException("Unable to find opus.dll", "opus.dll");
-		}
-
-		[DllImport("kernel32.dll")]
-		private static extern IntPtr LoadLibrary(string dllToLoad);
-
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr opus_encoder_create(int Fs, int channels, int application, out IntPtr error);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void opus_encoder_destroy(IntPtr encoder);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int opus_encode(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr opus_decoder_create(int Fs, int channels, out IntPtr error);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void opus_decoder_destroy(IntPtr decoder);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int opus_decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size, int decode_fec);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, int value);
 
-		[DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, out int value);
 	}
 
