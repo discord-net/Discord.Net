@@ -50,8 +50,7 @@
 		public static readonly string VoiceIce = $"{Voice}/ice";
 
 		//Web Sockets
-		public static readonly string BaseWss = "wss://" + BaseUrl;
-		public static readonly string WebSocket_Hub = $"{BaseWss}/hub";
+		public static readonly string WebSocket_Hub = $"{BaseUrl}/hub";
 
 		//Website
 		public static string InviteUrl(string code) => $"{BaseShortHttps}/{code}";

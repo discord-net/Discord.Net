@@ -1,49 +1,54 @@
-﻿{
-	"version": "0.5.0-*",
-	"description": "An unofficial .Net API wrapper for the Discord client.",
-	"authors": [ "RogueException" ],
-	"tags": [ "discord", "discordapp" ],
-	"projectUrl": "https://github.com/RogueException/Discord.Net",
-	"licenseUrl": "http://opensource.org/licenses/MIT",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/RogueException/Discord.Net"
-	},
-	"configurations": {
-		"FullDebug": {
-			"compilationOptions": {
-				"define": ["DEBUG","TRACE","TEST_RESPONSES"]
-			}
-		}
-	},
+{
+    "version": "0.5.0-*",
+    "description": "An unofficial .Net API wrapper for the Discord client.",
+    "authors": [ "RogueException" ],
+    "tags": [ "discord", "discordapp" ],
+    "projectUrl": "https://github.com/RogueException/Discord.Net",
+    "licenseUrl": "http://opensource.org/licenses/MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/RogueException/Discord.Net"
+    },
+    "configurations": {
+        "FullDebug": {
+            "compilationOptions": {
+                "define": [ "DEBUG", "TRACE", "TEST_RESPONSES" ]
+            }
+        }
+    },
 
-	"dependencies": {
-		"Newtonsoft.Json": "7.0.1"
-	},
+    "dependencies": {
+        "Newtonsoft.Json": "7.0.1"
+    },
 
-	"frameworks": {
-		"net45": {
-			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22"
-			}
-		},
-		"dnx451": {
-			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22"
-			}
-		},
-		"dnxcore50": {
-			"dependencies": {
-				"System.Collections.Concurrent": "4.0.10",
-				"System.Diagnostics.Debug": "4.0.10",
-				"System.IO.Compression": "4.0.0",
-				"System.Linq": "4.0.0",
-				"System.Net.Requests": "4.0.10",
-				"System.Net.Sockets": "4.0.10-beta-23019",
-				"System.Net.WebSockets.Client": "4.0.0-beta-23123",
-				"System.Runtime": "4.0.20",
-				"System.Text.RegularExpressions": "4.0.10"
-			}
-		}
-	}
+    "frameworks": {
+        "net45": {
+            "dependencies": {
+                "Microsoft.Net.Http": "2.2.22",
+                "libsodium-net": "0.8.0",
+                "Baseclass.Contrib.Nuget.Output": "2.1.0"
+            }
+        },
+        "dnx451": {
+            "dependencies": {
+                "Microsoft.Net.Http": "2.2.22",
+                "libsodium-net": "0.8.0",
+                "Baseclass.Contrib.Nuget.Output": "2.1.0"
+            }
+        },
+        "dnxcore50": {
+            "dependencies": {
+                "System.Collections.Concurrent": "4.0.10",
+                "System.Diagnostics.Debug": "4.0.10",
+                "System.IO.Compression": "4.0.0",
+                "System.Linq": "4.0.0",
+                "System.Net.Requests": "4.0.10",
+                "System.Net.Sockets": "4.0.10-beta-23019",
+                "System.Net.WebSockets.Client": "4.0.0-beta-23123",
+                "System.Runtime": "4.0.20",
+                "System.Text.RegularExpressions": "4.0.10",
+                "System.Net.NameResolution": "4.0.0-beta-23019"
+            }
+        }
+    }
 }

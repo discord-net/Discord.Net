@@ -11,9 +11,9 @@ namespace Discord.API.Models
 		public sealed class Ready
 		{
 			[JsonProperty(PropertyName = "ssrc")]
-			public int SSRC;
+			public uint SSRC;
 			[JsonProperty(PropertyName = "port")]
-			public int Port;
+			public ushort Port;
 			[JsonProperty(PropertyName = "modes")]
 			public string[] Modes;
 			[JsonProperty(PropertyName = "heartbeat_interval")]

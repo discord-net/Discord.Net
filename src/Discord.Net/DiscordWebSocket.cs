@@ -7,6 +7,8 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
+using System.Linq;
 
 namespace Discord
 {
@@ -16,8 +18,9 @@ namespace Discord
 		private const int SendChunkSize = 4096;
 
 		protected volatile CancellationTokenSource _disconnectToken;
-		protected int _heartbeatInterval;
+		protected int _timeout, _heartbeatInterval;
 		protected readonly int _sendInterval;
+		protected string _host;
 
 		private volatile ClientWebSocket _webSocket;
 		private volatile Task _tasks;
@@ -25,8 +28,9 @@ namespace Discord
 		private DateTime _lastHeartbeat;
 		private bool _isConnected;
 
-		public DiscordWebSocket(int interval)
+		public DiscordWebSocket(int timeout, int interval)
 		{
+			_timeout = timeout;
 			_sendInterval = interval;
 
 			_sendQueue = new ConcurrentQueue<byte[]>();
@@ -41,10 +45,12 @@ namespace Discord
 
 			_webSocket = new ClientWebSocket();
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
-			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
+			await _webSocket.ConnectAsync(new Uri("wss://" + url), cancelToken);
+			_host = url;
 
 			OnConnect();
 
+			_lastHeartbeat = DateTime.UtcNow;
 			_tasks = Task.WhenAll(CreateTasks(cancelToken))
 			.ContinueWith(x =>
 			{
@@ -123,7 +129,10 @@ namespace Discord
 					}
 					while (!result.EndOfMessage);
 
-					ProcessMessage(builder.ToString());
+					//TODO: Remove this
+					if (this is DiscordVoiceSocket)
+						System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
+					await ProcessMessage(builder.ToString());
 
 					builder.Clear();
 				}
@@ -157,16 +166,24 @@ namespace Discord
 			finally { _disconnectToken.Cancel(); }
 		}
 
-		protected abstract void ProcessMessage(string json);
+		protected abstract Task ProcessMessage(string json);
 		protected abstract object GetKeepAlive();
 
         protected void QueueMessage(object message)
 		{
-			var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+			//TODO: Remove this
+			if (this is DiscordVoiceSocket)
+				System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
+            var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
 			_sendQueue.Enqueue(bytes);
 		}
 		protected Task SendMessage(object message, CancellationToken cancelToken)
-			=> SendMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), cancelToken);
+		{
+			//TODO: Remove this
+			if (this is DiscordVoiceSocket)
+				System.Diagnostics.Debug.WriteLine("<<< " + JsonConvert.SerializeObject(message));
+			return SendMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)), cancelToken);
+		}
 		protected async Task SendMessage(byte[] message, CancellationToken cancelToken)
 		{
 			var frameCount = (int)Math.Ceiling((double)message.Length / SendChunkSize);

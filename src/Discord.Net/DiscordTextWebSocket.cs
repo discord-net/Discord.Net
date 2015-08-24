@@ -11,12 +11,10 @@ namespace Discord
 {
 	internal sealed partial class DiscordTextWebSocket : DiscordWebSocket
 	{
-		private const int ReadyTimeout = 2500; //Max time in milliseconds between connecting to Discord and receiving a READY event
-
 		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public DiscordTextWebSocket(int interval)
-			: base(interval)
+		public DiscordTextWebSocket(int timeout, int interval)
+			: base(timeout, interval)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
@@ -40,7 +38,7 @@ namespace Discord
 
 			try
 			{
-				if (!_connectWaitOnLogin.Wait(ReadyTimeout, cancelToken)) //Waiting on READY message
+				if (!_connectWaitOnLogin.Wait(_timeout, cancelToken)) //Waiting on READY message
 					throw new Exception("No reply from Discord server");
 			}
 			catch (OperationCanceledException)
@@ -53,7 +51,7 @@ namespace Discord
 			SetConnected();
 		}
 
-		protected override void ProcessMessage(string json)
+		protected override Task ProcessMessage(string json)
 		{
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			switch (msg.Operation)
@@ -65,7 +63,7 @@ namespace Discord
 							var payload = (msg.Payload as JToken).ToObject<TextWebSocketEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new TextWebSocketCommands.UpdateStatus());
-							QueueMessage(GetKeepAlive());
+							//QueueMessage(GetKeepAlive());
 							_connectWaitOnLogin.Set(); //Pre-Event
 						}
 						RaiseGotEvent(msg.Type, msg.Payload as JToken);
@@ -77,6 +75,11 @@ namespace Discord
 					RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
 					break;
 			}
+#if DNXCORE
+			return Task.CompletedTask
+#else
+			return Task.Delay(0);
+#endif
 		}
 
 		protected override object GetKeepAlive()

@@ -19,7 +19,7 @@ namespace Discord
 	{
 		private readonly DiscordClientConfig _config;
 		private readonly DiscordTextWebSocket _webSocket;
-		private readonly DiscordVoiceWebSocket _voiceWebSocket;
+		private readonly DiscordVoiceSocket _voiceWebSocket;
 		private readonly ManualResetEventSlim _blockEvent;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
@@ -287,7 +287,7 @@ namespace Discord
 				user => { }
 			);
 
-			_webSocket = new DiscordTextWebSocket(_config.WebSocketInterval);
+			_webSocket = new DiscordTextWebSocket(_config.ConnectionTimeout, _config.WebSocketInterval);
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) => 
 			{
@@ -312,7 +312,7 @@ namespace Discord
 			};
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
 			
-			_voiceWebSocket = new DiscordVoiceWebSocket(_config.WebSocketInterval);
+			_voiceWebSocket = new DiscordVoiceSocket(_config.VoiceConnectionTimeout, _config.WebSocketInterval);
 			_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
 			_voiceWebSocket.Disconnected += (s, e) =>
 			{
@@ -578,7 +578,7 @@ namespace Discord
 							{
 								_currentVoiceEndpoint = data.Endpoint.Split(':')[0];
 								_currentVoiceToken = data.Token;
-								await _voiceWebSocket.ConnectAsync("wss://" + _currentVoiceEndpoint);
+								await _voiceWebSocket.ConnectAsync(_currentVoiceEndpoint);
 								await _voiceWebSocket.Login(_currentVoiceServerId, UserId, SessionId, _currentVoiceToken);
 							}
 						}
