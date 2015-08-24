@@ -260,13 +260,19 @@ namespace Discord
 		public void SendWAV(byte[] buffer, int count)
 		{
 			int encodedLength;
-			buffer = _encoder.Encode(buffer, count, out encodedLength);
+			byte[] payload = _encoder.Encode(buffer, count, out encodedLength);
+
+			if (_mode == "xsalsa20_poly1305")
+			{
+				//TODO: Encode
+			}
+
 			byte[] packet = new byte[12 + encodedLength];
-			Buffer.BlockCopy(buffer, 0, packet, 12, encodedLength);
+			Buffer.BlockCopy(payload, 0, packet, 12, encodedLength);
 
 			ushort sequence = _sequence++;
 			long timestamp = (DateTime.UtcNow.Ticks - _startTicks) >> 2; //200ns resolution
-            packet[0] = 0x80; //Flags;
+			packet[0] = 0x80; //Flags;
 			packet[1] = 0x78; //Payload Type
 			packet[2] = (byte)((sequence >> 8) & 0xFF);
 			packet[3] = (byte)((sequence >> 0) & 0xFF);
@@ -278,6 +284,8 @@ namespace Discord
 			packet[9] = (byte)((_ssrc >> 16) & 0xFF);
 			packet[10] = (byte)((_ssrc >> 8) & 0xFF);
 			packet[11] = (byte)((_ssrc >> 0) & 0xFF);
+
+			_sendQueue.Enqueue(packet);
 		}
 #endif
 
