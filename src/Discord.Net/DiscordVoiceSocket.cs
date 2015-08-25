@@ -1,5 +1,5 @@
 ﻿//#define USE_THREAD
-
+#if !DNXCORE50
 using Discord.API.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,9 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using WebSocketMessage = Discord.API.Models.VoiceWebSocketCommands.WebSocketMessage;
-#if !DNXCORE50
 using Opus.Net;
-#endif
 
 namespace Discord
 {
@@ -411,3 +409,4 @@ namespace Discord
 		}
 	}
 }
+#endif

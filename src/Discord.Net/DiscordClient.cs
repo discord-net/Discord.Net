@@ -19,7 +19,9 @@ namespace Discord
 	{
 		private readonly DiscordClientConfig _config;
 		private readonly DiscordTextWebSocket _webSocket;
+#if !DNXCORE50
 		private readonly DiscordVoiceSocket _voiceWebSocket;
+#endif
 		private readonly ManualResetEventSlim _blockEvent;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
@@ -311,15 +313,20 @@ namespace Discord
 				}
 			};
 			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
-			
-			_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval);
-			_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
-			_voiceWebSocket.Disconnected += (s, e) =>
+
+#if !DNXCORE50
+			if (_config.EnableVoice)
 			{
+				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval);
+				_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
+				_voiceWebSocket.Disconnected += (s, e) =>
+				{
 				//TODO: Reconnect if we didn't cause the disconnect
 				RaiseVoiceDisconnected();
-			};
-			_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
+				};
+				_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
+			}
+#endif
 
 #pragma warning disable CS1998 //Disable unused async keyword warning
 			_webSocket.GotEvent += async (s, e) =>
@@ -573,14 +580,16 @@ namespace Discord
 							var server = _servers[data.ServerId];
 							server.VoiceServer = data.Endpoint;
                             try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
-							
-							if (data.ServerId == _currentVoiceServerId)
+
+#if !DNXCORE50
+							if (_config.EnableVoice && data.ServerId == _currentVoiceServerId)
 							{
 								_currentVoiceEndpoint = data.Endpoint.Split(':')[0];
 								_currentVoiceToken = data.Token;
 								await _voiceWebSocket.ConnectAsync(_currentVoiceEndpoint);
 								await _voiceWebSocket.Login(_currentVoiceServerId, UserId, SessionId, _currentVoiceToken);
 							}
+#endif
 						}
 						break;
 
@@ -901,7 +910,10 @@ namespace Discord
 				_tasks = _tasks.ContinueWith(async x =>
 				{
 					await _webSocket.DisconnectAsync();
-					await _voiceWebSocket.DisconnectAsync();
+#if !DNXCORE50
+					if (_config.EnableVoice)
+						await _voiceWebSocket.DisconnectAsync();
+#endif
 
 					//Clear send queue
 					Message ignored;
@@ -1233,29 +1245,6 @@ namespace Discord
 
 
 		//Voice
-		public Task JoinVoiceServer(Server server, Channel channel)
-			=> JoinVoiceServer(server.Id, channel.Id);
-		public Task JoinVoiceServer(Server server, string channelId)
-			=> JoinVoiceServer(server.Id, channelId);
-		public Task JoinVoiceServer(string serverId, Channel channel)
-			=> JoinVoiceServer(serverId, channel.Id);
-		public async Task JoinVoiceServer(string serverId, string channelId)
-		{
-			await LeaveVoiceServer();
-			_currentVoiceServerId = serverId;
-			_webSocket.JoinVoice(serverId, channelId);
-		}
-
-		public async Task LeaveVoiceServer()
-		{
-			await _voiceWebSocket.DisconnectAsync();
-			if (_currentVoiceEndpoint != null)
-				_webSocket.LeaveVoice();
-			_currentVoiceEndpoint = null;
-			_currentVoiceServerId = null;
-			_currentVoiceToken = null;
-        }
-
 		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, User user)
 			=> Mute(server.Id, user.Id);
@@ -1321,17 +1310,52 @@ namespace Discord
 		}
 
 #if !DNXCORE50
+		public Task JoinVoiceServer(Server server, Channel channel)
+			=> JoinVoiceServer(server.Id, channel.Id);
+		public Task JoinVoiceServer(Server server, string channelId)
+			=> JoinVoiceServer(server.Id, channelId);
+		public Task JoinVoiceServer(string serverId, Channel channel)
+			=> JoinVoiceServer(serverId, channel.Id);
+		public async Task JoinVoiceServer(string serverId, string channelId)
+		{
+			if (!_config.EnableVoice)
+				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+
+			await LeaveVoiceServer();
+			_currentVoiceServerId = serverId;
+			_webSocket.JoinVoice(serverId, channelId);
+		}
+
+		public async Task LeaveVoiceServer()
+		{
+			if (!_config.EnableVoice)
+				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+
+			await _voiceWebSocket.DisconnectAsync();
+			if (_currentVoiceEndpoint != null)
+				_webSocket.LeaveVoice();
+			_currentVoiceEndpoint = null;
+			_currentVoiceServerId = null;
+			_currentVoiceToken = null;
+		}
+
 		/// <summary> Sends a PCM frame to the voice server. </summary>
 		/// <param name="data">PCM frame to send.</param>
 		/// <param name="count">Number of bytes in this frame. </param>
 		public void SendVoicePCM(byte[] data, int count)
 		{
+			if (!_config.EnableVoice)
+				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+
 			_voiceWebSocket.SendPCMFrame(data, count);
 		}
 
 		/// <summary> Clears the PCM buffer. </summary>
 		public void ClearVoicePCM()
 		{
+			if (!_config.EnableVoice)
+				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+
 			_voiceWebSocket.ClearPCMFrames();
 		}
 #endif
