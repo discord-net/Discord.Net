@@ -1319,7 +1319,7 @@ namespace Discord
 		public async Task JoinVoiceServer(string serverId, string channelId)
 		{
 			if (!_config.EnableVoice)
-				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+				throw new InvalidOperationException("Voice is not enabled for this client.");
 
 			await LeaveVoiceServer();
 			_currentVoiceServerId = serverId;
@@ -1329,7 +1329,7 @@ namespace Discord
 		public async Task LeaveVoiceServer()
 		{
 			if (!_config.EnableVoice)
-				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+				throw new InvalidOperationException("Voice is not enabled for this client.");
 
 			await _voiceWebSocket.DisconnectAsync();
 			if (_currentVoiceEndpoint != null)
@@ -1345,7 +1345,7 @@ namespace Discord
 		public void SendVoicePCM(byte[] data, int count)
 		{
 			if (!_config.EnableVoice)
-				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+				throw new InvalidOperationException("Voice is not enabled for this client.");
 
 			_voiceWebSocket.SendPCMFrame(data, count);
 		}
@@ -1354,7 +1354,7 @@ namespace Discord
 		public void ClearVoicePCM()
 		{
 			if (!_config.EnableVoice)
-				throw new InvalidOperationException("Voice is not enabled for this client (see DiscordClientConfig).");
+				throw new InvalidOperationException("Voice is not enabled for this client.");
 
 			_voiceWebSocket.ClearPCMFrames();
 		}
