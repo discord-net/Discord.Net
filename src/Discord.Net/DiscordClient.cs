@@ -29,7 +29,6 @@ namespace Discord
 		private readonly Random _rand;
 
 		private volatile Task _tasks;		
-		private string _currentVoiceServerId, _currentVoiceEndpoint, _currentVoiceToken;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
 		public User User { get; private set; }
@@ -62,10 +61,12 @@ namespace Discord
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Role> Roles => _roles;
 		private readonly AsyncCache<Role, API.Models.Role> _roles;
-		
+
+#if !DNXCORE50
+		private string _currentVoiceServerId, _currentVoiceEndpoint, _currentVoiceToken;
 		public string CurrentVoiceServerId { get { return _currentVoiceEndpoint != null ? _currentVoiceToken : null; } }
 		public Server CurrentVoiceServer => _servers[CurrentVoiceServerId];
-
+#endif
 		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
 		public bool IsConnected => _isConnected;
 		private bool _isConnected;
