@@ -1,5 +1,6 @@
 ﻿using Discord.API.Models;
 using Discord.Helpers;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -124,12 +125,19 @@ namespace Discord.API
 		}
 		public static Task<SelfUserInfo> ChangeEmail(string newEmail, string currentPassword)
 		{
-			var request = new APIRequests.ChangeEmail { Email = newEmail, CurrentPassword = currentPassword };
+			var request = new APIRequests.ChangeEmail { NewEmail = newEmail, CurrentPassword = currentPassword };
 			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
 		}
 		public static Task<SelfUserInfo> ChangePassword(string newPassword, string currentEmail, string currentPassword)
 		{
 			var request = new APIRequests.ChangePassword { NewPassword = newPassword, CurrentEmail = currentEmail, CurrentPassword = currentPassword };
+			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
+		}
+		public static Task<SelfUserInfo> ChangeAvatar(DiscordClient.AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
+		{
+			string base64 = Convert.ToBase64String(bytes);
+			string type = imageType == DiscordClient.AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
+			var request = new APIRequests.ChangeAvatar { Avatar = $"data:{type},/9j/{base64}", CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return Http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
 		}
 	}

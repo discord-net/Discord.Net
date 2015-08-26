@@ -64,7 +64,7 @@ namespace Discord
 
 #if !DNXCORE50
 		private string _currentVoiceServerId, _currentVoiceEndpoint, _currentVoiceToken;
-		public string CurrentVoiceServerId { get { return _currentVoiceEndpoint != null ? _currentVoiceToken : null; } }
+		public string CurrentVoiceServerId => _currentVoiceEndpoint != null ? _currentVoiceToken : null;
 		public Server CurrentVoiceServer => _servers[CurrentVoiceServerId];
 #endif
 		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
@@ -1381,6 +1381,20 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await DiscordAPI.ChangePassword(newPassword, currentEmail, currentPassword);
+			_users.Update(response.Id, response);
+		}
+
+		public enum AvatarImageType
+		{
+			Jpeg,
+			Png
+		}
+		/// <summary> Changes your avatar. </summary>
+		/// <remarks>Only supports PNG and JPEG (see AvatarImageType)</remarks>
+		public async Task ChangeAvatar(AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
+		{
+			CheckReady();
+			var response = await DiscordAPI.ChangeAvatar(imageType, bytes, currentEmail, currentPassword);
 			_users.Update(response.Id, response);
 		}
 

@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Net45\Discord.Net.csproj">
       <Project>{8d71a857-879a-4a10-859e-5ff824ed6688}</Project>
@@ -42,6 +38,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Discord.Net.Commands\Command.cs">
+      <Link>Command.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandBuilder.cs">
       <Link>CommandBuilder.cs</Link>
     </Compile>

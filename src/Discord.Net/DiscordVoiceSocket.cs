@@ -1,6 +1,7 @@
 ﻿//#define USE_THREAD
 #if !DNXCORE50
 using Discord.API.Models;
+using Discord.Opus;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using WebSocketMessage = Discord.API.Models.VoiceWebSocketCommands.WebSocketMessage;
-using Opus.Net;
 
 namespace Discord
 {

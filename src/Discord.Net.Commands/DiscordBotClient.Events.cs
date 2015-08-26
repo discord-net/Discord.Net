@@ -1,14 +1,19 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 
 namespace Discord
 {
     public partial class DiscordBotClient : DiscordClient
 	{
+		public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
+
 		public class CommandEventArgs
 		{
-			public readonly Message Message;
-			public readonly Command Command;
-			public readonly string[] Args;
+			public Message Message { get; }
+			public Command Command { get; }
+			public string CommandText { get; }
+			public int? Permissions { get; }
+			public string[] Args { get; }
 
 			public User User => Message.User;
 			public string UserId => Message.UserId;
@@ -17,18 +22,21 @@ namespace Discord
 			public Server Server => Message.Channel.Server;
 			public string ServerId => Message.Channel.ServerId;
 
-			public CommandEventArgs(Message message, Command command, string[] args)
+			public CommandEventArgs(Message message, Command command, string commandText, int? permissions, string[] args)
 			{
 				Message = message;
 				Command = command;
+				CommandText = commandText;
+				Permissions = permissions;
 				Args = args;
 			}
 		}
 		public class CommandErrorEventArgs : CommandEventArgs
 		{
-			public readonly Exception Exception;
-			public CommandErrorEventArgs(Message message, Command command, string[] args, Exception ex)
-				: base(message, command, args)
+			public Exception Exception { get; }
+
+			public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
+				: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.Permissions, baseArgs.Args)
 			{
 				Exception = ex;
             }
@@ -40,11 +48,17 @@ namespace Discord
 			if (RanCommand != null)
 				RanCommand(this, args);
 		}
+		public event EventHandler<CommandEventArgs> UnknownCommand;
+		private void RaiseUnknownCommand(CommandEventArgs args)
+		{
+			if (UnknownCommand != null)
+				UnknownCommand(this, args);
+		}
 		public event EventHandler<CommandErrorEventArgs> CommandError;
-		private void RaiseCommandError(Message msg, Command command, string[] args, Exception ex)
+		private void RaiseCommandError(CommandEventArgs args, Exception ex)
 		{
 			if (CommandError != null)
-				CommandError(this, new CommandErrorEventArgs(msg, command, args, ex));
+				CommandError(this, new CommandErrorEventArgs(args, ex));
 		}
 	}
 }

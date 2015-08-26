@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Opus.Net
+namespace Discord.Opus
 {
 	/// <summary> Opus codec wrapper. </summary>
 	public class OpusEncoder : IDisposable

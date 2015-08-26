@@ -1,33 +1,13 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord
 {
-	public sealed class Command
-	{
-		public readonly string[] Text;
-		public readonly int MinArgs, MaxArgs;
-		public readonly bool UseWhitelist;
-		internal readonly Func<DiscordBotClient.CommandEventArgs, Task> Handler;
-
-		public Command(string[] text, int minArgs, int maxArgs, bool useWhitelist, Func<DiscordBotClient.CommandEventArgs, Task> handler)
-		{
-			Text = text;
-			MinArgs = minArgs;
-			MaxArgs = maxArgs;
-			UseWhitelist = useWhitelist;
-			Handler = handler;
-		}
-	}
-
-	/// <summary>
-	/// A Discord.Net client with extensions for handling common bot operations like text commands.
-	/// </summary>
+	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
 	public partial class DiscordBotClient : DiscordClient
     {
-		private List<Command> _commands;
-		private List<string> _whitelist;
+        internal List<Command> _commands;
 
 		public IEnumerable<Command> Commands => _commands;
 
@@ -35,26 +15,20 @@ namespace Discord
 		public bool UseCommandChar { get; set; }
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
-		public bool AlwaysUseWhitelist { get; set; }
 
-		public DiscordBotClient()
+		public DiscordBotClient(DiscordClientConfig config = null, Func<User, int> getPermissions = null)
+			: base(config)
 		{
 			_commands = new List<Command>();
-			_whitelist = new List<string>();
 
 			CommandChar = '~';
 			RequireCommandCharInPublic = true;
 			RequireCommandCharInPrivate = true;
-			AlwaysUseWhitelist = false;
 
 			MessageCreated += async (s, e) =>
 			{
 				//Ignore messages from ourselves
 				if (e.Message.UserId == UserId)
-					return;
-
-				//Check the global whitelist
-				if (AlwaysUseWhitelist && !_whitelist.Contains(e.Message.UserId))
 					return;
 
 				//Check for the command character
@@ -86,9 +60,9 @@ namespace Discord
 						continue;
 
                     bool isValid = true;
-					for (int j = 0; j < cmd.Text.Length; j++)
+					for (int j = 0; j < cmd.Parts.Length; j++)
 					{
-						if (!string.Equals(args[j], cmd.Text[j], StringComparison.OrdinalIgnoreCase))
+						if (!string.Equals(args[j], cmd.Parts[j], StringComparison.OrdinalIgnoreCase))
 						{
 							isValid = false;
 							break;
@@ -97,21 +71,26 @@ namespace Discord
 					if (!isValid)
 						continue;
 
-					//Check Whitelist
-					if (cmd.UseWhitelist && !_whitelist.Contains(e.Message.UserId))
-						continue;
-
 					//Check Arg Count
-					int argCount = args.Length - cmd.Text.Length;
+					int argCount = args.Length - cmd.Parts.Length;
 					if (argCount < cmd.MinArgs || argCount > cmd.MaxArgs)
 						continue;
 
-					//Run Command
-                    string[] newArgs = new string[argCount];
+					//Clean Args
+					string[] newArgs = new string[argCount];
 					for (int j = 0; j < newArgs.Length; j++)
-						newArgs[j] = args[j + cmd.Text.Length];
+						newArgs[j] = args[j + cmd.Parts.Length];
 					
-					var eventArgs = new CommandEventArgs(e.Message, cmd, newArgs);
+					//Check Permissions
+                    int permissions = getPermissions != null ? getPermissions(e.Message.User) : 0;
+					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, permissions, newArgs);
+					if (permissions < cmd.MinPerms)
+					{
+						RaiseCommandError(eventArgs, new PermissionException());
+						return;
+					}
+
+					//Run Command					
                     RaiseRanCommand(eventArgs);
 					try
 					{
@@ -121,31 +100,20 @@ namespace Discord
 					}
 					catch (Exception ex)
 					{
-						RaiseCommandError(e.Message, cmd, newArgs, ex);
+						RaiseCommandError(eventArgs, ex);
 					}
 					break;
 				}
 			};
 		}
 
-		public void AddCommandGroup(string cmd, Action<CommandBuilder> config, bool useWhitelist = false)
+		public void CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
+			=> config(new CommandGroupBuilder(this, cmd, 0));
+		public CommandBuilder CreateCommand(string cmd)
 		{
-			config(new CommandBuilder(this, cmd, useWhitelist));
-		}
-		public void AddCommand(string cmd, int minArgs, int maxArgs, Action<CommandEventArgs> handler, bool useWhitelist = false)
-		{
-			AddCommand(cmd, minArgs, maxArgs, e => { handler(e); return null; }, useWhitelist);
-		}
-		public void AddCommand(string cmd, int minArgs, int maxArgs, Func<CommandEventArgs, Task> handler, bool useWhitelist = false)
-		{
-			_commands.Add(new Command(cmd.Split(' '), minArgs, maxArgs, useWhitelist, handler));
-        }
-
-		public void AddWhitelist(User user)
-			=> AddWhitelist(user.Id);
-		public void AddWhitelist(string userId)
-		{
-			_whitelist.Add(userId);
+			var command = new Command(cmd);
+			_commands.Add(command);
+			return new CommandBuilder(command);
 		}
     }
 }

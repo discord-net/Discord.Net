@@ -1,32 +1,106 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.Commands
 {
 	public sealed class CommandBuilder
 	{
+		private readonly Command _command;
+		public CommandBuilder(Command command)
+		{
+			_command = command;
+		}
+		
+		public CommandBuilder ArgsEqual(int argCount)
+		{
+			_command.MinArgs = argCount;
+			_command.MaxArgs = argCount;
+			return this;
+		}
+		public CommandBuilder ArgsAtLeast(int minArgCount)
+		{
+			_command.MinArgs = minArgCount;
+			_command.MaxArgs = null;
+			return this;
+		}
+		public CommandBuilder ArgsAtMost(int maxArgCount)
+		{
+			_command.MinArgs = null;
+			_command.MaxArgs = maxArgCount;
+			return this;
+		}
+		public CommandBuilder ArgsBetween(int minArgCount, int maxArgCount)
+		{
+			_command.MinArgs = minArgCount;
+			_command.MaxArgs = maxArgCount;
+			return this;
+		}
+		public CommandBuilder NoArgs()
+		{
+			_command.MinArgs = 0;
+			_command.MaxArgs = 0;
+			return this;
+		}
+		public CommandBuilder AnyArgs()
+		{
+			_command.MinArgs = null;
+			_command.MaxArgs = null;
+			return this;
+		}
+
+		public CommandBuilder MinPermissions(int level)
+		{
+			_command.MinPerms = level;
+            return this;
+		}
+
+		public CommandBuilder Do(Func<DiscordBotClient.CommandEventArgs, Task> func)
+		{
+			_command.Handler = func;
+            return this;
+		}
+		public CommandBuilder Do(Action<DiscordBotClient.CommandEventArgs> func)
+		{
+#if DNXCORE50
+			_command.Handler = e => { func(e); return Task.CompletedTask; };
+#else
+			_command.Handler = e => { func(e); return Task.Delay(0); };
+#endif
+			return this;
+		}
+	}
+	public sealed class CommandGroupBuilder
+	{
 		private readonly DiscordBotClient _client;
 		private readonly string _prefix;
-		private readonly bool _useWhitelist;
+		private int _defaultMinPermissions;
 
-		public CommandBuilder(DiscordBotClient client, string prefix, bool useWhitelist = false)
+		internal CommandGroupBuilder(DiscordBotClient client, string prefix, int defaultMinPermissions)
 		{
 			_client = client;
 			_prefix = prefix;
-			_useWhitelist = useWhitelist;
-        }
+			_defaultMinPermissions = defaultMinPermissions;
+		}
 
-		public void AddCommandGroup(string cmd, Action<CommandBuilder> config, bool useWhitelist = false)
+		public CommandGroupBuilder DefaultMinPermissions(int level)
 		{
-			config(new CommandBuilder(_client, _prefix + ' ' + cmd, useWhitelist));
+			_defaultMinPermissions = level;
+			return this;
 		}
-		public void AddCommand(string cmd, int minArgs, int maxArgs, Action<DiscordBotClient.CommandEventArgs> handler, bool? useWhitelist = null)
+
+		public CommandGroupBuilder CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
 		{
-			AddCommand(cmd, minArgs, maxArgs, e => { handler(e); return null; }, useWhitelist);
+			config(new CommandGroupBuilder(_client, _prefix + ' ' + cmd, _defaultMinPermissions));
+			return this;
 		}
-		public void AddCommand(string cmd, int minArgs, int maxArgs, Func<DiscordBotClient.CommandEventArgs, Task> handler, bool? useWhitelist = null)
+		public CommandBuilder CreateCommand()
+			=> CreateCommand("");
+        public CommandBuilder CreateCommand(string cmd)
 		{
-			_client.AddCommand(cmd != "" ? _prefix + ' ' + cmd : _prefix, minArgs, maxArgs, handler, useWhitelist ?? _useWhitelist);
+			var command = new Command(cmd != "" ? _prefix + ' ' + cmd : _prefix);
+			command.MinPerms = _defaultMinPermissions;
+			_client._commands.Add(command);
+            return new CommandBuilder(command);
 		}
 	}
 }

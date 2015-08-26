@@ -3,7 +3,6 @@
 #pragma warning disable CS0169
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 
 namespace Discord.API.Models

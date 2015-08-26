@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
-namespace Opus.Net
+namespace Discord.Opus
 {
 	internal class API
 	{
@@ -42,9 +38,7 @@ namespace Opus.Net
 		GetInbandFECRequest = 4013
 	}
 
-	/// <summary>
-	/// Supported coding modes.
-	/// </summary>
+	/// <summary>Supported coding modes.</summary>
 	public enum Application : int
 	{
 		/// <summary>
@@ -58,45 +52,27 @@ namespace Opus.Net
 		/// Use this mode for music and mixed (music/voice) content, broadcast, and applications requiring less than 15 ms of coding delay.
 		/// </summary>
 		Audio = 2049,
-		/// <summary>
-		/// Low-delay mode that disables the speech-optimized mode in exchange for slightly reduced delay. 
-		/// </summary>
+		/// <summary> Low-delay mode that disables the speech-optimized mode in exchange for slightly reduced delay.  </summary>
 		Restricted_LowLatency = 2051
 	}
 
 	public enum Error : int
 	{
-		/// <summary>
-		/// No error.
-		/// </summary>
+		/// <summary>  No error. </summary>
 		OK = 0,
-		/// <summary>
-		/// One or more invalid/out of range arguments.
-		/// </summary>
+		/// <summary> One or more invalid/out of range arguments. </summary>
 		BadArg = -1,
-		/// <summary>
-		/// The mode struct passed is invalid.
-		/// </summary>
+		/// <summary> The mode struct passed is invalid. </summary>
 		BufferToSmall = -2,
-		/// <summary>
-		/// An internal error was detected.
-		/// </summary>
+		/// <summary> An internal error was detected. </summary>
 		InternalError = -3,
-		/// <summary>
-		/// The compressed data passed is corrupted.
-		/// </summary>
+		/// <summary> The compressed data passed is corrupted. </summary>
 		InvalidPacket = -4,
-		/// <summary>
-		/// Invalid/unsupported request number.
-		/// </summary>
+		/// <summary> Invalid/unsupported request number. </summary>
 		Unimplemented = -5,
-		/// <summary>
-		/// An encoder or decoder structure is invalid or already freed.
-		/// </summary>
+		/// <summary> An encoder or decoder structure is invalid or already freed.  </summary>
 		InvalidState = -6,
-		/// <summary>
-		/// Memory allocation has failed.
-		/// </summary>
+		/// <summary> Memory allocation has failed. </summary>
 		AllocFail = -7
 	}
 }

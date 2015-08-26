@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Discord
+namespace Discord.Commands
 {
 	public static class CommandParser
 	{
@@ -118,37 +118,6 @@ namespace Discord
 
 			args = argList.ToArray();
 			return true;
-		}
-
-		public static bool ArgsEqual(string[] args, int expected)
-		{
-			return args.Length == expected;
-		}
-		public static bool ArgsAtLeast(string[] args, int expected)
-		{
-			return args.Length >= expected;
-		}
-		public static bool ArgsAtMost(string[] args, int expected)
-		{
-			return args.Length <= expected;
-		}
-		public static bool ArgsIn(string[] args, params int[] expected)
-		{
-			int count = args.Length;
-			for (int i = 0; i < expected.Length; i++)
-			{
-				if (count == expected[i])
-					return true;
-			}
-			return false;
-		}
-		public static bool ArgsBetween(string[] args, int min, int max)
-		{
-			return args.Length >= min && args.Length <= max;
-		}
-		public static bool NoArgs(string[] args, params int[] expected)
-		{
-			return args.Length == 0;
 		}
 	}
 }

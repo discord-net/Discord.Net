@@ -29,7 +29,7 @@ namespace Discord
 		public bool IsVerified { get; internal set; }
 
 		/// <summary> Returns the string "&lt;@Id&gt;" to be used as a shortcut when including mentions in text. </summary>
-		public string Mention { get { return $"<@{Id}>"; } }
+		public string Mention => $"<@{Id}>";
 
 		public string PrivateChannelId { get; internal set; }
 		public Channel PrivateChannel => _client.GetChannel(PrivateChannelId);

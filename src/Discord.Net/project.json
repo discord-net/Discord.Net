@@ -1,5 +1,5 @@
 {
-	"version": "0.5.0-*",
+	"version": "0.6.0-beta1",
 	"description": "An unofficial .Net API wrapper for the Discord client.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
@@ -8,6 +8,9 @@
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/RogueException/Discord.Net"
+	},
+	"compilationOptions": {
+		"allowUnsafe": true
 	},
 	"configurations": {
 		"FullDebug": {
@@ -24,18 +27,12 @@
 	"frameworks": {
 		"net45": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22",
-				"libsodium-net": "0.8.0",
-				"Baseclass.Contrib.Nuget.Output": "2.1.0",
-				"Opus.Net": "0.1.0"
+				"Microsoft.Net.Http": "2.2.22"
 			}
 		},
 		"dnx451": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22",
-				"libsodium-net": "0.8.0",
-				"Baseclass.Contrib.Nuget.Output": "2.1.0",
-				"Opus.Net": "0.1.0"
+				"Microsoft.Net.Http": "2.2.22"
 			}
 		},
 		"dnxcore50": {
