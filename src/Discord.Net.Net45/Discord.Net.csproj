@@ -107,8 +107,8 @@
     <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
       <Link>Helpers\AsyncCache.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\Http.cs">
-      <Link>Helpers\Http.cs</Link>
+    <Compile Include="..\Discord.Net\Helpers\JsonHttpClient.cs">
+      <Link>Helpers\JsonHttpClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>

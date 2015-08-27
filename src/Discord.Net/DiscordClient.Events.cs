@@ -8,8 +8,7 @@ namespace Discord
 		Event,
 		Cache,
 		WebSocketRawInput, //TODO: Make Http instanced and add a rawoutput event
-		WebSocketUnknownInput,
-		WebSocketEvent,
+		WebSocketUnknownOpCode,
 		WebSocketUnknownEvent,
 		VoiceOutput
 	}

@@ -11,16 +11,16 @@ namespace Discord
 {
 	internal sealed partial class DiscordDataSocket : DiscordWebSocket
 	{
-		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
+		private readonly ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 
 		public DiscordDataSocket(DiscordClient client, int timeout, int interval)
 			: base(client, timeout, interval)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
-		}
+        }
 
-		public async Task Login()
+		public async Task Login(string token)
 		{
 			var cancelToken = _disconnectToken.Token;
 
@@ -28,7 +28,7 @@ namespace Discord
 			_connectWaitOnLogin2.Reset();
 
 			TextWebSocketCommands.Login msg = new TextWebSocketCommands.Login();
-			msg.Payload.Token = Http.Token;
+			msg.Payload.Token = token;
 			msg.Payload.Properties["$os"] = "";
 			msg.Payload.Properties["$browser"] = "";
 			msg.Payload.Properties["$device"] = "Discord.Net";
@@ -72,7 +72,7 @@ namespace Discord
 					}
 					break;
 				default:
-					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownInput, "Unknown DataSocket op: " + msg.Operation);
+					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown DataSocket op: " + msg.Operation);
 					break;
 			}
 #if DNXCORE

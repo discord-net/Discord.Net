@@ -287,7 +287,7 @@ namespace Discord
 					break;
 #endif
 				default:
-					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownInput, "Unknown VoiceSocket op: " + msg.Operation);
+					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown VoiceSocket op: " + msg.Operation);
 					break;
 			}
 #if DNXCORE50
