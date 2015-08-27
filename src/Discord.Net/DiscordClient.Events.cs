@@ -10,7 +10,10 @@ namespace Discord
 		WebSocketRawInput, //TODO: Make Http instanced and add a rawoutput event
 		WebSocketUnknownOpCode,
 		WebSocketUnknownEvent,
-		VoiceOutput
+		XHRRawOutput,
+		XHRTiming,
+        VoiceInput,
+		VoiceOutput,
 	}
 	public sealed class LogMessageEventArgs : EventArgs
 	{

@@ -1,7 +1,6 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Globalization;
 using System.Net.Http;
@@ -9,24 +8,22 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Discord.Helpers
 {
-	internal class JsonHttpClient
+	internal partial class JsonHttpClient
 	{
-#if TEST_RESPONSES
-		private const bool _isDebug = true;
-#else
-		private const bool _isDebug = false;
-#endif
+		private bool _isDebug;
 		private readonly HttpClient _client;
 		private readonly HttpMethod _patch;
 #if TEST_RESPONSES
 		private readonly JsonSerializerSettings _settings;
 #endif
 
-		public JsonHttpClient()
+		public JsonHttpClient(bool isDebug)
 		{
+			_isDebug = isDebug;
 			_patch = new HttpMethod("PATCH"); //Not sure why this isn't a default...
 
 			_client = new HttpClient(new HttpClientHandler
@@ -131,8 +128,8 @@ namespace Discord.Helpers
 		private async Task<string> Send(HttpMethod method, string path, HttpContent content)
 		{
 			string responseJson = await SendRequest(method, path, content, true);
-			if (path.StartsWith(Endpoints.BaseApi))
-				CheckEmptyResponse(responseJson);
+			if (path.StartsWith(Endpoints.BaseApi) && !string.IsNullOrEmpty(responseJson))
+				throw new Exception("API check failed: Response is not empty.");
 			return responseJson;
 		}
 #else
@@ -142,9 +139,25 @@ namespace Discord.Helpers
 
 		private async Task<string> SendRequest(HttpMethod method, string path, HttpContent content, bool hasResponse)
 		{
-#if TEST_RESPONSES
-			Stopwatch stopwatch = Stopwatch.StartNew();
-#endif
+			Stopwatch stopwatch = null;
+			if (_isDebug)
+			{
+				if (content != null)
+				{
+					if (content is StringContent)
+					{
+						string json = await (content as StringContent).ReadAsStringAsync();
+						RaiseOnDebugMessage(DebugMessageType.XHRRawOutput, $"{method} {path}: {json}");
+					}
+					else
+					{
+						byte[] bytes = await content.ReadAsByteArrayAsync();
+						RaiseOnDebugMessage(DebugMessageType.XHRRawOutput, $"{method} {path}: {bytes.Length} bytes");
+					}
+				}
+				stopwatch = Stopwatch.StartNew();
+			}
+
 			string result;
 			using (HttpRequestMessage msg = new HttpRequestMessage(method, path))
 			{
@@ -168,20 +181,13 @@ namespace Discord.Helpers
 				}
 			}
 
-#if TEST_RESPONSES
-			stopwatch.Stop();
-			Debug.WriteLine($"{method} {path}: {Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2)}ms");
-#endif
+			if (_isDebug)
+			{
+				stopwatch.Stop();
+				RaiseOnDebugMessage(DebugMessageType.XHRTiming, $"{method} {path}: {Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2)}ms");
+			}
 			return result;
 		}
-
-#if TEST_RESPONSES
-		private void CheckEmptyResponse(string json)
-		{
-			if (!string.IsNullOrEmpty(json))
-				throw new Exception("API check failed: Response is not empty.");
-		}
-#endif
 
 		private StringContent AsJson(object obj)
 		{

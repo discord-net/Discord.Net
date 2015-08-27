@@ -90,8 +90,6 @@ namespace Discord
 			_blockEvent = new ManualResetEventSlim(true);
 			_config = config ?? new DiscordClientConfig();
             _rand = new Random();
-			_http = new JsonHttpClient();
-			_api = new DiscordAPI(_http);
 
 			_serializer = new JsonSerializer();
 #if TEST_RESPONSES
@@ -367,7 +365,12 @@ namespace Discord
 				}
 			);
 
-			_webSocket = new DiscordDataSocket(this, _config.ConnectionTimeout, _config.WebSocketInterval);
+			_http = new JsonHttpClient(config.EnableDebug);
+			_api = new DiscordAPI(_http);
+			if (_config.EnableDebug)
+				_http.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
+
+			_webSocket = new DiscordDataSocket(this, config.ConnectionTimeout, config.WebSocketInterval, config.EnableDebug);
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) =>
 			{
@@ -406,7 +409,7 @@ namespace Discord
 #if !DNXCORE50
 			if (_config.EnableVoice)
 			{
-				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval);
+				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval, config.EnableDebug);
 				_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
 				_voiceWebSocket.Disconnected += async (s, e) =>
 				{

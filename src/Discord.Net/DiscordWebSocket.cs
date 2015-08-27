@@ -14,22 +14,24 @@ namespace Discord
 		private const int SendChunkSize = 4096;
 
 		protected readonly DiscordClient _client;
-		protected volatile CancellationTokenSource _disconnectToken;
-		protected int _timeout, _heartbeatInterval;
 		protected readonly int _sendInterval;
-		protected string _host;
+		protected readonly bool _isDebug;
+		private readonly ConcurrentQueue<byte[]> _sendQueue;
 
+		protected volatile CancellationTokenSource _disconnectToken;
 		private volatile ClientWebSocket _webSocket;
 		private volatile Task _tasks;
-		private ConcurrentQueue<byte[]> _sendQueue;
+		protected string _host;
+		protected int _timeout, _heartbeatInterval;
 		private DateTime _lastHeartbeat;
 		private bool _isConnected;
 
-		public DiscordWebSocket(DiscordClient client, int timeout, int interval)
+		public DiscordWebSocket(DiscordClient client, int timeout, int interval, bool isDebug)
 		{
 			_client = client;
             _timeout = timeout;
 			_sendInterval = interval;
+			_isDebug = isDebug;
 
 			_sendQueue = new ConcurrentQueue<byte[]>();
 		}

@@ -1,5 +1,4 @@
 ﻿using Discord.API.Models;
-using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,8 +12,8 @@ namespace Discord
 	{
 		private readonly ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public DiscordDataSocket(DiscordClient client, int timeout, int interval)
-			: base(client, timeout, interval)
+		public DiscordDataSocket(DiscordClient client, int timeout, int interval, bool isDebug)
+			: base(client, timeout, interval, isDebug)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
@@ -72,7 +71,8 @@ namespace Discord
 					}
 					break;
 				default:
-					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown DataSocket op: " + msg.Operation);
+					if (_isDebug)
+						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown DataSocket op: " + msg.Operation);
 					break;
 			}
 #if DNXCORE

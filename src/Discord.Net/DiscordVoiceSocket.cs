@@ -49,8 +49,8 @@ namespace Discord
 #endif
 #endif
 
-		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval)
-			: base(client, timeout, interval)
+		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, bool isDebug)
+			: base(client, timeout, interval, isDebug)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 #if !DNXCORE50
@@ -287,7 +287,8 @@ namespace Discord
 					break;
 #endif
 				default:
-					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown VoiceSocket op: " + msg.Operation);
+					if (_isDebug)
+						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown VoiceSocket op: " + msg.Operation);
 					break;
 			}
 #if DNXCORE50
@@ -322,25 +323,42 @@ namespace Discord
 				else
 				{
 					//Parse RTP Data
-					/*if (length < 12)
-						throw new Exception($"Unexpected message length. Expected >= 12, got {length}.");
+					if (length < 12)
+					{
+						if (_isDebug)
+							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected message length. Expected >= 12, got {length}.");
+						return;
+					}
 
 					byte flags = buffer[0];
 					if (flags != 0x80)
-						throw new Exception("Unexpected Flags");
+					{
+						if (_isDebug)
+							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected Flags: {flags}");
+						return;
+					}
 
 					byte payloadType = buffer[1];
 					if (payloadType != 0x78)
-						throw new Exception("Unexpected Payload Type");
+					{
+						if (_isDebug)
+							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected Payload Type: {flags}");
+						return;
+					}
 
-					ushort sequenceNumber = (ushort)((buffer[2] << 8) | buffer[3]);
-					uint timestamp = (uint)((buffer[4] << 24) | (buffer[5] << 16) |
-											(buffer[6] << 8) | (buffer[7] << 0));
-					uint ssrc = (uint)((buffer[8] << 24) | (buffer[9] << 16) |
-											 (buffer[10] << 8) | (buffer[11] << 0));
+					ushort sequenceNumber = (ushort)((buffer[2] << 8) | 
+													  buffer[3] << 0);
+					uint timestamp = (uint)((buffer[4] << 24) | 
+											(buffer[5] << 16) |
+											(buffer[6] << 8) | 
+											(buffer[7] << 0));
+					uint ssrc = (uint)((buffer[8] << 24) | 
+									   (buffer[9] << 16) |
+									   (buffer[10] << 8) | 
+									   (buffer[11] << 0));
 
 					//Decrypt
-					if (_mode == "xsalsa20_poly1305")
+					/*if (_mode == "xsalsa20_poly1305")
 					{
 						if (length < 36) //12 + 24
 							throw new Exception($"Unexpected message length. Expected >= 36, got {length}.");
@@ -362,6 +380,8 @@ namespace Discord
 						buffer = newBuffer;
 					}*/
 
+					if (_isDebug)
+						RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Received {buffer.Length - 12} bytes.");
 					//TODO: Use Voice Data
 				}
 			}
