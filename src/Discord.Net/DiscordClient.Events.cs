@@ -7,7 +7,7 @@ namespace Discord
 		Connection,
 		Event,
 		Cache,
-		WebSocketRawInput,
+		WebSocketRawInput, //TODO: Make Http instanced and add a rawoutput event
 		WebSocketUnknownInput,
 		WebSocketEvent,
 		WebSocketUnknownEvent,
@@ -110,7 +110,6 @@ namespace Discord
 		}
 
 		//Server
-
 		public event EventHandler<ServerEventArgs> ServerCreated;
 		private void RaiseServerCreated(Server server)
 		{
@@ -136,32 +135,6 @@ namespace Discord
 				ServerUpdated(this, new ServerEventArgs(server));
 		}
 
-		//Channel
-		public event EventHandler<ChannelEventArgs> ChannelCreated;
-		private void RaiseChannelCreated(Channel channel)
-		{
-			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelCreated {channel.Name} ({channel.Id})");
-			if (ChannelCreated != null)
-				ChannelCreated(this, new ChannelEventArgs(channel));
-		}
-		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
-		private void RaiseChannelDestroyed(Channel channel)
-		{
-			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelDestroyed {channel.Name} ({channel.Id})");
-			if (ChannelDestroyed != null)
-				ChannelDestroyed(this, new ChannelEventArgs(channel));
-		}
-		public event EventHandler<ChannelEventArgs> ChannelUpdated;
-		private void RaiseChannelUpdated(Channel channel)
-		{
-			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelUpdated {channel.Name} ({channel.Id})");
-			if (ChannelUpdated != null)
-				ChannelUpdated(this, new ChannelEventArgs(channel));
-		}
-
 		//User
 		public event EventHandler<UserEventArgs> UserUpdated;
 		private void RaiseUserUpdated(User user)
@@ -172,12 +145,38 @@ namespace Discord
 				UserUpdated(this, new UserEventArgs(user));
 		}
 
+		//Channel
+		public event EventHandler<ChannelEventArgs> ChannelCreated;
+		private void RaiseChannelCreated(Channel channel)
+		{
+			if (_config.EnableDebug)
+				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelCreated {channel.Name} ({channel.Id}) in {channel.Server?.Name} ({channel.ServerId})");
+			if (ChannelCreated != null)
+				ChannelCreated(this, new ChannelEventArgs(channel));
+		}
+		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
+		private void RaiseChannelDestroyed(Channel channel)
+		{
+			if (_config.EnableDebug)
+				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelDestroyed {channel.Name} ({channel.Id}) in {channel.Server?.Name} ({channel.ServerId})");
+			if (ChannelDestroyed != null)
+				ChannelDestroyed(this, new ChannelEventArgs(channel));
+		}
+		public event EventHandler<ChannelEventArgs> ChannelUpdated;
+		private void RaiseChannelUpdated(Channel channel)
+		{
+			if (_config.EnableDebug)
+				RaiseOnDebugMessage(DebugMessageType.Event, $"ChannelUpdated {channel.Name} ({channel.Id}) in {channel.Server?.Name} ({channel.ServerId})");
+			if (ChannelUpdated != null)
+				ChannelUpdated(this, new ChannelEventArgs(channel));
+		}
+
 		//Message
 		public event EventHandler<MessageEventArgs> MessageCreated;
 		private void RaiseMessageCreated(Message msg)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageCreated {msg.Id}");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageCreated {msg.Id} in {msg.Channel?.Name} ({msg.ChannelId})");
 			if (MessageCreated != null)
 				MessageCreated(this, new MessageEventArgs(msg));
 		}
@@ -185,7 +184,7 @@ namespace Discord
 		private void RaiseMessageDeleted(Message msg)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageDeleted {msg.Id}");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageDeleted {msg.Id} in {msg.Channel?.Name} ({msg.ChannelId})");
 			if (MessageDeleted != null)
 				MessageDeleted(this, new MessageEventArgs(msg));
 		}
@@ -193,7 +192,7 @@ namespace Discord
 		private void RaiseMessageUpdated(Message msg)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageUpdated {msg.Id}");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageUpdated {msg.Id} in {msg.Channel?.Name} ({msg.ChannelId})");
 			if (MessageUpdated != null)
 				MessageUpdated(this, new MessageEventArgs(msg));
 		}
@@ -201,7 +200,7 @@ namespace Discord
 		private void RaiseMessageRead(Message msg)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageRead {msg.Id}");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageRead {msg.Id} in {msg.Channel?.Name} ({msg.ChannelId})");
 			if (MessageRead != null)
 				MessageRead(this, new MessageEventArgs(msg));
 		}
@@ -209,7 +208,7 @@ namespace Discord
 		private void RaiseMessageSent(Message msg)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageSent {msg.Id}");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MessageSent {msg.Id} in {msg.Channel?.Name} ({msg.ChannelId})");
 			if (MessageSent != null)
 				MessageSent(this, new MessageEventArgs(msg));
 		}
@@ -219,7 +218,7 @@ namespace Discord
 		private void RaiseRoleCreated(Role role)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleCreated {role.Name} ({role.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleCreated {role.Name} ({role.Id}) in {role.Server?.Name} ({role.ServerId})");
 			if (RoleCreated != null)
 				RoleCreated(this, new RoleEventArgs(role));
 		}
@@ -227,7 +226,7 @@ namespace Discord
 		private void RaiseRoleDeleted(Role role)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleDeleted {role.Name} ({role.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleDeleted {role.Name} ({role.Id}) in {role.Server?.Name} ({role.ServerId})");
 			if (RoleDeleted != null)
 				RoleDeleted(this, new RoleEventArgs(role));
 		}
@@ -235,7 +234,7 @@ namespace Discord
 		private void RaiseRoleUpdated(Role role)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleUpdated {role.Name} ({role.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"RoleUpdated {role.Name} ({role.Id}) in {role.Server?.Name} ({role.ServerId})");
 			if (RoleUpdated != null)
 				RoleUpdated(this, new RoleEventArgs(role));
 		}
@@ -245,7 +244,7 @@ namespace Discord
 		private void RaiseBanAdded(User user, Server server)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"BanAdded {user.Name} ({user.Id}) on {server.Name} ({server.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"BanAdded {user.Name} ({user.Id}) in {server.Name} ({server.Id})");
 			if (BanAdded != null)
 				BanAdded(this, new BanEventArgs(user, server));
 		}
@@ -253,7 +252,7 @@ namespace Discord
 		private void RaiseBanRemoved(User user, Server server)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"BanRemoved {user.Name} ({user.Id}) on {server.Name} ({server.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"BanRemoved {user.Name} ({user.Id}) in {server.Name} ({server.Id})");
 			if (BanRemoved != null)
 				BanRemoved(this, new BanEventArgs(user, server));
 		}
@@ -263,7 +262,7 @@ namespace Discord
 		private void RaiseMemberAdded(Membership member)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberAdded {member.User.Name} ({member.UserId}) on {member.Server.Name} ({member.ServerId})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberAdded {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
 			if (MemberAdded != null)
 				MemberAdded(this, new MemberEventArgs(member));
 		}
@@ -271,7 +270,7 @@ namespace Discord
 		private void RaiseMemberRemoved(Membership member)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberRemoved {member.User.Name} ({member.UserId}) on {member.Server.Name} ({member.ServerId})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberRemoved {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
 			if (MemberRemoved != null)
 				MemberRemoved(this, new MemberEventArgs(member));
 		}
@@ -279,7 +278,7 @@ namespace Discord
 		private void RaiseMemberUpdated(Membership member)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberUpdated {member.User.Name} ({member.UserId}) on {member.Server.Name} ({member.ServerId})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
 			if (MemberUpdated != null)
 				MemberUpdated(this, new MemberEventArgs(member));
 		}
@@ -289,7 +288,7 @@ namespace Discord
 		private void RaisePresenceUpdated(Membership member)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"PresenceUpdated {member.User.Name} ({member.UserId}) on {member.Server.Name} ({member.ServerId})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"PresenceUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
 			if (PresenceUpdated != null)
 				PresenceUpdated(this, new MemberEventArgs(member));
 		}
@@ -297,7 +296,7 @@ namespace Discord
 		private void RaiseVoiceStateUpdated(Membership member)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"VoiceStateUpdated {member.User.Name} ({member.UserId}) on {member.Server.Name} ({member.ServerId})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"VoiceStateUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
 			if (VoiceStateUpdated != null)
 				VoiceStateUpdated(this, new MemberEventArgs(member));
 		}
@@ -305,7 +304,7 @@ namespace Discord
 		private void RaiseUserTyping(User user, Channel channel)
 		{
 			if (_config.EnableDebug)
-				RaiseOnDebugMessage(DebugMessageType.Event, $"VoiceStateUpdated {user.Name} ({user.Id}) on {channel.Name} ({channel.Id})");
+				RaiseOnDebugMessage(DebugMessageType.Event, $"VoiceStateUpdated {user.Name} ({user.Id}) in {channel.Name} ({channel.Id})");
 			if (UserTyping != null)
 				UserTyping(this, new UserTypingEventArgs(user, channel));
 		}

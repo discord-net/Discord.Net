@@ -33,7 +33,10 @@ namespace Discord
 		public User User { get; private set; }
 		/// <summary> Returns the id of the current logged in user. </summary>
 		public string UserId { get; private set; }
+#if !DNXCORE50
+		/// <summary> Returns the voice session id of the current logged in user. </summary>
 		public string SessionId { get; private set; }
+#endif
 
 		public DiscordClientConfig Config => _config;
         private readonly DiscordClientConfig _config;
@@ -450,7 +453,9 @@ namespace Discord
 							_users.Clear();
 
 							UserId = data.User.Id;
+#if !DNXCORE50
 							SessionId = data.SessionId;
+#endif
 							User = _users.Update(data.User.Id, data.User);
 							foreach (var server in data.Guilds)
 								_servers.Update(server.Id, server);
