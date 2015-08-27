@@ -10,7 +10,7 @@ namespace Discord.Commands
 		public int? MaxArgs { get; internal set; }
 		public int MinPerms { get; internal set; }
 		internal readonly string[] Parts;
-		internal Func<DiscordBotClient.CommandEventArgs, Task> Handler;
+		internal Func<CommandEventArgs, Task> Handler;
 
 		internal Command(string text)
 		{

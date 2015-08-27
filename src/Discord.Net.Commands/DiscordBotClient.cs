@@ -16,7 +16,7 @@ namespace Discord
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public DiscordBotClient(DiscordClientConfig config = null, Func<User, int> getPermissions = null)
+		public DiscordBotClient(DiscordClientConfig config = null, Func<User, Server, int> getPermissions = null)
 			: base(config)
 		{
 			_commands = new List<Command>();
@@ -56,7 +56,7 @@ namespace Discord
 					Command cmd = _commands[i];
 
 					//Check Command Parts
-					if (args.Length < cmd.Text.Length)
+					if (args.Length < cmd.Parts.Length)
 						continue;
 
                     bool isValid = true;
@@ -82,7 +82,7 @@ namespace Discord
 						newArgs[j] = args[j + cmd.Parts.Length];
 					
 					//Check Permissions
-                    int permissions = getPermissions != null ? getPermissions(e.Message.User) : 0;
+                    int permissions = getPermissions != null ? getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
 					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{

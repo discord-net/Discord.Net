@@ -3,45 +3,43 @@ using System;
 
 namespace Discord
 {
-    public partial class DiscordBotClient : DiscordClient
+	public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
+	public class CommandEventArgs
 	{
-		public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
+		public Message Message { get; }
+		public Command Command { get; }
+		public string CommandText { get; }
+		public int? Permissions { get; }
+		public string[] Args { get; }
 
-		public class CommandEventArgs
+		public User User => Message.User;
+		public string UserId => Message.UserId;
+		public Channel Channel => Message.Channel;
+		public string ChannelId => Message.ChannelId;
+		public Server Server => Message.Channel.Server;
+		public string ServerId => Message.Channel.ServerId;
+
+		public CommandEventArgs(Message message, Command command, string commandText, int? permissions, string[] args)
 		{
-			public Message Message { get; }
-			public Command Command { get; }
-			public string CommandText { get; }
-			public int? Permissions { get; }
-			public string[] Args { get; }
-
-			public User User => Message.User;
-			public string UserId => Message.UserId;
-			public Channel Channel => Message.Channel;
-			public string ChannelId => Message.ChannelId;
-			public Server Server => Message.Channel.Server;
-			public string ServerId => Message.Channel.ServerId;
-
-			public CommandEventArgs(Message message, Command command, string commandText, int? permissions, string[] args)
-			{
-				Message = message;
-				Command = command;
-				CommandText = commandText;
-				Permissions = permissions;
-				Args = args;
-			}
+			Message = message;
+			Command = command;
+			CommandText = commandText;
+			Permissions = permissions;
+			Args = args;
 		}
-		public class CommandErrorEventArgs : CommandEventArgs
+	}
+	public class CommandErrorEventArgs : CommandEventArgs
+	{
+		public Exception Exception { get; }
+
+		public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
+			: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.Permissions, baseArgs.Args)
 		{
-			public Exception Exception { get; }
-
-			public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
-				: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.Permissions, baseArgs.Args)
-			{
-				Exception = ex;
-            }
+			Exception = ex;
 		}
-
+	}
+	public partial class DiscordBotClient : DiscordClient
+	{
 		public event EventHandler<CommandEventArgs> RanCommand;
 		private void RaiseRanCommand(CommandEventArgs args)
 		{

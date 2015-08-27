@@ -54,12 +54,12 @@ namespace Discord.Commands
             return this;
 		}
 
-		public CommandBuilder Do(Func<DiscordBotClient.CommandEventArgs, Task> func)
+		public CommandBuilder Do(Func<CommandEventArgs, Task> func)
 		{
 			_command.Handler = func;
             return this;
 		}
-		public CommandBuilder Do(Action<DiscordBotClient.CommandEventArgs> func)
+		public CommandBuilder Do(Action<CommandEventArgs> func)
 		{
 #if DNXCORE50
 			_command.Handler = e => { func(e); return Task.CompletedTask; };
@@ -82,10 +82,9 @@ namespace Discord.Commands
 			_defaultMinPermissions = defaultMinPermissions;
 		}
 
-		public CommandGroupBuilder DefaultMinPermissions(int level)
+		public void DefaultMinPermissions(int level)
 		{
 			_defaultMinPermissions = level;
-			return this;
 		}
 
 		public CommandGroupBuilder CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
