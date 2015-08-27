@@ -67,7 +67,12 @@ namespace Discord
 			_client = client;
 			_bans = new ConcurrentDictionary<string, bool>();
 			_members = new AsyncCache<Membership, API.Models.MemberInfo>(
-				(key, parentKey) => new Membership(parentKey, key, _client),
+				(key, parentKey) =>
+				{
+					if (_client.Config.EnableDebug)
+						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Created user {key} in server {parentKey}.");
+                    return new Membership(parentKey, key, _client);
+				},
 				(member, model) =>
 				{
 					if (model is API.Models.PresenceMemberInfo)
@@ -103,7 +108,14 @@ namespace Discord
 						member.IsDeafened = extendedModel.IsDeafened;
 						member.IsMuted = extendedModel.IsMuted;
 					}
-                }
+					if (_client.Config.EnableDebug)
+						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
+				},
+				(member) =>
+				{
+					if (_client.Config.EnableDebug)
+						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
+				}
 			);
 		}
 

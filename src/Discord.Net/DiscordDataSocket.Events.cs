@@ -3,7 +3,7 @@ using System;
 
 namespace Discord
 {
-	internal partial class DiscordTextWebSocket
+	internal partial class DiscordDataSocket
 	{
 		public event EventHandler<MessageEventArgs> GotEvent;
 		public sealed class MessageEventArgs : EventArgs

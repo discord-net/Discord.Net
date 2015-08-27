@@ -17,8 +17,7 @@ namespace Discord
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient
 	{
-		private readonly DiscordClientConfig _config;
-		private readonly DiscordTextWebSocket _webSocket;
+		private readonly DiscordDataSocket _webSocket;
 #if !DNXCORE50
 		private readonly DiscordVoiceSocket _voiceWebSocket;
 #endif
@@ -35,6 +34,9 @@ namespace Discord
 		/// <summary> Returns the id of the current logged in user. </summary>
 		public string UserId { get; private set; }
 		public string SessionId { get; private set; }
+
+		public DiscordClientConfig Config => _config;
+        private readonly DiscordClientConfig _config;
 
 		/// <summary> Returns a collection of all users the client can see across all servers. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
@@ -113,7 +115,12 @@ namespace Discord
 			});
 
 			_servers = new AsyncCache<Server, API.Models.ServerReference>(
-				(key, parentKey) => new Server(key, this),
+				(key, parentKey) =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Created server {key}.");
+					return new Server(key, this);
+				},
 				(server, model) =>
 				{
 					server.Name = model.Name;
@@ -141,12 +148,28 @@ namespace Discord
 						foreach (var membership in extendedModel.Presences)
 							server.UpdateMember(membership);
 					}
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated server {server.Name} ({server.Id}).");
 				},
-				server => { }
+				server =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed server {server.Name} ({server.Id}).");
+				}
 			);
 
 			_channels = new AsyncCache<Channel, API.Models.ChannelReference>(
-				(key, parentKey) => new Channel(key, parentKey, this),
+				(key, parentKey) =>
+				{
+					if (_config.EnableDebug)
+					{
+						if (parentKey != null)
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Created channel {key} in server {parentKey}.");
+						else
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Created private channel {key}.");
+					}
+					return new Channel(key, parentKey, this);
+				},
 				(channel, model) =>
 				{
 					channel.Name = model.Name;
@@ -176,6 +199,13 @@ namespace Discord
 						else
 							channel.PermissionOverwrites = null;
 					}
+					if (_config.EnableDebug)
+					{
+						if (channel.IsPrivate)
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated private channel {channel.Name} ({channel.Id}).");
+						else
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated channel {channel.Name} ({channel.Id}) in server {channel.Server?.Name} ({channel.ServerId}).");
+					}
 				},
 				channel =>
 				{
@@ -184,10 +214,22 @@ namespace Discord
 						var user = channel.Recipient;
 						if (user.PrivateChannelId == channel.Id)
 							user.PrivateChannelId = null;
+						if (_config.EnableDebug)
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed private channel {channel.Name} ({channel.Id}).");
+					}
+					else
+					{
+						if (_config.EnableDebug)
+							RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed channel {channel.Name} ({channel.Id}) in server {channel.Server?.Name} ({channel.ServerId}).");
 					}
 				});
 			_messages = new AsyncCache<Message, API.Models.MessageReference>(
-				(key, parentKey) => new Message(key, parentKey, this),
+				(key, parentKey) =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Created message {key} in channel {parentKey}.");
+					return new Message(key, parentKey, this);
+				},
 				(message, model) =>
 				{
 					if (model is API.Models.Message)
@@ -260,21 +302,44 @@ namespace Discord
 						if (extendedModel.Author != null)
 							message.UserId = extendedModel.Author.Id;
 					}
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated message {message.Id} in channel {message.Channel?.Name} ({message.ChannelId}).");
 				},
-				message => { }
+				message =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed message {message.Id} in channel {message.Channel?.Name} ({message.ChannelId}).");
+				}
 			);
-			_pendingMessages = new ConcurrentQueue<Message>();
+			if (_config.UseMessageQueue)
+				_pendingMessages = new ConcurrentQueue<Message>();
 			_roles = new AsyncCache<Role, API.Models.Role>(
-				(key, parentKey) => new Role(key, parentKey, this),
+				(key, parentKey) =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Created role {key} in server {parentKey}.");
+					return new Role(key, parentKey, this);
+				},
 				(role, model) =>
 				{
 					role.Name = model.Name;
 					role.Permissions.RawValue = (uint)model.Permissions;
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated role {role.Name} ({role.Id}) in server {role.Server?.Name} ({role.ServerId}).");
 				},
-				role => { }
+				role =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed role {role.Name} ({role.Id}) in server {role.Server?.Name} ({role.ServerId}).");
+				}
 			);
 			_users = new AsyncCache<User, API.Models.UserReference>(
-				(key, parentKey) => new User(key, this),
+				(key, parentKey) =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Created user {key}.");
+					return new User(key, this);
+				},
 				(user, model) =>
 				{
 					user.AvatarId = model.Avatar;
@@ -286,53 +351,94 @@ namespace Discord
 						user.Email = extendedModel.Email;
 						user.IsVerified = extendedModel.IsVerified;
 					}
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated user {user?.Name} ({user.Id}).");
 				},
-				user => { }
+				user =>
+				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed user {user?.Name} ({user.Id}).");
+				}
 			);
 
-			_webSocket = new DiscordTextWebSocket(this, _config.ConnectionTimeout, _config.WebSocketInterval);
+			_webSocket = new DiscordDataSocket(this, _config.ConnectionTimeout, _config.WebSocketInterval);
 			_webSocket.Connected += (s, e) => RaiseConnected();
-			_webSocket.Disconnected += async (s, e) => 
+			_webSocket.Disconnected += async (s, e) =>
 			{
-				//Reconnect if we didn't cause the disconnect
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket disconnected.");
 				RaiseDisconnected();
+
+				//Reconnect if we didn't cause the disconnect
 				while (!_disconnectToken.IsCancellationRequested)
 				{
 					try
 					{
 						await Task.Delay(_config.ReconnectDelay);
 						await _webSocket.ReconnectAsync();
+						if (_config.EnableDebug)
+							RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
 						await _webSocket.Login();
+						if (_config.EnableDebug)
+							RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket logged in.");
 						break;
 					}
 					catch (Exception ex)
 					{
-						RaiseOnDebugMessage($"Reconnect Failed: {ex.Message}");
+						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket reconnect failed: {ex.Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_config.FailedReconnectDelay);
 					}
 				}
 			};
-			_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Message);
+			if (_config.EnableDebug)
+				_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
 
 #if !DNXCORE50
 			if (_config.EnableVoice)
 			{
 				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval);
 				_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
-				_voiceWebSocket.Disconnected += (s, e) =>
+				_voiceWebSocket.Disconnected += async (s, e) =>
 				{
-				//TODO: Reconnect if we didn't cause the disconnect
-				RaiseVoiceDisconnected();
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket disconnected.");
+					RaiseVoiceDisconnected();
+
+					//Reconnect if we didn't cause the disconnect
+					while (!_disconnectToken.IsCancellationRequested)
+					{
+						try
+						{
+							await Task.Delay(_config.ReconnectDelay);
+							if (_config.EnableDebug)
+								RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket connected.");
+							await _voiceWebSocket.ReconnectAsync();
+							break;
+						}
+						catch (Exception ex)
+						{
+							if (_config.EnableDebug)
+								RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket reconnect failed: {ex.Message}");
+							//Net is down? We can keep trying to reconnect until the user runs Disconnect()
+							await Task.Delay(_config.FailedReconnectDelay);
+						}
+					}
 				};
-				_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnVoiceDebugMessage(e.Message);
+				if (_config.EnableDebug)
+					_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
 			}
 #endif
 
-#pragma warning disable CS1998 //Disable unused async keyword warning
+#if !DNXCORE50
 			_webSocket.GotEvent += async (s, e) =>
+#else
+			_webSocket.GotEvent += (s, e) =>
+#endif
 			{
-				switch (e.Type)
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.WebSocketEvent, $"{e.Type}: {e.Event}");
+                switch (e.Type)
 				{
 					//Global
 					case "READY": //Resync
@@ -610,12 +716,11 @@ namespace Discord
 
 					//Others
 					default:
-						RaiseOnDebugMessage("Unknown WebSocket message type: " + e.Type);
+						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownEvent, "Unknown WebSocket message type: " + e.Type);
 						break;
 				}
 			};
 		}
-#pragma warning restore CS1998 //Restore unused async keyword warning
 
 		private async Task SendAsync()
 		{
@@ -658,7 +763,7 @@ namespace Discord
 			{
 				await Task.Delay(-1, cancelToken);
 			}
-			catch { }
+			catch (OperationCanceledException) { }
 		}
 
 		/// <summary> Returns the user with the specified id, or null if none was found. </summary>
@@ -867,12 +972,19 @@ namespace Discord
 				try
 				{
 					await _webSocket.ConnectAsync(url);
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
 					Http.Token = token;
+
 					await _webSocket.Login();
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
 					success = true;
 				}
 				catch (InvalidOperationException) //Bad Token
 				{
+					if (_config.EnableDebug)
+						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket had a bad token.");
 					if (password == null) //If we don't have an alternate login, throw this error
 						throw;
 				}
@@ -881,35 +993,51 @@ namespace Discord
 			{
 				//Open websocket while we wait for login response
 				Task socketTask = _webSocket.ConnectAsync(url);
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
+
 				var response = await DiscordAPI.Login(emailOrUsername, password);
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
+
 				await socketTask;
 
 				//Wait for websocket to finish connecting, then send token
 				token = response.Token;
                 Http.Token = token;
 				await _webSocket.Login();
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket logged in.");
 				success = true;
 			}
 			if (!success && password == null) //Anonymous login
 			{
 				//Open websocket while we wait for login response
 				Task socketTask = _webSocket.ConnectAsync(url);
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
+
 				var response = await DiscordAPI.LoginAnonymous(emailOrUsername);
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket generated anonymous token.");
+
 				await socketTask;
 
 				//Wait for websocket to finish connecting, then send token
 				token = response.Token;
 				Http.Token = token;
 				await _webSocket.Login();
+				if (_config.EnableDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket logged in.");
 				success = true;
 			}
 			if (success)
 			{
 				var cancelToken = _disconnectToken.Token;
 				if (_config.UseMessageQueue)
-					_tasks = Task.WhenAll(await Task.Factory.StartNew(SendAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+					_tasks = SendAsync();
 				else
-					_tasks = Task.WhenAll(await Task.Factory.StartNew(EmptyAsync, cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+					_tasks = EmptyAsync();
 				_tasks = _tasks.ContinueWith(async x =>
 				{
 					await _webSocket.DisconnectAsync();
@@ -1347,10 +1475,13 @@ namespace Discord
 		/// <param name="count">Number of bytes in this frame. </param>
 		public void SendVoicePCM(byte[] data, int count)
 		{
-			if (!_config.EnableVoice)
+            if (!_config.EnableVoice)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
+			if (count == 0) return;
 
-			_voiceWebSocket.SendPCMFrame(data, count);
+			if (_config.EnableDebug)
+				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
+            _voiceWebSocket.SendPCMFrame(data, count);
 		}
 
 		/// <summary> Clears the PCM buffer. </summary>
@@ -1359,6 +1490,8 @@ namespace Discord
 			if (!_config.EnableVoice)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 
+			if (_config.EnableDebug)
+				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Cleared the voice buffer.");
 			_voiceWebSocket.ClearPCMFrames();
 		}
 #endif

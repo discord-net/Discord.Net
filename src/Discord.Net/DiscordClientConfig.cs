@@ -7,6 +7,9 @@
 		/// <remarks> This option requires the opus .dll or .so be in the local lib/ folder. </remarks>
 		public bool EnableVoice { get; set; } = false;
 #endif
+		/// <summary> Enables the verbose DebugMessage event handler. May hinder performance but should help debug any issues. </summary>
+		public bool EnableDebug { get; set; } = false;
+
 		/// <summary> Max time in milliseconds to wait for the web socket to connect. </summary>
 		public int ConnectionTimeout { get; set; } = 5000;
 		/// <summary> Max time in milliseconds to wait for the voice web socket to connect. </summary>

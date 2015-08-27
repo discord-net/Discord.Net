@@ -9,11 +9,11 @@ using WebSocketMessage = Discord.API.Models.TextWebSocketCommands.WebSocketMessa
 
 namespace Discord
 {
-	internal sealed partial class DiscordTextWebSocket : DiscordWebSocket
+	internal sealed partial class DiscordDataSocket : DiscordWebSocket
 	{
 		private ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
 
-		public DiscordTextWebSocket(DiscordClient client, int timeout, int interval)
+		public DiscordDataSocket(DiscordClient client, int timeout, int interval)
 			: base(client, timeout, interval)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
@@ -72,7 +72,7 @@ namespace Discord
 					}
 					break;
 				default:
-					RaiseOnDebugMessage("Unknown WebSocket operation ID: " + msg.Operation);
+					RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownInput, "Unknown DataSocket op: " + msg.Operation);
 					break;
 			}
 #if DNXCORE

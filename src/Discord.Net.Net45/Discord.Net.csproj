@@ -89,11 +89,11 @@
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordTextWebSocket.cs">
-      <Link>DiscordTextWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordDataSocket.cs">
+      <Link>DiscordDataSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordTextWebSocket.Events.cs">
-      <Link>DiscordTextWebSocket.Events.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordDataSocket.Events.cs">
+      <Link>DiscordDataSocket.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordVoiceSocket.cs">
       <Link>DiscordVoiceSocket.cs</Link>
