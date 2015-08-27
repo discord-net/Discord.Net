@@ -288,7 +288,7 @@ namespace Discord
 #endif
 				default:
 					if (_isDebug)
-						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown VoiceSocket op: " + msg.Operation);
+						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown Opcode: " + msg.Operation);
 					break;
 			}
 #if DNXCORE50
@@ -306,7 +306,11 @@ namespace Discord
 				{
 					_isReady = true;
 					if (length != 70)
-						throw new Exception($"Unexpected message length. Expected 70, got {length}.");
+					{
+						if (_isDebug)
+							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected message length. Expected >= 70, got {length}.");
+						return;
+					}
 
 					int port = buffer[68] | buffer[69] << 8;
 

@@ -46,6 +46,9 @@ namespace Discord
 			}
 			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
 			catch (OperationCanceledException) { return; }
+			
+			if (_isDebug)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"Logged in.");
 
 			SetConnected();
 		}
@@ -72,7 +75,7 @@ namespace Discord
 					break;
 				default:
 					if (_isDebug)
-						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown DataSocket op: " + msg.Operation);
+						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown Opcode: " + msg.Operation);
 					break;
 			}
 #if DNXCORE

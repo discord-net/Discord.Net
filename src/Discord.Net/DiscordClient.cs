@@ -374,8 +374,6 @@ namespace Discord
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) =>
 			{
-				if (_config.EnableDebug)
-					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket disconnected.");
 				RaiseDisconnected();
 
 				//Reconnect if we didn't cause the disconnect
@@ -385,14 +383,8 @@ namespace Discord
 					{
 						await Task.Delay(_config.ReconnectDelay);
 						await _webSocket.ReconnectAsync();
-						if (_config.EnableDebug)
-							RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
 						if (_http.Token != null)
-						{
 							await _webSocket.Login(_http.Token);
-							if (_config.EnableDebug)
-								RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket logged in.");
-						}
 						break;
 					}
 					catch (Exception ex)
@@ -404,7 +396,7 @@ namespace Discord
 				}
 			};
 			if (_config.EnableDebug)
-				_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
+				_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, $"DataSocket: {e.Message}");
 
 #if !DNXCORE50
 			if (_config.EnableVoice)
@@ -413,8 +405,6 @@ namespace Discord
 				_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
 				_voiceWebSocket.Disconnected += async (s, e) =>
 				{
-					if (_config.EnableDebug)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket disconnected.");
 					RaiseVoiceDisconnected();
 
 					//Reconnect if we didn't cause the disconnect
@@ -423,8 +413,6 @@ namespace Discord
 						try
 						{
 							await Task.Delay(_config.ReconnectDelay);
-							if (_config.EnableDebug)
-								RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket connected.");
 							await _voiceWebSocket.ReconnectAsync();
 							break;
 						}
@@ -438,7 +426,7 @@ namespace Discord
 					}
 				};
 				if (_config.EnableDebug)
-					_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
+					_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, $"VoiceSocket: {e.Message}");
 			}
 #endif
 

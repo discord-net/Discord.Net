@@ -48,11 +48,17 @@ namespace Discord
 			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
 			_host = url;
 
+			if (_isDebug)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"Connected.");
+
 			OnConnect();
 
 			_lastHeartbeat = DateTime.UtcNow;
 			_tasks = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
 			{
+				if (_isDebug)
+					RaiseOnDebugMessage(DebugMessageType.Connection, $"Disconnected.");
+
 				//Do not clean up until all tasks have ended
 				OnDisconnect();
 
@@ -125,7 +131,8 @@ namespace Discord
 						if (result.MessageType == WebSocketMessageType.Close)
 						{
 							await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-							return;
+							RaiseOnDebugMessage(DebugMessageType.Connection, $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
+                            return;
 						}
 						else
 							builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
