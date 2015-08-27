@@ -9,7 +9,8 @@
 
 		// /api
 		public static readonly string BaseApi = $"{BaseHttps}/api";
-		public static readonly string Track = $"{BaseApi}/track";
+		//public static readonly string Track = $"{BaseApi}/track";
+		public static readonly string Gateway = $"{BaseApi}/gateway";
 
 		// /api/auth
 		public static readonly string Auth = $"{BaseApi}/auth";
@@ -48,9 +49,6 @@
 		public static readonly string Voice = $"{BaseApi}/voice";
 		public static readonly string VoiceRegions = $"{Voice}/regions";
 		public static readonly string VoiceIce = $"{Voice}/ice";
-
-		//Web Sockets
-		public static readonly string WebSocket_Hub = $"{BaseUrl}/hub";
 
 		//Website
 		public static string InviteUrl(string code) => $"{BaseShortHttps}/{code}";

@@ -9,6 +9,12 @@ namespace Discord.API.Models
 {
 	internal static class APIResponses
 	{
+		public class Gateway
+		{
+			[JsonProperty(PropertyName = "url")]
+			public string Url;
+		}
+
 		public class AuthFingerprint
 		{
 			[JsonProperty(PropertyName = "fingerprint")]

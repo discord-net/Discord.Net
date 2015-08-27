@@ -1,14 +1,10 @@
-﻿using Discord.API.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
-using System.Linq;
 
 namespace Discord
 {
@@ -47,7 +43,7 @@ namespace Discord
 
 			_webSocket = new ClientWebSocket();
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
-			await _webSocket.ConnectAsync(new Uri("wss://" + url), cancelToken);
+			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
 			_host = url;
 
 			OnConnect();
@@ -78,6 +74,8 @@ namespace Discord
 				_tasks = null;
 			});
 		}
+		public Task ReconnectAsync()
+			=> ConnectAsync(_host);
 		public async Task DisconnectAsync()
 		{
 			if (_tasks != null)

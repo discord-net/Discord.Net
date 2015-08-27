@@ -11,7 +11,9 @@ namespace Discord.API
 		public const int MaxMessageSize = 2000;
 
 		//Auth
-		public static async Task<APIResponses.AuthRegister> LoginAnonymous(string username)
+		public static Task<APIResponses.Gateway> GetWebSocket()
+			=> Http.Get<APIResponses.Gateway>(Endpoints.Gateway);
+        public static async Task<APIResponses.AuthRegister> LoginAnonymous(string username)
 		{
 			var fingerprintResponse = await Http.Post<APIResponses.AuthFingerprint>(Endpoints.AuthFingerprint);
 			var registerRequest = new APIRequests.AuthRegisterRequest { Fingerprint = fingerprintResponse.Fingerprint, Username = username };

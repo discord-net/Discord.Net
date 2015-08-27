@@ -301,7 +301,7 @@ namespace Discord
 					try
 					{
 						await Task.Delay(_config.ReconnectDelay);
-						await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+						await _webSocket.ReconnectAsync();
 						await _webSocket.Login();
 						break;
 					}
@@ -587,7 +587,7 @@ namespace Discord
 							{
 								_currentVoiceEndpoint = data.Endpoint.Split(':')[0];
 								_currentVoiceToken = data.Token;
-								await _voiceWebSocket.ConnectAsync(_currentVoiceEndpoint);
+								await _voiceWebSocket.ConnectAsync("wss://" + _currentVoiceEndpoint);
 								await _voiceWebSocket.Login(_currentVoiceServerId, UserId, SessionId, _currentVoiceToken);
 							}
 #endif
@@ -859,12 +859,14 @@ namespace Discord
 			_blockEvent.Reset();
 			_disconnectToken = new CancellationTokenSource();
 
+			string url = (await DiscordAPI.GetWebSocket()).Url;
+
 			//Connect by Token
 			if (token != null)
 			{
 				try
 				{
-					await _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+					await _webSocket.ConnectAsync(url);
 					Http.Token = token;
 					await _webSocket.Login();
 					success = true;
@@ -878,7 +880,7 @@ namespace Discord
 			if (!success && password != null) //Email/Password login
 			{
 				//Open websocket while we wait for login response
-				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+				Task socketTask = _webSocket.ConnectAsync(url);
 				var response = await DiscordAPI.Login(emailOrUsername, password);
 				await socketTask;
 
@@ -891,7 +893,7 @@ namespace Discord
 			if (!success && password == null) //Anonymous login
 			{
 				//Open websocket while we wait for login response
-				Task socketTask = _webSocket.ConnectAsync(Endpoints.WebSocket_Hub);
+				Task socketTask = _webSocket.ConnectAsync(url);
 				var response = await DiscordAPI.LoginAnonymous(emailOrUsername);
 				await socketTask;
 
