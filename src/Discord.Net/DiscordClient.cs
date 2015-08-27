@@ -396,7 +396,7 @@ namespace Discord
 				}
 			};
 			if (_config.EnableDebug)
-				_voiceWebSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, $"DataSocket: {e.Message}");
+				_webSocket.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, $"DataSocket: {e.Message}");
 
 #if !DNXCORE50
 			if (_config.EnableVoice)
