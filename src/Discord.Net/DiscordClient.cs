@@ -1262,10 +1262,17 @@ namespace Discord
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
-		//Chat
-		/// <summary> Sends a message to the provided channel. </summary>
-		public Task<Message[]> SendMessage(Channel channel, string text)
-			=> SendMessage(channel.Id, text, new string[0]);
+        //Chat
+        /// <summary> Sends a message to the provided channel. </summary>
+        public Task<Message[]> SendMessage(Channel channel, string text)
+        {
+            if (channel == null)
+            {
+                throw new ArgumentNullException("channel");
+            }
+
+            return SendMessage(channel.Id, text, new string[0]);
+        }
 		/// <summary> Sends a message to the provided channel. </summary>
 		public Task<Message[]> SendMessage(string channelId, string text)
 			=> SendMessage(channelId, text, new string[0]);
