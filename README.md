@@ -1,4 +1,4 @@
-# Discord.Net v0.6.0 Beta
+# Discord.Net v0.6.0-beta2
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 [Join the discussion](https://discord.gg/0SBTUU1wZTVjAMPx) on Discord.
@@ -28,7 +28,8 @@ await client.Connect("discordtest@email.com", "Password123");
 await client.AcceptInvite("channel-invite-code");
 ```
 
-### Example (Command Client, requires Discord.Net.Commands)
+### Example (Command Client)
+(Requires Discord.Net.Commands)
 ```
 var client = new DiscordBotClient();
 client.CreateCommand("acceptinvite")
