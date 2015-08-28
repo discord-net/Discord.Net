@@ -2,6 +2,12 @@
 
 namespace Discord
 {
+	public class DisconnectedEventArgs : EventArgs
+	{
+		public readonly bool WasUnexpected;
+		internal DisconnectedEventArgs(bool wasUnexpected) { WasUnexpected = wasUnexpected; }
+	}
+
 	internal abstract partial class DiscordWebSocket
 	{
 		//Debug
@@ -19,11 +25,11 @@ namespace Discord
 			if (Connected != null)
 				Connected(this, EventArgs.Empty);
 		}
-		public event EventHandler Disconnected;
-		private void RaiseDisconnected()
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
+		private void RaiseDisconnected(bool wasUnexpected)
 		{
 			if (Disconnected != null)
-				Disconnected(this, EventArgs.Empty);
+				Disconnected(this, new DisconnectedEventArgs(wasUnexpected));
 		}
 	}
 }

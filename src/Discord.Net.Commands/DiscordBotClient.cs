@@ -28,7 +28,7 @@ namespace Discord
 			MessageCreated += async (s, e) =>
 			{
 				//Ignore messages from ourselves
-				if (e.Message.UserId == UserId)
+				if (e.Message.UserId == _myId)
 					return;
 
 				//Check for the command character

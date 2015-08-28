@@ -141,10 +141,10 @@ namespace Discord.API
 			var request = new APIRequests.ChangePassword { NewPassword = newPassword, CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return _http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
 		}
-		public Task<SelfUserInfo> ChangeAvatar(DiscordClient.AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
+		public Task<SelfUserInfo> ChangeAvatar(AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
 		{
 			string base64 = Convert.ToBase64String(bytes);
-			string type = imageType == DiscordClient.AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
+			string type = imageType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
 			var request = new APIRequests.ChangeAvatar { Avatar = $"data:{type},/9j/{base64}", CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return _http.Patch<SelfUserInfo>(Endpoints.UserMe, request);
 		}

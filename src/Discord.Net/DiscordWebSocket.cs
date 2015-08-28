@@ -18,13 +18,13 @@ namespace Discord
 		protected readonly bool _isDebug;
 		private readonly ConcurrentQueue<byte[]> _sendQueue;
 
-		protected volatile CancellationTokenSource _disconnectToken;
-		private volatile ClientWebSocket _webSocket;
-		private volatile Task _tasks;
+		protected CancellationTokenSource _disconnectToken;
+		private ClientWebSocket _webSocket;
+		private DateTime _lastHeartbeat;
+		private Task _task;
 		protected string _host;
 		protected int _timeout, _heartbeatInterval;
-		private DateTime _lastHeartbeat;
-		private bool _isConnected;
+		private bool _isConnected, _wasDisconnectedUnexpected;
 
 		public DiscordWebSocket(DiscordClient client, int timeout, int interval, bool isDebug)
 		{
@@ -54,7 +54,7 @@ namespace Discord
 			OnConnect();
 
 			_lastHeartbeat = DateTime.UtcNow;
-			_tasks = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
+			_task = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
 			{
 				if (_isDebug)
 					RaiseOnDebugMessage(DebugMessageType.Connection, $"Disconnected.");
@@ -64,6 +64,7 @@ namespace Discord
 
 				_disconnectToken.Dispose();
 				_disconnectToken = null;
+				_wasDisconnectedUnexpected = false;
 
 				//Clear send queue
 				_heartbeatInterval = 0;
@@ -76,20 +77,20 @@ namespace Discord
 				if (_isConnected)
 				{
 					_isConnected = false;
-					RaiseDisconnected();
+					RaiseDisconnected(_wasDisconnectedUnexpected);
 				}
 
-				_tasks = null;
+				_task = null;
 			});
 		}
 		public Task ReconnectAsync()
 			=> ConnectAsync(_host);
 		public async Task DisconnectAsync()
 		{
-			if (_tasks != null)
+            if (_task != null)
 			{
 				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
-				try { await _tasks; } catch (NullReferenceException) { }
+				try { await _task; } catch (NullReferenceException) { }
 			}
 		}
 		protected virtual void OnConnect() { }
@@ -130,6 +131,7 @@ namespace Discord
 
 						if (result.MessageType == WebSocketMessageType.Close)
 						{
+							_wasDisconnectedUnexpected = true;
 							await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
 							RaiseOnDebugMessage(DebugMessageType.Connection, $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
                             return;

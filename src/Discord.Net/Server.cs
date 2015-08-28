@@ -29,7 +29,7 @@ namespace Discord
 		/// <summary> Returns the user that first created this server. </summary>
 		public User Owner => _client.GetUser(OwnerId);
 		/// <summary> Returns true if the current user created this server. </summary>
-		public bool IsOwner => _client.UserId == OwnerId;
+		public bool IsOwner => _client.User?.Id == OwnerId;
 
 		/// <summary> Returns the id of the AFK voice channel for this server (see AFKTimeout). </summary>
 		public string AFKChannelId { get; internal set; }
@@ -69,7 +69,7 @@ namespace Discord
 			_members = new AsyncCache<Membership, API.Models.MemberInfo>(
 				(key, parentKey) =>
 				{
-					if (_client.Config.EnableDebug)
+					if (_client.IsDebugMode)
 						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Created user {key} in server {parentKey}.");
                     return new Membership(parentKey, key, _client);
 				},
@@ -108,12 +108,12 @@ namespace Discord
 						member.IsDeafened = extendedModel.IsDeafened;
 						member.IsMuted = extendedModel.IsMuted;
 					}
-					if (_client.Config.EnableDebug)
+					if (_client.IsDebugMode)
 						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
 				},
 				(member) =>
 				{
-					if (_client.Config.EnableDebug)
+					if (_client.IsDebugMode)
 						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
 				}
 			);

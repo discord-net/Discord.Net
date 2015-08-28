@@ -80,6 +80,12 @@
     <Compile Include="..\Discord.Net\ChannelTypes.cs">
       <Link>ChannelTypes.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.API.cs">
+      <Link>DiscordClient.API.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Cache.cs">
+      <Link>DiscordClient.Cache.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.cs">
       <Link>DiscordClient.cs</Link>
     </Compile>
@@ -106,6 +112,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
       <Link>Helpers\AsyncCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\Extensions.cs">
+      <Link>Helpers\Extensions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\JsonHttpClient.cs">
       <Link>Helpers\JsonHttpClient.cs</Link>
