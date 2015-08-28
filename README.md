@@ -1,20 +1,16 @@
-# Discord.Net v0.5.0
+# Discord.Net v0.6.0 Beta
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 [Join the discussion](https://discord.gg/0SBTUU1wZTVjAMPx) on Discord.
 
 ### This is an alpha!
 The Discord API is still in active development, meaning this library may break at any time without notice.
-Discord.Net itself is also in early development so several functions may be unstable or not work at all.
+Discord.Net itself is also in alpha so several functions may be unstable or not work at all. 
 
 ### Features
-- Login/Logout (with credentials or anonymous)
-- Accepting/Creating/Deleting Invites (standard or human readable)
-- Receiving/Sending Messages
-- Creating/Destroying Servers
-- Creating/Destroying Channels (text, void or PM)
-- Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen Users
-- Several Discord Events
+- Server Management (Servers, Channels, Messages, Invites)
+- User Moderation (Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen)
+- Alpha Voice Support (Outgoing only currently)
 - Supports .Net 4.5, DNX 4.5.1, and DNX Core 5.0
 
 ### NuGet Packages
@@ -30,6 +26,28 @@ client.MessageCreated += (s, e) =>
 };
 await client.Connect("discordtest@email.com", "Password123");
 await client.AcceptInvite("channel-invite-code");
+```
+
+### Example (Command Client, requires Discord.Net.Commands)
+```
+var client = new DiscordBotClient();
+client.CreateCommand("acceptinvite")
+	.ArgsEqual(1)
+	.Do(async e =>
+	{
+		try
+		{
+			await _client.AcceptInvite(e.Args[0]);
+			await _client.SendMessage(e.Channel, $"Invite \"{e.Args[0]}\" accepted.");
+		}
+		catch (HttpException ex)
+		{
+			await _client.SendMessage(e.Channel, $"Error: {ex.Message}");
+		}
+	});
+await client.Connect("discordtest@email.com", "Password123");
+await client.AcceptInvite("channel-invite-code");
+
 ```
 
 ### Known Issues
