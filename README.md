@@ -20,9 +20,9 @@ Discord.Net itself is also in alpha so several functions may be unstable or not 
 ### Example (Echo Client)
 ```
 var client = new DiscordClient();
-client.MessageCreated += (s, e) =>
+client.MessageCreated += async (s, e) =>
 {
-	client.SendMessage(e.Message.ChannelId, e.Message.Text);
+	await client.SendMessage(e.Message.ChannelId, e.Message.Text);
 };
 await client.Connect("discordtest@email.com", "Password123");
 await client.AcceptInvite("channel-invite-code");
