@@ -385,10 +385,10 @@ namespace Discord
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
 		public Channel GetChannel(string id) => _channels[id];
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> GetOrCreatePMChannel(string userId)
-			=> GetOrCreatePMChannel(_users[userId]);
+		public Task<Channel> GetPMChannel(string userId)
+			=> GetPMChannel(_users[userId]);
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public async Task<Channel> GetOrCreatePMChannel(User user)
+		public async Task<Channel> GetPMChannel(User user)
 		{
 			CheckReady();
 			if (user == null) throw new ArgumentNullException(nameof(user));

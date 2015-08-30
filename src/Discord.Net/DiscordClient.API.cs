@@ -267,10 +267,10 @@ namespace Discord
 		}
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(User user, string text)
-			=> await SendMessage(await GetOrCreatePMChannel(user), text, new string[0]);
+			=> await SendMessage(await GetPMChannel(user), text, new string[0]);
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(string userId, string text)
-			=> await SendMessage(await GetOrCreatePMChannel(userId), text, new string[0]);
+			=> await SendMessage(await GetPMChannel(userId), text, new string[0]);
 		/*/// <summary> Sends a private message to the provided user, mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
 		public async Task<Message[]> SendPrivateMessage(User user, string text, string[] mentions)
