@@ -57,14 +57,14 @@ namespace Discord.Net.Tests
 		{
 			Channel channel = null;
 			string name = $"#test_{_random.Next()}";
-			AssertEvent<DiscordClient.ChannelEventArgs>(
+			AssertEvent<ChannelEventArgs>(
 				"ChannelCreated event never received",
 				() => channel = _hostClient.CreateChannel(_testServer, name.Substring(1), type).Result,
 				x => _targetBot.ChannelCreated += x,
 				x => _targetBot.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
 
-			AssertEvent<DiscordClient.ChannelEventArgs>(
+			AssertEvent<ChannelEventArgs>(
 				"ChannelDestroyed event never received",
 				() => _hostClient.DestroyChannel(channel),
 				x => _targetBot.ChannelDestroyed += x,
@@ -98,7 +98,7 @@ namespace Discord.Net.Tests
 		public void TestSendMessage()
 		{
 			string text = $"test_{_random.Next()}";
-			AssertEvent<DiscordClient.MessageEventArgs>(
+			AssertEvent<MessageEventArgs>(
 				"MessageCreated event never received",
 				() => _hostClient.SendMessage(_testServerChannel, text),
 				x => _targetBot.MessageCreated += x,
