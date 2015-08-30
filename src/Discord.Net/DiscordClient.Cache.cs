@@ -398,6 +398,14 @@ namespace Discord
 				return channel;
 			return await CreatePMChannel(user?.Id);
 		}
+		private async Task<Channel> CreatePMChannel(string userId)
+		{
+			CheckReady();
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+			var response = await _api.CreatePMChannel(_myId, userId);
+			return _channels.Update(response.Id, response);
+		}
 
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>

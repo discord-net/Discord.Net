@@ -57,16 +57,6 @@ namespace Discord
 			return _channels.Update(response.Id, serverId, response);
 		}
 
-		/// <summary> Creates a new private channel with the provided user. </summary>
-		public async Task<Channel> CreatePMChannel(string userId)
-		{
-			CheckReady();
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			var response = await _api.CreatePMChannel(_myId, userId);
-			return _channels.Update(response.Id, response);
-		}
-
 		/// <summary> Destroys the provided channel. </summary>
 		public Task<Channel> DestroyChannel(Channel channel)
 			=> DestroyChannel(channel?.Id);
