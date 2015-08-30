@@ -58,9 +58,6 @@ namespace Discord
 		}
 
 		/// <summary> Creates a new private channel with the provided user. </summary>
-		public Task<Channel> CreatePMChannel(User user)
-			=> CreatePMChannel(user?.Id);
-		/// <summary> Creates a new private channel with the provided user. </summary>
 		public async Task<Channel> CreatePMChannel(string userId)
 		{
 			CheckReady();
@@ -278,6 +275,21 @@ namespace Discord
 			}
 			return result;
 		}
+		/// <summary> Sends a private message to the provided channel. </summary>
+		public async Task<Message[]> SendPrivateMessage(User user, string text)
+			=> await SendMessage(await GetOrCreatePMChannel(user), text, new string[0]);
+		/// <summary> Sends a private message to the provided channel. </summary>
+		public async Task<Message[]> SendPrivateMessage(string userId, string text)
+			=> await SendMessage(await GetOrCreatePMChannel(userId), text, new string[0]);
+		/*/// <summary> Sends a private message to the provided user, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		public async Task<Message[]> SendPrivateMessage(User user, string text, string[] mentions)
+			=> SendMessage(await GetOrCreatePMChannel(user), text, mentions);
+		/// <summary> Sends a private message to the provided user, mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		public async Task<Message[]> SendPrivateMessage(string userId, string text, string[] mentions)
+			=> SendMessage(await GetOrCreatePMChannel(userId), text, mentions);*/
+
 
 		/// <summary> Edits a message the provided message. </summary>
 		public Task EditMessage(Message message, string text)

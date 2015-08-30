@@ -286,7 +286,8 @@ namespace Discord
 		}
 
 		/// <summary> Returns the user with the specified id, or null if none was found. </summary>
-		public User GetUser(string id) => _users[id];
+		public User GetUser(string id) 
+			=> _users[id];
 		/// <summary> Returns the user with the specified name and discriminator, or null if none was found. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public User GetUser(string name, string discriminator)
@@ -369,7 +370,8 @@ namespace Discord
 		}
 
 		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
-		public Server GetServer(string id) => _servers[id];
+		public Server GetServer(string id) 
+			=> _servers[id];
 		/// <summary> Returns all servers with the specified name. </summary>
 		/// <remarks> Search is case-insensitive. </remarks>
 		public IEnumerable<Server> FindServers(string name)
@@ -382,25 +384,21 @@ namespace Discord
 
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
 		public Channel GetChannel(string id) => _channels[id];
-		/// <summary> Returns a private channel with the provided user. </summary>
-		public Task<Channel> GetPMChannel(string userId, bool createIfNotExists = false)
-			=> GetPMChannel(_users[userId], createIfNotExists);
-		/// <summary> Returns a private channel with the provided user. </summary>
-		public async Task<Channel> GetPMChannel(User user, bool createIfNotExists = false)
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> GetOrCreatePMChannel(string userId)
+			=> GetOrCreatePMChannel(_users[userId]);
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public async Task<Channel> GetOrCreatePMChannel(User user)
 		{
-			if (user == null)
-			{
-				if (createIfNotExists)
-					throw new ArgumentNullException(nameof(user));
-				else
-					return null;
-			}
+			CheckReady();
+			if (user == null) throw new ArgumentNullException(nameof(user));
 
 			var channel = user.PrivateChannel;
-			if (channel == null && createIfNotExists)
-				await CreatePMChannel(user);
-			return channel;
+			if (channel != null)
+				return channel;
+			return await CreatePMChannel(user?.Id);
 		}
+
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
 		public IEnumerable<Channel> FindChannels(Server server, string name)
@@ -426,7 +424,8 @@ namespace Discord
 		}
 
 		/// <summary> Returns the role with the specified id, or null if none was found. </summary>
-		public Role GetRole(string id) => _roles[id];
+		public Role GetRole(string id) 
+			=> _roles[id];
 		/// <summary> Returns all roles with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public IEnumerable<Role> FindRoles(Server server, string name)
@@ -452,6 +451,7 @@ namespace Discord
 		}
 
 		/// <summary> Returns the message with the specified id, or null if none was found. </summary>
-		public Message GetMessage(string id) => _messages[id];
+		public Message GetMessage(string id) 
+			=> _messages[id];
 	}
 }
