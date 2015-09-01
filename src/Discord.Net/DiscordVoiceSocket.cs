@@ -109,7 +109,7 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				throw new InvalidOperationException("Bad Token");
+				throw _disconnectReason;
 			}
 
 			SetConnected();
@@ -129,8 +129,9 @@ namespace Discord
 					ProcessUdpMessage(result);
 				}
 			}
-			catch { }
-			finally { cancelSource.Cancel(); }
+			catch (OperationCanceledException) { }
+			catch (Exception ex) { DisconnectInternal(ex); }
+			finally { DisconnectInternal(); }
 		}
 
 #if USE_THREAD
@@ -156,7 +157,7 @@ namespace Discord
 				uint timestamp = 0;
 				double nextTicks = 0.0;
 				double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
-                double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
+				double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
 				double spinLockThreshold = 1.5 * ticksPerMillisecond;
 				uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
 				Stopwatch sw = Stopwatch.StartNew();
@@ -208,11 +209,12 @@ namespace Discord
 #endif
 				}
 			}
-			catch { }
-			finally { cancelSource.Cancel(); }
-		}
+			catch (OperationCanceledException) { }
+			catch (Exception ex) { DisconnectInternal(ex); }
+			finally { DisconnectInternal(); }
+        }
 #endif
-					//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
+		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private async Task WatcherAsync()
 		{
 			var cancelToken = _disconnectToken.Token;
@@ -220,7 +222,7 @@ namespace Discord
 			{
 				await Task.Delay(-1, cancelToken);
 			}
-			catch (TaskCanceledException) { }
+			catch (OperationCanceledException) { }
 			finally { _udp.Close(); }
         }
 		

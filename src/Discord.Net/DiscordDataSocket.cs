@@ -42,7 +42,7 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				throw new InvalidOperationException("Bad Token");
+				throw _disconnectReason;
 			}
 			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
 			catch (OperationCanceledException) { return; }

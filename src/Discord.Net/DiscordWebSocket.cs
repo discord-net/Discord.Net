@@ -19,12 +19,13 @@ namespace Discord
 		private readonly ConcurrentQueue<byte[]> _sendQueue;
 
 		protected CancellationTokenSource _disconnectToken;
+		protected string _host;
+		protected int _timeout, _heartbeatInterval;
+		protected Exception _disconnectReason;
 		private ClientWebSocket _webSocket;
 		private DateTime _lastHeartbeat;
 		private Task _task;
-		protected string _host;
-		protected int _timeout, _heartbeatInterval;
-		private bool _isConnected, _wasDisconnectedUnexpected;
+		private bool _isConnected, _wasDisconnectUnexpected;
 
 		public DiscordWebSocket(DiscordClient client, int timeout, int interval, bool isDebug)
 		{
@@ -64,7 +65,7 @@ namespace Discord
 
 				_disconnectToken.Dispose();
 				_disconnectToken = null;
-				_wasDisconnectedUnexpected = false;
+				_wasDisconnectUnexpected = false;
 
 				//Clear send queue
 				_heartbeatInterval = 0;
@@ -77,7 +78,7 @@ namespace Discord
 				if (_isConnected)
 				{
 					_isConnected = false;
-					RaiseDisconnected(_wasDisconnectedUnexpected);
+					RaiseDisconnected(_wasDisconnectUnexpected);
 				}
 
 				_task = null;
@@ -89,10 +90,26 @@ namespace Discord
 		{
             if (_task != null)
 			{
-				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
+				try { DisconnectInternal(new Exception("Disconnect requested by user.")); } catch (NullReferenceException) { }
 				try { await _task; } catch (NullReferenceException) { }
 			}
 		}
+
+		protected void DisconnectInternal()
+		{
+			_disconnectToken.Cancel();
+		}
+		protected void DisconnectInternal(Exception ex)
+		{
+			if (_disconnectReason == null)
+			{
+                if (ex == null)
+					ex = new Exception("Disconnect requested by user.");
+				_disconnectReason = ex;
+				_disconnectToken.Cancel();
+			}
+		}
+
 		protected virtual void OnConnect() { }
 		protected virtual void OnDisconnect() { }
 
@@ -131,17 +148,19 @@ namespace Discord
 
 						if (result.MessageType == WebSocketMessageType.Close)
 						{
-							_wasDisconnectedUnexpected = true;
+							_wasDisconnectUnexpected = true;
+							string msg = $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})";
+							RaiseOnDebugMessage(DebugMessageType.Connection, msg);
+							DisconnectInternal(new Exception(msg));
 							await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-							RaiseOnDebugMessage(DebugMessageType.Connection, $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
-                            return;
+							return;
 						}
 						else
 							builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
 
 					}
 					while (!result.EndOfMessage);
-					
+
 #if DEBUG
 					System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
 #endif
@@ -150,8 +169,9 @@ namespace Discord
 					builder.Clear();
 				}
 			}
-			catch { }
-			finally { cancelSource.Cancel(); }
+			catch (OperationCanceledException) { }
+			catch (Exception ex) { DisconnectInternal(ex); }
+			finally { DisconnectInternal(); }
 		}
 		private async Task SendAsync()
 		{
@@ -178,8 +198,9 @@ namespace Discord
 					await Task.Delay(_sendInterval, cancelToken);
 				}
 			}
-			catch { }
-			finally { cancelSource.Cancel(); }
+			catch (OperationCanceledException) { }
+			catch (Exception ex) { DisconnectInternal(ex); }
+			finally { DisconnectInternal(); }
 		}
 
 		protected abstract Task ProcessMessage(string json);
