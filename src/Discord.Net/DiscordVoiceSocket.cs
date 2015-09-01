@@ -33,8 +33,7 @@ namespace Discord
 		private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
 		private readonly Random _rand = new Random();
-
-#if !DNXCORE50
+		
 		private OpusEncoder _encoder;
 		private ConcurrentQueue<Packet> _sendQueue;
 		private UdpClient _udp;
@@ -47,19 +46,15 @@ namespace Discord
 #if USE_THREAD
 		private Thread _sendThread;
 #endif
-#endif
 
 		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, bool isDebug)
 			: base(client, timeout, interval, isDebug)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
-#if !DNXCORE50
 			_sendQueue = new ConcurrentQueue<Packet>();
 			_encoder = new OpusEncoder(48000, 1, 20, Application.Audio);
-#endif
 		}
-
-#if !DNXCORE50
+		
 		protected override void OnConnect()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
@@ -77,21 +72,18 @@ namespace Discord
 			_sendThread = null;
 #endif
         }
-#endif
 
 		protected override Task[] CreateTasks()
 		{
-#if !DNXCORE50 && USE_THREAD
+#if USE_THREAD
 			_sendThread = new Thread(new ThreadStart(() => SendAsync(_disconnectToken)));
 			_sendThread.Start();
 #endif
 			return new Task[]
 			{
-#if !DNXCORE50
 				ReceiveAsync(),
 #if !USE_THREAD
 				SendAsync(),
-#endif
 #endif
 				WatcherAsync()
 			}.Concat(base.CreateTasks()).ToArray();
@@ -122,8 +114,7 @@ namespace Discord
 
 			SetConnected();
 		}
-
-#if !DNXCORE50
+		
 		private async Task ReceiveAsync()
 		{
 			var cancelSource = _disconnectToken;
@@ -152,7 +143,6 @@ namespace Discord
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
 			await Task.Yield();
-#endif
 
 			Packet packet;
 			try
@@ -231,30 +221,21 @@ namespace Discord
 				await Task.Delay(-1, cancelToken);
 			}
 			catch (TaskCanceledException) { }
-#if !DNXCORE50
 			finally { _udp.Close(); }
-#endif
         }
-
-#if DNXCORE50
-		protected override Task ProcessMessage(string json)
-#else
+		
 		protected override async Task ProcessMessage(string json)
-#endif
 		{
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			switch (msg.Operation)
 			{
 				case 2: //READY
 					{
-#if !DNXCORE50
 						if (!_isReady)
 						{
-#endif
 							var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
-#if !DNXCORE50
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host)).FirstOrDefault(), payload.Port);
 							//_mode = payload.Modes.LastOrDefault();
 							_mode = "plain";
@@ -273,12 +254,8 @@ namespace Discord
 								0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 								0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }, 70);
 						}
-#else
-							_connectWaitOnLogin.Set();
-#endif
 					}
 					break;
-#if !DNXCORE50
 				case 4: //SESSION_DESCRIPTION
 					{
 						var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.JoinServer>();
@@ -287,17 +264,13 @@ namespace Discord
 						_connectWaitOnLogin.Set();
 					}
 					break;
-#endif
 				default:
 					if (_isDebug)
 						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown Opcode: " + msg.Operation);
 					break;
 			}
-#if DNXCORE50
-			return Task.CompletedTask;
-#endif
 		}
-#if !DNXCORE50
+
 		private void ProcessUdpMessage(UdpReceiveResult msg)
 		{
             if (msg.Buffer.Length > 0 && msg.RemoteEndPoint.Equals(_endpoint))
@@ -369,7 +342,6 @@ namespace Discord
 						if (length < 36) //12 + 24
 							throw new Exception($"Unexpected message length. Expected >= 36, got {length}.");
 
-#if !DNXCORE50
 						byte[] nonce = new byte[24]; //16 bytes static, 8 bytes incrementing?
 						Buffer.BlockCopy(buffer, 12, nonce, 0, 24);
 
@@ -377,7 +349,6 @@ namespace Discord
 						Buffer.BlockCopy(buffer, 36, cipherText, 0, cipherText.Length);
 						
 						Sodium.SecretBox.Open(cipherText, nonce, _secretKey);
-#endif
 					}
 					else //Plain
 					{
@@ -427,7 +398,6 @@ namespace Discord
 			isTalking.Payload.Delay = 0;
             QueueMessage(isTalking);
 		}
-#endif
 
 		protected override object GetKeepAlive()
 		{
