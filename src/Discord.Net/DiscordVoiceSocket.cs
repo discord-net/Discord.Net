@@ -63,7 +63,9 @@ namespace Discord
 		protected override void OnConnect()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
+#if !DNX451
 			_udp.AllowNatTraversal(true);
+#endif
 			_isReady = false;
 			_isClearing = false;
         }
