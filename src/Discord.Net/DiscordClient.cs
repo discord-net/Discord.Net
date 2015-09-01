@@ -59,7 +59,7 @@ namespace Discord
 		{
 			_blockEvent = new ManualResetEventSlim(true);
 			_config = config ?? new DiscordClientConfig();
-			_isDebugMode = config.EnableDebug;
+			_isDebugMode = _config.EnableDebug;
 			_rand = new Random();
 			
 			_serializer = new JsonSerializer();
@@ -92,14 +92,14 @@ namespace Discord
 			if (_config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 
-			_http = new JsonHttpClient(config.EnableDebug);
+			_http = new JsonHttpClient(_config.EnableDebug);
 			_api = new DiscordAPI(_http);
 			if (_isDebugMode)
 				_http.OnDebugMessage += (s, e) => RaiseOnDebugMessage(e.Type, e.Message);
 
 			CreateCaches();
 
-			_webSocket = new DiscordDataSocket(this, config.ConnectionTimeout, config.WebSocketInterval, config.EnableDebug);
+			_webSocket = new DiscordDataSocket(this, _config.ConnectionTimeout, _config.WebSocketInterval, _config.EnableDebug);
 			_webSocket.Connected += (s, e) => RaiseConnected();
 			_webSocket.Disconnected += async (s, e) =>
 			{
