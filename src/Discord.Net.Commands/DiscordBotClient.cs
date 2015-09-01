@@ -27,8 +27,12 @@ namespace Discord
 
 			MessageCreated += async (s, e) =>
 			{
+				//If commands aren't being used, don't bother processing them
+				if (_commands.Count == 0)
+					return;
+
 				//Ignore messages from ourselves
-				if (e.Message.UserId == _myId)
+					if (e.Message.UserId == _myId)
 					return;
 
 				//Check for the command character
