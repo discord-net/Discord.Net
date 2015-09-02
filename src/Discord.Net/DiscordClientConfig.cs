@@ -11,7 +11,7 @@
 		public bool EnableDebug { get; set; } = false;
 
 		/// <summary> Max time in milliseconds to wait for the web socket to connect. </summary>
-		public int ConnectionTimeout { get; set; } = 5000;
+		public int ConnectionTimeout { get; set; } = 10000;
 		/// <summary> Max time in milliseconds to wait for the voice web socket to connect. </summary>
 		public int VoiceConnectionTimeout { get; set; } = 10000;
 		/// <summary> Gets or sets the time (in milliseconds) to wait after an unexpected disconnect before reconnecting. </summary>
