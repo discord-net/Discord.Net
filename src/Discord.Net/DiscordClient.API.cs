@@ -471,12 +471,10 @@ namespace Discord
 		}
 
 #if !DNXCORE50
-		public Task JoinVoiceServer(Server server, Channel channel)
-			=> JoinVoiceServer(server?.Id, channel?.Id);
+		public Task JoinVoiceServer(Channel channel)
+			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
 		public Task JoinVoiceServer(Server server, string channelId)
 			=> JoinVoiceServer(server?.Id, channelId);
-		public Task JoinVoiceServer(string serverId, Channel channel)
-			=> JoinVoiceServer(serverId, channel?.Id);
 		public async Task JoinVoiceServer(string serverId, string channelId)
 		{
 			CheckReady();
