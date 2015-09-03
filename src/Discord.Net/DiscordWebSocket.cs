@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ namespace Discord
 	{
 		private const int ReceiveChunkSize = 4096;
 		private const int SendChunkSize = 4096;
+		private const int HR_TIMEOUT = -2147012894;
 
 		protected readonly DiscordClient _client;
 		protected readonly int _sendInterval;
@@ -90,7 +92,7 @@ namespace Discord
 		{
             if (_task != null)
 			{
-				try { DisconnectInternal(new Exception("Disconnect requested by user.")); } catch (NullReferenceException) { }
+				try { DisconnectInternal(new Exception("Disconnect requested by user."), false); } catch (NullReferenceException) { }
 				try { await _task; } catch (NullReferenceException) { }
 			}
 		}
@@ -99,12 +101,11 @@ namespace Discord
 		{
 			_disconnectToken.Cancel();
 		}
-		protected void DisconnectInternal(Exception ex)
+		protected void DisconnectInternal(Exception ex, bool isUnexpected = true)
 		{
 			if (_disconnectReason == null)
 			{
-                if (ex == null)
-					ex = new Exception("Disconnect requested by user.");
+				_wasDisconnectUnexpected = isUnexpected;
 				_disconnectReason = ex;
 				_disconnectToken.Cancel();
 			}
@@ -141,14 +142,27 @@ namespace Discord
 			{
 				while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
 				{
-					WebSocketReceiveResult result;
+					WebSocketReceiveResult result = null;
 					do
 					{
-						result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
+						if (_webSocket.State != WebSocketState.Open || cancelToken.IsCancellationRequested)
+							return;
+
+                        try
+						{
+							result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
+						}
+						catch (Win32Exception ex) 
+						when (ex.HResult == HR_TIMEOUT)
+						{
+							string msg = $"Connection timed out.";
+							RaiseOnDebugMessage(DebugMessageType.Connection, msg);
+							DisconnectInternal(new Exception(msg));
+							return;
+						}
 
 						if (result.MessageType == WebSocketMessageType.Close)
 						{
-							_wasDisconnectUnexpected = true;
 							string msg = $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})";
 							RaiseOnDebugMessage(DebugMessageType.Connection, msg);
 							DisconnectInternal(new Exception(msg));
@@ -159,7 +173,7 @@ namespace Discord
 							builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
 
 					}
-					while (!result.EndOfMessage);
+					while (result == null || !result.EndOfMessage);
 
 #if DEBUG
 					System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
@@ -235,8 +249,16 @@ namespace Discord
 					count = message.Length - (i * SendChunkSize);
 				else
 					count = SendChunkSize;
-
-				await _webSocket.SendAsync(new ArraySegment<byte>(message, offset, count), WebSocketMessageType.Text, isLast, cancelToken);
+				
+				try
+				{
+					await _webSocket.SendAsync(new ArraySegment<byte>(message, offset, count), WebSocketMessageType.Text, isLast, cancelToken);
+				}
+				catch (Win32Exception ex)
+				when (ex.HResult == HR_TIMEOUT)
+				{
+					return;
+				}
 			}
 		}
 
