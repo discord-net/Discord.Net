@@ -90,11 +90,11 @@ namespace Discord
 			return new TextWebSocketCommands.KeepAlive();
         }
 
-		public void JoinVoice(string serverId, string channelId)
+		public void JoinVoice(Channel channel)
 		{
 			var joinVoice = new TextWebSocketCommands.JoinVoice();
-			joinVoice.Payload.ServerId = serverId;
-			joinVoice.Payload.ChannelId = channelId;
+			joinVoice.Payload.ServerId = channel.ServerId;
+			joinVoice.Payload.ChannelId = channel.Id;
             QueueMessage(joinVoice);
 		}
 		public void LeaveVoice()

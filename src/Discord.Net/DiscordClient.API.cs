@@ -471,20 +471,17 @@ namespace Discord
 		}
 
 #if !DNXCORE50
-		public Task JoinVoiceServer(Channel channel)
-			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
-		public Task JoinVoiceServer(Server server, string channelId)
-			=> JoinVoiceServer(server?.Id, channelId);
-		public async Task JoinVoiceServer(string serverId, string channelId)
+		public Task JoinVoiceServer(string channelId)
+			=> JoinVoiceServer(_channels[channelId]);
+		public async Task JoinVoiceServer(Channel channel)
 		{
 			CheckReady();
 			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
 			await LeaveVoiceServer();
-			_currentVoiceServerId = serverId;
-			_webSocket.JoinVoice(serverId, channelId);
+			_currentVoiceServerId = channel.ServerId;
+			_webSocket.JoinVoice(channel);
 		}
 
 		public async Task LeaveVoiceServer()
