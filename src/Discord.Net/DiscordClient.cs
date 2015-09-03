@@ -569,11 +569,7 @@ namespace Discord
 
 				//Wait for websocket to finish connecting, then send token
 				await socketTask;
-				if (_isDebugMode)
-					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
 				await _webSocket.Login(_http.Token);
-				if (_isDebugMode)
-					RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket logged in.");
 				success = true;
 			}
 
