@@ -65,7 +65,8 @@ namespace Discord
 				//Do not clean up until all tasks have ended
 				OnDisconnect();
 
-				_disconnectToken.Dispose();
+				bool wasUnexpected = _wasDisconnectUnexpected;
+                _disconnectToken.Dispose();
 				_disconnectToken = null;
 				_wasDisconnectUnexpected = false;
 
@@ -80,7 +81,7 @@ namespace Discord
 				if (_isConnected)
 				{
 					_isConnected = false;
-					RaiseDisconnected(_wasDisconnectUnexpected);
+					RaiseDisconnected(wasUnexpected);
 				}
 
 				_task = null;
