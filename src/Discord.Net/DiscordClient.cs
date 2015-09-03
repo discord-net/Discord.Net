@@ -108,11 +108,11 @@ namespace Discord
 				//Reconnect if we didn't cause the disconnect
 				if (e.WasUnexpected)
 				{
+					await Task.Delay(_config.ReconnectDelay);
 					while (!_disconnectToken.IsCancellationRequested)
 					{
 						try
 						{
-							await Task.Delay(_config.ReconnectDelay);
 							await _webSocket.ReconnectAsync();
 							if (_http.Token != null)
 								await _webSocket.Login(_http.Token);
