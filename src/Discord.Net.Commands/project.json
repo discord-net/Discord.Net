@@ -1,5 +1,5 @@
 ﻿{
-	"version": "0.6.0",
+	"version": "0.6.1-beta1",
 	"description": "A small Discord.Net extension to make bot creation easier.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
