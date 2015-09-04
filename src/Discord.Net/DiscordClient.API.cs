@@ -470,57 +470,6 @@ namespace Discord
 			return _api.Undeafen(serverId, userId);
 		}
 
-#if !DNXCORE50
-		public Task JoinVoiceServer(string channelId)
-			=> JoinVoiceServer(_channels[channelId]);
-		public async Task JoinVoiceServer(Channel channel)
-		{
-			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-			if (channel == null) throw new ArgumentNullException(nameof(channel));
-
-			await LeaveVoiceServer();
-			_currentVoiceServerId = channel.ServerId;
-			_webSocket.JoinVoice(channel);
-		}
-
-		public async Task LeaveVoiceServer()
-		{
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-
-			await _voiceWebSocket.DisconnectAsync();
-			if (_currentVoiceServerId != null)
-				_webSocket.LeaveVoice();
-			_currentVoiceServerId = null;
-			_currentVoiceToken = null;
-		}
-
-		/// <summary> Sends a PCM frame to the voice server. </summary>
-		/// <param name="data">PCM frame to send.</param>
-		/// <param name="count">Number of bytes in this frame. </param>
-		public void SendVoicePCM(byte[] data, int count)
-		{
-			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-			if (count == 0) return;
-
-			if (_isDebugMode)
-				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
-			_voiceWebSocket.SendPCMFrame(data, count);
-		}
-
-		/// <summary> Clears the PCM buffer. </summary>
-		public void ClearVoicePCM()
-		{
-			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-
-			if (_isDebugMode)
-				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Cleared the voice buffer.");
-			_voiceWebSocket.ClearPCMFrames();
-		}
-#endif
-
 		//Profile
 		/// <summary> Changes your username to newName. </summary>
 		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
