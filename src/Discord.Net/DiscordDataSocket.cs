@@ -42,7 +42,10 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				_disconnectReason.Throw();
+				if (_disconnectReason == null)
+					throw new Exception("An unknown websocket error occurred.");
+				else
+					_disconnectReason.Throw();
 			}
 			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
 			catch (OperationCanceledException) { return; }

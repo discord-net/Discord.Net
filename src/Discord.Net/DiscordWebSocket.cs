@@ -45,6 +45,7 @@ namespace Discord
 			await DisconnectAsync();
 
 			_disconnectToken = new CancellationTokenSource();
+			_disconnectReason = null;
 			var cancelToken = _disconnectToken.Token;
 
 			_webSocket = new ClientWebSocket();
@@ -78,8 +79,7 @@ namespace Discord
 				_webSocket = null;
 				byte[] ignored;
 				while (_sendQueue.TryDequeue(out ignored)) { }
-
-				_disconnectReason = null;
+				
 				_task = null;
 				if (_isConnected)
 				{

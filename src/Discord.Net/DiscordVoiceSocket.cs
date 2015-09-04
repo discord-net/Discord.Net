@@ -109,7 +109,10 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				_disconnectReason.Throw();
+				if (_disconnectReason == null)
+					throw new Exception("An unknown websocket error occurred.");
+				else
+					_disconnectReason.Throw();
 			}
 
 			SetConnected();
