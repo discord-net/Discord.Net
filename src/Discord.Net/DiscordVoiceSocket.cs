@@ -369,25 +369,27 @@ namespace Discord
 			}
         }
 
-		public void SendPCMFrame(byte[] data, int count)
+		public Task SendPCMFrame(byte[] data, int count)
 		{
 			if (count != _encoder.FrameSize)
 				throw new InvalidOperationException($"Invalid frame size. Got {count}, expected {_encoder.FrameSize}.");
 
-			lock (_encoder)
+			byte[] payload;
+			int encodedLength;
+            lock (_encoder)
 			{
-				byte[] payload = new byte[4000];
-				int encodedLength = _encoder.EncodeFrame(data, payload);
+				payload = new byte[4000];
+				encodedLength = _encoder.EncodeFrame(data, payload);
 
 				if (_mode == "xsalsa20_poly1305")
 				{
 					//TODO: Encode
 				}
-
-				lock (_sendQueue)
-					_sendQueue.Enqueue(new Packet(payload, encodedLength));
 			}
-		}
+			_sendQueue.Enqueue(new Packet(payload, encodedLength));
+
+			return Task.Delay(0);
+        }
 		public void ClearPCMFrames()
 		{
 			_isClearing = true;

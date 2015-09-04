@@ -645,15 +645,15 @@ namespace Discord
 		/// <summary> Sends a PCM frame to the voice server. </summary>
 		/// <param name="data">PCM frame to send.</param>
 		/// <param name="count">Number of bytes in this frame. </param>
-		public void SendVoicePCM(byte[] data, int count)
+		public Task SendVoicePCM(byte[] data, int count)
 		{
 			CheckReady();
 			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-			if (count == 0) return;
+			if (count == 0) return TaskHelper.CompletedTask;
 
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
-			_voiceWebSocket.SendPCMFrame(data, count);
+			return _voiceWebSocket.SendPCMFrame(data, count);
 		}
 
 		/// <summary> Clears the PCM buffer. </summary>

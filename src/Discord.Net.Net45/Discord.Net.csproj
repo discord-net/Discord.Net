@@ -122,6 +122,9 @@
     <Compile Include="..\Discord.Net\Helpers\JsonHttpClient.Events.cs">
       <Link>Helpers\JsonHttpClient.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
+      <Link>Helpers\TaskHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>

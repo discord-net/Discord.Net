@@ -1,4 +1,5 @@
 ﻿using Discord.API.Models;
+using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -81,11 +82,7 @@ namespace Discord
 						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown Opcode: " + msg.Operation);
 					break;
 			}
-#if DNXCORE
-			return Task.CompletedTask
-#else
-			return Task.Delay(0);
-#endif
+			return TaskHelper.CompletedTask;
 		}
 
 		protected override object GetKeepAlive()
