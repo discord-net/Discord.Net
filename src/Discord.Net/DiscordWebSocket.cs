@@ -97,11 +97,7 @@ namespace Discord
 				try { await _task; } catch (NullReferenceException) { }
 			}
 		}
-
-		protected void DisconnectInternal()
-		{
-			_disconnectToken.Cancel();
-		}
+		
 		protected void DisconnectInternal(Exception ex, bool isUnexpected = true)
 		{
 			if (_disconnectReason == null)
@@ -186,7 +182,6 @@ namespace Discord
 			}
 			catch (OperationCanceledException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
-			finally { DisconnectInternal(); }
 		}
 		private async Task SendAsync()
 		{
@@ -215,7 +210,6 @@ namespace Discord
 			}
 			catch (OperationCanceledException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
-			finally { DisconnectInternal(); }
 		}
 
 		protected abstract Task ProcessMessage(string json);

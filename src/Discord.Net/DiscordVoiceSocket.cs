@@ -58,7 +58,7 @@ namespace Discord
 		protected override void OnConnect()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
-#if !DNX451
+#if !DNX451 && !MONO
 			_udp.AllowNatTraversal(true);
 #endif
 			_isReady = false;
@@ -132,7 +132,6 @@ namespace Discord
 			catch (OperationCanceledException) { }
 			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
-			finally { DisconnectInternal(); }
 		}
 
 #if USE_THREAD
@@ -213,7 +212,6 @@ namespace Discord
 			catch (OperationCanceledException) { }
 			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
-			finally { DisconnectInternal(); }
         }
 #endif
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
