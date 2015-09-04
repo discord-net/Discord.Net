@@ -130,6 +130,7 @@ namespace Discord
 				}
 			}
 			catch (OperationCanceledException) { }
+			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
 			finally { DisconnectInternal(); }
 		}
@@ -210,6 +211,7 @@ namespace Discord
 				}
 			}
 			catch (OperationCanceledException) { }
+			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
 			finally { DisconnectInternal(); }
         }
@@ -238,7 +240,7 @@ namespace Discord
 							var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
-							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host)).FirstOrDefault(), payload.Port);
+							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", ""))).FirstOrDefault(), payload.Port);
 							//_mode = payload.Modes.LastOrDefault();
 							_mode = "plain";
 							_udp.Connect(_endpoint);

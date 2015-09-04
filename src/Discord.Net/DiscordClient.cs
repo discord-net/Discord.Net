@@ -429,7 +429,7 @@ namespace Discord
 							{
 								_currentVoiceToken = data.Token;
 								await _voiceWebSocket.ConnectAsync("wss://" + data.Endpoint.Split(':')[0]);
-								await _voiceWebSocket.Login(_currentVoiceServerId, _myId, _myId, data.Token);
+								await _voiceWebSocket.Login(_currentVoiceServerId, _myId, _sessionId, data.Token);
 							}
 #endif
 						}

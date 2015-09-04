@@ -78,13 +78,13 @@ namespace Discord
 				byte[] ignored;
 				while (_sendQueue.TryDequeue(out ignored)) { }
 
+				_disconnectReason = null;
+				_task = null;
 				if (_isConnected)
 				{
 					_isConnected = false;
 					RaiseDisconnected(wasUnexpected);
 				}
-
-				_task = null;
 			});
 		}
 		public Task ReconnectAsync()
