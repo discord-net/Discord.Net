@@ -146,11 +146,11 @@ namespace Discord
 						if (_webSocket.State != WebSocketState.Open || cancelToken.IsCancellationRequested)
 							return;
 
-						try
+                        try
 						{
 							result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
 						}
-						catch (Win32Exception ex)
+						catch (Win32Exception ex) 
 						when (ex.HResult == HR_TIMEOUT)
 						{
 							string msg = $"Connection timed out.";
@@ -182,7 +182,6 @@ namespace Discord
 				}
 			}
 			catch (OperationCanceledException) { }
-			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
 		}
 		private async Task SendAsync()
@@ -211,7 +210,6 @@ namespace Discord
 				}
 			}
 			catch (OperationCanceledException) { }
-			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
 		}
 
