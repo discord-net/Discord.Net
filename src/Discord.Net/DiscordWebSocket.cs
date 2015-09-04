@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Net.WebSockets;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace Discord
 		protected CancellationTokenSource _disconnectToken;
 		protected string _host;
 		protected int _timeout, _heartbeatInterval;
-		protected Exception _disconnectReason;
+		protected ExceptionDispatchInfo _disconnectReason;
 		private ClientWebSocket _webSocket;
 		private DateTime _lastHeartbeat;
 		private Task _task;
@@ -103,7 +104,7 @@ namespace Discord
 			if (_disconnectReason == null)
 			{
 				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectReason = ex;
+				_disconnectReason = ExceptionDispatchInfo.Capture(ex);
 				_disconnectToken.Cancel();
 			}
 		}

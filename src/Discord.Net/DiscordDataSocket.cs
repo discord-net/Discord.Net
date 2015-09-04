@@ -42,7 +42,7 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				throw _disconnectReason;// ?? new Exception("Operation was cancelled");
+				_disconnectReason.Throw();
 			}
 			try { _connectWaitOnLogin2.Wait(cancelToken); } //Waiting on READY handler
 			catch (OperationCanceledException) { return; }

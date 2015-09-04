@@ -109,7 +109,7 @@ namespace Discord
 			}
 			catch (OperationCanceledException)
 			{
-				throw _disconnectReason;
+				_disconnectReason.Throw();
 			}
 
 			SetConnected();
