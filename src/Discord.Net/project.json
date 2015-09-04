@@ -27,12 +27,12 @@
 	"frameworks": {
 		"net45": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22"
+				"Microsoft.Net.Http": "2.2.29"
 			}
 		},
 		"dnx451": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.22"
+				"Microsoft.Net.Http": "2.2.29"
 			}
 		},
 		"dnxcore50": {
