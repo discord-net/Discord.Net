@@ -113,6 +113,9 @@
     <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
       <Link>Enums\UserStatus.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Format.cs">
+      <Link>Format.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
       <Link>Helpers\AsyncCache.cs</Link>
     </Compile>
