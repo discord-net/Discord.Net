@@ -28,9 +28,6 @@ namespace Discord
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		public bool IsVerified { get; internal set; }
 
-		/// <summary> Returns the string "&lt;@Id&gt;" to be used as a shortcut when including mentions in text. </summary>
-		public string Mention => $"<@{Id}>";
-
 		public string PrivateChannelId { get; set; }
 		public Channel PrivateChannel => _client.GetChannel(PrivateChannelId);
 
