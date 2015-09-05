@@ -1,4 +1,4 @@
-# Discord.Net v0.6.0-beta2
+# Discord.Net v0.6.1-beta2
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 [Join the discussion](https://discord.gg/0SBTUU1wZTVjAMPx) on Discord.
