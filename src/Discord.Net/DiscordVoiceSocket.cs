@@ -26,7 +26,7 @@ namespace Discord
 		
 		private OpusEncoder _encoder;
 		private ConcurrentQueue<byte[]> _sendQueue;
-		private ManualResetEventSlim _sendQueueWait;
+		private ManualResetEventSlim _sendQueueWait, _sendQueueEmptyWait;
 		private UdpClient _udp;
 		private IPEndPoint _endpoint;
 		private bool _isReady, _isClearing;
@@ -45,6 +45,7 @@ namespace Discord
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_sendQueue = new ConcurrentQueue<byte[]>();
 			_sendQueueWait = new ManualResetEventSlim(true);
+			_sendQueueEmptyWait = new ManualResetEventSlim(true);
 			_encoder = new OpusEncoder(48000, 1, 20, Application.Audio);
 			_encodingBuffer = new byte[4000];
 			_targetAudioBufferLength = audioBufferLength / 20;
@@ -170,10 +171,6 @@ namespace Discord
 
 				while (!cancelToken.IsCancellationRequested)
 				{
-					//If we have less than our target data buffered, request more
-					if (_sendQueue.Count < _targetAudioBufferLength)
-						_sendQueueWait.Set();
-
 					double ticksToNextFrame = nextTicks - sw.ElapsedTicks;
 					if (ticksToNextFrame <= 0.0)
 					{
@@ -199,6 +196,16 @@ namespace Discord
 								}
 								timestamp = unchecked(timestamp + samplesPerFrame);
 								nextTicks += ticksPerFrame;
+
+								//If we have less than our target data buffered, request more
+								int count = _sendQueue.Count;
+								if (count == 0)
+								{
+									_sendQueueWait.Set();
+									_sendQueueEmptyWait.Set();
+								}
+								else if (count < _targetAudioBufferLength)
+									_sendQueueWait.Set();
 							}
 						}
 					}
@@ -391,6 +398,7 @@ namespace Discord
 			_sendQueue.Enqueue(payload);
 			if (_sendQueue.Count >= _targetAudioBufferLength)
 				_sendQueueWait.Reset();
+			_sendQueueEmptyWait.Reset();
         }
 		public void ClearPCMFrames()
 		{
@@ -412,6 +420,11 @@ namespace Discord
 		{
 			return new VoiceWebSocketCommands.KeepAlive();
 		}
+
+		public void Wait()
+		{
+			_sendQueueEmptyWait.Wait();
+        }
 	}
 }
 #endif

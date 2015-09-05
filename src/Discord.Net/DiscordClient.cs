@@ -667,6 +667,16 @@ namespace Discord
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Cleared the voice buffer.");
 			_voiceWebSocket.ClearPCMFrames();
 		}
+
+		/// <summary> Returns a task that completes once the voice output buffer is empty. </summary>
+		public async Task WaitVoice()
+		{
+			CheckReady();
+			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+
+			_voiceWebSocket.Wait();
+			await TaskHelper.CompletedTask;
+		}
 #endif
 
 		//Helpers
