@@ -49,8 +49,7 @@ namespace Discord
 		private bool _isDebugMode;
 
 #if !DNXCORE50
-		public Server CurrentVoiceServer => _currentVoiceToken != null ? _servers[_currentVoiceServerId] : null;
-		private string _currentVoiceServerId, _currentVoiceToken;
+		public Server CurrentVoiceServer => GetServer(_voiceWebSocket.CurrentVoiceServerId);
 #endif
 
 		//Constructor
@@ -142,13 +141,12 @@ namespace Discord
 					//Reconnect if we didn't cause the disconnect
 					if (e.WasUnexpected)
 					{
+						await Task.Delay(_config.ReconnectDelay);
 						while (!_disconnectToken.IsCancellationRequested)
 						{
 							try
 							{
-								await Task.Delay(_config.ReconnectDelay);
 								await _voiceWebSocket.ReconnectAsync();
-								await _voiceWebSocket.Login(_currentVoiceServerId, _myId, _sessionId, _currentVoiceToken);
 								break;
 							}
 							catch (Exception ex)
@@ -425,11 +423,10 @@ namespace Discord
                             try { RaiseVoiceServerUpdated(server, data.Endpoint); } catch { }
 
 #if !DNXCORE50
-							if (_config.EnableVoice && data.ServerId == _currentVoiceServerId)
+							if (_config.EnableVoice)
 							{
-								_currentVoiceToken = data.Token;
+								_voiceWebSocket.SetSessionData(data.ServerId, _myId, _sessionId, data.Token);
 								await _voiceWebSocket.ConnectAsync("wss://" + data.Endpoint.Split(':')[0]);
-								await _voiceWebSocket.Login(_currentVoiceServerId, _myId, _sessionId, data.Token);
 							}
 #endif
 						}
@@ -627,19 +624,19 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
 			await LeaveVoiceServer();
-			_currentVoiceServerId = channel.ServerId;
+			//_currentVoiceServerId = channel.ServerId;
 			_webSocket.JoinVoice(channel);
+			await _voiceWebSocket.BeginConnect();
 		}
 
 		public async Task LeaveVoiceServer()
 		{
+			CheckReady();
 			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
 
 			await _voiceWebSocket.DisconnectAsync();
-			if (_currentVoiceServerId != null)
-				_webSocket.LeaveVoice();
-			_currentVoiceServerId = null;
-			_currentVoiceToken = null;
+			//if (_voiceWebSocket.CurrentVoiceServerId != null)
+			_webSocket.LeaveVoice();
 		}
 
 		/// <summary> Sends a PCM frame to the voice server. </summary>

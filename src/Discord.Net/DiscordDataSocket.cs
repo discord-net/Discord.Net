@@ -20,6 +20,11 @@ namespace Discord
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
         }
 
+		public override Task ConnectAsync(string url)
+		{
+			BeginConnect();
+			return base.ConnectAsync(url);
+		}
 		public async Task Login(string token)
 		{
 			var cancelToken = _disconnectToken.Token;

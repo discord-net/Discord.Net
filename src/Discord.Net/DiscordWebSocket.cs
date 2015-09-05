@@ -40,12 +40,15 @@ namespace Discord
 			_sendQueue = new ConcurrentQueue<byte[]>();
 		}
 
-		public async Task ConnectAsync(string url)
+		protected void BeginConnect()
+		{
+			_disconnectToken = new CancellationTokenSource();
+			_disconnectReason = null;
+		}
+		public virtual async Task ConnectAsync(string url)
 		{
 			await DisconnectAsync();
 
-			_disconnectToken = new CancellationTokenSource();
-			_disconnectReason = null;
 			var cancelToken = _disconnectToken.Token;
 
 			_webSocket = new ClientWebSocket();

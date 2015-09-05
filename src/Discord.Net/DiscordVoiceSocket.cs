@@ -1,4 +1,4 @@
-﻿//#define USE_THREAD
+﻿#define USE_THREAD
 #if !DNXCORE50
 using Discord.API.Models;
 using Discord.Opus;
@@ -35,9 +35,13 @@ namespace Discord
 		private ushort _sequence;
 		private string _mode;
 		private byte[] _encodingBuffer;
+		private string _serverId, _userId, _sessionId, _token;
+
 #if USE_THREAD
 		private Thread _sendThread;
 #endif
+
+		public string CurrentVoiceServerId => _serverId;
 
 		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, int audioBufferLength, bool isDebug)
 			: base(client, timeout, interval, isDebug)
@@ -54,25 +58,54 @@ namespace Discord
 		protected override void OnConnect()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
-#if !DNX451 && !MONO
+#if !DNX451
 			_udp.AllowNatTraversal(true);
 #endif
 			_isReady = false;
 			_isClearing = false;
-        }
+
+			var cancelToken = _disconnectToken.Token;
+			Task.Factory.StartNew(async () =>
+			{
+				_connectWaitOnLogin.Reset();
+
+				VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
+				msg.Payload.ServerId = _serverId;
+				msg.Payload.SessionId = _sessionId;
+				msg.Payload.Token = _token;
+				msg.Payload.UserId = _userId;
+				await SendMessage(msg, cancelToken);
+
+				try
+				{
+					if (!_connectWaitOnLogin.Wait(_timeout, cancelToken))
+						return;
+				}
+				catch (OperationCanceledException)
+				{
+					return;
+				}
+
+				SetConnected();
+			});
+		}
 		protected override void OnDisconnect()
 		{
 			_udp = null;
+			_serverId = null;
+			_userId = null;
+			_sessionId = null;
+			_token = null;
 #if USE_THREAD
 			_sendThread.Join();
 			_sendThread = null;
 #endif
-        }
+		}
 
 		protected override Task[] CreateTasks()
 		{
 #if USE_THREAD
-			_sendThread = new Thread(new ThreadStart(() => SendAsync(_disconnectToken)));
+			_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_disconnectToken)));
 			_sendThread.Start();
 #endif
 			return new Task[]
@@ -85,19 +118,20 @@ namespace Discord
 			}.Concat(base.CreateTasks()).ToArray();
 		}
 
-		public async Task Login(string serverId, string userId, string sessionId, string token)
+		public void SetSessionData(string serverId, string userId, string sessionId, string token)
 		{
+			_serverId = serverId;
+			_userId = userId;
+			_sessionId = sessionId;
+			_token = token;
+		}
+
+		public new async Task BeginConnect()
+		{
+			base.BeginConnect();
 			var cancelToken = _disconnectToken.Token;
 
-			_connectWaitOnLogin.Reset();
-
-			VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
-			msg.Payload.ServerId = serverId;
-			msg.Payload.SessionId = sessionId;
-			msg.Payload.Token = token;
-			msg.Payload.UserId = userId;
-			await SendMessage(msg, cancelToken);
-
+			await Task.Yield();
 			try
 			{
 				if (!_connectWaitOnLogin.Wait(_timeout, cancelToken)) //Waiting on JoinServer message
@@ -110,8 +144,6 @@ namespace Discord
 				else
 					_disconnectReason.Throw();
 			}
-
-			SetConnected();
 		}
 		
 		private async Task ReceiveVoiceAsync()
@@ -143,6 +175,7 @@ namespace Discord
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
 			await Task.Yield();
+#endif
 
 			byte[] packet;
 			try
@@ -189,7 +222,7 @@ namespace Discord
 									rtpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
 									Buffer.BlockCopy(packet, 0, rtpPacket, 12, packet.Length);
 #if USE_THREAD
-									_udp.Send(rtpPacket, packet.Count + 12);
+									_udp.Send(rtpPacket, packet.Length + 12);
 #else
 									await _udp.SendAsync(rtpPacket, packet.Length + 12);
 #endif
@@ -222,8 +255,7 @@ namespace Discord
 			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
         }
-#endif
-		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
+			//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private async Task WatcherAsync()
 		{
 			var cancelToken = _disconnectToken.Token;

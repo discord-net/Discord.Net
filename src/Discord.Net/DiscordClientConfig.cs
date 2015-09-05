@@ -3,8 +3,7 @@
     public class DiscordClientConfig
 	{
 #if !DNXCORE50
-		/// <summary> Enables the voice websocket and UDP client (Experimental!). </summary>
-		/// <remarks> This option requires the opus .dll or .so be in the local lib/ folder. </remarks>
+		/// <summary> Enables the voice websocket and UDP client (Experimental!). This option requires the opus .dll or .so be in the local lib/ folder. </remarks>
 		public bool EnableVoice { get; set; } = false;
 #endif
 		/// <summary> Enables the verbose DebugMessage event handler. May hinder performance but should help debug any issues. </summary>
@@ -24,9 +23,8 @@
 		public bool UseMessageQueue { get; set; } = false;
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get; set; } = 100;
-		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. </summary>
-		/// <remarks> This value is the target maximum but is not guaranteed. The buffer will often go a bit above this value. </remarks>
-		public int VoiceBufferLength { get; set; } = 1000;
+		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. This value is the target maximum but is not guaranteed, the buffer will often go slightly above this value. </remarks>
+		public int VoiceBufferLength { get; set; } = 3000;
 
 		public DiscordClientConfig() { }
     }
