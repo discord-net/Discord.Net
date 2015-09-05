@@ -54,7 +54,7 @@ namespace Discord
 			=> escape ? $"*{Escape(text)}*" : $"*{text}*";
 		/// <summary> Returns a markdown-formatted string with underline formatting, optionally escaping the contents. </summary>
 		public static string Underline(string text, bool escape = true)
-			=> escape ? $"_{Escape(text)}_" : $"_{text}_";
+			=> escape ? $"__{Escape(text)}__" : $"__{text}__";
 		/// <summary> Returns a markdown-formatted string with strikeout formatting, optionally escaping the contents. </summary>
 		public static string Strikeout(string text, bool escape = true)
 			=> escape ? $"~~{Escape(text)}~~" : $"~~{text}~~";
