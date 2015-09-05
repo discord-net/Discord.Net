@@ -74,12 +74,6 @@
     <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketEvents.cs">
       <Link>API\Models\VoiceWebSocketEvents.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Channel.cs">
-      <Link>Channel.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\ChannelTypes.cs">
-      <Link>ChannelTypes.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
     </Compile>
@@ -110,6 +104,15 @@
     <Compile Include="..\Discord.Net\DiscordWebSocket.Events.cs">
       <Link>DiscordWebSocket.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
+      <Link>Enums\ChannelTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Enums\Regions.cs">
+      <Link>Enums\Regions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
+      <Link>Enums\UserStatus.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
       <Link>Helpers\AsyncCache.cs</Link>
     </Compile>
@@ -128,35 +131,35 @@
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Invite.cs">
-      <Link>Invite.cs</Link>
+    <Compile Include="..\Discord.Net\Models\Channel.cs">
+      <Link>Models\Channel.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Membership.cs">
-      <Link>Membership.cs</Link>
+    <Compile Include="..\Discord.Net\Models\Invite.cs">
+      <Link>Models\Invite.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Message.cs">
-      <Link>Message.cs</Link>
+    <Compile Include="..\Discord.Net\Models\Membership.cs">
+      <Link>Models\Membership.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\Message.cs">
+      <Link>Models\Message.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\PackedPermissions.cs">
+      <Link>Models\PackedPermissions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\Role.cs">
+      <Link>Models\Role.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\Server.cs">
+      <Link>Models\Server.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\User.cs">
+      <Link>Models\User.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Opus\API.cs">
       <Link>Opus\API.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Opus\OpusEncoder.cs">
       <Link>Opus\OpusEncoder.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\PackedPermissions.cs">
-      <Link>PackedPermissions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Regions.cs">
-      <Link>Regions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Role.cs">
-      <Link>Role.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Server.cs">
-      <Link>Server.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\User.cs">
-      <Link>User.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

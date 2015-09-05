@@ -265,6 +265,7 @@ namespace Discord
 			}
 			return result;
 		}
+
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(User user, string text)
 			=> await SendMessage(await GetPMChannel(user), text, new string[0]);

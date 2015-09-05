@@ -114,7 +114,7 @@ namespace Discord
 
 		public override string ToString()
 		{
-			return User.ToString() + ": " + Text;
+			return User.ToString() + ": " + RawText;
 		}
     }
 }
