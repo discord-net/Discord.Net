@@ -131,6 +131,12 @@
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\lib\Opus\API.cs">
+      <Link>lib\Opus\API.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\lib\Opus\OpusEncoder.cs">
+      <Link>lib\Opus\OpusEncoder.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
     </Compile>
@@ -154,12 +160,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Opus\API.cs">
-      <Link>Opus\API.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Opus\OpusEncoder.cs">
-      <Link>Opus\OpusEncoder.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
