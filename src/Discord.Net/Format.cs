@@ -60,7 +60,7 @@ namespace Discord
 			=> escape ? $"~~{Escape(text)}~~" : $"~~{text}~~";
 
 		/// <summary> Returns a markdown-formatted string with multiple formatting, optionally escaping the contents. </summary>
-		public static string Text(string text, bool escape = true, bool bold = false, bool italics = false, bool underline = false, bool strikeout = false)
+		public static string Multiple(string text, bool escape = true, bool bold = false, bool italics = false, bool underline = false, bool strikeout = false)
 		{
 			string result = text;
 			if (escape) result = Escape(result);
