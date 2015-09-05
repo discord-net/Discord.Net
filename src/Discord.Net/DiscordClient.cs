@@ -133,7 +133,7 @@ namespace Discord
 #if !DNXCORE50
 			if (_config.EnableVoice)
 			{
-				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval, config.EnableDebug);
+				_voiceWebSocket = new DiscordVoiceSocket(this, _config.VoiceConnectionTimeout, _config.WebSocketInterval, _config.VoiceBufferLength, _config.EnableDebug);
 				_voiceWebSocket.Connected += (s, e) => RaiseVoiceConnected();
 				_voiceWebSocket.Disconnected += async (s, e) =>
 				{
@@ -643,17 +643,18 @@ namespace Discord
 		}
 
 		/// <summary> Sends a PCM frame to the voice server. </summary>
-		/// <param name="data">PCM frame to send.</param>
+		/// <param name="data">PCM frame to send. This must be a 48Kz 20ms </param>
 		/// <param name="count">Number of bytes in this frame. </param>
-		public Task SendVoicePCM(byte[] data, int count)
+		/// <remarks>Will block until</remarks>
+		public void SendVoicePCM(byte[] data, int count)
 		{
 			CheckReady();
 			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
-			if (count == 0) return TaskHelper.CompletedTask;
+			if (count == 0) return;
 
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
-			return _voiceWebSocket.SendPCMFrame(data, count);
+			_voiceWebSocket.SendPCMFrame(data, count);
 		}
 
 		/// <summary> Clears the PCM buffer. </summary>

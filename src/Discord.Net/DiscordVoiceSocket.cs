@@ -19,23 +19,14 @@ namespace Discord
 {
 	internal sealed partial class DiscordVoiceSocket : DiscordWebSocket
 	{
-		private struct Packet
-		{
-			public byte[] Data;
-			public int Count;
-			public Packet(byte[] data, int count)
-			{
-				Data = data;
-				Count = count;
-			}
-		}
-
-		private ManualResetEventSlim _connectWaitOnLogin;
+		private readonly int _targetAudioBufferLength;
+        private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
-		private readonly Random _rand = new Random();
+        private readonly Random _rand = new Random();
 		
 		private OpusEncoder _encoder;
-		private ConcurrentQueue<Packet> _sendQueue;
+		private ConcurrentQueue<byte[]> _sendQueue;
+		private ManualResetEventSlim _sendQueueWait;
 		private UdpClient _udp;
 		private IPEndPoint _endpoint;
 		private bool _isReady, _isClearing;
@@ -43,17 +34,21 @@ namespace Discord
 		private string _myIp;
 		private ushort _sequence;
 		private string _mode;
+		private byte[] _encodingBuffer;
 #if USE_THREAD
 		private Thread _sendThread;
 #endif
 
-		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, bool isDebug)
+		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, int audioBufferLength, bool isDebug)
 			: base(client, timeout, interval, isDebug)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
-			_sendQueue = new ConcurrentQueue<Packet>();
+			_sendQueue = new ConcurrentQueue<byte[]>();
+			_sendQueueWait = new ManualResetEventSlim(true);
 			_encoder = new OpusEncoder(48000, 1, 20, Application.Audio);
-		}
+			_encodingBuffer = new byte[4000];
+			_targetAudioBufferLength = audioBufferLength / 20;
+        }
 		
 		protected override void OnConnect()
 		{
@@ -81,9 +76,9 @@ namespace Discord
 #endif
 			return new Task[]
 			{
-				ReceiveAsync(),
+				ReceiveVoiceAsync(),
 #if !USE_THREAD
-				SendAsync(),
+				SendVoiceAsync(),
 #endif
 				WatcherAsync()
 			}.Concat(base.CreateTasks()).ToArray();
@@ -118,7 +113,7 @@ namespace Discord
 			SetConnected();
 		}
 		
-		private async Task ReceiveAsync()
+		private async Task ReceiveVoiceAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
@@ -138,17 +133,17 @@ namespace Discord
 		}
 
 #if USE_THREAD
-		private void SendAsync(CancellationTokenSource cancelSource)
+		private void SendVoiceAsync(CancellationTokenSource cancelSource)
 		{
 			var cancelToken = cancelSource.Token;
 #else
-		private async Task SendAsync()
+		private async Task SendVoiceAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
 			await Task.Yield();
 
-			Packet packet;
+			byte[] packet;
 			try
 			{
 				while (!cancelToken.IsCancellationRequested && !_isReady)
@@ -165,7 +160,7 @@ namespace Discord
 				uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
 				Stopwatch sw = Stopwatch.StartNew();
 
-				byte[] rtpPacket = new byte[4012];
+				byte[] rtpPacket = new byte[_encodingBuffer.Length + 12];
 				rtpPacket[0] = 0x80; //Flags;
 				rtpPacket[1] = 0x78; //Payload Type
 				rtpPacket[8] = (byte)((_ssrc >> 24) & 0xFF);
@@ -175,6 +170,10 @@ namespace Discord
 
 				while (!cancelToken.IsCancellationRequested)
 				{
+					//If we have less than our target data buffered, request more
+					if (_sendQueue.Count < _targetAudioBufferLength)
+						_sendQueueWait.Set();
+
 					double ticksToNextFrame = nextTicks - sw.ElapsedTicks;
 					if (ticksToNextFrame <= 0.0)
 					{
@@ -191,11 +190,11 @@ namespace Discord
 									rtpPacket[5] = (byte)((timestamp >> 16) & 0xFF);
 									rtpPacket[6] = (byte)((timestamp >> 8) & 0xFF);
 									rtpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
-									Buffer.BlockCopy(packet.Data, 0, rtpPacket, 12, packet.Count);
+									Buffer.BlockCopy(packet, 0, rtpPacket, 12, packet.Length);
 #if USE_THREAD
 									_udp.Send(rtpPacket, packet.Count + 12);
 #else
-									await _udp.SendAsync(rtpPacket, packet.Count + 12);
+									await _udp.SendAsync(rtpPacket, packet.Length + 12);
 #endif
 								}
 								timestamp = unchecked(timestamp + samplesPerFrame);
@@ -369,31 +368,34 @@ namespace Discord
 			}
         }
 
-		public Task SendPCMFrame(byte[] data, int count)
+		public void SendPCMFrame(byte[] data, int count)
 		{
 			if (count != _encoder.FrameSize)
 				throw new InvalidOperationException($"Invalid frame size. Got {count}, expected {_encoder.FrameSize}.");
 
 			byte[] payload;
-			int encodedLength;
             lock (_encoder)
 			{
-				payload = new byte[4000];
-				encodedLength = _encoder.EncodeFrame(data, payload);
+				int encodedLength = _encoder.EncodeFrame(data, _encodingBuffer);
 
 				if (_mode == "xsalsa20_poly1305")
 				{
 					//TODO: Encode
 				}
-			}
-			_sendQueue.Enqueue(new Packet(payload, encodedLength));
 
-			return Task.Delay(0);
+				payload = new byte[encodedLength];
+				Buffer.BlockCopy(_encodingBuffer, 0, payload, 0, encodedLength);
+            }
+
+			_sendQueueWait.Wait(_disconnectToken.Token);
+			_sendQueue.Enqueue(payload);
+			if (_sendQueue.Count >= _targetAudioBufferLength)
+				_sendQueueWait.Reset();
         }
 		public void ClearPCMFrames()
 		{
 			_isClearing = true;
-			Packet ignored;
+			byte[] ignored;
             while (_sendQueue.TryDequeue(out ignored)) { }
 			_isClearing = false;
 		}

@@ -24,6 +24,9 @@
 		public bool UseMessageQueue { get; set; } = false;
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get; set; } = 100;
+		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. </summary>
+		/// <remarks> This value is the target maximum but is not guaranteed. The buffer will often go a bit above this value. </remarks>
+		public int VoiceBufferLength { get; set; } = 1000;
 
 		public DiscordClientConfig() { }
     }
