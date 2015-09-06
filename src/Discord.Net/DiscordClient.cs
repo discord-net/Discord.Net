@@ -518,10 +518,6 @@ namespace Discord
 
 			return await ConnectInternal(response.Token);
 		}
-		/// <summary> Connects to the Discord server with the provided token, and will fall back to username and password. </summary>
-		/// <returns> Returns a token for future connections. </returns>
-		/*public Task<string> Connect(string email, string password, string token)
-			=> ConnectInternal(email, password, token);*/
 		/// <summary> Connects to the Discord server as an anonymous user with the provided username. </summary>
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> ConnectAnonymous(string username)
