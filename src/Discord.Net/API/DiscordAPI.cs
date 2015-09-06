@@ -17,7 +17,7 @@ namespace Discord.API
         }
 
 		//Auth
-		public Task<APIResponses.Gateway> GetWebSocket()
+		public Task<APIResponses.Gateway> GetWebSocketEndpoint()
 			=> _http.Get<APIResponses.Gateway>(Endpoints.Gateway);
         public async Task<APIResponses.AuthRegister> LoginAnonymous(string username)
 		{

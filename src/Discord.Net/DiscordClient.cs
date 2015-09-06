@@ -514,25 +514,21 @@ namespace Discord
 		public async Task<string> ConnectInternal(string emailOrUsername, string password, string token)
 		{
 			bool success = false;
+			string url = null;
+
 			await Disconnect();
 			_blockEvent.Reset();
 			_disconnectToken = new CancellationTokenSource();
-
-			string url = (await _api.GetWebSocket()).Url;
 
 			if (token != null)
 			{
 				try
 				{
 					//Login using cached token
-					await _webSocket.ConnectAsync(url);
+					_http.Token = token;
+					url = (await _api.GetWebSocketEndpoint()).Url;
 					if (_isDebugMode)
 						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
-					_http.Token = token;
-
-					await _webSocket.Login(_http.Token);
-					if (_isDebugMode)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
 					success = true;
 				}
 				catch (InvalidOperationException) //Bad Token
@@ -545,9 +541,6 @@ namespace Discord
 			}
 			if (!success) 
 			{
-				//Open websocket while we wait for login response
-				Task socketTask = _webSocket.ConnectAsync(url);
-
 				if (password != null) //Normal Login
 				{
 					var response = await _api.Login(emailOrUsername, password);
@@ -562,16 +555,16 @@ namespace Discord
 						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket generated anonymous token.");
 					token = response.Token;
 				}
-				_http.Token = token;
 
-				//Wait for websocket to finish connecting, then send token
-				await socketTask;
-				await _webSocket.Login(_http.Token);
+				_http.Token = token;
+				url = (await _api.GetWebSocketEndpoint()).Url;
 				success = true;
 			}
-
 			if (success)
 			{
+				await _webSocket.ConnectAsync(url);
+				await _webSocket.Login(token);
+
 				if (_config.UseMessageQueue)
 					_mainTask = MessageQueueLoop();
 				else
@@ -600,7 +593,10 @@ namespace Discord
 				_isConnected = true;
 			}
 			else
+			{
 				token = null;
+				_http.Token = null;
+            }
 			return token;
 		}
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
