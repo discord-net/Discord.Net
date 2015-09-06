@@ -522,6 +522,8 @@ namespace Discord
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> ConnectAnonymous(string username)
 		{
+			await Disconnect();
+
 			var response = await _api.LoginAnonymous(username);
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got anonymous token.");
