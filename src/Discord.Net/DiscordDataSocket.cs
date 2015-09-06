@@ -12,6 +12,8 @@ namespace Discord
 	internal sealed partial class DiscordDataSocket : DiscordWebSocket
 	{
 		private readonly ManualResetEventSlim _connectWaitOnLogin, _connectWaitOnLogin2;
+		private string _lastSession, _redirectServer;
+		private int _lastSeq;
 
 		public DiscordDataSocket(DiscordClient client, int timeout, int interval, bool isDebug)
 			: base(client, timeout, interval, isDebug)
@@ -20,10 +22,13 @@ namespace Discord
 			_connectWaitOnLogin2 = new ManualResetEventSlim(false);
         }
 
-		public override Task ConnectAsync(string url)
+		public override async Task ConnectAsync(string url)
 		{
-			BeginConnect();
-			return base.ConnectAsync(url);
+			_lastSeq = 0;
+			_lastSession = null;
+			_redirectServer = null;
+			await BeginConnect();
+			await base.ConnectAsync(url);
 		}
 		public async Task Login(string token)
 		{
@@ -65,6 +70,8 @@ namespace Discord
 		protected override Task ProcessMessage(string json)
 		{
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
+			if (msg.Sequence.HasValue)
+				_lastSeq = msg.Sequence.Value;
 			switch (msg.Operation)
 			{
 				case 0:
@@ -72,6 +79,7 @@ namespace Discord
 						if (msg.Type == "READY")
 						{
 							var payload = (msg.Payload as JToken).ToObject<TextWebSocketEvents.Ready>();
+							_lastSession = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new TextWebSocketCommands.UpdateStatus());
 							//QueueMessage(GetKeepAlive());
@@ -80,6 +88,15 @@ namespace Discord
 						RaiseGotEvent(msg.Type, msg.Payload as JToken);
 						if (msg.Type == "READY")
 							_connectWaitOnLogin2.Set(); //Post-Event
+					}
+					break;
+				case 7:
+					{
+						var payload = (msg.Payload as JToken).ToObject<TextWebSocketEvents.Redirect>();
+						if (_isDebug)
+							RaiseOnDebugMessage(DebugMessageType.Connection, $"Redirected to {payload.Url}.");
+						_host = payload.Url;
+						DisconnectInternal(new Exception("Server is redirecting."), true);
 					}
 					break;
 				default:
@@ -106,6 +123,18 @@ namespace Discord
 		{
 			var joinVoice = new TextWebSocketCommands.JoinVoice();
 			QueueMessage(joinVoice);
+		}
+
+		protected override void OnConnect()
+		{
+			if (_redirectServer != null)
+			{
+				var resumeMsg = new TextWebSocketCommands.Resume();
+				resumeMsg.Payload.SessionId = _lastSession;
+				resumeMsg.Payload.Sequence = _lastSeq;
+				SendMessage(resumeMsg, _disconnectToken.Token);
+			}
+			_redirectServer = null;
 		}
 	}
 }

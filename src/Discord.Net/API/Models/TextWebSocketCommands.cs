@@ -15,9 +15,11 @@ namespace Discord.API.Models
 		{
 			[JsonProperty(PropertyName = "op")]
 			public int Operation;
-			[JsonProperty(PropertyName = "t")]
+			[JsonProperty(PropertyName = "t", NullValueHandling = NullValueHandling.Ignore)]
 			public string Type;
-			[JsonProperty(PropertyName = "d")]
+			[JsonProperty(PropertyName = "s", NullValueHandling = NullValueHandling.Ignore)]
+			public int? Sequence;
+			[JsonProperty(PropertyName = "d", NullValueHandling = NullValueHandling.Ignore)]
 			public object Payload;
 		}
 		internal abstract class WebSocketMessage<T> : WebSocketMessage
@@ -76,6 +78,17 @@ namespace Discord.API.Models
 				public string SelfMute;
 				[JsonProperty(PropertyName = "self_deaf")]
 				public string SelfDeaf;
+			}
+		}
+		public sealed class Resume : WebSocketMessage<Resume.Data>
+		{
+			public Resume() : base(6) { }
+			public class Data
+			{
+				[JsonProperty(PropertyName = "session_id")]
+				public string SessionId;
+				[JsonProperty(PropertyName = "seq")]
+				public int Sequence;
 			}
 		}
 	}

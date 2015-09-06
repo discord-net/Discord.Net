@@ -36,6 +36,12 @@ namespace Discord.API.Models
 			public int HeartbeatInterval;
 		}
 
+		public sealed class Redirect
+		{
+			[JsonProperty(PropertyName = "url")]
+			public string Url;
+		}
+
 		//Servers
 		public sealed class GuildCreate : ExtendedServerInfo { }
 		public sealed class GuildUpdate : ServerInfo { }

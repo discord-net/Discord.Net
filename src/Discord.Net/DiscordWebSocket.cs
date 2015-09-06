@@ -40,14 +40,15 @@ namespace Discord
 			_sendQueue = new ConcurrentQueue<byte[]>();
 		}
 
-		protected void BeginConnect()
+		protected virtual async Task BeginConnect()
 		{
+			await DisconnectAsync();
 			_disconnectToken = new CancellationTokenSource();
 			_disconnectReason = null;
 		}
 		public virtual async Task ConnectAsync(string url)
 		{
-			await DisconnectAsync();
+			//await DisconnectAsync();
 
 			var cancelToken = _disconnectToken.Token;
 
@@ -152,7 +153,7 @@ namespace Discord
                         try
 						{
 							result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
-						}
+                        }
 						catch (Win32Exception ex) 
 						when (ex.HResult == HR_TIMEOUT)
 						{

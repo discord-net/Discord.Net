@@ -128,7 +128,7 @@ namespace Discord
 
 		public new async Task BeginConnect()
 		{
-			base.BeginConnect();
+			await base.BeginConnect();
 			var cancelToken = _disconnectToken.Token;
 
 			await Task.Yield();
