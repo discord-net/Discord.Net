@@ -497,106 +497,80 @@ namespace Discord
 
 		//Connection
 		/// <summary> Connects to the Discord server with the provided token. </summary>
-		public Task<string> Connect(string token)
-			=> ConnectInternal(null, null, token);
+		public async Task<string> Connect(string token)
+		{
+			await Disconnect();
+
+			if (_isDebugMode)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket is using cached token.");
+
+			return await ConnectInternal(token);
+		}
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public Task<string> Connect(string email, string password)
-			=> ConnectInternal(email, password, null);
+		public async Task<string> Connect(string email, string password)
+		{
+			await Disconnect();
+
+			var response = await _api.Login(email, password);
+			if (_isDebugMode)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
+
+			return await ConnectInternal(response.Token);
+		}
 		/// <summary> Connects to the Discord server with the provided token, and will fall back to username and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public Task<string> Connect(string email, string password, string token)
-			=> ConnectInternal(email, password, token);
+		/*public Task<string> Connect(string email, string password, string token)
+			=> ConnectInternal(email, password, token);*/
 		/// <summary> Connects to the Discord server as an anonymous user with the provided username. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public Task<string> ConnectAnonymous(string username)
-			=> ConnectInternal(username, null, null);
-		public async Task<string> ConnectInternal(string emailOrUsername, string password, string token)
+		public async Task<string> ConnectAnonymous(string username)
 		{
-			bool success = false;
-			string url = null;
+			var response = await _api.LoginAnonymous(username);
+			if (_isDebugMode)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got anonymous token.");
+			_http.Token = response.Token;
 
-			await Disconnect();
-			_blockEvent.Reset();
+			return await ConnectInternal(response.Token);
+		}
+
+		private async Task<string> ConnectInternal(string token)
+		{
+            _http.Token = token;
+			string url = (await _api.GetWebSocketEndpoint()).Url;
+			if (_isDebugMode)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got endpoint.");
+
+			await _webSocket.ConnectAsync(url);
+			await _webSocket.Login(token);
+
 			_disconnectToken = new CancellationTokenSource();
-
-			if (token != null)
+			if (_config.UseMessageQueue)
+				_mainTask = MessageQueueLoop();
+			else
+				_mainTask = _disconnectToken.Wait();
+			_mainTask = _mainTask.ContinueWith(async x =>
 			{
-				try
-				{
-					//Login using cached token
-					_http.Token = token;
-					url = (await _api.GetWebSocketEndpoint()).Url;
-					if (_isDebugMode)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket connected.");
-					success = true;
-				}
-				catch (InvalidOperationException) //Bad Token
-				{
-					if (_isDebugMode)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket had a bad token.");
-					if (password == null) //If we don't have an alternate login, throw this error
-						throw;
-				}
-			}
-			if (!success) 
-			{
-				if (password != null) //Normal Login
-				{
-					var response = await _api.Login(emailOrUsername, password);
-					if (_isDebugMode)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
-					token = response.Token;
-				}
-				else //Anonymous login
-				{
-					var response = await _api.LoginAnonymous(emailOrUsername);
-					if (_isDebugMode)
-						RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket generated anonymous token.");
-					token = response.Token;
-				}
-
-				_http.Token = token;
-				url = (await _api.GetWebSocketEndpoint()).Url;
-				success = true;
-			}
-			if (success)
-			{
-				await _webSocket.ConnectAsync(url);
-				await _webSocket.Login(token);
-
-				if (_config.UseMessageQueue)
-					_mainTask = MessageQueueLoop();
-				else
-					_mainTask = _disconnectToken.Wait();
-				_mainTask = _mainTask.ContinueWith(async x =>
-				{
-					await _webSocket.DisconnectAsync();
+				await _webSocket.DisconnectAsync();
 #if !DNXCORE50
-					if (_config.EnableVoice)
-						await _voiceWebSocket.DisconnectAsync();
+				if (_config.EnableVoice)
+					await _voiceWebSocket.DisconnectAsync();
 #endif
 
-					//Clear send queue
-					Message ignored;
-					while (_pendingMessages.TryDequeue(out ignored)) { }
+				//Clear send queue
+				Message ignored;
+				while (_pendingMessages.TryDequeue(out ignored)) { }
 
-					_channels.Clear();
-					_messages.Clear();
-					_roles.Clear();
-					_servers.Clear();
-					_users.Clear();
+				_channels.Clear();
+				_messages.Clear();
+				_roles.Clear();
+				_servers.Clear();
+				_users.Clear();
 
-					_blockEvent.Set();
-					_mainTask = null;
-				}).Unwrap();
-				_isConnected = true;
-			}
-			else
-			{
-				token = null;
-				_http.Token = null;
-            }
+				_blockEvent.Set();
+				_mainTask = null;
+			}).Unwrap();
+			_isConnected = true;
 			return token;
 		}
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
