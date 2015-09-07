@@ -56,7 +56,7 @@ namespace Discord
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 		{
-			_blockEvent = new ManualResetEventSlim(true);
+			_blockEvent = new ManualResetEventSlim(false);
 			_config = config ?? new DiscordClientConfig();
 			_isDebugMode = _config.EnableDebug;
 			_rand = new Random();
@@ -501,7 +501,7 @@ namespace Discord
 		{
 			await Disconnect();
 
-			if (_isDebugMode)
+            if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket is using cached token.");
 
 			return await ConnectInternal(token);
@@ -534,7 +534,8 @@ namespace Discord
 
 		private async Task<string> ConnectInternal(string token)
 		{
-            _http.Token = token;
+			_blockEvent.Reset();
+			_http.Token = token;
 			string url = (await _api.GetWebSocketEndpoint()).Url;
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got endpoint.");
