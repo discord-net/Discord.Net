@@ -22,7 +22,8 @@ Discord.Net itself is also in alpha so several functions may be unstable or not 
 var client = new DiscordClient();
 client.MessageCreated += async (s, e) =>
 {
-	await client.SendMessage(e.Message.ChannelId, e.Message.Text);
+	if (e.Message.UserId != client.User.Id)
+		await client.SendMessage(e.Message.ChannelId, e.Message.Text);
 };
 await client.Connect("discordtest@email.com", "Password123");
 await client.AcceptInvite("channel-invite-code");
