@@ -359,13 +359,20 @@ namespace Discord
 				return server.Members.Where(x =>
 				{
 					var user = x.User;
+					if (user == null)
+						return false;
 					return string.Equals(user.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(user.Name, name2, StringComparison.OrdinalIgnoreCase);
 				});
 			}
 			else
 			{
 				return server.Members.Where(x =>
+				{
+					var user = x.User;
+					if (user == null)
+						return false;
 					string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase));
+				}
 			}
 		}
 
