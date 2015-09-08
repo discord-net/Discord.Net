@@ -20,7 +20,8 @@
 		"dnx451": { },
 		"dnxcore50": {
 			"dependencies": {
-				"Microsoft.CSharp": "4.0.1-beta-23225"
+				"System.Runtime": "4.0.20",
+				"Microsoft.CSharp": "4.0.0"
 			}
 		}
 	}
