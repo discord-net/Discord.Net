@@ -1,6 +1,7 @@
 ﻿using Discord.API;
 using Discord.API.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -320,7 +321,7 @@ namespace Discord
 		public Task DeleteMessage(Message msg)
 			=> DeleteMessage(msg?.ChannelId, msg?.Id);
 		/// <summary> Deletes the provided message. </summary>
-		public async Task<Message> DeleteMessage(string channelId, string msgId)
+		public async Task DeleteMessage(string channelId, string msgId)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
@@ -329,11 +330,40 @@ namespace Discord
 			try
 			{
 				await _api.DeleteMessage(channelId, msgId);
-				return _messages.Remove(msgId);
+				_messages.Remove(msgId);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
-			return null;
+		}
+		public async Task DeleteMessages(IEnumerable<Message> msgs)
+		{
+			CheckReady();
+			if (msgs == null) throw new ArgumentNullException(nameof(msgs));
+
+			foreach (var msg in msgs)
+			{
+                try
+				{
+					await _api.DeleteMessage(msg.ChannelId, msg.Id);
+				}
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
+			}
+		}
+		public async Task DeleteMessages(string channelId, IEnumerable<string> msgIds)
+		{
+			CheckReady();
+			if (msgIds == null) throw new ArgumentNullException(nameof(msgIds));
+
+			foreach (var msgId in msgIds)
+			{
+                try
+				{
+					await _api.DeleteMessage(channelId, msgId);
+				}
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
+			}
 		}
 
 		/// <summary> Sends a file to the provided channel. </summary>
