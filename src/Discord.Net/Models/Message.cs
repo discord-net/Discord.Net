@@ -91,9 +91,15 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.GetUser(x)).Where(x => x != null);
 
-		/// <summary> Returns the id of the channel this message was sent in. </summary>
+		/// <summary> Returns the id of the server containing the channel this message was sent to. </summary>
+		public string ServerId => Channel.ServerId;
+		/// <summary> Returns the server containing the channel this message was sent to. </summary>
+		[JsonIgnore]
+		public Server Server => _client.GetServer(Channel.ServerId);
+
+		/// <summary> Returns the id of the channel this message was sent to. </summary>
 		public string ChannelId { get; }
-		/// <summary> Returns the the channel this message was sent in. </summary>
+		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Channel Channel => _client.GetChannel(ChannelId);
 
@@ -102,6 +108,8 @@ namespace Discord
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
 		public User User => _client.GetUser(UserId);
+		[JsonIgnore]
+		public Membership Member => _client.GetMember(ServerId, UserId);
 		/// <summary> Returns true if the current user created this message. </summary>
 		public bool IsAuthor => _client.User?.Id == UserId;
 
