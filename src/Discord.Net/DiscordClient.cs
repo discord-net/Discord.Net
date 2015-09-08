@@ -497,14 +497,14 @@ namespace Discord
 
 		//Connection
 		/// <summary> Connects to the Discord server with the provided token. </summary>
-		public async Task<string> Connect(string token)
+		public async Task Connect(string token)
 		{
 			await Disconnect();
 
             if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket is using cached token.");
 
-			return await ConnectInternal(token);
+			await ConnectInternal(token);
 		}
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
