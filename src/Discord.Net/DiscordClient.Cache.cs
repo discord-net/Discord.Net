@@ -12,27 +12,27 @@ namespace Discord
 		/// <summary> Returns a collection of all users the client can see across all servers. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<User> Users => _users;
-		private AsyncCache<User, API.Models.UserReference> _users;
+		internal AsyncCache<User, API.Models.UserReference> _users;
 
 		/// <summary> Returns a collection of all servers the client is a member of. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Server> Servers => _servers;
-		private AsyncCache<Server, API.Models.ServerReference> _servers;
+		internal AsyncCache<Server, API.Models.ServerReference> _servers;
 
 		/// <summary> Returns a collection of all channels the client can see across all servers. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Channel> Channels => _channels;
-		private AsyncCache<Channel, API.Models.ChannelReference> _channels;
+		internal AsyncCache<Channel, API.Models.ChannelReference> _channels;
 
 		/// <summary> Returns a collection of all messages the client has in cache. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Message> Messages => _messages;
-		private AsyncCache<Message, API.Models.MessageReference> _messages;
+		internal AsyncCache<Message, API.Models.MessageReference> _messages;
 
 		/// <summary> Returns a collection of all roles the client can see across all servers. </summary>
 		/// <remarks> This collection does not guarantee any ordering. </remarks>
 		public IEnumerable<Role> Roles => _roles;
-		private AsyncCache<Role, API.Models.Role> _roles;
+		internal AsyncCache<Role, API.Models.Role> _roles;
 
 		private void CreateCaches()
 		{

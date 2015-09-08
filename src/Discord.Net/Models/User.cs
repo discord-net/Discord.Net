@@ -1,6 +1,8 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -28,10 +30,17 @@ namespace Discord
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		public bool IsVerified { get; internal set; }
 
+		/// <summary> Returns the Id of the private messaging channel with this user, if one exists. </summary>
 		public string PrivateChannelId { get; set; }
+		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		public Channel PrivateChannel => _client.GetChannel(PrivateChannelId);
 
-		//TODO: Add voice
+		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
+		public IEnumerable<Member> Memberships => _client._servers.Select(x => x._members[Id]).Where(x => x != null);
+		/// <summary> Returns a collection of all servers this user is a member of. </summary>
+		public IEnumerable<Server> Servers => _client._servers.Where(x => x._members[Id] != null);
+
+		//TODO: Add voice triggering lastactivity
 		/// <summary> Returns the time this user last sent a message. </summary>
 		/// <remarks> Is not currently affected by voice activity </remarks>
 		public DateTime LastActivity { get; private set; }
