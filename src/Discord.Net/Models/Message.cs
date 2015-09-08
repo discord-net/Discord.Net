@@ -109,7 +109,7 @@ namespace Discord
 		[JsonIgnore]
 		public User User => _client.GetUser(UserId);
 		[JsonIgnore]
-		public Membership Member => _client.GetMember(ServerId, UserId);
+		public Member Member => _client.GetMember(ServerId, UserId);
 		/// <summary> Returns true if the current user created this message. </summary>
 		public bool IsAuthor => _client.User?.Id == UserId;
 

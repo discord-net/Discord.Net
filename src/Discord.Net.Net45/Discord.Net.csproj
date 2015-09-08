@@ -146,8 +146,8 @@
     <Compile Include="..\Discord.Net\Models\Invite.cs">
       <Link>Models\Invite.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Models\Membership.cs">
-      <Link>Models\Membership.cs</Link>
+    <Compile Include="..\Discord.Net\Models\Member.cs">
+      <Link>Models\Member.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Message.cs">
       <Link>Models\Message.cs</Link>

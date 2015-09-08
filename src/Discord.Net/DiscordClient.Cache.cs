@@ -326,16 +326,16 @@ namespace Discord
 		}
 
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Membership GetMember(string serverId, User user)
+		public Member GetMember(string serverId, User user)
 			=> GetMember(_servers[serverId], user?.Id);
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Membership GetMember(string serverId, string userId)
+		public Member GetMember(string serverId, string userId)
 			=> GetMember(_servers[serverId], userId);
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Membership GetMember(Server server, User user)
+		public Member GetMember(Server server, User user)
 			=> GetMember(server, user?.Id);
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Membership GetMember(Server server, string userId)
+		public Member GetMember(Server server, string userId)
 		{
 			if (server == null || userId == null)
 				return null;
@@ -344,14 +344,14 @@ namespace Discord
 
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<Membership> FindMembers(string serverId, string name)
+		public IEnumerable<Member> FindMembers(string serverId, string name)
 			=> FindMembers(GetServer(serverId), name);
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<Membership> FindMembers(Server server, string name)
+		public IEnumerable<Member> FindMembers(Server server, string name)
 		{
 			if (server == null || name == null)
-				return new Membership[0];
+				return new Member[0];
 
 			if (name.StartsWith("@"))
 			{

@@ -58,8 +58,8 @@ namespace Discord
 	}
 	public sealed class MemberEventArgs : EventArgs
 	{
-		public readonly Membership Member;
-		internal MemberEventArgs(Membership member) { Member = member; }
+		public readonly Member Member;
+		internal MemberEventArgs(Member member) { Member = member; }
 	}
 	public sealed class UserTypingEventArgs : EventArgs
 	{
@@ -261,7 +261,7 @@ namespace Discord
 
 		//Member
 		public event EventHandler<MemberEventArgs> MemberAdded;
-		private void RaiseMemberAdded(Membership member)
+		private void RaiseMemberAdded(Member member)
 		{
 			if (_config.EnableDebug)
 				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberAdded {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
@@ -269,7 +269,7 @@ namespace Discord
 				MemberAdded(this, new MemberEventArgs(member));
 		}
 		public event EventHandler<MemberEventArgs> MemberRemoved;
-		private void RaiseMemberRemoved(Membership member)
+		private void RaiseMemberRemoved(Member member)
 		{
 			if (_config.EnableDebug)
 				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberRemoved {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
@@ -277,7 +277,7 @@ namespace Discord
 				MemberRemoved(this, new MemberEventArgs(member));
 		}
 		public event EventHandler<MemberEventArgs> MemberUpdated;
-		private void RaiseMemberUpdated(Membership member)
+		private void RaiseMemberUpdated(Member member)
 		{
 			if (_config.EnableDebug)
 				RaiseOnDebugMessage(DebugMessageType.Event, $"MemberUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
@@ -287,7 +287,7 @@ namespace Discord
 
 		//Status
 		public event EventHandler<MemberEventArgs> PresenceUpdated;
-		private void RaisePresenceUpdated(Membership member)
+		private void RaisePresenceUpdated(Member member)
 		{
 			if (_config.EnableDebug)
 				RaiseOnDebugMessage(DebugMessageType.Event, $"PresenceUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");
@@ -295,7 +295,7 @@ namespace Discord
 				PresenceUpdated(this, new MemberEventArgs(member));
 		}
 		public event EventHandler<MemberEventArgs> VoiceStateUpdated;
-		private void RaiseVoiceStateUpdated(Membership member)
+		private void RaiseVoiceStateUpdated(Member member)
 		{
 			if (_config.EnableDebug)
 				RaiseOnDebugMessage(DebugMessageType.Event, $"VoiceStateUpdated {member.User?.Name} ({member.UserId}) in {member.Server?.Name} ({member.ServerId})");

@@ -41,9 +41,9 @@ namespace Discord
 		/// <summary> Returns the default channel for this server. </summary>
 		public Channel DefaultChannel =>_client.GetChannel(DefaultChannelId);
 
-		internal AsyncCache<Membership, API.Models.MemberInfo> _members;
+		internal AsyncCache<Member, API.Models.MemberInfo> _members;
 		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Membership> Members => _members;
+		public IEnumerable<Member> Members => _members;
 
 		internal ConcurrentDictionary<string, bool> _bans;
 		/// <summary> Returns a collection of all users banned on this server. </summary>
@@ -66,12 +66,12 @@ namespace Discord
 			Id = id;
 			_client = client;
 			_bans = new ConcurrentDictionary<string, bool>();
-			_members = new AsyncCache<Membership, API.Models.MemberInfo>(
+			_members = new AsyncCache<Member, API.Models.MemberInfo>(
 				(key, parentKey) =>
 				{
 					if (_client.IsDebugMode)
 						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Created user {key} in server {parentKey}.");
-                    return new Membership(parentKey, key, _client);
+                    return new Member(parentKey, key, _client);
 				},
 				(member, model) =>
 				{
@@ -119,17 +119,17 @@ namespace Discord
 			);
 		}
 
-		internal Membership UpdateMember(API.Models.MemberInfo membership)
+		internal Member UpdateMember(API.Models.MemberInfo membership)
 		{
 			return _members.Update(membership.User?.Id ?? membership.UserId, Id, membership);
 		}
-		internal Membership RemoveMember(string userId)
+		internal Member RemoveMember(string userId)
 		{
 			return _members.Remove(userId);
 		}
-		public Membership GetMembership(User user)
+		public Member GetMembership(User user)
 			=> GetMember(user.Id);
-        public Membership GetMember(string userId)
+        public Member GetMember(string userId)
 		{
 			return _members[userId];
 		}

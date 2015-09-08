@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public class Membership
+	public class Member
 	{
 		private readonly DiscordClient _client;
 
@@ -36,7 +36,7 @@ namespace Discord
 		public string[] RoleIds { get; internal set; }
 		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.GetRole(x));
 
-		public Membership(string serverId, string userId, DiscordClient client)
+		public Member(string serverId, string userId, DiscordClient client)
 		{
 			ServerId = serverId;
 			UserId = userId;
