@@ -520,7 +520,7 @@ namespace Discord
 		}
 		/// <summary> Connects to the Discord server as an anonymous user with the provided username. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public async Task<string> ConnectAnonymous(string username)
+		/*public async Task<string> ConnectAnonymous(string username)
 		{
 			await Disconnect();
 
@@ -530,7 +530,7 @@ namespace Discord
 			_http.Token = response.Token;
 
 			return await ConnectInternal(response.Token);
-		}
+		}*/
 
 		private async Task<string> ConnectInternal(string token)
 		{
