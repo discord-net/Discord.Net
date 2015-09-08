@@ -333,7 +333,6 @@ namespace Discord
 				_messages.Remove(msgId);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
 		}
 		public async Task DeleteMessages(IEnumerable<Message> msgs)
 		{
@@ -347,7 +346,6 @@ namespace Discord
 					await _api.DeleteMessage(msg.ChannelId, msg.Id);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
 			}
 		}
 		public async Task DeleteMessages(string channelId, IEnumerable<string> msgIds)
@@ -362,7 +360,6 @@ namespace Discord
 					await _api.DeleteMessage(channelId, msgId);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError) { } //TODO: Remove me - temporary fix for deleting nonexisting messages
 			}
 		}
 
