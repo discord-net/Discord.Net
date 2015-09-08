@@ -371,8 +371,8 @@ namespace Discord
 					var user = x.User;
 					if (user == null)
 						return false;
-					string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase));
-				}
+					return string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase);
+				});
 			}
 		}
 
