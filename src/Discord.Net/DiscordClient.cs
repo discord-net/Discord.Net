@@ -583,27 +583,34 @@ namespace Discord
 		}
 
 		//Voice
-#if !DNXCORE50
 		public Task JoinVoiceServer(string channelId)
 			=> JoinVoiceServer(_channels[channelId]);
 		public async Task JoinVoiceServer(Channel channel)
 		{
 			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+			CheckVoice();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
 			await LeaveVoiceServer();
 			//_currentVoiceServerId = channel.ServerId;
 			_webSocket.JoinVoice(channel);
+#if !DNXCORE50
 			await _voiceWebSocket.BeginConnect();
+#else
+			await Task.CompletedTask;
+#endif
 		}
 
 		public async Task LeaveVoiceServer()
 		{
 			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+			CheckVoice();
 
+#if !DNXCORE50
 			await _voiceWebSocket.DisconnectAsync();
+#else
+			await Task.CompletedTask;
+#endif
 			//if (_voiceWebSocket.CurrentVoiceServerId != null)
 			_webSocket.LeaveVoice();
 		}
@@ -615,35 +622,40 @@ namespace Discord
 		public void SendVoicePCM(byte[] data, int count)
 		{
 			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+			CheckVoice();
 			if (count == 0) return;
 
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
+#if !DNXCORE50
 			_voiceWebSocket.SendPCMFrame(data, count);
+#endif
 		}
 
 		/// <summary> Clears the PCM buffer. </summary>
 		public void ClearVoicePCM()
 		{
 			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+			CheckVoice();
 
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Cleared the voice buffer.");
+#if !DNXCORE50
 			_voiceWebSocket.ClearPCMFrames();
+#endif
 		}
 
 		/// <summary> Returns a task that completes once the voice output buffer is empty. </summary>
 		public async Task WaitVoice()
 		{
 			CheckReady();
-			if (!_config.EnableVoice) throw new InvalidOperationException("Voice is not enabled for this client.");
+			CheckVoice();
 
+#if !DNXCORE50
 			_voiceWebSocket.Wait();
+#endif
 			await TaskHelper.CompletedTask;
 		}
-#endif
 
 		//Helpers
 		private void CheckReady()
@@ -652,6 +664,13 @@ namespace Discord
 				throw new InvalidOperationException("The client is currently disconnecting.");
 			else if (!_isConnected)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
+		}
+		private void CheckVoice()
+		{
+#if !DNXCORE50
+			if (!_config.EnableVoice)
+#endif
+				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		internal string CleanMessageText(string text)
 		{
