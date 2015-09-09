@@ -590,12 +590,10 @@ namespace Discord
 			=> JoinVoiceServer(_channels[channelId]);
 		public async Task JoinVoiceServer(Channel channel)
 		{
-			CheckReady();
-			CheckVoice();
+			CheckReady(checkVoice: true);
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
 			await LeaveVoiceServer().ConfigureAwait(false);
-			//_currentVoiceServerId = channel.ServerId;
 			_webSocket.JoinVoice(channel);
 #if !DNXCORE50
 			await _voiceWebSocket.BeginConnect().ConfigureAwait(false);
@@ -606,15 +604,13 @@ namespace Discord
 
 		public async Task LeaveVoiceServer()
 		{
-			CheckReady();
-			CheckVoice();
+			CheckReady(checkVoice: true);
 
 #if !DNXCORE50
 			await _voiceWebSocket.DisconnectAsync().ConfigureAwait(false);
 #else
 			await Task.CompletedTask.ConfigureAwait(false);
 #endif
-			//if (_voiceWebSocket.CurrentVoiceServerId != null)
 			_webSocket.LeaveVoice();
 		}
 
@@ -624,8 +620,7 @@ namespace Discord
 		/// <remarks>Will block until</remarks>
 		public void SendVoicePCM(byte[] data, int count)
 		{
-			CheckReady();
-			CheckVoice();
+			CheckReady(checkVoice: true);
 			if (count == 0) return;
 
 			if (_isDebugMode)
@@ -638,8 +633,7 @@ namespace Discord
 		/// <summary> Clears the PCM buffer. </summary>
 		public void ClearVoicePCM()
 		{
-			CheckReady();
-			CheckVoice();
+			CheckReady(checkVoice: true);
 
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Cleared the voice buffer.");
@@ -651,8 +645,7 @@ namespace Discord
 		/// <summary> Returns a task that completes once the voice output buffer is empty. </summary>
 		public async Task WaitVoice()
 		{
-			CheckReady();
-			CheckVoice();
+			CheckReady(checkVoice: true);
 
 #if !DNXCORE50
 			_voiceWebSocket.Wait();
@@ -661,17 +654,16 @@ namespace Discord
 		}
 
 		//Helpers
-		private void CheckReady()
+		private void CheckReady(bool checkVoice = false)
 		{
 			if (_isDisconnecting)
 				throw new InvalidOperationException("The client is currently disconnecting.");
 			else if (!_isConnected)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
-		}
-		private void CheckVoice()
-		{
 #if !DNXCORE50
-			if (!_config.EnableVoice)
+			else if (checkVoice && !_config.EnableVoice)
+#else
+			else if (checkVoice) //Always fail on DNXCORE50
 #endif
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}

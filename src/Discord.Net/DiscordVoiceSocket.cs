@@ -162,7 +162,7 @@ namespace Discord
 					}
 				}
 				catch (OperationCanceledException) { }
-				catch (ObjectDisposedException) { }
+				catch (InvalidOperationException) { } //Includes ObjectDisposedException
 				catch (Exception ex) { DisconnectInternal(ex); }
 			}).ConfigureAwait(false);
 		}
@@ -255,7 +255,7 @@ namespace Discord
 				}
 			}
 			catch (OperationCanceledException) { }
-			catch (ObjectDisposedException) { }
+			catch (InvalidOperationException) { } //Includes ObjectDisposedException
 			catch (Exception ex) { DisconnectInternal(ex); }
 #if !USE_THREAD
 		}).ConfigureAwait(false);
@@ -411,6 +411,8 @@ namespace Discord
 
 		public void SendPCMFrame(byte[] data, int count)
 		{
+			if (!_isReady)
+				return;
 			if (count != _encoder.FrameSize)
 				throw new InvalidOperationException($"Invalid frame size. Got {count}, expected {_encoder.FrameSize}.");
 
