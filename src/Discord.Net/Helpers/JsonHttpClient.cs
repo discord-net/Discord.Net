@@ -174,7 +174,11 @@ namespace Discord.Helpers
 				}
 				else
 				{
+#if !NET45
 					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+#else
+					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+#endif
 					if (!response.IsSuccessStatusCode)
 						throw new HttpException(response.StatusCode);
 					result = null;
