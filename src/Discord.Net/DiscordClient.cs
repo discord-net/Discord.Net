@@ -23,12 +23,12 @@ namespace Discord
 		private readonly JsonSerializer _serializer;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
-		private readonly ManualResetEventSlim _blockEvent;
+		private readonly object _disconnectEvent;
 		private readonly Random _rand;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly DiscordClientConfig _config;
 
-		private volatile Task _mainTask;
+		private volatile Task _runTask;
 		protected volatile string _myId, _sessionId;
 
 		/// <summary> Returns the User object for the current logged in user. </summary>
@@ -37,7 +37,7 @@ namespace Discord
 
 		/// <summary> Returns true if the user has successfully logged in and the websocket connection has been established. </summary>
 		public bool IsConnected => _isConnected;
-		private bool _isConnected;
+		private bool _isConnected, _isDisconnecting;
 
 		/// <summary> Returns true if this client was requested to disconnect. </summary>
 		public bool IsClosing => _disconnectToken.IsCancellationRequested;
@@ -56,7 +56,7 @@ namespace Discord
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 		{
-			_blockEvent = new ManualResetEventSlim(false);
+			_disconnectEvent = new object();
 			_config = config ?? new DiscordClientConfig();
 			_isDebugMode = _config.EnableDebug;
 			_rand = new Random();
@@ -521,7 +521,6 @@ namespace Discord
 
 		private async Task<string> ConnectInternal(string token)
 		{
-			_blockEvent.Reset();
 			_http.Token = token;
 			string url = (await _api.GetWebSocketEndpoint().ConfigureAwait(false)).Url;
 			if (_isDebugMode)
@@ -530,43 +529,60 @@ namespace Discord
 			await _webSocket.ConnectAsync(url).ConfigureAwait(false);
 			await _webSocket.Login(token).ConfigureAwait(false);
 
-			_disconnectToken = new CancellationTokenSource();
-			if (_config.UseMessageQueue)
-				_mainTask = MessageQueueLoop();
-			else
-				_mainTask = _disconnectToken.Wait();
-			_mainTask = _mainTask.ContinueWith(async x =>
-			{
-				await _webSocket.DisconnectAsync().ConfigureAwait(false);
-#if !DNXCORE50
-				if (_config.EnableVoice)
-					await _voiceWebSocket.DisconnectAsync().ConfigureAwait(false);
-#endif
-
-				//Clear send queue
-				Message ignored;
-				while (_pendingMessages.TryDequeue(out ignored)) { }
-
-				_channels.Clear();
-				_messages.Clear();
-				_roles.Clear();
-				_servers.Clear();
-				_users.Clear();
-
-				_blockEvent.Set();
-				_mainTask = null;
-			}).Unwrap();
-            _isConnected = true;
+			_runTask = Run();
 			return token;
 		}
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public async Task Disconnect()
 		{
-			if (_mainTask != null)
+			Task task = _runTask;
+            if (task != null)
 			{
 				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
-				try { await _mainTask.ConfigureAwait(false); } catch (NullReferenceException) { }
+				try { await task.ConfigureAwait(false); } catch (NullReferenceException) { }
 			}
+		}
+
+		private async Task Run()
+		{
+			_disconnectToken = new CancellationTokenSource();
+
+			//Run Loops
+			Task task;
+			if (_config.UseMessageQueue)
+				task = MessageQueueLoop();
+			else
+				task = _disconnectToken.Wait();
+
+			_isConnected = true;
+
+			await task.ConfigureAwait(false);
+			await Cleanup();
+		}
+		//TODO: What happens if a reconnect occurs and caches havent been cleared yet? Compare to DiscordWebSocket.Cleanup()
+		private async Task Cleanup()
+		{
+			_isDisconnecting = true;
+
+			await _webSocket.DisconnectAsync().ConfigureAwait(false);
+#if !DNXCORE50
+			if (_config.EnableVoice)
+				await _voiceWebSocket.DisconnectAsync().ConfigureAwait(false);
+#endif
+
+			Message ignored;
+			while (_pendingMessages.TryDequeue(out ignored)) { }
+
+			_channels.Clear();
+			_messages.Clear();
+			_roles.Clear();
+			_servers.Clear();
+			_users.Clear();
+
+			_runTask = null;
+			_isConnected = false;
+			_isDisconnecting = false;
+            Monitor.Pulse(_disconnectEvent);
 		}
 
 		//Voice
@@ -647,7 +663,7 @@ namespace Discord
 		//Helpers
 		private void CheckReady()
 		{
-			if (_blockEvent.IsSet)
+			if (_isDisconnecting)
 				throw new InvalidOperationException("The client is currently disconnecting.");
 			else if (!_isConnected)
 				throw new InvalidOperationException("The client is not currently connected to Discord");
@@ -669,7 +685,8 @@ namespace Discord
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
 		public void Block()
 		{
-			_blockEvent.Wait();
+			while (_isConnected)
+				Monitor.Wait(_disconnectEvent, TimeSpan.FromSeconds(3));
 		}
 	}
 }

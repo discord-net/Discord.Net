@@ -27,7 +27,7 @@ namespace Discord
 		protected ExceptionDispatchInfo _disconnectReason;
 		private ClientWebSocket _webSocket;
 		private DateTime _lastHeartbeat;
-		private Task _task;
+		private Task _runTask;
 		private bool _isConnected, _wasDisconnectUnexpected;
 
 		public DiscordWebSocket(DiscordClient client, int timeout, int interval, bool isDebug)
@@ -60,44 +60,17 @@ namespace Discord
 
 			OnConnect();
 
-			_lastHeartbeat = DateTime.UtcNow;
-			_task = Task.Factory.ContinueWhenAll(CreateTasks(), x =>
-			{
-				if (_isDebug)
-					RaiseOnDebugMessage(DebugMessageType.Connection, $"Disconnected.");
-
-				//Do not clean up until all tasks have ended
-				OnDisconnect();
-
-				bool wasUnexpected = _wasDisconnectUnexpected;
-                _disconnectToken.Dispose();
-				_disconnectToken = null;
-				_wasDisconnectUnexpected = false;
-
-				//Clear send queue
-				_heartbeatInterval = 0;
-				_lastHeartbeat = DateTime.MinValue;
-				_webSocket.Dispose();
-				_webSocket = null;
-				byte[] ignored;
-				while (_sendQueue.TryDequeue(out ignored)) { }
-				
-				_task = null;
-				if (_isConnected)
-				{
-					_isConnected = false;
-					RaiseDisconnected(wasUnexpected);
-				}
-			});
+			_runTask = Run();
 		}
 		public Task ReconnectAsync()
 			=> ConnectAsync(_host);
 		public async Task DisconnectAsync()
 		{
-            if (_task != null)
+			Task task = _runTask;
+            if (task != null)
 			{
 				try { DisconnectInternal(new Exception("Disconnect requested by user."), false); } catch (NullReferenceException) { }
-				try { await _task.ConfigureAwait(false); } catch (NullReferenceException) { }
+				try { await task.ConfigureAwait(false); } catch (NullReferenceException) { }
 			}
 		}
 		
@@ -118,6 +91,39 @@ namespace Discord
 		{
 			_isConnected = true;
 			RaiseConnected();
+		}
+
+		private async Task Run()
+		{
+			_lastHeartbeat = DateTime.UtcNow;
+
+			await Task.WhenAll(CreateTasks());
+			Cleanup();
+		}
+        private void Cleanup()
+		{
+			if (_isDebug)
+				RaiseOnDebugMessage(DebugMessageType.Connection, $"Disconnected.");			
+			OnDisconnect();
+
+			bool wasUnexpected = _wasDisconnectUnexpected;
+			_disconnectToken.Dispose();
+			_disconnectToken = null;
+			_wasDisconnectUnexpected = false;
+			
+			_heartbeatInterval = 0;
+			_lastHeartbeat = DateTime.MinValue;
+			_webSocket.Dispose();
+			_webSocket = null;
+			byte[] ignored;
+			while (_sendQueue.TryDequeue(out ignored)) { }
+
+			_runTask = null;
+			if (_isConnected)
+			{
+				_isConnected = false;
+				RaiseDisconnected(wasUnexpected);
+			}
 		}
 
 		protected virtual Task[] CreateTasks()

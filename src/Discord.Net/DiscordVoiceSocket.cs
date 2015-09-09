@@ -129,7 +129,7 @@ namespace Discord
 			await base.BeginConnect().ConfigureAwait(false);
 			var cancelToken = _disconnectToken.Token;
 
-			await Task.Factory.StartNew(() =>
+			await Task.Run(() =>
 			{
 				try
 				{
