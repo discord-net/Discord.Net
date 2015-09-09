@@ -35,9 +35,9 @@ namespace Discord.Opus
 			if (samplingRate != 8000 && samplingRate != 12000 &&
 				samplingRate != 16000 && samplingRate != 24000 &&
 				samplingRate != 48000)
-				throw new ArgumentOutOfRangeException("inputSamplingRate");
+				throw new ArgumentOutOfRangeException(nameof(samplingRate));
 			if (channels != 1 && channels != 2)
-				throw new ArgumentOutOfRangeException("inputChannels");
+				throw new ArgumentOutOfRangeException(nameof(channels));
 
 			InputSamplingRate = samplingRate;
 			InputChannels = channels;
@@ -50,31 +50,29 @@ namespace Discord.Opus
 			Error error;
 			_encoder = API.opus_encoder_create(samplingRate, channels, (int)application, out error);
 			if (error != Error.OK)
-				throw new InvalidOperationException("Error occured while creating encoder: " + error.ToString());
+				throw new InvalidOperationException($"Error occured while creating encoder: {error}");
 
 			SetForwardErrorCorrection(true);
 		}
 
 		/// <summary> Produces Opus encoded audio from PCM samples. </summary>
 		/// <param name="pcmSamples">PCM samples to encode.</param>
-		/// <param name="encodedLength">Length of encoded audio.</param>
-		/// <returns>Opus encoded audio buffer.</returns>
-		public unsafe int EncodeFrame(byte[] pcmSamples, byte[] outputBuffer)
+		/// <param name="offset">Offset of the frame in pcmSamples.</param>
+		/// <param name="outputBuffer">Buffer to store the encoded frame.</param>
+		/// <returns>Length of the frame contained in outputBuffer.</returns>
+		public unsafe int EncodeFrame(byte[] pcmSamples, int offset, byte[] outputBuffer)
 		{
 			if (disposed)
 				throw new ObjectDisposedException("OpusEncoder");
 			
-			IntPtr encodedPtr;
-			int length = 0;
-			fixed (byte* bPtr = outputBuffer)
-			{
-				encodedPtr = new IntPtr((void*)bPtr);
-				length = API.opus_encode(_encoder, pcmSamples, SamplesPerFrame, encodedPtr, outputBuffer.Length);
-			}
+			int result = 0;
+			fixed (byte* inPtr = pcmSamples)
+            fixed (byte* outPtr = outputBuffer)
+				result = API.opus_encode(_encoder, inPtr + offset, SamplesPerFrame, outPtr, outputBuffer.Length);
 
-			if (length < 0)
-				throw new Exception("Encoding failed: " + ((Error)length).ToString());
-			return length;
+			if (result < 0)
+				throw new Exception("Encoding failed: " + ((Error)result).ToString());
+			return result;
 		}
 
 		/// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
@@ -83,9 +81,9 @@ namespace Discord.Opus
 			if (_encoder == IntPtr.Zero)
 				throw new ObjectDisposedException("OpusEncoder");
 
-			var ret = API.opus_encoder_ctl(_encoder, Ctl.SetInbandFECRequest, value ? 1 : 0);
-			if (ret < 0)
-				throw new Exception("Encoder error - " + ((Error)ret).ToString());
+			var result = API.opus_encoder_ctl(_encoder, Ctl.SetInbandFECRequest, value ? 1 : 0);
+			if (result < 0)
+				throw new Exception("Encoder error: " + ((Error)result).ToString());
 		}
 
 		private bool disposed;

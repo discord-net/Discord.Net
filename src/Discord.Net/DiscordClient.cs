@@ -615,7 +615,7 @@ namespace Discord
 		}
 
 		/// <summary> Sends a PCM frame to the voice server. </summary>
-		/// <param name="data">PCM frame to send. This must be an uncompressed 48Kz monochannel 20ms PCM frame. </param>
+		/// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
 		/// <param name="count">Number of bytes in this frame. </param>
 		/// <remarks>Will block until</remarks>
 		public void SendVoicePCM(byte[] data, int count)
@@ -626,7 +626,7 @@ namespace Discord
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.VoiceOutput, $"Queued {count} bytes for voice output.");
 #if !DNXCORE50
-			_voiceWebSocket.SendPCMFrame(data, count);
+			_voiceWebSocket.SendPCMFrames(data, count);
 #endif
 		}
 

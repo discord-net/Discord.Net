@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Discord.Opus
 {
-	internal class API
+	internal unsafe class API
 	{
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr opus_encoder_create(int Fs, int channels, int application, out Error error);
@@ -12,7 +12,7 @@ namespace Discord.Opus
 		public static extern void opus_encoder_destroy(IntPtr encoder);
 
 		[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int opus_encode(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
+		public static extern int opus_encode(IntPtr st, byte* pcm, int frame_size, byte* data, int max_data_bytes);
 
 		/*[DllImport("lib/opus", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr opus_decoder_create(int Fs, int channels, out Errors error);

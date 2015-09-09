@@ -409,33 +409,70 @@ namespace Discord
 			}
         }
 
-		public void SendPCMFrame(byte[] data, int count)
+		public void SendPCMFrames(byte[] data, int bytes)
 		{
-			if (!_isReady)
+			var cancelToken = _disconnectToken.Token;
+            if (!_isReady || cancelToken == null)
+				throw new InvalidOperationException("Not connected to a voice server.");
+			if (bytes == 0)
 				return;
-			if (count != _encoder.FrameSize)
-				throw new InvalidOperationException($"Invalid frame size. Got {count}, expected {_encoder.FrameSize}.");
+
+			int frameSize = _encoder.FrameSize;
+			int frames = bytes / frameSize;
+            int expectedBytes = frames * frameSize;
+			int lastFrameSize = expectedBytes - bytes;
+
+			//If this only consists of a partial frame and the buffer is too small to pad the end, make a new one
+			if (data.Length < frameSize)
+			{
+				byte[] newData = new byte[frameSize];
+				Buffer.BlockCopy(data, 0, newData, 0, bytes);
+				data = newData;
+			}
 
 			byte[] payload;
-            lock (_encoder)
+			//Opus encoder requires packets be queued in the same order they were generated, so all of this must still be locked.
+			lock (_encoder) 
 			{
-				int encodedLength = _encoder.EncodeFrame(data, _encodingBuffer);
-
-				if (_mode == "xsalsa20_poly1305")
+				for (int i = 0, pos = 0; i <= frames; i++, pos += frameSize)
 				{
-					//TODO: Encode
+					if (i == frames)
+					{
+						//If there are no partial frames, skip this step
+						if (lastFrameSize == 0)
+							break;
+
+						//Take the partial frame from the end of the buffer and put it at the start
+						Buffer.BlockCopy(data, pos, data, 0, lastFrameSize);
+						pos = 0;
+
+						//Wipe the end of the buffer
+						for (int j = lastFrameSize; j < frameSize; j++)
+							data[j] = 0;
+
+					}
+
+					//Encode the frame
+					int encodedLength = _encoder.EncodeFrame(data, pos, _encodingBuffer);
+
+					//TODO: Handle Encryption
+					if (_mode == "xsalsa20_poly1305")
+					{
+					}
+
+					//Copy result to the queue
+					payload = new byte[encodedLength];
+					Buffer.BlockCopy(_encodingBuffer, 0, payload, 0, encodedLength);
+
+					//Wait until the queue has a spot open
+					_sendQueueWait.Wait(_disconnectToken.Token);
+					_sendQueue.Enqueue(payload);
+					if (_sendQueue.Count >= _targetAudioBufferLength)
+						_sendQueueWait.Reset();
+					_sendQueueEmptyWait.Reset();
 				}
-
-				payload = new byte[encodedLength];
-				Buffer.BlockCopy(_encodingBuffer, 0, payload, 0, encodedLength);
-            }
-
-			_sendQueueWait.Wait(_disconnectToken.Token);
-			_sendQueue.Enqueue(payload);
-			if (_sendQueue.Count >= _targetAudioBufferLength)
-				_sendQueueWait.Reset();
-			_sendQueueEmptyWait.Reset();
-        }
+			}
+		}
 		public void ClearPCMFrames()
 		{
 			_isClearing = true;
