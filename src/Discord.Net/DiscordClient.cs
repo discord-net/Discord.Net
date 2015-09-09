@@ -23,7 +23,7 @@ namespace Discord
 		private readonly JsonSerializer _serializer;
 		private readonly Regex _userRegex, _channelRegex;
 		private readonly MatchEvaluator _userRegexEvaluator, _channelRegexEvaluator;
-		private readonly object _disconnectEvent;
+		private readonly ManualResetEvent _disconnectEvent;
 		private readonly Random _rand;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly DiscordClientConfig _config;
@@ -56,7 +56,7 @@ namespace Discord
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 		{
-			_disconnectEvent = new object();
+			_disconnectEvent = new ManualResetEvent(true);
 			_config = config ?? new DiscordClientConfig();
 			_isDebugMode = _config.EnableDebug;
 			_rand = new Random();
@@ -545,6 +545,7 @@ namespace Discord
 
 		private async Task Run()
 		{
+			_disconnectEvent.Reset();
 			_disconnectToken = new CancellationTokenSource();
 
 			//Run Loops
@@ -562,7 +563,7 @@ namespace Discord
 		//TODO: What happens if a reconnect occurs and caches havent been cleared yet? Compare to DiscordWebSocket.Cleanup()
 		private async Task Cleanup()
 		{
-			_isDisconnecting = true;
+			_disconnectEvent.Set();
 
 			await _webSocket.DisconnectAsync().ConfigureAwait(false);
 #if !DNXCORE50
@@ -582,7 +583,6 @@ namespace Discord
 			_runTask = null;
 			_isConnected = false;
 			_isDisconnecting = false;
-            Monitor.Pulse(_disconnectEvent);
 		}
 
 		//Voice
@@ -685,8 +685,8 @@ namespace Discord
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
 		public void Block()
 		{
-			while (_isConnected)
-				Monitor.Wait(_disconnectEvent, TimeSpan.FromSeconds(3));
-		}
+			if (_isConnected)
+				_disconnectEvent.WaitOne();
+        }
 	}
 }
