@@ -107,21 +107,21 @@ namespace Discord
 				//Reconnect if we didn't cause the disconnect
 				if (e.WasUnexpected)
 				{
-					await Task.Delay(_config.ReconnectDelay);
+					await Task.Delay(_config.ReconnectDelay).ConfigureAwait(false);
 					while (!_disconnectToken.IsCancellationRequested)
 					{
 						try
 						{
-							await _webSocket.ReconnectAsync();
+							await _webSocket.ReconnectAsync().ConfigureAwait(false);
 							if (_http.Token != null)
-								await _webSocket.Login(_http.Token);
+								await _webSocket.Login(_http.Token).ConfigureAwait(false);
 							break;
 						}
 						catch (Exception ex)
 						{
 							RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket reconnect failed: {ex.Message}");
 							//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-							await Task.Delay(_config.FailedReconnectDelay);
+							await Task.Delay(_config.FailedReconnectDelay).ConfigureAwait(false);
 						}
 					}
 				}
@@ -141,12 +141,12 @@ namespace Discord
 					//Reconnect if we didn't cause the disconnect
 					if (e.WasUnexpected)
 					{
-						await Task.Delay(_config.ReconnectDelay);
+						await Task.Delay(_config.ReconnectDelay).ConfigureAwait(false);
 						while (!_disconnectToken.IsCancellationRequested)
 						{
 							try
 							{
-								await _voiceWebSocket.ReconnectAsync();
+								await _voiceWebSocket.ReconnectAsync().ConfigureAwait(false);
 								break;
 							}
 							catch (Exception ex)
@@ -154,7 +154,7 @@ namespace Discord
 								if (_isDebugMode)
 									RaiseOnDebugMessage(DebugMessageType.Connection, $"VoiceSocket reconnect failed: {ex.Message}");
 								//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-								await Task.Delay(_config.FailedReconnectDelay);
+								await Task.Delay(_config.FailedReconnectDelay).ConfigureAwait(false);
 							}
 						}
 					}
@@ -426,7 +426,7 @@ namespace Discord
 							if (_config.EnableVoice)
 							{
 								_voiceWebSocket.SetSessionData(data.ServerId, _myId, _sessionId, data.Token);
-								await _voiceWebSocket.ConnectAsync("wss://" + data.Endpoint.Split(':')[0]);
+								await _voiceWebSocket.ConnectAsync("wss://" + data.Endpoint.Split(':')[0]).ConfigureAwait(false);
 							}
 #endif
 						}
@@ -469,7 +469,7 @@ namespace Discord
 						APIResponses.SendMessage apiMsg = null;
                         try
 						{
-							apiMsg = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce);
+							apiMsg = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }
@@ -483,7 +483,7 @@ namespace Discord
 						msg.HasFailed = hasFailed;
 						try { RaiseMessageSent(msg); } catch { }
 					}
-					await Task.Delay(_config.MessageQueueInterval);
+					await Task.Delay(_config.MessageQueueInterval).ConfigureAwait(false);
 				}
 			}
 			catch { }
@@ -499,49 +499,36 @@ namespace Discord
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
 		{
-			await Disconnect();
+			await Disconnect().ConfigureAwait(false);
 
             if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket is using cached token.");
 
-			await ConnectInternal(token);
+			await ConnectInternal(token).ConfigureAwait(false);
 		}
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
 		{
-			await Disconnect();
+			await Disconnect().ConfigureAwait(false);
 
-			var response = await _api.Login(email, password);
+			var response = await _api.Login(email, password).ConfigureAwait(false);
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got token.");
 
-			return await ConnectInternal(response.Token);
+			return await ConnectInternal(response.Token).ConfigureAwait(false);
 		}
-		/// <summary> Connects to the Discord server as an anonymous user with the provided username. </summary>
-		/// <returns> Returns a token for future connections. </returns>
-		/*public async Task<string> ConnectAnonymous(string username)
-		{
-			await Disconnect();
-
-			var response = await _api.LoginAnonymous(username);
-			if (_isDebugMode)
-				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got anonymous token.");
-			_http.Token = response.Token;
-
-			return await ConnectInternal(response.Token);
-		}*/
 
 		private async Task<string> ConnectInternal(string token)
 		{
 			_blockEvent.Reset();
 			_http.Token = token;
-			string url = (await _api.GetWebSocketEndpoint()).Url;
+			string url = (await _api.GetWebSocketEndpoint().ConfigureAwait(false)).Url;
 			if (_isDebugMode)
 				RaiseOnDebugMessage(DebugMessageType.Connection, $"DataSocket got endpoint.");
 
-			await _webSocket.ConnectAsync(url);
-			await _webSocket.Login(token);
+			await _webSocket.ConnectAsync(url).ConfigureAwait(false);
+			await _webSocket.Login(token).ConfigureAwait(false);
 
 			_disconnectToken = new CancellationTokenSource();
 			if (_config.UseMessageQueue)
@@ -550,10 +537,10 @@ namespace Discord
 				_mainTask = _disconnectToken.Wait();
 			_mainTask = _mainTask.ContinueWith(async x =>
 			{
-				await _webSocket.DisconnectAsync();
+				await _webSocket.DisconnectAsync().ConfigureAwait(false);
 #if !DNXCORE50
 				if (_config.EnableVoice)
-					await _voiceWebSocket.DisconnectAsync();
+					await _voiceWebSocket.DisconnectAsync().ConfigureAwait(false);
 #endif
 
 				//Clear send queue
@@ -569,7 +556,7 @@ namespace Discord
 				_blockEvent.Set();
 				_mainTask = null;
 			}).Unwrap();
-			_isConnected = true;
+            _isConnected = true;
 			return token;
 		}
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -578,7 +565,7 @@ namespace Discord
 			if (_mainTask != null)
 			{
 				try { _disconnectToken.Cancel(); } catch (NullReferenceException) { }
-				try { await _mainTask; } catch (NullReferenceException) { }
+				try { await _mainTask.ConfigureAwait(false); } catch (NullReferenceException) { }
 			}
 		}
 
@@ -591,13 +578,13 @@ namespace Discord
 			CheckVoice();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
-			await LeaveVoiceServer();
+			await LeaveVoiceServer().ConfigureAwait(false);
 			//_currentVoiceServerId = channel.ServerId;
 			_webSocket.JoinVoice(channel);
 #if !DNXCORE50
-			await _voiceWebSocket.BeginConnect();
+			await _voiceWebSocket.BeginConnect().ConfigureAwait(false);
 #else
-			await Task.CompletedTask;
+			await Task.CompletedTask.ConfigureAwait(false);
 #endif
 		}
 
@@ -607,9 +594,9 @@ namespace Discord
 			CheckVoice();
 
 #if !DNXCORE50
-			await _voiceWebSocket.DisconnectAsync();
+			await _voiceWebSocket.DisconnectAsync().ConfigureAwait(false);
 #else
-			await Task.CompletedTask;
+			await Task.CompletedTask.ConfigureAwait(false);
 #endif
 			//if (_voiceWebSocket.CurrentVoiceServerId != null)
 			_webSocket.LeaveVoice();
@@ -654,7 +641,7 @@ namespace Discord
 #if !DNXCORE50
 			_voiceWebSocket.Wait();
 #endif
-			await TaskHelper.CompletedTask;
+			await TaskHelper.CompletedTask.ConfigureAwait(false);
 		}
 
 		//Helpers

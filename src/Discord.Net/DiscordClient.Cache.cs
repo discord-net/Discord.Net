@@ -403,14 +403,14 @@ namespace Discord
 			var channel = user.PrivateChannel;
 			if (channel != null)
 				return channel;
-			return await CreatePMChannel(user?.Id);
+			return await CreatePMChannel(user?.Id).ConfigureAwait(false);
 		}
 		private async Task<Channel> CreatePMChannel(string userId)
 		{
 			CheckReady();
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
-			var response = await _api.CreatePMChannel(_myId, userId);
+			var response = await _api.CreatePMChannel(_myId, userId).ConfigureAwait(false);
 			return _channels.Update(response.Id, response);
 		}
 

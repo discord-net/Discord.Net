@@ -21,15 +21,15 @@ namespace Discord.API
 			=> _http.Get<APIResponses.Gateway>(Endpoints.Gateway);
         public async Task<APIResponses.AuthRegister> LoginAnonymous(string username)
 		{
-			var fingerprintResponse = await _http.Post<APIResponses.AuthFingerprint>(Endpoints.AuthFingerprint);
+			var fingerprintResponse = await _http.Post<APIResponses.AuthFingerprint>(Endpoints.AuthFingerprint).ConfigureAwait(false);
 			var registerRequest = new APIRequests.AuthRegisterRequest { Fingerprint = fingerprintResponse.Fingerprint, Username = username };
-			var registerResponse = await _http.Post<APIResponses.AuthRegister>(Endpoints.AuthRegister, registerRequest);
+			var registerResponse = await _http.Post<APIResponses.AuthRegister>(Endpoints.AuthRegister, registerRequest).ConfigureAwait(false);
 			return registerResponse;
         }
 		public async Task<APIResponses.AuthLogin> Login(string email, string password)
 		{
 			var request = new APIRequests.AuthLogin { Email = email, Password = password };
-			var response = await _http.Post<APIResponses.AuthLogin>(Endpoints.AuthLogin, request);
+			var response = await _http.Post<APIResponses.AuthLogin>(Endpoints.AuthLogin, request).ConfigureAwait(false);
 			return response;
 		}
 		public Task Logout()

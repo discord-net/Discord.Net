@@ -42,19 +42,17 @@ namespace Discord
 
 		protected virtual async Task BeginConnect()
 		{
-			await DisconnectAsync();
+			await DisconnectAsync().ConfigureAwait(false);
 			_disconnectToken = new CancellationTokenSource();
 			_disconnectReason = null;
 		}
 		public virtual async Task ConnectAsync(string url)
 		{
-			//await DisconnectAsync();
-
 			var cancelToken = _disconnectToken.Token;
 
 			_webSocket = new ClientWebSocket();
 			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
-			await _webSocket.ConnectAsync(new Uri(url), cancelToken);
+			await _webSocket.ConnectAsync(new Uri(url), cancelToken).ConfigureAwait(false);
 			_host = url;
 
 			if (_isDebug)
@@ -99,7 +97,7 @@ namespace Discord
             if (_task != null)
 			{
 				try { DisconnectInternal(new Exception("Disconnect requested by user."), false); } catch (NullReferenceException) { }
-				try { await _task; } catch (NullReferenceException) { }
+				try { await _task.ConfigureAwait(false); } catch (NullReferenceException) { }
 			}
 		}
 		
@@ -131,90 +129,94 @@ namespace Discord
 			};
 		}
 
-		private async Task ReceiveAsync()
+		private Task ReceiveAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
-			await Task.Yield();
 
-			var buffer = new byte[ReceiveChunkSize];
-			var builder = new StringBuilder();
-
-			try
+			return Task.Run(async () =>
 			{
-				while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
+				var buffer = new byte[ReceiveChunkSize];
+				var builder = new StringBuilder();
+
+				try
 				{
-					WebSocketReceiveResult result = null;
-					do
+					while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
 					{
-						if (_webSocket.State != WebSocketState.Open || cancelToken.IsCancellationRequested)
-							return;
+						WebSocketReceiveResult result = null;
+						do
+						{
+							if (_webSocket.State != WebSocketState.Open || cancelToken.IsCancellationRequested)
+								return;
 
-                        try
-						{
-							result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);
-                        }
-						catch (Win32Exception ex) 
-						when (ex.HResult == HR_TIMEOUT)
-						{
-							string msg = $"Connection timed out.";
-							RaiseOnDebugMessage(DebugMessageType.Connection, msg);
-							DisconnectInternal(new Exception(msg));
-							return;
+							try
+							{
+								result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken).ConfigureAwait(false);
+							}
+							catch (Win32Exception ex)
+							when (ex.HResult == HR_TIMEOUT)
+							{
+								string msg = $"Connection timed out.";
+								RaiseOnDebugMessage(DebugMessageType.Connection, msg);
+								DisconnectInternal(new Exception(msg));
+								return;
+							}
+
+							if (result.MessageType == WebSocketMessageType.Close)
+							{
+								string msg = $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})";
+								RaiseOnDebugMessage(DebugMessageType.Connection, msg);
+								DisconnectInternal(new Exception(msg));
+								await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).ConfigureAwait(false);
+								return;
+							}
+							else
+								builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+
 						}
-
-						if (result.MessageType == WebSocketMessageType.Close)
-						{
-							string msg = $"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})";
-							RaiseOnDebugMessage(DebugMessageType.Connection, msg);
-							DisconnectInternal(new Exception(msg));
-							await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-							return;
-						}
-						else
-							builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-
-					}
-					while (result == null || !result.EndOfMessage);
+						while (result == null || !result.EndOfMessage);
 
 #if DEBUG
-					System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
+						System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
 #endif
-					await ProcessMessage(builder.ToString());
+						await ProcessMessage(builder.ToString()).ConfigureAwait(false);
 
-					builder.Clear();
+						builder.Clear();
+					}
 				}
-			}
-			catch (OperationCanceledException) { }
-			catch (Exception ex) { DisconnectInternal(ex); }
-		}
-		private async Task SendAsync()
+				catch (OperationCanceledException) { }
+				catch (Exception ex) { DisconnectInternal(ex); }
+			});
+        }
+		private Task SendAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
-			await Task.Yield();
 
-			try
+			return Task.Run(async () =>
 			{
-				byte[] bytes;
-				while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
+				try
 				{
-					if (_heartbeatInterval > 0)
+					byte[] bytes;
+					while (_webSocket.State == WebSocketState.Open && !cancelToken.IsCancellationRequested)
 					{
-						DateTime now = DateTime.UtcNow;
-						if ((now - _lastHeartbeat).TotalMilliseconds > _heartbeatInterval)
+						if (_heartbeatInterval > 0)
 						{
-							await SendMessage(GetKeepAlive(), cancelToken);
-							_lastHeartbeat = now;
+							DateTime now = DateTime.UtcNow;
+							if ((now - _lastHeartbeat).TotalMilliseconds > _heartbeatInterval)
+							{
+								await SendMessage(GetKeepAlive(), cancelToken).ConfigureAwait(false);
+								_lastHeartbeat = now;
+							}
 						}
+						while (_sendQueue.TryDequeue(out bytes))
+							await SendMessage(bytes, cancelToken).ConfigureAwait(false);
+						await Task.Delay(_sendInterval, cancelToken).ConfigureAwait(false);
 					}
-					while (_sendQueue.TryDequeue(out bytes))
-						await SendMessage(bytes, cancelToken);
-					await Task.Delay(_sendInterval, cancelToken);
 				}
-			}
-			catch (OperationCanceledException) { }
-			catch (Exception ex) { DisconnectInternal(ex); }
+				catch (OperationCanceledException) { }
+				catch (Exception ex) { DisconnectInternal(ex); }
+			});
 		}
 
 		protected abstract Task ProcessMessage(string json);
@@ -252,7 +254,7 @@ namespace Discord
 				
 				try
 				{
-					await _webSocket.SendAsync(new ArraySegment<byte>(message, offset, count), WebSocketMessageType.Text, isLast, cancelToken);
+					await _webSocket.SendAsync(new ArraySegment<byte>(message, offset, count), WebSocketMessageType.Text, isLast, cancelToken).ConfigureAwait(false);
 				}
 				catch (Win32Exception ex)
 				when (ex.HResult == HR_TIMEOUT)

@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using WebSocketMessage = Discord.API.Models.VoiceWebSocketCommands.WebSocketMessage;
+using Discord.Helpers;
 
 namespace Discord
 {
@@ -65,29 +66,26 @@ namespace Discord
 			_isClearing = false;
 
 			var cancelToken = _disconnectToken.Token;
-			Task.Factory.StartNew(async () =>
+			Task.Run(async () =>
 			{
-				_connectWaitOnLogin.Reset();
-
-				VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
-				msg.Payload.ServerId = _serverId;
-				msg.Payload.SessionId = _sessionId;
-				msg.Payload.Token = _token;
-				msg.Payload.UserId = _userId;
-				await SendMessage(msg, cancelToken);
-
 				try
 				{
+					_connectWaitOnLogin.Reset();
+
+					VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
+					msg.Payload.ServerId = _serverId;
+					msg.Payload.SessionId = _sessionId;
+					msg.Payload.Token = _token;
+					msg.Payload.UserId = _userId;
+					await SendMessage(msg, cancelToken).ConfigureAwait(false);
+
 					if (!_connectWaitOnLogin.Wait(_timeout, cancelToken))
 						return;
-				}
-				catch (OperationCanceledException)
-				{
-					return;
-				}
 
-				SetConnected();
-			});
+					SetConnected();
+				}
+				catch (OperationCanceledException) { }
+            }, _disconnectToken.Token);
 		}
 		protected override void OnDisconnect()
 		{
@@ -128,41 +126,45 @@ namespace Discord
 
 		public new async Task BeginConnect()
 		{
-			await base.BeginConnect();
+			await base.BeginConnect().ConfigureAwait(false);
 			var cancelToken = _disconnectToken.Token;
 
-			await Task.Yield();
-			try
+			await Task.Factory.StartNew(() =>
 			{
-				if (!_connectWaitOnLogin.Wait(_timeout, cancelToken)) //Waiting on JoinServer message
-					throw new Exception("No reply from Discord server");
-			}
-			catch (OperationCanceledException)
-			{
-				if (_disconnectReason == null)
-					throw new Exception("An unknown websocket error occurred.");
-				else
-					_disconnectReason.Throw();
-			}
+				try
+				{
+					if (!_connectWaitOnLogin.Wait(_timeout, cancelToken)) //Waiting on JoinServer message
+						throw new Exception("No reply from Discord server");
+				}
+				catch (OperationCanceledException)
+				{
+					if (_disconnectReason == null)
+						throw new Exception("An unknown websocket error occurred.");
+					else
+						_disconnectReason.Throw();
+				}
+			}).ConfigureAwait(false);
 		}
 		
 		private async Task ReceiveVoiceAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
-			await Task.Yield();
 
-			try
+			await Task.Run(async () =>
 			{
-				while (!cancelToken.IsCancellationRequested)
+				try
 				{
-					var result = await _udp.ReceiveAsync();
-					ProcessUdpMessage(result);
+					while (!cancelToken.IsCancellationRequested)
+					{
+						var result = await _udp.ReceiveAsync().ConfigureAwait(false);
+						ProcessUdpMessage(result);
+					}
 				}
-			}
-			catch (OperationCanceledException) { }
-			catch (ObjectDisposedException) { }
-			catch (Exception ex) { DisconnectInternal(ex); }
+				catch (OperationCanceledException) { }
+				catch (ObjectDisposedException) { }
+				catch (Exception ex) { DisconnectInternal(ex); }
+			}).ConfigureAwait(false);
 		}
 
 #if USE_THREAD
@@ -170,11 +172,12 @@ namespace Discord
 		{
 			var cancelToken = cancelSource.Token;
 #else
-		private async Task SendVoiceAsync()
+		private Task SendVoiceAsync()
 		{
 			var cancelSource = _disconnectToken;
 			var cancelToken = cancelSource.Token;
-			await Task.Yield();
+			return Task.Run(() =>
+			{
 #endif
 
 			byte[] packet;
@@ -224,7 +227,7 @@ namespace Discord
 #if USE_THREAD
 									_udp.Send(rtpPacket, packet.Length + 12);
 #else
-									await _udp.SendAsync(rtpPacket, packet.Length + 12);
+									await _udp.SendAsync(rtpPacket, packet.Length + 12).ConfigureAwait(false);
 #endif
 								}
 								timestamp = unchecked(timestamp + samplesPerFrame);
@@ -247,24 +250,23 @@ namespace Discord
 #if USE_THREAD
 						Thread.Sleep(1);
 #else
-						await Task.Delay(1);
+						await Task.Delay(1).ConfigureAwait(false);
 #endif
 				}
 			}
 			catch (OperationCanceledException) { }
 			catch (ObjectDisposedException) { }
 			catch (Exception ex) { DisconnectInternal(ex); }
-        }
-			//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
-		private async Task WatcherAsync()
+#if !USE_THREAD
+		}).ConfigureAwait(false);
+#endif
+		}
+		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
+		private Task WatcherAsync()
 		{
 			var cancelToken = _disconnectToken.Token;
-			try
-			{
-				await Task.Delay(-1, cancelToken);
-			}
-			catch (OperationCanceledException) { }
-			finally { _udp.Close(); }
+			return cancelToken.Wait()
+				.ContinueWith(_ => _udp.Close());
         }
 		
 		protected override async Task ProcessMessage(string json)
@@ -279,7 +281,7 @@ namespace Discord
 							var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
-							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", ""))).FirstOrDefault(), payload.Port);
+							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
 							//_mode = payload.Modes.LastOrDefault();
 							_mode = "plain";
 							_udp.Connect(_endpoint);
@@ -295,7 +297,7 @@ namespace Discord
 								0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 								0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 								0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-								0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }, 70);
+								0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }, 70).ConfigureAwait(false);
 						}
 					}
 					break;

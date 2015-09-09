@@ -117,7 +117,7 @@ namespace Discord.Helpers
 		private async Task<ResponseT> Send<ResponseT>(HttpMethod method, string path, HttpContent content)
 			where ResponseT : class
 		{
-			string responseJson = await SendRequest(method, path, content, true);
+			string responseJson = await SendRequest(method, path, content, true).ConfigureAwait(false);
 #if TEST_RESPONSES
 			if (path.StartsWith(Endpoints.BaseApi))
 				return JsonConvert.DeserializeObject<ResponseT>(responseJson, _settings);
@@ -127,7 +127,7 @@ namespace Discord.Helpers
 #if TEST_RESPONSES
 		private async Task<string> Send(HttpMethod method, string path, HttpContent content)
 		{
-			string responseJson = await SendRequest(method, path, content, true);
+			string responseJson = await SendRequest(method, path, content, true).ConfigureAwait(false);
 			if (path.StartsWith(Endpoints.BaseApi) && !string.IsNullOrEmpty(responseJson))
 				throw new Exception("API check failed: Response is not empty.");
 			return responseJson;
@@ -146,12 +146,12 @@ namespace Discord.Helpers
 				{
 					if (content is StringContent)
 					{
-						string json = await (content as StringContent).ReadAsStringAsync();
+						string json = await (content as StringContent).ReadAsStringAsync().ConfigureAwait(false);
 						RaiseOnDebugMessage(DebugMessageType.XHRRawOutput, $"{method} {path}: {json}");
 					}
 					else
 					{
-						byte[] bytes = await content.ReadAsByteArrayAsync();
+						byte[] bytes = await content.ReadAsByteArrayAsync().ConfigureAwait(false);
 						RaiseOnDebugMessage(DebugMessageType.XHRRawOutput, $"{method} {path}: {bytes.Length} bytes");
 					}
 				}
@@ -167,14 +167,14 @@ namespace Discord.Helpers
 				HttpResponseMessage response;
 				if (hasResponse)
 				{
-					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead);
+					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
 					if (!response.IsSuccessStatusCode)
 						throw new HttpException(response.StatusCode);
-					result = await response.Content.ReadAsStringAsync();
+					result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				}
 				else
 				{
-					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead);
+					response = await _client.SendAsync(msg, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 					if (!response.IsSuccessStatusCode)
 						throw new HttpException(response.StatusCode);
 					result = null;

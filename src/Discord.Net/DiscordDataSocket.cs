@@ -27,8 +27,8 @@ namespace Discord
 			_lastSeq = 0;
 			_lastSession = null;
 			_redirectServer = null;
-			await BeginConnect();
-			await base.ConnectAsync(url);
+			await BeginConnect().ConfigureAwait(false);
+			await base.ConnectAsync(url).ConfigureAwait(false);
 		}
 		public async Task Login(string token)
 		{
@@ -44,7 +44,7 @@ namespace Discord
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			msg.Payload.Properties["$referrer"] = "";
 			msg.Payload.Properties["$referring_domain"] = "";
-			await SendMessage(msg, cancelToken);
+			await SendMessage(msg, cancelToken).ConfigureAwait(false);
 
 			try
 			{

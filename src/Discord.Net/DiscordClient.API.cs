@@ -24,7 +24,7 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			if (region == null) throw new ArgumentNullException(nameof(region));
 
-			var response = await _api.CreateServer(name, region);
+			var response = await _api.CreateServer(name, region).ConfigureAwait(false);
 			return _servers.Update(response.Id, response);
 		}
 
@@ -37,7 +37,7 @@ namespace Discord
 			CheckReady();
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			try { await _api.LeaveServer(serverId); }
+			try { await _api.LeaveServer(serverId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			return _servers.Remove(serverId);
 		}
@@ -54,7 +54,7 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
-			var response = await _api.CreateChannel(serverId, name, type);
+			var response = await _api.CreateChannel(serverId, name, type).ConfigureAwait(false);
 			return _channels.Update(response.Id, serverId, response);
 		}
 
@@ -67,7 +67,7 @@ namespace Discord
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			try { await _api.DestroyChannel(channelId); }
+			try { await _api.DestroyChannel(channelId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			return _channels.Remove(channelId);
 		}
@@ -108,7 +108,7 @@ namespace Discord
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
-			try { await _api.Unban(serverId, userId); }
+			try { await _api.Unban(serverId, userId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
@@ -139,7 +139,7 @@ namespace Discord
 			if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
 			if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 
-			var response = await _api.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass);
+			var response = await _api.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass).ConfigureAwait(false);
 			_channels.Update(response.Channel.Id, response.Server.Id, response.Channel);
 			_servers.Update(response.Server.Id, response.Server);
 			_users.Update(response.Inviter.Id, response.Inviter);
@@ -163,7 +163,7 @@ namespace Discord
 			CheckReady();
 			if (id == null) throw new ArgumentNullException(nameof(id));
 
-			var response = await _api.GetInvite(id);
+			var response = await _api.GetInvite(id).ConfigureAwait(false);
 			return new Invite(response.Code, response.XkcdPass, this)
 			{
 				ChannelId = response.Channel.Id,
@@ -195,8 +195,8 @@ namespace Discord
 				id = id.Substring(0, id.Length - 1);
 
 			//Check if this is a human-readable link and get its ID
-			var response = await _api.GetInvite(id);
-			await _api.AcceptInvite(response.Code);
+			var response = await _api.GetInvite(id).ConfigureAwait(false);
+			await _api.AcceptInvite(response.Code).ConfigureAwait(false);
 		}
 
 		/// <summary> Deletes the provided invite. </summary>
@@ -208,8 +208,8 @@ namespace Discord
 			try
 			{
 				//Check if this is a human-readable link and get its ID
-				var response = await _api.GetInvite(id);
-				await _api.DeleteInvite(response.Code);
+				var response = await _api.GetInvite(id).ConfigureAwait(false);
+				await _api.DeleteInvite(response.Code).ConfigureAwait(false);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
@@ -257,31 +257,28 @@ namespace Discord
 				}
 				else
 				{
-					var msg = await _api.SendMessage(channelId, blockText, mentions, nonce);
+					var msg = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
 					result[i] = _messages.Update(msg.Id, channelId, msg);
 					result[i].Nonce = nonce;
 					try { RaiseMessageSent(result[i]); } catch { }
 				}
-				await Task.Delay(1000);
+				await Task.Delay(1000).ConfigureAwait(false);
 			}
 			return result;
 		}
 
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(User user, string text)
-			=> await SendMessage(await GetPMChannel(user), text, new string[0]);
+		{
+			var channel = await GetPMChannel(user).ConfigureAwait(false);
+			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
+		}
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(string userId, string text)
-			=> await SendMessage(await GetPMChannel(userId), text, new string[0]);
-		/*/// <summary> Sends a private message to the provided user, mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public async Task<Message[]> SendPrivateMessage(User user, string text, string[] mentions)
-			=> SendMessage(await GetOrCreatePMChannel(user), text, mentions);
-		/// <summary> Sends a private message to the provided user, mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public async Task<Message[]> SendPrivateMessage(string userId, string text, string[] mentions)
-			=> SendMessage(await GetOrCreatePMChannel(userId), text, mentions);*/
-
+		{
+			var channel = await GetPMChannel(userId).ConfigureAwait(false);
+			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
+		}
 
 		/// <summary> Edits a message the provided message. </summary>
 		public Task EditMessage(Message message, string text)
@@ -313,7 +310,7 @@ namespace Discord
 			if (text.Length > DiscordAPI.MaxMessageSize)
 				text = text.Substring(0, DiscordAPI.MaxMessageSize);
 
-			var msg = await _api.EditMessage(channelId, messageId, text, mentions);
+			var msg = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
 			_messages.Update(msg.Id, channelId, msg);
 		}
 
@@ -329,7 +326,7 @@ namespace Discord
 
 			try
 			{
-				await _api.DeleteMessage(channelId, msgId);
+				await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
 				_messages.Remove(msgId);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
@@ -343,7 +340,7 @@ namespace Discord
 			{
                 try
 				{
-					await _api.DeleteMessage(msg.ChannelId, msg.Id);
+					await _api.DeleteMessage(msg.ChannelId, msg.Id).ConfigureAwait(false);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
@@ -357,7 +354,7 @@ namespace Discord
 			{
                 try
 				{
-					await _api.DeleteMessage(channelId, msgId);
+					await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
@@ -404,7 +401,7 @@ namespace Discord
 			{
 				try
 				{
-					var msgs = await _api.GetMessages(channel.Id, count);
+					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
 					return msgs.OrderBy(x => x.Timestamp)
 						.Select(x =>
 						{
@@ -503,21 +500,21 @@ namespace Discord
 		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
 		{
 			CheckReady();
-			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword);
+			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword).ConfigureAwait(false);
 			_users.Update(response.Id, response);
 		}
 		/// <summary> Changes your email to newEmail. </summary>
 		public async Task ChangeEmail(string newEmail, string currentPassword)
 		{
 			CheckReady();
-			var response = await _api.ChangeEmail(newEmail, currentPassword);
+			var response = await _api.ChangeEmail(newEmail, currentPassword).ConfigureAwait(false);
 			_users.Update(response.Id, response);
 		}
 		/// <summary> Changes your password to newPassword. </summary>
 		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
 		{
 			CheckReady();
-			var response = await _api.ChangePassword(newPassword, currentEmail, currentPassword);
+			var response = await _api.ChangePassword(newPassword, currentEmail, currentPassword).ConfigureAwait(false);
 			_users.Update(response.Id, response);
 		}
 
@@ -526,7 +523,7 @@ namespace Discord
 		public async Task ChangeAvatar(AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
 		{
 			CheckReady();
-			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword);
+			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword).ConfigureAwait(false);
 			_users.Update(response.Id, response);
 		}
 	}
