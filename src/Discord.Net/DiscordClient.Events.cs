@@ -25,7 +25,7 @@ namespace Discord
 		public readonly LogMessageSeverity Severity;
 		public readonly LogMessageSource Source;
 		public readonly string Message;
-		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) { Severity = severity; Message = msg; }
+		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) { Severity = severity; Source = source; Message = msg; }
 	}
 	public sealed class ServerEventArgs : EventArgs
 	{
