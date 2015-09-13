@@ -1,4 +1,5 @@
-﻿using Discord.Helpers;
+﻿using Discord.Net.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ namespace Discord
 	public sealed class Server
 	{
 		private readonly DiscordClient _client;
+		private ConcurrentDictionary<string, bool> _bans, _channels, _invites, _members, _roles;
 
 		/// <summary> Returns the unique identifier for this server. </summary>
 		public string Id { get; }
@@ -24,115 +26,127 @@ namespace Discord
 		/// <summary> Returns the endpoint for this server's voice server. </summary>
 		internal string VoiceServer { get; set; }
 
+		/// <summary> Returns true if the current user created this server. </summary>
+		public bool IsOwner => _client.CurrentUserId == OwnerId;
 		/// <summary> Returns the id of the user that first created this server. </summary>
 		public string OwnerId { get; internal set; }
 		/// <summary> Returns the user that first created this server. </summary>
-		public User Owner => _client.GetUser(OwnerId);
-		/// <summary> Returns true if the current user created this server. </summary>
-		public bool IsOwner => _client.User?.Id == OwnerId;
+		[JsonIgnore]
+		public User Owner => _client.Users[OwnerId];
 
 		/// <summary> Returns the id of the AFK voice channel for this server (see AFKTimeout). </summary>
 		public string AFKChannelId { get; internal set; }
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
-		public Channel AFKChannel => _client.GetChannel(AFKChannelId);
+		[JsonIgnore]
+		public Channel AFKChannel => _client.Channels[AFKChannelId];
 
 		/// <summary> Returns the id of the default channel for this server. </summary>
 		public string DefaultChannelId => Id;
 		/// <summary> Returns the default channel for this server. </summary>
-		public Channel DefaultChannel =>_client.GetChannel(DefaultChannelId);
-
-		internal AsyncCache<Member, API.Models.MemberInfo> _members;
-		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Member> Members => _members;
-
-		internal ConcurrentDictionary<string, bool> _bans;
-		/// <summary> Returns a collection of all users banned on this server. </summary>
-		/// <remarks> Only users seen in other servers will be returned. To get a list of all users, use BanIds. </remarks>
-		public IEnumerable<User> Bans => _bans.Keys.Select(x => _client.GetUser(x));
+		[JsonIgnore]
+		public Channel DefaultChannel => _client.Channels[DefaultChannelId];
+		
 		/// <summary> Returns a collection of the ids of all users banned on this server. </summary>
-		public IEnumerable<string> BanIds => _bans.Keys;
+		[JsonIgnore]
+		public IEnumerable<string> BanIds => _bans.Select(x => x.Key);
 
+		/// <summary> Returns a collection of the ids of all channels within this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<string> ChannelIds => _channels.Select(x => x.Key);
 		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.ServerId == Id);
+		[JsonIgnore]
+		public IEnumerable<Channel> Channels => _channels.Select(x => _client.Channels[x.Key]);
 		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Channel> TextChannels => _client.Channels.Where(x => x.ServerId == Id && x.Type == ChannelTypes.Text);
+		[JsonIgnore]
+		public IEnumerable<Channel> TextChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelTypes.Text);
 		/// <summary> Returns a collection of all channels within this server. </summary>
-		public IEnumerable<Channel> VoiceChannels => _client.Channels.Where(x => x.ServerId == Id && x.Type == ChannelTypes.Voice);
+		[JsonIgnore]
+		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelTypes.Voice);
+		
+		/// <summary> Returns a collection of all invite codes to this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<string> InviteCodes => _invites.Select(x => x.Key);
+		/*/// <summary> Returns a collection of all invites to this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<Invite> Invites => _invites.Select(x => _client.Invites[x.Key]);*/
+
+		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
+		[JsonIgnore]
+		public IEnumerable<Member> Members => _members.Select(x => _client.Members[x.Key, Id]);
+		/// <summary> Returns a collection of the ids of all users within this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<string> UserIds => _members.Select(x => x.Key);
+		/// <summary> Returns a collection of all users within this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<User> Users => _members.Select(x => _client.Users[x.Key]);
+
+		/// <summary> Returns a collection of the ids of all roles within this server. </summary>
+		[JsonIgnore]
+		public IEnumerable<string> RoleIds => _roles.Select(x => x.Key);
 		/// <summary> Returns a collection of all roles within this server. </summary>
-		public IEnumerable<Role> Roles => _client.Roles.Where(x => x.ServerId == Id);
+		[JsonIgnore]
+		public IEnumerable<Role> Roles => _roles.Select(x => _client.Roles[x.Key]);
 
-		internal Server(string id, DiscordClient client)
+		internal Server(DiscordClient client, string id)
 		{
-			Id = id;
 			_client = client;
+			Id = id;
 			_bans = new ConcurrentDictionary<string, bool>();
-			_members = new AsyncCache<Member, API.Models.MemberInfo>(
-				(key, parentKey) =>
-				{
-					if (_client.IsDebugMode)
-						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Created user {key} in server {parentKey}.");
-                    return new Member(parentKey, key, _client);
-				},
-				(member, model) =>
-				{
-					if (model is API.Models.PresenceMemberInfo)
-					{
-						var extendedModel = model as API.Models.PresenceMemberInfo;
-						member.Status = extendedModel.Status;
-						member.GameId = extendedModel.GameId;
-					}
-					if (model is API.Models.VoiceMemberInfo)
-					{
-						var extendedModel = model as API.Models.VoiceMemberInfo;
-						member.VoiceChannelId = extendedModel.ChannelId;
-						member.IsDeafened = extendedModel.IsDeafened;
-						member.IsMuted = extendedModel.IsMuted;
-						if (extendedModel.IsSelfDeafened.HasValue)
-							member.IsSelfDeafened = extendedModel.IsSelfDeafened.Value;
-						if (extendedModel.IsSelfMuted.HasValue)
-							member.IsSelfMuted = extendedModel.IsSelfMuted.Value;
-						member.IsSuppressed = extendedModel.IsSuppressed;
-						member.SessionId = extendedModel.SessionId;
-						member.Token = extendedModel.Token;
-					}
-					if (model is API.Models.RoleMemberInfo)
-					{
-						var extendedModel = model as API.Models.RoleMemberInfo;
-						member.RoleIds = extendedModel.Roles;
-						if (extendedModel.JoinedAt.HasValue)
-							member.JoinedAt = extendedModel.JoinedAt.Value;
-					}
-					if (model is API.Models.InitialMemberInfo)
-					{
-						var extendedModel = model as API.Models.InitialMemberInfo;
-						member.IsDeafened = extendedModel.IsDeafened;
-						member.IsMuted = extendedModel.IsMuted;
-					}
-					if (_client.IsDebugMode)
-						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Updated user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
-				},
-				(member) =>
-				{
-					if (_client.IsDebugMode)
-						_client.RaiseOnDebugMessage(DebugMessageType.Cache, $"Destroyed user {member.User?.Name} ({member.UserId}) in server {member.Server?.Name} ({member.ServerId}).");
-				}
-			);
+			_channels = new ConcurrentDictionary<string, bool>();
+			_invites = new ConcurrentDictionary<string, bool>();
+			_members = new ConcurrentDictionary<string, bool>();
+			_roles = new ConcurrentDictionary<string, bool>();
 		}
 
-		internal Member UpdateMember(API.Models.MemberInfo membership)
+		internal void Update(GuildInfo model)
 		{
-			return _members.Update(membership.User?.Id ?? membership.UserId, Id, membership);
+			AFKChannelId = model.AFKChannelId;
+			AFKTimeout = model.AFKTimeout;
+			if (model.JoinedAt.HasValue)
+				JoinedAt = model.JoinedAt.Value;
+			OwnerId = model.OwnerId;
+			Region = model.Region;
+
+			var roles = _client.Roles;
+			foreach (var subModel in model.Roles)
+			{
+				var role = roles.GetOrAdd(subModel.Id, Id);
+				role.Update(subModel);
+			}
 		}
-		internal Member RemoveMember(string userId)
+		internal void Update(ExtendedGuildInfo model)
 		{
-			return _members.Remove(userId);
+			Update(model as GuildInfo);
+
+			var channels = _client.Channels;
+			foreach (var subModel in model.Channels)
+			{
+				var channel = channels.GetOrAdd(subModel.Id, Id);
+				channel.Update(subModel);
+			}
+
+			var users = _client.Users;
+			var members = _client.Members;
+			foreach (var subModel in model.Members)
+			{
+				var user = users.GetOrAdd(subModel.UserId);
+				var member = members.GetOrAdd(subModel.UserId, Id);
+				user.Update(subModel.User);
+				member.Update(subModel);
+			}
+			foreach (var subModel in model.VoiceStates)
+			{
+				var member = members.GetOrAdd(subModel.UserId, Id);
+				member.Update(subModel);
+			}
+			foreach (var subModel in model.Presences)
+			{
+				var member = members.GetOrAdd(subModel.UserId, Id);
+				member.Update(subModel);
+			}
 		}
-		public Member GetMembership(User user)
-			=> GetMember(user.Id);
-        public Member GetMember(string userId)
-		{
-			return _members[userId];
-		}
+
+		public override string ToString() => Name;
 
 		internal void AddBan(string banId)
 		{
@@ -144,9 +158,48 @@ namespace Discord
 			return _bans.TryRemove(banId, out ignored);
 		}
 
-		public override string ToString()
+		internal void AddChannel(string channelId)
 		{
-			return Name;
+			_channels.TryAdd(channelId, true);
+		}
+		internal bool RemoveChannel(string channelId)
+		{
+			bool ignored;
+			return _channels.TryRemove(channelId, out ignored);
+		}
+
+		internal void AddInvite(string inviteId)
+		{
+			_invites.TryAdd(inviteId, true);
+		}
+		internal bool RemoveInvite(string inviteId)
+		{
+			bool ignored;
+			return _invites.TryRemove(inviteId, out ignored);
+		}
+
+		internal void AddMember(string userId)
+		{
+			_members.TryAdd(userId, true);
+		}
+		internal bool RemoveMember(string userId)
+		{
+			bool ignored;
+			return _members.TryRemove(userId, out ignored);
+		}
+		internal bool HasMember(string userId)
+		{
+			return _members.ContainsKey(userId);
+		}
+
+		internal void AddRole(string roleId)
+		{
+			_roles.TryAdd(roleId, true);
+		}
+		internal bool RemoveRole(string roleId)
+		{
+			bool ignored;
+			return _roles.TryRemove(roleId, out ignored);
 		}
 	}
 }

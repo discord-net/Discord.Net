@@ -4,9 +4,9 @@
 
 using Newtonsoft.Json;
 
-namespace Discord.API.Models
+namespace Discord.Net.WebSockets
 {
-	internal static class VoiceWebSocketEvents
+	internal static class VoiceEvents
 	{
 		public sealed class Ready
 		{

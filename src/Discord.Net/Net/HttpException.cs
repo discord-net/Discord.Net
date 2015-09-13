@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Discord
+namespace Discord.Net
 {
 	public class HttpException : Exception
 	{
@@ -9,8 +9,8 @@ namespace Discord
 
 		public HttpException(HttpStatusCode statusCode)
 			: base($"The server responded with error {statusCode}")
-        {
+		{
 			StatusCode = statusCode;
-        }
+		}
 	}
 }

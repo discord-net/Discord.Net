@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public static class UserStatus
+	public static class UserStatus
 	{
 		/// <summary> User is currently online and active. </summary>
 		public const string Online = "online";

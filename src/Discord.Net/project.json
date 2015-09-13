@@ -1,5 +1,5 @@
 {
-	"version": "0.6.1-beta2",
+	"version": "0.7.0-beta1",
 	"description": "An unofficial .Net API wrapper for the Discord client.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
@@ -27,12 +27,14 @@
 	"frameworks": {
 		"net45": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.29"
+				"Microsoft.Net.Http": "2.2.29",
+				"RestSharp": "105.2.3"
 			}
 		},
 		"dnx451": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.29"
+				"Microsoft.Net.Http": "2.2.29",
+				"RestSharp": "105.2.3"
 			}
 		},
 		"dnxcore50": {

@@ -4,7 +4,7 @@ namespace Discord
 {
     public static class Format
 	{
-		private static char[] specialChars = new char[] {'_', '*', '~', '\\' }; //Backslash must always be last!
+		private static char[] specialChars = new char[] { '_', '*', '~', '\\' }; //Backslash must always be last!
 
 		/// <summary> Removes all special formatting characters from the provided text. </summary>
 		private static string Escape(string text)
@@ -21,27 +21,13 @@ namespace Discord
 						{
 							builder.Insert(i, '\\');
 							length++;
-                        }
-                    }
+						}
+					}
 				}
 				return builder.ToString();
 			}
 			return text;
-        }
-
-		/// <summary> Returns the string used to create a user mention. </summary>
-		public static string User(User user)
-			=> $"<@{user.Id}>";
-		/// <summary> Returns the string used to create a user mention. </summary>
-		public static string User(string userId)
-			=> $"<@{userId}>";
-
-		/// <summary> Returns the string used to create a channel mention. </summary>
-		public static string Channel(Channel channel)
-			=> $"<#{channel.Id}>";
-		/// <summary> Returns the string used to create a channel mention. </summary>
-		public static string Channel(string channelId)
-			=> $"<#{channelId}>";
+		}
 
 		/// <summary> Returns a markdown-formatted string with no formatting, optionally escaping the contents. </summary>
 		public static string Normal(string text, bool escape = true)

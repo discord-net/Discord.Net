@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Net.API;
+using Newtonsoft.Json;
 
 namespace Discord
 {
@@ -8,7 +9,7 @@ namespace Discord
 
 		/// <summary> Returns the unique identifier for this invite. </summary>
 		public string Id { get; }
-		
+
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
 		public int MaxAge { get; internal set; }
 		/// <summary> The amount  of times this invite has been used. </summary>
@@ -23,31 +24,51 @@ namespace Discord
 		public string XkcdPass { get; }
 
 		/// <summary> Returns a URL for this invite using XkcdPass if available or Id if not. </summary>
-		public string Url => API.Endpoints.InviteUrl(XkcdPass ?? Id);
+		public string Url => Endpoints.InviteUrl(XkcdPass ?? Id);
 
 		/// <summary> Returns the id of the user that created this invite. </summary>
 		public string InviterId { get; internal set; }
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
-		public User Inviter => _client.GetUser(InviterId);
+		public User Inviter => _client.Users[InviterId];
 
 		/// <summary> Returns the id of the server this invite is to. </summary>
 		public string ServerId { get; internal set; }
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.GetServer(ServerId);
+		public Server Server => _client.Servers[ServerId];
 
 		/// <summary> Returns the id of the channel this invite is to. </summary>
 		public string ChannelId { get; internal set; }
 		/// <summary> Returns the channel this invite is to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.GetChannel(ChannelId);
+		public Channel Channel => _client.Channels[ChannelId];
 
-		internal Invite(string code, string xkcdPass, DiscordClient client)
+		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId)
 		{
+			_client = client;
 			Id = code;
 			XkcdPass = xkcdPass;
-			_client = client;
-		}		
+			ServerId = serverId;
+		}
+
+		public override string ToString() => XkcdPass ?? Id;
+
+		internal void Update(Net.API.Invite model)
+		{
+			ChannelId = model.Channel.Id;
+			InviterId = model.Inviter.Id;
+			ServerId = model.Guild.Id;
+		}
+
+		internal void Update(Net.API.ExtendedInvite model)
+		{
+			Update(model as Net.API.Invite);
+            IsRevoked = model.IsRevoked;
+			IsTemporary = model.IsTemporary;
+			MaxAge = model.MaxAge;
+			MaxUses = model.MaxUses;
+			Uses = model.Uses;
+        }
 	}
 }

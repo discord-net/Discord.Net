@@ -37,42 +37,52 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\DiscordBot\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\DiscordBot\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="lib\libopus.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\opus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net\API\DiscordAPI.cs">
-      <Link>API\DiscordAPI.cs</Link>
+    <Compile Include="..\Discord.Net\Audio\Opus.cs">
+      <Link>Audio\Opus.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Endpoints.cs">
-      <Link>API\Endpoints.cs</Link>
+    <Compile Include="..\Discord.Net\Audio\OpusEncoder.cs">
+      <Link>Audio\OpusEncoder.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\APIRequests.cs">
-      <Link>API\Models\APIRequests.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\AsyncCollection.cs">
+      <Link>Collections\AsyncCollection.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\APIResponses.cs">
-      <Link>API\Models\APIResponses.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Channels.cs">
+      <Link>Collections\Channels.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\Common.cs">
-      <Link>API\Models\Common.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Members.cs">
+      <Link>Collections\Members.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\TextWebSocketCommands.cs">
-      <Link>API\Models\TextWebSocketCommands.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Messages.cs">
+      <Link>Collections\Messages.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\TextWebSocketEvents.cs">
-      <Link>API\Models\TextWebSocketEvents.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Roles.cs">
+      <Link>Collections\Roles.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketCommands.cs">
-      <Link>API\Models\VoiceWebSocketCommands.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Servers.cs">
+      <Link>Collections\Servers.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Models\VoiceWebSocketEvents.cs">
-      <Link>API\Models\VoiceWebSocketEvents.cs</Link>
+    <Compile Include="..\Discord.Net\Collections\Users.cs">
+      <Link>Collections\Users.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
@@ -86,23 +96,11 @@
     <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
       <Link>DiscordClient.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Voice.cs">
+      <Link>DiscordClient.Voice.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordDataSocket.cs">
-      <Link>DiscordDataSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordDataSocket.Events.cs">
-      <Link>DiscordDataSocket.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordVoiceSocket.cs">
-      <Link>DiscordVoiceSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocket.cs">
-      <Link>DiscordWebSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocket.Events.cs">
-      <Link>DiscordWebSocket.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
       <Link>Enums\ChannelTypes.cs</Link>
@@ -116,29 +114,17 @@
     <Compile Include="..\Discord.Net\Format.cs">
       <Link>Format.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\AsyncCache.cs">
-      <Link>Helpers\AsyncCache.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Helpers\Extensions.cs">
       <Link>Helpers\Extensions.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\JsonHttpClient.cs">
-      <Link>Helpers\JsonHttpClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\JsonHttpClient.Events.cs">
-      <Link>Helpers\JsonHttpClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Helpers\MessageCleaner.cs">
+      <Link>Helpers\MessageCleaner.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
       <Link>Helpers\TaskHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\HttpException.cs">
-      <Link>HttpException.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\lib\Opus\API.cs">
-      <Link>lib\Opus\API.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\lib\Opus\OpusEncoder.cs">
-      <Link>lib\Opus\OpusEncoder.cs</Link>
+    <Compile Include="..\Discord.Net\Mention.cs">
+      <Link>Mention.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
@@ -163,6 +149,66 @@
     </Compile>
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\Common.cs">
+      <Link>Net\API\Common.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\DiscordAPIClient.cs">
+      <Link>Net\API\DiscordAPIClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\Endpoints.cs">
+      <Link>Net\API\Endpoints.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\Requests.cs">
+      <Link>Net\API\Requests.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\Responses.cs">
+      <Link>Net\API\Responses.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\HttpException.cs">
+      <Link>Net\HttpException.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\RestClient.BuiltIn.cs">
+      <Link>Net\RestClient.BuiltIn.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\RestClient.cs">
+      <Link>Net\RestClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\RestClient.Events.cs">
+      <Link>Net\RestClient.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\RestClient.SharpRest.cs">
+      <Link>Net\RestClient.SharpRest.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\Commands.cs">
+      <Link>Net\WebSockets\Commands.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSocket.cs">
+      <Link>Net\WebSockets\DataWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\Events.cs">
+      <Link>Net\WebSockets\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceCommands.cs">
+      <Link>Net\WebSockets\VoiceCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceEvents.cs">
+      <Link>Net\WebSockets\VoiceEvents.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.BuiltIn.cs">
+      <Link>Net\WebSockets\WebSocket.BuiltIn.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.cs">
+      <Link>Net\WebSockets\WebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.Events.cs">
+      <Link>Net\WebSockets\WebSocket.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketMessage.cs">
+      <Link>Net\WebSockets\WebSocketMessage.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

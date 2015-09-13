@@ -54,7 +54,7 @@ namespace Discord
 
 		private readonly DiscordClient _client;
 		private string _cleanText;
-		
+
 		/// <summary> Returns the global unique identifier for this message. </summary>
 		public string Id { get; internal set; }
 		/// <summary> Returns the local unique identifier for this message. </summary>
@@ -75,7 +75,7 @@ namespace Discord
 		public string RawText { get; internal set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.CleanMessageText(RawText));
+		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.Messages.CleanText(RawText));
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; internal set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>
@@ -89,40 +89,108 @@ namespace Discord
 		public string[] MentionIds { get; internal set; }
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.GetUser(x)).Where(x => x != null);
+		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.Users[x]).Where(x => x != null);
 
 		/// <summary> Returns the id of the server containing the channel this message was sent to. </summary>
 		public string ServerId => Channel.ServerId;
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.GetServer(Channel.ServerId);
+		public Server Server => _client.Servers[Channel.ServerId];
 
 		/// <summary> Returns the id of the channel this message was sent to. </summary>
 		public string ChannelId { get; }
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.GetChannel(ChannelId);
+		public Channel Channel => _client.Channels[ChannelId];
 
+		/// <summary> Returns true if the current user created this message. </summary>
+		public bool IsAuthor => _client.CurrentUserId == UserId;
 		/// <summary> Returns the id of the author of this message. </summary>
 		public string UserId { get; internal set; }
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User User => _client.GetUser(UserId);
+		public User User => _client.Users[UserId];
+		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public Member Member => _client.GetMember(ServerId, UserId);
-		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.User?.Id == UserId;
+		public Member Member => _client.Members[ServerId, UserId];
 
-		internal Message(string id, string channelId, DiscordClient client)
+		internal Message(DiscordClient client, string id, string channelId)
 		{
+			_client = client;
 			Id = id;
 			ChannelId = channelId;
-			_client = client;
-        }
-
-		public override string ToString()
-		{
-			return User.ToString() + ": " + RawText;
 		}
-    }
+
+		internal void Update(Net.API.Message model)
+		{
+			if (model.Attachments != null)
+			{
+				Attachments = model.Attachments.Select(x => new Attachment
+				{
+					Id = x.Id,
+					Url = x.Url,
+					ProxyUrl = x.ProxyUrl,
+					Size = x.Size,
+					Filename = x.Filename,
+					Width = x.Width,
+					Height = x.Height
+				}).ToArray();
+			}
+			else
+				Attachments = new Attachment[0];
+			if (model.Embeds != null)
+			{
+				Embeds = model.Embeds.Select(x =>
+				{
+					var embed = new Embed
+					{
+						Url = x.Url,
+						Type = x.Type,
+						Description = x.Description,
+						Title = x.Title
+					};
+					if (x.Provider != null)
+					{
+						embed.Provider = new EmbedReference
+						{
+							Url = x.Provider.Url,
+							Name = x.Provider.Name
+						};
+					}
+					if (x.Author != null)
+					{
+						embed.Author = new EmbedReference
+						{
+							Url = x.Author.Url,
+							Name = x.Author.Name
+						};
+					}
+					if (x.Thumbnail != null)
+					{
+						embed.Thumbnail = new File
+						{
+							Url = x.Thumbnail.Url,
+							ProxyUrl = x.Thumbnail.ProxyUrl,
+							Width = x.Thumbnail.Width,
+							Height = x.Thumbnail.Height
+						};
+					}
+					return embed;
+				}).ToArray();
+			}
+			else
+				Embeds = new Embed[0];
+			IsMentioningEveryone = model.IsMentioningEveryone;
+			IsTTS = model.IsTextToSpeech;
+			MentionIds = model.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
+			IsMentioningMe = MentionIds.Contains(_client.CurrentUserId);
+			RawText = model.Content;
+			Timestamp = model.Timestamp;
+			EditedTimestamp = model.EditedTimestamp;
+			if (model.Author != null)
+				UserId = model.Author.Id;
+		}
+
+		public override string ToString() => User.ToString() + ": " + RawText;
+	}
 }

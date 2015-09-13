@@ -1,4 +1,4 @@
-﻿using Discord.API.Models;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,23 +24,65 @@ namespace Discord
 		/// <summary> Returns the current status for this user. </summary>
 		public string Status { get; internal set; }
 
-		public string ServerId { get; }
-		public Server Server => _client.GetServer(ServerId);
-
 		public string UserId { get; }
-		public User User => _client.GetUser(UserId);
+		[JsonIgnore]
+		public User User => _client.Users[UserId];
+
+		public string ServerId { get; }
+		[JsonIgnore]
+		public Server Server => _client.Servers[ServerId];
 
 		public string VoiceChannelId { get; internal set; }
-		public Channel VoiceChannel => _client.GetChannel(VoiceChannelId);
+		[JsonIgnore]
+		public Channel VoiceChannel => _client.Channels[VoiceChannelId];
 
 		public string[] RoleIds { get; internal set; }
-		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.GetRole(x));
+		[JsonIgnore]
+		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.Roles[x]);
 
-		public Member(string serverId, string userId, DiscordClient client)
+		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
+		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == UserId && x.ServerId == ServerId);
+
+		internal Member(DiscordClient client, string userId, string serverId)
 		{
-			ServerId = serverId;
-			UserId = userId;
 			_client = client;
+			UserId = userId;
+			ServerId = serverId;
 		}
-	}
+
+		public override string ToString() => UserId;
+
+		internal void Update(Net.API.MemberInfo model)
+		{
+			RoleIds = model.Roles;
+			if (model.JoinedAt.HasValue)
+				JoinedAt = model.JoinedAt.Value;
+		}
+		internal void Update(Net.API.ExtendedMemberInfo model)
+		{
+			Update(model as Net.API.MemberInfo);
+			IsDeafened = model.IsDeafened;
+			IsMuted = model.IsMuted;
+		}
+		internal void Update(Net.API.PresenceMemberInfo model)
+		{
+			Status = model.Status;
+			GameId = model.GameId;
+		}
+		internal void Update(Net.API.VoiceMemberInfo model)
+		{
+			IsDeafened = model.IsDeafened;
+			IsMuted = model.IsMuted;
+			SessionId = model.SessionId;
+			Token = model.Token;
+
+			VoiceChannelId = model.ChannelId;
+			if (model.IsSelfDeafened.HasValue)
+				IsSelfDeafened = model.IsSelfDeafened.Value;
+			if (model.IsSelfMuted.HasValue)
+				IsSelfMuted = model.IsSelfMuted.Value;
+			if (model.IsSuppressed.HasValue)
+				IsSuppressed = model.IsSuppressed.Value;
+		}
+    }
 }

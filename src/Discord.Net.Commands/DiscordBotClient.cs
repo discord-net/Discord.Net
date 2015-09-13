@@ -33,7 +33,7 @@ namespace Discord
 					return;
 
 				//Ignore messages from ourselves
-				if (e.Message.UserId == _myId)
+				if (e.Message.UserId == CurrentUserId)
 					return;
 
 				//Check for the command character

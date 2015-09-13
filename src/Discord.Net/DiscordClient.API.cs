@@ -1,8 +1,7 @@
-﻿using Discord.API;
-using Discord.API.Models;
+﻿using Discord.Net;
+using Discord.Net.API;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,8 +13,11 @@ namespace Discord
 		Jpeg,
 		Png
 	}
+
 	public partial class DiscordClient
 	{
+		//TODO: Move all these functions into their respective collections object
+
 		//Servers
 		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
 		public async Task<Server> CreateServer(string name, string region)
@@ -25,7 +27,9 @@ namespace Discord
 			if (region == null) throw new ArgumentNullException(nameof(region));
 
 			var response = await _api.CreateServer(name, region).ConfigureAwait(false);
-			return _servers.Update(response.Id, response);
+			var server = _servers.GetOrAdd(response.Id);
+			server.Update(response);
+			return server;
 		}
 
 		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
@@ -39,7 +43,7 @@ namespace Discord
 
 			try { await _api.LeaveServer(serverId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _servers.Remove(serverId);
+			return _servers.TryRemove(serverId);
 		}
 
 		//Channels
@@ -55,7 +59,29 @@ namespace Discord
 			if (type == null) throw new ArgumentNullException(nameof(type));
 
 			var response = await _api.CreateChannel(serverId, name, type).ConfigureAwait(false);
-			return _channels.Update(response.Id, serverId, response);
+			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
+			channel.Update(response);
+			return channel;
+		}
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(string userId) => CreatePMChannel(_users[userId], userId);
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(User user) => CreatePMChannel(user, user?.Id);
+		private async Task<Channel> CreatePMChannel(User user, string userId)
+		{
+            CheckReady();
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+			Channel channel = null;
+			if (user != null)
+				channel = user.PrivateChannel;
+			if (channel == null)
+			{
+				var response = await _api.CreatePMChannel(_currentUserId, userId).ConfigureAwait(false);
+				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
+				channel.Update(response);
+			}
+			return channel;
 		}
 
 		/// <summary> Destroys the provided channel. </summary>
@@ -69,7 +95,7 @@ namespace Discord
 
 			try { await _api.DestroyChannel(channelId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _channels.Remove(channelId);
+			return _channels.TryRemove(channelId);
 		}
 
 		//Bans
@@ -140,36 +166,22 @@ namespace Discord
 			if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 
 			var response = await _api.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass).ConfigureAwait(false);
-			_channels.Update(response.Channel.Id, response.Server.Id, response.Channel);
-			_servers.Update(response.Server.Id, response.Server);
-			_users.Update(response.Inviter.Id, response.Inviter);
-			return new Invite(response.Code, response.XkcdPass, this)
-			{
-				ChannelId = response.Channel.Id,
-				InviterId = response.Inviter.Id,
-				ServerId = response.Server.Id,
-				IsRevoked = response.IsRevoked,
-				IsTemporary = response.IsTemporary,
-				MaxAge = response.MaxAge,
-				MaxUses = response.MaxUses,
-				Uses = response.Uses
-			};
+			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
+			invite.Update(response);
+			return invite;
 		}
 
-		/// <summary> Gets more info about the provided invite. </summary>
+		/// <summary> Gets more info about the provided invite code. </summary>
 		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
 		public async Task<Invite> GetInvite(string id)
 		{
 			CheckReady();
 			if (id == null) throw new ArgumentNullException(nameof(id));
-
+			
 			var response = await _api.GetInvite(id).ConfigureAwait(false);
-			return new Invite(response.Code, response.XkcdPass, this)
-			{
-				ChannelId = response.Channel.Id,
-				InviterId = response.Inviter.Id,
-				ServerId = response.Server.Id
-			};
+			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
+            invite.Update(response);
+			return invite;
 		}
 
 		/// <summary> Accepts the provided invite. </summary>
@@ -181,34 +193,33 @@ namespace Discord
 			return _api.AcceptInvite(invite.Id);
 		}
 		/// <summary> Accepts the provided invite. </summary>
-		public async Task AcceptInvite(string id)
+		public async Task AcceptInvite(string code)
 		{
 			CheckReady();
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (code == null) throw new ArgumentNullException(nameof(code));
 
-			//Remove Url Parts
-			if (id.StartsWith(Endpoints.BaseShortHttps))
-				id = id.Substring(Endpoints.BaseShortHttps.Length);
-			if (id.Length > 0 && id[0] == '/')
-				id = id.Substring(1);
-			if (id.Length > 0 && id[id.Length - 1] == '/')
-				id = id.Substring(0, id.Length - 1);
+			//Remove trailing slash and any non-code url parts
+			if (code.Length > 0 && code[code.Length - 1] == '/')
+				code = code.Substring(0, code.Length - 1);
+			int index = code.LastIndexOf('/');
+			if (index >= 0)
+				code = code.Substring(index + 1);
 
 			//Check if this is a human-readable link and get its ID
-			var response = await _api.GetInvite(id).ConfigureAwait(false);
-			await _api.AcceptInvite(response.Code).ConfigureAwait(false);
+			var invite = await GetInvite(code).ConfigureAwait(false);
+			await _api.AcceptInvite(invite.Id).ConfigureAwait(false);
 		}
 
 		/// <summary> Deletes the provided invite. </summary>
-		public async Task DeleteInvite(string id)
+		public async Task DeleteInvite(string code)
 		{
 			CheckReady();
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (code == null) throw new ArgumentNullException(nameof(code));
 
 			try
 			{
 				//Check if this is a human-readable link and get its ID
-				var response = await _api.GetInvite(id).ConfigureAwait(false);
+				var response = await _api.GetInvite(code).ConfigureAwait(false);
 				await _api.DeleteInvite(response.Code).ConfigureAwait(false);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
@@ -234,20 +245,21 @@ namespace Discord
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
 
-			int blockCount = (int)Math.Ceiling(text.Length / (double)DiscordAPI.MaxMessageSize);
+			int blockCount = (int)Math.Ceiling(text.Length / (double)DiscordAPIClient.MaxMessageSize);
 			Message[] result = new Message[blockCount];
 			for (int i = 0; i < blockCount; i++)
 			{
-				int index = i * DiscordAPI.MaxMessageSize;
+				int index = i * DiscordAPIClient.MaxMessageSize;
 				string blockText = text.Substring(index, Math.Min(2000, text.Length - index));
 				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
-					var msg = _messages.Update("nonce_" + nonce, channelId, new API.Models.Message
+					var msg = _messages.GetOrAdd("nonce_" + nonce, channelId);
+                    msg.Update(new Net.API.Message
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
-						Author = new UserReference { Avatar = User.AvatarId, Discriminator = User.Discriminator, Id = User.Id, Username = User.Name },
+						Author = new UserReference { Avatar = _currentUser.AvatarId, Discriminator = _currentUser.Discriminator, Id = _currentUser.Id, Username = _currentUser.Name },
 						ChannelId = channelId
 					});
 					msg.IsQueued = true;
@@ -257,9 +269,9 @@ namespace Discord
 				}
 				else
 				{
-					var msg = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
-					result[i] = _messages.Update(msg.Id, channelId, msg);
-					result[i].Nonce = nonce;
+					var response = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
+					var msg = _messages.GetOrAdd(response.Id, channelId);
+					msg.Update(response);
 					try { RaiseMessageSent(result[i]); } catch { }
 				}
 				await Task.Delay(1000).ConfigureAwait(false);
@@ -268,15 +280,12 @@ namespace Discord
 		}
 
 		/// <summary> Sends a private message to the provided channel. </summary>
-		public async Task<Message[]> SendPrivateMessage(User user, string text)
-		{
-			var channel = await GetPMChannel(user).ConfigureAwait(false);
-			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
-		}
+		public Task<Message[]> SendPrivateMessage(User user, string text)
+			=> SendPrivateMessage(user?.Id, text);
 		/// <summary> Sends a private message to the provided channel. </summary>
 		public async Task<Message[]> SendPrivateMessage(string userId, string text)
 		{
-			var channel = await GetPMChannel(userId).ConfigureAwait(false);
+			var channel = await CreatePMChannel(userId).ConfigureAwait(false);
 			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
 		}
 
@@ -307,11 +316,12 @@ namespace Discord
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
 
-			if (text.Length > DiscordAPI.MaxMessageSize)
-				text = text.Substring(0, DiscordAPI.MaxMessageSize);
+			if (text.Length > DiscordAPIClient.MaxMessageSize)
+				text = text.Substring(0, DiscordAPIClient.MaxMessageSize);
 
-			var msg = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
-			_messages.Update(msg.Id, channelId, msg);
+			var response = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
+			var msg = _messages.GetOrAdd(messageId, channelId);
+			msg.Update(response);
 		}
 
 		/// <summary> Deletes the provided message. </summary>
@@ -327,7 +337,7 @@ namespace Discord
 			try
 			{
 				await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
-				_messages.Remove(msgId);
+				_messages.TryRemove(msgId);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
@@ -338,7 +348,7 @@ namespace Discord
 
 			foreach (var msg in msgs)
 			{
-                try
+				try
 				{
 					await _api.DeleteMessage(msg.ChannelId, msg.Id).ConfigureAwait(false);
 				}
@@ -352,37 +362,25 @@ namespace Discord
 
 			foreach (var msgId in msgIds)
 			{
-                try
+				try
 				{
 					await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
 		}
-
+		
 		/// <summary> Sends a file to the provided channel. </summary>
-		public Task SendFile(Channel channel, string path)
-			=> SendFile(channel?.Id, path);
+		public Task SendFile(Channel channel, string filePath)
+			=> SendFile(channel?.Id, filePath);
 		/// <summary> Sends a file to the provided channel. </summary>
-		public Task SendFile(string channelId, string path)
-		{
-			if (path == null) throw new ArgumentNullException(nameof(path));
-			return SendFile(channelId, File.OpenRead(path), Path.GetFileName(path));
-		}
-		/// <summary> Reads a stream and sends it to the provided channel as a file. </summary>
-		/// <remarks> It is highly recommended that this stream be cached in memory or on disk, or the request may time out. </remarks>
-		public Task SendFile(Channel channel, Stream stream, string filename = null)
-			=> SendFile(channel?.Id, stream, filename);
-		/// <summary> Reads a stream and sends it to the provided channel as a file. </summary>
-		/// <remarks> It is highly recommended that this stream be cached in memory or on disk, or the request may time out. </remarks>
-		public Task SendFile(string channelId, Stream stream, string filename = null)
+		public Task SendFile(string channelId, string filePath)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-			if (stream == null) throw new ArgumentNullException(nameof(stream));
-			if (filename == null) throw new ArgumentNullException(nameof(filename));
+			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
 
-			return _api.SendFile(channelId, stream, filename);
+			return _api.SendFile(channelId, filePath);
 		}
 
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
@@ -396,16 +394,16 @@ namespace Discord
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
 			if (count == 0) return new Message[0];
 
-			Channel channel = GetChannel(channelId);
+			Channel channel = _channels[channelId];
 			if (channel != null && channel.Type == ChannelTypes.Text)
 			{
 				try
 				{
 					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
-					return msgs.OrderBy(x => x.Timestamp)
-						.Select(x =>
+					return msgs.Select(x =>
 						{
-							var msg = _messages.Update(x.Id, x.ChannelId, x);
+							var msg = _messages.GetOrAdd(x.Id, x.ChannelId);
+							msg.Update(x);
 							var user = msg.User;
 							if (user != null)
 								user.UpdateActivity(x.Timestamp);
@@ -501,21 +499,21 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword).ConfigureAwait(false);
-			_users.Update(response.Id, response);
+			_currentUser.Update(response);
 		}
 		/// <summary> Changes your email to newEmail. </summary>
 		public async Task ChangeEmail(string newEmail, string currentPassword)
 		{
 			CheckReady();
 			var response = await _api.ChangeEmail(newEmail, currentPassword).ConfigureAwait(false);
-			_users.Update(response.Id, response);
+			_currentUser.Update(response);
 		}
 		/// <summary> Changes your password to newPassword. </summary>
 		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
 		{
 			CheckReady();
 			var response = await _api.ChangePassword(newPassword, currentEmail, currentPassword).ConfigureAwait(false);
-			_users.Update(response.Id, response);
+			_currentUser.Update(response);
 		}
 
 		/// <summary> Changes your avatar. </summary>
@@ -524,7 +522,7 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword).ConfigureAwait(false);
-			_users.Update(response.Id, response);
+			_currentUser.Update(response);
 		}
 	}
 }

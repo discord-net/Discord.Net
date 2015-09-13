@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Threading;
 
 namespace Discord
 {
@@ -18,19 +19,22 @@ namespace Discord
 		public string ServerId { get; }
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
-		public Server Server => _client.GetServer(ServerId);
+		public Server Server => _client.Servers[ServerId];
 
-		internal Role(string id, string serverId, DiscordClient client)
+		internal Role(DiscordClient client, string id, string serverId)
 		{
-			Permissions = new PackedPermissions();
+			_client = client;
 			Id = id;
 			ServerId = serverId;
-			_client = client;
+			Permissions = new PackedPermissions(true);
 		}
 
-		public override string ToString()
+		internal void Update(Net.API.RoleInfo model)
 		{
-			return Name;
+			Name = model.Name;
+			Permissions.RawValue = (uint)model.Permissions;
 		}
+
+		public override string ToString() => Name;
 	}
 }

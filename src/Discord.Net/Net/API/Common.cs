@@ -5,9 +5,9 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Discord.API.Models
+namespace Discord.Net.API
 {
-	//Users
+	//User
 	internal class UserReference
 	{
 		[JsonProperty(PropertyName = "username")]
@@ -26,35 +26,44 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "verified")]
 		public bool IsVerified;
 	}
-	internal class MemberInfo
+
+	//Members
+	internal class MemberReference
 	{
 		[JsonProperty(PropertyName = "user_id")]
 		public string UserId;
 		[JsonProperty(PropertyName = "user")]
 		public UserReference User;
 		[JsonProperty(PropertyName = "guild_id")]
-		public string ServerId;
+		public string GuildId;
 	}
-	internal class InitialMemberInfo : RoleMemberInfo
+	internal class MemberInfo : MemberReference
+	{
+		[JsonProperty(PropertyName = "joined_at")]
+		public DateTime? JoinedAt;
+		[JsonProperty(PropertyName = "roles")]
+		public string[] Roles;
+	}
+	internal class ExtendedMemberInfo : MemberInfo
 	{
 		[JsonProperty(PropertyName = "mute")]
 		public bool IsMuted;
 		[JsonProperty(PropertyName = "deaf")]
 		public bool IsDeafened;
 	}
-	internal class PresenceMemberInfo : MemberInfo
+	internal class PresenceMemberInfo : MemberReference
 	{
 		[JsonProperty(PropertyName = "game_id")]
 		public string GameId;
 		[JsonProperty(PropertyName = "status")]
 		public string Status;
 	}
-	internal class VoiceMemberInfo : MemberInfo
+	internal class VoiceMemberInfo : MemberReference
 	{
 		[JsonProperty(PropertyName = "channel_id")]
 		public string ChannelId;
 		[JsonProperty(PropertyName = "suppress")]
-		public bool IsSuppressed;
+		public bool? IsSuppressed;
 		[JsonProperty(PropertyName = "session_id")]
 		public string SessionId;
 		[JsonProperty(PropertyName = "self_mute")]
@@ -67,13 +76,6 @@ namespace Discord.API.Models
 		public bool IsDeafened;
 		[JsonProperty(PropertyName = "token")]
 		public string Token;
-	}
-	internal class RoleMemberInfo : MemberInfo
-	{
-		[JsonProperty(PropertyName = "joined_at")]
-		public DateTime? JoinedAt;
-		[JsonProperty(PropertyName = "roles")]
-		public string[] Roles;
 	}
 
 	//Channels
@@ -114,15 +116,15 @@ namespace Discord.API.Models
 		public UserReference Recipient;
 	}
 
-	//Servers
-	internal class ServerReference
+	//Guilds (Servers)
+	internal class GuildReference
 	{
 		[JsonProperty(PropertyName = "id")]
 		public string Id;
 		[JsonProperty(PropertyName = "name")]
 		public string Name;
 	}
-	internal class ServerInfo : ServerReference
+	internal class GuildInfo : GuildReference
 	{
 		[JsonProperty(PropertyName = "afk_channel_id")]
 		public string AFKChannelId;
@@ -141,14 +143,14 @@ namespace Discord.API.Models
 		[JsonProperty(PropertyName = "region")]
 		public string Region;
 		[JsonProperty(PropertyName = "roles")]
-		public Role[] Roles;
+		public RoleInfo[] Roles;
 	}
-	internal class ExtendedServerInfo : ServerInfo
+	internal class ExtendedGuildInfo : GuildInfo
 	{
 		[JsonProperty(PropertyName = "channels")]
 		public ChannelInfo[] Channels;
 		[JsonProperty(PropertyName = "members")]
-		public InitialMemberInfo[] Members;
+		public ExtendedMemberInfo[] Members;
 		[JsonProperty(PropertyName = "presences")]
 		public PresenceMemberInfo[] Presences;
 		[JsonProperty(PropertyName = "voice_states")]
@@ -244,7 +246,14 @@ namespace Discord.API.Models
 	}
 
 	//Roles
-    internal class Role
+	internal class RoleReference
+	{
+		[JsonProperty(PropertyName = "guild_id")]
+		public string GuildId;
+		[JsonProperty(PropertyName = "role_id")]
+		public string RoleId;
+	}
+	internal class RoleInfo
 	{
 		[JsonProperty(PropertyName = "permissions")]
 		public int Permissions;
@@ -252,5 +261,35 @@ namespace Discord.API.Models
 		public string Name;
 		[JsonProperty(PropertyName = "id")]
 		public string Id;
+	}
+
+	//Invites
+	internal class Invite
+	{
+		[JsonProperty(PropertyName = "inviter")]
+		public UserReference Inviter;
+		[JsonProperty(PropertyName = "guild")]
+		public GuildReference Guild;
+		[JsonProperty(PropertyName = "channel")]
+		public ChannelReference Channel;
+		[JsonProperty(PropertyName = "code")]
+		public string Code;
+		[JsonProperty(PropertyName = "xkcdpass")]
+		public string XkcdPass;
+	}
+	internal class ExtendedInvite : Invite
+	{
+		[JsonProperty(PropertyName = "max_age")]
+		public int MaxAge;
+		[JsonProperty(PropertyName = "max_uses")]
+		public int MaxUses;
+		[JsonProperty(PropertyName = "revoked")]
+		public bool IsRevoked;
+		[JsonProperty(PropertyName = "temporary")]
+		public bool IsTemporary;
+		[JsonProperty(PropertyName = "uses")]
+		public int Uses;
+		[JsonProperty(PropertyName = "created_at")]
+		public DateTime CreatedAt;
 	}
 }

@@ -4,18 +4,19 @@
 
 using Newtonsoft.Json;
 
-namespace Discord.API.Models
+namespace Discord.Net.API
 {
-	internal static class APIRequests
+	internal static class Requests
 	{
-		public class AuthRegisterRequest
+		//Auth
+		public sealed class AuthRegister
 		{
 			[JsonProperty(PropertyName = "fingerprint")]
 			public string Fingerprint;
 			[JsonProperty(PropertyName = "username")]
 			public string Username;
 		}
-		public class AuthLogin
+		public sealed class AuthLogin
 		{
 			[JsonProperty(PropertyName = "email")]
 			public string Email;
@@ -23,7 +24,8 @@ namespace Discord.API.Models
 			public string Password;
 		}
 
-		public class CreateServer
+		//Servers
+		public sealed class CreateServer
 		{
 			[JsonProperty(PropertyName = "name")]
 			public string Name;
@@ -31,20 +33,22 @@ namespace Discord.API.Models
 			public string Region;
 		}
 
-		public class CreateChannel
+		//Channels
+		public sealed class CreateChannel
 		{
 			[JsonProperty(PropertyName = "name")]
 			public string Name;
 			[JsonProperty(PropertyName = "type")]
 			public string Type;
 		}
-		public class CreatePMChannel
+		public sealed class CreatePMChannel
 		{
 			[JsonProperty(PropertyName = "recipient_id")]
 			public string RecipientId;
 		}
 
-		public class CreateInvite
+		//Invites
+		public sealed class CreateInvite
 		{
 			[JsonProperty(PropertyName = "max_age")]
 			public int MaxAge;
@@ -53,10 +57,11 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "temporary")]
 			public bool IsTemporary;
 			[JsonProperty(PropertyName = "xkcdpass")]
-			public bool HasXkcdPass;
+			public bool WithXkcdPass;
 		}
 
-		public class SendMessage
+		//Messages
+		public sealed class SendMessage
 		{
 			[JsonProperty(PropertyName = "content")]
 			public string Content;
@@ -65,45 +70,58 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "nonce")]
 			public string Nonce;
 		}
-		public class EditMessage : SendMessage { }
+		public sealed class EditMessage
+		{
+			[JsonProperty(PropertyName = "content")]
+			public string Content;
+			[JsonProperty(PropertyName = "mentions")]
+			public string[] Mentions;
+		}
 
-		public class SetMemberMute
+		//Members
+		public sealed class SetMemberMute
 		{
 			[JsonProperty(PropertyName = "mute")]
-			public bool Mute;
+			public bool Value;
 		}
-		public class SetMemberDeaf
+		public sealed class SetMemberDeaf
 		{
 			[JsonProperty(PropertyName = "deaf")]
-			public bool Deaf;
+			public bool Value;
 		}
-
-		public abstract class ChangeProfile
+		
+		//Profile
+		public sealed class ChangeUsername
 		{
 			[JsonProperty(PropertyName = "email")]
 			public string CurrentEmail;
 			[JsonProperty(PropertyName = "password")]
 			public string CurrentPassword;
-		}
-		public class ChangeUsername : ChangeProfile
-		{
 			[JsonProperty(PropertyName = "username")]
 			public string Username;
 		}
-		public class ChangeEmail
+		public sealed class ChangeEmail
 		{
 			[JsonProperty(PropertyName = "email")]
 			public string NewEmail;
 			[JsonProperty(PropertyName = "password")]
 			public string CurrentPassword;
 		}
-		public class ChangePassword : ChangeProfile
+		public sealed class ChangePassword
 		{
+			[JsonProperty(PropertyName = "email")]
+			public string CurrentEmail;
+			[JsonProperty(PropertyName = "password")]
+			public string CurrentPassword;
 			[JsonProperty(PropertyName = "new_password")]
 			public string NewPassword;
 		}
-		public class ChangeAvatar : ChangeProfile
+		public sealed class ChangeAvatar
 		{
+			[JsonProperty(PropertyName = "email")]
+			public string CurrentEmail;
+			[JsonProperty(PropertyName = "password")]
+			public string CurrentPassword;
 			[JsonProperty(PropertyName = "avatar")]
 			public string Avatar;
 		}

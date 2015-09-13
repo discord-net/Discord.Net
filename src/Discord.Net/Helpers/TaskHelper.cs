@@ -2,8 +2,8 @@
 
 namespace Discord.Helpers
 {
-    internal static class TaskHelper
-    {
+	internal static class TaskHelper
+	{
 		public static Task CompletedTask { get; }
 		static TaskHelper()
 		{

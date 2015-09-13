@@ -3,38 +3,11 @@
 #pragma warning disable CS0169
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-namespace Discord.API.Models
+namespace Discord.Net.WebSockets
 {
-	internal static class VoiceWebSocketCommands
+	internal static class VoiceCommands
 	{
-		public class WebSocketMessage
-		{
-			[JsonProperty(PropertyName = "op")]
-			public int Operation;
-			[JsonProperty(PropertyName = "d")]
-			public object Payload;
-		}
-		internal abstract class WebSocketMessage<T> : WebSocketMessage
-			where T : new()
-		{
-			public WebSocketMessage() { Payload = new T(); }
-			public WebSocketMessage(int op) { Operation = op; Payload = new T(); }
-			public WebSocketMessage(int op, T payload) { Operation = op; Payload = payload; }
-
-			[JsonIgnore]
-			public new T Payload
-			{
-				get { if (base.Payload is JToken) { base.Payload = (base.Payload as JToken).ToObject<T>(); } return (T)base.Payload; }
-				set { base.Payload = value; }
-			}
-		}
-
-		public sealed class KeepAlive : WebSocketMessage<object>
-		{
-			public KeepAlive() : base(3, null) { }
-		}
 		public sealed class Login : WebSocketMessage<Login.Data>
 		{
 			public Login() : base(0) { }
@@ -69,6 +42,10 @@ namespace Discord.API.Models
 				[JsonProperty(PropertyName = "data")]
 				public SocketInfo SocketData = new SocketInfo();
 			}
+		}
+		public sealed class KeepAlive : WebSocketMessage<object>
+		{
+			public KeepAlive() : base(3, null) { }
 		}
 		public sealed class IsTalking : WebSocketMessage<IsTalking.Data>
 		{

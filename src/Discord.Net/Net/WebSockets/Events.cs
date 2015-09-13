@@ -2,11 +2,12 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.Net.API;
 using Newtonsoft.Json;
 
-namespace Discord.API.Models
+namespace Discord.Net.WebSockets
 {
-	internal static class TextWebSocketEvents
+	internal static class Events
 	{
 		public sealed class Ready
 		{
@@ -29,7 +30,7 @@ namespace Discord.API.Models
 			[JsonProperty(PropertyName = "read_state")]
 			public ReadStateInfo[] ReadState;
 			[JsonProperty(PropertyName = "guilds")]
-			public ExtendedServerInfo[] Guilds;
+			public ExtendedGuildInfo[] Guilds;
 			[JsonProperty(PropertyName = "private_channels")]
 			public ChannelInfo[] PrivateChannels;
 			[JsonProperty(PropertyName = "heartbeat_interval")]
@@ -43,9 +44,9 @@ namespace Discord.API.Models
 		}
 
 		//Servers
-		public sealed class GuildCreate : ExtendedServerInfo { }
-		public sealed class GuildUpdate : ServerInfo { }
-		public sealed class GuildDelete : ExtendedServerInfo { }
+		public sealed class GuildCreate : ExtendedGuildInfo { }
+		public sealed class GuildUpdate : GuildInfo { }
+		public sealed class GuildDelete : ExtendedGuildInfo { }
 
 		//Channels
 		public sealed class ChannelCreate : ChannelInfo { }
@@ -53,43 +54,30 @@ namespace Discord.API.Models
 		public sealed class ChannelUpdate : ChannelInfo { }
 
 		//Memberships
-		public sealed class GuildMemberAdd : RoleMemberInfo { }
-		public sealed class GuildMemberUpdate : RoleMemberInfo { }
+		public sealed class GuildMemberAdd : MemberInfo { }
+		public sealed class GuildMemberUpdate : MemberInfo { }
 		public sealed class GuildMemberRemove : MemberInfo { }
 
 		//Roles
-		public abstract class GuildRoleEvent
+		public sealed class GuildRoleCreate
 		{
 			[JsonProperty(PropertyName = "guild_id")]
-			public string ServerId;
-		}
-		public sealed class GuildRoleCreateUpdate : GuildRoleEvent
-		{
+			public string GuildId;
 			[JsonProperty(PropertyName = "role")]
-			public Role Role;
+			public RoleInfo Data;
 		}
-		public sealed class GuildRoleDelete : GuildRoleEvent
+		public sealed class GuildRoleUpdate
 		{
-			[JsonProperty(PropertyName = "role_id")]
-			public string RoleId;
+			[JsonProperty(PropertyName = "guild_id")]
+			public string GuildId;
+			[JsonProperty(PropertyName = "role")]
+			public RoleInfo Data;
 		}
+		public sealed class GuildRoleDelete : RoleReference { }
 
 		//Bans
-		public abstract class GuildBanEvent
-		{
-			[JsonProperty(PropertyName = "guild_id")]
-			public string ServerId;
-		}
-		public sealed class GuildBanAddRemove : GuildBanEvent
-		{
-			[JsonProperty(PropertyName = "user")]
-			public UserReference User;
-		}
-		public sealed class GuildBanRemove : GuildBanEvent
-		{
-			[JsonProperty(PropertyName = "user_id")]
-			public string UserId;
-		}
+		public sealed class GuildBanAdd : MemberReference { }
+		public sealed class GuildBanRemove : MemberReference { }
 
 		//User
 		public sealed class UserUpdate : SelfUserInfo { }
@@ -97,8 +85,8 @@ namespace Discord.API.Models
 		public sealed class VoiceStateUpdate : VoiceMemberInfo { }
 
 		//Chat
-		public sealed class MessageCreate : Message { }
-		public sealed class MessageUpdate : Message { }
+		public sealed class MessageCreate : API.Message { }
+		public sealed class MessageUpdate : API.Message { }
 		public sealed class MessageDelete : MessageReference { }
 		public sealed class MessageAck : MessageReference { }
 		public sealed class TypingStart
@@ -115,7 +103,7 @@ namespace Discord.API.Models
 		public sealed class VoiceServerUpdate
 		{
 			[JsonProperty(PropertyName = "guild_id")]
-			public string ServerId;
+			public string GuildId;
 			[JsonProperty(PropertyName = "endpoint")]
 			public string Endpoint;
 			[JsonProperty(PropertyName = "token")]

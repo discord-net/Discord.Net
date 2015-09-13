@@ -1,7 +1,5 @@
-﻿#define USE_THREAD
-#if !DNXCORE50
-using Discord.API.Models;
-using Discord.Opus;
+﻿using Discord.Audio;
+using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,21 +8,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
-using WebSocketMessage = Discord.API.Models.VoiceWebSocketCommands.WebSocketMessage;
-using Discord.Helpers;
 
-namespace Discord
+namespace Discord.Net.WebSockets
 {
-	internal sealed partial class DiscordVoiceSocket : DiscordWebSocket
+    internal partial class VoiceWebSocket : WebSocket
 	{
 		private readonly int _targetAudioBufferLength;
-        private ManualResetEventSlim _connectWaitOnLogin;
+		private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
-        private readonly Random _rand = new Random();
-		
+		private readonly Random _rand = new Random();
+
 		private OpusEncoder _encoder;
 		private ConcurrentQueue<byte[]> _sendQueue;
 		private ManualResetEventSlim _sendQueueWait, _sendQueueEmptyWait;
@@ -44,19 +40,19 @@ namespace Discord
 
 		public string CurrentVoiceServerId => _serverId;
 
-		public DiscordVoiceSocket(DiscordClient client, int timeout, int interval, int audioBufferLength, bool isDebug)
-			: base(client, timeout, interval, isDebug)
+		public VoiceWebSocket(DiscordClient client)
+			: base(client)
 		{
 			_connectWaitOnLogin = new ManualResetEventSlim(false);
 			_sendQueue = new ConcurrentQueue<byte[]>();
 			_sendQueueWait = new ManualResetEventSlim(true);
 			_sendQueueEmptyWait = new ManualResetEventSlim(true);
-			_encoder = new OpusEncoder(48000, 1, 20, Application.Audio);
+			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
 			_encodingBuffer = new byte[4000];
-			_targetAudioBufferLength = audioBufferLength / 20;
-        }
-		
-		protected override void OnConnect()
+			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
+		}
+
+		protected override Task[] Run()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 #if !DNX451
@@ -64,44 +60,14 @@ namespace Discord
 #endif
 			_isReady = false;
 			_isClearing = false;
+			
+			VoiceCommands.Login msg = new VoiceCommands.Login();
+			msg.Payload.ServerId = _serverId;
+			msg.Payload.SessionId = _sessionId;
+			msg.Payload.Token = _token;
+			msg.Payload.UserId = _userId;
+			QueueMessage(msg);
 
-			var cancelToken = _disconnectToken.Token;
-			Task.Run(async () =>
-			{
-				try
-				{
-					_connectWaitOnLogin.Reset();
-
-					VoiceWebSocketCommands.Login msg = new VoiceWebSocketCommands.Login();
-					msg.Payload.ServerId = _serverId;
-					msg.Payload.SessionId = _sessionId;
-					msg.Payload.Token = _token;
-					msg.Payload.UserId = _userId;
-					await SendMessage(msg, cancelToken).ConfigureAwait(false);
-
-					if (!_connectWaitOnLogin.Wait(_timeout, cancelToken))
-						return;
-
-					SetConnected();
-				}
-				catch (OperationCanceledException) { }
-            }, _disconnectToken.Token);
-		}
-		protected override void OnDisconnect()
-		{
-			_udp = null;
-			_serverId = null;
-			_userId = null;
-			_sessionId = null;
-			_token = null;
-#if USE_THREAD
-			_sendThread.Join();
-			_sendThread = null;
-#endif
-		}
-
-		protected override Task[] CreateTasks()
-		{
 #if USE_THREAD
 			_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_disconnectToken)));
 			_sendThread.Start();
@@ -112,8 +78,24 @@ namespace Discord
 #if !USE_THREAD
 				SendVoiceAsync(),
 #endif
+#if !DNXCORE50
 				WatcherAsync()
-			}.Concat(base.CreateTasks()).ToArray();
+#endif
+			}.Concat(base.Run()).ToArray();
+		}
+		protected override Task Cleanup()
+		{
+			ClearPCMFrames();
+			_udp = null;
+			_serverId = null;
+			_userId = null;
+			_sessionId = null;
+			_token = null;
+#if USE_THREAD
+			_sendThread.Join();
+			_sendThread = null;
+#endif
+			return base.Cleanup();
 		}
 
 		public void SetSessionData(string serverId, string userId, string sessionId, string token)
@@ -124,31 +106,9 @@ namespace Discord
 			_token = token;
 		}
 
-		public new async Task BeginConnect()
-		{
-			await base.BeginConnect().ConfigureAwait(false);
-			var cancelToken = _disconnectToken.Token;
-
-			await Task.Run(() =>
-			{
-				try
-				{
-					if (!_connectWaitOnLogin.Wait(_timeout, cancelToken)) //Waiting on JoinServer message
-						throw new Exception("No reply from Discord server");
-				}
-				catch (OperationCanceledException)
-				{
-					if (_disconnectReason == null)
-						throw new Exception("An unknown websocket error occurred.");
-					else
-						_disconnectReason.Throw();
-				}
-			}).ConfigureAwait(false);
-		}
-		
 		private async Task ReceiveVoiceAsync()
 		{
-			var cancelSource = _disconnectToken;
+			var cancelSource = _cancelToken;
 			var cancelToken = cancelSource.Token;
 
 			await Task.Run(async () =>
@@ -157,13 +117,22 @@ namespace Discord
 				{
 					while (!cancelToken.IsCancellationRequested)
 					{
-						var result = await _udp.ReceiveAsync().ConfigureAwait(false);
-						ProcessUdpMessage(result);
+#if DNXCORE50
+						if (_udp.Available > 0)
+						{
+#endif
+							var result = await _udp.ReceiveAsync().ConfigureAwait(false);
+							ProcessUdpMessage(result);
+#if DNXCORE50
+						}
+						else
+							await Task.Delay(1).ConfigureAwait(false);
+#endif
 					}
 				}
 				catch (OperationCanceledException) { }
 				catch (InvalidOperationException) { } //Includes ObjectDisposedException
-				catch (Exception ex) { DisconnectInternal(ex); }
+				catch (Exception ex) { await DisconnectInternal(ex); }
 			}).ConfigureAwait(false);
 		}
 
@@ -174,101 +143,106 @@ namespace Discord
 #else
 		private Task SendVoiceAsync()
 		{
-			var cancelSource = _disconnectToken;
+			var cancelSource = _cancelToken;
 			var cancelToken = cancelSource.Token;
-			return Task.Run(() =>
+			return Task.Run(async () =>
 			{
 #endif
 
-			byte[] packet;
-			try
-			{
-				while (!cancelToken.IsCancellationRequested && !_isReady)
-					Thread.Sleep(1);
-
-				if (cancelToken.IsCancellationRequested)
-					return;
-
-				uint timestamp = 0;
-				double nextTicks = 0.0;
-				double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
-				double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
-				double spinLockThreshold = 1.5 * ticksPerMillisecond;
-				uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
-				Stopwatch sw = Stopwatch.StartNew();
-
-				byte[] rtpPacket = new byte[_encodingBuffer.Length + 12];
-				rtpPacket[0] = 0x80; //Flags;
-				rtpPacket[1] = 0x78; //Payload Type
-				rtpPacket[8] = (byte)((_ssrc >> 24) & 0xFF);
-				rtpPacket[9] = (byte)((_ssrc >> 16) & 0xFF);
-				rtpPacket[10] = (byte)((_ssrc >> 8) & 0xFF);
-				rtpPacket[11] = (byte)((_ssrc >> 0) & 0xFF);
-
-				while (!cancelToken.IsCancellationRequested)
+				byte[] packet;
+				try
 				{
-					double ticksToNextFrame = nextTicks - sw.ElapsedTicks;
-					if (ticksToNextFrame <= 0.0)
-					{
-						while (sw.ElapsedTicks > nextTicks)
-						{
-							if (!_isClearing)
-							{
-								if (_sendQueue.TryDequeue(out packet))
-								{
-									ushort sequence = unchecked(_sequence++);
-									rtpPacket[2] = (byte)((sequence >> 8) & 0xFF);
-									rtpPacket[3] = (byte)((sequence >> 0) & 0xFF);
-									rtpPacket[4] = (byte)((timestamp >> 24) & 0xFF);
-									rtpPacket[5] = (byte)((timestamp >> 16) & 0xFF);
-									rtpPacket[6] = (byte)((timestamp >> 8) & 0xFF);
-									rtpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
-									Buffer.BlockCopy(packet, 0, rtpPacket, 12, packet.Length);
-#if USE_THREAD
-									_udp.Send(rtpPacket, packet.Length + 12);
-#else
-									await _udp.SendAsync(rtpPacket, packet.Length + 12).ConfigureAwait(false);
-#endif
-								}
-								timestamp = unchecked(timestamp + samplesPerFrame);
-								nextTicks += ticksPerFrame;
-
-								//If we have less than our target data buffered, request more
-								int count = _sendQueue.Count;
-								if (count == 0)
-								{
-									_sendQueueWait.Set();
-									_sendQueueEmptyWait.Set();
-								}
-								else if (count < _targetAudioBufferLength)
-									_sendQueueWait.Set();
-							}
-						}
-					}
-					//Dont sleep for 1 millisecond if we need to output audio in the next 1.5
-					else if (_sendQueue.Count == 0 || ticksToNextFrame >= spinLockThreshold)
+					while (!cancelToken.IsCancellationRequested && !_isReady)
 #if USE_THREAD
 						Thread.Sleep(1);
 #else
-						await Task.Delay(1).ConfigureAwait(false);
+						await Task.Delay(1);
 #endif
+
+						if (cancelToken.IsCancellationRequested)
+						return;
+
+					uint timestamp = 0;
+					double nextTicks = 0.0;
+					double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
+					double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
+					double spinLockThreshold = 1.5 * ticksPerMillisecond;
+					uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
+					Stopwatch sw = Stopwatch.StartNew();
+
+					byte[] rtpPacket = new byte[_encodingBuffer.Length + 12];
+					rtpPacket[0] = 0x80; //Flags;
+					rtpPacket[1] = 0x78; //Payload Type
+					rtpPacket[8] = (byte)((_ssrc >> 24) & 0xFF);
+					rtpPacket[9] = (byte)((_ssrc >> 16) & 0xFF);
+					rtpPacket[10] = (byte)((_ssrc >> 8) & 0xFF);
+					rtpPacket[11] = (byte)((_ssrc >> 0) & 0xFF);
+
+					while (!cancelToken.IsCancellationRequested)
+					{
+						double ticksToNextFrame = nextTicks - sw.ElapsedTicks;
+						if (ticksToNextFrame <= 0.0)
+						{
+							while (sw.ElapsedTicks > nextTicks)
+							{
+								if (!_isClearing)
+								{
+									if (_sendQueue.TryDequeue(out packet))
+									{
+										ushort sequence = unchecked(_sequence++);
+										rtpPacket[2] = (byte)((sequence >> 8) & 0xFF);
+										rtpPacket[3] = (byte)((sequence >> 0) & 0xFF);
+										rtpPacket[4] = (byte)((timestamp >> 24) & 0xFF);
+										rtpPacket[5] = (byte)((timestamp >> 16) & 0xFF);
+										rtpPacket[6] = (byte)((timestamp >> 8) & 0xFF);
+										rtpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
+										Buffer.BlockCopy(packet, 0, rtpPacket, 12, packet.Length);
+#if USE_THREAD
+										_udp.Send(rtpPacket, packet.Length + 12);
+#else
+										await _udp.SendAsync(rtpPacket, packet.Length + 12).ConfigureAwait(false);
+#endif
+									}
+									timestamp = unchecked(timestamp + samplesPerFrame);
+									nextTicks += ticksPerFrame;
+
+									//If we have less than our target data buffered, request more
+									int count = _sendQueue.Count;
+									if (count == 0)
+									{
+										_sendQueueWait.Set();
+										_sendQueueEmptyWait.Set();
+									}
+									else if (count < _targetAudioBufferLength)
+										_sendQueueWait.Set();
+								}
+							}
+						}
+						//Dont sleep for 1 millisecond if we need to output audio in the next 1.5
+						else if (_sendQueue.Count == 0 || ticksToNextFrame >= spinLockThreshold)
+#if USE_THREAD
+						Thread.Sleep(1);
+#else
+							await Task.Delay(1).ConfigureAwait(false);
+#endif
+					}
 				}
-			}
-			catch (OperationCanceledException) { }
-			catch (InvalidOperationException) { } //Includes ObjectDisposedException
-			catch (Exception ex) { DisconnectInternal(ex); }
+				catch (OperationCanceledException) { }
+				catch (InvalidOperationException) { } //Includes ObjectDisposedException
 #if !USE_THREAD
-		}).ConfigureAwait(false);
+			});
 #endif
 		}
+#if !DNXCORE50
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private Task WatcherAsync()
 		{
-			var cancelToken = _disconnectToken.Token;
+			var cancelToken = _cancelToken.Token;
 			return cancelToken.Wait()
 				.ContinueWith(_ => _udp.Close());
-        }
-		
+		}
+#endif
+
 		protected override async Task ProcessMessage(string json)
 		{
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
@@ -278,7 +252,7 @@ namespace Discord
 					{
 						if (!_isReady)
 						{
-							var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.Ready>();
+							var payload = (msg.Payload as JToken).ToObject<VoiceEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
@@ -303,22 +277,22 @@ namespace Discord
 					break;
 				case 4: //SESSION_DESCRIPTION
 					{
-						var payload = (msg.Payload as JToken).ToObject<VoiceWebSocketEvents.JoinServer>();
+						var payload = (msg.Payload as JToken).ToObject<VoiceEvents.JoinServer>();
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
 						_connectWaitOnLogin.Set();
 					}
 					break;
 				default:
-					if (_isDebug)
-						RaiseOnDebugMessage(DebugMessageType.WebSocketUnknownOpCode, "Unknown Opcode: " + msg.Operation);
+					if (_logLevel >= LogMessageSeverity.Warning)
+						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {msg.Operation}");
 					break;
 			}
 		}
 
 		private void ProcessUdpMessage(UdpReceiveResult msg)
 		{
-            if (msg.Buffer.Length > 0 && msg.RemoteEndPoint.Equals(_endpoint))
+			if (msg.Buffer.Length > 0 && msg.RemoteEndPoint.Equals(_endpoint))
 			{
 				byte[] buffer = msg.Buffer;
 				int length = msg.Buffer.Length;
@@ -327,8 +301,8 @@ namespace Discord
 					_isReady = true;
 					if (length != 70)
 					{
-						if (_isDebug)
-							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected message length. Expected >= 70, got {length}.");
+						if (_logLevel >= LogMessageSeverity.Warning)
+							RaiseOnLog(LogMessageSeverity.Warning, $"Unexpected message length. Expected 70, got {length}.");
 						return;
 					}
 
@@ -337,7 +311,7 @@ namespace Discord
 					_myIp = Encoding.ASCII.GetString(buffer, 4, 70 - 6).TrimEnd('\0');
 
 					_isReady = true;
-					var login2 = new VoiceWebSocketCommands.Login2();
+					var login2 = new VoiceCommands.Login2();
 					login2.Payload.Protocol = "udp";
 					login2.Payload.SocketData.Address = _myIp;
 					login2.Payload.SocketData.Mode = _mode;
@@ -349,36 +323,36 @@ namespace Discord
 					//Parse RTP Data
 					if (length < 12)
 					{
-						if (_isDebug)
-							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected message length. Expected >= 12, got {length}.");
+						if (_logLevel >= LogMessageSeverity.Warning)
+							RaiseOnLog(LogMessageSeverity.Warning, $"Unexpected message length. Expected >= 12, got {length}.");
 						return;
 					}
 
 					byte flags = buffer[0];
 					if (flags != 0x80)
 					{
-						if (_isDebug)
-							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected Flags: {flags}");
+						if (_logLevel >= LogMessageSeverity.Warning)
+							RaiseOnLog(LogMessageSeverity.Warning, $"Unexpected Flags: {flags}");
 						return;
 					}
 
 					byte payloadType = buffer[1];
 					if (payloadType != 0x78)
 					{
-						if (_isDebug)
-							RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Unexpected Payload Type: {flags}");
+						if (_logLevel >= LogMessageSeverity.Warning)
+							RaiseOnLog(LogMessageSeverity.Warning, $"Unexpected Payload Type: {payloadType}");
 						return;
 					}
 
-					ushort sequenceNumber = (ushort)((buffer[2] << 8) | 
+					ushort sequenceNumber = (ushort)((buffer[2] << 8) |
 													  buffer[3] << 0);
-					uint timestamp = (uint)((buffer[4] << 24) | 
+					uint timestamp = (uint)((buffer[4] << 24) |
 											(buffer[5] << 16) |
-											(buffer[6] << 8) | 
+											(buffer[6] << 8) |
 											(buffer[7] << 0));
-					uint ssrc = (uint)((buffer[8] << 24) | 
+					uint ssrc = (uint)((buffer[8] << 24) |
 									   (buffer[9] << 16) |
-									   (buffer[10] << 8) | 
+									   (buffer[10] << 8) |
 									   (buffer[11] << 0));
 
 					//Decrypt
@@ -402,24 +376,24 @@ namespace Discord
 						buffer = newBuffer;
 					}*/
 
-					if (_isDebug)
-						RaiseOnDebugMessage(DebugMessageType.VoiceInput, $"Received {buffer.Length - 12} bytes.");
+					if (_logLevel >= LogMessageSeverity.Verbose)
+						RaiseOnLog(LogMessageSeverity.Verbose, $"Received {buffer.Length - 12} bytes.");
 					//TODO: Use Voice Data
 				}
 			}
-        }
+		}
 
 		public void SendPCMFrames(byte[] data, int bytes)
 		{
-			var cancelToken = _disconnectToken.Token;
-            if (!_isReady || cancelToken == null)
+			var cancelToken = _cancelToken.Token;
+			if (!_isReady || cancelToken == null)
 				throw new InvalidOperationException("Not connected to a voice server.");
 			if (bytes == 0)
 				return;
 
 			int frameSize = _encoder.FrameSize;
 			int frames = bytes / frameSize;
-            int expectedBytes = frames * frameSize;
+			int expectedBytes = frames * frameSize;
 			int lastFrameSize = expectedBytes - bytes;
 
 			//If this only consists of a partial frame and the buffer is too small to pad the end, make a new one
@@ -432,7 +406,7 @@ namespace Discord
 
 			byte[] payload;
 			//Opus encoder requires packets be queued in the same order they were generated, so all of this must still be locked.
-			lock (_encoder) 
+			lock (_encoder)
 			{
 				for (int i = 0, pos = 0; i <= frames; i++, pos += frameSize)
 				{
@@ -465,39 +439,43 @@ namespace Discord
 					Buffer.BlockCopy(_encodingBuffer, 0, payload, 0, encodedLength);
 
 					//Wait until the queue has a spot open
-					_sendQueueWait.Wait(_disconnectToken.Token);
+					_sendQueueWait.Wait(_cancelToken.Token);
 					_sendQueue.Enqueue(payload);
 					if (_sendQueue.Count >= _targetAudioBufferLength)
 						_sendQueueWait.Reset();
 					_sendQueueEmptyWait.Reset();
 				}
 			}
+
+			if (_logLevel >= LogMessageSeverity.Verbose)
+				RaiseOnLog(LogMessageSeverity.Verbose, $"Queued {bytes} bytes for voice output.");
 		}
 		public void ClearPCMFrames()
 		{
 			_isClearing = true;
 			byte[] ignored;
-            while (_sendQueue.TryDequeue(out ignored)) { }
+			while (_sendQueue.TryDequeue(out ignored)) { }
+			if (_logLevel >= LogMessageSeverity.Verbose)
+				RaiseOnLog(LogMessageSeverity.Verbose, "Cleared the voice buffer.");
 			_isClearing = false;
 		}
 
 		private void SendIsTalking(bool value)
 		{
-			var isTalking = new VoiceWebSocketCommands.IsTalking();
+			var isTalking = new VoiceCommands.IsTalking();
 			isTalking.Payload.IsSpeaking = value;
 			isTalking.Payload.Delay = 0;
-            QueueMessage(isTalking);
+			QueueMessage(isTalking);
 		}
 
 		protected override object GetKeepAlive()
 		{
-			return new VoiceWebSocketCommands.KeepAlive();
+			return new VoiceCommands.KeepAlive();
 		}
 
 		public void Wait()
 		{
 			_sendQueueEmptyWait.Wait();
-        }
+		}
 	}
 }
-#endif
