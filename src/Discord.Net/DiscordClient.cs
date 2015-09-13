@@ -119,9 +119,9 @@ namespace Discord
 				_api.RestClient.OnRequest += (s, e) =>
 				{
 					if (e.Payload != null)
-						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"{e.Method.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ({e.Payload})");
+						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Rest, $"{e.Method.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ({e.Payload})");
 					else
-						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"{e.Method.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)}");
+						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Rest, $"{e.Method.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)}");
 				};
 			}
 

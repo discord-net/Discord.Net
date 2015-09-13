@@ -4,20 +4,21 @@ namespace Discord
 {
 	public enum LogMessageSeverity : byte
 	{
-		Error,
-		Warning,
-		Info,
-		Verbose,
-		Debug
+		Error = 1,
+		Warning = 2,
+		Info = 3,
+		Verbose = 4,
+		Debug = 5
 	}
     public enum LogMessageSource : byte
 	{
-		Unknown,
+		Unknown = 0,
 		Authentication,
 		Cache,
 		DataWebSocket,
         MessageQueue,
-		VoiceWebSocket,
+		Rest,
+        VoiceWebSocket,
 	}
 
 	public sealed class LogMessageEventArgs : EventArgs
