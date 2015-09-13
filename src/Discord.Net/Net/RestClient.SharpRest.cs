@@ -1,4 +1,5 @@
 ﻿#if !DNXCORE50
+using Discord.Net.API;
 using RestSharp;
 using System;
 using System.IO;
@@ -14,7 +15,7 @@ namespace Discord.Net
 
 		public SharpRestEngine(string userAgent)
 		{
-			_client = new RestSharp.RestClient()
+			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
 				PreAuthenticate = false
 			};
@@ -32,8 +33,8 @@ namespace Discord.Net
 
 		public Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
 		{
-			var request = new RestRequest(path, GetMethod(method)) { RequestFormat = DataFormat.Json };
-			request.AddBody(json);
+			var request = new RestRequest(path, GetMethod(method));
+			request.AddParameter("application/json", json, ParameterType.RequestBody);
 			return Send(request, cancelToken);
 		}
 		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)

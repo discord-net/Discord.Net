@@ -1,4 +1,5 @@
 ﻿#if DNXCORE50
+using Discord.Net.API;
 using System;
 using System.Globalization;
 using System.IO;
@@ -36,7 +37,7 @@ namespace Discord.Net
 
 		public Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
 		{
-			using (var request = new HttpRequestMessage(method, path))
+			using (var request = new HttpRequestMessage(method, Endpoints.BaseApi + path))
 			{
 				if (json != null)
 					request.Content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -45,7 +46,7 @@ namespace Discord.Net
 		}
 		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
 		{
-			using (var request = new HttpRequestMessage(method, path))
+			using (var request = new HttpRequestMessage(method, Endpoints.BaseApi + path))
 			{
 				var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
 				content.Add(new StreamContent(File.OpenRead(filePath)), "file", Path.GetFileName(filePath));
