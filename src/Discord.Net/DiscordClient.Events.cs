@@ -24,22 +24,22 @@ namespace Discord
 
 	public sealed class LogMessageEventArgs : EventArgs
 	{
-		public readonly LogMessageSeverity Severity;
-		public readonly LogMessageSource Source;
-		public readonly string Message;
+		public LogMessageSeverity Severity { get; }
+		public LogMessageSource Source { get; }
+		public string Message { get; }
 
 		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) { Severity = severity; Source = source; Message = msg; }
 	}
 	public sealed class ServerEventArgs : EventArgs
 	{
-		public readonly Server Server;
+		public Server Server { get; }
 		public string ServerId => Server.Id;
 
 		internal ServerEventArgs(Server server) { Server = server; }
 	}
 	public sealed class ChannelEventArgs : EventArgs
 	{
-		public readonly Channel Channel;
+		public Channel Channel { get; }
 		public string ChannelId => Channel.Id;
 		public Server Server => Channel.Server;
 		public string ServerId => Channel.ServerId;
@@ -48,14 +48,14 @@ namespace Discord
 	}
 	public sealed class UserEventArgs : EventArgs
 	{
-		public readonly User User;
+		public User User { get; }
 		public string UserId => User.Id;
 
 		internal UserEventArgs(User user) { User = user; }
 	}
 	public sealed class MessageEventArgs : EventArgs
 	{
-		public readonly Message Message;
+		public Message Message { get; }
 		public string MessageId => Message.Id;
 		public Member Member => Message.Member;
 		public Channel Channel => Message.Channel;
@@ -69,7 +69,7 @@ namespace Discord
 	}
 	public sealed class RoleEventArgs : EventArgs
 	{
-		public readonly Role Role;
+		public Role Role { get; }
 		public string RoleId => Role.Id;
 		public Server Server => Role.Server;
 		public string ServerId => Role.ServerId;
@@ -78,9 +78,9 @@ namespace Discord
 	}
 	public sealed class BanEventArgs : EventArgs
 	{
-		public readonly User User;
-		public readonly string UserId;
-		public readonly Server Server;
+		public User User { get; }
+		public string UserId { get; }
+		public Server Server { get; }
 		public string ServerId => Server.Id;
 
 		internal BanEventArgs(User user, string userId, Server server)
@@ -92,7 +92,7 @@ namespace Discord
 	}
 	public sealed class MemberEventArgs : EventArgs
 	{
-		public readonly Member Member;
+		public Member Member { get; }
 		public User User => Member.User;
 		public string UserId => Member.UserId;
 		public Server Server => Member.Server;
@@ -102,25 +102,24 @@ namespace Discord
 	}
 	public sealed class UserTypingEventArgs : EventArgs
 	{
-		public readonly Member Member;
-		public readonly Channel Channel;
+		public Channel Channel { get; }
 		public string ChannelId => Channel.Id;
 		public Server Server => Channel.Server;
 		public string ServerId => Channel.ServerId;
-		public User User => Member.User;
-		public string UserId => Member.UserId;
+		public User User { get; }
+		public string UserId => User.Id;
 
-		internal UserTypingEventArgs(Member member, Channel channel)
+		internal UserTypingEventArgs(User user, Channel channel)
 		{
-			Member = member;
+			User = user;
 			Channel = channel;
         }
 	}
 	/*public sealed class VoiceServerUpdatedEventArgs : EventArgs
 	{
-		public readonly Server Server;
+		public Server Server { get; }
 		public string ServerId => Server.Id;
-		public readonly string Endpoint;
+		public string Endpoint { get; }
 		internal VoiceServerUpdatedEventArgs(Server server, string endpoint)
 		{
 			Server = server;
@@ -295,11 +294,11 @@ namespace Discord
 			if (MemberVoiceStateUpdated != null)
 				MemberVoiceStateUpdated(this, new MemberEventArgs(member));
 		}
-		public event EventHandler<UserTypingEventArgs> MemberIsTyping;
-		private void RaiseMemberIsTyping(Member member, Channel channel)
+		public event EventHandler<UserTypingEventArgs> UserIsTyping;
+		private void RaiseUserIsTyping(User user, Channel channel)
 		{
-			if (MemberIsTyping != null)
-				MemberIsTyping(this, new UserTypingEventArgs(member, channel));
+			if (UserIsTyping != null)
+				UserIsTyping(this, new UserTypingEventArgs(user, channel));
 		}		
 
 		//Voice
