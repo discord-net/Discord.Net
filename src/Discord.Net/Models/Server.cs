@@ -23,8 +23,8 @@ namespace Discord
 		public DateTime JoinedAt { get; internal set; }
 		/// <summary> Returns the region for this server (see Regions). </summary>
 		public string Region { get; internal set; }
-		/// <summary> Returns the endpoint for this server's voice server. </summary>
-		internal string VoiceServer { get; set; }
+		/*/// <summary> Returns the endpoint for this server's voice server. </summary>
+		internal string VoiceServer { get; set; }*/
 
 		/// <summary> Returns true if the current user created this server. </summary>
 		public bool IsOwner => _client.CurrentUserId == OwnerId;

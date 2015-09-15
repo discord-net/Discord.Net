@@ -16,11 +16,11 @@ namespace Discord.Net.WebSockets
 
 	internal partial class DataWebSocket
 	{
-		public event EventHandler<WebSocketEventEventArgs> OnEvent;
-		private void RaiseOnEvent(string type, JToken payload)
+		public event EventHandler<WebSocketEventEventArgs> ReceievedEvent;
+		private void RaiseReceievedEvent(string type, JToken payload)
 		{
-			if (OnEvent != null)
-				OnEvent(this, new WebSocketEventEventArgs(type, payload));
+			if (ReceievedEvent != null)
+				ReceievedEvent(this, new WebSocketEventEventArgs(type, payload));
 		}
 	}
 }

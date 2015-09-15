@@ -404,9 +404,12 @@ namespace Discord
 						{
 							var msg = _messages.GetOrAdd(x.Id, x.ChannelId);
 							msg.Update(x);
-							var user = msg.User;
-							if (user != null)
-								user.UpdateActivity(x.Timestamp);
+							if (_config.TrackActivity)
+							{
+								var user = msg.User;
+								if (user != null)
+									user.UpdateActivity(x.Timestamp);
+							}
 							return msg;
 						})
 						.ToArray();

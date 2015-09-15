@@ -16,6 +16,13 @@ namespace Discord.Collections
 			public TValue Item { get; }
 			public CollectionItemEventArgs(TValue item) { Item = item; }
 		}
+		internal class CollectionItemRemappedEventArgs : EventArgs
+		{
+			public TValue Item { get; }
+			public string OldId { get; }
+			public string NewId { get; }
+			public CollectionItemRemappedEventArgs(TValue item, string oldId, string newId) { Item = item; OldId = oldId; NewId = newId; }
+		}
 
 		internal EventHandler<CollectionItemEventArgs> ItemCreated;
 		private void RaiseItemCreated(TValue item)
@@ -23,17 +30,24 @@ namespace Discord.Collections
 			if (ItemCreated != null)
 				ItemCreated(this, new CollectionItemEventArgs(item));
 		}
-		internal EventHandler<CollectionItemEventArgs> ItemUpdated;
-		protected void RaiseItemUpdated(TValue item)
-		{
-			if (ItemUpdated != null)
-				ItemUpdated(this, new CollectionItemEventArgs(item));
-		}
 		internal EventHandler<CollectionItemEventArgs> ItemDestroyed;
 		private void RaiseItemDestroyed(TValue item)
 		{
 			if (ItemDestroyed != null)
 				ItemDestroyed(this, new CollectionItemEventArgs(item));
+		}
+		internal EventHandler<CollectionItemRemappedEventArgs> ItemRemapped;
+		private void RaiseItemRemapped(TValue item, string oldId, string newId)
+		{
+			if (ItemRemapped != null)
+				ItemRemapped(this, new CollectionItemRemappedEventArgs(item, oldId, newId));
+		}
+
+		internal EventHandler Cleared;
+		private void RaiseCleared()
+		{
+			if (Cleared != null)
+				Cleared(this, EventArgs.Empty);
 		}
 
 		protected readonly DiscordClient _client;
@@ -100,8 +114,11 @@ namespace Discord.Collections
 		protected internal void Clear()
 		{
 			lock (_writerLock)
+			{
 				_dictionary.Clear();
-		}
+				RaiseCleared();
+			}
+        }
 
 		protected abstract void OnCreated(TValue item);
 		protected abstract void OnRemoved(TValue item);

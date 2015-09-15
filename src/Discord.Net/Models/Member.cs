@@ -23,6 +23,7 @@ namespace Discord
 		public string GameId { get; internal set; }
 		/// <summary> Returns the current status for this user. </summary>
 		public string Status { get; internal set; }
+		public DateTime StatusSince { get; internal set; }
 
 		public string UserId { get; }
 		[JsonIgnore]
@@ -66,7 +67,11 @@ namespace Discord
 		}
 		internal void Update(Net.API.PresenceMemberInfo model)
 		{
-			Status = model.Status;
+			if (Status != model.Status)
+			{
+				Status = model.Status;
+				StatusSince = DateTime.UtcNow;
+            }
 			GameId = model.GameId;
 		}
 		internal void Update(Net.API.VoiceMemberInfo model)

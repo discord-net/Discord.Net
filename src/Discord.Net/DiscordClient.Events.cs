@@ -15,6 +15,7 @@ namespace Discord
 		Unknown = 0,
 		Authentication,
 		Cache,
+		Client,
 		DataWebSocket,
         MessageQueue,
 		Rest,
@@ -26,68 +27,106 @@ namespace Discord
 		public readonly LogMessageSeverity Severity;
 		public readonly LogMessageSource Source;
 		public readonly string Message;
+
 		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) { Severity = severity; Source = source; Message = msg; }
 	}
 	public sealed class ServerEventArgs : EventArgs
 	{
 		public readonly Server Server;
+		public string ServerId => Server.Id;
+
 		internal ServerEventArgs(Server server) { Server = server; }
 	}
 	public sealed class ChannelEventArgs : EventArgs
 	{
 		public readonly Channel Channel;
+		public string ChannelId => Channel.Id;
+		public Server Server => Channel.Server;
+		public string ServerId => Channel.ServerId;
+
 		internal ChannelEventArgs(Channel channel) { Channel = channel; }
 	}
 	public sealed class UserEventArgs : EventArgs
 	{
 		public readonly User User;
+		public string UserId => User.Id;
+
 		internal UserEventArgs(User user) { User = user; }
 	}
 	public sealed class MessageEventArgs : EventArgs
 	{
 		public readonly Message Message;
+		public string MessageId => Message.Id;
+		public Member Member => Message.Member;
+		public Channel Channel => Message.Channel;
+		public string ChannelId => Message.ChannelId;
+		public Server Server => Message.Server;
+		public string ServerId => Message.ServerId;
+		public User User => Member.User;
+		public string UserId => Message.UserId;
+
 		internal MessageEventArgs(Message msg) { Message = msg; }
 	}
 	public sealed class RoleEventArgs : EventArgs
 	{
 		public readonly Role Role;
+		public string RoleId => Role.Id;
+		public Server Server => Role.Server;
+		public string ServerId => Role.ServerId;
+
 		internal RoleEventArgs(Role role) { Role = role; }
 	}
 	public sealed class BanEventArgs : EventArgs
 	{
 		public readonly User User;
+		public readonly string UserId;
 		public readonly Server Server;
-		internal BanEventArgs(User user, Server server)
+		public string ServerId => Server.Id;
+
+		internal BanEventArgs(User user, string userId, Server server)
 		{
 			User = user;
+			UserId = userId;
 			Server = server;
 		}
 	}
 	public sealed class MemberEventArgs : EventArgs
 	{
 		public readonly Member Member;
+		public User User => Member.User;
+		public string UserId => Member.UserId;
+		public Server Server => Member.Server;
+		public string ServerId => Member.ServerId;
+
 		internal MemberEventArgs(Member member) { Member = member; }
 	}
 	public sealed class UserTypingEventArgs : EventArgs
 	{
-		public readonly User User;
+		public readonly Member Member;
 		public readonly Channel Channel;
-		internal UserTypingEventArgs(User user, Channel channel)
+		public string ChannelId => Channel.Id;
+		public Server Server => Channel.Server;
+		public string ServerId => Channel.ServerId;
+		public User User => Member.User;
+		public string UserId => Member.UserId;
+
+		internal UserTypingEventArgs(Member member, Channel channel)
 		{
-			User = user;
+			Member = member;
 			Channel = channel;
-		}
+        }
 	}
-	public sealed class VoiceServerUpdatedEventArgs : EventArgs
+	/*public sealed class VoiceServerUpdatedEventArgs : EventArgs
 	{
 		public readonly Server Server;
+		public string ServerId => Server.Id;
 		public readonly string Endpoint;
 		internal VoiceServerUpdatedEventArgs(Server server, string endpoint)
 		{
 			Server = server;
 			Endpoint = endpoint;
 		}
-	}
+	}*/
 
 	public partial class DiscordClient
 	{
@@ -178,11 +217,11 @@ namespace Discord
 			if (MessageUpdated != null)
 				MessageUpdated(this, new MessageEventArgs(msg));
 		}
-		public event EventHandler<MessageEventArgs> MessageRead;
-		private void RaiseMessageRead(Message msg)
+		public event EventHandler<MessageEventArgs> MessageReadRemotely;
+		private void RaiseMessageReadRemotely(Message msg)
 		{
-			if (MessageRead != null)
-				MessageRead(this, new MessageEventArgs(msg));
+			if (MessageReadRemotely != null)
+				MessageReadRemotely(this, new MessageEventArgs(msg));
 		}
 		public event EventHandler<MessageEventArgs> MessageSent;
 		private void RaiseMessageSent(Message msg)
@@ -213,16 +252,16 @@ namespace Discord
 
 		//Ban
 		public event EventHandler<BanEventArgs> BanAdded;
-		private void RaiseBanAdded(User user, Server server)
+		private void RaiseBanAdded(string userId, Server server)
 		{
 			if (BanAdded != null)
-				BanAdded(this, new BanEventArgs(user, server));
+				BanAdded(this, new BanEventArgs(_users[userId], userId, server));
 		}
 		public event EventHandler<BanEventArgs> BanRemoved;
-		private void RaiseBanRemoved(User user, Server server)
+		private void RaiseBanRemoved(string userId, Server server)
 		{
 			if (BanRemoved != null)
-				BanRemoved(this, new BanEventArgs(user, server));
+				BanRemoved(this, new BanEventArgs(_users[userId], userId, server));
 		}
 
 		//Member
@@ -244,26 +283,24 @@ namespace Discord
 			if (MemberUpdated != null)
 				MemberUpdated(this, new MemberEventArgs(member));
 		}
-
-		//Status
-		public event EventHandler<MemberEventArgs> PresenceUpdated;
-		private void RaisePresenceUpdated(Member member)
+		public event EventHandler<MemberEventArgs> MemberPresenceUpdated;
+		private void RaiseMemberPresenceUpdated(Member member)
 		{
-			if (PresenceUpdated != null)
-				PresenceUpdated(this, new MemberEventArgs(member));
+			if (MemberPresenceUpdated != null)
+				MemberPresenceUpdated(this, new MemberEventArgs(member));
 		}
-		public event EventHandler<MemberEventArgs> VoiceStateUpdated;
-		private void RaiseVoiceStateUpdated(Member member)
+		public event EventHandler<MemberEventArgs> MemberVoiceStateUpdated;
+		private void RaiseMemberVoiceStateUpdated(Member member)
 		{
-			if (VoiceStateUpdated != null)
-				VoiceStateUpdated(this, new MemberEventArgs(member));
+			if (MemberVoiceStateUpdated != null)
+				MemberVoiceStateUpdated(this, new MemberEventArgs(member));
 		}
-		public event EventHandler<UserTypingEventArgs> UserTyping;
-		private void RaiseUserTyping(User user, Channel channel)
+		public event EventHandler<UserTypingEventArgs> MemberIsTyping;
+		private void RaiseMemberIsTyping(Member member, Channel channel)
 		{
-			if (UserTyping != null)
-				UserTyping(this, new UserTypingEventArgs(user, channel));
-		}
+			if (MemberIsTyping != null)
+				MemberIsTyping(this, new UserTypingEventArgs(member, channel));
+		}		
 
 		//Voice
 		public event EventHandler VoiceConnected;
@@ -278,11 +315,11 @@ namespace Discord
 			if (VoiceDisconnected != null)
 				VoiceDisconnected(this, EventArgs.Empty);
 		}
-		public event EventHandler<VoiceServerUpdatedEventArgs> VoiceServerUpdated;
+		/*public event EventHandler<VoiceServerUpdatedEventArgs> VoiceServerChanged;
 		private void RaiseVoiceServerUpdated(Server server, string endpoint)
 		{
-			if (VoiceServerUpdated != null)
-				VoiceServerUpdated(this, new VoiceServerUpdatedEventArgs(server, endpoint));
-		}
+			if (VoiceServerChanged != null)
+				VoiceServerChanged(this, new VoiceServerUpdatedEventArgs(server, endpoint));
+		}*/
 	}
 }

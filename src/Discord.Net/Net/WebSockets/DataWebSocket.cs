@@ -7,8 +7,11 @@ namespace Discord.Net.WebSockets
 {
     internal partial class DataWebSocket : WebSocket
     {		
-		private string _lastSession, _redirectServer;
+		private string _redirectServer;
 		private int _lastSeq;
+
+		public string SessionId => _sessionId;
+		private string _sessionId;
 
 		public DataWebSocket(DiscordClient client)
 			: base(client)
@@ -35,7 +38,7 @@ namespace Discord.Net.WebSockets
 			if (_redirectServer != null)
 			{
 				var resumeMsg = new Commands.Resume();
-				resumeMsg.Payload.SessionId = _lastSession;
+				resumeMsg.Payload.SessionId = _sessionId;
 				resumeMsg.Payload.Sequence = _lastSeq;
 				QueueMessage(resumeMsg);
 				_redirectServer = null;
@@ -57,11 +60,11 @@ namespace Discord.Net.WebSockets
                         if (msg.Type == "READY")
 						{
 							var payload = token.ToObject<Events.Ready>();
-							_lastSession = payload.SessionId;
+							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new Commands.UpdateStatus());
 						}
-						RaiseOnEvent(msg.Type, token);
+						RaiseReceievedEvent(msg.Type, token);
 						if (msg.Type == "READY")
 							CompleteConnect();
 						if (_logLevel >= LogMessageSeverity.Info)

@@ -52,6 +52,25 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
+		public async Task Login(string host, string serverId, string userId, string sessionId, string token)
+		{
+			_serverId = serverId;
+			_userId = userId;
+			_sessionId = sessionId;
+			_token = token;
+
+			await base.Connect(host);
+
+			Commands.Login msg = new Commands.Login();
+			msg.Payload.Token = token;
+			//msg.Payload.Properties["$os"] = "";
+			//msg.Payload.Properties["$browser"] = "";
+			msg.Payload.Properties["$device"] = "Discord.Net";
+			//msg.Payload.Properties["$referrer"] = "";
+			//msg.Payload.Properties["$referring_domain"] = "";
+			QueueMessage(msg);
+		}
+
 		protected override Task[] Run()
 		{
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
@@ -96,14 +115,6 @@ namespace Discord.Net.WebSockets
 			_sendThread = null;
 #endif
 			return base.Cleanup();
-		}
-
-		public void SetSessionData(string serverId, string userId, string sessionId, string token)
-		{
-			_serverId = serverId;
-			_userId = userId;
-			_sessionId = sessionId;
-			_token = token;
 		}
 
 		private async Task ReceiveVoiceAsync()
