@@ -225,9 +225,12 @@ namespace Discord
 					case "GUILD_UPDATE":
 						{
 							var model = e.Payload.ToObject<Events.GuildUpdate>(_serializer);
-							var server = _servers.GetOrAdd(model.Id);
-							server.Update(model);
-							RaiseEvent(nameof(ServerUpdated), () => RaiseServerUpdated(server));
+							var server = _servers[model.Id];
+							if (server != null)
+							{
+								server.Update(model);
+								RaiseEvent(nameof(ServerUpdated), () => RaiseServerUpdated(server));
+							}
 						}
 						break;
 					case "GUILD_DELETE":
@@ -251,9 +254,12 @@ namespace Discord
 					case "CHANNEL_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.ChannelUpdate>(_serializer);
-							var channel = _channels.GetOrAdd(data.Id, data.GuildId, data.Recipient?.Id);
-							channel.Update(data);
-							RaiseEvent(nameof(ChannelUpdated), () => RaiseChannelUpdated(channel));
+							var channel = _channels[data.Id];
+							if (channel != null)
+							{
+								channel.Update(data);
+								RaiseEvent(nameof(ChannelUpdated), () => RaiseChannelUpdated(channel));
+							}
 						}
 						break;
 					case "CHANNEL_DELETE":
@@ -269,7 +275,7 @@ namespace Discord
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Payload.ToObject<Events.GuildMemberAdd>(_serializer);
-							var member = _members.GetOrAdd(data.UserId, data.GuildId);
+							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
 							RaiseEvent(nameof(MemberAdded), () => RaiseMemberAdded(member));
 						}
@@ -277,9 +283,12 @@ namespace Discord
 					case "GUILD_MEMBER_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.GuildMemberUpdate>(_serializer);
-							var member = _members.GetOrAdd(data.UserId, data.GuildId);
-							member.Update(data);
-							RaiseEvent(nameof(MemberUpdated), () => RaiseMemberUpdated(member));
+							var member = _members[data.User.Id, data.GuildId];
+							if (member != null)
+							{
+								member.Update(data);
+								RaiseEvent(nameof(MemberUpdated), () => RaiseMemberUpdated(member));
+							}
 						}
 						break;
 					case "GUILD_MEMBER_REMOVE":
@@ -303,8 +312,9 @@ namespace Discord
 					case "GUILD_ROLE_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.GuildRoleUpdate>(_serializer);
-							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
-							role.Update(data.Data);
+							var role = _roles[data.Data.Id];
+							if (role != null)
+								role.Update(data.Data);
 							RaiseEvent(nameof(RoleUpdated), () => RaiseRoleUpdated(role));
 						}
 						break;

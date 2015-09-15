@@ -136,13 +136,15 @@ namespace Discord
 			}
 			foreach (var subModel in model.VoiceStates)
 			{
-				var member = members.GetOrAdd(subModel.UserId, Id);
-				member.Update(subModel);
+				var member = members[subModel.UserId, Id];
+				if (member != null)
+					member.Update(subModel);
 			}
 			foreach (var subModel in model.Presences)
 			{
-				var member = members.GetOrAdd(subModel.User.Id, Id);
-				member.Update(subModel);
+				var member = members[subModel.User.Id, Id];
+				if (member != null)
+					member.Update(subModel);
 			}
 		}
 

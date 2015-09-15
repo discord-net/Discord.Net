@@ -320,8 +320,9 @@ namespace Discord
 				text = text.Substring(0, DiscordAPIClient.MaxMessageSize);
 
 			var model = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
-			var msg = _messages.GetOrAdd(messageId, channelId, model.Author.Id);
-			msg.Update(model);
+			var msg = _messages[messageId];
+			if (msg != null)
+				msg.Update(model);
 		}
 
 		/// <summary> Deletes the provided message. </summary>
@@ -384,10 +385,10 @@ namespace Discord
 		}
 
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
-		public Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null)
-			=> DownloadMessages(channel.Id, count);
+		public Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null, bool cache = true)
+			=> DownloadMessages(channel.Id, count, beforeMessageId, cache);
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(string channelId, int count, string beforeMessageId = null)
+		public async Task<Message[]> DownloadMessages(string channelId, int count, string beforeMessageId = null, bool cache = true)
 		{
 			CheckReady();
 			if (channelId == null) throw new NullReferenceException(nameof(channelId));
@@ -402,11 +403,16 @@ namespace Discord
 					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
 					return msgs.Select(x =>
 						{
-							var msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
-							msg.Update(x);
+							Message msg;
+							if (cache)
+								msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
+							else
+								msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
+							if (msg != null)
+								msg.Update(x);
 							if (_config.TrackActivity)
 							{
-								var user = msg.User;
+								var user = _users[x.Author.Id];
 								if (user != null)
 									user.UpdateActivity(x.Timestamp);
 							}

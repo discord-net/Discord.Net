@@ -14,7 +14,7 @@ namespace Discord.Collections
 
 		protected override void OnCreated(Channel item)
 		{
-			if (item.ServerId != null)
+			if (!item.IsPrivate)
 				item.Server.AddChannel(item.Id);
 			if (item.RecipientId != null)
 			{
@@ -27,7 +27,7 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Channel item)
 		{
-			if (item.ServerId != null)
+			if (!item.IsPrivate)
 				item.Server.RemoveChannel(item.Id);
 			if (item.RecipientId != null)
 			{
