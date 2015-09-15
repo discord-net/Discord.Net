@@ -111,7 +111,7 @@ namespace Discord.Net.WebSockets
 					while (_webSocket.State == State.Open && !cancelToken.IsCancellationRequested)
 					{
 						while (_sendQueue.TryDequeue(out bytes))
-							QueueMessage(bytes);
+							await SendMessageInternal(bytes, cancelToken);
 						await Task.Delay(_sendInterval, cancelToken).ConfigureAwait(false);
 					}
 				}
