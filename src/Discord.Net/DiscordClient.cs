@@ -42,23 +42,36 @@ namespace Discord
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
         private User _currentUser;
+		/// <summary> Returns the id of the server this user is currently connected to for voice. </summary>
+		public string CurrentVoiceServerId => _voiceSocket.CurrentVoiceServerId;
+		/// <summary> Returns the server this user is currently connected to for voice. </summary>
+		public Server CurrentVoiceServer => _servers[_voiceSocket.CurrentVoiceServerId];
 
+		/// <summary> Returns the current connection state of this client. </summary>
 		public DiscordClientState State => (DiscordClientState)_state;
 		private int _state;
 
+		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
 		public DiscordClientConfig Config => _config;
 		private readonly DiscordClientConfig _config;
-		
+
+		/// <summary> Returns a collection of all channels this client is a member of. </summary>
 		public Channels Channels => _channels;
 		private readonly Channels _channels;
+		/// <summary> Returns a collection of all user-server pairs this client can currently see. </summary>
 		public Members Members => _members;
 		private readonly Members _members;
+		/// <summary> Returns a collection of all messages this client has seen since logging in and currently has in cache. </summary>
 		public Messages Messages => _messages;
 		private readonly Messages _messages;
+		//TODO: Do we need the roles cache?
+		/// <summary> Returns a collection of all role-server pairs this client can currently see. </summary>
 		public Roles Roles => _roles;
 		private readonly Roles _roles;
+		/// <summary> Returns a collection of all servers this client is a member of. </summary>
 		public Servers Servers => _servers;
 		private readonly Servers _servers;
+		/// <summary> Returns a collection of all users this client can currently see. </summary>
 		public Users Users => _users;
 		private readonly Users _users;
 
@@ -343,7 +356,7 @@ namespace Discord
 							}
 							
 							if (msg == null)
-								msg = _messages.GetOrAdd(data.Id, data.ChannelId);
+								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
 							msg.Update(data);
 							if (_config.TrackActivity)
 								msg.User.UpdateActivity(data.Timestamp);
@@ -355,7 +368,7 @@ namespace Discord
 					case "MESSAGE_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.MessageUpdate>(_serializer);
-							var msg = _messages.GetOrAdd(data.Id, data.ChannelId);
+							var msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
 							msg.Update(data);
 							RaiseEvent(nameof(MessageUpdated), () => RaiseMessageUpdated(msg));
 						}

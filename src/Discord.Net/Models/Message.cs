@@ -114,11 +114,12 @@ namespace Discord
 		[JsonIgnore]
 		public Member Member => _client.Members[ServerId, UserId];
 
-		internal Message(DiscordClient client, string id, string channelId)
+		internal Message(DiscordClient client, string id, string channelId, string userId)
 		{
 			_client = client;
 			Id = id;
 			ChannelId = channelId;
+			UserId = userId;
 		}
 
 		internal void Update(Net.API.Message model)

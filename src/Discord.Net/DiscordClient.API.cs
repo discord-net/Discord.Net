@@ -254,7 +254,7 @@ namespace Discord
 				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
-					var msg = _messages.GetOrAdd("nonce_" + nonce, channelId);
+					var msg = _messages.GetOrAdd("nonce_" + nonce, channelId, _currentUserId);
                     msg.Update(new Net.API.Message
 					{
 						Content = blockText,
@@ -269,9 +269,9 @@ namespace Discord
 				}
 				else
 				{
-					var response = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
-					var msg = _messages.GetOrAdd(response.Id, channelId);
-					msg.Update(response);
+					var model = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
+					var msg = _messages.GetOrAdd(model.Id, channelId, model.Author.Id);
+					msg.Update(model);
 					try { RaiseMessageSent(result[i]); } catch { }
 				}
 				await Task.Delay(1000).ConfigureAwait(false);
@@ -319,9 +319,9 @@ namespace Discord
 			if (text.Length > DiscordAPIClient.MaxMessageSize)
 				text = text.Substring(0, DiscordAPIClient.MaxMessageSize);
 
-			var response = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
-			var msg = _messages.GetOrAdd(messageId, channelId);
-			msg.Update(response);
+			var model = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
+			var msg = _messages.GetOrAdd(messageId, channelId, model.Author.Id);
+			msg.Update(model);
 		}
 
 		/// <summary> Deletes the provided message. </summary>
@@ -402,7 +402,7 @@ namespace Discord
 					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
 					return msgs.Select(x =>
 						{
-							var msg = _messages.GetOrAdd(x.Id, x.ChannelId);
+							var msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
 							msg.Update(x);
 							if (_config.TrackActivity)
 							{
