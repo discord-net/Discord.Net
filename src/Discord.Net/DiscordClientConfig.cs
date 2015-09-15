@@ -29,9 +29,13 @@ namespace Discord
 		private int _voiceBufferLength = 3000;
 
 		//Experimental Features
+#if !DNXCORE50
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the opus .dll or .so be in the local lib/ folder. </remarks>
 		public bool EnableVoice { get { return _enableVoice; } set { SetValue(ref _enableVoice, value); } }
 		private bool _enableVoice = false;
+#else
+		internal bool EnableVoice => false;
+#endif
 		/// <summary> (Experimental) Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
 		public bool UseMessageQueue { get { return _useMessageQueue; } set { SetValue(ref _useMessageQueue, value); } }
 		private bool _useMessageQueue = false;

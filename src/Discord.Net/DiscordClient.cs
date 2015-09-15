@@ -642,12 +642,8 @@ namespace Discord
 				case (int)DiscordClientState.Connecting:
 					throw new InvalidOperationException("The client is connecting.");
 			}
-
-#if !DNXCORE50
+			
 			if (checkVoice && !_config.EnableVoice)
-#else
-			if (checkVoice) //Always fail on DNXCORE50
-#endif
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		private void RaiseEvent(string name, Action action)
