@@ -368,9 +368,12 @@ namespace Discord
 					case "MESSAGE_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.MessageUpdate>(_serializer);
-							var msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
-							msg.Update(data);
-							RaiseEvent(nameof(MessageUpdated), () => RaiseMessageUpdated(msg));
+							var msg = _messages[data.Id];
+                            if (msg != null)
+							{
+								msg.Update(data);
+								RaiseEvent(nameof(MessageUpdated), () => RaiseMessageUpdated(msg));
+							}
 						}
 						break;
 					case "MESSAGE_DELETE":
