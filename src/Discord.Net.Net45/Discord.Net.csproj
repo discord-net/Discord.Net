@@ -186,6 +186,9 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSocket.cs">
       <Link>Net\WebSockets\DataWebSocket.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSockets.Events.cs">
+      <Link>Net\DataWebSockets.Events.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\Events.cs">
       <Link>Net\WebSockets\Events.cs</Link>
     </Compile>

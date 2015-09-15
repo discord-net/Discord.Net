@@ -53,14 +53,17 @@ namespace Discord.Net.WebSockets
 			{
 				case 0:
 					{
-						if (msg.Type == "READY")
+						JToken token = msg.Payload as JToken;
+                        if (msg.Type == "READY")
 						{
-							var payload = (msg.Payload as JToken).ToObject<Events.Ready>();
+							var payload = token.ToObject<Events.Ready>();
 							_lastSession = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new Commands.UpdateStatus());
-							CompleteConnect();
 						}
+						RaiseOnEvent(msg.Type, token);
+						if (msg.Type == "READY")
+							CompleteConnect();
 						if (_logLevel >= LogMessageSeverity.Info)
 							RaiseOnLog(LogMessageSeverity.Info, "Got Event: " + msg.Type);
 					}
