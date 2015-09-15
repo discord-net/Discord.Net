@@ -35,23 +35,23 @@ namespace Discord.Net
 				_client.DefaultRequestHeaders.Add("authorization", token);
 		}
 
-		public Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
+		public async Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
 		{
 			using (var request = new HttpRequestMessage(method, Endpoints.BaseApi + path))
 			{
 				if (json != null)
 					request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-				return Send(request, cancelToken);
+				return await Send(request, cancelToken);
 			}
 		}
-		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
+		public async Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
 		{
 			using (var request = new HttpRequestMessage(method, Endpoints.BaseApi + path))
 			{
 				var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
 				content.Add(new StreamContent(File.OpenRead(filePath)), "file", Path.GetFileName(filePath));
 				request.Content = content;
-				return Send(request, cancelToken);
+				return await Send(request, cancelToken);
 			}
 		}
 		private async Task<string> Send(HttpRequestMessage request, CancellationToken cancelToken)

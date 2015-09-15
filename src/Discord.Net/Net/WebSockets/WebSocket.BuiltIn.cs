@@ -89,10 +89,7 @@ namespace Discord.Net.WebSockets
 
 						}
 						while (result == null || !result.EndOfMessage);
-
-#if DEBUG
-						System.Diagnostics.Debug.WriteLine(">>> " + builder.ToString());
-#endif
+						
 						RaiseProcessMessage(builder.ToString());
 
 						builder.Clear();

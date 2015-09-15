@@ -79,7 +79,8 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_voiceSocket = new VoiceWebSocket(this);
+			if (_config.EnableVoice)
+				_voiceSocket = new VoiceWebSocket(this);
 
 			_channels = new Channels(this);
 			_members = new Members(this);
@@ -89,14 +90,18 @@ namespace Discord
 			_users = new Users(this);
 
 			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
-			_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
+			if (_config.EnableVoice)
+				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
 				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 				_dataSocket.ReceievedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Receieved {e.Type}");
-				_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
-				_voiceSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
+				if (_config.EnableVoice)
+				{
+					_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
+					_voiceSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
+				}
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
@@ -115,7 +120,7 @@ namespace Discord
 				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Read Message (Remotely): {e.Server.Name}/{e.Channel.Name}/{e.MessageId} ({e.ServerId}/{e.ChannelId}/{e.MessageId})");
 				MessageSent += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Sent Message: {e.Server.Name}/{e.Channel.Name}/{e.MessageId} ({e.ServerId}/{e.ChannelId}/{e.MessageId})");
 				RoleCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Created Role: {e.Server.Name}/{e.Role.Name} ({e.ServerId}/{e.RoleId}).");
-				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Update Role: {e.Server.Name}/{e.Role.Name} ({e.ServerId}/{e.RoleId}).");
+				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Updated Role: {e.Server.Name}/{e.Role.Name} ({e.ServerId}/{e.RoleId}).");
 				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Deleted Role: {e.Server.Name}/{e.Role.Name} ({e.ServerId}/{e.RoleId}).");
 				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Added Ban: {e.Server.Name}/{e.User?.Name ?? "Unknown"} ({e.ServerId}/{e.UserId}).");
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Removed Ban: {e.Server.Name}/{e.User?.Name ?? "Unknown"} ({e.ServerId}/{e.UserId}).");
@@ -137,16 +142,16 @@ namespace Discord
 				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Created Message {e.Item.ServerId}/{e.Item.ChannelId}/{e.Item.Id}");
 				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Destroyed Message {e.Item.ServerId}/{e.Item.ChannelId}/{e.Item.Id}");
 				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Remapped Message {e.Item.ServerId}/{e.Item.ChannelId}/[{e.OldId} -> {e.NewId}]");
-				_messages.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Members");
+				_messages.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Messages");
 				_roles.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Created Role {e.Item.ServerId}/{e.Item.Id}");
 				_roles.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Destroyed Role {e.Item.ServerId}/{e.Item.Id}");
-				_roles.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Members");
+				_roles.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Roles");
 				_servers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Created Server {e.Item.Id}");
 				_servers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Destroyed Server {e.Item.Id}");
-				_servers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Members");
+				_servers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Servers");
 				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Created User {e.Item.Id}");
 				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Destroyed User {e.Item.Id}");
-				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Members");
+				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Cache, $"Cleared Users");
 
 				_api.RestClient.OnRequest += (s, e) =>
 				{
@@ -514,12 +519,14 @@ namespace Discord
 
 				try
 				{
-					if (!_connectedEvent.Wait(_config.ConnectionTimeout, CancellationTokenSource.CreateLinkedTokenSource(_cancelToken.Token, _dataSocket.CancelToken).Token)) 
+					//Cancel if either Disconnect is called, data socket errors or timeout is reached
+					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken.Token, _dataSocket.CancelToken).Token;
+                    if (!_connectedEvent.Wait(_config.ConnectionTimeout, cancelToken)) 
 						throw new Exception("Operation timed out.");
 				}
 				catch (OperationCanceledException)
 				{
-					_dataSocket.ThrowError();
+					_dataSocket.ThrowError(); //Throws data socket's internal error if any occured
 					throw;
 				}
 

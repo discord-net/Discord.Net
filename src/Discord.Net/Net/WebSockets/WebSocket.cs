@@ -197,7 +197,11 @@ namespace Discord.Net.WebSockets
 		internal void ThrowError()
 		{
 			if (_wasDisconnectUnexpected)
-				_disconnectReason.Throw();
+			{
+				var reason = _disconnectReason;
+				_disconnectReason = null;
+				reason.Throw();
+			}
 		}
 	}
 }
