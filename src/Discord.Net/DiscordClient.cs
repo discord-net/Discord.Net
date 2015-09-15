@@ -109,7 +109,7 @@ namespace Discord
 			{
 				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
 				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
-				_dataSocket.ReceievedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Receieved {e.Type}");
+				//_dataSocket.ReceivedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Received {e.Type}");
 				if (_config.EnableVoice)
 				{
 					_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
@@ -184,7 +184,7 @@ namespace Discord
 			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #endif
 
-			_dataSocket.ReceievedEvent += async (s, e) =>
+			_dataSocket.ReceivedEvent += async (s, e) =>
 			{
 				switch (e.Type)
 				{

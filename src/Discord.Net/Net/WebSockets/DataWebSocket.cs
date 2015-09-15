@@ -60,7 +60,7 @@ namespace Discord.Net.WebSockets
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new Commands.UpdateStatus());
 						}
-						RaiseReceievedEvent(msg.Type, token);
+						RaiseReceivedEvent(msg.Type, token);
 						if (msg.Type == "READY")
 							CompleteConnect();
 						if (_logLevel >= LogMessageSeverity.Info)
