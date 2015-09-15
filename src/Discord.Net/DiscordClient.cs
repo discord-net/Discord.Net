@@ -376,7 +376,7 @@ namespace Discord
 					case "PRESENCE_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.PresenceUpdate>(_serializer);
-							var member = _members[data.UserId, data.GuildId];
+							var member = _members[data.User.Id, data.GuildId];
 							/*if (_config.TrackActivity)
 							{
 								var user = _users[data.User.Id];
@@ -539,8 +539,8 @@ namespace Discord
 		}
 
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."));
-		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true)
+		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
+		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
@@ -563,9 +563,12 @@ namespace Discord
 				_cancelToken.Cancel();
 			}
 
-			Task task = _runTask;
-			if (task != null)
-				await task.ConfigureAwait(false);
+			if (!skipAwait)
+			{
+				Task task = _runTask;
+				if (task != null)
+					await task.ConfigureAwait(false);
+			}
 
 			if (hasWriterLock)
 			{
@@ -587,7 +590,7 @@ namespace Discord
 			{
 				await task.ConfigureAwait(false);
 			}
-			catch (Exception ex) { await DisconnectInternal(ex).ConfigureAwait(false); }
+			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
 
 			await Cleanup().ConfigureAwait(false);
 			_runTask = null;

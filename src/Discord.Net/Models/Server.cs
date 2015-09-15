@@ -129,8 +129,8 @@ namespace Discord
 			var members = _client.Members;
 			foreach (var subModel in model.Members)
 			{
-				var user = users.GetOrAdd(subModel.UserId);
-				var member = members.GetOrAdd(subModel.UserId, Id);
+				var user = users.GetOrAdd(subModel.User.Id);
+				var member = members.GetOrAdd(subModel.User.Id, Id);
 				user.Update(subModel.User);
 				member.Update(subModel);
 			}
@@ -141,7 +141,7 @@ namespace Discord
 			}
 			foreach (var subModel in model.Presences)
 			{
-				var member = members.GetOrAdd(subModel.UserId, Id);
+				var member = members.GetOrAdd(subModel.User.Id, Id);
 				member.Update(subModel);
 			}
 		}

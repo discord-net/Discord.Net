@@ -61,6 +61,9 @@ namespace Discord.Collections
 
 		protected TValue Get(string key)
 		{
+			if (key == null)
+				return null;
+
 			TValue result;
 			if (!_dictionary.TryGetValue(key, out result))
 				return null;

@@ -1,6 +1,7 @@
 ﻿using Discord.Helpers;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
@@ -96,8 +97,8 @@ namespace Discord.Net.WebSockets
 		public Task Reconnect()
 			=> Connect(_host);
 
-		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."));
-		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true)
+		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
+		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
@@ -120,9 +121,12 @@ namespace Discord.Net.WebSockets
 				_cancelToken.Cancel();
 			}
 
-			Task task = _runTask;
-			if (task != null)
-				await task.ConfigureAwait(false);
+			if (!skipAwait)
+			{
+				Task task = _runTask;
+				if (task != null)
+					await task.ConfigureAwait(false);
+			}
 
 			if (hasWriterLock)
 			{
@@ -133,12 +137,13 @@ namespace Discord.Net.WebSockets
 
 		protected virtual async Task RunTasks()
 		{
-			Task[] tasks = Run();
+			Task task = Task.WhenAll(Run());
+
             try
 			{
-				await Task.WhenAll(tasks).ConfigureAwait(false);
+				await task.ConfigureAwait(false);
 			}
-			catch (Exception ex) { await DisconnectInternal(ex).ConfigureAwait(false); }
+			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
 
 			bool wasUnexpected = _wasDisconnectUnexpected;
 			_wasDisconnectUnexpected = false;
@@ -147,7 +152,13 @@ namespace Discord.Net.WebSockets
 			await Cleanup().ConfigureAwait(false);
 			_runTask = null;
 		}
-		protected virtual Task[] Run() { return _engine.RunTasks(_cancelToken.Token); }
+		protected virtual Task[] Run()
+		{
+			var cancelToken = _cancelToken.Token;
+            return _engine.RunTasks(cancelToken)
+				.Concat(new Task[] { HeartbeatAsync(cancelToken) })
+				.ToArray();
+		}
 		protected virtual Task Cleanup() { return TaskHelper.CompletedTask; }
 
 		protected abstract Task ProcessMessage(string json);

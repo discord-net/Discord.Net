@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord.Collections
 {
@@ -15,7 +14,8 @@ namespace Discord.Collections
 
 		protected override void OnCreated(Channel item)
 		{
-			item.Server.AddChannel(item.Id);
+			if (item.ServerId != null)
+				item.Server.AddChannel(item.Id);
 			if (item.RecipientId != null)
 			{
 				var user = item.Recipient;
@@ -27,8 +27,8 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Channel item)
 		{
-			item.Server.RemoveChannel(item.Id);
-
+			if (item.ServerId != null)
+				item.Server.RemoveChannel(item.Id);
 			if (item.RecipientId != null)
 			{
 				var user = item.Recipient;

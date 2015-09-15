@@ -24,11 +24,7 @@ namespace Discord.Net.WebSockets
 			
 			Commands.Login msg = new Commands.Login();
 			msg.Payload.Token = token;
-			//msg.Payload.Properties["$os"] = "";
-			//msg.Payload.Properties["$browser"] = "";
 			msg.Payload.Properties["$device"] = "Discord.Net";
-			//msg.Payload.Properties["$referrer"] = "";
-			//msg.Payload.Properties["$referring_domain"] = "";
 			QueueMessage(msg);
         }
 

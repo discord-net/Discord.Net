@@ -11,12 +11,12 @@ namespace Discord.Net.WebSockets
 {
 	internal static class Commands
 	{
-		public sealed class KeepAlive : WebSocketMessage<int>
+		public sealed class KeepAlive : WebSocketMessage<ulong>
 		{
 			public KeepAlive() : base(1, GetTimestamp()) { }
 			private static DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-			private static int GetTimestamp()
-				=> (int)(DateTime.UtcNow - epoch).TotalMilliseconds;
+			private static ulong GetTimestamp()
+				=> (ulong)(DateTime.UtcNow - epoch).TotalMilliseconds;
 		}
 		public sealed class Login : WebSocketMessage<Login.Data>
 		{
