@@ -17,12 +17,6 @@
 	},
 	"frameworks": {
 		"net45": { },
-		"dnx451": { },
-		"dnxcore50": {
-			"dependencies": {
-				"System.Runtime": "4.0.20",
-				"Microsoft.CSharp": "4.0.0"
-			}
-		}
+		"dnx451": { }
 	}
 }
