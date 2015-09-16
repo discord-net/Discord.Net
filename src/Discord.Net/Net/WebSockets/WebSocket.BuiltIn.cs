@@ -17,9 +17,9 @@ namespace Discord.Net.WebSockets
 		private const int HR_TIMEOUT = -2147012894;
 
 		private readonly ConcurrentQueue<byte[]> _sendQueue;
-		private readonly ClientWebSocket _webSocket;
 		private readonly int _sendInterval;
-		
+		private ClientWebSocket _webSocket;
+
 		public event EventHandler<WebSocketMessageEventArgs> ProcessMessage;
 		private void RaiseProcessMessage(string msg)
 		{
@@ -31,12 +31,12 @@ namespace Discord.Net.WebSockets
 		{
 			_sendInterval = sendInterval;
 			_sendQueue = new ConcurrentQueue<byte[]>();
-			_webSocket = new ClientWebSocket();
-            _webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
         }
 
 		public Task Connect(string host, CancellationToken cancelToken)
 		{
+			_webSocket = new ClientWebSocket();
+			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
 			return _webSocket.ConnectAsync(new Uri(host), cancelToken);
 		}
 
@@ -44,7 +44,9 @@ namespace Discord.Net.WebSockets
 		{
 			byte[] ignored;
 			while (_sendQueue.TryDequeue(out ignored)) { }
-			return TaskHelper.CompletedTask;
+			_webSocket.Dispose();
+			_webSocket = new ClientWebSocket();
+            return TaskHelper.CompletedTask;
 		}
 
 		public Task[] RunTasks(CancellationToken cancelToken)
@@ -60,7 +62,7 @@ namespace Discord.Net.WebSockets
 		{
 			return Task.Run(async () =>
 			{
-				var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
+				var buffer = new byte[ReceiveChunkSize]; //new ArraySegment<byte>(new byte[ReceiveChunkSize]);
                 var builder = new StringBuilder();
 
 				try
@@ -75,7 +77,7 @@ namespace Discord.Net.WebSockets
 
 							try
 							{
-								result = await _webSocket.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
+                                result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken).ConfigureAwait(false);
 							}
 							catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
 							{
@@ -85,11 +87,11 @@ namespace Discord.Net.WebSockets
 							if (result.MessageType == WebSocketMessageType.Close)
 								throw new Exception($"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
 							else
-								builder.Append(Encoding.UTF8.GetString(buffer.Array, buffer.Offset, result.Count));
+								builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
 
 						}
 						while (result == null || !result.EndOfMessage);
-						
+
 						RaiseProcessMessage(builder.ToString());
 
 						builder.Clear();
