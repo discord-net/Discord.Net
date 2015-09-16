@@ -118,7 +118,12 @@ namespace Discord.Net.API
 			{
 				stopwatch.Stop();
 				if (content != null && _logLevel >= LogMessageSeverity.Debug)
-                    RaiseOnRequest(method, path, requestJson, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
+				{
+					if (path.StartsWith(Endpoints.Auth))
+                        RaiseOnRequest(method, path, "[Hidden]", stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
+					else
+						RaiseOnRequest(method, path, requestJson, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
+				}
 				else
 					RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 			}
