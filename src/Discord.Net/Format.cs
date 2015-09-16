@@ -1,33 +1,23 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Discord
 {
     public static class Format
 	{
-		private static char[] specialChars = new char[] { '_', '*', '~', '\\' }; //Backslash must always be last!
+		private static readonly Regex _escapeRegex;
+		private static readonly MatchEvaluator _escapeEvaluator;
+
+		static Format()
+		{
+			const string innerPattern = "[_*]|~~";
+			_escapeRegex = new Regex($@"(?:^|\W)(?:{innerPattern})|(?:{innerPattern})(?:\W|$)|\\", RegexOptions.Compiled);
+			_escapeEvaluator = new MatchEvaluator(e => '\\' + e.Value);
+		}
 
 		/// <summary> Removes all special formatting characters from the provided text. </summary>
 		private static string Escape(string text)
-		{
-			if (text.IndexOfAny(specialChars) >= 0)
-			{
-				StringBuilder builder = new StringBuilder(text);
-				foreach (char c in specialChars)
-				{
-					int length = builder.Length;
-					for (int i = 0; i < length; i++)
-					{
-						if (builder[i] == c)
-						{
-							builder.Insert(i, '\\');
-							length++;
-						}
-					}
-				}
-				return builder.ToString();
-			}
-			return text;
-		}
+			=> _escapeRegex.Replace(text, _escapeEvaluator);
 
 		/// <summary> Returns a markdown-formatted string with no formatting, optionally escaping the contents. </summary>
 		public static string Normal(string text, bool escape = true)
