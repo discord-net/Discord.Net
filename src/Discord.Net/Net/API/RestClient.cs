@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
@@ -20,12 +21,13 @@ namespace Discord.Net.API
 		private readonly IRestEngine _engine;
 		private readonly LogMessageSeverity _logLevel;
 		private CancellationToken _cancelToken;
+		private ServicePoint _servicePoint;
 
 		public RestClient(LogMessageSeverity logLevel)
 		{
 			_logLevel = logLevel;
-
-            string version = typeof(RestClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
+			
+			string version = typeof(RestClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
 			string userAgent = $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)";
 #if DNXCORE50
 			_engine = new BuiltInRestEngine(userAgent);
@@ -107,8 +109,11 @@ namespace Discord.Net.API
 
 			if (_logLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
-
+			
 			string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
+			if (_servicePoint == null)
+				ConfigureServicePoint();
+
 #if TEST_RESPONSES
 			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
 				throw new Exception("API check failed: Response is not empty.");
@@ -147,6 +152,9 @@ namespace Discord.Net.API
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await _engine.SendFile(method, path, filePath, _cancelToken).ConfigureAwait(false);
+			if (_servicePoint == null)
+				ConfigureServicePoint();
+
 #if TEST_RESPONSES
 			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
 				throw new Exception("API check failed: Response is not empty.");
@@ -184,5 +192,14 @@ namespace Discord.Net.API
 
 		internal void SetToken(string token) => _engine.SetToken(token);
 		internal void SetCancelToken(CancellationToken token) => _cancelToken = token;
+		
+		private void ConfigureServicePoint()
+		{
+			_servicePoint = ServicePointManager.FindServicePoint(new Uri(Endpoints.BaseApi));
+			_servicePoint.Expect100Continue = true;
+			_servicePoint.UseNagleAlgorithm = false;
+			//_servicePoint.MaxIdleTime = int.MaxValue;
+			//_servicePoint.ConnectionLeaseTimeout = int.MaxValue;
+		}
 	}
 }
