@@ -11,7 +11,7 @@ namespace Discord
 		static Format()
 		{
 			const string innerPattern = "[_*]|~~";
-			_escapeRegex = new Regex($@"(?:^|\W)(?:{innerPattern})|(?:{innerPattern})(?:\W|$)|\\", RegexOptions.Compiled);
+			_escapeRegex = new Regex($@"(?<=^|\W)(?:{innerPattern})|(?:{innerPattern})(?=\W|$)|\\", RegexOptions.Compiled);
 			_escapeEvaluator = new MatchEvaluator(e => '\\' + e.Value);
 		}
 
