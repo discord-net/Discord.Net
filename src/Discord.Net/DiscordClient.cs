@@ -75,8 +75,9 @@ namespace Discord
 		public Users Users => _users;
 		private readonly Users _users;
 
-		public CancellationToken CancelToken => _cancelToken.Token;
-		private CancellationTokenSource _cancelToken;
+		public CancellationToken CancelToken => _cancelToken;
+		private CancellationTokenSource _cancelTokenSource;
+		private CancellationToken _cancelToken;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
@@ -509,7 +510,7 @@ namespace Discord
 							if (_config.EnableVoice)
 							{
 								string host = "wss://" + data.Endpoint.Split(':')[0];
-                                await _voiceSocket.Login(host, data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token).ConfigureAwait(false);
+                                await _voiceSocket.Login(host, data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
 							}
 						}
 						break;
@@ -576,7 +577,8 @@ namespace Discord
             try
 			{
 				_disconnectedEvent.Reset();
-				_cancelToken = new CancellationTokenSource();
+				_cancelTokenSource = new CancellationTokenSource();
+				_cancelToken = _cancelTokenSource.Token;
 				_state = (int)DiscordClientState.Connecting;
 
 				_api.Token = token;
@@ -584,14 +586,14 @@ namespace Discord
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Websocket endpoint: {url}");
 				
-				await _dataSocket.Login(url, token).ConfigureAwait(false);				
+				await _dataSocket.Login(url, token, _cancelToken).ConfigureAwait(false);				
 
 				_runTask = RunTasks();
 
 				try
 				{
 					//Cancel if either Disconnect is called, data socket errors or timeout is reached
-					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken.Token, _dataSocket.CancelToken).Token;
+					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _dataSocket.CancelToken).Token;
                     if (!_connectedEvent.Wait(_config.ConnectionTimeout, cancelToken)) 
 						throw new Exception("Operation timed out.");
 				}
@@ -638,7 +640,7 @@ namespace Discord
 			{
 				_wasDisconnectUnexpected = isUnexpected;
 				_disconnectReason = ExceptionDispatchInfo.Capture(ex);
-				_cancelToken.Cancel();
+				_cancelTokenSource.Cancel();
 			}
 
 			if (!skipAwait)
@@ -730,7 +732,7 @@ namespace Discord
 		//Experimental
 		private Task MessageQueueLoop()
 		{
-			var cancelToken = _cancelToken.Token;
+			var cancelToken = _cancelToken;
 			int interval = _config.MessageQueueInterval;
 
 			return Task.Run(async () =>

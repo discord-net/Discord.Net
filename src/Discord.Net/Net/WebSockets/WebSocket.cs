@@ -47,8 +47,9 @@ namespace Discord.Net.WebSockets
 		protected ExceptionDispatchInfo _disconnectReason;
 		private bool _wasDisconnectUnexpected;
 
-		public CancellationToken CancelToken => _cancelToken.Token;
-		protected CancellationTokenSource _cancelToken;
+		public CancellationToken CancelToken => _cancelToken;
+		private CancellationTokenSource _cancelTokenSource;
+		protected CancellationToken _cancelToken;
 
 		public WebSocket(DiscordClient client)
 		{
@@ -64,20 +65,18 @@ namespace Discord.Net.WebSockets
 			};
         }
 
-		protected virtual async Task Connect(string host)
+		protected virtual async Task Connect(string host, CancellationToken cancelToken)
 		{
-			if (_state != (int)WebSocketState.Disconnected)
-				throw new InvalidOperationException("Client is already connected or connecting to the server.");
-
 			try
 			{
 				await Disconnect().ConfigureAwait(false);
 				
 				_state = (int)WebSocketState.Connecting;
 
-				_cancelToken = new CancellationTokenSource();
+				_cancelTokenSource = new CancellationTokenSource();
+				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, cancelToken).Token;
 
-				await _engine.Connect(host, _cancelToken.Token).ConfigureAwait(false);
+				await _engine.Connect(host, _cancelToken).ConfigureAwait(false);
 				_host = host;
 				_lastHeartbeat = DateTime.UtcNow;
 
@@ -94,8 +93,8 @@ namespace Discord.Net.WebSockets
 			_state = (int)WebSocketState.Connected;
 			RaiseConnected();
         }
-		public Task Reconnect()
-			=> Connect(_host);
+		/*public Task Reconnect(CancellationToken cancelToken)
+			=> Connect(_host, _cancelToken);*/
 
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
 		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
@@ -118,7 +117,7 @@ namespace Discord.Net.WebSockets
 			{
 				_wasDisconnectUnexpected = isUnexpected;
 				_disconnectReason = ExceptionDispatchInfo.Capture(ex);
-				_cancelToken.Cancel();
+				_cancelTokenSource.Cancel();
 			}
 
 			if (!skipAwait)
@@ -154,12 +153,16 @@ namespace Discord.Net.WebSockets
 		}
 		protected virtual Task[] Run()
 		{
-			var cancelToken = _cancelToken.Token;
+			var cancelToken = _cancelToken;
             return _engine.RunTasks(cancelToken)
 				.Concat(new Task[] { HeartbeatAsync(cancelToken) })
 				.ToArray();
 		}
-		protected virtual Task Cleanup() { return TaskHelper.CompletedTask; }
+		protected virtual Task Cleanup()
+		{
+			_cancelTokenSource = null;
+            return TaskHelper.CompletedTask;
+		}
 
 		protected abstract Task ProcessMessage(string json);
 		protected abstract object GetKeepAlive();

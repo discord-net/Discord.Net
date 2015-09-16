@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
@@ -18,9 +19,9 @@ namespace Discord.Net.WebSockets
 		{
 		}
 		
-		public async Task Login(string host, string token)
+		public async Task Login(string host, string token, CancellationToken cancelToken)
 		{
-			await base.Connect(host);
+			await base.Connect(host, cancelToken);
 			
 			Commands.Login msg = new Commands.Login();
 			msg.Payload.Token = token;

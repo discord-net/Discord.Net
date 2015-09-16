@@ -52,14 +52,14 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public Task Login(string host, string serverId, string userId, string sessionId, string token)
+		public Task Login(string host, string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
 		{
 			_serverId = serverId;
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
 
-			return base.Connect(host);
+			return base.Connect(host, cancelToken);
 		}
 
 		protected override Task[] Run()
@@ -110,8 +110,7 @@ namespace Discord.Net.WebSockets
 
 		private async Task ReceiveVoiceAsync()
 		{
-			var cancelSource = _cancelToken;
-			var cancelToken = cancelSource.Token;
+			var cancelToken = _cancelToken;
 
 			await Task.Run(async () =>
 			{
@@ -145,8 +144,8 @@ namespace Discord.Net.WebSockets
 #else
 		private Task SendVoiceAsync()
 		{
-			var cancelSource = _cancelToken;
-			var cancelToken = cancelSource.Token;
+			var cancelToken = _cancelToken;
+
 			return Task.Run(async () =>
 			{
 #endif
@@ -239,7 +238,7 @@ namespace Discord.Net.WebSockets
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private Task WatcherAsync()
 		{
-			var cancelToken = _cancelToken.Token;
+			var cancelToken = _cancelToken;
 			return cancelToken.Wait()
 				.ContinueWith(_ => _udp.Close());
 		}
@@ -387,7 +386,7 @@ namespace Discord.Net.WebSockets
 
 		public void SendPCMFrames(byte[] data, int bytes)
 		{
-			var cancelToken = _cancelToken.Token;
+			var cancelToken = _cancelToken;
 			if (!_isReady || cancelToken == null)
 				throw new InvalidOperationException("Not connected to a voice server.");
 			if (bytes == 0)
@@ -441,7 +440,7 @@ namespace Discord.Net.WebSockets
 					Buffer.BlockCopy(_encodingBuffer, 0, payload, 0, encodedLength);
 
 					//Wait until the queue has a spot open
-					_sendQueueWait.Wait(_cancelToken.Token);
+					_sendQueueWait.Wait(_cancelToken);
 					_sendQueue.Enqueue(payload);
 					if (_sendQueue.Count >= _targetAudioBufferLength)
 						_sendQueueWait.Reset();
