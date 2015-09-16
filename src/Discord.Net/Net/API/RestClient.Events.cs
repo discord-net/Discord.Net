@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace Discord.Net
+namespace Discord.Net.API
 {
     internal partial class RestClient
 	{

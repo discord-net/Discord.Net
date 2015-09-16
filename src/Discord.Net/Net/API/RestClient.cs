@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Net.Http;
@@ -7,7 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.API
 {
 	internal interface IRestEngine
 	{
@@ -31,7 +30,7 @@ namespace Discord.Net
 #if DNXCORE50
 			_engine = new BuiltInRestEngine(userAgent);
 #else
-			_engine = new SharpRestEngine(userAgent);
+			_engine = new RestSharpRestEngine(userAgent);
 #endif
 		}
 

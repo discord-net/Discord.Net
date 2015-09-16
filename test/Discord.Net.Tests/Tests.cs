@@ -110,9 +110,9 @@ namespace Discord.Net.Tests
 		public static void Cleanup()
 		{
 			WaitMany(
-				_hostClient.IsConnected ? _hostClient.Servers.Select(x => _hostClient.LeaveServer(x)) : null,
-				_targetBot.IsConnected ? _targetBot.Servers.Select(x => _targetBot.LeaveServer(x)) : null,
-				_observerBot.IsConnected ? _observerBot.Servers.Select(x => _observerBot.LeaveServer(x)) : null);
+				_hostClient.State == DiscordClientState.Connected ? _hostClient.Servers.Select(x => _hostClient.LeaveServer(x)) : null,
+				_targetBot.State == DiscordClientState.Connected ? _targetBot.Servers.Select(x => _targetBot.LeaveServer(x)) : null,
+				_observerBot.State == DiscordClientState.Connected ? _observerBot.Servers.Select(x => _observerBot.LeaveServer(x)) : null);
 
 			WaitAll(
 				_hostClient.Disconnect(),

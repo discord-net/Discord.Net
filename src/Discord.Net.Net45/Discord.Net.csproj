@@ -165,20 +165,20 @@
     <Compile Include="..\Discord.Net\Net\API\Responses.cs">
       <Link>Net\API\Responses.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\API\RestClient.BuiltIn.cs">
+      <Link>Net\API\RestClient.BuiltIn.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\RestClient.cs">
+      <Link>Net\API\RestClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\RestClient.Events.cs">
+      <Link>Net\API\RestClient.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\API\RestClient.SharpRest.cs">
+      <Link>Net\API\RestClient.SharpRest.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\HttpException.cs">
       <Link>Net\HttpException.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.BuiltIn.cs">
-      <Link>Net\RestClient.BuiltIn.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.cs">
-      <Link>Net\RestClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.Events.cs">
-      <Link>Net\RestClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.SharpRest.cs">
-      <Link>Net\RestClient.SharpRest.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\Commands.cs">
       <Link>Net\WebSockets\Commands.cs</Link>

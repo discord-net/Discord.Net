@@ -1,5 +1,4 @@
 ﻿#if !DNXCORE50
-using Discord.Net.API;
 using RestSharp;
 using System;
 using System.IO;
@@ -7,13 +6,13 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.API
 {
-    internal class SharpRestEngine : IRestEngine
+    internal class RestSharpRestEngine : IRestEngine
 	{
 		private readonly RestSharp.RestClient _client;
 
-		public SharpRestEngine(string userAgent)
+		public RestSharpRestEngine(string userAgent)
 		{
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{

@@ -27,14 +27,18 @@
 	"frameworks": {
 		"net45": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.29",
 				"RestSharp": "105.2.3"
+			},
+			"frameworkAssemblies": {
+				"System.Net.Http": "4.0.0.0"
 			}
 		},
 		"dnx451": {
 			"dependencies": {
-				"Microsoft.Net.Http": "2.2.29",
 				"RestSharp": "105.2.3"
+			},
+			"frameworkAssemblies": {
+				"System.Net.Http": "4.0.0.0"
 			}
 		},
 		"dnxcore50": {

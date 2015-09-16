@@ -1,5 +1,4 @@
 ﻿#if DNXCORE50
-using Discord.Net.API;
 using System;
 using System.Globalization;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.API
 {
 	internal class BuiltInRestEngine : IRestEngine
 	{
