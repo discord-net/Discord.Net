@@ -63,8 +63,8 @@ namespace Discord.Net.WebSockets
 						RaiseReceivedEvent(msg.Type, token);
 						if (msg.Type == "READY")
 							CompleteConnect();
-						if (_logLevel >= LogMessageSeverity.Info)
-							RaiseOnLog(LogMessageSeverity.Info, "Got Event: " + msg.Type);
+						/*if (_logLevel >= LogMessageSeverity.Info)
+							RaiseOnLog(LogMessageSeverity.Info, "Got Event: " + msg.Type);*/
 					}
 					break;
 				case 7: //Redirect

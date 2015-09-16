@@ -107,6 +107,8 @@ namespace Discord
 				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
+				Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, "Connected");
+				Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, "Disconnected");
 				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
 				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 				//_dataSocket.ReceivedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Received {e.Type}");
@@ -118,8 +120,6 @@ namespace Discord
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
-				Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Connected");
-				Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Disconnected");
 				ServerCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Created Server: {e.Server?.Name} ({e.ServerId})");
 				ServerDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Destroyed Server: {e.Server?.Name} ({e.ServerId})");
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Updated Server: {e.Server?.Name} ({e.ServerId})");
