@@ -44,11 +44,25 @@ namespace Discord.Net.API
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)
 		{
-			var response = await _client.ExecuteTaskAsync(request, cancelToken).ConfigureAwait(false);
-			int statusCode = (int)response.StatusCode;
-			if (statusCode < 200 || statusCode >= 300) //2xx = Success
-				throw new HttpException(response.StatusCode);
-			return response.Content;
+			bool hasRetried = false;
+			while (true)
+			{
+				var response = await _client.ExecuteTaskAsync(request, cancelToken).ConfigureAwait(false);
+				int statusCode = (int)response.StatusCode;
+				if (statusCode == 0) //Internal Error
+				{
+					if (!hasRetried)
+					{
+						//SSL/TTS Error seems to work if we immediately retry
+						hasRetried = true;
+						continue;
+					}
+					throw response.ErrorException;
+				}
+				if (statusCode < 200 || statusCode >= 300) //2xx = Success
+					throw new HttpException(response.StatusCode);
+				return response.Content;
+			}
 		}
 
 		private Method GetMethod(HttpMethod method)
