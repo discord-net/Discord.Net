@@ -198,8 +198,8 @@ namespace Discord.Net.API
 			_servicePoint = ServicePointManager.FindServicePoint(new Uri(Endpoints.BaseApi));
 			_servicePoint.Expect100Continue = true;
 			_servicePoint.UseNagleAlgorithm = false;
-			//_servicePoint.MaxIdleTime = int.MaxValue;
-			//_servicePoint.ConnectionLeaseTimeout = int.MaxValue;
+			_servicePoint.MaxIdleTime = int.MaxValue;
+			_servicePoint.ConnectionLeaseTimeout = int.MaxValue;
 		}
 	}
 }
