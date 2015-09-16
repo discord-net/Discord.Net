@@ -22,10 +22,13 @@ namespace Discord
 		public async Task LeaveVoiceServer()
 		{
 			CheckReady(checkVoice: true);
-			
-			await _voiceSocket.Disconnect().ConfigureAwait(false);
-			await TaskHelper.CompletedTask.ConfigureAwait(false);
-			_dataSocket.SendLeaveVoice();
+
+			if (_voiceSocket.CurrentVoiceServerId != null)
+			{
+				await _voiceSocket.Disconnect().ConfigureAwait(false);
+				await TaskHelper.CompletedTask.ConfigureAwait(false);
+				_dataSocket.SendLeaveVoice();
+			}
 		}
 
 		/// <summary> Sends a PCM frame to the voice server. </summary>

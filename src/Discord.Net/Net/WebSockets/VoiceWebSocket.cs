@@ -52,23 +52,14 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public async Task Login(string host, string serverId, string userId, string sessionId, string token)
+		public Task Login(string host, string serverId, string userId, string sessionId, string token)
 		{
 			_serverId = serverId;
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
 
-			await base.Connect(host);
-
-			Commands.Login msg = new Commands.Login();
-			msg.Payload.Token = token;
-			//msg.Payload.Properties["$os"] = "";
-			//msg.Payload.Properties["$browser"] = "";
-			msg.Payload.Properties["$device"] = "Discord.Net";
-			//msg.Payload.Properties["$referrer"] = "";
-			//msg.Payload.Properties["$referring_domain"] = "";
-			QueueMessage(msg);
+			return base.Connect(host);
 		}
 
 		protected override Task[] Run()
@@ -405,7 +396,7 @@ namespace Discord.Net.WebSockets
 			int frameSize = _encoder.FrameSize;
 			int frames = bytes / frameSize;
 			int expectedBytes = frames * frameSize;
-			int lastFrameSize = expectedBytes - bytes;
+			int lastFrameSize = bytes - expectedBytes;
 
 			//If this only consists of a partial frame and the buffer is too small to pad the end, make a new one
 			if (data.Length < frameSize)
