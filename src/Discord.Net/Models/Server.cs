@@ -104,6 +104,7 @@ namespace Discord
 			AFKTimeout = model.AFKTimeout;
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
+			Name = model.Name;
 			OwnerId = model.OwnerId;
 			Region = model.Region;
 
