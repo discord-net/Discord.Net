@@ -2,13 +2,6 @@
 
 namespace Discord.Net.WebSockets
 {
-	public class DisconnectedEventArgs : EventArgs
-	{
-		public readonly bool WasUnexpected;
-		public readonly Exception Error;
-		internal DisconnectedEventArgs(bool wasUnexpected, Exception error) { WasUnexpected = wasUnexpected; Error = error; }
-	}
-
 	internal partial class WebSocket
 	{		
 		public event EventHandler Connected;

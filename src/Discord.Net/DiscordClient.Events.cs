@@ -22,6 +22,12 @@ namespace Discord
         VoiceWebSocket,
 	}
 
+	public class DisconnectedEventArgs : EventArgs
+	{
+		public readonly bool WasUnexpected;
+		public readonly Exception Error;
+		internal DisconnectedEventArgs(bool wasUnexpected, Exception error) { WasUnexpected = wasUnexpected; Error = error; }
+	}
 	public sealed class LogMessageEventArgs : EventArgs
 	{
 		public LogMessageSeverity Severity { get; }
@@ -30,6 +36,7 @@ namespace Discord
 
 		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) { Severity = severity; Source = source; Message = msg; }
 	}
+
 	public sealed class ServerEventArgs : EventArgs
 	{
 		public Server Server { get; }
@@ -136,11 +143,11 @@ namespace Discord
 			if (Connected != null)
 				Connected(this, EventArgs.Empty);
 		}
-		public event EventHandler Disconnected;
-		private void RaiseDisconnected()
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
+		private void RaiseDisconnected(DisconnectedEventArgs e)
 		{
 			if (Disconnected != null)
-				Disconnected(this, EventArgs.Empty);
+				Disconnected(this, e);
 		}
 		public event EventHandler<LogMessageEventArgs> LogMessage;
 		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message)
@@ -308,11 +315,11 @@ namespace Discord
 			if (VoiceConnected != null)
 				VoiceConnected(this, EventArgs.Empty);
 		}
-		public event EventHandler VoiceDisconnected;
-		private void RaiseVoiceDisconnected()
+		public event EventHandler<DisconnectedEventArgs> VoiceDisconnected;
+		private void RaiseVoiceDisconnected(DisconnectedEventArgs e)
 		{
 			if (VoiceDisconnected != null)
-				VoiceDisconnected(this, EventArgs.Empty);
+				VoiceDisconnected(this, e);
 		}
 		/*public event EventHandler<VoiceServerUpdatedEventArgs> VoiceServerChanged;
 		private void RaiseVoiceServerUpdated(Server server, string endpoint)

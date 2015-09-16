@@ -35,6 +35,7 @@ namespace Discord
 		private Task _runTask;
 		protected ExceptionDispatchInfo _disconnectReason;
 		private bool _wasDisconnectUnexpected;
+		private string _token;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -86,6 +87,7 @@ namespace Discord
 			_config.Lock();
 
 			_state = (int)DiscordClientState.Disconnected;
+			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 			_rand = new Random();
@@ -93,8 +95,13 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
+			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await Connect(_token); /*await _dataSocket.Reconnect(_cancelToken);*/ };
 			if (_config.EnableVoice)
+			{
 				_voiceSocket = new VoiceWebSocket(this);
+				_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
+				_voiceSocket.Disconnected += async (s, e) => { RaiseVoiceDisconnected(e); if (e.WasUnexpected) await _voiceSocket.Reconnect(_cancelToken); };
+            }
 
 			_channels = new Channels(this);
 			_members = new Members(this);
@@ -108,10 +115,6 @@ namespace Discord
 				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, "Connected");
-				Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, "Disconnected");
-				VoiceConnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, $"Voice Connected");
-				VoiceDisconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client, $"Voice Disconnected");
 				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
 				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 				//_dataSocket.ReceivedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Received {e.Type}");
@@ -604,6 +607,7 @@ namespace Discord
 				}
 
 				//_state = (int)DiscordClientState.Connected;
+				_token = token;
 				return token;
 			}
 			catch
@@ -616,23 +620,24 @@ namespace Discord
 		{
 			_state = (int)WebSocketState.Connected;
 			_connectedEvent.Set();
+			RaiseConnected();
 		}
 
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected async Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
+		protected Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
 
 			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
 			oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connecting);
-			if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
+			if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
 			hasWriterLock = oldState == (int)DiscordClientState.Connecting; //Caused state change
 			if (!hasWriterLock)
 			{
 				oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connected);
-				if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
+				if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
 				hasWriterLock = oldState == (int)DiscordClientState.Connected; //Caused state change
 			}
 
@@ -644,18 +649,9 @@ namespace Discord
 			}
 
 			if (!skipAwait)
-			{
-				Task task = _runTask;
-				if (task != null)
-					await task.ConfigureAwait(false);
-			}
-
-			if (hasWriterLock)
-			{
-				_state = (int)DiscordClientState.Disconnected;
-				_disconnectedEvent.Set();
-				_connectedEvent.Reset();
-            }
+				return _runTask ?? TaskHelper.CompletedTask;
+			else
+				return TaskHelper.CompletedTask;
 		}
 
 		private async Task RunTasks()
@@ -672,13 +668,14 @@ namespace Discord
 			}
 			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
 
-			await Cleanup().ConfigureAwait(false);
+			bool wasUnexpected = _wasDisconnectUnexpected;
+			_wasDisconnectUnexpected = false;
+
+			await Cleanup(wasUnexpected).ConfigureAwait(false);
 			_runTask = null;
 		}
-		private async Task Cleanup()
+		private async Task Cleanup(bool wasUnexpected)
 		{
-			_disconnectedEvent.Set();
-
 			await _dataSocket.Disconnect().ConfigureAwait(false);
 			if (_config.EnableVoice)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
@@ -695,6 +692,14 @@ namespace Discord
 
 			_currentUser = null;
 			_currentUserId = null;
+			_token = null;
+
+			if (!wasUnexpected)
+			{
+				_state = (int)DiscordClientState.Disconnected;
+				_disconnectedEvent.Set();
+			}
+			_connectedEvent.Reset();
 		}
 
 		//Helpers

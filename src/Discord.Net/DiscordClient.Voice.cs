@@ -38,7 +38,10 @@ namespace Discord
 		public void SendVoicePCM(byte[] data, int count)
 		{
 			CheckReady(checkVoice: true);
+			if (data == null) throw new ArgumentException(nameof(data));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
 			if (count == 0) return;
+			
 			_voiceSocket.SendPCMFrames(data, count);
 		}
 
@@ -46,6 +49,7 @@ namespace Discord
 		public void ClearVoicePCM()
 		{
 			CheckReady(checkVoice: true);
+
 			_voiceSocket.ClearPCMFrames();
 		}
 
@@ -53,6 +57,7 @@ namespace Discord
 		public async Task WaitVoice()
 		{
 			CheckReady(checkVoice: true);
+
 			_voiceSocket.Wait();
 			await TaskHelper.CompletedTask.ConfigureAwait(false);
 		}

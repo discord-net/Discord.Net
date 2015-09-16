@@ -16,7 +16,10 @@ namespace Discord.Net.WebSockets
 {
     internal partial class VoiceWebSocket : WebSocket
 	{
-		private readonly int _targetAudioBufferLength;
+		private const string EncryptedMode = "xsalsa20_poly1305";
+		private const string UnencryptedMode = "plain";
+
+        private readonly int _targetAudioBufferLength;
 		private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
 		private readonly Random _rand = new Random();
@@ -26,11 +29,9 @@ namespace Discord.Net.WebSockets
 		private ManualResetEventSlim _sendQueueWait, _sendQueueEmptyWait;
 		private UdpClient _udp;
 		private IPEndPoint _endpoint;
-		private bool _isReady, _isClearing;
+		private bool _isClearing, _isEncrypted;
 		private byte[] _secretKey;
-		private string _myIp;
 		private ushort _sequence;
-		private string _mode;
 		private byte[] _encodingBuffer;
 		private string _serverId, _userId, _sessionId, _token;
 
@@ -52,24 +53,32 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public Task Login(string host, string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
+		public async Task Login(string host, string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
 		{
+			if (_serverId == serverId && _userId == userId && _sessionId == sessionId && _token == token)
+			{
+				//Adjust the host and tell the system to reconnect
+				_host = host;
+				await DisconnectInternal(new Exception("Server transfer occurred."));
+				return;
+			}
+			
 			_serverId = serverId;
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
 
-			return base.Connect(host, cancelToken);
+			await Connect(host, cancelToken);
 		}
 
 		protected override Task[] Run()
 		{
+			_isClearing = false;
+			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 #if !DNX451
 			_udp.AllowNatTraversal(true);
 #endif
-			_isReady = false;
-			_isClearing = false;
 			
 			VoiceCommands.Login msg = new VoiceCommands.Login();
 			msg.Payload.ServerId = _serverId;
@@ -93,19 +102,24 @@ namespace Discord.Net.WebSockets
 #endif
 			}.Concat(base.Run()).ToArray();
 		}
-		protected override Task Cleanup()
+		protected override Task Cleanup(bool wasUnexpected)
 		{
-			ClearPCMFrames();
-			_udp = null;
-			_serverId = null;
-			_userId = null;
-			_sessionId = null;
-			_token = null;
 #if USE_THREAD
 			_sendThread.Join();
 			_sendThread = null;
 #endif
-			return base.Cleanup();
+
+			ClearPCMFrames();
+			if (!wasUnexpected)
+			{
+				_serverId = null;
+				_userId = null;
+				_sessionId = null;
+				_token = null;
+			}
+			_udp = null;
+
+			return base.Cleanup(wasUnexpected);
 		}
 
 		private async Task ReceiveVoiceAsync()
@@ -153,14 +167,16 @@ namespace Discord.Net.WebSockets
 				byte[] packet;
 				try
 				{
-					while (!cancelToken.IsCancellationRequested && !_isReady)
+					while (!cancelToken.IsCancellationRequested && _state != (int)WebSocketState.Connected)
+					{
 #if USE_THREAD
 						Thread.Sleep(1);
 #else
 						await Task.Delay(1);
 #endif
+					}
 
-						if (cancelToken.IsCancellationRequested)
+					if (cancelToken.IsCancellationRequested)
 						return;
 
 					uint timestamp = 0;
@@ -251,15 +267,15 @@ namespace Discord.Net.WebSockets
 			{
 				case 2: //READY
 					{
-						if (!_isReady)
+						if (_state != (int)WebSocketState.Connected)
 						{
 							var payload = (msg.Payload as JToken).ToObject<VoiceEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
 							//_mode = payload.Modes.LastOrDefault();
-							_mode = "plain";
-							_udp.Connect(_endpoint);
+							_isEncrypted = !payload.Modes.Contains("plain");
+                            _udp.Connect(_endpoint);
 
 							_sequence = (ushort)_rand.Next(0, ushort.MaxValue);
 							//No thread issue here because SendAsync doesn't start until _isReady is true
@@ -297,9 +313,8 @@ namespace Discord.Net.WebSockets
 			{
 				byte[] buffer = msg.Buffer;
 				int length = msg.Buffer.Length;
-				if (!_isReady)
+				if (_state != (int)WebSocketState.Connected)
 				{
-					_isReady = true;
 					if (length != 70)
 					{
 						if (_logLevel >= LogMessageSeverity.Warning)
@@ -308,15 +323,15 @@ namespace Discord.Net.WebSockets
 					}
 
 					int port = buffer[68] | buffer[69] << 8;
+					string ip = Encoding.ASCII.GetString(buffer, 4, 70 - 6).TrimEnd('\0');
 
-					_myIp = Encoding.ASCII.GetString(buffer, 4, 70 - 6).TrimEnd('\0');
+					CompleteConnect();
 
-					_isReady = true;
 					var login2 = new VoiceCommands.Login2();
 					login2.Payload.Protocol = "udp";
-					login2.Payload.SocketData.Address = _myIp;
-					login2.Payload.SocketData.Mode = _mode;
-					login2.Payload.SocketData.Port = port;
+					login2.Payload.SocketData.Address = ip;
+					login2.Payload.SocketData.Mode = _isEncrypted ? EncryptedMode : UnencryptedMode;
+                    login2.Payload.SocketData.Port = port;
 					QueueMessage(login2);
 				}
 				else
@@ -377,8 +392,8 @@ namespace Discord.Net.WebSockets
 						buffer = newBuffer;
 					}*/
 
-					if (_logLevel >= LogMessageSeverity.Verbose)
-						RaiseOnLog(LogMessageSeverity.Verbose, $"Received {buffer.Length - 12} bytes.");
+					if (_logLevel >= LogMessageSeverity.Debug)
+						RaiseOnLog(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");
 					//TODO: Use Voice Data
 				}
 			}
@@ -386,12 +401,6 @@ namespace Discord.Net.WebSockets
 
 		public void SendPCMFrames(byte[] data, int bytes)
 		{
-			var cancelToken = _cancelToken;
-			if (!_isReady || cancelToken == null)
-				throw new InvalidOperationException("Not connected to a voice server.");
-			if (bytes == 0)
-				return;
-
 			int frameSize = _encoder.FrameSize;
 			int frames = bytes / frameSize;
 			int expectedBytes = frames * frameSize;
@@ -431,7 +440,7 @@ namespace Discord.Net.WebSockets
 					int encodedLength = _encoder.EncodeFrame(data, pos, _encodingBuffer);
 
 					//TODO: Handle Encryption
-					if (_mode == "xsalsa20_poly1305")
+					if (_isEncrypted)
 					{
 					}
 
@@ -448,16 +457,16 @@ namespace Discord.Net.WebSockets
 				}
 			}
 
-			if (_logLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, $"Queued {bytes} bytes for voice output.");
+			if (_logLevel >= LogMessageSeverity.Debug)
+				RaiseOnLog(LogMessageSeverity.Debug, $"Queued {bytes} bytes for voice output.");
 		}
 		public void ClearPCMFrames()
 		{
 			_isClearing = true;
 			byte[] ignored;
 			while (_sendQueue.TryDequeue(out ignored)) { }
-			if (_logLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, "Cleared the voice buffer.");
+			if (_logLevel >= LogMessageSeverity.Debug)
+				RaiseOnLog(LogMessageSeverity.Debug, "Cleared the voice buffer.");
 			_isClearing = false;
 		}
 
