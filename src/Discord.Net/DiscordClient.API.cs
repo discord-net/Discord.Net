@@ -272,7 +272,7 @@ namespace Discord
 					var model = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
 					var msg = _messages.GetOrAdd(model.Id, channelId, model.Author.Id);
 					msg.Update(model);
-					try { RaiseMessageSent(result[i]); } catch { }
+					RaiseEvent(nameof(MessageSent), () => RaiseMessageSent(msg));
 				}
 				await Task.Delay(1000).ConfigureAwait(false);
 			}

@@ -296,7 +296,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildMemberRemove>(_serializer);
 							var member = _members.TryRemove(data.UserId, data.GuildId);
 							if (member != null)
-								try { RaiseMemberRemoved(member); } catch { }
+								RaiseEvent(nameof(MemberRemoved), () => RaiseMemberRemoved(member));
 						}
 						break;
 
@@ -474,7 +474,7 @@ namespace Discord
 							if (user != null)
 							{
 								user.Update(data);
-								try { RaiseUserUpdated(user); } catch { }
+								RaiseEvent(nameof(UserUpdated), () => RaiseUserUpdated(user));
 							}
 						}
 						break;
@@ -709,8 +709,8 @@ namespace Discord
 						}
 						msg.IsQueued = false;
 						msg.HasFailed = hasFailed;
-						try { RaiseMessageSent(msg); } catch { }
-					}
+						RaiseEvent(nameof(MessageSent), () => RaiseMessageSent(msg));
+                    }
 					await Task.Delay(interval).ConfigureAwait(false);
 				}
 			});
