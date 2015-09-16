@@ -62,7 +62,7 @@ namespace Discord.Net.WebSockets
 		{
 			return Task.Run(async () =>
 			{
-				var buffer = new byte[ReceiveChunkSize]; //new ArraySegment<byte>(new byte[ReceiveChunkSize]);
+				var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
                 var builder = new StringBuilder();
 
 				try
@@ -77,7 +77,7 @@ namespace Discord.Net.WebSockets
 
 							try
 							{
-                                result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken).ConfigureAwait(false);
+                                result = await _webSocket.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
 							}
 							catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
 							{
@@ -87,7 +87,7 @@ namespace Discord.Net.WebSockets
 							if (result.MessageType == WebSocketMessageType.Close)
 								throw new Exception($"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
 							else
-								builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+								builder.Append(Encoding.UTF8.GetString(buffer.Array, buffer.Offset, result.Count));
 
 						}
 						while (result == null || !result.EndOfMessage);
@@ -110,7 +110,30 @@ namespace Discord.Net.WebSockets
 					while (_webSocket.State == State.Open && !cancelToken.IsCancellationRequested)
 					{
 						while (_sendQueue.TryDequeue(out bytes))
-							await SendMessageInternal(bytes, cancelToken);
+						{
+							var frameCount = (int)Math.Ceiling((double)bytes.Length / SendChunkSize);
+
+							int offset = 0;
+							for (var i = 0; i < frameCount; i++, offset += SendChunkSize)
+							{
+								bool isLast = i == (frameCount - 1);
+
+								int count;
+								if (isLast)
+									count = bytes.Length - (i * SendChunkSize);
+								else
+									count = SendChunkSize;
+																
+								try
+								{
+									await _webSocket.SendAsync(new ArraySegment<byte>(bytes, offset, count), WebSocketMessageType.Text, isLast, cancelToken).ConfigureAwait(false);
+								}
+								catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
+								{
+									return;
+								}
+							}
+						}
 						await Task.Delay(_sendInterval, cancelToken).ConfigureAwait(false);
 					}
 				}
@@ -122,31 +145,5 @@ namespace Discord.Net.WebSockets
 		{
 			_sendQueue.Enqueue(message);
         }
-
-		private async Task SendMessageInternal(byte[] message, CancellationToken cancelToken)
-		{
-			var frameCount = (int)Math.Ceiling((double)message.Length / SendChunkSize);
-
-			int offset = 0;
-			for (var i = 0; i < frameCount; i++, offset += SendChunkSize)
-			{
-				bool isLast = i == (frameCount - 1);
-
-				int count;
-				if (isLast)
-					count = message.Length - (i * SendChunkSize);
-				else
-					count = SendChunkSize;
-
-				try
-				{
-					await _webSocket.SendAsync(new ArraySegment<byte>(message, offset, count), WebSocketMessageType.Text, isLast, cancelToken).ConfigureAwait(false);
-				}
-				catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
-				{
-					return;
-				}
-			}
-		}
 	}
 }
