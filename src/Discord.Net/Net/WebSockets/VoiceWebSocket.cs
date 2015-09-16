@@ -70,6 +70,29 @@ namespace Discord.Net.WebSockets
 
 			await Connect(host, cancelToken);
 		}
+		public async Task Reconnect(CancellationToken cancelToken)
+		{
+			try
+			{
+				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				while (!cancelToken.IsCancellationRequested)
+				{
+					try
+					{
+						await Connect(_host, cancelToken).ConfigureAwait(false);
+						break;
+					}
+					catch (OperationCanceledException) { throw; }
+					catch (Exception ex)
+					{
+						RaiseOnLog(LogMessageSeverity.Error, $"DataSocket reconnect failed: {ex.GetBaseException().Message}");
+						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
+						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+					}
+				}
+			}
+			catch (OperationCanceledException) { }
+		}
 
 		protected override Task[] Run()
 		{

@@ -69,29 +69,6 @@ namespace Discord.Net.WebSockets
 			};
         }
 
-		public async Task Reconnect(CancellationToken cancelToken)
-		{
-			try
-			{
-				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
-				while (!cancelToken.IsCancellationRequested)
-				{
-					try
-					{
-						await Connect(_host, cancelToken).ConfigureAwait(false);
-						break;
-					}
-					catch (OperationCanceledException) { throw; }
-					catch (Exception ex)
-					{
-						RaiseOnLog(LogMessageSeverity.Error, $"DataSocket reconnect failed: {ex.GetBaseException().Message}");
-						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
-					}
-				}
-			}
-			catch (OperationCanceledException) { }
-		}
 		protected virtual async Task Connect(string host, CancellationToken cancelToken)
 		{
 			if (_state != (int)WebSocketState.Disconnected)
@@ -127,7 +104,7 @@ namespace Discord.Net.WebSockets
 			=> Connect(_host, _cancelToken);*/
 
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
+		protected Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
@@ -146,7 +123,7 @@ namespace Discord.Net.WebSockets
 			if (hasWriterLock)
 			{
 				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectReason = ExceptionDispatchInfo.Capture(ex);
+				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
 				_cancelTokenSource.Cancel();
 			}
 
@@ -158,13 +135,17 @@ namespace Discord.Net.WebSockets
 
 		protected virtual async Task RunTasks()
 		{
-			Task task = Task.WhenAll(Run());
+			Task[] tasks = Run();
+			Task firstTask = Task.WhenAny(tasks);
+			Task allTasks = Task.WhenAll(tasks);
 
-            try
-			{
-				await task.ConfigureAwait(false);
-			}
-			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
+            try {  await firstTask.ConfigureAwait(false); }
+			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
+
+			//When the first task ends, make sure the rest do too
+			await DisconnectInternal(skipAwait: true);
+			try { await allTasks.ConfigureAwait(false); }
+			catch { }
 
 			bool wasUnexpected = _wasDisconnectUnexpected;
 			_wasDisconnectUnexpected = false;
@@ -207,7 +188,7 @@ namespace Discord.Net.WebSockets
 				{
 					while (!cancelToken.IsCancellationRequested)
 					{
-						if (_heartbeatInterval > 0)
+						if (_state == (int)WebSocketState.Connected)
 						{
 							QueueMessage(GetKeepAlive());
 							await Task.Delay(_heartbeatInterval, cancelToken).ConfigureAwait(false);

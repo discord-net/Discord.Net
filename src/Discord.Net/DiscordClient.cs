@@ -95,7 +95,7 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await Connect(_token); /*await _dataSocket.Reconnect(_cancelToken);*/ };
+			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await Reconnect(_token); };
 			if (_config.EnableVoice)
 			{
 				_voiceSocket = new VoiceWebSocket(this);
@@ -553,7 +553,8 @@ namespace Discord
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
 		{
-			await Disconnect().ConfigureAwait(false);
+			if (_state != (int)DiscordClientState.Disconnected)
+				await Disconnect().ConfigureAwait(false);
 
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Using cached token.");
@@ -564,7 +565,8 @@ namespace Discord
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
 		{
-			await Disconnect().ConfigureAwait(false);
+			if (_state != (int)DiscordClientState.Disconnected)
+				await Disconnect().ConfigureAwait(false);
 	
 			var response = await _api.Login(email, password).ConfigureAwait(false);
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
@@ -572,11 +574,15 @@ namespace Discord
 			
 			return await ConnectInternal(response.Token).ConfigureAwait(false);
 		}
+		private Task Reconnect(string token)
+		{
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Using cached token.");
+
+			return ConnectInternal(token);
+		}
 		private async Task<string> ConnectInternal(string token)
 		{
-			if (_state != (int)DiscordClientState.Disconnected)
-				throw new InvalidOperationException("Client is already connected or connecting to the server.");
-
             try
 			{
 				_disconnectedEvent.Reset();
@@ -618,14 +624,14 @@ namespace Discord
 		}
 		protected void CompleteConnect()
 		{
-			_state = (int)WebSocketState.Connected;
+			_state = (int)DiscordClientState.Connected;
 			_connectedEvent.Set();
 			RaiseConnected();
 		}
 
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected Task DisconnectInternal(Exception ex, bool isUnexpected = true, bool skipAwait = false)
+		protected Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
@@ -644,7 +650,7 @@ namespace Discord
 			if (hasWriterLock)
 			{
 				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectReason = ExceptionDispatchInfo.Capture(ex);
+				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
 				_cancelTokenSource.Cancel();
 			}
 
@@ -662,11 +668,11 @@ namespace Discord
 			else
 				task = _cancelToken.Wait();
 
-			try
-			{
-				await task.ConfigureAwait(false);
-			}
+			try { await task.ConfigureAwait(false); }
 			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
+
+			//When the first task ends, make sure the rest do too
+			await DisconnectInternal(skipAwait: true);
 
 			bool wasUnexpected = _wasDisconnectUnexpected;
 			_wasDisconnectUnexpected = false;
@@ -680,8 +686,11 @@ namespace Discord
 			if (_config.EnableVoice)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 
-			Message ignored;
-			while (_pendingMessages.TryDequeue(out ignored)) { }
+			if (_config.UseMessageQueue)
+			{
+				Message ignored;
+				while (_pendingMessages.TryDequeue(out ignored)) { }
+			}
 			
 			_channels.Clear();
 			_members.Clear();
