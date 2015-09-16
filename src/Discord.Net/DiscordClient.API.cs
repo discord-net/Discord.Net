@@ -16,8 +16,6 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		//TODO: Move all these functions into their respective collections object
-
 		//Servers
 		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
 		public async Task<Server> CreateServer(string name, string region)

@@ -85,7 +85,7 @@ namespace Discord.Net.WebSockets
 							}
 
 							if (result.MessageType == WebSocketMessageType.Close)
-								throw new Exception($"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}, {result.CloseStatusDescription ?? "No Reason"})");
+								throw new Exception($"Got Close Message ({result.CloseStatus?.ToString() ?? "Unexpected"}): {result.CloseStatusDescription ?? "No Reason"}");
 							else
 								builder.Append(Encoding.UTF8.GetString(buffer.Array, buffer.Offset, result.Count));
 
