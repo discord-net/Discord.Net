@@ -299,15 +299,15 @@ namespace Discord
 		public Task EditMessage(string channelId, string messageId, string text)
 			=> EditMessage(channelId, messageId, text, new string[0]);
 		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
 		public Task EditMessage(Message message, string text, string[] mentions)
 			=> EditMessage(message?.ChannelId, message?.Id, text, mentions);
 		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
 		public Task EditMessage(Channel channel, string messageId, string text, string[] mentions)
 			=> EditMessage(channel?.Id, messageId, text, mentions);
 		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
 		public async Task EditMessage(string channelId, string messageId, string text, string[] mentions)
 		{
 			CheckReady();
