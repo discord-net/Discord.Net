@@ -456,8 +456,8 @@ namespace Discord
 			=> RemoveChannelPermissions(channel?.Id, user?.Id);
 		public Task RemoveChannelUserPermissions(string channelId, User user)
 			=> RemoveChannelPermissions(channelId, user?.Id);
-		public Task RemoveChannelPermissions(Channel channel, string userId)
-			=> RemoveChannelUserPermissions(channel?.Id, userId);
+		public Task RemoveChannelUserPermissions(Channel channel, string userId)
+			=> RemoveChannelPermissions(channel?.Id, userId);
 		public Task RemoveChannelUserPermissions(string channelId, string userId)
 			=> RemoveChannelPermissions(channelId, userId);
 

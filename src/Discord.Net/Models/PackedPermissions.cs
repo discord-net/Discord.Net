@@ -1,4 +1,6 @@
-﻿namespace Discord
+﻿using System;
+
+namespace Discord
 {
 	public sealed class PackedPermissions
 	{
@@ -6,6 +8,7 @@
 		private uint _rawValue;
 		public uint RawValue { get { return _rawValue; } internal set { _rawValue = value; } } //Internal set bypasses isLocked for API changes.
 
+		public PackedPermissions() { _isLocked = false; }
 		internal PackedPermissions(bool isLocked) { _isLocked = isLocked; }
 		internal PackedPermissions(bool isLocked, uint rawValue) { _isLocked = isLocked; _rawValue = rawValue; }
 
@@ -61,13 +64,15 @@
 		private bool GetBit(int pos) => ((_rawValue >> (pos - 1)) & 1U) == 1;
 		private void SetBit(int pos, bool value)
 		{
+			if (_isLocked)
+				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
 			if (value)
-				_rawValue &= (1U << (pos - 1));
+				_rawValue |= (1U << (pos - 1));
 			else
-				_rawValue |= ~(1U << (pos - 1));
+				_rawValue &= ~(1U << (pos - 1));
 		}
 
 		public static implicit operator uint (PackedPermissions perms) => perms._rawValue;
-		public PackedPermissions Edit() => new PackedPermissions(false, _rawValue);
+		public PackedPermissions Copy() => new PackedPermissions(false, _rawValue);
 	}
 }
