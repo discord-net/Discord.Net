@@ -89,6 +89,11 @@ namespace Discord.Net.API
 			[JsonProperty(PropertyName = "deaf")]
 			public bool Value;
 		}
+		public sealed class ModifyMember
+		{
+			[JsonProperty(PropertyName = "roles")]
+			public string[] Roles;
+		}
 		
 		//Profile
 		public sealed class ChangeUsername
@@ -124,6 +129,15 @@ namespace Discord.Net.API
 			public string CurrentPassword;
 			[JsonProperty(PropertyName = "avatar")]
 			public string Avatar;
+		}
+
+		//Roles
+		public sealed class ModifyRole
+		{
+			[JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
+			public string Name;
+			[JsonProperty(PropertyName = "permissions", NullValueHandling = NullValueHandling.Ignore)]
+			public uint Permissions;
 		}
 
 		//Permissions

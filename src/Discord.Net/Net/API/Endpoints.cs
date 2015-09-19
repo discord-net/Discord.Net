@@ -26,7 +26,9 @@
 		public static string ServerChannels(string serverId) => $"guilds/{serverId}/channels";
 		public static string ServerMember(string serverId, string userId) => $"guilds/{serverId}/members/{userId}";
 		public static string ServerBan(string serverId, string userId) => $"guilds/{serverId}/bans/{userId}";
-		
+		public static string ServerRoles(string serverId) => $"guilds/{serverId}/roles";
+		public static string ServerRole(string serverId, string roleId) => $"guilds/{serverId}/roles/{roleId}";
+
 		public const string Invites = "invite";
 		public static string Invite(string inviteId) => $"invite/{inviteId}";
 		public static string InviteUrl(string inviteId) => $"https://discord.gg/{inviteId}";

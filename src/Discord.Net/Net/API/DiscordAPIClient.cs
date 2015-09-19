@@ -67,12 +67,17 @@ namespace Discord.Net.API
 			=> _rest.Get<Responses.GetMessages[]>(Endpoints.ChannelMessages(channelId, count));
 
 		//Members
-		public Task Kick(string serverId, string memberId)
-			=> _rest.Delete(Endpoints.ServerMember(serverId, memberId));
-		public Task Ban(string serverId, string memberId)
-			=> _rest.Put(Endpoints.ServerBan(serverId, memberId));
-		public Task Unban(string serverId, string memberId)
-			=> _rest.Delete(Endpoints.ServerBan(serverId, memberId));
+		public Task Kick(string serverId, string userId)
+			=> _rest.Delete(Endpoints.ServerMember(serverId, userId));
+		public Task Ban(string serverId, string userId)
+			=> _rest.Put(Endpoints.ServerBan(serverId, userId));
+		public Task Unban(string serverId, string userId)
+			=> _rest.Delete(Endpoints.ServerBan(serverId, userId));
+		public Task SetMemberRoles(string serverId, string userId, string[] roles)
+		{
+			var request = new Requests.ModifyMember { Roles = roles };
+			return _rest.Patch(Endpoints.ServerMember(serverId, userId));
+		}
 
 		//Invites
 		public Task<Responses.CreateInvite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool withXkcdPass)
@@ -86,7 +91,39 @@ namespace Discord.Net.API
 			=> _rest.Post<Responses.AcceptInvite>(Endpoints.Invite(id));
 		public Task DeleteInvite(string id)
 			=> _rest.Delete(Endpoints.Invite(id));
-		
+
+		//Roles
+		public Task CreateRole(string serverId)
+		{
+			//TODO: Return a result when Discord starts giving us one
+			return _rest.Post(Endpoints.ServerRoles(serverId));
+		}
+		public Task RenameRole(string serverId, string roleId, string newName)
+		{
+			var request = new Requests.ModifyRole { Name = newName };
+			return _rest.Patch(Endpoints.ServerRole(serverId, roleId), request);
+		}
+		public Task SetRolePermissions(string serverId, string roleId, PackedPermissions permissions)
+		{
+			var request = new Requests.ModifyRole { Permissions = permissions.RawValue };
+			return _rest.Patch(Endpoints.ServerRole(serverId, roleId), request);
+		}
+		public Task DeleteRole(string serverId, string roleId)
+		{
+			return _rest.Delete(Endpoints.ServerRole(serverId, roleId));
+		}
+
+		//Permissions
+		public Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedPermissions allow, PackedPermissions deny)
+		{
+			var request = new Requests.SetChannelPermissions { Id = userOrRoleId, Type = idType, Allow = allow.RawValue, Deny = deny.RawValue };
+			return _rest.Put(Endpoints.ChannelPermission(channelId, userOrRoleId), request);
+		}
+		public Task DeleteChannelPermissions(string channelId, string userOrRoleId)
+		{
+			return _rest.Delete(Endpoints.ChannelPermission(channelId, userOrRoleId), null);
+		}
+
 		//Chat
 		public Task<Responses.SendMessage> SendMessage(string channelId, string message, string[] mentions, string nonce)
 		{
@@ -153,17 +190,6 @@ namespace Discord.Net.API
 			string type = imageType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
 			var request = new Requests.ChangeAvatar { Avatar = $"data:{type},/9j/{base64}", CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return _rest.Patch<Responses.ChangeProfile>(Endpoints.UserMe, request);
-		}
-
-		//Permissions
-		public Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedPermissions allow, PackedPermissions deny)
-		{
-			var request = new Requests.SetChannelPermissions { Id = userOrRoleId, Type = idType, Allow = allow.RawValue, Deny = deny.RawValue };
-			return _rest.Put(Endpoints.ChannelPermission(channelId, userOrRoleId), request);
-		}
-		public Task DeleteChannelPermissions(string channelId, string userOrRoleId)
-		{
-			return _rest.Delete(Endpoints.ChannelPermission(channelId, userOrRoleId), null);
 		}
 	}
 }

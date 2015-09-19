@@ -1,4 +1,5 @@
-﻿using Discord.Net;
+﻿using Discord.Helpers;
+using Discord.Net;
 using Discord.Net.API;
 using System;
 using System.Collections.Generic;
@@ -421,6 +422,113 @@ namespace Discord
 				catch (HttpException) { } //Bad Permissions?
 			}
 			return null;
+		}
+
+		//Roles
+		/// <summary>Note: due to current API limitations, the created role cannot be returned. </summary>
+		public Task CreateRole(Server server)
+			=> CreateRole(server?.Id);
+		/// <summary>Note: due to current API limitations, the created role cannot be returned. </summary>
+		public Task CreateRole(string serverId)
+		{
+			CheckReady();
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+
+			return _api.CreateRole(serverId);
+		}
+
+		public Task RenameRole(Role role, string newName)
+			=> RenameRole(role?.ServerId, role?.Id, newName);
+        public Task RenameRole(string serverId, string roleId, string newName)
+		{
+			CheckReady();
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			if (newName == null) throw new NullReferenceException(nameof(newName));
+
+			return _api.RenameRole(serverId, roleId, newName);
+		}
+
+		public Task DeleteRole(Role role)
+			=> DeleteRole(role?.ServerId, role?.Id);
+		public Task DeleteRole(string serverId, string roleId)
+		{
+			CheckReady();
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+
+			return _api.DeleteRole(serverId, roleId);
+		}
+
+		public Task AddRoleMember(Role role, string serverId, string userId)
+			=> AddRoleMember(role?.Id, GetMember(serverId, userId));
+		public Task AddRoleMember(Role role, string serverId, User user)
+			=> AddRoleMember(role?.Id, GetMember(serverId, user));
+		public Task AddRoleMember(Role role, Server server, string userId)
+			=> AddRoleMember(role?.Id, GetMember(server, userId));
+		public Task AddRoleMember(Role role, Server server, User user)
+			=> AddRoleMember(role?.Id, GetMember(server, user));
+		public Task AddRoleMember(Role role, Member member)
+			=> AddRoleMember(role?.Id, member);
+        public Task AddRoleMember(string roleId, string serverId, string userId)
+			=> AddRoleMember(roleId, GetMember(serverId, userId));
+        public Task AddRoleMember(string roleId, string serverId, User user)
+			=> AddRoleMember(roleId, GetMember(serverId, user));
+		public Task AddRoleMember(string roleId, Server server, string userId)
+			=> AddRoleMember(roleId, GetMember(server, userId));
+		public Task AddRoleMember(string roleId, Server server, User user)
+			=> AddRoleMember(roleId, GetMember(server, user));
+        public Task AddRoleMember(string roleId, Member member)
+		{
+			CheckReady();
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			if (member == null) throw new NullReferenceException(nameof(member));
+
+			if (!member.RoleIds.Contains(roleId))
+			{
+				var oldRoles = member.RoleIds;
+                string[] newRoles = new string[oldRoles.Length + 1];
+				for (int i = 0; i < oldRoles.Length; i++)
+					newRoles[i] = oldRoles[i];
+				return _api.SetMemberRoles(member.ServerId, member.UserId, newRoles);
+			}
+			return TaskHelper.CompletedTask;
+		}
+
+		public Task RemoveRoleMember(Role role, string serverId, string userId)
+			=> RemoveRoleMember(role?.Id, GetMember(serverId, userId));
+		public Task RemoveRoleMember(Role role, string serverId, User user)
+			=> RemoveRoleMember(role?.Id, GetMember(serverId, user));
+		public Task RemoveRoleMember(Role role, Server server, string userId)
+			=> RemoveRoleMember(role?.Id, GetMember(server, userId));
+		public Task RemoveRoleMember(Role role, Server server, User user)
+			=> RemoveRoleMember(role?.Id, GetMember(server, user));
+		public Task RemoveRoleMember(Role role, Member member)
+			=> RemoveRoleMember(role?.Id, member);
+		public Task RemoveRoleMember(string roleId, string serverId, string userId)
+			=> RemoveRoleMember(roleId, GetMember(serverId, userId));
+		public Task RemoveRoleMember(string roleId, string serverId, User user)
+			=> RemoveRoleMember(roleId, GetMember(serverId, user));
+		public Task RemoveRoleMember(string roleId, Server server, string userId)
+			=> RemoveRoleMember(roleId, GetMember(server, userId));
+		public Task RemoveRoleMember(string roleId, Server server, User user)
+			=> RemoveRoleMember(roleId, GetMember(server, user));
+		public Task RemoveRoleMember(string roleId, Member member)
+		{
+			CheckReady();
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			if (member == null) throw new NullReferenceException(nameof(member));
+
+			if (member.RoleIds.Contains(roleId))
+			{
+				var oldRoles = member.RoleIds;
+				string[] newRoles = new string[oldRoles.Length - 1];
+				for (int i = 0, j = 0; i < oldRoles.Length; i++)
+				{
+					if (oldRoles[i] != roleId)
+						newRoles[j++] = oldRoles[i];
+				}
+				return _api.SetMemberRoles(member.ServerId, member.UserId, newRoles);
+			}
+			return TaskHelper.CompletedTask;
 		}
 
 		//Permissions
