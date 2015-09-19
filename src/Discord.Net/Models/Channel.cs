@@ -45,12 +45,10 @@ namespace Discord
 		[JsonIgnore]
 		public User Recipient => _client.Users[RecipientId];
 
-		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. </summary>
-		/// <remarks> This collection does not guarantee any ordering. </remarks>
+		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
 		public IEnumerable<string> MessageIds => _messages.Select(x => x.Key);
-		/// <summary> Returns a collection of all messages the client has seen posted in this channel. </summary>
-		/// <remarks> This collection does not guarantee any ordering. </remarks>
+		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
 		public IEnumerable<Message> Messages => _messages.Select(x => _client.Messages[x.Key]);
 

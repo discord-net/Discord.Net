@@ -24,13 +24,13 @@ namespace Discord
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get { return _messageQueueInterval; } set { SetValue(ref _messageQueueInterval, value); } }
 		private int _messageQueueInterval = 100;
-		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. This value is the target maximum but is not guaranteed, the buffer will often go slightly above this value. </remarks>
+		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. This value is the target maximum but is not guaranteed, the buffer will often go slightly above this value. </summary>
 		public int VoiceBufferLength { get { return _voiceBufferLength; } set { SetValue(ref _voiceBufferLength, value); } }
 		private int _voiceBufferLength = 3000;
 
 		//Experimental Features
 #if !DNXCORE50
-		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the opus .dll or .so be in the local lib/ folder. </remarks>
+		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the opus .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoice { get { return _enableVoice; } set { SetValue(ref _enableVoice, value); } }
 		private bool _enableVoice = false;
 #else

@@ -47,7 +47,7 @@ namespace Discord
 
 		//TODO: Add voice triggering LastActivity
 		/// <summary> Returns the time this user last sent a message. </summary>
-		/// <remarks> Is not currently affected by voice activity </remarks>
+		/// <remarks> Is not currently affected by voice activity. </remarks>
 		public DateTime LastActivity { get; private set; }
 
 		internal User(DiscordClient client, string id)
