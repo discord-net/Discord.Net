@@ -66,6 +66,8 @@ namespace Discord
 		public Task<Channel> CreatePMChannel(string userId) => CreatePMChannel(_users[userId], userId);
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
 		public Task<Channel> CreatePMChannel(User user) => CreatePMChannel(user, user?.Id);
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(Member member) => CreatePMChannel(member.User, member.UserId);
 		private async Task<Channel> CreatePMChannel(User user, string userId)
 		{
             CheckReady();
@@ -99,6 +101,9 @@ namespace Discord
 
 		//Bans
 		/// <summary> Bans a user from the provided server. </summary>
+		public Task Ban(Member member)
+			=> Ban(member?.ServerId, member?.UserId);
+		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(Server server, User user)
 			=> Ban(server?.Id, user?.Id);
 		/// <summary> Bans a user from the provided server. </summary>
@@ -117,6 +122,9 @@ namespace Discord
 			return _api.Ban(serverId, userId);
 		}
 
+		/// <summary> Unbans a user from the provided server. </summary>
+		public Task Unban(Member member)
+			=> Unban(member?.ServerId, member?.UserId);
 		/// <summary> Unbans a user from the provided server. </summary>
 		public Task Unban(Server server, User user)
 			=> Unban(server?.Id, user?.Id);
@@ -278,10 +286,13 @@ namespace Discord
 			return result;
 		}
 
-		/// <summary> Sends a private message to the provided channel. </summary>
+		/// <summary> Sends a private message to the provided user. </summary>
+		public Task<Message[]> SendPrivateMessage(Member member, string text)
+			=> SendPrivateMessage(member?.UserId, text);
+		/// <summary> Sends a private message to the provided user. </summary>
 		public Task<Message[]> SendPrivateMessage(User user, string text)
 			=> SendPrivateMessage(user?.Id, text);
-		/// <summary> Sends a private message to the provided channel. </summary>
+		/// <summary> Sends a private message to the provided user. </summary>
 		public async Task<Message[]> SendPrivateMessage(string userId, string text)
 		{
 			var channel = await CreatePMChannel(userId).ConfigureAwait(false);
@@ -532,6 +543,10 @@ namespace Discord
 		}
 
 		//Permissions
+		public Task SetChannelUserPermissions(Channel channel, Member member, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channel?.Id, member?.UserId, "member", allow, deny);
+		public Task SetChannelUserPermissions(string channelId, Member member, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channelId, member?.UserId, "member", allow, deny);
 		public Task SetChannelUserPermissions(Channel channel, User user, PackedPermissions allow, PackedPermissions deny)
 			=> SetChannelPermissions(channel?.Id, user?.Id, "member", allow, deny);
 		public Task SetChannelUserPermissions(string channelId, User user, PackedPermissions allow, PackedPermissions deny)
@@ -560,6 +575,10 @@ namespace Discord
 			//TODO: Remove permission from cache
 		}
 
+		public Task RemoveChannelUserPermissions(Channel channel, Member member)
+			=> RemoveChannelPermissions(channel?.Id, member?.UserId);
+		public Task RemoveChannelUserPermissions(string channelId, Member member)
+			=> RemoveChannelPermissions(channelId, member?.UserId);
 		public Task RemoveChannelUserPermissions(Channel channel, User user)
 			=> RemoveChannelPermissions(channel?.Id, user?.Id);
 		public Task RemoveChannelUserPermissions(string channelId, User user)
@@ -594,6 +613,9 @@ namespace Discord
 
 		//Voice
 		/// <summary> Mutes a user on the provided server. </summary>
+		public Task Mute(Member member)
+			=> Mute(member?.ServerId, member?.UserId);
+		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, User user)
 			=> Mute(server?.Id, user?.Id);
 		/// <summary> Mutes a user on the provided server. </summary>
@@ -612,6 +634,9 @@ namespace Discord
 			return _api.Mute(serverId, userId);
 		}
 
+		/// <summary> Mutes a user on the provided server. </summary>
+		public Task Unmute(Member member)
+			=> Unmute(member?.ServerId, member?.UserId);
 		/// <summary> Unmutes a user on the provided server. </summary>
 		public Task Unmute(Server server, User user)
 			=> Unmute(server?.Id, user?.Id);
@@ -632,6 +657,9 @@ namespace Discord
 		}
 
 		/// <summary> Deafens a user on the provided server. </summary>
+		public Task Deafen(Member member)
+			=> Deafen(member?.ServerId, member?.UserId);
+		/// <summary> Deafens a user on the provided server. </summary>
 		public Task Deafen(Server server, User user)
 			=> Deafen(server?.Id, user?.Id);
 		/// <summary> Deafens a user on the provided server. </summary>
@@ -650,6 +678,9 @@ namespace Discord
 			return _api.Deafen(serverId, userId);
 		}
 
+		/// <summary> Undeafens a user on the provided server. </summary>
+		public Task Undeafen(Member member)
+			=> Undeafen(member?.ServerId, member?.UserId);
 		/// <summary> Undeafens a user on the provided server. </summary>
 		public Task Undeafen(Server server, User user)
 			=> Undeafen(server?.Id, user?.Id);
