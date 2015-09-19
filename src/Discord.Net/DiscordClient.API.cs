@@ -423,6 +423,67 @@ namespace Discord
 			return null;
 		}
 
+		//Permissions
+		public Task SetChannelUserPermissions(Channel channel, User user, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channel?.Id, user?.Id, "member", allow, deny);
+		public Task SetChannelUserPermissions(string channelId, User user, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channelId, user?.Id, "member", allow, deny);
+		public Task SetChannelUserPermissions(Channel channel, string userId, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channel?.Id, userId, "member", allow, deny);
+		public Task SetChannelUserPermissions(string channelId, string userId, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channelId, userId, "member", allow, deny);
+
+		public Task SetChannelRolePermissions(Channel channel, Role role, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channel?.Id, role?.Id, "role", allow, deny);
+		public Task SetChannelRolePermissions(string channelId, Role role, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channelId, role?.Id, "role", allow, deny);
+		public Task SetChannelRolePermissions(Channel channel, string userId, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channel?.Id, userId, "role", allow, deny);
+		public Task SetChannelRolePermissions(string channelId, string userId, PackedPermissions allow, PackedPermissions deny)
+			=> SetChannelPermissions(channelId, userId, "role", allow, deny);
+
+		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedPermissions allow, PackedPermissions deny)
+		{
+			CheckReady();
+			if (channelId == null) throw new NullReferenceException(nameof(channelId));
+			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
+
+			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow, deny);
+			//TODO: Remove permission from cache
+		}
+
+		public Task RemoveChannelUserPermissions(Channel channel, User user)
+			=> RemoveChannelPermissions(channel?.Id, user?.Id);
+		public Task RemoveChannelUserPermissions(string channelId, User user)
+			=> RemoveChannelPermissions(channelId, user?.Id);
+		public Task RemoveChannelPermissions(Channel channel, string userId)
+			=> RemoveChannelUserPermissions(channel?.Id, userId);
+		public Task RemoveChannelUserPermissions(string channelId, string userId)
+			=> RemoveChannelPermissions(channelId, userId);
+
+		public Task RemoveChannelRolePermissions(Channel channel, Role role)
+			=> RemoveChannelPermissions(channel?.Id, role?.Id);
+		public Task RemoveChannelRolePermissions(string channelId, Role role)
+			=> RemoveChannelPermissions(channelId, role?.Id);
+		public Task RemoveChannelRolePermissions(Channel channel, string roleId)
+			=> RemoveChannelUserPermissions(channel?.Id, roleId);
+		public Task RemoveChannelRolePermissions(string channelId, string roleId)
+			=> RemoveChannelPermissions(channelId, roleId);
+
+		private async Task RemoveChannelPermissions(string channelId, string userOrRoleId)
+		{
+			CheckReady();
+			if (channelId == null) throw new NullReferenceException(nameof(channelId));
+			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
+
+			try
+			{
+				await _api.DeleteChannelPermissions(channelId, userOrRoleId).ConfigureAwait(false);
+				//TODO: Remove permission from cache
+			}
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+		}
+
 		//Voice
 		/// <summary> Mutes a user on the provided server. </summary>
 		public Task Mute(Server server, User user)

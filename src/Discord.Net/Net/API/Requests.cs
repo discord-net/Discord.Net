@@ -125,5 +125,18 @@ namespace Discord.Net.API
 			[JsonProperty(PropertyName = "avatar")]
 			public string Avatar;
 		}
+
+		//Permissions
+		public sealed class SetChannelPermissions
+		{
+			[JsonProperty(PropertyName = "id")]
+			public string Id;
+			[JsonProperty(PropertyName = "type")]
+			public string Type;
+			[JsonProperty(PropertyName = "allow")]
+			public uint Allow;
+			[JsonProperty(PropertyName = "deny")]
+			public uint Deny;
+		}
 	}
 }

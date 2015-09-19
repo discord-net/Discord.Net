@@ -154,5 +154,16 @@ namespace Discord.Net.API
 			var request = new Requests.ChangeAvatar { Avatar = $"data:{type},/9j/{base64}", CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return _rest.Patch<Responses.ChangeProfile>(Endpoints.UserMe, request);
 		}
+
+		//Permissions
+		public Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedPermissions allow, PackedPermissions deny)
+		{
+			var request = new Requests.SetChannelPermissions { Id = userOrRoleId, Type = idType, Allow = allow.RawValue, Deny = deny.RawValue };
+			return _rest.Put(Endpoints.ChannelPermission(channelId, userOrRoleId), request);
+		}
+		public Task DeleteChannelPermissions(string channelId, string userOrRoleId)
+		{
+			return _rest.Delete(Endpoints.ChannelPermission(channelId, userOrRoleId), null);
+		}
 	}
 }
