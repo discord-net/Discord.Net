@@ -16,6 +16,7 @@ namespace Discord
 		public bool IsSelfMuted { get; internal set; }
 		public bool IsSelfDeafened { get; internal set; }
 		public bool IsSuppressed { get; internal set; }
+		public bool IsSpeaking { get; internal set; }
 
 		public string SessionId { get; internal set; }
 		public string Token { get; internal set; }

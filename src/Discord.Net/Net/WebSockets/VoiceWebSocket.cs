@@ -323,6 +323,12 @@ namespace Discord.Net.WebSockets
 						_connectWaitOnLogin.Set();
 					}
 					break;
+				case 5:
+					{
+						var payload = (msg.Payload as JToken).ToObject<VoiceEvents.IsTalking>();
+						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
+					}
+					break;
 				default:
 					if (_logLevel >= LogMessageSeverity.Warning)
 						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {msg.Operation}");

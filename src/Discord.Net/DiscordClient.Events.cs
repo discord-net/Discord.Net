@@ -122,6 +122,23 @@ namespace Discord
 			Channel = channel;
         }
 	}
+	public sealed class UserIsSpeakingEventArgs : EventArgs
+	{
+		public Channel Channel => Member.VoiceChannel;
+        public string ChannelId => Member.VoiceChannelId;
+		public Server Server => Member.Server;
+		public string ServerId => Member.ServerId;
+		public User User => Member.User;
+        public string UserId => Member.UserId;
+		public Member Member { get; }
+		public bool IsSpeaking { get; }
+
+		internal UserIsSpeakingEventArgs(Member member, bool isSpeaking)
+		{
+			Member = member;
+			IsSpeaking = isSpeaking;
+		}
+	}
 	/*public sealed class VoiceServerUpdatedEventArgs : EventArgs
 	{
 		public Server Server { get; }
@@ -141,19 +158,19 @@ namespace Discord
 		private void RaiseConnected()
 		{
 			if (Connected != null)
-				Connected(this, EventArgs.Empty);
+				RaiseEvent(nameof(Connected), () => Connected(this, EventArgs.Empty));
 		}
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
 		private void RaiseDisconnected(DisconnectedEventArgs e)
 		{
 			if (Disconnected != null)
-				Disconnected(this, e);
+				RaiseEvent(nameof(Disconnected), () => Disconnected(this, e));
 		}
 		public event EventHandler<LogMessageEventArgs> LogMessage;
 		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message)
 		{
 			if (LogMessage != null)
-				LogMessage(this, new LogMessageEventArgs(severity, source, message));
+				RaiseEvent(nameof(LogMessage), () => LogMessage(this, new LogMessageEventArgs(severity, source, message)));
 		}
 
 		//Server
@@ -161,27 +178,19 @@ namespace Discord
 		private void RaiseServerCreated(Server server)
 		{
 			if (ServerCreated != null)
-				ServerCreated(this, new ServerEventArgs(server));
+				RaiseEvent(nameof(ServerCreated), () => ServerCreated(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerDestroyed;
 		private void RaiseServerDestroyed(Server server)
 		{
 			if (ServerDestroyed != null)
-				ServerDestroyed(this, new ServerEventArgs(server));
+				RaiseEvent(nameof(ServerDestroyed), () => ServerDestroyed(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerUpdated;
 		private void RaiseServerUpdated(Server server)
 		{
 			if (ServerUpdated != null)
-				ServerUpdated(this, new ServerEventArgs(server));
-		}
-
-		//User
-		public event EventHandler<UserEventArgs> UserUpdated;
-		private void RaiseUserUpdated(User user)
-		{
-			if (UserUpdated != null)
-				UserUpdated(this, new UserEventArgs(user));
+				RaiseEvent(nameof(ServerUpdated), () => ServerUpdated(this, new ServerEventArgs(server)));
 		}
 
 		//Channel
@@ -189,19 +198,19 @@ namespace Discord
 		private void RaiseChannelCreated(Channel channel)
 		{
 			if (ChannelCreated != null)
-				ChannelCreated(this, new ChannelEventArgs(channel));
+				RaiseEvent(nameof(ChannelCreated), () => ChannelCreated(this, new ChannelEventArgs(channel)));
 		}
 		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
 		private void RaiseChannelDestroyed(Channel channel)
 		{
 			if (ChannelDestroyed != null)
-				ChannelDestroyed(this, new ChannelEventArgs(channel));
+				RaiseEvent(nameof(ChannelDestroyed), () => ChannelDestroyed(this, new ChannelEventArgs(channel)));
 		}
 		public event EventHandler<ChannelEventArgs> ChannelUpdated;
 		private void RaiseChannelUpdated(Channel channel)
 		{
 			if (ChannelUpdated != null)
-				ChannelUpdated(this, new ChannelEventArgs(channel));
+				RaiseEvent(nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
 		}
 
 		//Message
@@ -209,31 +218,31 @@ namespace Discord
 		private void RaiseMessageCreated(Message msg)
 		{
 			if (MessageCreated != null)
-				MessageCreated(this, new MessageEventArgs(msg));
+				RaiseEvent(nameof(MessageCreated), () => MessageCreated(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageDeleted;
 		private void RaiseMessageDeleted(Message msg)
 		{
 			if (MessageDeleted != null)
-				MessageDeleted(this, new MessageEventArgs(msg));
+				RaiseEvent(nameof(MessageDeleted), () => MessageDeleted(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageUpdated;
 		private void RaiseMessageUpdated(Message msg)
 		{
 			if (MessageUpdated != null)
-				MessageUpdated(this, new MessageEventArgs(msg));
+				RaiseEvent(nameof(MessageUpdated), () => MessageUpdated(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageReadRemotely;
 		private void RaiseMessageReadRemotely(Message msg)
 		{
 			if (MessageReadRemotely != null)
-				MessageReadRemotely(this, new MessageEventArgs(msg));
+				RaiseEvent(nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageSent;
 		private void RaiseMessageSent(Message msg)
 		{
 			if (MessageSent != null)
-				MessageSent(this, new MessageEventArgs(msg));
+				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
 		}
 
 		//Role
@@ -241,19 +250,19 @@ namespace Discord
 		private void RaiseRoleCreated(Role role)
 		{
 			if (RoleCreated != null)
-				RoleCreated(this, new RoleEventArgs(role));
+				RaiseEvent(nameof(RoleCreated), () => RoleCreated(this, new RoleEventArgs(role)));
 		}
 		public event EventHandler<RoleEventArgs> RoleUpdated;
 		private void RaiseRoleDeleted(Role role)
 		{
 			if (RoleDeleted != null)
-				RoleDeleted(this, new RoleEventArgs(role));
+				RaiseEvent(nameof(RoleDeleted), () => RoleDeleted(this, new RoleEventArgs(role)));
 		}
 		public event EventHandler<RoleEventArgs> RoleDeleted;
 		private void RaiseRoleUpdated(Role role)
 		{
 			if (RoleUpdated != null)
-				RoleUpdated(this, new RoleEventArgs(role));
+				RaiseEvent(nameof(RoleUpdated), () => RoleUpdated(this, new RoleEventArgs(role)));
 		}
 
 		//Ban
@@ -261,71 +270,77 @@ namespace Discord
 		private void RaiseBanAdded(string userId, Server server)
 		{
 			if (BanAdded != null)
-				BanAdded(this, new BanEventArgs(_users[userId], userId, server));
+				RaiseEvent(nameof(BanAdded), () => BanAdded(this, new BanEventArgs(_users[userId], userId, server)));
 		}
 		public event EventHandler<BanEventArgs> BanRemoved;
 		private void RaiseBanRemoved(string userId, Server server)
 		{
 			if (BanRemoved != null)
-				BanRemoved(this, new BanEventArgs(_users[userId], userId, server));
+				RaiseEvent(nameof(BanRemoved), () => BanRemoved(this, new BanEventArgs(_users[userId], userId, server)));
 		}
 
-		//Member
-		public event EventHandler<MemberEventArgs> MemberAdded;
-		private void RaiseMemberAdded(Member member)
+		//User
+		public event EventHandler<MemberEventArgs> UserAdded;
+		private void RaiseUserAdded(Member member)
 		{
-			if (MemberAdded != null)
-				MemberAdded(this, new MemberEventArgs(member));
+			if (UserAdded != null)
+				RaiseEvent(nameof(UserAdded), () => UserAdded(this, new MemberEventArgs(member)));
 		}
-		public event EventHandler<MemberEventArgs> MemberRemoved;
-		private void RaiseMemberRemoved(Member member)
+		public event EventHandler<MemberEventArgs> UserRemoved;
+		private void RaiseUserRemoved(Member member)
 		{
-			if (MemberRemoved != null)
-				MemberRemoved(this, new MemberEventArgs(member));
+			if (UserRemoved != null)
+				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new MemberEventArgs(member)));
+		}
+		public event EventHandler<UserEventArgs> UserUpdated;
+		private void RaiseUserUpdated(User user)
+		{
+			if (UserUpdated != null)
+				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<MemberEventArgs> MemberUpdated;
 		private void RaiseMemberUpdated(Member member)
 		{
 			if (MemberUpdated != null)
-				MemberUpdated(this, new MemberEventArgs(member));
+				RaiseEvent(nameof(MemberUpdated), () => MemberUpdated(this, new MemberEventArgs(member)));
 		}
-		public event EventHandler<MemberEventArgs> MemberPresenceUpdated;
-		private void RaiseMemberPresenceUpdated(Member member)
+		public event EventHandler<MemberEventArgs> UserPresenceUpdated;
+		private void RaiseUserPresenceUpdated(Member member)
 		{
-			if (MemberPresenceUpdated != null)
-				MemberPresenceUpdated(this, new MemberEventArgs(member));
+			if (UserPresenceUpdated != null)
+				RaiseEvent(nameof(UserPresenceUpdated), () => UserPresenceUpdated(this, new MemberEventArgs(member)));
 		}
-		public event EventHandler<MemberEventArgs> MemberVoiceStateUpdated;
-		private void RaiseMemberVoiceStateUpdated(Member member)
+		public event EventHandler<MemberEventArgs> UserVoiceStateUpdated;
+		private void RaiseUserVoiceStateUpdated(Member member)
 		{
-			if (MemberVoiceStateUpdated != null)
-				MemberVoiceStateUpdated(this, new MemberEventArgs(member));
+			if (UserVoiceStateUpdated != null)
+				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new MemberEventArgs(member)));
 		}
 		public event EventHandler<UserTypingEventArgs> UserIsTyping;
 		private void RaiseUserIsTyping(User user, Channel channel)
 		{
 			if (UserIsTyping != null)
-				UserIsTyping(this, new UserTypingEventArgs(user, channel));
-		}		
+				RaiseEvent(nameof(UserIsTyping), () => UserIsTyping(this, new UserTypingEventArgs(user, channel)));
+		}
+		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeaking;
+		private void RaiseUserIsSpeaking(Member member, bool isSpeaking)
+		{
+			if (UserIsSpeaking != null)
+				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new UserIsSpeakingEventArgs(member, isSpeaking)));
+		}
 
 		//Voice
 		public event EventHandler VoiceConnected;
 		private void RaiseVoiceConnected()
 		{
 			if (VoiceConnected != null)
-				VoiceConnected(this, EventArgs.Empty);
+				RaiseEvent(nameof(UserIsSpeaking), () => VoiceConnected(this, EventArgs.Empty));
 		}
 		public event EventHandler<DisconnectedEventArgs> VoiceDisconnected;
 		private void RaiseVoiceDisconnected(DisconnectedEventArgs e)
 		{
 			if (VoiceDisconnected != null)
-				VoiceDisconnected(this, e);
+				RaiseEvent(nameof(UserIsSpeaking), () => VoiceDisconnected(this, e));
 		}
-		/*public event EventHandler<VoiceServerUpdatedEventArgs> VoiceServerChanged;
-		private void RaiseVoiceServerUpdated(Server server, string endpoint)
-		{
-			if (VoiceServerChanged != null)
-				VoiceServerChanged(this, new VoiceServerUpdatedEventArgs(server, endpoint));
-		}*/
 	}
 }

@@ -201,6 +201,9 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.cs">
       <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.Events.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.Events.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.BuiltIn.cs">
       <Link>Net\WebSockets\WebSocket.BuiltIn.cs</Link>
     </Compile>

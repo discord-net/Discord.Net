@@ -32,8 +32,8 @@ namespace Discord
 		private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
 		private readonly JsonSerializer _serializer;
-		private Task _runTask;
 		protected ExceptionDispatchInfo _disconnectReason;
+		private Task _runTask;
 		private bool _wasDisconnectUnexpected;
 		private string _token;
 
@@ -100,7 +100,32 @@ namespace Discord
 			{
 				_voiceSocket = new VoiceWebSocket(this);
 				_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
-				_voiceSocket.Disconnected += async (s, e) => { RaiseVoiceDisconnected(e); if (e.WasUnexpected) await _voiceSocket.Reconnect(_cancelToken); };
+				_voiceSocket.Disconnected += async (s, e) =>
+				{
+					foreach (var member in _members)
+					{
+						if (member.IsSpeaking)
+						{
+							member.IsSpeaking = false;
+							RaiseUserIsSpeaking(member, false);
+						}
+					}
+					RaiseVoiceDisconnected(e);
+					if (e.WasUnexpected)
+						await _voiceSocket.Reconnect(_cancelToken);
+				};
+				_voiceSocket.IsSpeaking += (s, e) =>
+				{
+					if (_voiceSocket.CurrentVoiceServerId != null)
+					{
+						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
+						if (!member.IsSpeaking)
+						{
+							member.IsSpeaking = true;
+							RaiseUserIsSpeaking(member, true);
+						}
+					}
+				};
             }
 
 			_channels = new Channels(this);
@@ -136,9 +161,6 @@ namespace Discord
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
 					$"Updated Server: {e.Server?.Name}" + 
 					(isDebug ? $" ({e.ServerId})" : ""));
-				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
-					$"Updated User: {e.User.Name}" + 
-					(isDebug ? $" ({e.UserId})" : ""));
 				UserIsTyping += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
 					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel.Name}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.ChannelId}/{e.UserId})" : ""));
@@ -181,19 +203,22 @@ namespace Discord
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.User?.Name ?? "Unknown"}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
-				MemberAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
-				MemberRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Removed Member: {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
-				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+					$"Updated User: {e.User.Name}" +
+					(isDebug ? $" ({e.UserId})." : ""));
+				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
 					$"Updated Member: {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
-				MemberPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+				UserPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Updated Member (Presence): {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})" : ""));
-				MemberVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
+				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Updated Member (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
 					(isDebug ? $" ({e.ServerId ?? "0"}/{e.UserId})" : ""));
 				
@@ -267,7 +292,7 @@ namespace Discord
 							var model = e.Payload.ToObject<Events.GuildCreate>(_serializer);
 							var server = _servers.GetOrAdd(model.Id);
 							server.Update(model);
-							RaiseEvent(nameof(ServerCreated), () => RaiseServerCreated(server));
+							RaiseServerCreated(server);
 						}
 						break;
 					case "GUILD_UPDATE":
@@ -277,7 +302,7 @@ namespace Discord
 							if (server != null)
 							{
 								server.Update(model);
-								RaiseEvent(nameof(ServerUpdated), () => RaiseServerUpdated(server));
+								RaiseServerUpdated(server);
 							}
 						}
 						break;
@@ -286,7 +311,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildDelete>(_serializer);
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
-								RaiseEvent(nameof(ServerDestroyed), () => RaiseServerDestroyed(server));
+								RaiseServerDestroyed(server);
 						}
 						break;
 
@@ -296,7 +321,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.ChannelCreate>(_serializer);
 							var channel = _channels.GetOrAdd(data.Id, data.GuildId, data.Recipient?.Id);
 							channel.Update(data);
-							RaiseEvent(nameof(ChannelCreated), () => RaiseChannelCreated(channel));
+							RaiseChannelCreated(channel);
 						}
 						break;
 					case "CHANNEL_UPDATE":
@@ -306,7 +331,7 @@ namespace Discord
 							if (channel != null)
 							{
 								channel.Update(data);
-								RaiseEvent(nameof(ChannelUpdated), () => RaiseChannelUpdated(channel));
+								RaiseChannelUpdated(channel);
 							}
 						}
 						break;
@@ -315,7 +340,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.ChannelDelete>(_serializer);
 							var channel = _channels.TryRemove(data.Id);
 							if (channel != null)
-								RaiseEvent(nameof(ChannelDestroyed), () => RaiseChannelDestroyed(channel));
+								RaiseChannelDestroyed(channel);
 						}
 						break;
 
@@ -329,7 +354,7 @@ namespace Discord
 								user.UpdateActivity(DateTime.UtcNow);
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
-							RaiseEvent(nameof(MemberAdded), () => RaiseMemberAdded(member));
+							RaiseUserAdded(member);
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
@@ -339,7 +364,7 @@ namespace Discord
 							if (member != null)
 							{
 								member.Update(data);
-								RaiseEvent(nameof(MemberUpdated), () => RaiseMemberUpdated(member));
+								RaiseMemberUpdated(member);
 							}
 						}
 						break;
@@ -348,7 +373,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildMemberRemove>(_serializer);
 							var member = _members.TryRemove(data.UserId, data.GuildId);
 							if (member != null)
-								RaiseEvent(nameof(MemberRemoved), () => RaiseMemberRemoved(member));
+								RaiseUserRemoved(member);
 						}
 						break;
 
@@ -358,7 +383,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildRoleCreate>(_serializer);
 							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
 							role.Update(data.Data);
-							RaiseEvent(nameof(RoleUpdated), () => RaiseRoleUpdated(role));
+							RaiseRoleUpdated(role);
 						}
 						break;
 					case "GUILD_ROLE_UPDATE":
@@ -367,7 +392,7 @@ namespace Discord
 							var role = _roles[data.Data.Id];
 							if (role != null)
 								role.Update(data.Data);
-							RaiseEvent(nameof(RoleUpdated), () => RaiseRoleUpdated(role));
+							RaiseRoleUpdated(role);
 						}
 						break;
 					case "GUILD_ROLE_DELETE":
@@ -375,7 +400,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildRoleDelete>(_serializer);
 							var role = _roles.TryRemove(data.RoleId);
 							if (role != null)
-								RaiseEvent(nameof(RoleDeleted), () => RaiseRoleDeleted(role));
+								RaiseRoleDeleted(role);
 						}
 						break;
 
@@ -387,7 +412,7 @@ namespace Discord
 							if (server != null)
 							{
 								server.AddBan(data.UserId);
-								RaiseEvent(nameof(BanAdded), () => RaiseBanAdded(data.UserId, server));
+								RaiseBanAdded(data.UserId, server);
 							}
 						}
 						break;
@@ -396,7 +421,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildBanRemove>(_serializer);
 							var server = _servers[data.GuildId];
 							if (server != null && server.RemoveBan(data.UserId))
-								RaiseEvent(nameof(BanRemoved), () => RaiseBanRemoved(data.UserId, server));
+								RaiseBanRemoved(data.UserId, server);
 						}
 						break;
 
@@ -423,8 +448,8 @@ namespace Discord
 							if (_config.TrackActivity)
 								msg.User.UpdateActivity(data.Timestamp);
 							if (wasLocal)
-								RaiseEvent(nameof(MessageSent), () => RaiseMessageSent(msg));
-							RaiseEvent(nameof(MessageCreated), () => RaiseMessageCreated(msg));
+								RaiseMessageSent(msg);
+							RaiseMessageCreated(msg);
 						}
 						break;
 					case "MESSAGE_UPDATE":
@@ -434,7 +459,7 @@ namespace Discord
                             if (msg != null)
 							{
 								msg.Update(data);
-								RaiseEvent(nameof(MessageUpdated), () => RaiseMessageUpdated(msg));
+								RaiseMessageUpdated(msg);
 							}
 						}
 						break;
@@ -443,7 +468,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.MessageDelete>(_serializer);
 							var msg = _messages.TryRemove(data.Id);
 							if (msg != null)
-								RaiseEvent(nameof(MessageDeleted), () => RaiseMessageDeleted(msg));
+								RaiseMessageDeleted(msg);
 						}
 						break;
 					case "MESSAGE_ACK":
@@ -451,7 +476,7 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.MessageAck>(_serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
-								RaiseEvent(nameof(MessageReadRemotely), () => RaiseMessageReadRemotely(msg));
+								RaiseMessageReadRemotely(msg);
 						}
 						break;
 
@@ -469,7 +494,7 @@ namespace Discord
 							if (member != null)
 							{
 								member.Update(data);
-								RaiseEvent(nameof(MemberPresenceUpdated), () => RaiseMemberPresenceUpdated(member));
+								RaiseUserPresenceUpdated(member);
 							}
 						}
 						break;
@@ -486,7 +511,12 @@ namespace Discord
 							if (member != null)
 							{
 								member.Update(data);
-								RaiseEvent(nameof(MemberVoiceStateUpdated), () => RaiseMemberVoiceStateUpdated(member));
+								if (member.IsSpeaking)
+								{
+									member.IsSpeaking = false;
+									RaiseUserIsSpeaking(member, false);
+								}
+								RaiseUserVoiceStateUpdated(member);
 							}
 						}
 						break;
@@ -495,12 +525,13 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.TypingStart>(_serializer);
 							var channel = _channels[data.ChannelId];
 							var user = _users[data.UserId];
+
 							if (user != null)
 							{
 								if (_config.TrackActivity)
 									user.UpdateActivity(DateTime.UtcNow);
 								if (channel != null)
-									RaiseEvent(nameof(UserIsTyping), () => RaiseUserIsTyping(user, channel));
+									RaiseUserIsTyping(user, channel);
 							}
 						}
 						break;
@@ -526,7 +557,7 @@ namespace Discord
 							if (user != null)
 							{
 								user.Update(data);
-								RaiseEvent(nameof(UserUpdated), () => RaiseUserUpdated(user));
+								RaiseUserUpdated(user);
 							}
 						}
 						break;
@@ -773,7 +804,7 @@ namespace Discord
 						}
 						msg.IsQueued = false;
 						msg.HasFailed = hasFailed;
-						RaiseEvent(nameof(MessageSent), () => RaiseMessageSent(msg));
+						RaiseMessageSent(msg);
                     }
 					await Task.Delay(interval).ConfigureAwait(false);
 				}
