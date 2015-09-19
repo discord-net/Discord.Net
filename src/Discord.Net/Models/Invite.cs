@@ -57,7 +57,7 @@ namespace Discord
 		internal void Update(Net.API.Invite model)
 		{
 			ChannelId = model.Channel.Id;
-			InviterId = model.Inviter.Id;
+			InviterId = model.Inviter?.Id;
 			ServerId = model.Guild.Id;
 		}
 
