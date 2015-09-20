@@ -125,9 +125,9 @@ namespace Discord.Net.API
 		}
 
 		//Chat
-		public Task<Responses.SendMessage> SendMessage(string channelId, string message, string[] mentions, string nonce)
+		public Task<Responses.SendMessage> SendMessage(string channelId, string message, string[] mentions, string nonce, bool isTTS)
 		{
-			var request = new Requests.SendMessage { Content = message, Mentions = mentions, Nonce = nonce };
+			var request = new Requests.SendMessage { Content = message, Mentions = mentions, Nonce = nonce, IsTTS = isTTS };
 			return _rest.Post<Responses.SendMessage>(Endpoints.ChannelMessages(channelId), request);
 		}
 		public Task<Responses.EditMessage> EditMessage(string messageId, string channelId, string message, string[] mentions)

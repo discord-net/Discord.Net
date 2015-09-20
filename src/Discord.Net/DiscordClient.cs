@@ -791,7 +791,7 @@ namespace Discord
 						Responses.SendMessage response = null;
 						try
 						{
-							response = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce).ConfigureAwait(false);
+							response = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce, msg.IsTTS).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }

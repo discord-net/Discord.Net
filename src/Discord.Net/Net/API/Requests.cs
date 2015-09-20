@@ -69,6 +69,8 @@ namespace Discord.Net.API
 			public string[] Mentions;
 			[JsonProperty(PropertyName = "nonce")]
 			public string Nonce;
+			[JsonProperty(PropertyName = "tts")]
+			public bool IsTTS;
 		}
 		public sealed class EditMessage
 		{

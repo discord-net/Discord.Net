@@ -77,7 +77,7 @@ namespace Discord.Net.WebSockets
 
 							try
 							{
-                                result = await _webSocket.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
+								result = await _webSocket.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
 							}
 							catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
 							{

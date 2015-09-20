@@ -245,7 +245,7 @@ namespace Discord
 			=> SendMessage(channel?.Id, text, mentions);
 		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
+		public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions, bool isTextToSpeech = false)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
@@ -267,7 +267,8 @@ namespace Discord
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
 						Author = new UserReference { Avatar = _currentUser.AvatarId, Discriminator = _currentUser.Discriminator, Id = _currentUser.Id, Username = _currentUser.Name },
-						ChannelId = channelId
+						ChannelId = channelId,
+						IsTextToSpeech = isTextToSpeech
 					});
 					msg.IsQueued = true;
 					msg.Nonce = nonce;
@@ -276,11 +277,11 @@ namespace Discord
 				}
 				else
 				{
-					var model = await _api.SendMessage(channelId, blockText, mentions, nonce).ConfigureAwait(false);
+					var model = await _api.SendMessage(channelId, blockText, mentions, nonce, isTextToSpeech).ConfigureAwait(false);
 					var msg = _messages.GetOrAdd(model.Id, channelId, model.Author.Id);
 					msg.Update(model);
 					RaiseMessageSent(msg);
-				}
+                }
 				await Task.Delay(1000).ConfigureAwait(false);
 			}
 			return result;
