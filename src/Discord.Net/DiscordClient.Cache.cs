@@ -8,10 +8,10 @@ namespace Discord
 		public Channel GetChannel(string id) => _channels[id];
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(Server server, string name) => _channels.Find(server?.Id, name);
+		public IEnumerable<Channel> FindChannels(Server server, string name, string type = null) => _channels.Find(server?.Id, name, type);
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(string serverId, string name) => _channels.Find(serverId, name);
+		public IEnumerable<Channel> FindChannels(string serverId, string name, string type = null) => _channels.Find(serverId, name, type);
 
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
 		public Member GetMember(string serverId, User user) => _members[user?.Id, serverId];

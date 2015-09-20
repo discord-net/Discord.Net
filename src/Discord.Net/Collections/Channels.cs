@@ -41,21 +41,27 @@ namespace Discord.Collections
 
 		internal Channel this[string id] => Get(id);
 		
-		internal IEnumerable<Channel> Find(string serverId, string name)
+		internal IEnumerable<Channel> Find(string serverId, string name, string type = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
+			IEnumerable<Channel> result;
 			if (name.StartsWith("#"))
 			{
 				string name2 = name.Substring(1);
-				return this.Where(x => x.ServerId == serverId &&
+				result = this.Where(x => x.ServerId == serverId &&
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
 			}
 			else
 			{
-				return this.Where(x => x.ServerId == serverId &&
+				result = this.Where(x => x.ServerId == serverId &&
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
+
+			if (type != null)
+				result = result.Where(x => x.Type == type);
+
+			return result;
 		}
 	}
 }
