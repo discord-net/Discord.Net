@@ -119,10 +119,11 @@ namespace Discord
 					if (_voiceSocket.CurrentVoiceServerId != null)
 					{
 						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
-						if (!member.IsSpeaking)
+						bool value = e.IsSpeaking;
+                        if (member.IsSpeaking != value)
 						{
-							member.IsSpeaking = true;
-							RaiseUserIsSpeaking(member, true);
+							member.IsSpeaking = value;
+							RaiseUserIsSpeaking(member, value);
 						}
 					}
 				};
