@@ -44,17 +44,14 @@ namespace Discord
 		public IEnumerable<Server> Servers => _client.Servers.Where(x => x.HasMember(Id));
 		/// <summary> Returns a collection of all messages this user has sent that are still in cache. </summary>
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id);
-
-		//TODO: Add voice triggering LastActivity
+		
 		/// <summary> Returns the time this user last sent a message. </summary>
-		/// <remarks> Is not currently affected by voice activity. </remarks>
-		public DateTime LastActivity { get; private set; }
+		public DateTime? LastActivity { get; private set; }
 
 		internal User(DiscordClient client, string id)
 		{
 			_client = client;
 			Id = id;
-			LastActivity = DateTime.UtcNow;
 		}
 
 		internal void Update(UserReference model)
@@ -70,10 +67,10 @@ namespace Discord
 			IsVerified = model.IsVerified;
 		}
 
-		internal void UpdateActivity(DateTime activity)
+		internal void UpdateActivity(DateTime? activity)
 		{
-			if (activity > LastActivity)
-				LastActivity = activity;
+			if (LastActivity == null || activity > LastActivity.Value)
+				LastActivity = activity ?? DateTime.UtcNow;
 		}
 
 		public override string ToString() => Name;

@@ -118,6 +118,12 @@ namespace Discord
 				{
 					if (_voiceSocket.CurrentVoiceServerId != null)
 					{
+						if (_config.TrackActivity)
+						{
+							var user = _users[e.UserId];
+							if (user != null)
+								user.UpdateActivity();
+						}
 						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
 						bool value = e.IsSpeaking;
                         if (member.IsSpeaking != value)
