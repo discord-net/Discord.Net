@@ -18,7 +18,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
 		/// <summary> Returns the name of this user. </summary>
-		public string Name => Memberships.Where(x => x.GameId != null).Select(x => x.GameId).FirstOrDefault();
+		public string Name => Memberships.Where(x => x.Name != null).Select(x => x.Name).FirstOrDefault();
 		
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
