@@ -17,9 +17,15 @@ namespace Discord
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
-		/// <summary> Returns the name of this user. </summary>
-		public string Name => Memberships.Where(x => x.Name != null).Select(x => x.Name).FirstOrDefault();
-		
+		/// <summary> Returns the name of this user on this server. </summary>
+		public string Name { get; internal set; }
+		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
+		public string Discriminator { get; internal set; }
+		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
+		public string AvatarId { get; internal set; }
+		/// <summary> Returns the URL to this user's current avatar. </summary>
+		public string AvatarUrl => Endpoints.UserAvatar(Id, AvatarId);
+
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		[JsonIgnore]
@@ -45,7 +51,7 @@ namespace Discord
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id);
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
-		public string GameId => Memberships.Where(x => x.GameId != null).Select(x => x.GameId).FirstOrDefault();
+		/*public string GameId => Memberships.Where(x => x.GameId != null).Select(x => x.GameId).FirstOrDefault();
 		/// <summary> Returns the current status for this user. </summary>
 		public string Status => Memberships.OrderByDescending(x => x.StatusSince).Select(x => x.Status).FirstOrDefault();
 		/// <summary> Returns the time this user's status was last changed. </summary>
@@ -63,7 +69,7 @@ namespace Discord
 			}
 		}
 		/// <summary> Returns the time this user was last seen online. </summary>
-		public DateTime? LastOnline => Memberships.OrderByDescending(x => x.LastOnline).Select(x => x.LastOnline).FirstOrDefault();
+		public DateTime? LastOnline => Memberships.OrderByDescending(x => x.LastOnline).Select(x => x.LastOnline).FirstOrDefault();*/
 
 		internal User(DiscordClient client, string id)
 		{
@@ -72,8 +78,18 @@ namespace Discord
 			_servers = new ConcurrentDictionary<string, bool>();
         }
 
+		internal void Update(UserReference model)
+		{
+			if (model.Avatar != null)
+				AvatarId = model.Avatar;
+			if (model.Discriminator != null)
+				Discriminator = model.Discriminator;
+			if (model.Username != null)
+				Name = model.Username;
+		}
 		internal void Update(SelfUserInfo model)
 		{
+			Update(model as UserReference);
 			Email = model.Email;
 			IsVerified = model.IsVerified;
 		}

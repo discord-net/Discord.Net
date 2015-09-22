@@ -12,12 +12,13 @@ namespace Discord
 
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; internal set; }
+		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
+		public string Discriminator { get; internal set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; internal set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
 		public string AvatarUrl => Endpoints.UserAvatar(UserId, AvatarId);
-		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public string Discriminator { get; internal set; }
+		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; internal set; }
 
 		public bool IsMuted { get; internal set; }
@@ -34,12 +35,10 @@ namespace Discord
 		public string GameId { get; internal set; }
 		/// <summary> Returns the current status for this user. </summary>
 		public string Status { get; internal set; }
-		/// <summary> Returns the time this user's status was last changed in this server. </summary>
-		public DateTime StatusSince { get; internal set; }
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
-		public DateTime? LastActivity { get; private set; }
+		public DateTime? LastActivityAt { get; private set; }
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
-		public DateTime? LastOnline => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
+		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
 		private DateTime _lastOnline;
 
 		public string UserId { get; }
@@ -98,11 +97,9 @@ namespace Discord
 		{
 			if (Status != model.Status)
 			{
-				var now = DateTime.UtcNow;
                 Status = model.Status;
-				StatusSince = now;
 				if (Status == UserStatus.Offline)
-					_lastOnline = now;
+					_lastOnline = DateTime.UtcNow;
             }
 			GameId = model.GameId;
 		}
@@ -124,8 +121,8 @@ namespace Discord
 
 		internal void UpdateActivity(DateTime? activity = null)
 		{
-			if (LastActivity == null || activity > LastActivity.Value)
-				LastActivity = activity ?? DateTime.UtcNow;
+			if (LastActivityAt == null || activity > LastActivityAt.Value)
+				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
 	}
 }

@@ -719,6 +719,7 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword).ConfigureAwait(false);
+			_currentUser.Update(response);
 			foreach (var membership in _currentUser.Memberships)
 				membership.Update(response);
 		}
@@ -742,6 +743,7 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword).ConfigureAwait(false);
+			_currentUser.Update(response);
 			foreach (var membership in _currentUser.Memberships)
 				membership.Update(response);
 		}
