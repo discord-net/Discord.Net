@@ -241,14 +241,14 @@ namespace Discord
 			=> SendMessage(channelId, text, new string[0]);
 		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(Channel channel, string text, string[] mentions)
-			=> SendMessage(channel?.Id, text, mentions);
+		public Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
+			=> SendMessage(_channels[channelId], text, mentions);
 		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public async Task<Message[]> SendMessage(string channelId, string text, string[] mentions, bool isTextToSpeech = false)
+		public async Task<Message[]> SendMessage(Channel channel, string text, string[] mentions, bool isTextToSpeech = false)
 		{
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
 
@@ -261,13 +261,14 @@ namespace Discord
 				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
-					var msg = _messages.GetOrAdd("nonce_" + nonce, channelId, _currentUserId);
+					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _currentUserId);
+					var currentMember = _members[msg.UserId, channel.ServerId];
                     msg.Update(new Net.API.Message
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
-						Author = new UserReference { Avatar = _currentUser.AvatarId, Discriminator = _currentUser.Discriminator, Id = _currentUser.Id, Username = _currentUser.Name },
-						ChannelId = channelId,
+						Author = new UserReference { Avatar = currentMember.AvatarId, Discriminator = currentMember.Discriminator, Id = _currentUserId, Username = currentMember.Name },
+						ChannelId = channel.Id,
 						IsTextToSpeech = isTextToSpeech
 					});
 					msg.IsQueued = true;
@@ -277,8 +278,8 @@ namespace Discord
 				}
 				else
 				{
-					var model = await _api.SendMessage(channelId, blockText, mentions, nonce, isTextToSpeech).ConfigureAwait(false);
-					var msg = _messages.GetOrAdd(model.Id, channelId, model.Author.Id);
+					var model = await _api.SendMessage(channel.Id, blockText, mentions, nonce, isTextToSpeech).ConfigureAwait(false);
+					var msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 					msg.Update(model);
 					RaiseMessageSent(msg);
                 }
@@ -718,7 +719,8 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
+			foreach (var membership in _currentUser.Memberships)
+				membership.Update(response);
 		}
 		/// <summary> Changes your email to newEmail. </summary>
 		public async Task ChangeEmail(string newEmail, string currentPassword)
@@ -731,8 +733,7 @@ namespace Discord
 		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
 		{
 			CheckReady();
-			var response = await _api.ChangePassword(newPassword, currentEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
+			await _api.ChangePassword(newPassword, currentEmail, currentPassword).ConfigureAwait(false);
 		}
 
 		/// <summary> Changes your avatar. </summary>
@@ -741,7 +742,8 @@ namespace Discord
 		{
 			CheckReady();
 			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
+			foreach (var membership in _currentUser.Memberships)
+				membership.Update(response);
 		}
 	}
 }

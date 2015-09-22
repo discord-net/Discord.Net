@@ -1,6 +1,7 @@
 ﻿using Discord.Net.API;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,18 +13,13 @@ namespace Discord
 		private readonly DiscordClient _client;
 		private int _refs;
 		private DateTime? _lastPrivateActivity;
+		private ConcurrentDictionary<string, bool> _servers;
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
-		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get; internal set; }
-
-		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
-		public string AvatarId { get; internal set; }
-		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => Endpoints.UserAvatar(Id, AvatarId);
-		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public string Discriminator { get; internal set; }
+		/// <summary> Returns the name of this user. </summary>
+		public string Name => Memberships.Where(x => x.GameId != null).Select(x => x.GameId).FirstOrDefault();
+		
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		[JsonIgnore]
@@ -40,9 +36,11 @@ namespace Discord
 		public Channel PrivateChannel => _client.Channels[PrivateChannelId];
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
-		public IEnumerable<Member> Memberships => _client.Servers.Where(x => x.HasMember(Id)).Select(x => _client.Members[Id, x?.Id]);
+		public IEnumerable<Member> Memberships => _servers.Select(x => _client.GetMember(x.Key, Id));
 		/// <summary> Returns a collection of all servers this user is a member of. </summary>
-		public IEnumerable<Server> Servers => _client.Servers.Where(x => x.HasMember(Id));
+		public IEnumerable<Server> Servers => _servers.Select(x => _client.GetServer(x.Key));
+		/// <summary> Returns a collection of the ids of all servers this user is a member of. </summary>
+		public IEnumerable<string> ServersIds => _servers.Select(x => x.Key);
 		/// <summary> Returns a collection of all messages this user has sent that are still in cache. </summary>
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id);
 
@@ -71,17 +69,11 @@ namespace Discord
 		{
 			_client = client;
 			Id = id;
-		}
+			_servers = new ConcurrentDictionary<string, bool>();
+        }
 
-		internal void Update(UserReference model)
-		{
-			AvatarId = model.Avatar;
-			Discriminator = model.Discriminator;
-			Name = model.Username;
-		}
 		internal void Update(SelfUserInfo model)
 		{
-			Update(model as UserReference);
 			Email = model.Email;
 			IsVerified = model.IsVerified;
 		}
@@ -92,7 +84,17 @@ namespace Discord
 		}
 
 		public override string ToString() => Name;
-		
+
+		internal void AddServer(string serverId)
+		{
+			_servers.TryAdd(serverId, true);
+		}
+		internal bool RemoveServer(string serverId)
+		{
+			bool ignored;
+			return _servers.TryRemove(serverId, out ignored);
+		}
+
 		public void AddRef()
 		{
 			Interlocked.Increment(ref _refs);

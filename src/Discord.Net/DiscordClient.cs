@@ -353,8 +353,6 @@ namespace Discord
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Payload.ToObject<Events.GuildMemberAdd>(_serializer);
-							var user = _users.GetOrAdd(data.User.Id);
-							user.Update(data.User);
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
 							if (_config.TrackActivity)

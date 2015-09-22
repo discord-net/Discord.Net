@@ -15,26 +15,9 @@ namespace Discord.Collections
 		protected override void OnCreated(User item) { }
 		protected override void OnRemoved(User item) { }
 
-		public User this[string id] => Get(id);
-		public User this[string name, string discriminator]
-		{
-			get
-			{
-				if (name == null) throw new ArgumentNullException(nameof(name));
-				if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
+		internal User this[string id] => Get(id);
 
-				if (name.StartsWith("@"))
-					name = name.Substring(1);
-
-				return this.Where(x =>
-						string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) &&
-						x.Discriminator == discriminator
-					)
-					.FirstOrDefault();
-			}
-		}
-
-		public IEnumerable<User> Find(string name)
+		internal IEnumerable<User> Find(string name)
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name));
 

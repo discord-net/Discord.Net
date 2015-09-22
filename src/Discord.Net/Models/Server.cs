@@ -16,6 +16,8 @@ namespace Discord
 		public string Id { get; }
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; internal set; }
+		/// <summary> Returns the current logged-in user's data for this server. </summary>
+		public Member CurrentMember { get; internal set; }
 
 		/// <summary> Returns the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel (see AFKChannel). </summary>
 		public int AFKTimeout { get; internal set; }
@@ -130,9 +132,8 @@ namespace Discord
 			var members = _client.Members;
 			foreach (var subModel in model.Members)
 			{
-				var user = users.GetOrAdd(subModel.User.Id);
+				users.GetOrAdd(subModel.User.Id);
 				var member = members.GetOrAdd(subModel.User.Id, Id);
-				user.Update(subModel.User);
 				member.Update(subModel);
 			}
 			foreach (var subModel in model.VoiceStates)

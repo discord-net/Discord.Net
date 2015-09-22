@@ -17,12 +17,18 @@ namespace Discord.Collections
 		protected override void OnCreated(Member item)
 		{
 			item.Server.AddMember(item.UserId);
+			item.User.AddServer(item.ServerId);
 			item.User.AddRef();
+			if (item.UserId == _client.CurrentUserId)
+				item.Server.CurrentMember = item;
 		}
 		protected override void OnRemoved(Member item)
 		{
 			item.Server.RemoveMember(item.UserId);
+			item.User.RemoveServer(item.ServerId);
 			item.User.RemoveRef();
+			if (item.UserId == _client.CurrentUserId)
+				item.Server.CurrentMember = null;
 		}
 		
 		internal Member this[string userId, string serverId]
@@ -62,6 +68,21 @@ namespace Discord.Collections
 					return string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase);
 				});
 			}
+		}
+
+		internal Member Find(string username, string discriminator)
+		{
+            if (username == null) throw new ArgumentNullException(nameof(username));
+			if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
+
+			if (username.StartsWith("@"))
+				username = username.Substring(1);
+
+			return this.Where(x =>
+					string.Equals(x.Name, username, StringComparison.OrdinalIgnoreCase) &&
+					x.Discriminator == discriminator
+				)
+				.FirstOrDefault();
 		}
 	}
 }

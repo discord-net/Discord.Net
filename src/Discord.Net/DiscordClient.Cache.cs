@@ -50,7 +50,7 @@ namespace Discord
 		public User GetUser(string id) => _users[id];
 		/// <summary> Returns the user with the specified name and discriminator, or null if none was found. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public User GetUser(string name, string discriminator) => _users[name, discriminator];
+		public User GetUser(string name, string discriminator) => _members[name, discriminator]?.User;
 		/// <summary> Returns all users with the specified name across all servers. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public IEnumerable<User> FindUsers(string name) => _users.Find(name);

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Net.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,14 @@ namespace Discord
 	{
 		private readonly DiscordClient _client;
 
+		/// <summary> Returns the name of this user on this server. </summary>
+		public string Name { get; internal set; }
+		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
+		public string AvatarId { get; internal set; }
+		/// <summary> Returns the URL to this user's current avatar. </summary>
+		public string AvatarUrl => Endpoints.UserAvatar(UserId, AvatarId);
+		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
+		public string Discriminator { get; internal set; }
 		public DateTime JoinedAt { get; internal set; }
 
 		public bool IsMuted { get; internal set; }
@@ -62,19 +71,30 @@ namespace Discord
 
 		public override string ToString() => UserId;
 
-		internal void Update(Net.API.MemberInfo model)
+		internal void Update(UserReference model)
 		{
+			if (model.Avatar != null)
+				AvatarId = model.Avatar;
+			if (model.Discriminator != null)
+				Discriminator = model.Discriminator;
+			if (model.Username != null)
+				Name = model.Username;
+		}
+		internal void Update(MemberInfo model)
+		{
+			if (model.User != null)
+				Update(model.User);
 			RoleIds = model.Roles;
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
 		}
-		internal void Update(Net.API.ExtendedMemberInfo model)
+		internal void Update(ExtendedMemberInfo model)
 		{
-			Update(model as Net.API.MemberInfo);
+			Update(model as MemberInfo);
 			IsDeafened = model.IsDeafened;
 			IsMuted = model.IsMuted;
 		}
-		internal void Update(Net.API.PresenceMemberInfo model)
+		internal void Update(PresenceMemberInfo model)
 		{
 			if (Status != model.Status)
 			{
@@ -86,7 +106,7 @@ namespace Discord
             }
 			GameId = model.GameId;
 		}
-		internal void Update(Net.API.VoiceMemberInfo model)
+		internal void Update(VoiceMemberInfo model)
 		{
 			IsDeafened = model.IsDeafened;
 			IsMuted = model.IsMuted;
