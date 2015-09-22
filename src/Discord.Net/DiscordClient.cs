@@ -652,7 +652,6 @@ namespace Discord
 				_state = (int)DiscordClientState.Connecting;
 				
 				string url = (await _api.GetWebSocketEndpoint().ConfigureAwait(false)).Url;
-				url = "wss://gateway-besaid.discord.gg/";
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Websocket endpoint: {url}");
 
