@@ -67,7 +67,7 @@ namespace Discord
 			IsVerified = model.IsVerified;
 		}
 
-		internal void UpdateActivity(DateTime? activity)
+		internal void UpdateActivity(DateTime? activity = null)
 		{
 			if (LastActivity == null || activity > LastActivity.Value)
 				LastActivity = activity ?? DateTime.UtcNow;
