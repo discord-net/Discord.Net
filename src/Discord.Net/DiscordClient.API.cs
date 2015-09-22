@@ -420,12 +420,23 @@ namespace Discord
 							else
 								msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
 							if (msg != null)
-								msg.Update(x);
-							if (_config.TrackActivity)
 							{
-								var user = _users[x.Author.Id];
-								if (user != null)
-									user.UpdateActivity(x.Timestamp);
+								msg.Update(x);
+								if (_config.TrackActivity)
+								{
+									if (channel.IsPrivate)
+									{
+										var user = msg.User;
+										if (user != null)
+											user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
+									}
+									else
+									{
+										var member = msg.Member;
+										if (member != null)
+											member.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
+									}
+								}
 							}
 							return msg;
 						})

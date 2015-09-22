@@ -118,18 +118,14 @@ namespace Discord
 				{
 					if (_voiceSocket.CurrentVoiceServerId != null)
 					{
-						if (_config.TrackActivity)
-						{
-							var user = _users[e.UserId];
-							if (user != null)
-								user.UpdateActivity();
-						}
 						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
 						bool value = e.IsSpeaking;
                         if (member.IsSpeaking != value)
 						{
 							member.IsSpeaking = value;
 							RaiseUserIsSpeaking(member, value);
+							if (_config.TrackActivity)
+								member.UpdateActivity();
 						}
 					}
 				};
@@ -359,10 +355,10 @@ namespace Discord
 							var data = e.Payload.ToObject<Events.GuildMemberAdd>(_serializer);
 							var user = _users.GetOrAdd(data.User.Id);
 							user.Update(data.User);
-							if (_config.TrackActivity)
-								user.UpdateActivity();
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
+							if (_config.TrackActivity)
+								member.UpdateActivity();
 							RaiseUserAdded(member);
 						}
 						break;
@@ -455,7 +451,21 @@ namespace Discord
 								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
 							msg.Update(data);
 							if (_config.TrackActivity)
-								msg.User.UpdateActivity(data.Timestamp);
+							{
+								var channel = msg.Channel;
+								if (channel == null || channel.IsPrivate)
+								{
+									var user = msg.User;
+									if (user != null)
+										user.UpdateActivity(data.Timestamp);
+								}
+								else
+								{
+									var member = msg.Member;
+									if (member != null)
+										member.UpdateActivity(data.Timestamp);
+								}
+							}
 							if (wasLocal)
 								RaiseMessageSent(msg);
 							RaiseMessageCreated(msg);
@@ -537,10 +547,22 @@ namespace Discord
 
 							if (user != null)
 							{
-								if (_config.TrackActivity)
-									user.UpdateActivity();
 								if (channel != null)
 									RaiseUserIsTyping(user, channel);
+							}
+							if (_config.TrackActivity)
+							{
+								if (channel.IsPrivate)
+								{
+									if (user != null)
+										user.UpdateActivity();
+								}
+								else
+								{
+									var member = _members[data.UserId, channel.ServerId];
+									if (member != null)
+										member.UpdateActivity();
+								}
 							}
 						}
 						break;

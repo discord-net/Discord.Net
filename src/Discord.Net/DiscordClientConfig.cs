@@ -41,7 +41,7 @@ namespace Discord
 		private bool _useMessageQueue = false;
 		/// <summary> (Experimental) Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
 		public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
-		private bool _trackActivity = false;
+		private bool _trackActivity = true;
 
 		//Lock
 		private bool _isLocked;

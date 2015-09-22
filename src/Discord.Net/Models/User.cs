@@ -11,6 +11,7 @@ namespace Discord
 	{
 		private readonly DiscordClient _client;
 		private int _refs;
+		private DateTime? _lastPrivateActivity;
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
@@ -44,9 +45,27 @@ namespace Discord
 		public IEnumerable<Server> Servers => _client.Servers.Where(x => x.HasMember(Id));
 		/// <summary> Returns a collection of all messages this user has sent that are still in cache. </summary>
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id);
-		
-		/// <summary> Returns the time this user last sent a message. </summary>
-		public DateTime? LastActivity { get; private set; }
+
+		/// <summary> Returns the id for the game this user is currently playing. </summary>
+		public string GameId => Memberships.Where(x => x.GameId != null).Select(x => x.GameId).FirstOrDefault();
+		/// <summary> Returns the current status for this user. </summary>
+		public string Status => Memberships.OrderByDescending(x => x.StatusSince).Select(x => x.Status).FirstOrDefault();
+		/// <summary> Returns the time this user's status was last changed. </summary>
+		public DateTime StatusSince => Memberships.OrderByDescending(x => x.StatusSince).Select(x => x.StatusSince).First();
+		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data. </summary>
+		public DateTime? LastActivity
+		{
+			get
+			{
+				var lastServerActivity = Memberships.OrderByDescending(x => x.LastActivity).Select(x => x.LastActivity).FirstOrDefault();
+				if (lastServerActivity == null || (_lastPrivateActivity != null && _lastPrivateActivity.Value > lastServerActivity.Value))
+					return _lastPrivateActivity;
+				else
+					return lastServerActivity;
+			}
+		}
+		/// <summary> Returns the time this user was last seen online. </summary>
+		public DateTime? LastOnline => Memberships.OrderByDescending(x => x.LastOnline).Select(x => x.LastOnline).FirstOrDefault();
 
 		internal User(DiscordClient client, string id)
 		{
@@ -66,11 +85,10 @@ namespace Discord
 			Email = model.Email;
 			IsVerified = model.IsVerified;
 		}
-
 		internal void UpdateActivity(DateTime? activity = null)
 		{
-			if (LastActivity == null || activity > LastActivity.Value)
-				LastActivity = activity ?? DateTime.UtcNow;
+			if (_lastPrivateActivity == null || activity > _lastPrivateActivity.Value)
+				_lastPrivateActivity = activity ?? DateTime.UtcNow;
 		}
 
 		public override string ToString() => Name;

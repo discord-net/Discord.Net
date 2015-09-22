@@ -20,11 +20,18 @@ namespace Discord
 
 		public string SessionId { get; internal set; }
 		public string Token { get; internal set; }
+
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
 		public string GameId { get; internal set; }
 		/// <summary> Returns the current status for this user. </summary>
 		public string Status { get; internal set; }
+		/// <summary> Returns the time this user's status was last changed in this server. </summary>
 		public DateTime StatusSince { get; internal set; }
+		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
+		public DateTime? LastActivity { get; private set; }
+		/// <summary> Returns the time this user was last seen online in this server. </summary>
+		public DateTime? LastOnline => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
+		private DateTime _lastOnline;
 
 		public string UserId { get; }
 		[JsonIgnore]
@@ -50,7 +57,8 @@ namespace Discord
 			_client = client;
 			UserId = userId;
 			ServerId = serverId;
-		}
+			Status = UserStatus.Offline;
+        }
 
 		public override string ToString() => UserId;
 
@@ -70,8 +78,11 @@ namespace Discord
 		{
 			if (Status != model.Status)
 			{
-				Status = model.Status;
-				StatusSince = DateTime.UtcNow;
+				var now = DateTime.UtcNow;
+                Status = model.Status;
+				StatusSince = now;
+				if (Status == UserStatus.Offline)
+					_lastOnline = now;
             }
 			GameId = model.GameId;
 		}
@@ -90,5 +101,11 @@ namespace Discord
 			if (model.IsSuppressed.HasValue)
 				IsSuppressed = model.IsSuppressed.Value;
 		}
-    }
+
+		internal void UpdateActivity(DateTime? activity = null)
+		{
+			if (LastActivity == null || activity > LastActivity.Value)
+				LastActivity = activity ?? DateTime.UtcNow;
+		}
+	}
 }
