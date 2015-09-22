@@ -330,7 +330,7 @@ namespace Discord
 			if (text.Length > DiscordAPIClient.MaxMessageSize)
 				text = text.Substring(0, DiscordAPIClient.MaxMessageSize);
 
-			var model = await _api.EditMessage(channelId, messageId, text, mentions).ConfigureAwait(false);
+			var model = await _api.EditMessage(messageId, channelId, text, mentions).ConfigureAwait(false);
 			var msg = _messages[messageId];
 			if (msg != null)
 				msg.Update(model);
