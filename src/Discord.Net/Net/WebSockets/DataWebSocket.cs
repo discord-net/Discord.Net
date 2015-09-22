@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace Discord.Net.WebSockets
 {
     internal partial class DataWebSocket : WebSocket
-    {		
-		private string _redirectServer;
+    {
 		private int _lastSeq;
 
 		public string SessionId => _sessionId;
@@ -18,29 +17,25 @@ namespace Discord.Net.WebSockets
 			: base(client)
 		{
 		}
-		
-		public async Task Login(string host, string token, CancellationToken cancelToken)
+
+        public async Task Login(string token)
 		{
-			await base.Connect(host, cancelToken);
+			await Connect();
 			
 			Commands.Login msg = new Commands.Login();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			QueueMessage(msg);
         }
-
-		protected override Task[] Run()
+		private async Task Redirect(string server)
 		{
-			//Send resume session if we were transferred
-			if (_redirectServer != null)
-			{
-				var resumeMsg = new Commands.Resume();
-				resumeMsg.Payload.SessionId = _sessionId;
-				resumeMsg.Payload.Sequence = _lastSeq;
-				QueueMessage(resumeMsg);
-				_redirectServer = null;
-			}
-			return base.Run();
+			await DisconnectInternal(isUnexpected: false);
+			await Connect();
+
+			var resumeMsg = new Commands.Resume();
+			resumeMsg.Payload.SessionId = _sessionId;
+			resumeMsg.Payload.Sequence = _lastSeq;
+			QueueMessage(resumeMsg);
 		}
 
 		protected override async Task ProcessMessage(string json)
@@ -54,27 +49,31 @@ namespace Discord.Net.WebSockets
 				case 0:
 					{
 						JToken token = msg.Payload as JToken;
-                        if (msg.Type == "READY")
+						if (msg.Type == "READY")
 						{
 							var payload = token.ToObject<Events.Ready>();
 							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 							QueueMessage(new Commands.UpdateStatus());
 						}
+						else if (msg.Type == "RESUMED")
+						{
+							var payload = token.ToObject<Events.Resumed>();
+							_heartbeatInterval = payload.HeartbeatInterval;
+							QueueMessage(new Commands.UpdateStatus());
+						}
 						RaiseReceivedEvent(msg.Type, token);
-						if (msg.Type == "READY")
+						if (msg.Type == "READY" || msg.Type == "RESUMED")
 							CompleteConnect();
-						/*if (_logLevel >= LogMessageSeverity.Info)
-							RaiseOnLog(LogMessageSeverity.Info, "Got Event: " + msg.Type);*/
 					}
 					break;
 				case 7: //Redirect
 					{
 						var payload = (msg.Payload as JToken).ToObject<Events.Redirect>();
-						_host = payload.Url;
+						Host = payload.Url;
 						if (_logLevel >= LogMessageSeverity.Info)
 							RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
-						await DisconnectInternal(new Exception("Server is redirecting."), true);
+						await Redirect(payload.Url);
 					}
 					break;
 				default:

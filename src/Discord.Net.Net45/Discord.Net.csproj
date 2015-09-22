@@ -7,7 +7,7 @@
     <ProjectGuid>{8D71A857-879A-4A10-859E-5FF824ED6688}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Discord.Net</RootNamespace>
+    <RootNamespace>Discord</RootNamespace>
     <AssemblyName>Discord.Net</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -159,6 +159,9 @@
     <Compile Include="..\Discord.Net\Net\API\Endpoints.cs">
       <Link>Net\API\Endpoints.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\API\HttpException.cs">
+      <Link>Net\API\HttpException.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\API\Requests.cs">
       <Link>Net\API\Requests.cs</Link>
     </Compile>
@@ -177,9 +180,6 @@
     <Compile Include="..\Discord.Net\Net\API\RestClient.SharpRest.cs">
       <Link>Net\API\RestClient.SharpRest.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\HttpException.cs">
-      <Link>Net\HttpException.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\Commands.cs">
       <Link>Net\WebSockets\Commands.cs</Link>
     </Compile>
@@ -187,7 +187,7 @@
       <Link>Net\WebSockets\DataWebSocket.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSockets.Events.cs">
-      <Link>Net\DataWebSockets.Events.cs</Link>
+      <Link>Net\WebSockets\DataWebSockets.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\Events.cs">
       <Link>Net\WebSockets\Events.cs</Link>
@@ -215,6 +215,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketMessage.cs">
       <Link>Net\WebSockets\WebSocketMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\TimeoutException.cs">
+      <Link>TimeoutException.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

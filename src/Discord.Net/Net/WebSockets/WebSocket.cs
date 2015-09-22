@@ -38,7 +38,8 @@ namespace Discord.Net.WebSockets
 		protected readonly DiscordClient _client;
 		protected readonly LogMessageSeverity _logLevel;
 
-		protected string _host;
+		public string Host { get; set; }
+
 		protected int _loginTimeout, _heartbeatInterval;
 		private DateTime _lastHeartbeat;
 		private Task _runTask;
@@ -49,6 +50,7 @@ namespace Discord.Net.WebSockets
 		protected ExceptionDispatchInfo _disconnectReason;
 		private bool _wasDisconnectUnexpected;
 
+		public CancellationToken ParentCancelToken { get; set; }
 		public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
 		protected CancellationToken _cancelToken;
@@ -69,22 +71,24 @@ namespace Discord.Net.WebSockets
 			};
         }
 
-		protected virtual async Task Connect(string host, CancellationToken cancelToken)
+		protected virtual async Task Connect()
 		{
 			if (_state != (int)WebSocketState.Disconnected)
 				throw new InvalidOperationException("Client is already connected or connecting to the server.");
 
-			try
+            try
 			{
 				await Disconnect().ConfigureAwait(false);
 				
 				_state = (int)WebSocketState.Connecting;
 
 				_cancelTokenSource = new CancellationTokenSource();
-				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, cancelToken).Token;
+				if (ParentCancelToken != null)
+					_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken).Token;
+				else
+					_cancelToken = _cancelTokenSource.Token;
 
-				await _engine.Connect(host, _cancelToken).ConfigureAwait(false);
-				_host = host;
+				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
 				_lastHeartbeat = DateTime.UtcNow;
 
 				_runTask = RunTasks();

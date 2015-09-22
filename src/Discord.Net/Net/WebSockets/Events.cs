@@ -36,6 +36,11 @@ namespace Discord.Net.WebSockets
 			[JsonProperty(PropertyName = "heartbeat_interval")]
 			public int HeartbeatInterval;
 		}
+		public sealed class Resumed
+		{
+			[JsonProperty(PropertyName = "heartbeat_interval")]
+			public int HeartbeatInterval;
+		}
 
 		public sealed class Redirect
 		{

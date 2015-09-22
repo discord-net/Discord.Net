@@ -53,13 +53,12 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public async Task Login(string host, string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
+		public async Task Login(string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
 		{
 			if (_serverId == serverId && _userId == userId && _sessionId == sessionId && _token == token)
 			{
 				//Adjust the host and tell the system to reconnect
-				_host = host;
-				await DisconnectInternal(new Exception("Server transfer occurred."));
+				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false);
 				return;
 			}
 			
@@ -68,18 +67,19 @@ namespace Discord.Net.WebSockets
 			_sessionId = sessionId;
 			_token = token;
 
-			await Connect(host, cancelToken);
+			await Connect();
 		}
-		public async Task Reconnect(CancellationToken cancelToken)
+		public async Task Reconnect()
 		{
 			try
 			{
-				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				var cancelToken = ParentCancelToken;
+                await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{
 					try
 					{
-						await Connect(_host, cancelToken).ConfigureAwait(false);
+						await Connect().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -295,7 +295,7 @@ namespace Discord.Net.WebSockets
 							var payload = (msg.Payload as JToken).ToObject<VoiceEvents.Ready>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
-							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(_host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
+							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
 							//_mode = payload.Modes.LastOrDefault();
 							_isEncrypted = !payload.Modes.Contains("plain");
                             _udp.Connect(_endpoint);

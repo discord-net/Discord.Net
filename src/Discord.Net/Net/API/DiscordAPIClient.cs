@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.API
@@ -20,6 +21,12 @@ namespace Discord.Net.API
 		{
 			get { return _token; }
 			set { _token = value; _rest.SetToken(value); }
+		}
+		private CancellationToken _cancelToken;
+		public CancellationToken CancelToken
+		{
+			get { return _cancelToken; }
+			set { _cancelToken = value; _rest.SetCancelToken(value); }
 		}
 
 		//Auth
@@ -191,5 +198,15 @@ namespace Discord.Net.API
 			var request = new Requests.ChangeAvatar { Avatar = $"data:{type},/9j/{base64}", CurrentEmail = currentEmail, CurrentPassword = currentPassword };
 			return _rest.Patch<Responses.ChangeProfile>(Endpoints.UserMe, request);
 		}
+
+		//Other
+		/*public Task<Responses.Status> GetUnresolvedIncidents()
+		{
+			return _rest.Get<Responses.Status>(Endpoints.StatusUnresolvedMaintenance);
+		}
+		public Task<Responses.Status> GetActiveIncidents()
+		{
+			return _rest.Get<Responses.Status>(Endpoints.StatusActiveMaintenance);
+		}*/
 	}
 }

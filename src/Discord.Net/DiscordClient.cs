@@ -95,7 +95,7 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await Reconnect(_token); };
+			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await _dataSocket.Login(_token); };
 			if (_config.EnableVoice)
 			{
 				_voiceSocket = new VoiceWebSocket(this);
@@ -112,7 +112,7 @@ namespace Discord
 					}
 					RaiseVoiceDisconnected(e);
 					if (e.WasUnexpected)
-						await _voiceSocket.Reconnect(_cancelToken);
+						await _voiceSocket.Reconnect();
 				};
 				_voiceSocket.IsSpeaking += (s, e) =>
 				{
@@ -292,6 +292,8 @@ namespace Discord
 							}
 						}
 						break;
+					case "RESUMED":
+						break;
 
 					//Servers
 					case "GUILD_CREATE":
@@ -358,7 +360,7 @@ namespace Discord
 							var user = _users.GetOrAdd(data.User.Id);
 							user.Update(data.User);
 							if (_config.TrackActivity)
-								user.UpdateActivity(DateTime.UtcNow);
+								user.UpdateActivity();
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
 							RaiseUserAdded(member);
@@ -536,7 +538,7 @@ namespace Discord
 							if (user != null)
 							{
 								if (_config.TrackActivity)
-									user.UpdateActivity(DateTime.UtcNow);
+									user.UpdateActivity();
 								if (channel != null)
 									RaiseUserIsTyping(user, channel);
 							}
@@ -550,8 +552,8 @@ namespace Discord
 							var server = _servers[data.GuildId];
 							if (_config.EnableVoice)
 							{
-								string host = "wss://" + data.Endpoint.Split(':')[0];
-                                await _voiceSocket.Login(host, data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
+								_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
+								await _voiceSocket.Login(data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
 							}
 						}
 						break;
@@ -582,11 +584,6 @@ namespace Discord
 			};
 		}
 
-		private void _dataSocket_Connected(object sender, EventArgs e)
-		{
-			throw new NotImplementedException();
-		}
-
 		//Connection
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
@@ -594,46 +591,54 @@ namespace Discord
 			if (_state != (int)DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
 
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Using cached token.");
-
-            await ConnectInternal(token).ConfigureAwait(false);
-        }
+			await ConnectInternal(token)
+				.Timeout(_config.ConnectionTimeout)
+				.ConfigureAwait(false);
+		}
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
 		{
 			if (_state != (int)DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
-	
-			var response = await _api.Login(email, password).ConfigureAwait(false);
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, "Login successful, got token.");
-			
-			return await ConnectInternal(response.Token).ConfigureAwait(false);
-		}
-		private Task Reconnect(string token)
-		{
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Using cached token.");
 
-			return ConnectInternal(token);
+			string token;
+			try
+			{
+				var cancelToken = new CancellationTokenSource();
+				cancelToken.CancelAfter(5000);
+				_api.CancelToken = cancelToken.Token;
+				var response = await _api.Login(email, password).ConfigureAwait(false);
+				token = response.Token;
+                if (_config.LogLevel >= LogMessageSeverity.Verbose)
+					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, "Login successful, got token.");
+			}
+			catch (TaskCanceledException) { throw new TimeoutException(); }
+
+			return await ConnectInternal(token)
+				.Timeout(_config.ConnectionTimeout)
+				.ConfigureAwait(false);
 		}
 		private async Task<string> ConnectInternal(string token)
 		{
-            try
+			try
 			{
 				_disconnectedEvent.Reset();
 				_cancelTokenSource = new CancellationTokenSource();
 				_cancelToken = _cancelTokenSource.Token;
-				_state = (int)DiscordClientState.Connecting;
-
 				_api.Token = token;
+				_api.CancelToken = _cancelToken;
+				_token = token;
+				_state = (int)DiscordClientState.Connecting;
+				
 				string url = (await _api.GetWebSocketEndpoint().ConfigureAwait(false)).Url;
+				url = "wss://gateway-besaid.discord.gg/";
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Websocket endpoint: {url}");
-				
-				await _dataSocket.Login(url, token, _cancelToken).ConfigureAwait(false);				
+
+				_dataSocket.Host = url;
+				_dataSocket.ParentCancelToken = _cancelToken;
+				await _dataSocket.Login(token).ConfigureAwait(false);				
 
 				_runTask = RunTasks();
 
@@ -641,8 +646,7 @@ namespace Discord
 				{
 					//Cancel if either Disconnect is called, data socket errors or timeout is reached
 					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _dataSocket.CancelToken).Token;
-                    if (!_connectedEvent.Wait(_config.ConnectionTimeout, cancelToken)) 
-						throw new Exception("Operation timed out.");
+					_connectedEvent.Wait(cancelToken);
 				}
 				catch (OperationCanceledException)
 				{
@@ -656,6 +660,7 @@ namespace Discord
 			}
 			catch
 			{
+
 				await Disconnect().ConfigureAwait(false);
 				throw;
 			}

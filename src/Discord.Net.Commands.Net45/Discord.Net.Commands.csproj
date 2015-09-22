@@ -7,7 +7,7 @@
     <ProjectGuid>{1B5603B4-6F8F-4289-B945-7BAAE523D740}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Discord.Net</RootNamespace>
+    <RootNamespace>Discord</RootNamespace>
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
