@@ -284,7 +284,7 @@ namespace Discord
 							foreach (var model in data.PrivateChannels)
 							{
 								var user = _users.GetOrAdd(model.Recipient.Id);
-								user.Update(data.Recipient);
+								user.Update(model.Recipient);
 								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
 								channel.Update(model);
 							}
