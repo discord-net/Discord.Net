@@ -95,7 +95,12 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await _dataSocket.Login(_token); };
+			_dataSocket.Disconnected += async (s, e) => 
+			{
+				RaiseDisconnected(e);
+				if (e.WasUnexpected)
+					await _dataSocket.Reconnect(_token);
+			};
 			if (_config.EnableVoice)
 			{
 				_voiceSocket = new VoiceWebSocket(this);

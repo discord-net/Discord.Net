@@ -67,7 +67,7 @@ namespace Discord.Net.WebSockets
 			_sessionId = sessionId;
 			_token = token;
 
-			await Connect();
+			await Connect().ConfigureAwait(false);
 		}
 		public async Task Reconnect()
 		{
@@ -85,7 +85,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						RaiseOnLog(LogMessageSeverity.Error, $"DataSocket reconnect failed: {ex.GetBaseException().Message}");
+						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -125,7 +125,7 @@ namespace Discord.Net.WebSockets
 #endif
 			}.Concat(base.Run()).ToArray();
 		}
-		protected override Task Cleanup(bool wasUnexpected)
+		protected override Task Cleanup()
 		{
 #if USE_THREAD
 			_sendThread.Join();
@@ -133,7 +133,7 @@ namespace Discord.Net.WebSockets
 #endif
 
 			ClearPCMFrames();
-			if (!wasUnexpected)
+			if (!_wasDisconnectUnexpected)
 			{
 				_serverId = null;
 				_userId = null;
@@ -142,7 +142,7 @@ namespace Discord.Net.WebSockets
 			}
 			_udp = null;
 
-			return base.Cleanup(wasUnexpected);
+			return base.Cleanup();
 		}
 
 		private async Task ReceiveVoiceAsync()

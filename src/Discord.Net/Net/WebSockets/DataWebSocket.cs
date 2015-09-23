@@ -20,7 +20,7 @@ namespace Discord.Net.WebSockets
 
         public async Task Login(string token)
 		{
-			await Connect();
+			await Connect().ConfigureAwait(false);
 			
 			Commands.Login msg = new Commands.Login();
 			msg.Payload.Token = token;
@@ -29,13 +29,37 @@ namespace Discord.Net.WebSockets
         }
 		private async Task Redirect(string server)
 		{
-			await DisconnectInternal(isUnexpected: false);
-			await Connect();
+			await DisconnectInternal(isUnexpected: false).ConfigureAwait(false);
+			await Connect().ConfigureAwait(false);
 
 			var resumeMsg = new Commands.Resume();
 			resumeMsg.Payload.SessionId = _sessionId;
 			resumeMsg.Payload.Sequence = _lastSeq;
 			QueueMessage(resumeMsg);
+		}
+		public async Task Reconnect(string token)
+		{
+			try
+			{
+				var cancelToken = ParentCancelToken;
+				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				while (!cancelToken.IsCancellationRequested)
+				{
+					try
+					{
+						await Login(token).ConfigureAwait(false);
+						break;
+					}
+					catch (OperationCanceledException) { throw; }
+					catch (Exception ex)
+					{
+						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
+						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
+						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+					}
+				}
+			}
+			catch (OperationCanceledException) { }
 		}
 
 		protected override async Task ProcessMessage(string json)
