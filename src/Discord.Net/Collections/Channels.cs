@@ -22,7 +22,7 @@ namespace Discord.Collections
 				if (user.PrivateChannelId != null)
 					throw new Exception("User already has a private channel.");
 				user.PrivateChannelId = item.Id;
-				item.Recipient.AddRef();
+				user.AddRef();
 			}
 		}
 		protected override void OnRemoved(Channel item)

@@ -283,7 +283,9 @@ namespace Discord
 							}
 							foreach (var model in data.PrivateChannels)
 							{
-								var channel = _channels.GetOrAdd(model.Id, null, model.Recipient?.Id);
+								var user = _users.GetOrAdd(model.Recipient.Id);
+								user.Update(data.Recipient);
+								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
 								channel.Update(model);
 							}
 						}
@@ -324,7 +326,15 @@ namespace Discord
 					case "CHANNEL_CREATE":
 						{
 							var data = e.Payload.ToObject<Events.ChannelCreate>(_serializer);
-							var channel = _channels.GetOrAdd(data.Id, data.GuildId, data.Recipient?.Id);
+							Channel channel;
+							if (data.IsPrivate)
+							{
+								var user = _users.GetOrAdd(data.Recipient.Id);
+								user.Update(data.Recipient);
+								channel = _channels.GetOrAdd(data.Id, null, user.Id);
+							}
+							else
+								channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
 							channel.Update(data);
 							RaiseChannelCreated(channel);
 						}
