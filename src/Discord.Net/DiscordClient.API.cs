@@ -258,9 +258,9 @@ namespace Discord
 			{
 				int index = i * DiscordAPIClient.MaxMessageSize;
 				string blockText = text.Substring(index, Math.Min(2000, text.Length - index));
-				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
+					var nonce = GenerateNonce();
 					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _currentUserId);
 					var currentMember = _members[msg.UserId, channel.ServerId];
                     msg.Update(new Net.API.Message
@@ -282,7 +282,8 @@ namespace Discord
 					var msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 					msg.Update(model);
 					RaiseMessageSent(msg);
-                }
+					result[i] = msg;
+				}
 				await Task.Delay(1000).ConfigureAwait(false);
 			}
 			return result;
