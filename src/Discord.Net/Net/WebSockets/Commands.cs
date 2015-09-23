@@ -26,7 +26,7 @@ namespace Discord.Net.WebSockets
 				[JsonProperty(PropertyName = "token")]
 				public string Token;
 				[JsonProperty(PropertyName = "v")]
-				public int Version = 2;
+				public int Version = 3;
 				[JsonProperty(PropertyName = "properties")]
 				public Dictionary<string, string> Properties = new Dictionary<string, string>();
 			}
