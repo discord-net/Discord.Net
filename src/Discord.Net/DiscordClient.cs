@@ -92,7 +92,7 @@ namespace Discord
 			_connectedEvent = new ManualResetEventSlim(false);
 			_rand = new Random();
 
-			_api = new DiscordAPIClient(_config.LogLevel);
+			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
 			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await _dataSocket.Login(_token); };

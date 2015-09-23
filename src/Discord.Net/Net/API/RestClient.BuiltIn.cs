@@ -14,7 +14,7 @@ namespace Discord.Net.API
 	{
 		private readonly HttpClient _client;
 
-		public BuiltInRestEngine(string userAgent)
+		public BuiltInRestEngine(string userAgent, int timeout)
 		{
 			_client = new HttpClient(new HttpClientHandler
 			{
@@ -25,6 +25,7 @@ namespace Discord.Net.API
 			_client.DefaultRequestHeaders.Add("accept", "*/*");
 			_client.DefaultRequestHeaders.Add("accept-encoding", "gzip,deflate");			
 			_client.DefaultRequestHeaders.Add("user-agent", userAgent);
+			_client.Timeout = TimeSpan.FromMilliseconds(timeout);
 		}
 
 		public void SetToken(string token)

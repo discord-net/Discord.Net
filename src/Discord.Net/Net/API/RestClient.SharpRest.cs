@@ -12,7 +12,7 @@ namespace Discord.Net.API
 	{
 		private readonly RestSharp.RestClient _client;
 
-		public RestSharpRestEngine(string userAgent)
+		public RestSharpRestEngine(string userAgent, int timeout)
 		{
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
@@ -20,7 +20,8 @@ namespace Discord.Net.API
 			};
 			_client.AddDefaultHeader("accept", "*/*");
 			_client.AddDefaultHeader("accept-encoding", "gzip,deflate");
-			_client.UserAgent = userAgent;
+            _client.UserAgent = userAgent;
+			_client.ReadWriteTimeout = timeout;
 		}
 
 		public void SetToken(string token)
