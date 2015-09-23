@@ -1,6 +1,5 @@
 ﻿using Discord.Net.API;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Discord
 {
