@@ -643,7 +643,7 @@ namespace Discord
 				var response = await _api.Login(email, password).ConfigureAwait(false);
 				token = response.Token;
                 if (_config.LogLevel >= LogMessageSeverity.Verbose)
-					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, "Login successful, got token.");
+					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Login successful, got token.");
 			}
 			catch (TaskCanceledException) { throw new TimeoutException(); }
 
@@ -665,7 +665,7 @@ namespace Discord
 				
 				string url = (await _api.GetWebSocketEndpoint().ConfigureAwait(false)).Url;
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
-					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Authentication, $"Websocket endpoint: {url}");
+					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {url}");
 
 				_dataSocket.Host = url;
 				_dataSocket.ParentCancelToken = _cancelToken;

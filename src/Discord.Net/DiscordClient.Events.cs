@@ -13,7 +13,6 @@ namespace Discord
     public enum LogMessageSource : byte
 	{
 		Unknown = 0,
-		Authentication,
 		Cache,
 		Client,
 		DataWebSocket,
