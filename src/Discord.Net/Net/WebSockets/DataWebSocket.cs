@@ -119,9 +119,10 @@ namespace Discord.Net.WebSockets
 			joinVoice.Payload.ChannelId = channelId;
 			QueueMessage(joinVoice);
 		}
-		public void SendLeaveVoice()
+		public void SendLeaveVoice(string serverId)
 		{
 			var leaveVoice = new Commands.JoinVoice();
+			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}
 	}

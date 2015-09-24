@@ -32,10 +32,11 @@ namespace Discord
 		private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
 		private readonly JsonSerializer _serializer;
-		protected ExceptionDispatchInfo _disconnectReason;
 		private Task _runTask;
-		private bool _wasDisconnectUnexpected;
 		private string _token;
+
+		protected ExceptionDispatchInfo _disconnectReason;
+		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -754,14 +755,14 @@ namespace Discord
 			//When the first task ends, make sure the rest do too
 			await DisconnectInternal(skipAwait: true);
 
-			bool wasUnexpected = _wasDisconnectUnexpected;
-			_wasDisconnectUnexpected = false;
-
-			await Cleanup(wasUnexpected).ConfigureAwait(false);
+			await Cleanup().ConfigureAwait(false);
 			_runTask = null;
 		}
-		private async Task Cleanup(bool wasUnexpected)
+		private async Task Cleanup()
 		{
+			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
+			_wasDisconnectUnexpected = false;
+
 			await _dataSocket.Disconnect().ConfigureAwait(false);
 			if (_config.EnableVoice)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
@@ -783,7 +784,7 @@ namespace Discord
 			_currentUserId = null;
 			_token = null;
 
-			if (!wasUnexpected)
+			if (!wasDisconnectUnexpected)
 			{
 				_state = (int)DiscordClientState.Disconnected;
 				_disconnectedEvent.Set();

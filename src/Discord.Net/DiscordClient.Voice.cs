@@ -15,10 +15,22 @@ namespace Discord
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
 			await LeaveVoiceServer().ConfigureAwait(false);
-			_voiceSocket.SetServer(serverId);
-			_dataSocket.SendJoinVoice(serverId, channelId);
-			//await _voiceSocket.WaitForConnection().ConfigureAwait(false);
-			//TODO: Add another ManualResetSlim to wait on here, base it off of DiscordClient's setup
+
+			try
+			{
+				await Task.Run(() =>
+				{
+					_voiceSocket.SetServer(serverId);
+					_dataSocket.SendJoinVoice(serverId, channelId);
+					_voiceSocket.WaitForConnection();
+				})
+				.Timeout(_config.ConnectionTimeout)
+				.ConfigureAwait(false);
+			}
+			catch (TaskCanceledException)
+			{
+				await LeaveVoiceServer().ConfigureAwait(false);
+			}
 		}
 		public async Task LeaveVoiceServer()
 		{
@@ -26,9 +38,12 @@ namespace Discord
 
 			if (_voiceSocket.State != Net.WebSockets.WebSocketState.Disconnected)
 			{
-				await _voiceSocket.Disconnect().ConfigureAwait(false);
-				await TaskHelper.CompletedTask.ConfigureAwait(false);
-				_dataSocket.SendLeaveVoice();
+				var serverId = _voiceSocket.CurrentVoiceServerId;
+				if (serverId != null)
+				{
+					await _voiceSocket.Disconnect().ConfigureAwait(false);
+					_dataSocket.SendLeaveVoice(serverId);
+				}
 			}
 		}
 
@@ -57,7 +72,7 @@ namespace Discord
 		{
 			CheckReady(checkVoice: true);
 
-			_voiceSocket.Wait();
+			_voiceSocket.WaitForQueue();
 			await TaskHelper.CompletedTask.ConfigureAwait(false);
 		}
 	}

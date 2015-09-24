@@ -514,9 +514,13 @@ namespace Discord.Net.WebSockets
 			return new VoiceCommands.KeepAlive();
 		}
 
-		public void Wait()
+		public void WaitForQueue()
 		{
-			_sendQueueEmptyWait.Wait();
+			_sendQueueEmptyWait.Wait(_cancelToken);
+		}
+		public void WaitForConnection()
+		{
+			_connectedEvent.Wait();
 		}
 	}
 }

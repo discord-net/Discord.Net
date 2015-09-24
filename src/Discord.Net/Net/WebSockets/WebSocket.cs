@@ -37,24 +37,25 @@ namespace Discord.Net.WebSockets
 		protected readonly IWebSocketEngine _engine;
 		protected readonly DiscordClient _client;
 		protected readonly LogMessageSeverity _logLevel;
+		protected readonly ManualResetEventSlim _connectedEvent;
 
-		public string Host { get; set; }
+		protected ExceptionDispatchInfo _disconnectReason;
+		protected bool _wasDisconnectUnexpected;
+		protected WebSocketState _disconnectState;
 
 		protected int _loginTimeout, _heartbeatInterval;
 		private DateTime _lastHeartbeat;
 		private Task _runTask;
 
-		public WebSocketState State => (WebSocketState)_state;
-		protected int _state;
-
-        protected ExceptionDispatchInfo _disconnectReason;
-		protected bool _wasDisconnectUnexpected;
-		protected WebSocketState _disconnectState;
-
 		public CancellationToken ParentCancelToken { get; set; }
 		public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
 		protected CancellationToken _cancelToken;
+
+		public string Host { get; set; }
+
+		public WebSocketState State => (WebSocketState)_state;
+		protected int _state;
 
 		public WebSocket(DiscordClient client)
 		{
@@ -62,6 +63,7 @@ namespace Discord.Net.WebSockets
 			_logLevel = client.Config.LogLevel;
 			_loginTimeout = client.Config.ConnectionTimeout;
 			_cancelToken = new CancellationToken(true);
+			_connectedEvent = new ManualResetEventSlim(false);
 
 			_engine = new BuiltInWebSocketEngine(client.Config.WebSocketInterval);
 			_engine.ProcessMessage += async (s, e) =>
@@ -102,6 +104,7 @@ namespace Discord.Net.WebSockets
 		protected void CompleteConnect()
 		{
 			_state = (int)WebSocketState.Connected;
+			_connectedEvent.Set();
 			RaiseConnected();
         }
 		/*public Task Reconnect(CancellationToken cancelToken)
@@ -184,6 +187,7 @@ namespace Discord.Net.WebSockets
 			var oldState = _state;
             _state = (int)WebSocketState.Disconnected;
 			_runTask = null;
+			_connectedEvent.Reset();
 
 			if (disconnectState == WebSocketState.Connected)
 				RaiseDisconnected(wasDisconnectUnexpected, _disconnectReason?.SourceException);
