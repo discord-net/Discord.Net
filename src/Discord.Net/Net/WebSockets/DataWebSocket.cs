@@ -112,11 +112,11 @@ namespace Discord.Net.WebSockets
 			return new Commands.KeepAlive();
 		}
 
-		public void SendJoinVoice(Channel channel)
+		public void SendJoinVoice(string serverId, string channelId)
 		{
 			var joinVoice = new Commands.JoinVoice();
-			joinVoice.Payload.ServerId = channel.ServerId;
-			joinVoice.Payload.ChannelId = channel.Id;
+			joinVoice.Payload.ServerId = serverId;
+			joinVoice.Payload.ChannelId = channelId;
 			QueueMessage(joinVoice);
 		}
 		public void SendLeaveVoice()

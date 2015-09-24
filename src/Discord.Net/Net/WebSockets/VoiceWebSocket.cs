@@ -53,16 +53,19 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public async Task Login(string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
+		public void SetServer(string serverId)
 		{
-			if (_serverId == serverId && _userId == userId && _sessionId == sessionId && _token == token)
+			_serverId = serverId;
+        }
+		public async Task Login(string userId, string sessionId, string token, CancellationToken cancelToken)
+		{
+			if ((WebSocketState)_state != WebSocketState.Disconnected)
 			{
 				//Adjust the host and tell the system to reconnect
 				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false);
 				return;
 			}
 			
-			_serverId = serverId;
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
@@ -135,7 +138,6 @@ namespace Discord.Net.WebSockets
 			ClearPCMFrames();
 			if (!_wasDisconnectUnexpected)
 			{
-				_serverId = null;
 				_userId = null;
 				_sessionId = null;
 				_token = null;

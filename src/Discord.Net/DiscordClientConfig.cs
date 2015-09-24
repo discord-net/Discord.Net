@@ -29,7 +29,7 @@ namespace Discord
 		private int _messageQueueInterval = 100;
 		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. This value is the target maximum but is not guaranteed, the buffer will often go slightly above this value. </summary>
 		public int VoiceBufferLength { get { return _voiceBufferLength; } set { SetValue(ref _voiceBufferLength, value); } }
-		private int _voiceBufferLength = 3000;
+		private int _voiceBufferLength = 1000;
 
 		//Experimental Features
 #if !DNXCORE50

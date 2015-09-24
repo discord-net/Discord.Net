@@ -121,7 +121,7 @@ namespace Discord
 				};
 				_voiceSocket.IsSpeaking += (s, e) =>
 				{
-					if (_voiceSocket.CurrentVoiceServerId != null)
+					if (_voiceSocket.State == WebSocketState.Connected)
 					{
 						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
 						bool value = e.IsSpeaking;
@@ -586,11 +586,14 @@ namespace Discord
 					case "VOICE_SERVER_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.VoiceServerUpdate>(_serializer);
-							var server = _servers[data.GuildId];
-							if (_config.EnableVoice)
+							if (data.GuildId == _voiceSocket.CurrentVoiceServerId)
 							{
-								_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
-								await _voiceSocket.Login(data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
+								var server = _servers[data.GuildId];
+								if (_config.EnableVoice)
+								{
+									_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
+									await _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
+								}
 							}
 						}
 						break;

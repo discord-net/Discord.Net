@@ -6,24 +6,25 @@ namespace Discord
 {
     public partial class DiscordClient
 	{
-		public Task JoinVoiceServer(string channelId)
-			=> JoinVoiceServer(_channels[channelId]);
-		public async Task JoinVoiceServer(Channel channel)
+        public Task JoinVoiceServer(Channel channel)
+			=> JoinVoiceServer(channel.ServerId, channel.Id);
+		public async Task JoinVoiceServer(string serverId, string channelId)
 		{
 			CheckReady(checkVoice: true);
-			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
 			await LeaveVoiceServer().ConfigureAwait(false);
-			_dataSocket.SendJoinVoice(channel);
+			_voiceSocket.SetServer(serverId);
+			_dataSocket.SendJoinVoice(serverId, channelId);
 			//await _voiceSocket.WaitForConnection().ConfigureAwait(false);
 			//TODO: Add another ManualResetSlim to wait on here, base it off of DiscordClient's setup
 		}
-
 		public async Task LeaveVoiceServer()
 		{
 			CheckReady(checkVoice: true);
 
-			if (_voiceSocket.CurrentVoiceServerId != null)
+			if (_voiceSocket.State != Net.WebSockets.WebSocketState.Disconnected)
 			{
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 				await TaskHelper.CompletedTask.ConfigureAwait(false);
@@ -43,7 +44,6 @@ namespace Discord
 			
 			_voiceSocket.SendPCMFrames(data, count);
 		}
-
 		/// <summary> Clears the PCM buffer. </summary>
 		public void ClearVoicePCM()
 		{
