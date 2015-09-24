@@ -6,8 +6,8 @@ namespace Discord.Collections
 {
     public sealed class Channels : AsyncCollection<Channel>
     {
-		internal Channels(DiscordClient client)
-			: base(client) { }
+		internal Channels(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
 
 		internal Channel GetOrAdd(string id, string serverId, string recipientId = null) => GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));
 		internal new Channel TryRemove(string id) => base.TryRemove(id);

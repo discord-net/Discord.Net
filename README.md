@@ -1,4 +1,4 @@
-# Discord.Net v0.7.0-beta1
+# Discord.Net v0.7.0
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 [Join the discussion](https://discord.gg/0SBTUU1wZTVjAMPx) on Discord.
@@ -7,11 +7,13 @@ An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 The Discord API is still in active development, meaning this library may break at any time without notice.
 Discord.Net itself is also in alpha so several functions may be unstable or not work at all. 
 
-### Features
-- Server Management (Servers, Channels, Messages, Invites)
-- User Moderation (Kick/Ban/Unban/Mute/Unmute/Deafen/Undeafen)
-- Alpha Voice Support (Outgoing only currently)
+### Current Features
+- Using Discord API version 3
 - Supports .Net 4.5 and DNX 4.5.1
+- Server Management (Servers, Channels, Messages, Invites, Roles, Users)
+- Send/Receieve Messages (Including mentions and formatting)
+- Basic Voice Support (Outgoing only, Unencrypted only)
+- Command extension library (Supports permission levels)
 
 ### NuGet Packages
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
@@ -26,7 +28,6 @@ client.MessageCreated += async (s, e) =>
 		await client.SendMessage(e.Message.ChannelId, e.Message.Text);
 };
 await client.Connect("discordtest@email.com", "Password123");
-await client.AcceptInvite("channel-invite-code");
 ```
 
 ### Example (Command Client)
@@ -48,11 +49,9 @@ client.CreateCommand("acceptinvite")
 		}
 	});
 await client.Connect("discordtest@email.com", "Password123");
-await client.AcceptInvite("channel-invite-code");
-
 ```
 
 ### Known Issues
 - Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
-- Caches do not currently clean up when their entries are no longer referenced, and there is no cap to the message cache. For now, disconencting and reconnecting will clear all caches.
+- The Message caches does not currently clean up when their entries are no longer referenced, and there is currently no cap to it. For now, disconnecting and reconnecting will clear all caches.
 - DNX Core 5.0 is experiencing several network-related issues and support has been temporarily dropped.

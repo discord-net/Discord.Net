@@ -6,8 +6,8 @@ namespace Discord.Collections
 {
     public sealed class Roles : AsyncCollection<Role>
 	{
-		internal Roles(DiscordClient client)
-			: base(client) { }
+		internal Roles(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
 
 		internal Role GetOrAdd(string id, string serverId) => GetOrAdd(id, () => new Role(_client, id, serverId));
 		internal new Role TryRemove(string id) => base.TryRemove(id);

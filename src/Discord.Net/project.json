@@ -1,5 +1,5 @@
 {
-	"version": "0.7.0-beta1",
+	"version": "0.7.0",
 	"description": "An unofficial .Net API wrapper for the Discord client.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],

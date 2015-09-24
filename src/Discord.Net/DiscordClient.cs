@@ -32,10 +32,11 @@ namespace Discord
 		private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
 		private readonly JsonSerializer _serializer;
-		protected ExceptionDispatchInfo _disconnectReason;
 		private Task _runTask;
-		private bool _wasDisconnectUnexpected;
 		private string _token;
+
+		protected ExceptionDispatchInfo _disconnectReason;
+		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -95,7 +96,12 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
 			_dataSocket = new DataWebSocket(this);
 			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => { RaiseDisconnected(e); if (e.WasUnexpected) await _dataSocket.Login(_token); };
+			_dataSocket.Disconnected += async (s, e) => 
+			{
+				RaiseDisconnected(e);
+				if (e.WasUnexpected)
+					await _dataSocket.Reconnect(_token);
+			};
 			if (_config.EnableVoice)
 			{
 				_voiceSocket = new VoiceWebSocket(this);
@@ -116,7 +122,7 @@ namespace Discord
 				};
 				_voiceSocket.IsSpeaking += (s, e) =>
 				{
-					if (_voiceSocket.CurrentVoiceServerId != null)
+					if (_voiceSocket.State == WebSocketState.Connected)
 					{
 						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
 						bool value = e.IsSpeaking;
@@ -131,12 +137,13 @@ namespace Discord
 				};
             }
 
-			_channels = new Channels(this);
-			_members = new Members(this);
-			_messages = new Messages(this);
-			_roles = new Roles(this);
-			_servers = new Servers(this);
-			_users = new Users(this);
+			object cacheLock = new object();
+			_channels = new Channels(this, cacheLock);
+			_members = new Members(this, cacheLock);
+			_messages = new Messages(this, cacheLock);
+			_roles = new Roles(this, cacheLock);
+			_servers = new Servers(this, cacheLock);
+			_users = new Users(this, cacheLock);
 
 			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
 			if (_config.EnableVoice)
@@ -581,11 +588,14 @@ namespace Discord
 					case "VOICE_SERVER_UPDATE":
 						{
 							var data = e.Payload.ToObject<Events.VoiceServerUpdate>(_serializer);
-							var server = _servers[data.GuildId];
-							if (_config.EnableVoice)
+							if (data.GuildId == _voiceSocket.CurrentVoiceServerId)
 							{
-								_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
-								await _voiceSocket.Login(data.GuildId, _currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
+								var server = _servers[data.GuildId];
+								if (_config.EnableVoice)
+								{
+									_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
+									await _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
+								}
 							}
 						}
 						break;
@@ -637,9 +647,6 @@ namespace Discord
 			string token;
 			try
 			{
-				var cancelToken = new CancellationTokenSource();
-				cancelToken.CancelAfter(5000);
-				_api.CancelToken = cancelToken.Token;
 				var response = await _api.Login(email, password).ConfigureAwait(false);
 				token = response.Token;
                 if (_config.LogLevel >= LogMessageSeverity.Verbose)
@@ -748,14 +755,14 @@ namespace Discord
 			//When the first task ends, make sure the rest do too
 			await DisconnectInternal(skipAwait: true);
 
-			bool wasUnexpected = _wasDisconnectUnexpected;
-			_wasDisconnectUnexpected = false;
-
-			await Cleanup(wasUnexpected).ConfigureAwait(false);
+			await Cleanup().ConfigureAwait(false);
 			_runTask = null;
 		}
-		private async Task Cleanup(bool wasUnexpected)
+		private async Task Cleanup()
 		{
+			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
+			_wasDisconnectUnexpected = false;
+
 			await _dataSocket.Disconnect().ConfigureAwait(false);
 			if (_config.EnableVoice)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
@@ -777,7 +784,7 @@ namespace Discord
 			_currentUserId = null;
 			_token = null;
 
-			if (!wasUnexpected)
+			if (!wasDisconnectUnexpected)
 			{
 				_state = (int)DiscordClientState.Disconnected;
 				_disconnectedEvent.Set();

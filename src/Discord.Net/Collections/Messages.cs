@@ -5,8 +5,8 @@ namespace Discord.Collections
     public sealed class Messages : AsyncCollection<Message>
 	{
 		private readonly MessageCleaner _msgCleaner;
-		internal Messages(DiscordClient client)
-			: base(client)
+		internal Messages(DiscordClient client, object writerLock)
+			: base(client, writerLock)
 		{
 			_msgCleaner = new MessageCleaner(client);
         }

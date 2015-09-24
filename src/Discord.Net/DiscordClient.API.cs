@@ -282,7 +282,8 @@ namespace Discord
 					var msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 					msg.Update(model);
 					RaiseMessageSent(msg);
-                }
+					result[i] = msg;
+				}
 				await Task.Delay(1000).ConfigureAwait(false);
 			}
 			return result;

@@ -53,21 +53,24 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 		}
 
-		public async Task Login(string serverId, string userId, string sessionId, string token, CancellationToken cancelToken)
+		public void SetServer(string serverId)
 		{
-			if (_serverId == serverId && _userId == userId && _sessionId == sessionId && _token == token)
+			_serverId = serverId;
+        }
+		public async Task Login(string userId, string sessionId, string token, CancellationToken cancelToken)
+		{
+			if ((WebSocketState)_state != WebSocketState.Disconnected)
 			{
 				//Adjust the host and tell the system to reconnect
 				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false);
 				return;
 			}
 			
-			_serverId = serverId;
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
 
-			await Connect();
+			await Connect().ConfigureAwait(false);
 		}
 		public async Task Reconnect()
 		{
@@ -85,7 +88,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						RaiseOnLog(LogMessageSeverity.Error, $"DataSocket reconnect failed: {ex.GetBaseException().Message}");
+						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -125,7 +128,7 @@ namespace Discord.Net.WebSockets
 #endif
 			}.Concat(base.Run()).ToArray();
 		}
-		protected override Task Cleanup(bool wasUnexpected)
+		protected override Task Cleanup()
 		{
 #if USE_THREAD
 			_sendThread.Join();
@@ -133,16 +136,15 @@ namespace Discord.Net.WebSockets
 #endif
 
 			ClearPCMFrames();
-			if (!wasUnexpected)
+			if (!_wasDisconnectUnexpected)
 			{
-				_serverId = null;
 				_userId = null;
 				_sessionId = null;
 				_token = null;
 			}
 			_udp = null;
 
-			return base.Cleanup(wasUnexpected);
+			return base.Cleanup();
 		}
 
 		private async Task ReceiveVoiceAsync()
@@ -512,9 +514,13 @@ namespace Discord.Net.WebSockets
 			return new VoiceCommands.KeepAlive();
 		}
 
-		public void Wait()
+		public void WaitForQueue()
 		{
-			_sendQueueEmptyWait.Wait();
+			_sendQueueEmptyWait.Wait(_cancelToken);
+		}
+		public void WaitForConnection()
+		{
+			_connectedEvent.Wait();
 		}
 	}
 }

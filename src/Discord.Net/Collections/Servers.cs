@@ -6,8 +6,8 @@ namespace Discord.Collections
 {
     public sealed class Servers : AsyncCollection<Server>
 	{
-		internal Servers(DiscordClient client)
-			: base(client) { }
+		internal Servers(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
 
 		internal Server GetOrAdd(string id) => base.GetOrAdd(id, () => new Server(_client, id));
 		internal new Server TryRemove(string id) => base.TryRemove(id);
