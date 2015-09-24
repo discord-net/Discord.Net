@@ -9,7 +9,7 @@ namespace Discord.Collections
 	public abstract class AsyncCollection<TValue> : IEnumerable<TValue>
 		where TValue : class
 	{
-		private static readonly object _writerLock = new object();
+		private readonly object _writerLock;
 
 		internal class CollectionItemEventArgs : EventArgs
 		{
@@ -53,9 +53,10 @@ namespace Discord.Collections
 		protected readonly DiscordClient _client;
 		protected readonly ConcurrentDictionary<string, TValue> _dictionary;
 
-		protected AsyncCollection(DiscordClient client)
+		protected AsyncCollection(DiscordClient client, object writerLock)
 		{
 			_client = client;
+			_writerLock = writerLock;
 			_dictionary = new ConcurrentDictionary<string, TValue>();
 		}
 

@@ -6,8 +6,8 @@ namespace Discord.Collections
 {
 	public sealed class Users : AsyncCollection<User>
 	{
-		internal Users(DiscordClient client)
-			: base(client) { }
+		internal Users(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
 
 		internal User GetOrAdd(string id) => GetOrAdd(id, () => new User(_client, id));
 		internal new User TryRemove(string id) => base.TryRemove(id);

@@ -136,12 +136,13 @@ namespace Discord
 				};
             }
 
-			_channels = new Channels(this);
-			_members = new Members(this);
-			_messages = new Messages(this);
-			_roles = new Roles(this);
-			_servers = new Servers(this);
-			_users = new Users(this);
+			object cacheLock = new object();
+			_channels = new Channels(this, cacheLock);
+			_members = new Members(this, cacheLock);
+			_messages = new Messages(this, cacheLock);
+			_roles = new Roles(this, cacheLock);
+			_servers = new Servers(this, cacheLock);
+			_users = new Users(this, cacheLock);
 
 			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
 			if (_config.EnableVoice)
@@ -645,9 +646,6 @@ namespace Discord
 			string token;
 			try
 			{
-				var cancelToken = new CancellationTokenSource();
-				cancelToken.CancelAfter(5000);
-				_api.CancelToken = cancelToken.Token;
 				var response = await _api.Login(email, password).ConfigureAwait(false);
 				token = response.Token;
                 if (_config.LogLevel >= LogMessageSeverity.Verbose)

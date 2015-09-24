@@ -6,8 +6,8 @@ namespace Discord.Collections
 {
     public sealed class Members : AsyncCollection<Member>
 	{
-		internal Members(DiscordClient client)
-			: base(client) { }
+		internal Members(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
 
 		private string GetKey(string userId, string serverId) => serverId + '_' + userId;
 
