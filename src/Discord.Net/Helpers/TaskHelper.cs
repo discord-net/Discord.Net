@@ -19,9 +19,7 @@ namespace Discord.Helpers
 			Task timeoutTask = Task.Delay(milliseconds);
 			Task finishedTask = await Task.WhenAny(self, timeoutTask);
 			if (finishedTask == timeoutTask)
-			{
                 throw new TimeoutException();
-			}
 			else
 				await self;
 		}
