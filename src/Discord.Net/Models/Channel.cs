@@ -25,6 +25,8 @@ namespace Discord
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get { return !IsPrivate ? $"{_name}" : $"@{Recipient.Name}"; } internal set { _name = value; } }
 
+		/// <summary> Returns the topic associated with this channel. </summary>
+		public string Topic { get; internal set; }
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
 		public int Position { get; internal set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
