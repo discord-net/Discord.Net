@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets.Voice
 {
     internal partial class VoiceWebSocket : WebSocket
 	{
@@ -106,7 +106,7 @@ namespace Discord.Net.WebSockets
 			_udp.AllowNatTraversal(true);
 #endif
 			
-			VoiceCommands.Login msg = new VoiceCommands.Login();
+			LoginCommand msg = new LoginCommand();
 			msg.Payload.ServerId = _serverId;
 			msg.Payload.SessionId = _sessionId;
 			msg.Payload.Token = _token;
@@ -294,7 +294,7 @@ namespace Discord.Net.WebSockets
 					{
 						if (_state != (int)WebSocketState.Connected)
 						{
-							var payload = (msg.Payload as JToken).ToObject<VoiceEvents.Ready>();
+							var payload = (msg.Payload as JToken).ToObject<ReadyEvent>();
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
@@ -319,7 +319,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 4: //SESSION_DESCRIPTION
 					{
-						var payload = (msg.Payload as JToken).ToObject<VoiceEvents.JoinServer>();
+						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>();
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
 						_connectWaitOnLogin.Set();
@@ -327,7 +327,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 5:
 					{
-						var payload = (msg.Payload as JToken).ToObject<VoiceEvents.IsTalking>();
+						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>();
 						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
 					}
 					break;
@@ -358,7 +358,7 @@ namespace Discord.Net.WebSockets
 
 					CompleteConnect();
 
-					var login2 = new VoiceCommands.Login2();
+					var login2 = new Login2Command();
 					login2.Payload.Protocol = "udp";
 					login2.Payload.SocketData.Address = ip;
 					login2.Payload.SocketData.Mode = _isEncrypted ? EncryptedMode : UnencryptedMode;
@@ -503,7 +503,7 @@ namespace Discord.Net.WebSockets
 
 		private void SendIsTalking(bool value)
 		{
-			var isTalking = new VoiceCommands.IsTalking();
+			var isTalking = new IsTalkingCommand();
 			isTalking.Payload.IsSpeaking = value;
 			isTalking.Payload.Delay = 0;
 			QueueMessage(isTalking);
@@ -511,7 +511,7 @@ namespace Discord.Net.WebSockets
 
 		protected override object GetKeepAlive()
 		{
-			return new VoiceCommands.KeepAlive();
+			return new KeepAliveCommand();
 		}
 
 		public void WaitForQueue()

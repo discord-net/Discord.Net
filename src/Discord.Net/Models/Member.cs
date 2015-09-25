@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; internal set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => Endpoints.UserAvatar(UserId, AvatarId);
+		public string AvatarUrl => API.Endpoints.UserAvatar(UserId, AvatarId);
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; internal set; }
 
@@ -70,7 +69,7 @@ namespace Discord
 
 		public override string ToString() => UserId;
 
-		internal void Update(UserReference model)
+		internal void Update(API.UserReference model)
 		{
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
@@ -79,7 +78,7 @@ namespace Discord
 			if (model.Username != null)
 				Name = model.Username;
 		}
-		internal void Update(MemberInfo model)
+		internal void Update(API.MemberInfo model)
 		{
 			if (model.User != null)
 				Update(model.User);
@@ -87,13 +86,13 @@ namespace Discord
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
 		}
-		internal void Update(ExtendedMemberInfo model)
+		internal void Update(API.ExtendedMemberInfo model)
 		{
-			Update(model as MemberInfo);
+			Update(model as API.MemberInfo);
 			IsDeafened = model.IsDeafened;
 			IsMuted = model.IsMuted;
 		}
-		internal void Update(PresenceMemberInfo model)
+		internal void Update(API.PresenceMemberInfo model)
 		{
 			if (Status != model.Status)
 			{
@@ -103,7 +102,7 @@ namespace Discord
             }
 			GameId = model.GameId;
 		}
-		internal void Update(VoiceMemberInfo model)
+		internal void Update(API.VoiceMemberInfo model)
 		{
 			IsDeafened = model.IsDeafened;
 			IsMuted = model.IsMuted;

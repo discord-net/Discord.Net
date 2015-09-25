@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.API
+﻿namespace Discord.API
 {
 	internal static class Endpoints
 	{
@@ -45,5 +45,6 @@
 
 		public const string StatusActiveMaintenance = "scheduled-maintenances/active.json";
 		public const string StatusUnresolvedMaintenance = "scheduled-maintenances/unresolved.json";
+		public const string StatusUpcomingMaintenance = "scheduled-maintenances/upcoming.json";
 	}
 }

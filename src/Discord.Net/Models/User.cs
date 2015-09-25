@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,7 +23,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; internal set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => Endpoints.UserAvatar(Id, AvatarId);
+		public string AvatarUrl => API.Endpoints.UserAvatar(Id, AvatarId);
 
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
@@ -78,7 +77,7 @@ namespace Discord
 			_servers = new ConcurrentDictionary<string, bool>();
         }
 
-		internal void Update(UserReference model)
+		internal void Update(API.UserReference model)
 		{
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
@@ -87,9 +86,9 @@ namespace Discord
 			if (model.Username != null)
 				Name = model.Username;
 		}
-		internal void Update(SelfUserInfo model)
+		internal void Update(API.SelfUserInfo model)
 		{
-			Update(model as UserReference);
+			Update(model as API.UserReference);
 			Email = model.Email;
 			IsVerified = model.IsVerified;
 		}

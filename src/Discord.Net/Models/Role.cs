@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Threading;
 
 namespace Discord
 {
@@ -29,7 +28,7 @@ namespace Discord
 			Permissions = new PackedPermissions(true);
 		}
 
-		internal void Update(Net.API.RoleInfo model)
+		internal void Update(API.RoleInfo model)
 		{
 			Name = model.Name;
 			Permissions.RawValue = (uint)model.Permissions;

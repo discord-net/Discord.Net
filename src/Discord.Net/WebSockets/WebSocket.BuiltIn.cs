@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using State = System.Net.WebSockets.WebSocketState;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets
 {
     internal class BuiltInWebSocketEngine : IWebSocketEngine
 	{

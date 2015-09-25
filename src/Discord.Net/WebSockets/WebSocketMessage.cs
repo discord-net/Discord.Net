@@ -1,17 +1,17 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets
 {
 	public class WebSocketMessage
 	{
-		[JsonProperty(PropertyName = "op")]
+		[JsonProperty("op")]
 		public int Operation;
-		[JsonProperty(PropertyName = "d")]
+		[JsonProperty("d")]
 		public object Payload;
-		[JsonProperty(PropertyName = "t", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
 		public string Type;
-		[JsonProperty(PropertyName = "s", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
 		public int? Sequence;
 	}
 	internal abstract class WebSocketMessage<T> : WebSocketMessage

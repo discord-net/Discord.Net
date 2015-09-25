@@ -122,7 +122,7 @@ namespace Discord
 			UserId = userId;
 		}
 
-		internal void Update(Net.API.Message model)
+		internal void Update(API.Message model)
 		{
 			if (model.Attachments != null)
 			{

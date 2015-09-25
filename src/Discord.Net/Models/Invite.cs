@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Discord
 {
@@ -24,7 +23,7 @@ namespace Discord
 		public string XkcdPass { get; }
 
 		/// <summary> Returns a URL for this invite using XkcdPass if available or Id if not. </summary>
-		public string Url => Endpoints.InviteUrl(XkcdPass ?? Id);
+		public string Url => API.Endpoints.InviteUrl(XkcdPass ?? Id);
 
 		/// <summary> Returns the id of the user that created this invite. </summary>
 		public string InviterId { get; internal set; }
@@ -54,16 +53,16 @@ namespace Discord
 
 		public override string ToString() => XkcdPass ?? Id;
 
-		internal void Update(Net.API.Invite model)
+		internal void Update(API.Invite model)
 		{
 			ChannelId = model.Channel.Id;
 			InviterId = model.Inviter?.Id;
 			ServerId = model.Guild.Id;
 		}
 
-		internal void Update(Net.API.ExtendedInvite model)
+		internal void Update(API.ExtendedInvite model)
 		{
-			Update(model as Net.API.Invite);
+			Update(model as API.Invite);
             IsRevoked = model.IsRevoked;
 			IsTemporary = model.IsTemporary;
 			MaxAge = model.MaxAge;

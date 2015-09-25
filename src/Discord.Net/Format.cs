@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using System.Text;
+﻿using System.Text;
 
 namespace Discord
 {
@@ -11,7 +10,7 @@ namespace Discord
 		static Format()
 		{
 			_patterns = new string[] { "__", "_", "**", "*", "~~" };
-			_builder = new StringBuilder(DiscordAPIClient.MaxMessageSize);
+			_builder = new StringBuilder(DiscordClient.MaxMessageSize);
         }
 
 		/// <summary> Removes all special formatting characters from the provided text. </summary>

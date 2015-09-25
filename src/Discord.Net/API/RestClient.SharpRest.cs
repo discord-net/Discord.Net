@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.API
+namespace Discord.API
 {
     internal class RestSharpRestEngine : IRestEngine
 	{

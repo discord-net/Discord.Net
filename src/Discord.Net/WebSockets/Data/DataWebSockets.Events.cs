@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets.Data
 {
-	public sealed class WebSocketEventEventArgs : EventArgs
+	internal sealed class WebSocketEventEventArgs : EventArgs
 	{
 		public readonly string Type;
 		public readonly JToken Payload;

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets
 {
 	public enum WebSocketState : byte
 	{
@@ -88,7 +88,7 @@ namespace Discord.Net.WebSockets
 					_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken).Token;
 				else
 					_cancelToken = _cancelTokenSource.Token;
-
+				
 				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
 				_lastHeartbeat = DateTime.UtcNow;
 
@@ -107,8 +107,6 @@ namespace Discord.Net.WebSockets
 			_connectedEvent.Set();
 			RaiseConnected();
         }
-		/*public Task Reconnect(CancellationToken cancelToken)
-			=> Connect(_host, _cancelToken);*/
 
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
 		protected async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)

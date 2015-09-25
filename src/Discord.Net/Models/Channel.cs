@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,14 +63,14 @@ namespace Discord
 			_messages = new ConcurrentDictionary<string, bool>();
 		}
 
-		internal void Update(ChannelReference model)
+		internal void Update(API.ChannelReference model)
 		{
 			Name = model.Name;
 			Type = model.Type;
 		}
-		internal void Update(ChannelInfo model)
+		internal void Update(API.ChannelInfo model)
 		{
-			Update(model as ChannelReference);
+			Update(model as API.ChannelReference);
 			
 			Position = model.Position;
 

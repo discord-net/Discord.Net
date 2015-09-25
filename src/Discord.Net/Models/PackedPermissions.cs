@@ -71,8 +71,7 @@ namespace Discord
 			else
 				_rawValue &= ~(1U << (pos - 1));
 		}
-
-		public static implicit operator uint (PackedPermissions perms) => perms._rawValue;
+		
 		public PackedPermissions Copy() => new PackedPermissions(false, _rawValue);
 	}
 }

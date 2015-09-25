@@ -1,6 +1,5 @@
-﻿using Discord.Helpers;
-using Discord.Net;
-using Discord.Net.API;
+﻿using Discord.API;
+using Discord.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,87 +16,7 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		//Servers
-		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
-		public async Task<Server> CreateServer(string name, string region)
-		{
-			CheckReady();
-			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (region == null) throw new ArgumentNullException(nameof(region));
-
-			var response = await _api.CreateServer(name, region).ConfigureAwait(false);
-			var server = _servers.GetOrAdd(response.Id);
-			server.Update(response);
-			return server;
-		}
-
-		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
-		public Task<Server> LeaveServer(Server server)
-			=> LeaveServer(server?.Id);
-		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
-		public async Task<Server> LeaveServer(string serverId)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-
-			try { await _api.LeaveServer(serverId).ConfigureAwait(false); }
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _servers.TryRemove(serverId);
-		}
-
-		//Channels
-		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public Task<Channel> CreateChannel(Server server, string name, string type)
-			=> CreateChannel(server?.Id, name, type);
-		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public async Task<Channel> CreateChannel(string serverId, string name, string type)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (type == null) throw new ArgumentNullException(nameof(type));
-
-			var response = await _api.CreateChannel(serverId, name, type).ConfigureAwait(false);
-			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
-			channel.Update(response);
-			return channel;
-		}
-		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(string userId) => CreatePMChannel(_users[userId], userId);
-		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(User user) => CreatePMChannel(user, user?.Id);
-		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(Member member) => CreatePMChannel(member.User, member.UserId);
-		private async Task<Channel> CreatePMChannel(User user, string userId)
-		{
-            CheckReady();
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			Channel channel = null;
-			if (user != null)
-				channel = user.PrivateChannel;
-			if (channel == null)
-			{
-				var response = await _api.CreatePMChannel(_currentUserId, userId).ConfigureAwait(false);
-				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
-				channel.Update(response);
-			}
-			return channel;
-		}
-
-		/// <summary> Destroys the provided channel. </summary>
-		public Task<Channel> DestroyChannel(Channel channel)
-			=> DestroyChannel(channel?.Id);
-		/// <summary> Destroys the provided channel. </summary>
-		public async Task<Channel> DestroyChannel(string channelId)
-		{
-			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-
-			try { await _api.DestroyChannel(channelId).ConfigureAwait(false); }
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _channels.TryRemove(channelId);
-		}
+		public const int MaxMessageSize = 2000;
 
 		//Bans
 		/// <summary> Bans a user from the provided server. </summary>
@@ -144,6 +63,74 @@ namespace Discord
 			try { await _api.Unban(serverId, userId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
+		
+		//Channels
+		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
+		public Task<Channel> CreateChannel(Server server, string name, string type)
+			=> CreateChannel(server?.Id, name, type);
+		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
+		public async Task<Channel> CreateChannel(string serverId, string name, string type)
+		{
+			CheckReady();
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (name == null) throw new ArgumentNullException(nameof(name));
+			if (type == null) throw new ArgumentNullException(nameof(type));
+
+			var response = await _api.CreateChannel(serverId, name, type).ConfigureAwait(false);
+			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
+			channel.Update(response);
+			return channel;
+		}
+
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(string userId) => CreatePMChannel(_users[userId], userId);
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(User user) => CreatePMChannel(user, user?.Id);
+		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
+		public Task<Channel> CreatePMChannel(Member member) => CreatePMChannel(member.User, member.UserId);
+		private async Task<Channel> CreatePMChannel(User user, string userId)
+		{
+			CheckReady();
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+			Channel channel = null;
+			if (user != null)
+				channel = user.PrivateChannel;
+			if (channel == null)
+			{
+				var response = await _api.CreatePMChannel(_currentUserId, userId).ConfigureAwait(false);
+				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
+				channel.Update(response);
+			}
+			return channel;
+		}
+
+		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
+		public Task EditChannel(Channel channel)
+			=> EditChannel(channel?.Id);
+		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
+		public Task EditChannel(string channelId, string name = null, string topic = null)
+		{
+			CheckReady();
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (topic == null) throw new ArgumentNullException(nameof(topic));
+
+			return _api.EditChannel(channelId, name: name, topic: topic);
+		}
+
+		/// <summary> Destroys the provided channel. </summary>
+		public Task<Channel> DestroyChannel(Channel channel)
+			=> DestroyChannel(channel?.Id);
+		/// <summary> Destroys the provided channel. </summary>
+		public async Task<Channel> DestroyChannel(string channelId)
+		{
+			CheckReady();
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+
+			try { await _api.DestroyChannel(channelId).ConfigureAwait(false); }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+			return _channels.TryRemove(channelId);
+		}
 
 		//Invites
 		/// <summary> Creates a new invite to the default channel of the provided server. </summary>
@@ -178,14 +165,29 @@ namespace Discord
 			return invite;
 		}
 
-		/// <summary> Gets more info about the provided invite code. </summary>
-		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
-		public async Task<Invite> GetInvite(string id)
+		/// <summary> Deletes the provided invite. </summary>
+		public async Task DestroyInvite(string inviteId)
 		{
 			CheckReady();
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (inviteId == null) throw new ArgumentNullException(nameof(inviteId));
+
+			try
+			{
+				//Check if this is a human-readable link and get its ID
+				var response = await _api.GetInvite(inviteId).ConfigureAwait(false);
+				await _api.DeleteInvite(response.Code).ConfigureAwait(false);
+			}
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+		}
+
+		/// <summary> Gets more info about the provided invite code. </summary>
+		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
+		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
+		{
+			CheckReady();
+			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
 			
-			var response = await _api.GetInvite(id).ConfigureAwait(false);
+			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
 			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
             invite.Update(response);
 			return invite;
@@ -200,39 +202,42 @@ namespace Discord
 			return _api.AcceptInvite(invite.Id);
 		}
 		/// <summary> Accepts the provided invite. </summary>
-		public async Task AcceptInvite(string code)
+		public async Task AcceptInvite(string inviteId)
 		{
 			CheckReady();
-			if (code == null) throw new ArgumentNullException(nameof(code));
+			if (inviteId == null) throw new ArgumentNullException(nameof(inviteId));
 
 			//Remove trailing slash and any non-code url parts
-			if (code.Length > 0 && code[code.Length - 1] == '/')
-				code = code.Substring(0, code.Length - 1);
-			int index = code.LastIndexOf('/');
+			if (inviteId.Length > 0 && inviteId[inviteId.Length - 1] == '/')
+				inviteId = inviteId.Substring(0, inviteId.Length - 1);
+			int index = inviteId.LastIndexOf('/');
 			if (index >= 0)
-				code = code.Substring(index + 1);
+				inviteId = inviteId.Substring(index + 1);
 
 			//Check if this is a human-readable link and get its ID
-			var invite = await GetInvite(code).ConfigureAwait(false);
+			var invite = await GetInvite(inviteId).ConfigureAwait(false);
 			await _api.AcceptInvite(invite.Id).ConfigureAwait(false);
 		}
 
-		/// <summary> Deletes the provided invite. </summary>
-		public async Task DeleteInvite(string code)
+		//Members
+		public Task EditMember(Member member, bool? mute = null, bool? deaf = null, string[] roles = null)
+			=> EditMember(member?.ServerId, member?.UserId, mute, deaf, roles);
+		public Task EditMember(Server server, User user, bool? mute = null, bool? deaf = null, string[] roles = null)
+			=> EditMember(server?.Id, user?.Id, mute, deaf, roles);
+		public Task EditMember(Server server, string userId, bool? mute = null, bool? deaf = null, string[] roles = null)
+			=> EditMember(server?.Id, userId, mute, deaf, roles);
+		public Task EditMember(string serverId, User user, bool? mute = null, bool? deaf = null, string[] roles = null)
+			=> EditMember(serverId, user?.Id, mute, deaf, roles);
+        public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, string[] roles = null)
 		{
 			CheckReady();
-			if (code == null) throw new ArgumentNullException(nameof(code));
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+			if (userId == null) throw new NullReferenceException(nameof(userId));
 
-			try
-			{
-				//Check if this is a human-readable link and get its ID
-				var response = await _api.GetInvite(code).ConfigureAwait(false);
-				await _api.DeleteInvite(response.Code).ConfigureAwait(false);
-			}
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+			return _api.EditMember(serverId, userId, mute, deaf, roles);
 		}
 
-		//Chat
+		//Messages
 		/// <summary> Sends a message to the provided channel. </summary>
 		public Task<Message[]> SendMessage(Channel channel, string text)
 			=> SendMessage(channel?.Id, text, new string[0]);
@@ -252,18 +257,18 @@ namespace Discord
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
 
-			int blockCount = (int)Math.Ceiling(text.Length / (double)DiscordAPIClient.MaxMessageSize);
+			int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
 			Message[] result = new Message[blockCount];
 			for (int i = 0; i < blockCount; i++)
 			{
-				int index = i * DiscordAPIClient.MaxMessageSize;
+				int index = i * MaxMessageSize;
 				string blockText = text.Substring(index, Math.Min(2000, text.Length - index));
 				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
 					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _currentUserId);
 					var currentMember = _members[msg.UserId, channel.ServerId];
-                    msg.Update(new Net.API.Message
+                    msg.Update(new API.Message
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
@@ -302,35 +307,37 @@ namespace Discord
 			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
 		}
 
-		/// <summary> Edits a message the provided message. </summary>
-		public Task EditMessage(Message message, string text)
-			=> EditMessage(message?.ChannelId, message?.Id, text, new string[0]);
-		/// <summary> Edits a message the provided message. </summary>
-		public Task EditMessage(Channel channel, string messageId, string text)
-			=> EditMessage(channel?.Id, messageId, text, new string[0]);
-		/// <summary> Edits a message the provided message. </summary>
-		public Task EditMessage(string channelId, string messageId, string text)
-			=> EditMessage(channelId, messageId, text, new string[0]);
-		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <summary> Sends a file to the provided channel. </summary>
+		public Task SendFile(Channel channel, string filePath)
+			=> SendFile(channel?.Id, filePath);
+		/// <summary> Sends a file to the provided channel. </summary>
+		public Task SendFile(string channelId, string filePath)
+		{
+			CheckReady();
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+
+			return _api.SendFile(channelId, filePath);
+		}
+
+		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Message message, string text, string[] mentions)
+		public Task EditMessage(Message message, string text = null, string[] mentions = null)
 			=> EditMessage(message?.ChannelId, message?.Id, text, mentions);
-		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Channel channel, string messageId, string text, string[] mentions)
+		public Task EditMessage(Channel channel, string messageId, string text = null, string[] mentions = null)
 			=> EditMessage(channel?.Id, messageId, text, mentions);
-		/// <summary> Edits a message the provided message, mentioning certain users. </summary>
+		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public async Task EditMessage(string channelId, string messageId, string text, string[] mentions)
+		public async Task EditMessage(string channelId, string messageId, string text = null, string[] mentions = null)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
 
-			if (text.Length > DiscordAPIClient.MaxMessageSize)
-				text = text.Substring(0, DiscordAPIClient.MaxMessageSize);
+			if (text != null && text.Length > MaxMessageSize)
+				text = text.Substring(0, MaxMessageSize);
 
 			var model = await _api.EditMessage(messageId, channelId, text, mentions).ConfigureAwait(false);
 			var msg = _messages[messageId];
@@ -382,19 +389,6 @@ namespace Discord
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
-		}
-		
-		/// <summary> Sends a file to the provided channel. </summary>
-		public Task SendFile(Channel channel, string filePath)
-			=> SendFile(channel?.Id, filePath);
-		/// <summary> Sends a file to the provided channel. </summary>
-		public Task SendFile(string channelId, string filePath)
-		{
-			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
-
-			return _api.SendFile(channelId, filePath);
 		}
 
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
@@ -449,113 +443,6 @@ namespace Discord
 			return null;
 		}
 
-		//Roles
-		/// <summary>Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task CreateRole(Server server)
-			=> CreateRole(server?.Id);
-		/// <summary>Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task CreateRole(string serverId)
-		{
-			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
-
-			return _api.CreateRole(serverId);
-		}
-
-		public Task RenameRole(Role role, string newName)
-			=> RenameRole(role?.ServerId, role?.Id, newName);
-        public Task RenameRole(string serverId, string roleId, string newName)
-		{
-			CheckReady();
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
-			if (newName == null) throw new NullReferenceException(nameof(newName));
-
-			return _api.RenameRole(serverId, roleId, newName);
-		}
-
-		public Task DeleteRole(Role role)
-			=> DeleteRole(role?.ServerId, role?.Id);
-		public Task DeleteRole(string serverId, string roleId)
-		{
-			CheckReady();
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
-
-			return _api.DeleteRole(serverId, roleId);
-		}
-
-		public Task AddRoleMember(Role role, string serverId, string userId)
-			=> AddRoleMember(role?.Id, GetMember(serverId, userId));
-		public Task AddRoleMember(Role role, string serverId, User user)
-			=> AddRoleMember(role?.Id, GetMember(serverId, user));
-		public Task AddRoleMember(Role role, Server server, string userId)
-			=> AddRoleMember(role?.Id, GetMember(server, userId));
-		public Task AddRoleMember(Role role, Server server, User user)
-			=> AddRoleMember(role?.Id, GetMember(server, user));
-		public Task AddRoleMember(Role role, Member member)
-			=> AddRoleMember(role?.Id, member);
-        public Task AddRoleMember(string roleId, string serverId, string userId)
-			=> AddRoleMember(roleId, GetMember(serverId, userId));
-        public Task AddRoleMember(string roleId, string serverId, User user)
-			=> AddRoleMember(roleId, GetMember(serverId, user));
-		public Task AddRoleMember(string roleId, Server server, string userId)
-			=> AddRoleMember(roleId, GetMember(server, userId));
-		public Task AddRoleMember(string roleId, Server server, User user)
-			=> AddRoleMember(roleId, GetMember(server, user));
-        public Task AddRoleMember(string roleId, Member member)
-		{
-			CheckReady();
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
-			if (member == null) throw new NullReferenceException(nameof(member));
-
-			if (!member.RoleIds.Contains(roleId))
-			{
-				var oldRoles = member.RoleIds;
-                string[] newRoles = new string[oldRoles.Length + 1];
-				for (int i = 0; i < oldRoles.Length; i++)
-					newRoles[i] = oldRoles[i];
-				return _api.SetMemberRoles(member.ServerId, member.UserId, newRoles);
-			}
-			return TaskHelper.CompletedTask;
-		}
-
-		public Task RemoveRoleMember(Role role, string serverId, string userId)
-			=> RemoveRoleMember(role?.Id, GetMember(serverId, userId));
-		public Task RemoveRoleMember(Role role, string serverId, User user)
-			=> RemoveRoleMember(role?.Id, GetMember(serverId, user));
-		public Task RemoveRoleMember(Role role, Server server, string userId)
-			=> RemoveRoleMember(role?.Id, GetMember(server, userId));
-		public Task RemoveRoleMember(Role role, Server server, User user)
-			=> RemoveRoleMember(role?.Id, GetMember(server, user));
-		public Task RemoveRoleMember(Role role, Member member)
-			=> RemoveRoleMember(role?.Id, member);
-		public Task RemoveRoleMember(string roleId, string serverId, string userId)
-			=> RemoveRoleMember(roleId, GetMember(serverId, userId));
-		public Task RemoveRoleMember(string roleId, string serverId, User user)
-			=> RemoveRoleMember(roleId, GetMember(serverId, user));
-		public Task RemoveRoleMember(string roleId, Server server, string userId)
-			=> RemoveRoleMember(roleId, GetMember(server, userId));
-		public Task RemoveRoleMember(string roleId, Server server, User user)
-			=> RemoveRoleMember(roleId, GetMember(server, user));
-		public Task RemoveRoleMember(string roleId, Member member)
-		{
-			CheckReady();
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
-			if (member == null) throw new NullReferenceException(nameof(member));
-
-			if (member.RoleIds.Contains(roleId))
-			{
-				var oldRoles = member.RoleIds;
-				string[] newRoles = new string[oldRoles.Length - 1];
-				for (int i = 0, j = 0; i < oldRoles.Length; i++)
-				{
-					if (oldRoles[i] != roleId)
-						newRoles[j++] = oldRoles[i];
-				}
-				return _api.SetMemberRoles(member.ServerId, member.UserId, newRoles);
-			}
-			return TaskHelper.CompletedTask;
-		}
-
 		//Permissions
 		public Task SetChannelUserPermissions(Channel channel, Member member, PackedPermissions allow, PackedPermissions deny)
 			=> SetChannelPermissions(channel?.Id, member?.UserId, "member", allow, deny);
@@ -585,7 +472,7 @@ namespace Discord
 			if (channelId == null) throw new NullReferenceException(nameof(channelId));
 			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
 
-			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow, deny);
+			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow.RawValue, deny.RawValue);
 			//TODO: Remove permission from cache
 		}
 
@@ -625,128 +512,90 @@ namespace Discord
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
-		//Voice
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Mute(Member member)
-			=> Mute(member?.ServerId, member?.UserId);
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Mute(Server server, User user)
-			=> Mute(server?.Id, user?.Id);
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Mute(Server server, string userId)
-			=> Mute(server?.Id, userId);
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Mute(string server, User user)
-			=> Mute(server, user?.Id);
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Mute(string serverId, string userId)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			return _api.Mute(serverId, userId);
-		}
-
-		/// <summary> Mutes a user on the provided server. </summary>
-		public Task Unmute(Member member)
-			=> Unmute(member?.ServerId, member?.UserId);
-		/// <summary> Unmutes a user on the provided server. </summary>
-		public Task Unmute(Server server, User user)
-			=> Unmute(server?.Id, user?.Id);
-		/// <summary> Unmutes a user on the provided server. </summary>
-		public Task Unmute(Server server, string userId)
-			=> Unmute(server?.Id, userId);
-		/// <summary> Unmutes a user on the provided server. </summary>
-		public Task Unmute(string server, User user)
-			=> Unmute(server, user?.Id);
-		/// <summary> Unmutes a user on the provided server. </summary>
-		public Task Unmute(string serverId, string userId)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			return _api.Unmute(serverId, userId);
-		}
-
-		/// <summary> Deafens a user on the provided server. </summary>
-		public Task Deafen(Member member)
-			=> Deafen(member?.ServerId, member?.UserId);
-		/// <summary> Deafens a user on the provided server. </summary>
-		public Task Deafen(Server server, User user)
-			=> Deafen(server?.Id, user?.Id);
-		/// <summary> Deafens a user on the provided server. </summary>
-		public Task Deafen(Server server, string userId)
-			=> Deafen(server?.Id, userId);
-		/// <summary> Deafens a user on the provided server. </summary>
-		public Task Deafen(string server, User user)
-			=> Deafen(server, user?.Id);
-		/// <summary> Deafens a user on the provided server. </summary>
-		public Task Deafen(string serverId, string userId)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			return _api.Deafen(serverId, userId);
-		}
-
-		/// <summary> Undeafens a user on the provided server. </summary>
-		public Task Undeafen(Member member)
-			=> Undeafen(member?.ServerId, member?.UserId);
-		/// <summary> Undeafens a user on the provided server. </summary>
-		public Task Undeafen(Server server, User user)
-			=> Undeafen(server?.Id, user?.Id);
-		/// <summary> Undeafens a user on the provided server. </summary>
-		public Task Undeafen(Server server, string userId)
-			=> Undeafen(server?.Id, userId);
-		/// <summary> Undeafens a user on the provided server. </summary>
-		public Task Undeafen(string server, User user)
-			=> Undeafen(server, user?.Id);
-		/// <summary> Undeafens a user on the provided server. </summary>
-		public Task Undeafen(string serverId, string userId)
-		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			return _api.Undeafen(serverId, userId);
-		}
-
 		//Profile
-		/// <summary> Changes your username to newName. </summary>
-		public async Task ChangeUsername(string newName, string currentEmail, string currentPassword)
+		public Task<EditProfileResponse> EditProfile(string currentPassword,
+			string username = null, string email = null, string password = null,
+			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
 		{
-			CheckReady();
-			var response = await _api.ChangeUsername(newName, currentEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
-			foreach (var membership in _currentUser.Memberships)
-				membership.Update(response);
-		}
-		/// <summary> Changes your email to newEmail. </summary>
-		public async Task ChangeEmail(string newEmail, string currentPassword)
-		{
-			CheckReady();
-			var response = await _api.ChangeEmail(newEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
-		}
-		/// <summary> Changes your password to newPassword. </summary>
-		public async Task ChangePassword(string newPassword, string currentEmail, string currentPassword)
-		{
-			CheckReady();
-			await _api.ChangePassword(newPassword, currentEmail, currentPassword).ConfigureAwait(false);
+			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
+
+			return _api.EditProfile(currentPassword, username: username, email: email, password: password,
+				avatarType: avatarType, avatar: avatar);
 		}
 
-		/// <summary> Changes your avatar. </summary>
-		/// <remarks>Only supports PNG and JPEG (see AvatarImageType)</remarks>
-		public async Task ChangeAvatar(AvatarImageType imageType, byte[] bytes, string currentEmail, string currentPassword)
+		//Roles
+		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
+		public Task CreateRole(Server server)
+			=> CreateRole(server?.Id);
+		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
+		public Task CreateRole(string serverId)
 		{
 			CheckReady();
-			var response = await _api.ChangeAvatar(imageType, bytes, currentEmail, currentPassword).ConfigureAwait(false);
-			_currentUser.Update(response);
-			foreach (var membership in _currentUser.Memberships)
-				membership.Update(response);
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+
+			return _api.CreateRole(serverId);
+		}
+
+		public Task EditRole(Role role, string newName)
+			=> EditRole(role?.ServerId, role?.Id, newName);
+		public Task EditRole(string serverId, string roleId, string name = null, PackedPermissions permissions = null)
+		{
+			CheckReady();
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+
+			return _api.EditRole(serverId, roleId, name: name, permissions: permissions?.RawValue);
+		}
+
+		public Task DeleteRole(Role role)
+			=> DeleteRole(role?.ServerId, role?.Id);
+		public Task DeleteRole(string serverId, string roleId)
+		{
+			CheckReady();
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+
+			return _api.DeleteRole(serverId, roleId);
+		}
+
+		//Servers
+		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
+		public async Task<Server> CreateServer(string name, string region)
+		{
+			CheckReady();
+			if (name == null) throw new ArgumentNullException(nameof(name));
+			if (region == null) throw new ArgumentNullException(nameof(region));
+
+			var response = await _api.CreateServer(name, region).ConfigureAwait(false);
+			var server = _servers.GetOrAdd(response.Id);
+			server.Update(response);
+			return server;
+		}
+
+		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
+		public Task EditServer(Server server)
+			=> EditServer(server?.Id);
+		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
+		public Task EditServer(string serverId, string name = null, string region = null)
+		{
+			CheckReady();
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			return _api.EditServer(serverId, name: name, region: region);
+		}
+
+		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
+		public Task<Server> LeaveServer(Server server)
+			=> LeaveServer(server?.Id);
+		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
+		public async Task<Server> LeaveServer(string serverId)
+		{
+			CheckReady();
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			try { await _api.LeaveServer(serverId).ConfigureAwait(false); }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+			return _servers.TryRemove(serverId);
 		}
 	}
 }

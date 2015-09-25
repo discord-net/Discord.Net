@@ -1,4 +1,5 @@
 ﻿using Discord.Helpers;
+using Discord.WebSockets;
 using System;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace Discord
 		{
 			CheckReady(checkVoice: true);
 
-			if (_voiceSocket.State != Net.WebSockets.WebSocketState.Disconnected)
+			if (_voiceSocket.State != WebSocketState.Disconnected)
 			{
 				var serverId = _voiceSocket.CurrentVoiceServerId;
 				if (serverId != null)

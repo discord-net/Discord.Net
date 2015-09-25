@@ -1,5 +1,4 @@
-﻿using Discord.Net.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -100,7 +99,7 @@ namespace Discord
 			_roles = new ConcurrentDictionary<string, bool>();
 		}
 
-		internal void Update(GuildInfo model)
+		internal void Update(API.GuildInfo model)
 		{
 			AFKChannelId = model.AFKChannelId;
 			AFKTimeout = model.AFKTimeout;
@@ -117,9 +116,9 @@ namespace Discord
 				role.Update(subModel);
 			}
 		}
-		internal void Update(ExtendedGuildInfo model)
+		internal void Update(API.ExtendedGuildInfo model)
 		{
-			Update(model as GuildInfo);
+			Update(model as API.GuildInfo);
 
 			var channels = _client.Channels;
 			foreach (var subModel in model.Channels)

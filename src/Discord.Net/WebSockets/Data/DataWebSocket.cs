@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.WebSockets
+namespace Discord.WebSockets.Data
 {
     internal partial class DataWebSocket : WebSocket
     {
@@ -22,7 +21,7 @@ namespace Discord.Net.WebSockets
 		{
 			await Connect().ConfigureAwait(false);
 			
-			Commands.Login msg = new Commands.Login();
+			LoginCommand msg = new LoginCommand();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			QueueMessage(msg);
@@ -32,7 +31,7 @@ namespace Discord.Net.WebSockets
 			await DisconnectInternal(isUnexpected: false).ConfigureAwait(false);
 			await Connect().ConfigureAwait(false);
 
-			var resumeMsg = new Commands.Resume();
+			var resumeMsg = new ResumeCommand();
 			resumeMsg.Payload.SessionId = _sessionId;
 			resumeMsg.Payload.Sequence = _lastSeq;
 			QueueMessage(resumeMsg);
@@ -75,16 +74,16 @@ namespace Discord.Net.WebSockets
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
 						{
-							var payload = token.ToObject<Events.Ready>();
+							var payload = token.ToObject<ReadyEvent>();
 							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
-							QueueMessage(new Commands.UpdateStatus());
+							QueueMessage(new UpdateStatusCommand());
 						}
 						else if (msg.Type == "RESUMED")
 						{
-							var payload = token.ToObject<Events.Resumed>();
+							var payload = token.ToObject<ResumedEvent>();
 							_heartbeatInterval = payload.HeartbeatInterval;
-							QueueMessage(new Commands.UpdateStatus());
+							QueueMessage(new UpdateStatusCommand());
 						}
 						RaiseReceivedEvent(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
@@ -93,7 +92,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 7: //Redirect
 					{
-						var payload = (msg.Payload as JToken).ToObject<Events.Redirect>();
+						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>();
 						Host = payload.Url;
 						if (_logLevel >= LogMessageSeverity.Info)
 							RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
@@ -109,19 +108,19 @@ namespace Discord.Net.WebSockets
 
 		protected override object GetKeepAlive()
 		{
-			return new Commands.KeepAlive();
+			return new KeepAliveCommand();
 		}
 
 		public void SendJoinVoice(string serverId, string channelId)
 		{
-			var joinVoice = new Commands.JoinVoice();
+			var joinVoice = new JoinVoiceCommand();
 			joinVoice.Payload.ServerId = serverId;
 			joinVoice.Payload.ChannelId = channelId;
 			QueueMessage(joinVoice);
 		}
 		public void SendLeaveVoice(string serverId)
 		{
-			var leaveVoice = new Commands.JoinVoice();
+			var leaveVoice = new JoinVoiceCommand();
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}

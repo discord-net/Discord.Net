@@ -2,6 +2,7 @@
 
 namespace Discord.Commands
 {
+	//TODO: Check support for escaping
 	public static class CommandParser
 	{
 		private enum CommandParserPart
