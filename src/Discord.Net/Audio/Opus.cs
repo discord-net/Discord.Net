@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Discord.Audio
 {
-	internal unsafe class Opus
+	internal static unsafe class Opus
 	{
 		[DllImport("lib/opus", EntryPoint = "opus_encoder_create", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr CreateEncoder(int Fs, int channels, int application, out Error error);

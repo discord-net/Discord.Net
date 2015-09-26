@@ -33,7 +33,7 @@ namespace Discord.WebSockets.Voice
 		private byte[] _secretKey;
 		private ushort _sequence;
 		private byte[] _encodingBuffer;
-		private string _serverId, _userId, _sessionId, _token;
+		private string _serverId, _userId, _sessionId, _token, _encryptionMode;
 
 #if USE_THREAD
 		private Thread _sendThread;
@@ -213,12 +213,18 @@ namespace Discord.WebSockets.Voice
 					Stopwatch sw = Stopwatch.StartNew();
 
 					byte[] rtpPacket = new byte[_encodingBuffer.Length + 12];
+					byte[] nonce = null;
 					rtpPacket[0] = 0x80; //Flags;
 					rtpPacket[1] = 0x78; //Payload Type
 					rtpPacket[8] = (byte)((_ssrc >> 24) & 0xFF);
 					rtpPacket[9] = (byte)((_ssrc >> 16) & 0xFF);
 					rtpPacket[10] = (byte)((_ssrc >> 8) & 0xFF);
 					rtpPacket[11] = (byte)((_ssrc >> 0) & 0xFF);
+					if (_isEncrypted)
+					{
+						nonce = new byte[24];
+						Buffer.BlockCopy(rtpPacket, 0, nonce, 0, 12);
+					}
 
 					while (!cancelToken.IsCancellationRequested)
 					{
@@ -238,6 +244,13 @@ namespace Discord.WebSockets.Voice
 										rtpPacket[5] = (byte)((timestamp >> 16) & 0xFF);
 										rtpPacket[6] = (byte)((timestamp >> 8) & 0xFF);
 										rtpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
+										if (_isEncrypted)
+										{
+											Buffer.BlockCopy(rtpPacket, 2, nonce, 2, 6); //Update nonce
+											int ret = Sodium.Encrypt(packet, packet.Length, packet, nonce, _secretKey);
+											if (ret != 0)
+												continue;
+                                        }
 										Buffer.BlockCopy(packet, 0, rtpPacket, 12, packet.Length);
 #if USE_THREAD
 										_udp.Send(rtpPacket, packet.Length + 12);
@@ -298,8 +311,22 @@ namespace Discord.WebSockets.Voice
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
-							//_mode = payload.Modes.LastOrDefault();
-							_isEncrypted = !payload.Modes.Contains("plain");
+							
+							if (_client.Config.EnableVoiceEncryption)
+							{
+								if (payload.Modes.Contains(EncryptedMode))
+								{
+									_encryptionMode = EncryptedMode;
+									_isEncrypted = true;
+								}
+								else
+									throw new InvalidOperationException("Unexpected encryption format.");
+							}
+							else
+							{
+								_encryptionMode = UnencryptedMode;
+								_isEncrypted = false;
+                            }
                             _udp.Connect(_endpoint);
 
 							_sequence = (ushort)_rand.Next(0, ushort.MaxValue);
@@ -361,7 +388,7 @@ namespace Discord.WebSockets.Voice
 					var login2 = new Login2Command();
 					login2.Payload.Protocol = "udp";
 					login2.Payload.SocketData.Address = ip;
-					login2.Payload.SocketData.Mode = _isEncrypted ? EncryptedMode : UnencryptedMode;
+					login2.Payload.SocketData.Mode = _encryptionMode;
                     login2.Payload.SocketData.Port = port;
 					QueueMessage(login2);
 				}

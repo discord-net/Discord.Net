@@ -4,7 +4,7 @@ namespace Discord
 {
 	public class DiscordClientConfig
 	{
-		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to verbose will hinder performance but should help investigate any internal issues. </summary>
+		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
 		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
 		private LogMessageSeverity _logLevel = LogMessageSeverity.Info;
 
@@ -36,8 +36,12 @@ namespace Discord
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the opus .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoice { get { return _enableVoice; } set { SetValue(ref _enableVoice, value); } }
 		private bool _enableVoice = false;
+		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
+		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
+		private bool _enableVoiceEncryption = false;
 #else
 		internal bool EnableVoice => false;
+		internal bool EnableVoiceEncryption => false;
 #endif
 		/// <summary> (Experimental) Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
 		public bool UseMessageQueue { get { return _useMessageQueue; } set { SetValue(ref _useMessageQueue, value); } }
