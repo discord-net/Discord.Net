@@ -21,5 +21,12 @@ namespace Discord.WebSockets.Voice
 			if (IsSpeaking != null)
 				IsSpeaking(this, new IsTalkingEventArgs(userId, isSpeaking));
 		}
+
+		public event EventHandler<VoicePacketEventArgs> OnPacket;
+		internal void RaiseOnPacket(string userId, string channelId, byte[] buffer, int offset, int count)
+		{
+			if (OnPacket != null)
+				OnPacket(this, new VoicePacketEventArgs(userId, channelId, buffer, offset, count));
+		}
 	}
 }

@@ -3,21 +3,21 @@ using System.Runtime.InteropServices;
 
 namespace Discord.Audio
 {
-	internal static unsafe class Opus
+	internal unsafe static class Opus
 	{
 		[DllImport("lib/opus", EntryPoint = "opus_encoder_create", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr CreateEncoder(int Fs, int channels, int application, out Error error);
 		[DllImport("lib/opus", EntryPoint = "opus_encoder_destroy", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void DestroyEncoder(IntPtr encoder);
 		[DllImport("lib/opus", EntryPoint = "opus_encode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int Encode(IntPtr st, byte* pcm, int frame_size, byte* data, int max_data_bytes);
+		public static extern int Encode(IntPtr st, byte* pcm, int frame_size, byte[] data, int max_data_bytes);
 
-		/*[DllImport("lib/opus", EntryPoint = "opus_decoder_create", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr CreateDecoder(int Fs, int channels, out Errors error);
+		[DllImport("lib/opus", EntryPoint = "opus_decoder_create", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr CreateDecoder(int Fs, int channels, out Error error);
 		[DllImport("lib/opus", EntryPoint = "opus_decoder_destroy", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void DestroyDecoder(IntPtr decoder);
 		[DllImport("lib/opus", EntryPoint = "opus_decode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int Decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size, int decode_fec);*/
+		public static extern int Decode(IntPtr st, byte* data, int len, byte[] pcm, int frame_size, int decode_fec);
 
 		[DllImport("lib/opus", EntryPoint = "opus_encoder_ctl", CallingConvention = CallingConvention.Cdecl)]
 		public static extern int EncoderCtl(IntPtr st, Ctl request, int value);

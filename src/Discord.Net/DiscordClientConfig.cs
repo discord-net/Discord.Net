@@ -2,6 +2,15 @@
 
 namespace Discord
 {
+	[Flags]
+	public enum DiscordVoiceMode
+	{
+		Disabled = 0x00,
+		Incoming = 0x01,
+		Outgoing = 0x02,
+		Both = Outgoing | Incoming
+	}
+
 	public class DiscordClientConfig
 	{
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
@@ -33,15 +42,19 @@ namespace Discord
 
 		//Experimental Features
 #if !DNXCORE50
-		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the opus .dll or .so be in the local lib/ folder. </summary>
-		public bool EnableVoice { get { return _enableVoice; } set { SetValue(ref _enableVoice, value); } }
-		private bool _enableVoice = false;
+		/// <summary> (Experimental) Enables the voice websocket and UDP client and specifies how it will be used. Any option other than Disabled requires the opus .dll or .so be in the local lib/ folder. </summary>
+		public DiscordVoiceMode VoiceMode { get { return _voiceMode; } set { SetValue(ref _voiceMode, value); } }
+		private DiscordVoiceMode _voiceMode = DiscordVoiceMode.Disabled;
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
-		private bool _enableVoiceEncryption = false;
+		private bool _enableVoiceEncryption = true;
+		/// <summary> (Experimental) Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server). </summary>
+		public bool EnableVoiceMultiserver { get { return _enableVoiceMultiserver; } set { SetValue(ref _enableVoiceMultiserver, value); } }
+		private bool _enableVoiceMultiserver = false;
 #else
-		internal bool EnableVoice => false;
+		internal DiscordVoiceMode VoiceMode => DiscordVoiceMode.Disabled;
 		internal bool EnableVoiceEncryption => false;
+		internal bool EnableVoiceMultiserver => false;
 #endif
 		/// <summary> (Experimental) Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
 		public bool UseMessageQueue { get { return _useMessageQueue; } set { SetValue(ref _useMessageQueue, value); } }

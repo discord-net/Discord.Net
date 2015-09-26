@@ -28,8 +28,8 @@ namespace Discord
 
 		internal DisconnectedEventArgs(bool wasUnexpected, Exception error) 
 		{ 
-			this.WasUnexpected = wasUnexpected; 
-			this.Error = error; 
+			WasUnexpected = wasUnexpected; 
+			Error = error; 
 		}
 	}
 	public sealed class LogMessageEventArgs : EventArgs
@@ -40,9 +40,9 @@ namespace Discord
 
 		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) 
 		{ 
-			this.Severity = severity; 
-			this.Source = source; 
-			this.Message = msg; 
+			Severity = severity; 
+			Source = source; 
+			Message = msg; 
 		}
 	}
 
@@ -51,7 +51,7 @@ namespace Discord
 		public Server Server { get; }
 		public string ServerId => Server.Id;
 
-		internal ServerEventArgs(Server server) { this.Server = server; }
+		internal ServerEventArgs(Server server) { Server = server; }
 	}
 	public sealed class ChannelEventArgs : EventArgs
 	{
@@ -60,14 +60,14 @@ namespace Discord
 		public Server Server => Channel.Server;
 		public string ServerId => Channel.ServerId;
 
-		internal ChannelEventArgs(Channel channel) { this.Channel = channel; }
+		internal ChannelEventArgs(Channel channel) { Channel = channel; }
 	}
 	public sealed class UserEventArgs : EventArgs
 	{
 		public User User { get; }
 		public string UserId => User.Id;
 
-		internal UserEventArgs(User user) { this.User = user; }
+		internal UserEventArgs(User user) { User = user; }
 	}
 	public sealed class MessageEventArgs : EventArgs
 	{
@@ -81,7 +81,7 @@ namespace Discord
 		public User User => Member.User;
 		public string UserId => Message.UserId;
 
-		internal MessageEventArgs(Message msg) { this.Message = msg; }
+		internal MessageEventArgs(Message msg) { Message = msg; }
 	}
 	public sealed class RoleEventArgs : EventArgs
 	{
@@ -90,7 +90,7 @@ namespace Discord
 		public Server Server => Role.Server;
 		public string ServerId => Role.ServerId;
 
-		internal RoleEventArgs(Role role) { this.Role = role; }
+		internal RoleEventArgs(Role role) { Role = role; }
 	}
 	public sealed class BanEventArgs : EventArgs
 	{
@@ -101,9 +101,9 @@ namespace Discord
 
 		internal BanEventArgs(User user, string userId, Server server)
 		{
-			this.User = user;
-			this.UserId = userId;
-			this.Server = server;
+			User = user;
+			UserId = userId;
+			Server = server;
 		}
 	}
 	public sealed class MemberEventArgs : EventArgs
@@ -114,7 +114,7 @@ namespace Discord
 		public Server Server => Member.Server;
 		public string ServerId => Member.ServerId;
 
-		internal MemberEventArgs(Member member) { this.Member = member; }
+		internal MemberEventArgs(Member member) { Member = member; }
 	}
 	public sealed class UserTypingEventArgs : EventArgs
 	{
@@ -127,8 +127,8 @@ namespace Discord
 
 		internal UserTypingEventArgs(User user, Channel channel)
 		{
-			this.User = user;
-			this.Channel = channel;
+			User = user;
+			Channel = channel;
         }
 	}
 	public sealed class UserIsSpeakingEventArgs : EventArgs
@@ -144,9 +144,25 @@ namespace Discord
 
 		internal UserIsSpeakingEventArgs(Member member, bool isSpeaking)
 		{
-			this.Member = member;
-			this.IsSpeaking = isSpeaking;
+			Member = member;
+			IsSpeaking = isSpeaking;
 		}
+	}
+	public sealed class VoicePacketEventArgs
+	{
+		public string UserId { get; }
+		public string ChannelId { get; }
+		public byte[] Buffer { get; }
+		public int Offset { get; }
+		public int Count { get; }
+
+		internal VoicePacketEventArgs(string userId, string channelId, byte[] buffer, int offset, int count)
+		{
+			UserId = userId;
+			Buffer = buffer;
+			Offset = offset;
+			Count = count;
+        }
 	}
 
 	public partial class DiscordClient
@@ -339,6 +355,13 @@ namespace Discord
 		{
 			if (VoiceDisconnected != null)
 				RaiseEvent(nameof(UserIsSpeaking), () => VoiceDisconnected(this, e));
+		}
+
+		public event EventHandler<VoicePacketEventArgs> OnVoicePacket;
+		internal void RaiseOnVoicePacket(VoicePacketEventArgs e)
+		{
+			if (OnVoicePacket != null)
+				OnVoicePacket(this, e);
 		}
 	}
 }

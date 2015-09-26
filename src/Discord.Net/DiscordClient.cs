@@ -45,10 +45,8 @@ namespace Discord
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
         private User _currentUser;
-		/// <summary> Returns the id of the server this user is currently connected to for voice. </summary>
-		public string CurrentVoiceServerId => _voiceSocket.CurrentVoiceServerId;
 		/// <summary> Returns the server this user is currently connected to for voice. </summary>
-		public Server CurrentVoiceServer => _servers[_voiceSocket.CurrentVoiceServerId];
+		public Server CurrentVoiceServer => _voiceSocket.CurrentVoiceServer;
 
 		/// <summary> Returns the current connection state of this client. </summary>
 		public DiscordClientState State => (DiscordClientState)_state;
@@ -103,7 +101,7 @@ namespace Discord
 				if (e.WasUnexpected)
 					await _dataSocket.Reconnect(_token);
 			};
-			if (_config.EnableVoice)
+			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 			{
 				_voiceSocket = new VoiceWebSocket(this);
 				_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
@@ -125,7 +123,7 @@ namespace Discord
 				{
 					if (_voiceSocket.State == WebSocketState.Connected)
 					{
-						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServerId];
+						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServer.Id];
 						bool value = e.IsSpeaking;
                         if (member.IsSpeaking != value)
 						{
@@ -147,14 +145,14 @@ namespace Discord
 			_users = new Users(this, cacheLock);
 
 			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
-			if (_config.EnableVoice)
+			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
 				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 				//_dataSocket.ReceivedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Received {e.Type}");
-				if (_config.EnableVoice)
+				if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 				{
 					_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
 					_voiceSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
@@ -535,28 +533,6 @@ namespace Discord
 							}
 						}
 						break;
-					case "VOICE_STATE_UPDATE":
-						{
-							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
-							var member = _members[data.UserId, data.GuildId];
-							/*if (_config.TrackActivity)
-							{
-								var user = _users[data.User.Id];
-								if (user != null)
-									user.UpdateActivity(DateTime.UtcNow);
-							}*/
-							if (member != null)
-							{
-								member.Update(data);
-								if (member.IsSpeaking)
-								{
-									member.IsSpeaking = false;
-									RaiseUserIsSpeaking(member, false);
-								}
-								RaiseUserVoiceStateUpdated(member);
-							}
-						}
-						break;
 					case "TYPING_START":
 						{
 							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
@@ -586,13 +562,35 @@ namespace Discord
 						break;
 
 					//Voice
+					case "VOICE_STATE_UPDATE":
+						{
+							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
+							var member = _members[data.UserId, data.GuildId];
+							/*if (_config.TrackActivity)
+							{
+								var user = _users[data.User.Id];
+								if (user != null)
+									user.UpdateActivity(DateTime.UtcNow);
+							}*/
+							if (member != null)
+							{
+								member.Update(data);
+								if (member.IsSpeaking)
+								{
+									member.IsSpeaking = false;
+									RaiseUserIsSpeaking(member, false);
+								}
+								RaiseUserVoiceStateUpdated(member);
+							}
+						}
+						break;
 					case "VOICE_SERVER_UPDATE":
 						{
 							var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
-							if (data.GuildId == _voiceSocket.CurrentVoiceServerId)
+							if (data.GuildId == _voiceSocket.CurrentVoiceServer.Id)
 							{
 								var server = _servers[data.GuildId];
-								if (_config.EnableVoice)
+								if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 								{
 									_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
 									await _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
@@ -770,7 +768,7 @@ namespace Discord
 			_wasDisconnectUnexpected = false;
 
 			await _dataSocket.Disconnect().ConfigureAwait(false);
-			if (_config.EnableVoice)
+			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 
 			if (_config.UseMessageQueue)
@@ -817,7 +815,7 @@ namespace Discord
 					throw new InvalidOperationException("The client is connecting.");
 			}
 			
-			if (checkVoice && !_config.EnableVoice)
+			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		private void RaiseEvent(string name, Action action)

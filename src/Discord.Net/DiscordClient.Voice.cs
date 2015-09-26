@@ -8,25 +8,26 @@ namespace Discord
     public partial class DiscordClient
 	{
         public Task JoinVoiceServer(Channel channel)
-			=> JoinVoiceServer(channel.ServerId, channel.Id);
-		public async Task JoinVoiceServer(string serverId, string channelId)
+			=> JoinVoiceServer(channel?.Server, channel);
+		public Task JoinVoiceServer(string serverId, string channelId)
+			=> JoinVoiceServer(_servers[serverId], _channels[channelId]);
+		public Task JoinVoiceServer(Server server, string channelId)
+			=> JoinVoiceServer(server, _channels[channelId]);
+		private async Task JoinVoiceServer(Server server, Channel channel)
 		{
 			CheckReady(checkVoice: true);
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
 			await LeaveVoiceServer().ConfigureAwait(false);
+			_voiceSocket.SetChannel(server, channel);
+			_dataSocket.SendJoinVoice(server.Id, channel.Id);
 
 			try
 			{
-				await Task.Run(() =>
-				{
-					_voiceSocket.SetServer(serverId);
-					_dataSocket.SendJoinVoice(serverId, channelId);
-					_voiceSocket.WaitForConnection();
-				})
-				.Timeout(_config.ConnectionTimeout)
-				.ConfigureAwait(false);
+				await Task.Run(() =>  _voiceSocket.WaitForConnection())
+					.Timeout(_config.ConnectionTimeout)
+					.ConfigureAwait(false);
 			}
 			catch (TaskCanceledException)
 			{
@@ -39,11 +40,11 @@ namespace Discord
 
 			if (_voiceSocket.State != WebSocketState.Disconnected)
 			{
-				var serverId = _voiceSocket.CurrentVoiceServerId;
-				if (serverId != null)
+				var server = _voiceSocket.CurrentVoiceServer;
+				if (server != null)
 				{
 					await _voiceSocket.Disconnect().ConfigureAwait(false);
-					_dataSocket.SendLeaveVoice(serverId);
+					_dataSocket.SendLeaveVoice(server.Id);
 				}
 			}
 		}

@@ -88,9 +88,9 @@ namespace Discord.WebSockets
 					_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken).Token;
 				else
 					_cancelToken = _cancelTokenSource.Token;
-				
-				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
+
 				_lastHeartbeat = DateTime.UtcNow;
+				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
 
 				_state = (int)WebSocketState.Connecting;
 				_runTask = RunTasks();

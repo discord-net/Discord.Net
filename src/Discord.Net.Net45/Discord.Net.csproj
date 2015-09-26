@@ -103,6 +103,9 @@
     <Compile Include="..\Discord.Net\Audio\Opus.cs">
       <Link>Audio\Opus.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Audio\OpusDecoder.cs">
+      <Link>Audio\OpusDecoder.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Audio\OpusEncoder.cs">
       <Link>Audio\OpusEncoder.cs</Link>
     </Compile>

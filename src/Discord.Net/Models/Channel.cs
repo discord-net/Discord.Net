@@ -17,6 +17,7 @@ namespace Discord
 
 		private readonly DiscordClient _client;
 		private ConcurrentDictionary<string, bool> _messages;
+		private ConcurrentDictionary<uint, string> _ssrcMapping;
 
 		/// <summary> Returns the unique identifier for this channel. </summary>
 		public string Id { get; }
@@ -69,6 +70,8 @@ namespace Discord
 		{
 			Name = model.Name;
 			Type = model.Type;
+			if (Type == ChannelTypes.Voice && _ssrcMapping == null)
+				_ssrcMapping = new ConcurrentDictionary<uint, string>();
 		}
 		internal void Update(API.ChannelInfo model)
 		{
@@ -100,6 +103,13 @@ namespace Discord
 		{
 			bool ignored;
 			return _messages.TryRemove(messageId, out ignored);
+		}
+
+		internal string GetUserId(uint ssrc)
+		{
+			string userId = null;
+			_ssrcMapping.TryGetValue(ssrc, out userId);
+			return userId;
 		}
 	}
 }
