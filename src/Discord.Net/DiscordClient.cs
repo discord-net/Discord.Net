@@ -634,6 +634,10 @@ namespace Discord
 			if (_state != (int)DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
 
+			_cancelTokenSource = new CancellationTokenSource();
+			_cancelToken = _cancelTokenSource.Token;
+			_api.CancelToken = _cancelToken;
+
 			await ConnectInternal(token)
 				.Timeout(_config.ConnectionTimeout)
 				.ConfigureAwait(false);
@@ -644,6 +648,10 @@ namespace Discord
 		{
 			if (_state != (int)DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
+
+			_cancelTokenSource = new CancellationTokenSource();
+			_cancelToken = _cancelTokenSource.Token;
+			_api.CancelToken = _cancelToken;
 
 			string token;
 			try
@@ -664,10 +672,7 @@ namespace Discord
 			try
 			{
 				_disconnectedEvent.Reset();
-				_cancelTokenSource = new CancellationTokenSource();
-				_cancelToken = _cancelTokenSource.Token;
 				_api.Token = token;
-				_api.CancelToken = _cancelToken;
 				_token = token;
 				_state = (int)DiscordClientState.Connecting;
 				
