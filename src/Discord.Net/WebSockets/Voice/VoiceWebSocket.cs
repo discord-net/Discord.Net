@@ -102,7 +102,7 @@ namespace Discord.WebSockets.Voice
 			_isClearing = false;
 			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
-#if !DNX451
+#if !DNX451 && !__MonoCS__
 			_udp.AllowNatTraversal(true);
 #endif
 			
