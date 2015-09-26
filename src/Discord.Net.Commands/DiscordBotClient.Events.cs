@@ -21,11 +21,11 @@ namespace Discord
 
 		public CommandEventArgs(Message message, Command command, string commandText, int? permissions, string[] args)
 		{
-			Message = message;
-			Command = command;
-			CommandText = commandText;
-			Permissions = permissions;
-			Args = args;
+			this.Message = message;
+			this.Command = command;
+			this.CommandText = commandText;
+			this.Permissions = permissions;
+			this.Args = args;
 		}
 	}
 	public class CommandErrorEventArgs : CommandEventArgs
@@ -35,7 +35,7 @@ namespace Discord
 		public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
 			: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.Permissions, baseArgs.Args)
 		{
-			Exception = ex;
+			this.Exception = ex;
 		}
 	}
 	public partial class DiscordBotClient : DiscordClient
