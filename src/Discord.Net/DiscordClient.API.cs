@@ -1,5 +1,4 @@
 ﻿using Discord.API;
-using Discord.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +97,7 @@ namespace Discord
 				channel = user.PrivateChannel;
 			if (channel == null)
 			{
-				var response = await _api.CreatePMChannel(_currentUserId, userId).ConfigureAwait(false);
+				var response = await _api.CreatePMChannel(CurrentUserId, userId).ConfigureAwait(false);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 				channel.Update(response);
 			}
@@ -266,13 +265,13 @@ namespace Discord
 				var nonce = GenerateNonce();
 				if (_config.UseMessageQueue)
 				{
-					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _currentUserId);
+					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, CurrentUserId);
 					var currentMember = _members[msg.UserId, channel.ServerId];
                     msg.Update(new API.Message
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
-						Author = new UserReference { Avatar = currentMember.AvatarId, Discriminator = currentMember.Discriminator, Id = _currentUserId, Username = currentMember.Name },
+						Author = new UserReference { Avatar = currentMember.AvatarId, Discriminator = currentMember.Discriminator, Id = CurrentUserId, Username = currentMember.Name },
 						ChannelId = channel.Id,
 						IsTextToSpeech = isTextToSpeech
 					});
@@ -513,13 +512,13 @@ namespace Discord
 		}
 
 		//Profile
-		public Task<EditProfileResponse> EditProfile(string currentPassword,
+		public Task<EditProfileResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 
-			return _api.EditProfile(currentPassword, username: username, email: email, password: password,
+			return _api.EditProfile(currentPassword: currentPassword, username: username, email: email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 

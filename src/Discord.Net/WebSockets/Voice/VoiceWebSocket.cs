@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord.WebSockets.Voice
 {
-    internal partial class VoiceWebSocket : WebSocket
+	internal partial class VoiceWebSocket : WebSocket
 	{
 		private const int MaxOpusSize = 4000;
         private const string EncryptedMode = "xsalsa20_poly1305";
@@ -27,6 +27,7 @@ namespace Discord.WebSockets.Voice
 		private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
 		private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
+		private ConcurrentDictionary<uint, string> _ssrcMapping;
 
 		private ConcurrentQueue<byte[]> _sendQueue;
 		private ManualResetEventSlim _sendQueueWait, _sendQueueEmptyWait;
@@ -35,17 +36,16 @@ namespace Discord.WebSockets.Voice
 		private bool _isClearing, _isEncrypted;
 		private byte[] _secretKey, _encodingBuffer;
 		private ushort _sequence;
-		private string _userId, _sessionId, _token, _encryptionMode;
-		private Server _server;
-		private Channel _channel;
+		private string _serverId, _channelId, _userId, _sessionId, _token, _encryptionMode;
 
 #if USE_THREAD
-		private Thread _sendThread;
+		private Thread _sendThread, _receiveThread;
 #endif
 
-		public Server CurrentVoiceServer => _server;
+		public string CurrentServerId => _serverId;
+		public string CurrentChannelId => _channelId;
 
-		public VoiceWebSocket(DiscordClient client)
+		public VoiceWebSocket(DiscordBaseClient client)
 			: base(client)
 		{
 			_rand = new Random();
@@ -56,12 +56,14 @@ namespace Discord.WebSockets.Voice
 			_sendQueueEmptyWait = new ManualResetEventSlim(true);
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
+			_ssrcMapping = new ConcurrentDictionary<uint, string>();
+			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
         }
 
-		public void SetChannel(Server server, Channel channel)
+		public void SetChannel(string serverId, string channelId)
 		{
-			_server = server;
-			_channel = channel;
+			_serverId = serverId;
+			_channelId = channelId;
         }
 		public async Task Login(string userId, string sessionId, string token, CancellationToken cancelToken)
 		{
@@ -113,7 +115,7 @@ namespace Discord.WebSockets.Voice
 #endif
 			
 			LoginCommand msg = new LoginCommand();
-			msg.Payload.ServerId = _server.Id;
+			msg.Payload.ServerId = _serverId;
 			msg.Payload.SessionId = _sessionId;
 			msg.Payload.Token = _token;
 			msg.Payload.UserId = _userId;
@@ -122,6 +124,8 @@ namespace Discord.WebSockets.Voice
 #if USE_THREAD
 			_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
 			_sendThread.Start();
+			_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
+			_receiveThread.Start();
 #if !DNXCORE50
 			return new Task[] { WatcherAsync() }.Concat(base.Run()).ToArray();
 #else
@@ -141,9 +145,11 @@ namespace Discord.WebSockets.Voice
 		{
 #if USE_THREAD
 			_sendThread.Join();
+			_receiveThread.Join();
 			_sendThread = null;
+			_receiveThread = null;
 #endif
-			
+
 			OpusDecoder decoder;
 			foreach (var pair in _decoders)
 			{
@@ -274,9 +280,9 @@ namespace Discord.WebSockets.Voice
 								/*if (_logLevel >= LogMessageSeverity.Debug)
 									RaiseOnLog(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");*/
 
-								string userId = _channel.GetUserId(ssrc);
-								if (userId != null)
-									RaiseOnPacket(userId, _channel.Id, result, resultOffset, resultLength);
+								string userId;
+								if (_ssrcMapping.TryGetValue(ssrc, out userId))
+									RaiseOnPacket(userId, _channelId, result, resultOffset, resultLength);
 							}
 						}
 #if USE_THREAD || DNXCORE50
@@ -568,9 +574,9 @@ namespace Discord.WebSockets.Voice
 		{
 			_sendQueueEmptyWait.Wait(_cancelToken);
 		}
-		public void WaitForConnection()
+		public void WaitForConnection(CancellationToken cancelToken)
 		{
-			_connectedEvent.Wait();
+			_connectedEvent.Wait(cancelToken);
 		}
 	}
 }

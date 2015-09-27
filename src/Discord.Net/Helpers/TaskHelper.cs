@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord.Helpers
 {
@@ -31,6 +33,30 @@ namespace Discord.Helpers
 				throw new TimeoutException();
 			else
 				return await self.ConfigureAwait(false);
+		}
+		public static async Task Timeout(this Task self, int milliseconds, CancellationTokenSource cancelToken)
+		{
+			try
+			{
+				cancelToken.CancelAfter(milliseconds);
+				await self;
+			}
+			catch (OperationCanceledException)
+			{
+				throw new TimeoutException();
+			}
+		}
+		public static async Task<T> Timeout<T>(this Task<T> self, int milliseconds, CancellationTokenSource cancelToken)
+		{
+			try
+			{
+				cancelToken.CancelAfter(milliseconds);
+				return await self;
+			}
+			catch (OperationCanceledException)
+			{
+				throw new TimeoutException();
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Discord.Helpers;
 using Discord.WebSockets;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -8,30 +9,31 @@ namespace Discord
     public partial class DiscordClient
 	{
         public Task JoinVoiceServer(Channel channel)
-			=> JoinVoiceServer(channel?.Server, channel);
-		public Task JoinVoiceServer(string serverId, string channelId)
-			=> JoinVoiceServer(_servers[serverId], _channels[channelId]);
+			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
 		public Task JoinVoiceServer(Server server, string channelId)
-			=> JoinVoiceServer(server, _channels[channelId]);
-		private async Task JoinVoiceServer(Server server, Channel channel)
+			=> JoinVoiceServer(server?.Id, channelId);
+		public async Task JoinVoiceServer(string serverId, string channelId)
 		{
 			CheckReady(checkVoice: true);
-			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
 			await LeaveVoiceServer().ConfigureAwait(false);
-			_voiceSocket.SetChannel(server, channel);
-			_dataSocket.SendJoinVoice(server.Id, channel.Id);
+			_voiceSocket.SetChannel(serverId, channelId);
+			_dataSocket.SendJoinVoice(serverId, channelId);
 
+			CancellationTokenSource tokenSource = new CancellationTokenSource();
 			try
 			{
-				await Task.Run(() =>  _voiceSocket.WaitForConnection())
-					.Timeout(_config.ConnectionTimeout)
+				await Task.Run(() =>  _voiceSocket.WaitForConnection(tokenSource.Token))
+					.Timeout(_config.ConnectionTimeout, tokenSource)
 					.ConfigureAwait(false);
 			}
-			catch (TaskCanceledException)
+			catch (TimeoutException)
 			{
+				tokenSource.Cancel();
 				await LeaveVoiceServer().ConfigureAwait(false);
+				throw;
 			}
 		}
 		public async Task LeaveVoiceServer()
@@ -40,11 +42,11 @@ namespace Discord
 
 			if (_voiceSocket.State != WebSocketState.Disconnected)
 			{
-				var server = _voiceSocket.CurrentVoiceServer;
-				if (server != null)
+				var serverId = _voiceSocket.CurrentServerId;
+				if (serverId != null)
 				{
 					await _voiceSocket.Disconnect().ConfigureAwait(false);
-					_dataSocket.SendLeaveVoice(server.Id);
+					_dataSocket.SendLeaveVoice(serverId);
 				}
 			}
 		}

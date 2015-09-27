@@ -35,7 +35,7 @@ namespace Discord.WebSockets
 	internal abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
-		protected readonly DiscordClient _client;
+		protected readonly DiscordBaseClient _client;
 		protected readonly LogMessageSeverity _logLevel;
 		protected readonly ManualResetEventSlim _connectedEvent;
 
@@ -57,7 +57,7 @@ namespace Discord.WebSockets
 		public WebSocketState State => (WebSocketState)_state;
 		protected int _state;
 
-		public WebSocket(DiscordClient client)
+		public WebSocket(DiscordBaseClient client)
 		{
 			_client = client;
 			_logLevel = client.Config.LogLevel;
@@ -131,9 +131,9 @@ namespace Discord.WebSockets
 				_disconnectState = (WebSocketState)oldState;
 				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
 
-				if (_disconnectState == WebSocketState.Connecting) //_runTask was never made
-					await Cleanup();
 				_cancelTokenSource.Cancel();
+				if (_disconnectState == WebSocketState.Connecting) //_runTask was never made
+					await Cleanup().ConfigureAwait(false);
 			}
 
 			if (!skipAwait)
@@ -161,8 +161,8 @@ namespace Discord.WebSockets
 			//Wait for the remaining tasks to complete
 			try { await allTasks.ConfigureAwait(false); }
 			catch { }
-			
-			//Clean up state variables and raise disconnect event
+
+			//Start cleanup
 			await Cleanup().ConfigureAwait(false);
 		}
 		protected virtual Task[] Run()

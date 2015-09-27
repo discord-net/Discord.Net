@@ -2,7 +2,7 @@
 
 namespace Discord.WebSockets.Voice
 {
-	public sealed class IsTalkingEventArgs : EventArgs
+	internal sealed class IsTalkingEventArgs : EventArgs
 	{
 		public readonly string UserId;
 		public readonly bool IsSpeaking;

@@ -7,54 +7,22 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using VoiceWebSocket = Discord.WebSockets.Voice.VoiceWebSocket;
 
 namespace Discord
 {
-	public enum DiscordClientState : byte
-	{
-		Disconnected,
-		Connecting,
-		Connected,
-		Disconnecting
-	}
-
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
-	public partial class DiscordClient
+	public partial class DiscordClient : DiscordBaseClient
 	{
+		protected readonly DiscordAPIClient _api;
 		private readonly Random _rand;
-		private readonly DiscordAPIClient _api;
-		private readonly DataWebSocket _dataSocket;
-		private readonly VoiceWebSocket _voiceSocket;
-		private readonly ConcurrentQueue<Message> _pendingMessages;
-		private readonly ManualResetEvent _disconnectedEvent;
-		private readonly ManualResetEventSlim _connectedEvent;
 		private readonly JsonSerializer _serializer;
-		private Task _runTask;
-		private string _token;
+		private readonly ConcurrentQueue<Message> _pendingMessages;
 
-		protected ExceptionDispatchInfo _disconnectReason;
-		private bool _wasDisconnectUnexpected;
-
-		/// <summary> Returns the id of the current logged-in user. </summary>
-		public string CurrentUserId => _currentUserId;
-		private string _currentUserId;
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
         private User _currentUser;
-		/// <summary> Returns the server this user is currently connected to for voice. </summary>
-		public Server CurrentVoiceServer => _voiceSocket.CurrentVoiceServer;
-
-		/// <summary> Returns the current connection state of this client. </summary>
-		public DiscordClientState State => (DiscordClientState)_state;
-		private int _state;
-
-		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordClientConfig Config => _config;
-		private readonly DiscordClientConfig _config;
 
 		/// <summary> Returns a collection of all channels this client is a member of. </summary>
 		public Channels Channels => _channels;
@@ -76,65 +44,14 @@ namespace Discord
 		public Users Users => _users;
 		private readonly Users _users;
 
-		public CancellationToken CancelToken => _cancelToken;
-		private CancellationTokenSource _cancelTokenSource;
-		private CancellationToken _cancelToken;
-
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
+			: base(config)
 		{
-			_config = config ?? new DiscordClientConfig();
-			_config.Lock();
-
-			_state = (int)DiscordClientState.Disconnected;
-			_cancelToken = new CancellationToken(true);
-			_disconnectedEvent = new ManualResetEvent(true);
-			_connectedEvent = new ManualResetEventSlim(false);
 			_rand = new Random();
-
 			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
-			_dataSocket = new DataWebSocket(this);
-			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => 
-			{
-				RaiseDisconnected(e);
-				if (e.WasUnexpected)
-					await _dataSocket.Reconnect(_token);
-			};
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-			{
-				_voiceSocket = new VoiceWebSocket(this);
-				_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
-				_voiceSocket.Disconnected += async (s, e) =>
-				{
-					foreach (var member in _members)
-					{
-						if (member.IsSpeaking)
-						{
-							member.IsSpeaking = false;
-							RaiseUserIsSpeaking(member, false);
-						}
-					}
-					RaiseVoiceDisconnected(e);
-					if (e.WasUnexpected)
-						await _voiceSocket.Reconnect();
-				};
-				_voiceSocket.IsSpeaking += (s, e) =>
-				{
-					if (_voiceSocket.State == WebSocketState.Connected)
-					{
-						var member = _members[e.UserId, _voiceSocket.CurrentVoiceServer.Id];
-						bool value = e.IsSpeaking;
-                        if (member.IsSpeaking != value)
-						{
-							member.IsSpeaking = value;
-							RaiseUserIsSpeaking(member, value);
-							if (_config.TrackActivity)
-								member.UpdateActivity();
-						}
-					}
-				};
-            }
+			if (_config.UseMessageQueue)
+				_pendingMessages = new ConcurrentQueue<Message>();
 
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
@@ -144,20 +61,38 @@ namespace Discord
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
 
-			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
-			if (_config.LogLevel >= LogMessageSeverity.Info)
+			if (Config.VoiceMode != DiscordVoiceMode.Disabled)
 			{
-				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
-				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
-				//_dataSocket.ReceivedEvent += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, $"Received {e.Type}");
-				if (_config.VoiceMode != DiscordVoiceMode.Disabled)
+				this.VoiceDisconnected += (s, e) =>
 				{
-					_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
-					_voiceSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
-				}
-			}
+					foreach (var member in _members)
+					{
+						if (member.IsSpeaking)
+						{
+							member.IsSpeaking = false;
+							RaiseUserIsSpeaking(member, false);
+						}
+					}
+				};
+				_voiceSocket.IsSpeaking += (s, e) =>
+				{
+					if (_voiceSocket.State == WebSocketState.Connected)
+					{
+						var member = _members[e.UserId, _voiceSocket.CurrentServerId];
+						bool value = e.IsSpeaking;
+                        if (member.IsSpeaking != value)
+						{
+							member.IsSpeaking = value;
+							RaiseUserIsSpeaking(member, value);
+							if (Config.TrackActivity)
+								member.UpdateActivity();
+						}
+					}
+				};
+            }
+
+			this.Connected += (s,e) => _api.CancelToken = CancelToken;
+			
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				bool isDebug = _config.LogLevel >= LogMessageSeverity.Debug;
@@ -270,513 +205,56 @@ namespace Discord
 			_serializer.CheckAdditionalContent = true;
 			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #endif
-
-			_dataSocket.ReceivedEvent += async (s, e) =>
-			{
-				switch (e.Type)
-				{
-					//Global
-					case "READY": //Resync
-						{
-							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-							_currentUserId = data.User.Id;
-							_currentUser = _users.GetOrAdd(data.User.Id);
-							_currentUser.Update(data.User);
-							foreach (var model in data.Guilds)
-							{
-								var server = _servers.GetOrAdd(model.Id);
-								server.Update(model);
-							}
-							foreach (var model in data.PrivateChannels)
-							{
-								var user = _users.GetOrAdd(model.Recipient.Id);
-								user.Update(model.Recipient);
-								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
-								channel.Update(model);
-							}
-						}
-						break;
-					case "RESUMED":
-						break;
-
-					//Servers
-					case "GUILD_CREATE":
-						{
-							var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
-							var server = _servers.GetOrAdd(model.Id);
-							server.Update(model);
-							RaiseServerCreated(server);
-						}
-						break;
-					case "GUILD_UPDATE":
-						{
-							var model = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
-							var server = _servers[model.Id];
-							if (server != null)
-							{
-								server.Update(model);
-								RaiseServerUpdated(server);
-							}
-						}
-						break;
-					case "GUILD_DELETE":
-						{
-							var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
-							var server = _servers.TryRemove(data.Id);
-							if (server != null)
-								RaiseServerDestroyed(server);
-						}
-						break;
-
-					//Channels
-					case "CHANNEL_CREATE":
-						{
-							var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
-							Channel channel;
-							if (data.IsPrivate)
-							{
-								var user = _users.GetOrAdd(data.Recipient.Id);
-								user.Update(data.Recipient);
-								channel = _channels.GetOrAdd(data.Id, null, user.Id);
-							}
-							else
-								channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
-							channel.Update(data);
-							RaiseChannelCreated(channel);
-						}
-						break;
-					case "CHANNEL_UPDATE":
-						{
-							var data = e.Payload.ToObject<ChannelUpdateEvent>(_serializer);
-							var channel = _channels[data.Id];
-							if (channel != null)
-							{
-								channel.Update(data);
-								RaiseChannelUpdated(channel);
-							}
-						}
-						break;
-					case "CHANNEL_DELETE":
-						{
-							var data = e.Payload.ToObject<ChannelDeleteEvent>(_serializer);
-							var channel = _channels.TryRemove(data.Id);
-							if (channel != null)
-								RaiseChannelDestroyed(channel);
-						}
-						break;
-
-					//Members
-					case "GUILD_MEMBER_ADD":
-						{
-							var data = e.Payload.ToObject<GuildMemberAddEvent>(_serializer);
-							var user = _users.GetOrAdd(data.User.Id);
-							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
-							user.Update(data.User);
-							member.Update(data);
-							if (_config.TrackActivity)
-								member.UpdateActivity();
-							RaiseUserAdded(member);
-						}
-						break;
-					case "GUILD_MEMBER_UPDATE":
-						{
-							var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_serializer);
-							var member = _members[data.User.Id, data.GuildId];
-							if (member != null)
-							{
-								member.Update(data);
-								RaiseMemberUpdated(member);
-							}
-						}
-						break;
-					case "GUILD_MEMBER_REMOVE":
-						{
-							var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_serializer);
-							var member = _members.TryRemove(data.UserId, data.GuildId);
-							if (member != null)
-								RaiseUserRemoved(member);
-						}
-						break;
-
-					//Roles
-					case "GUILD_ROLE_CREATE":
-						{
-							var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
-							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
-							role.Update(data.Data);
-							RaiseRoleUpdated(role);
-						}
-						break;
-					case "GUILD_ROLE_UPDATE":
-						{
-							var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_serializer);
-							var role = _roles[data.Data.Id];
-							if (role != null)
-								role.Update(data.Data);
-							RaiseRoleUpdated(role);
-						}
-						break;
-					case "GUILD_ROLE_DELETE":
-						{
-							var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_serializer);
-							var role = _roles.TryRemove(data.RoleId);
-							if (role != null)
-								RaiseRoleDeleted(role);
-						}
-						break;
-
-					//Bans
-					case "GUILD_BAN_ADD":
-						{
-							var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
-							var server = _servers[data.GuildId];
-							if (server != null)
-							{
-								server.AddBan(data.UserId);
-								RaiseBanAdded(data.UserId, server);
-							}
-						}
-						break;
-					case "GUILD_BAN_REMOVE":
-						{
-							var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
-							var server = _servers[data.GuildId];
-							if (server != null && server.RemoveBan(data.UserId))
-								RaiseBanRemoved(data.UserId, server);
-						}
-						break;
-
-					//Messages
-					case "MESSAGE_CREATE":
-						{
-							var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
-							Message msg = null;
-
-							bool wasLocal = _config.UseMessageQueue && data.Author.Id == _currentUserId && data.Nonce != null;
-							if (wasLocal)
-							{
-								msg = _messages.Remap("nonce" + data.Nonce, data.Id);
-								if (msg != null)
-								{
-									msg.IsQueued = false;
-									msg.Id = data.Id;
-								}
-							}
-							
-							if (msg == null)
-								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
-							msg.Update(data);
-							if (_config.TrackActivity)
-							{
-								var channel = msg.Channel;
-								if (channel == null || channel.IsPrivate)
-								{
-									var user = msg.User;
-									if (user != null)
-										user.UpdateActivity(data.Timestamp);
-								}
-								else
-								{
-									var member = msg.Member;
-									if (member != null)
-										member.UpdateActivity(data.Timestamp);
-								}
-							}
-							if (wasLocal)
-								RaiseMessageSent(msg);
-							RaiseMessageCreated(msg);
-						}
-						break;
-					case "MESSAGE_UPDATE":
-						{
-							var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
-							var msg = _messages[data.Id];
-                            if (msg != null)
-							{
-								msg.Update(data);
-								RaiseMessageUpdated(msg);
-							}
-						}
-						break;
-					case "MESSAGE_DELETE":
-						{
-							var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
-							var msg = _messages.TryRemove(data.Id);
-							if (msg != null)
-								RaiseMessageDeleted(msg);
-						}
-						break;
-					case "MESSAGE_ACK":
-						{
-							var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
-							var msg = GetMessage(data.MessageId);
-							if (msg != null)
-								RaiseMessageReadRemotely(msg);
-						}
-						break;
-
-					//Statuses
-					case "PRESENCE_UPDATE":
-						{
-							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
-							var member = _members[data.User.Id, data.GuildId];
-							/*if (_config.TrackActivity)
-							{
-								var user = _users[data.User.Id];
-								if (user != null)
-									user.UpdateActivity(DateTime.UtcNow);
-							}*/
-							if (member != null)
-							{
-								member.Update(data);
-								RaiseUserPresenceUpdated(member);
-							}
-						}
-						break;
-					case "TYPING_START":
-						{
-							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
-							var channel = _channels[data.ChannelId];
-							var user = _users[data.UserId];
-
-							if (user != null)
-							{
-								if (channel != null)
-									RaiseUserIsTyping(user, channel);
-							}
-							if (_config.TrackActivity)
-							{
-								if (channel.IsPrivate)
-								{
-									if (user != null)
-										user.UpdateActivity();
-								}
-								else
-								{
-									var member = _members[data.UserId, channel.ServerId];
-									if (member != null)
-										member.UpdateActivity();
-								}
-							}
-						}
-						break;
-
-					//Voice
-					case "VOICE_STATE_UPDATE":
-						{
-							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
-							var member = _members[data.UserId, data.GuildId];
-							/*if (_config.TrackActivity)
-							{
-								var user = _users[data.User.Id];
-								if (user != null)
-									user.UpdateActivity(DateTime.UtcNow);
-							}*/
-							if (member != null)
-							{
-								member.Update(data);
-								if (member.IsSpeaking)
-								{
-									member.IsSpeaking = false;
-									RaiseUserIsSpeaking(member, false);
-								}
-								RaiseUserVoiceStateUpdated(member);
-							}
-						}
-						break;
-					case "VOICE_SERVER_UPDATE":
-						{
-							var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
-							if (data.GuildId == _voiceSocket.CurrentVoiceServer.Id)
-							{
-								var server = _servers[data.GuildId];
-								if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-								{
-									_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
-									await _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, data.Token, _cancelToken).ConfigureAwait(false);
-								}
-							}
-						}
-						break;
-
-					//Settings
-					case "USER_UPDATE":
-						{
-							var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
-							var user = _users[data.Id];
-							if (user != null)
-							{
-								user.Update(data);
-								RaiseUserUpdated(user);
-							}
-						}
-						break;
-					case "USER_SETTINGS_UPDATE":
-						{
-							//TODO: Process this
-						}
-						break;
-
-					//Others
-					default:
-						RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
-						break;
-				}
-			};
 		}
 
-		//Connection
-		/// <summary> Connects to the Discord server with the provided token. </summary>
-		public async Task Connect(string token)
-		{
-			if (_state != (int)DiscordClientState.Disconnected)
-				await Disconnect().ConfigureAwait(false);
-
-			_cancelTokenSource = new CancellationTokenSource();
-			_cancelToken = _cancelTokenSource.Token;
-			_api.CancelToken = _cancelToken;
-
-			await ConnectInternal(token)
-				.Timeout(_config.ConnectionTimeout)
-				.ConfigureAwait(false);
-		}
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public async Task<string> Connect(string email, string password)
+		public new async Task<string> Connect(string email, string password)
 		{
-			if (_state != (int)DiscordClientState.Disconnected)
+			if (State != DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
-
-			_cancelTokenSource = new CancellationTokenSource();
-			_cancelToken = _cancelTokenSource.Token;
-			_api.CancelToken = _cancelToken;
 
 			string token;
 			try
 			{
-				var response = await _api.Login(email, password).ConfigureAwait(false);
+				var response = await _api.Login(email, password)
+					.Timeout(5000);
 				token = response.Token;
-                if (_config.LogLevel >= LogMessageSeverity.Verbose)
+				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Login successful, got token.");
 			}
 			catch (TaskCanceledException) { throw new TimeoutException(); }
 
-			return await ConnectInternal(token)
+			await Connect(token);
+			return token;
+		}
+
+		/// <summary> Connects to the Discord server with the provided token. </summary>
+		public async Task Connect(string token)
+		{
+			if (State != (int)DiscordClientState.Disconnected)
+				await Disconnect().ConfigureAwait(false);
+
+			_api.Token = token;
+			string gateway = (await _api.Gateway().ConfigureAwait(false)).Url;
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {gateway}");
+
+			await base.Connect(gateway, token)
 				.Timeout(_config.ConnectionTimeout)
 				.ConfigureAwait(false);
 		}
-		private async Task<string> ConnectInternal(string token)
+
+		protected override async Task Cleanup()
 		{
-			try
-			{
-				_disconnectedEvent.Reset();
-				_api.Token = token;
-				_token = token;
-				_state = (int)DiscordClientState.Connecting;
-				
-				string url = (await _api.Gateway().ConfigureAwait(false)).Url;
-                if (_config.LogLevel >= LogMessageSeverity.Verbose)
-					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {url}");
-
-				_dataSocket.Host = url;
-				_dataSocket.ParentCancelToken = _cancelToken;
-				await _dataSocket.Login(token).ConfigureAwait(false);				
-
-				_runTask = RunTasks();
-
-				try
-				{
-					//Cancel if either Disconnect is called, data socket errors or timeout is reached
-					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _dataSocket.CancelToken).Token;
-					_connectedEvent.Wait(cancelToken);
-				}
-				catch (OperationCanceledException)
-				{
-					_dataSocket.ThrowError(); //Throws data socket's internal error if any occured
-					throw;
-				}
-
-				//_state = (int)DiscordClientState.Connected;
-				_token = token;
-				return token;
-			}
-			catch
-			{
-
-				await Disconnect().ConfigureAwait(false);
-				throw;
-			}
-		}
-		protected void CompleteConnect()
-		{
-			_state = (int)DiscordClientState.Connected;
-			_connectedEvent.Set();
-			RaiseConnected();
-		}
-
-		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
-		{
-			int oldState;
-			bool hasWriterLock;
-
-			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
-			oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connecting);
-			if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
-			hasWriterLock = oldState == (int)DiscordClientState.Connecting; //Caused state change
-			if (!hasWriterLock)
-			{
-				oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connected);
-				if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
-				hasWriterLock = oldState == (int)DiscordClientState.Connected; //Caused state change
-			}
-
-			if (hasWriterLock)
-			{
-				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
-				_cancelTokenSource.Cancel();
-			}
-
-			if (!skipAwait)
-				return _runTask ?? TaskHelper.CompletedTask;
-			else
-				return TaskHelper.CompletedTask;
-		}
-
-		private async Task RunTasks()
-		{
-			Task task;
-			if (_config.UseMessageQueue)
-				task = MessageQueueLoop();
-			else
-				task = _cancelToken.Wait();
-
-			try { await task.ConfigureAwait(false); }
-			catch (Exception ex) { await DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false); }
-
-			//When the first task ends, make sure the rest do too
-			await DisconnectInternal(skipAwait: true);
-
-			await Cleanup().ConfigureAwait(false);
-			_runTask = null;
-		}
-		private async Task Cleanup()
-		{
-			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
-			_wasDisconnectUnexpected = false;
-
-			await _dataSocket.Disconnect().ConfigureAwait(false);
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-				await _voiceSocket.Disconnect().ConfigureAwait(false);
+			await base.Cleanup().ConfigureAwait(false);
 
 			if (_config.UseMessageQueue)
 			{
 				Message ignored;
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
-			
+
 			_channels.Clear();
 			_members.Clear();
 			_messages.Clear();
@@ -785,53 +263,12 @@ namespace Discord
 			_users.Clear();
 
 			_currentUser = null;
-			_currentUserId = null;
-			_token = null;
-
-			if (!wasDisconnectUnexpected)
-			{
-				_state = (int)DiscordClientState.Disconnected;
-				_disconnectedEvent.Set();
-			}
-			_connectedEvent.Reset();
-		}
-
-		//Helpers
-		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-		public void Block()
-		{
-			_disconnectedEvent.WaitOne();
-		}
-
-		private void CheckReady(bool checkVoice = false)
-		{
-			switch (_state)
-			{
-				case (int)DiscordClientState.Disconnecting:
-					throw new InvalidOperationException("The client is disconnecting.");
-				case (int)DiscordClientState.Disconnected:
-					throw new InvalidOperationException("The client is not connected to Discord");
-				case (int)DiscordClientState.Connecting:
-					throw new InvalidOperationException("The client is connecting.");
-			}
-			
-			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
-				throw new InvalidOperationException("Voice is not enabled for this client.");
-		}
-		private void RaiseEvent(string name, Action action)
-		{
-			try { action(); }
-			catch (Exception ex)
-			{
-				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client,
-					$"{name} event handler raised an exception: ${ex.GetBaseException().Message}");
-			}
 		}
 
 		//Experimental
 		private Task MessageQueueLoop()
 		{
-			var cancelToken = _cancelToken;
+			var cancelToken = CancelToken;
 			int interval = _config.MessageQueueInterval;
 
 			return Task.Run(async () =>
@@ -859,7 +296,7 @@ namespace Discord
 						msg.IsQueued = false;
 						msg.HasFailed = hasFailed;
 						RaiseMessageSent(msg);
-                    }
+					}
 					await Task.Delay(interval).ConfigureAwait(false);
 				}
 			});
@@ -868,6 +305,363 @@ namespace Discord
 		{
 			lock (_rand)
 				return _rand.Next().ToString();
+		}
+
+		internal override async Task OnReceivedEvent(WebSocketEventEventArgs e)
+		{
+			await base.OnReceivedEvent(e);
+
+			switch (e.Type)
+			{
+				//Global
+				case "READY": //Resync
+					{
+						var data = e.Payload.ToObject<ReadyEvent>(_serializer);
+						_currentUser = _users.GetOrAdd(data.User.Id);
+						_currentUser.Update(data.User);
+						foreach (var model in data.Guilds)
+						{
+							var server = _servers.GetOrAdd(model.Id);
+							server.Update(model);
+						}
+						foreach (var model in data.PrivateChannels)
+						{
+							var user = _users.GetOrAdd(model.Recipient.Id);
+							user.Update(model.Recipient);
+							var channel = _channels.GetOrAdd(model.Id, null, user.Id);
+							channel.Update(model);
+						}
+
+						/*foreach (var server in _servers)
+							_dataSocket.SendJoinVoice(server.Id, System.Linq.Enumerable.First(server.ChannelIds));*/
+					}
+					break;
+				case "RESUMED":
+					break;
+
+				//Servers
+				case "GUILD_CREATE":
+					{
+						var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
+						var server = _servers.GetOrAdd(model.Id);
+						server.Update(model);
+						RaiseServerCreated(server);
+					}
+					break;
+				case "GUILD_UPDATE":
+					{
+						var model = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
+						var server = _servers[model.Id];
+						if (server != null)
+						{
+							server.Update(model);
+							RaiseServerUpdated(server);
+						}
+					}
+					break;
+				case "GUILD_DELETE":
+					{
+						var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
+						var server = _servers.TryRemove(data.Id);
+						if (server != null)
+							RaiseServerDestroyed(server);
+					}
+					break;
+
+				//Channels
+				case "CHANNEL_CREATE":
+					{
+						var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
+						Channel channel;
+						if (data.IsPrivate)
+						{
+							var user = _users.GetOrAdd(data.Recipient.Id);
+							user.Update(data.Recipient);
+							channel = _channels.GetOrAdd(data.Id, null, user.Id);
+						}
+						else
+							channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
+						channel.Update(data);
+						RaiseChannelCreated(channel);
+					}
+					break;
+				case "CHANNEL_UPDATE":
+					{
+						var data = e.Payload.ToObject<ChannelUpdateEvent>(_serializer);
+						var channel = _channels[data.Id];
+						if (channel != null)
+						{
+							channel.Update(data);
+							RaiseChannelUpdated(channel);
+						}
+					}
+					break;
+				case "CHANNEL_DELETE":
+					{
+						var data = e.Payload.ToObject<ChannelDeleteEvent>(_serializer);
+						var channel = _channels.TryRemove(data.Id);
+						if (channel != null)
+							RaiseChannelDestroyed(channel);
+					}
+					break;
+
+				//Members
+				case "GUILD_MEMBER_ADD":
+					{
+						var data = e.Payload.ToObject<GuildMemberAddEvent>(_serializer);
+						var user = _users.GetOrAdd(data.User.Id);
+						var member = _members.GetOrAdd(data.User.Id, data.GuildId);
+						user.Update(data.User);
+						member.Update(data);
+						if (_config.TrackActivity)
+							member.UpdateActivity();
+						RaiseUserAdded(member);
+					}
+					break;
+				case "GUILD_MEMBER_UPDATE":
+					{
+						var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_serializer);
+						var member = _members[data.User.Id, data.GuildId];
+						if (member != null)
+						{
+							member.Update(data);
+							RaiseMemberUpdated(member);
+						}
+					}
+					break;
+				case "GUILD_MEMBER_REMOVE":
+					{
+						var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_serializer);
+						var member = _members.TryRemove(data.UserId, data.GuildId);
+						if (member != null)
+							RaiseUserRemoved(member);
+					}
+					break;
+
+				//Roles
+				case "GUILD_ROLE_CREATE":
+					{
+						var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
+						var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
+						role.Update(data.Data);
+						RaiseRoleUpdated(role);
+					}
+					break;
+				case "GUILD_ROLE_UPDATE":
+					{
+						var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_serializer);
+						var role = _roles[data.Data.Id];
+						if (role != null)
+							role.Update(data.Data);
+						RaiseRoleUpdated(role);
+					}
+					break;
+				case "GUILD_ROLE_DELETE":
+					{
+						var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_serializer);
+						var role = _roles.TryRemove(data.RoleId);
+						if (role != null)
+							RaiseRoleDeleted(role);
+					}
+					break;
+
+				//Bans
+				case "GUILD_BAN_ADD":
+					{
+						var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
+						var server = _servers[data.GuildId];
+						if (server != null)
+						{
+							server.AddBan(data.UserId);
+							RaiseBanAdded(data.UserId, server);
+						}
+					}
+					break;
+				case "GUILD_BAN_REMOVE":
+					{
+						var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
+						var server = _servers[data.GuildId];
+						if (server != null && server.RemoveBan(data.UserId))
+							RaiseBanRemoved(data.UserId, server);
+					}
+					break;
+
+				//Messages
+				case "MESSAGE_CREATE":
+					{
+						var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
+						Message msg = null;
+
+						bool wasLocal = _config.UseMessageQueue && data.Author.Id == CurrentUserId && data.Nonce != null;
+						if (wasLocal)
+						{
+							msg = _messages.Remap("nonce" + data.Nonce, data.Id);
+							if (msg != null)
+							{
+								msg.IsQueued = false;
+								msg.Id = data.Id;
+							}
+						}
+
+						if (msg == null)
+							msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+						msg.Update(data);
+						if (_config.TrackActivity)
+						{
+							var channel = msg.Channel;
+							if (channel == null || channel.IsPrivate)
+							{
+								var user = msg.User;
+								if (user != null)
+									user.UpdateActivity(data.Timestamp);
+							}
+							else
+							{
+								var member = msg.Member;
+								if (member != null)
+									member.UpdateActivity(data.Timestamp);
+							}
+						}
+						if (wasLocal)
+							RaiseMessageSent(msg);
+						RaiseMessageCreated(msg);
+					}
+					break;
+				case "MESSAGE_UPDATE":
+					{
+						var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
+						var msg = _messages[data.Id];
+						if (msg != null)
+						{
+							msg.Update(data);
+							RaiseMessageUpdated(msg);
+						}
+					}
+					break;
+				case "MESSAGE_DELETE":
+					{
+						var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
+						var msg = _messages.TryRemove(data.Id);
+						if (msg != null)
+							RaiseMessageDeleted(msg);
+					}
+					break;
+				case "MESSAGE_ACK":
+					{
+						var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
+						var msg = GetMessage(data.MessageId);
+						if (msg != null)
+							RaiseMessageReadRemotely(msg);
+					}
+					break;
+
+				//Statuses
+				case "PRESENCE_UPDATE":
+					{
+						var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
+						var member = _members[data.User.Id, data.GuildId];
+						/*if (_config.TrackActivity)
+						{
+							var user = _users[data.User.Id];
+							if (user != null)
+								user.UpdateActivity(DateTime.UtcNow);
+						}*/
+						if (member != null)
+						{
+							member.Update(data);
+							RaiseUserPresenceUpdated(member);
+						}
+					}
+					break;
+				case "TYPING_START":
+					{
+						var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
+						var channel = _channels[data.ChannelId];
+						var user = _users[data.UserId];
+
+						if (user != null)
+						{
+							if (channel != null)
+								RaiseUserIsTyping(user, channel);
+						}
+						if (_config.TrackActivity)
+						{
+							if (channel.IsPrivate)
+							{
+								if (user != null)
+									user.UpdateActivity();
+							}
+							else
+							{
+								var member = _members[data.UserId, channel.ServerId];
+								if (member != null)
+									member.UpdateActivity();
+							}
+						}
+					}
+					break;
+
+				//Voice
+				case "VOICE_STATE_UPDATE":
+					{
+						var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
+						var member = _members[data.UserId, data.GuildId];
+						/*if (_config.TrackActivity)
+						{
+							var user = _users[data.User.Id];
+							if (user != null)
+								user.UpdateActivity(DateTime.UtcNow);
+						}*/
+						if (member != null)
+						{
+							member.Update(data);
+							if (member.IsSpeaking)
+							{
+								member.IsSpeaking = false;
+								RaiseUserIsSpeaking(member, false);
+							}
+							RaiseUserVoiceStateUpdated(member);
+						}
+					}
+					break;
+				case "VOICE_SERVER_UPDATE":
+					{
+						var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
+						if (data.GuildId == _voiceSocket.CurrentServerId)
+						{
+							var server = _servers[data.GuildId];
+							if (_config.VoiceMode != DiscordVoiceMode.Disabled)
+							{
+								_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
+								await _voiceSocket.Login(CurrentUserId, _dataSocket.SessionId, data.Token, CancelToken).ConfigureAwait(false);
+							}
+						}
+					}
+					break;
+
+				//Settings
+				case "USER_UPDATE":
+					{
+						var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
+						var user = _users[data.Id];
+						if (user != null)
+						{
+							user.Update(data);
+							RaiseUserUpdated(user);
+						}
+					}
+					break;
+				case "USER_SETTINGS_UPDATE":
+					{
+						//TODO: Process this
+					}
+					break;
+
+				//Others
+				default:
+					RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
+					break;
+			}
 		}
 	}
 }

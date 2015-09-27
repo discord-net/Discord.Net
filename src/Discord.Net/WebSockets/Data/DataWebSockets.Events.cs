@@ -16,7 +16,7 @@ namespace Discord.WebSockets.Data
 
 	internal partial class DataWebSocket
 	{
-		public event EventHandler<WebSocketEventEventArgs> ReceivedEvent;
+		internal event EventHandler<WebSocketEventEventArgs> ReceivedEvent;
 		private void RaiseReceivedEvent(string type, JToken payload)
 		{
 			if (ReceivedEvent != null)

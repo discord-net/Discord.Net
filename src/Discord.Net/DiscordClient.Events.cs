@@ -2,50 +2,6 @@
 
 namespace Discord
 {
-	public enum LogMessageSeverity : byte
-	{
-		Error = 1,
-		Warning = 2,
-		Info = 3,
-		Verbose = 4,
-		Debug = 5
-	}
-    public enum LogMessageSource : byte
-	{
-		Unknown = 0,
-		Cache,
-		Client,
-		DataWebSocket,
-        MessageQueue,
-		Rest,
-        VoiceWebSocket,
-	}
-
-	public class DisconnectedEventArgs : EventArgs
-	{
-		public readonly bool WasUnexpected;
-		public readonly Exception Error;
-
-		internal DisconnectedEventArgs(bool wasUnexpected, Exception error) 
-		{ 
-			WasUnexpected = wasUnexpected; 
-			Error = error; 
-		}
-	}
-	public sealed class LogMessageEventArgs : EventArgs
-	{
-		public LogMessageSeverity Severity { get; }
-		public LogMessageSource Source { get; }
-		public string Message { get; }
-
-		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) 
-		{ 
-			Severity = severity; 
-			Source = source; 
-			Message = msg; 
-		}
-	}
-
 	public sealed class ServerEventArgs : EventArgs
 	{
 		public Server Server { get; }
@@ -148,45 +104,9 @@ namespace Discord
 			IsSpeaking = isSpeaking;
 		}
 	}
-	public sealed class VoicePacketEventArgs
-	{
-		public string UserId { get; }
-		public string ChannelId { get; }
-		public byte[] Buffer { get; }
-		public int Offset { get; }
-		public int Count { get; }
-
-		internal VoicePacketEventArgs(string userId, string channelId, byte[] buffer, int offset, int count)
-		{
-			UserId = userId;
-			Buffer = buffer;
-			Offset = offset;
-			Count = count;
-        }
-	}
 
 	public partial class DiscordClient
 	{
-		//General
-		public event EventHandler Connected;
-		private void RaiseConnected()
-		{
-			if (Connected != null)
-				RaiseEvent(nameof(Connected), () => Connected(this, EventArgs.Empty));
-		}
-		public event EventHandler<DisconnectedEventArgs> Disconnected;
-		private void RaiseDisconnected(DisconnectedEventArgs e)
-		{
-			if (Disconnected != null)
-				RaiseEvent(nameof(Disconnected), () => Disconnected(this, e));
-		}
-		public event EventHandler<LogMessageEventArgs> LogMessage;
-		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message)
-		{
-			if (LogMessage != null)
-				RaiseEvent(nameof(LogMessage), () => LogMessage(this, new LogMessageEventArgs(severity, source, message)));
-		}
-
 		//Server
 		public event EventHandler<ServerEventArgs> ServerCreated;
 		private void RaiseServerCreated(Server server)
@@ -341,27 +261,6 @@ namespace Discord
 		{
 			if (UserIsSpeaking != null)
 				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new UserIsSpeakingEventArgs(member, isSpeaking)));
-		}
-
-		//Voice
-		public event EventHandler VoiceConnected;
-		private void RaiseVoiceConnected()
-		{
-			if (VoiceConnected != null)
-				RaiseEvent(nameof(UserIsSpeaking), () => VoiceConnected(this, EventArgs.Empty));
-		}
-		public event EventHandler<DisconnectedEventArgs> VoiceDisconnected;
-		private void RaiseVoiceDisconnected(DisconnectedEventArgs e)
-		{
-			if (VoiceDisconnected != null)
-				RaiseEvent(nameof(UserIsSpeaking), () => VoiceDisconnected(this, e));
-		}
-
-		public event EventHandler<VoicePacketEventArgs> OnVoicePacket;
-		internal void RaiseOnVoicePacket(VoicePacketEventArgs e)
-		{
-			if (OnVoicePacket != null)
-				OnVoicePacket(this, e);
 		}
 	}
 }

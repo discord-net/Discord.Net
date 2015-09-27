@@ -2,7 +2,7 @@
 
 namespace Discord.WebSockets
 {
-	internal partial class WebSocket
+	internal abstract partial class WebSocket
 	{		
 		public event EventHandler Connected;
 		private void RaiseConnected()
