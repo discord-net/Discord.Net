@@ -6,19 +6,22 @@ using Discord.WebSockets.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using VoiceWebSocket = Discord.WebSockets.Voice.VoiceWebSocket;
 
 namespace Discord
 {
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
-	public partial class DiscordClient : DiscordBaseClient
+	public partial class DiscordClient : DiscordSimpleClient
 	{
 		protected readonly DiscordAPIClient _api;
 		private readonly Random _rand;
 		private readonly JsonSerializer _serializer;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
+		private readonly ConcurrentDictionary<string, DiscordSimpleClient> _voiceClients;
 
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
@@ -52,6 +55,8 @@ namespace Discord
 			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
 			if (_config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
+			if (_config.EnableVoiceMultiserver)
+				_voiceClients = new ConcurrentDictionary<string, DiscordSimpleClient>();
 
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
@@ -61,38 +66,20 @@ namespace Discord
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
 
-			if (Config.VoiceMode != DiscordVoiceMode.Disabled)
-			{
-				this.VoiceDisconnected += (s, e) =>
-				{
-					foreach (var member in _members)
-					{
-						if (member.IsSpeaking)
-						{
-							member.IsSpeaking = false;
-							RaiseUserIsSpeaking(member, false);
-						}
-					}
-				};
-				_voiceSocket.IsSpeaking += (s, e) =>
-				{
-					if (_voiceSocket.State == WebSocketState.Connected)
-					{
-						var member = _members[e.UserId, _voiceSocket.CurrentServerId];
-						bool value = e.IsSpeaking;
-                        if (member.IsSpeaking != value)
-						{
-							member.IsSpeaking = value;
-							RaiseUserIsSpeaking(member, value);
-							if (Config.TrackActivity)
-								member.UpdateActivity();
-						}
-					}
-				};
-            }
-
 			this.Connected += (s,e) => _api.CancelToken = CancelToken;
-			
+
+			VoiceDisconnected += (s, e) =>
+			{
+				foreach (var member in _members)
+				{
+					if (member.ServerId == e.ServerId && member.IsSpeaking)
+					{
+						member.IsSpeaking = false;
+						RaiseUserIsSpeaking(member, false);
+					}
+				}
+			};
+
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				bool isDebug = _config.LogLevel >= LogMessageSeverity.Debug;
@@ -207,6 +194,27 @@ namespace Discord
 #endif
 		}
 
+		internal override VoiceWebSocket CreateVoiceSocket()
+		{
+			var socket = base.CreateVoiceSocket();
+			socket.IsSpeaking += (s, e) =>
+			{
+				if (_voiceSocket.State == WebSocketState.Connected)
+				{
+					var member = _members[e.UserId, socket.CurrentServerId];
+					bool value = e.IsSpeaking;
+					if (member.IsSpeaking != value)
+					{
+						member.IsSpeaking = value;
+						RaiseUserIsSpeaking(member, value);
+						if (_config.TrackActivity)
+							member.UpdateActivity();
+					}
+				}
+			};
+			return socket;
+		}
+
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
 		public new async Task<string> Connect(string email, string password)
@@ -248,6 +256,18 @@ namespace Discord
 		protected override async Task Cleanup()
 		{
 			await base.Cleanup().ConfigureAwait(false);
+
+			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
+			{
+				if (_config.EnableVoiceMultiserver)
+				{
+					var tasks = _voiceClients
+						.Select(x => x.Value.Disconnect())
+						.ToArray();
+					_voiceClients.Clear();
+					await Task.WhenAll(tasks).ConfigureAwait(false);
+				}
+			}
 
 			if (_config.UseMessageQueue)
 			{
@@ -624,20 +644,6 @@ namespace Discord
 						}
 					}
 					break;
-				case "VOICE_SERVER_UPDATE":
-					{
-						var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
-						if (data.GuildId == _voiceSocket.CurrentServerId)
-						{
-							var server = _servers[data.GuildId];
-							if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-							{
-								_voiceSocket.Host = "wss://" + data.Endpoint.Split(':')[0];
-								await _voiceSocket.Login(CurrentUserId, _dataSocket.SessionId, data.Token, CancelToken).ConfigureAwait(false);
-							}
-						}
-					}
-					break;
 
 				//Settings
 				case "USER_UPDATE":
@@ -657,11 +663,76 @@ namespace Discord
 					}
 					break;
 
+				//Internal (handled in DiscordSimpleClient)
+				case "VOICE_SERVER_UPDATE":
+					break;
+
 				//Others
 				default:
 					RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
 					break;
 			}
+		}
+
+		public IDiscordVoiceClient GetVoiceClient(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			if (!_config.EnableVoiceMultiserver)
+			{
+				if (serverId == _voiceServerId)
+					return this;
+				else
+					return null;
+			}
+
+			DiscordSimpleClient client;
+			if (_voiceClients.TryGetValue(serverId, out client))
+				return client;
+			else
+				return null;
+		}
+		private async Task<IDiscordVoiceClient> CreateVoiceClient(string serverId)
+		{
+			if (!_config.EnableVoiceMultiserver)
+			{
+				_voiceServerId = serverId;
+				return this;
+			}
+
+			var client = _voiceClients.GetOrAdd(serverId, _ =>
+			{
+				var config = _config.Clone();
+				config.LogLevel = (LogMessageSeverity)Math.Min((int)_config.LogLevel, (int)LogMessageSeverity.Warning);
+				config.EnableVoiceMultiserver = false;
+				return new DiscordSimpleClient(config, serverId);
+			});
+			await client.Connect(_gateway, _token).ConfigureAwait(false);
+			return client;
+		}
+
+		public Task JoinVoiceServer(Channel channel)
+			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
+		public Task JoinVoiceServer(Server server, string channelId)
+			=> JoinVoiceServer(server?.Id, channelId);
+		public async Task JoinVoiceServer(string serverId, string channelId)
+		{
+			CheckReady(); //checkVoice is done inside the voice client
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+
+			var client = await CreateVoiceClient(serverId).ConfigureAwait(false);
+			await client.JoinChannel(channelId).ConfigureAwait(false);
+		}
+
+		async Task LeaveVoiceServer(string serverId)
+		{
+			CheckReady(); //checkVoice is done inside the voice client
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			DiscordSimpleClient client;
+			if (_voiceClients.TryRemove(serverId, out client))
+				await client.Disconnect();
 		}
 	}
 }

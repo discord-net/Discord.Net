@@ -32,6 +32,16 @@ namespace Discord
 			Error = error; 
 		}
 	}
+	public class VoiceDisconnectedEventArgs : DisconnectedEventArgs
+	{
+		public readonly string ServerId;
+
+		internal VoiceDisconnectedEventArgs(string serverId, DisconnectedEventArgs e)
+			: base(e.WasUnexpected, e.Error)
+		{
+			ServerId = serverId;
+		}
+	}
 	public sealed class LogMessageEventArgs : EventArgs
 	{
 		public LogMessageSeverity Severity { get; }
@@ -63,7 +73,7 @@ namespace Discord
         }
 	}
 
-	public abstract partial class DiscordBaseClient
+	public partial class DiscordSimpleClient
 	{
 		public event EventHandler Connected;
 		private void RaiseConnected()
@@ -90,11 +100,11 @@ namespace Discord
 			if (VoiceConnected != null)
 				RaiseEvent(nameof(VoiceConnected), () => VoiceConnected(this, EventArgs.Empty));
 		}
-		public event EventHandler<DisconnectedEventArgs> VoiceDisconnected;
-		private void RaiseVoiceDisconnected(DisconnectedEventArgs e)
+		public event EventHandler<VoiceDisconnectedEventArgs> VoiceDisconnected;
+		private void RaiseVoiceDisconnected(string serverId, DisconnectedEventArgs e)
 		{
 			if (VoiceDisconnected != null)
-				RaiseEvent(nameof(VoiceDisconnected), () => VoiceDisconnected(this, e));
+				RaiseEvent(nameof(VoiceDisconnected), () => VoiceDisconnected(this, new VoiceDisconnectedEventArgs(serverId, e)));
 		}
 
 		public event EventHandler<VoicePacketEventArgs> OnVoicePacket;

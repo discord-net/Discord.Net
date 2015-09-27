@@ -12,7 +12,7 @@ namespace Discord.WebSockets.Data
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public DataWebSocket(DiscordBaseClient client)
+		public DataWebSocket(DiscordSimpleClient client)
 			: base(client)
 		{
 		}

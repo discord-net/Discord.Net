@@ -136,15 +136,6 @@
     <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
       <Link>DiscordAPIClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordBaseClient.cs">
-      <Link>DiscordBaseClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordBaseClient.Events.cs">
-      <Link>DiscordBaseClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordBaseClient.Voice.cs">
-      <Link>DiscordBaseClient.Voice.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
     </Compile>
@@ -159,6 +150,15 @@
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordSimpleClient.cs">
+      <Link>DiscordSimpleClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordSimpleClient.Events.cs">
+      <Link>DiscordSimpleClient.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordSimpleClient.Voice.cs">
+      <Link>DiscordSimpleClient.Voice.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
       <Link>Enums\ChannelTypes.cs</Link>

@@ -35,7 +35,7 @@ namespace Discord.WebSockets
 	internal abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
-		protected readonly DiscordBaseClient _client;
+		protected readonly DiscordSimpleClient _client;
 		protected readonly LogMessageSeverity _logLevel;
 		protected readonly ManualResetEventSlim _connectedEvent;
 
@@ -57,7 +57,7 @@ namespace Discord.WebSockets
 		public WebSocketState State => (WebSocketState)_state;
 		protected int _state;
 
-		public WebSocket(DiscordBaseClient client)
+		public WebSocket(DiscordSimpleClient client)
 		{
 			_client = client;
 			_logLevel = client.Config.LogLevel;

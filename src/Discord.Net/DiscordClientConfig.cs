@@ -11,7 +11,7 @@ namespace Discord
 		Both = Outgoing | Incoming
 	}
 
-	public class DiscordClientConfig
+	public sealed class DiscordClientConfig
 	{
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
 		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
@@ -72,5 +72,12 @@ namespace Discord
 				throw new InvalidOperationException("Unable to modify a discord client's configuration after it has been created.");
 			storage = value;
 		}
-    }
+
+		public DiscordClientConfig Clone()
+		{
+			var config = this.MemberwiseClone() as DiscordClientConfig;
+			config._isLocked = false;
+			return config;
+        }
+	}
 }

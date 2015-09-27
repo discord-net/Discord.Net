@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -45,7 +46,7 @@ namespace Discord.WebSockets.Voice
 		public string CurrentServerId => _serverId;
 		public string CurrentChannelId => _channelId;
 
-		public VoiceWebSocket(DiscordBaseClient client)
+		public VoiceWebSocket(DiscordSimpleClient client)
 			: base(client)
 		{
 			_rand = new Random();
@@ -121,25 +122,32 @@ namespace Discord.WebSockets.Voice
 			msg.Payload.UserId = _userId;
 			QueueMessage(msg);
 
+			List<Task> tasks = new List<Task>();
+			if ((_client.Config.VoiceMode & DiscordVoiceMode.Outgoing) != 0)
+			{
 #if USE_THREAD
-			_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
-			_sendThread.Start();
-			_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
-			_receiveThread.Start();
-#if !DNXCORE50
-			return new Task[] { WatcherAsync() }.Concat(base.Run()).ToArray();
+				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
+				_sendThread.Start();
 #else
-			return base.Run();
+				tasks.Add(SendVoiceAsync());
 #endif
-#else //!USE_THREAD
-			return new Task[] { Task.WhenAll(
-				ReceiveVoiceAsync(),
-				SendVoiceAsync(),
+			}
+			if ((_client.Config.VoiceMode & DiscordVoiceMode.Incoming) != 0)
+			{
+#if USE_THREAD
+				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
+				_receiveThread.Start();
+#else
+				tasks.Add(ReceiveVoiceAsync());
+#endif
+			}
+
 #if !DNXCORE50
-				WatcherAsync()
+			tasks.Add(WatcherAsync());
 #endif
-			)}.Concat(base.Run()).ToArray();
-#endif
+			tasks.AddRange(base.Run());
+			
+			return tasks.ToArray();
 		}
 		protected override Task Cleanup()
 		{

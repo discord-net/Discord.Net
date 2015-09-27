@@ -1,10 +1,6 @@
-﻿using Discord.API;
-using Discord.Collections;
-using Discord.Helpers;
+﻿using Discord.Helpers;
 using Discord.WebSockets.Data;
 using System;
-using System.Collections.Concurrent;
-using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,17 +17,23 @@ namespace Discord
 	}
 
 	/// <summary> Provides a barebones connection to the Discord service </summary>
-	public partial class DiscordBaseClient
+	public partial class DiscordSimpleClient
 	{
 		internal readonly DataWebSocket _dataSocket;
 		internal readonly VoiceWebSocket _voiceSocket;
 		protected readonly ManualResetEvent _disconnectedEvent;
 		protected readonly ManualResetEventSlim _connectedEvent;
+		protected readonly bool _enableVoice;
+		protected string _gateway, _token;
+		protected string _voiceServerId;
 		private Task _runTask;
-		private string _gateway, _token;
 
 		protected ExceptionDispatchInfo _disconnectReason;
 		private bool _wasDisconnectUnexpected;
+
+		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
+		public DiscordClientConfig Config => _config;
+		protected readonly DiscordClientConfig _config;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -43,64 +45,78 @@ namespace Discord
 		public DiscordClientState State => (DiscordClientState)_state;
 		private int _state;
 
-		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordClientConfig Config => _config;
-		protected readonly DiscordClientConfig _config;
-
 		public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
 		private CancellationToken _cancelToken;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
-		public DiscordBaseClient(DiscordClientConfig config = null)
+		public DiscordSimpleClient(DiscordClientConfig config = null)
 		{
 			_config = config ?? new DiscordClientConfig();
 			_config.Lock();
+
+			_enableVoice = config.VoiceMode != DiscordVoiceMode.Disabled && !config.EnableVoiceMultiserver;
 
 			_state = (int)DiscordClientState.Disconnected;
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
-			_dataSocket = new DataWebSocket(this);
-			_dataSocket.Connected += (s, e) => { if (_state == (int)DiscordClientState.Connecting) CompleteConnect(); };
-			_dataSocket.Disconnected += async (s, e) => 
+			_dataSocket = CreateDataSocket();
+			if (_enableVoice)
+				_voiceSocket = CreateVoiceSocket();
+		}
+		internal DiscordSimpleClient(DiscordClientConfig config = null, string serverId = null)
+			: this(config)
+		{
+			_voiceServerId = serverId;
+		}
+
+		internal virtual DataWebSocket CreateDataSocket()
+		{
+			var socket = new DataWebSocket(this);
+			socket.Connected += (s, e) => 
+			{
+				if (_state == (int)DiscordClientState.Connecting)
+					CompleteConnect(); }
+			;
+			socket.Disconnected += async (s, e) =>
 			{
 				RaiseDisconnected(e);
 				if (e.WasUnexpected)
-					await _dataSocket.Reconnect(_token);
+					await socket.Reconnect(_token);
 			};
-			if (Config.VoiceMode != DiscordVoiceMode.Disabled)
-			{
-				_voiceSocket = new VoiceWebSocket(this);
-				_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
-				_voiceSocket.Disconnected += async (s, e) =>
-				{
-					RaiseVoiceDisconnected(e);
-					if (e.WasUnexpected)
-						await _voiceSocket.Reconnect();
-				};
-			}
-
-			_dataSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-				_voiceSocket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				_dataSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
-				_dataSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
-				if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-				{
-					_voiceSocket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
-					_voiceSocket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
-				}
+				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
+				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 			}
 
-			_dataSocket.ReceivedEvent += (s, e) => OnReceivedEvent(e);
+			socket.ReceivedEvent += (s, e) => OnReceivedEvent(e);
+			return socket;
+		}
+		internal virtual VoiceWebSocket CreateVoiceSocket()
+		{
+			var socket = new VoiceWebSocket(this);
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
+			socket.Connected += (s, e) => RaiseVoiceConnected();
+			socket.Disconnected += async (s, e) =>
+			{
+				RaiseVoiceDisconnected(socket.CurrentServerId, e);				
+				if (e.WasUnexpected)
+					await socket.Reconnect();
+			};
+			if (_config.LogLevel >= LogMessageSeverity.Info)
+			{
+				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
+				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
+			}
+			return socket;
 		}
 
 		//Connection
-		protected async Task<string> Connect(string gateway, string token)
+		public async Task<string> Connect(string gateway, string token)
 		{
 			try
 			{
@@ -132,7 +148,6 @@ namespace Discord
 				}
 
 				//_state = (int)DiscordClientState.Connected;
-				_token = token;
 				return token;
 			}
 			catch
@@ -222,7 +237,7 @@ namespace Discord
         protected virtual async Task Cleanup()
 		{
 			await _dataSocket.Disconnect().ConfigureAwait(false);
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
+			if (_enableVoice)
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 			
 			_currentUserId = null;
@@ -249,7 +264,7 @@ namespace Discord
 					throw new InvalidOperationException("The client is connecting.");
 			}
 			
-			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
+			if (checkVoice && !_enableVoice)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		protected void RaiseEvent(string name, Action action)
@@ -264,8 +279,24 @@ namespace Discord
 
 		internal virtual Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
-			if (e.Type == "READY")
-				_currentUserId = e.Payload["user"].Value<string>("id");
+			switch (e.Type)
+			{
+				case "READY":
+					_currentUserId = e.Payload["user"].Value<string>("id");
+					break;
+				case "VOICE_SERVER_UPDATE":
+					{
+						string guildId = e.Payload.Value<string>("guild_id");
+						
+						if (_enableVoice && guildId == _voiceSocket.CurrentServerId)
+						{
+							string token = e.Payload.Value<string>("token");
+							_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
+							return _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, token, CancelToken);
+						}
+					}
+					break;
+			}
 			return TaskHelper.CompletedTask;
 		}
     }
