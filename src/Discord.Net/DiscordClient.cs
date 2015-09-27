@@ -66,7 +66,7 @@ namespace Discord
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
 
-			this.Connected += (s,e) => _api.CancelToken = CancelToken;
+			this.Connected += (s, e) => _api.CancelToken = CancelToken;
 
 			VoiceDisconnected += (s, e) =>
 			{
@@ -341,8 +341,11 @@ namespace Discord
 						_currentUser.Update(data.User);
 						foreach (var model in data.Guilds)
 						{
-							var server = _servers.GetOrAdd(model.Id);
-							server.Update(model);
+							if (!model.Unavailable)
+							{
+								var server = _servers.GetOrAdd(model.Id);
+								server.Update(model);
+							}
 						}
 						foreach (var model in data.PrivateChannels)
 						{
@@ -351,9 +354,6 @@ namespace Discord
 							var channel = _channels.GetOrAdd(model.Id, null, user.Id);
 							channel.Update(model);
 						}
-
-						/*foreach (var server in _servers)
-							_dataSocket.SendJoinVoice(server.Id, System.Linq.Enumerable.First(server.ChannelIds));*/
 					}
 					break;
 				case "RESUMED":
@@ -363,9 +363,12 @@ namespace Discord
 				case "GUILD_CREATE":
 					{
 						var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
-						var server = _servers.GetOrAdd(model.Id);
-						server.Update(model);
-						RaiseServerCreated(server);
+						if (!model.Unavailable)
+						{
+							var server = _servers.GetOrAdd(model.Id);
+							server.Update(model);
+							RaiseServerCreated(server);
+						}
 					}
 					break;
 				case "GUILD_UPDATE":
@@ -694,7 +697,7 @@ namespace Discord
 		}
 		private async Task<IDiscordVoiceClient> CreateVoiceClient(string serverId)
 		{
-			if (!_config.EnableVoiceMultiserver)
+            if (!_config.EnableVoiceMultiserver)
 			{
 				_voiceServerId = serverId;
 				return this;

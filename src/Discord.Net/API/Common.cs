@@ -157,6 +157,8 @@ namespace Discord.API
 		public PresenceMemberInfo[] Presences;
 		[JsonProperty("voice_states")]
 		public VoiceMemberInfo[] VoiceStates;
+		[JsonProperty("unavailable")]
+		public bool Unavailable;
 	}
 
 	//Messages

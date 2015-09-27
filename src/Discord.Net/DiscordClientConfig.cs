@@ -19,7 +19,7 @@ namespace Discord
 
 		/// <summary> Max time in milliseconds to wait for DiscordClient to connect and initialize. </summary>
 		public int ConnectionTimeout { get { return _connectionTimeout; } set { SetValue(ref _connectionTimeout, value); } }
-		private int _connectionTimeout = 10000;
+		private int _connectionTimeout = 30000;
 		/// <summary> Gets or sets the time (in milliseconds) to wait after an unexpected disconnect before reconnecting. </summary>
 		public int ReconnectDelay { get { return _reconnectDelay; } set { SetValue(ref _reconnectDelay, value); } }
 		private int _reconnectDelay = 1000;
