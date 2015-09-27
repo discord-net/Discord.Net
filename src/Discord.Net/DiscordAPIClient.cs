@@ -220,7 +220,7 @@ namespace Discord
 		}
 
 		//Profile
-		public Task<EditProfileResponse> EditProfile(string currentPassword,
+		public Task<EditProfileResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
 		{
@@ -231,7 +231,7 @@ namespace Discord
 			{
 				string base64 = Convert.ToBase64String(avatar);
 				string type = avatarType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
-				avatarBase64 = $"data:{type},/9j/{base64}";
+				avatarBase64 = $"data:{type},{base64}";
 			}
 			var request = new EditProfileRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = avatarBase64 };
 			return _rest.Patch<EditProfileResponse>(Endpoints.UserMe, request);

@@ -107,7 +107,7 @@ namespace Discord.API
 		public string CurrentPassword;
 		[JsonProperty(PropertyName = "email", NullValueHandling = NullValueHandling.Ignore)]
 		public string Email;
-		[JsonProperty(PropertyName = "new_password", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty(PropertyName = "new_password")]
 		public string Password;
 		[JsonProperty(PropertyName = "username", NullValueHandling = NullValueHandling.Ignore)]
 		public string Username;
