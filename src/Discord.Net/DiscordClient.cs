@@ -714,11 +714,11 @@ namespace Discord
 			return client;
 		}
 
-		public Task JoinVoiceServer(Channel channel)
+		public Task<IDiscordVoiceClient> JoinVoiceServer(Channel channel)
 			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
-		public Task JoinVoiceServer(Server server, string channelId)
+		public Task<IDiscordVoiceClient> JoinVoiceServer(Server server, string channelId)
 			=> JoinVoiceServer(server?.Id, channelId);
-		public async Task JoinVoiceServer(string serverId, string channelId)
+		public async Task<IDiscordVoiceClient> JoinVoiceServer(string serverId, string channelId)
 		{
 			CheckReady(); //checkVoice is done inside the voice client
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
@@ -726,6 +726,7 @@ namespace Discord
 
 			var client = await CreateVoiceClient(serverId).ConfigureAwait(false);
 			await client.JoinChannel(channelId).ConfigureAwait(false);
+			return client;
 		}
 
 		async Task LeaveVoiceServer(string serverId)
