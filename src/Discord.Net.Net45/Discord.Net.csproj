@@ -142,6 +142,9 @@
     <Compile Include="..\Discord.Net\DiscordBaseClient.Events.cs">
       <Link>DiscordBaseClient.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordBaseClient.Voice.cs">
+      <Link>DiscordBaseClient.Voice.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
     </Compile>
@@ -153,9 +156,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
       <Link>DiscordClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Voice.cs">
-      <Link>DiscordClient.Voice.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>

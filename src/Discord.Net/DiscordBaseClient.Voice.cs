@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public partial class DiscordClient
+    public partial class DiscordBaseClient
 	{
         public Task JoinVoiceServer(Channel channel)
 			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
