@@ -227,7 +227,9 @@ namespace Discord
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 
 			string avatarBase64 = null;
-			if (avatar != null)
+			if (avatarType == AvatarImageType.None)
+				avatarBase64 = "";
+			else if (avatar != null)
 			{
 				string base64 = Convert.ToBase64String(avatar);
 				string type = avatarType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
