@@ -4,21 +4,21 @@ Discord.Net
 Discord.Net is an unofficial C# wrapper around the `Discord chat service`.
 It offers several methods to create automated operations, bots, or even custom clients.
 
-Feel free to chat with us in the `API Server on Discord`_.
+Feel free to join us in the `Discord API chat`_.
 
 .. _Discord chat service: https://discordapp.com
-.. _API Server on Discord: https://discord.gg/0SBTUU1wZTVjAMPx
+.. _Discord API chat: https://discord.gg/0SBTUU1wZTVjAMPx
 
 Warning
 -------
 
 This is an alpha!
 
-The Discord API is still in active development, meaning this library may break at any time without notice. 
+This library has been built thanks to a community effort reverse engineering the Discord client. 
+As Discord is still in alpha, it may change at any time without notice, breaking this library as well.
+Discord.Net itself is also in early development and you will often encounter breaking changes until the official Discord API is released.
 
-Discord.Net itself is also in alpha so several functions may be unstable, untested, or not work at all.
-
-Please report any bugs you find to our `Discord chat`_.
+It is highly recommended that you always use the latest version and please report any bugs you find to our `Discord chat`_.
 
 .. _Discord chat: https://discord.gg/0SBTUU1wZTVjAMPx
 
