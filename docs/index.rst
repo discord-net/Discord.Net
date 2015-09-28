@@ -22,18 +22,15 @@ It is highly recommended that you always use the latest version and please repor
 
 .. _Discord chat: https://discord.gg/0SBTUU1wZTVjAMPx
 
-Contents
---------
-
 .. toctree::
    :maxdepth: 2
-   :caption: Discord.Net
+   :caption: Documentation
    
    getting_started  
    features/logging 
+   features/management
+   features/permissions
+   features/profile
    features/commands
    features/voice
-   
-.. toctree::
-   :maxdepth: 2
-   :caption: Discord API
+   features/events

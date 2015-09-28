@@ -1,0 +1,4 @@
+|stub-icon| Profile
+===================
+
+|stub|
