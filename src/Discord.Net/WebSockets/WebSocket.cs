@@ -29,7 +29,7 @@ namespace Discord.WebSockets
 		Task Connect(string host, CancellationToken cancelToken);
 		Task Disconnect();
 		void QueueMessage(byte[] message);
-        Task[] RunTasks(CancellationToken cancelToken);
+        Task[] GetTasks(CancellationToken cancelToken);
     }
 
 	internal abstract partial class WebSocket
@@ -147,7 +147,7 @@ namespace Discord.WebSockets
 
 		protected virtual async Task RunTasks()
 		{
-			Task[] tasks = Run();
+			Task[] tasks = GetTasks();
 			Task firstTask = Task.WhenAny(tasks);
 			Task allTasks = Task.WhenAll(tasks);
 
@@ -165,10 +165,10 @@ namespace Discord.WebSockets
 			//Start cleanup
 			await Cleanup().ConfigureAwait(false);
 		}
-		protected virtual Task[] Run()
+		protected virtual Task[] GetTasks()
 		{
 			var cancelToken = _cancelToken;
-            return _engine.RunTasks(cancelToken)
+            return _engine.GetTasks(cancelToken)
 				.Concat(new Task[] { HeartbeatAsync(cancelToken) })
 				.ToArray();
 		}

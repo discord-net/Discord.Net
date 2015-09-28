@@ -49,7 +49,7 @@ namespace Discord.WebSockets
             return TaskHelper.CompletedTask;
 		}
 
-		public Task[] RunTasks(CancellationToken cancelToken)
+		public Task[] GetTasks(CancellationToken cancelToken)
 		{
 			return new Task[]
 			{

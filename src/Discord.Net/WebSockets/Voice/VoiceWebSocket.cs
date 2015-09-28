@@ -106,7 +106,7 @@ namespace Discord.WebSockets.Voice
 			catch (OperationCanceledException) { }
 		}
 
-		protected override Task[] Run()
+		protected override Task[] GetTasks()
 		{
 			_isClearing = false;
 			
@@ -145,7 +145,7 @@ namespace Discord.WebSockets.Voice
 #if !DNXCORE50
 			tasks.Add(WatcherAsync());
 #endif
-			tasks.AddRange(base.Run());
+			tasks.AddRange(base.GetTasks());
 			
 			return tasks.ToArray();
 		}

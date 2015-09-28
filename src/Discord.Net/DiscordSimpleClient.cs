@@ -200,7 +200,7 @@ namespace Discord
 
 		private async Task RunTasks()
 		{
-			Task[] tasks = Run();
+			Task[] tasks = GetTasks();
 			Task firstTask = Task.WhenAny(tasks);
 			Task allTasks = Task.WhenAll(tasks);
 
@@ -229,7 +229,7 @@ namespace Discord
 			_connectedEvent.Reset();
 			_runTask = null;
 		}
-		protected virtual Task[] Run()
+		protected virtual Task[] GetTasks()
 		{
 			return new Task[] { _cancelToken.Wait() };
 		}
@@ -247,7 +247,13 @@ namespace Discord
 
 		//Helpers
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-		public void Block()
+		public void Run(Func<Task> asyncAction)
+		{
+			asyncAction().Wait();
+			_disconnectedEvent.WaitOne();
+		}
+		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+		public void Run()
 		{
 			_disconnectedEvent.WaitOne();
 		}
