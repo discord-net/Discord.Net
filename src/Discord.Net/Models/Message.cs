@@ -186,6 +186,7 @@ namespace Discord
 			MentionIds = model.Mentions?.Select(x => x.Id)?.ToArray() ?? new string[0];
 			IsMentioningMe = MentionIds.Contains(_client.CurrentUserId);
 			RawText = model.Content;
+			_cleanText = null;
 			Timestamp = model.Timestamp;
 			EditedTimestamp = model.EditedTimestamp;
 			if (model.Author != null)
