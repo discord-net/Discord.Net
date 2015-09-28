@@ -29,7 +29,8 @@ Async
 
 Discord.Net uses C# tasks extensively - nearly all operations return one. It is highly recommended that these tasks be awaited whenever possible.
 To do so requires the calling method be marked as async, which can be problematic in a console application. An example of how to get around this is provided below.
-For more information, goto MSDN's Await-Async section.
+
+For more information, go to `MSDN's Await-Async section`_.
 
 .. _MSDN's Await-Async section: https://msdn.microsoft.com/en-us/library/hh191443.aspx
 
