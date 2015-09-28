@@ -1,0 +1,4 @@
+|stub-icon| Logging
+===================
+
+|stub|

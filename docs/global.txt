@@ -1,0 +1,2 @@
+.. |stub-icon| unicode:: U+0D83D U+0DD27
+.. |stub| replace:: This page is a placeholder and has not been written yet. It should be coming soon!
