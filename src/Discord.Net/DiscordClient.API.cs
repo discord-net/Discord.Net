@@ -357,7 +357,7 @@ namespace Discord
 
 			try
 			{
-				await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
+				await _api.DeleteMessage(msgId, channelId).ConfigureAwait(false);
 				_messages.TryRemove(msgId);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
