@@ -23,8 +23,8 @@ It is highly recommended that you always use the latest version and please repor
 .. _Discord chat: https://discord.gg/0SBTUU1wZTVjAMPx
 
 .. toctree::
-   :maxdepth: 2
    :caption: Documentation
+   :maxdepth: 2
    
    getting_started  
    features/logging 

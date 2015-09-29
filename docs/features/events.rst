@@ -1,4 +1,4 @@
-|stub-icon| Events
-==================
+|stub| Events
+=============
 
-|stub|
+|stub-info|

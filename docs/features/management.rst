@@ -1,4 +1,4 @@
-|stub-icon| Server Management
-=============================
+|stub| Server Management
+========================
 
-|stub|
+|stub-info|

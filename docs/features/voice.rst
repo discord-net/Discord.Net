@@ -1,9 +1,7 @@
-|stub-icon| Voice
+|stub| Voice
 =================
 
-|experimental|
-
-|stub|
+|stub-desc|
 
 Broadcasting
 ------------

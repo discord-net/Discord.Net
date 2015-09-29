@@ -1,4 +1,4 @@
-|stub-icon| Logging
-===================
+|stub| Logging
+==============
 
-|stub|
+|stub-info|
