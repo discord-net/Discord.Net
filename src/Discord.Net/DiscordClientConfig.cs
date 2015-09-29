@@ -48,9 +48,6 @@ namespace Discord
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
 		private bool _enableVoiceEncryption = true;
-		/// <summary> (Experimental) Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server). </summary>
-		public bool EnableVoiceMultiserver { get { return _enableVoiceMultiserver; } set { SetValue(ref _enableVoiceMultiserver, value); } }
-		private bool _enableVoiceMultiserver = false;
 #else
 		internal DiscordVoiceMode VoiceMode => DiscordVoiceMode.Disabled;
 		internal bool EnableVoiceEncryption => false;
@@ -62,6 +59,14 @@ namespace Discord
 		/// <summary> (Experimental) Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
 		public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
 		private bool _trackActivity = true;
+
+		/// <summary> (Experimental) Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server). </summary>
+		public bool EnableVoiceMultiserver { get { return _enableVoiceMultiserver; } set { SetValue(ref _enableVoiceMultiserver, value); } }
+		private bool _enableVoiceMultiserver = false;
+		internal bool VoiceOnly { get { return _voiceOnly; } set { SetValue(ref _voiceOnly, value); } }
+		private bool _voiceOnly;
+		internal uint VoiceClientId { get { return _voiceClientId; } set { SetValue(ref _voiceClientId, value); } }
+		private uint _voiceClientId;
 
 		//Lock
 		private bool _isLocked;

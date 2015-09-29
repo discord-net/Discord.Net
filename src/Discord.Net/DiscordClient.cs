@@ -23,6 +23,7 @@ namespace Discord
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly ConcurrentDictionary<string, DiscordSimpleClient> _voiceClients;
 		private bool _sentInitialLog;
+		private uint _nextVoiceClientId;
 
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
@@ -713,11 +714,14 @@ namespace Discord
 			var client = _voiceClients.GetOrAdd(serverId, _ =>
 			{
 				var config = _config.Clone();
-				config.LogLevel = (LogMessageSeverity)Math.Min((int)_config.LogLevel, (int)LogMessageSeverity.Warning);
+				config.LogLevel = _config.LogLevel;// (LogMessageSeverity)Math.Min((int)_config.LogLevel, (int)LogMessageSeverity.Warning);
 				config.EnableVoiceMultiserver = false;
+				config.VoiceOnly = true;
+				config.VoiceClientId = unchecked(++_nextVoiceClientId);
 				return new DiscordSimpleClient(config, serverId);
 			});
-			await client.Connect(_gateway, _token).ConfigureAwait(false);
+			client.LogMessage += (s, e) => RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}");
+            await client.Connect(_gateway, _token).ConfigureAwait(false);
 			return client;
 		}
 

@@ -61,7 +61,7 @@ namespace Discord
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
-
+			
 			_dataSocket = CreateDataSocket();
 			if (_enableVoice)
 				_voiceSocket = CreateVoiceSocket();
@@ -86,11 +86,15 @@ namespace Discord
 				if (e.WasUnexpected)
 					await socket.Reconnect(_token);
 			};
-			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
-			if (_config.LogLevel >= LogMessageSeverity.Info)
+
+			if (!_config.VoiceOnly)
 			{
-				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
-				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
+				socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
+				if (_config.LogLevel >= LogMessageSeverity.Info)
+				{
+					socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
+					socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
+				}
 			}
 
 			socket.ReceivedEvent += (s, e) => OnReceivedEvent(e);
