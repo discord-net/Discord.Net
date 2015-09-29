@@ -1,4 +1,4 @@
 |stub| Permissions
 ==================
 
-|stub-info|
+|stub-desc|

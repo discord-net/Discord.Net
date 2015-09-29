@@ -1,4 +1,4 @@
-|stub-icon| Profile
+|stub| Profile
 ===================
 
-|stub|
+|stub-desc|

@@ -1,4 +1,4 @@
 |stub| Server Management
 ========================
 
-|stub-info|
+|stub-desc|
