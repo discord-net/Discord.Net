@@ -61,15 +61,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\libopus.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\libsodium.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="lib\libopus.so" />
+    <Content Include="lib\libsodium.dll" />
+    <Content Include="lib\opus.dll" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
