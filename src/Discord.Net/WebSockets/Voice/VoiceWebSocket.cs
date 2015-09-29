@@ -132,22 +132,35 @@ namespace Discord.WebSockets.Voice
 				tasks.Add(SendVoiceAsync());
 #endif
 			}
+
+			//This thread is required to establish a connection even if we're outgoing only
+#if USE_THREAD
 			if ((_client.Config.VoiceMode & DiscordVoiceMode.Incoming) != 0)
 			{
-#if USE_THREAD
 				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
 				_receiveThread.Start();
+			}
+			else //Dont make an OS thread if we only want to capture one packet...
+				tasks.Add(Task.Run(() => ReceiveVoiceAsync(_cancelToken)));
 #else
 				tasks.Add(ReceiveVoiceAsync());
 #endif
-			}
 
 #if !DNXCORE50
 			tasks.Add(WatcherAsync());
 #endif
+			if (tasks.Count > 0)
+			{
+				// We need to combine tasks into one because receiveThread is 
+				// supposed to exit early if it's an outgoing-only client
+				// and we dont want the main thread to think we errored
+				var task = Task.WhenAll(tasks);
+				tasks.Clear();
+				tasks.Add(task);
+			}
 			tasks.AddRange(base.GetTasks());
 			
-			return tasks.ToArray();
+			return new Task[] { Task.WhenAll(tasks.ToArray()) };
 		}
 		protected override Task Cleanup()
 		{
