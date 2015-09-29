@@ -9,7 +9,6 @@ namespace Discord
 	public interface IDiscordVoiceClient
 	{
 		Task JoinChannel(string channelId);
-		Task Disconnect();
 
         void SendVoicePCM(byte[] data, int count);
 		void ClearVoicePCM();
@@ -24,7 +23,7 @@ namespace Discord
 			CheckReady(checkVoice: true);
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			
-			await ((IDiscordVoiceClient)this).Disconnect().ConfigureAwait(false);
+			await _voiceSocket.Disconnect().ConfigureAwait(false);
 			_voiceSocket.SetChannel(_voiceServerId, channelId);
 			_dataSocket.SendJoinVoice(_voiceServerId, channelId);
 
@@ -38,12 +37,12 @@ namespace Discord
 			catch (TimeoutException)
 			{
 				tokenSource.Cancel();
-				await ((IDiscordVoiceClient)this).Disconnect().ConfigureAwait(false);
+				await _voiceSocket.Disconnect().ConfigureAwait(false);
 				throw;
 			}
 		}
 
-		async Task IDiscordVoiceClient.Disconnect()
+		/*async Task IDiscordVoiceClient.Disconnect()
 		{
 			CheckReady(checkVoice: true);
 
@@ -55,7 +54,7 @@ namespace Discord
 					_dataSocket.SendLeaveVoice(_voiceSocket.CurrentServerId);
 				}
 			}
-		}
+		}*/
 
 		/// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
 		/// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>

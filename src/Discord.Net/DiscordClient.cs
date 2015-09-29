@@ -22,6 +22,7 @@ namespace Discord
 		private readonly JsonSerializer _serializer;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly ConcurrentDictionary<string, DiscordSimpleClient> _voiceClients;
+		private bool _sentInitialLog;
 
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
@@ -219,9 +220,12 @@ namespace Discord
 		/// <returns> Returns a token for future connections. </returns>
 		public new async Task<string> Connect(string email, string password)
 		{
+			if (!_sentInitialLog)
+				SendInitialLog();
+
 			if (State != DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
-
+			
 			string token;
 			try
 			{
@@ -240,6 +244,9 @@ namespace Discord
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
 		{
+			if (!_sentInitialLog)
+				SendInitialLog();
+
 			if (State != (int)DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
 
@@ -729,7 +736,9 @@ namespace Discord
 			return client;
 		}
 
-		async Task LeaveVoiceServer(string serverId)
+		public Task LeaveVoiceServer(Server server)
+			=> LeaveVoiceServer(server?.Id);
+        public async Task LeaveVoiceServer(string serverId)
 		{
 			CheckReady(); //checkVoice is done inside the voice client
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
@@ -738,5 +747,12 @@ namespace Discord
 			if (_voiceClients.TryRemove(serverId, out client))
 				await client.Disconnect();
 		}
+
+		private void SendInitialLog()
+		{
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Config: {JsonConvert.SerializeObject(_config)}");
+			_sentInitialLog = true;
+        }
 	}
 }
