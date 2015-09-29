@@ -495,8 +495,8 @@ namespace Discord
 						var server = _servers[data.GuildId];
 						if (server != null)
 						{
-							server.AddBan(data.UserId);
-							RaiseBanAdded(data.UserId, server);
+							server.AddBan(data.User?.Id);
+							RaiseBanAdded(data.User?.Id, server);
 						}
 					}
 					break;
@@ -504,8 +504,8 @@ namespace Discord
 					{
 						var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
 						var server = _servers[data.GuildId];
-						if (server != null && server.RemoveBan(data.UserId))
-							RaiseBanRemoved(data.UserId, server);
+						if (server != null && server.RemoveBan(data.User?.Id))
+							RaiseBanRemoved(data.User?.Id, server);
 					}
 					break;
 
