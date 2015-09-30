@@ -9,7 +9,7 @@ namespace Discord.Collections
 		internal Roles(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
 
-		internal Role GetOrAdd(string id, string serverId) => GetOrAdd(id, () => new Role(_client, id, serverId));
+		internal Role GetOrAdd(string id, string serverId, bool isEveryone) => GetOrAdd(id, () => new Role(_client, id, serverId, isEveryone));
 		internal new Role TryRemove(string id) => base.TryRemove(id);
 
 		protected override void OnCreated(Role item)

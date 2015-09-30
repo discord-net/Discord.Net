@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -20,13 +22,21 @@ namespace Discord
 		[JsonIgnore]
 		public Server Server => _client.Servers[ServerId];
 
-		internal Role(DiscordClient client, string id, string serverId)
+		/// <summary> Returns true if this is the role representing all users in a server. </summary>
+		public bool IsEveryone { get; }
+		/// <summary> Returns a list of the ids of all members in this role. </summary>
+		public IEnumerable<string> MemberIds { get { return IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId); } }
+		/// <summary> Returns a list of all members in this role. </summary>
+		public IEnumerable<Member> Members { get { return IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id)); } }
+
+		internal Role(DiscordClient client, string id, string serverId, bool isEveryone)
 		{
 			_client = client;
 			Id = id;
 			ServerId = serverId;
 			Permissions = new PackedPermissions(true);
-		}
+			IsEveryone = isEveryone;
+        }
 
 		internal void Update(API.RoleInfo model)
 		{

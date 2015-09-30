@@ -473,7 +473,7 @@ namespace Discord
 				case "GUILD_ROLE_CREATE":
 					{
 						var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
-						var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
+						var role = _roles.GetOrAdd(data.Data.Id, data.GuildId, false);
 						role.Update(data.Data);
 						RaiseRoleUpdated(role);
 					}
