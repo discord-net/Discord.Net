@@ -157,6 +157,9 @@
     <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
       <Link>Enums\ChannelTypes.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Enums\PermissionTarget.cs">
+      <Link>Enums\PermissionTarget.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Enums\Regions.cs">
       <Link>Enums\Regions.cs</Link>
     </Compile>
