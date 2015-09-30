@@ -46,6 +46,50 @@ namespace Discord
 		[JsonIgnore]
 		public User Recipient => _client.Users[RecipientId];
 
+		public IEnumerable<string> UserIds
+		{
+			get
+			{
+				if (IsPrivate)
+					return new string[] { RecipientId };
+
+				var server = Server;
+				string everyoneId = server.EveryoneRoleId;
+
+				//Is this channel Opt-In or Opt-Out?
+				IEnumerable<PermissionOverwrite> everyones = PermissionOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Id == server.EveryoneRoleId);
+				bool isOptIn = everyones.Any(x => x.Deny.Text_ReadMessages) && !everyones.Any(x => x.Allow.Text_ReadMessages);
+				
+				var denyMembers = PermissionOverwrites
+					.Where(x => x.Deny.Text_ReadMessages && x.Type == PermissionTarget.Member)
+					.Select(x => x.Id);
+				var allowRoles = PermissionOverwrites
+					.Where(x => x.Allow.Text_ReadMessages && x.Type == PermissionTarget.Role && x.Id != server.EveryoneRoleId)
+					.SelectMany(x => _client.Roles[x.Id].MemberIds);
+				var allowMembers = PermissionOverwrites
+					.Where(x => x.Allow.Text_ReadMessages && x.Type == PermissionTarget.Member)
+					.Select(x => x.Id);
+
+				if (isOptIn)
+				{
+					//AllowRole -> DenyMember -> AllowMember -> AllowOwner
+					return allowRoles.Except(denyMembers).Concat(allowMembers).Concat(new string[] { server.OwnerId }).Distinct();
+				}
+				else
+				{
+					var denyRoles = PermissionOverwrites
+						.Where(x => x.Deny.Text_ReadMessages && x.Type == PermissionTarget.Role && x.Id != server.EveryoneRoleId)
+						.SelectMany(x => _client.Roles[x.Id].MemberIds);
+
+					//DenyRole -> AllowRole -> DenyMember -> AllowMember -> AllowOwner
+					var optOut = denyRoles.Except(allowRoles).Concat(denyMembers).Except(allowMembers).Except(new string[] { server.OwnerId });
+					return Server.UserIds.Except(optOut);
+				}
+			}
+		}
+        public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);
+		public IEnumerable<User> Users => UserIds.Select(x => _client.Users[x]);
+
 		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
 		public IEnumerable<string> MessageIds => _messages.Select(x => x.Key);
