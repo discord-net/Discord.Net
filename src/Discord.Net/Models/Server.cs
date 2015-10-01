@@ -173,10 +173,14 @@ namespace Discord
 		internal void AddChannel(string channelId)
 		{
 			_channels.TryAdd(channelId, true);
+			foreach (var member in Members)
+				member.AddChannel(channelId);
 		}
 		internal bool RemoveChannel(string channelId)
 		{
 			bool ignored;
+			foreach (var member in Members)
+				member.RemoveChannel(channelId);
 			return _channels.TryRemove(channelId, out ignored);
 		}
 
@@ -193,10 +197,14 @@ namespace Discord
 		internal void AddMember(string userId)
 		{
 			_members.TryAdd(userId, true);
-		}
+			foreach (var channel in Channels)
+				channel._areMembersStale = true;
+        }
 		internal bool RemoveMember(string userId)
 		{
 			bool ignored;
+			foreach (var channel in Channels)
+				channel._areMembersStale = true;
 			return _members.TryRemove(userId, out ignored);
 		}
 		internal bool HasMember(string userId)

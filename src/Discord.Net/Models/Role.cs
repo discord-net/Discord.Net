@@ -42,6 +42,9 @@ namespace Discord
 		{
 			Name = model.Name;
 			Permissions.RawValue = (uint)model.Permissions;
+
+			foreach (var member in Members)
+				member.UpdatePermissions();
 		}
 
 		public override string ToString() => Name;

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,6 +9,7 @@ namespace Discord
 	public class Member
 	{
 		private readonly DiscordClient _client;
+		private ConcurrentDictionary<string, PackedPermissions> _permissions;
 
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; internal set; }
@@ -29,6 +31,7 @@ namespace Discord
 
 		public string SessionId { get; internal set; }
 		public string Token { get; internal set; }
+		public PackedPermissions Permissions { get; internal set; }
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
 		public string GameId { get; internal set; }
@@ -65,6 +68,7 @@ namespace Discord
 			UserId = userId;
 			ServerId = serverId;
 			Status = UserStatus.Offline;
+			_permissions = new ConcurrentDictionary<string, PackedPermissions>();
         }
 
 		public override string ToString() => UserId;
@@ -91,6 +95,8 @@ namespace Discord
 			for (int i = 0; i < model.Roles.Length; i++)
 				newRoles[i + 1] = model.Roles[i];
 			RoleIds = newRoles;
+
+			UpdatePermissions();
         }
 		internal void Update(API.ExtendedMemberInfo model)
 		{
@@ -128,6 +134,59 @@ namespace Discord
 		{
 			if (LastActivityAt == null || activity > LastActivityAt.Value)
 				LastActivityAt = activity ?? DateTime.UtcNow;
+		}
+
+		internal void AddChannel(string channelId)
+		{
+			_permissions.TryAdd(channelId, new PackedPermissions());
+			UpdatePermissions(channelId);
+        }
+		internal bool RemoveChannel(string channelId)
+		{
+			PackedPermissions ignored;
+			return _permissions.TryRemove(channelId, out ignored);
+		}
+		internal void UpdatePermissions()
+		{
+			foreach (var channel in _permissions)
+				UpdatePermissions(channel.Key);
+		}
+		internal void UpdatePermissions(string channelId)
+		{
+			var server = Server;
+			if (server == null) return;
+			var channel = _client.Channels[channelId];
+			if (channel == null) return;
+			var serverOverwrites = channel.PermissionOverwrites;
+			var channelOverwrites = channel.PermissionOverwrites;
+
+			PackedPermissions permissions;
+			if (!_permissions.TryGetValue(channelId, out permissions)) return;
+			uint newPermissions = 0x0;
+
+			foreach (var serverRole in Roles)
+				newPermissions |= serverRole.Permissions.RawValue;
+			foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && RoleIds.Contains(x.Id)))
+				newPermissions &= ~denyRole.Deny.RawValue;
+			foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && RoleIds.Contains(x.Id)))
+				newPermissions |= allowRole.Allow.RawValue;
+			foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Deny.RawValue != 0))
+                newPermissions &= ~denyMembers.Deny.RawValue;
+			foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Allow.RawValue != 0))
+                newPermissions |= allowMembers.Allow.RawValue;
+
+			if (permissions.RawValue != newPermissions)
+			{
+				permissions.RawValue = newPermissions;
+				channel._areMembersStale = true;
+			}
+		}
+		public PackedPermissions GetPermissions(string channelId)
+		{
+			PackedPermissions perms;
+			if (_permissions.TryGetValue(channelId, out perms))
+				return perms;
+			return null;
 		}
 	}
 }
