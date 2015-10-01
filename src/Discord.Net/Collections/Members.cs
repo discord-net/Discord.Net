@@ -16,7 +16,7 @@ namespace Discord.Collections
 
 		protected override void OnCreated(Member item)
 		{
-			item.Server.AddMember(item.UserId);
+			item.Server.AddMember(item);
 			item.User.AddServer(item.ServerId);
 			item.User.AddRef();
 			if (item.UserId == _client.CurrentUserId)
@@ -24,7 +24,7 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Member item)
 		{
-			item.Server.RemoveMember(item.UserId);
+			item.Server.RemoveMember(item);
 			item.User.RemoveServer(item.ServerId);
 			item.User.RemoveRef();
 			if (item.UserId == _client.CurrentUserId)

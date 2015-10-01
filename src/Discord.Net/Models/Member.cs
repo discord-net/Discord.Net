@@ -152,7 +152,9 @@ namespace Discord
 		}
 		internal void UpdatePermissions(string channelId)
 		{
-			var server = Server;
+			if (RoleIds == null) return; // We don't have all our data processed yet, this will be called again soon
+
+            var server = Server;
 			if (server == null) return;
 			var channel = _client.Channels[channelId];
 			if (channel == null) return;

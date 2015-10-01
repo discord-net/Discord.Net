@@ -194,18 +194,24 @@ namespace Discord
 			return _invites.TryRemove(inviteId, out ignored);
 		}
 
-		internal void AddMember(string userId)
+		internal void AddMember(Member member)
 		{
-			_members.TryAdd(userId, true);
+			_members.TryAdd(member.UserId, true);
 			foreach (var channel in Channels)
-				channel._areMembersStale = true;
+			{
+				member.AddChannel(channel.Id);
+                channel._areMembersStale = true;
+			}
         }
-		internal bool RemoveMember(string userId)
+		internal bool RemoveMember(Member member)
 		{
 			bool ignored;
 			foreach (var channel in Channels)
+			{
+				member.RemoveChannel(channel.Id);
 				channel._areMembersStale = true;
-			return _members.TryRemove(userId, out ignored);
+			}
+			return _members.TryRemove(member.UserId, out ignored);
 		}
 		internal bool HasMember(string userId)
 		{

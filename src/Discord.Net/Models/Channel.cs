@@ -55,7 +55,7 @@ namespace Discord
 				if (!_areMembersStale)
 					return _userIds;
 				
-				_userIds = Server.Members.Where(x => x.GetPermissions(Id).Text_ReadMessages).Select(x => x.UserId).ToArray();
+				_userIds = Server.Members.Where(x => x.GetPermissions(Id)?.Text_ReadMessages ?? false).Select(x => x.UserId).ToArray();
 				_areMembersStale = false;
 				return _userIds;
 			}
