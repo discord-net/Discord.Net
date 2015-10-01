@@ -28,7 +28,7 @@ namespace Discord.WebSockets
 
 		Task Connect(string host, CancellationToken cancelToken);
 		Task Disconnect();
-		void QueueMessage(byte[] message);
+		void QueueMessage(string message);
         Task[] GetTasks(CancellationToken cancelToken);
     }
 
@@ -47,7 +47,7 @@ namespace Discord.WebSockets
 		private DateTime _lastHeartbeat;
 		private Task _runTask;
 
-		public CancellationToken ParentCancelToken { get; set; }
+		public CancellationToken? ParentCancelToken { get; set; }
 		public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
 		protected CancellationToken _cancelToken;
@@ -61,11 +61,16 @@ namespace Discord.WebSockets
 		{
 			_client = client;
 			_logLevel = client.Config.LogLevel;
+
 			_loginTimeout = client.Config.ConnectionTimeout;
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
+#if DNXCORE50
 			_engine = new BuiltInWebSocketEngine(client.Config.WebSocketInterval);
+#else
+			_engine = new WSSharpWebSocketEngine(this, client.Config.UserAgent, client.Config.WebSocketInterval);
+#endif
 			_engine.ProcessMessage += async (s, e) =>
 			{
 				if (_logLevel >= LogMessageSeverity.Debug)
@@ -84,10 +89,11 @@ namespace Discord.WebSockets
 				await Disconnect().ConfigureAwait(false);				
 
 				_cancelTokenSource = new CancellationTokenSource();
-				if (ParentCancelToken != null)
-					_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken).Token;
-				else
-					_cancelToken = _cancelTokenSource.Token;
+				if (ParentCancelToken == null)
+					throw new InvalidOperationException("Parent cancel token was never set.");
+				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
+				/*else
+					_cancelToken = _cancelTokenSource.Token;*/
 
 				_lastHeartbeat = DateTime.UtcNow;
 				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
@@ -198,8 +204,7 @@ namespace Discord.WebSockets
 			string json = JsonConvert.SerializeObject(message);
 			if (_logLevel >= LogMessageSeverity.Debug)
 				RaiseOnLog(LogMessageSeverity.Debug, $"Out: " + json);
-			var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-			_engine.QueueMessage(bytes);
+			_engine.QueueMessage(json);
 		}
 
 		private Task HeartbeatAsync(CancellationToken cancelToken)

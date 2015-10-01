@@ -40,7 +40,7 @@ namespace Discord.WebSockets.Data
 		{
 			try
 			{
-				var cancelToken = ParentCancelToken;
+				var cancelToken = ParentCancelToken.Value;
 				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{

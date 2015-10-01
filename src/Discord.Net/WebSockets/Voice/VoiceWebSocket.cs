@@ -85,7 +85,7 @@ namespace Discord.WebSockets.Voice
 		{
 			try
 			{
-				var cancelToken = ParentCancelToken;
+				var cancelToken = ParentCancelToken.Value;
                 await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{
@@ -127,7 +127,8 @@ namespace Discord.WebSockets.Voice
 			{
 #if USE_THREAD
 				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
-				_sendThread.Start();
+				_sendThread.IsBackground = true;
+                _sendThread.Start();
 #else
 				tasks.Add(SendVoiceAsync());
 #endif
@@ -138,6 +139,7 @@ namespace Discord.WebSockets.Voice
 			if ((_client.Config.VoiceMode & DiscordVoiceMode.Incoming) != 0)
 			{
 				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
+				_sendThread.IsBackground = true;
 				_receiveThread.Start();
 			}
 			else //Dont make an OS thread if we only want to capture one packet...

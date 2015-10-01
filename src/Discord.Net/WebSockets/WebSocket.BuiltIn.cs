@@ -1,4 +1,5 @@
-﻿using Discord.Helpers;
+﻿#if DNXCORE50
+using Discord.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace Discord.WebSockets
 		private const int SendChunkSize = 4096;
 		private const int HR_TIMEOUT = -2147012894;
 
-		private readonly ConcurrentQueue<byte[]> _sendQueue;
+		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly int _sendInterval;
 		private ClientWebSocket _webSocket;
 
@@ -30,7 +31,7 @@ namespace Discord.WebSockets
 		public BuiltInWebSocketEngine(int sendInterval)
 		{
 			_sendInterval = sendInterval;
-			_sendQueue = new ConcurrentQueue<byte[]>();
+			_sendQueue = new ConcurrentQueue<string>();
         }
 
 		public Task Connect(string host, CancellationToken cancelToken)
@@ -42,7 +43,7 @@ namespace Discord.WebSockets
 
 		public Task Disconnect()
 		{
-			byte[] ignored;
+			string ignored;
 			while (_sendQueue.TryDequeue(out ignored)) { }
 			_webSocket.Dispose();
 			_webSocket = new ClientWebSocket();
@@ -107,12 +108,13 @@ namespace Discord.WebSockets
 			{
 				try
 				{
-					byte[] bytes;
 					while (_webSocket.State == State.Open && !cancelToken.IsCancellationRequested)
 					{
-						while (_sendQueue.TryDequeue(out bytes))
+						string json;
+						while (_sendQueue.TryDequeue(out json))
 						{
-							var frameCount = (int)Math.Ceiling((double)bytes.Length / SendChunkSize);
+							byte[] bytes = Encoding.UTF8.GetBytes(json);
+							int frameCount = (int)Math.Ceiling((double)bytes.Length / SendChunkSize);
 
 							int offset = 0;
 							for (var i = 0; i < frameCount; i++, offset += SendChunkSize)
@@ -142,9 +144,10 @@ namespace Discord.WebSockets
 			});
 		}
 		
-		public void QueueMessage(byte[] message)
+		public void QueueMessage(string message)
 		{
 			_sendQueue.Enqueue(message);
         }
 	}
 }
+#endif
