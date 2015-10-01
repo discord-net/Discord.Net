@@ -6,6 +6,9 @@
 		public static string User(User user)
 			=> $"<@{user.Id}>";
 		/// <summary> Returns the string used to create a user mention. </summary>
+		public static string User(Member member)
+			=> $"<@{member.UserId}>";
+		/// <summary> Returns the string used to create a user mention. </summary>
 		public static string User(string userId)
 			=> $"<@{userId}>";
 
