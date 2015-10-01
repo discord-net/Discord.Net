@@ -82,10 +82,16 @@ namespace Discord
 		{
 			if (model.User != null)
 				Update(model.User);
-			RoleIds = model.Roles;
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
-		}
+
+			//Set roles, with the everyone role added too
+			string[] newRoles = new string[model.Roles.Length + 1];
+			newRoles[0] = Server.EveryoneRoleId;
+			for (int i = 0; i < model.Roles.Length; i++)
+				newRoles[i + 1] = model.Roles[i];
+			RoleIds = newRoles;
+        }
 		internal void Update(API.ExtendedMemberInfo model)
 		{
 			Update(model as API.MemberInfo);
