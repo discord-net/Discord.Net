@@ -21,12 +21,10 @@ namespace Discord.API
 		private readonly LogMessageSeverity _logLevel;
 		private CancellationToken _cancelToken;
 
-		public RestClient(LogMessageSeverity logLevel, int timeout)
+		public RestClient(LogMessageSeverity logLevel, string userAgent, int timeout)
 		{
 			_logLevel = logLevel;
-			
-			string version = typeof(RestClient).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-			string userAgent = $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)";
+
 #if DNXCORE50
 			_engine = new BuiltInRestEngine(userAgent, timeout);
 #else

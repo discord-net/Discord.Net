@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Discord
 {
@@ -67,6 +68,15 @@ namespace Discord
 		private bool _voiceOnly;
 		internal uint VoiceClientId { get { return _voiceClientId; } set { SetValue(ref _voiceClientId, value); } }
 		private uint _voiceClientId;
+
+		internal string UserAgent
+		{
+			get
+			{
+				string version = typeof(DiscordClientConfig).GetTypeInfo().Assembly.GetName().Version.ToString(2);
+				return $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)";
+			}
+		}
 
 		//Lock
 		private bool _isLocked;

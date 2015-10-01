@@ -11,9 +11,9 @@ namespace Discord
 		internal RestClient RestClient => _rest;
 		private readonly RestClient _rest;
 
-		public DiscordAPIClient(LogMessageSeverity logLevel, int timeout)
+		public DiscordAPIClient(LogMessageSeverity logLevel, string userAgent, int timeout)
 		{
-			_rest = new RestClient(logLevel, timeout);
+			_rest = new RestClient(logLevel, userAgent, timeout);
         }
 
 		private string _token;

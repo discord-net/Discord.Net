@@ -54,7 +54,7 @@ namespace Discord
 			: base(config)
 		{
 			_rand = new Random();
-			_api = new DiscordAPIClient(_config.LogLevel, _config.APITimeout);
+			_api = new DiscordAPIClient(_config.LogLevel, _config.UserAgent, _config.APITimeout);
 			if (_config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 			if (_config.EnableVoiceMultiserver)
