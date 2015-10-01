@@ -47,17 +47,17 @@ namespace Discord
 		[JsonIgnore]
 		public User Recipient => _client.Users[RecipientId];
 
-		private string[] userIds;
+		private string[] _userIds;
 		public IEnumerable<string> UserIds
 		{
 			get
 			{
 				if (!_areMembersStale)
-					return userIds;
+					return _userIds;
 				
+				_userIds = Server.Members.Where(x => x.GetPermissions(Id).Text_ReadMessages).Select(x => x.UserId).ToArray();
 				_areMembersStale = false;
-				userIds = Members.Where(x => x.Permissions.Text_ReadMessages).Select(x => x.UserId).ToArray();
-				return userIds;
+				return _userIds;
 			}
 		}
         public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);

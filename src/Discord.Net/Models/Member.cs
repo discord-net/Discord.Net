@@ -31,7 +31,6 @@ namespace Discord
 
 		public string SessionId { get; internal set; }
 		public string Token { get; internal set; }
-		public PackedPermissions Permissions { get; internal set; }
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
 		public string GameId { get; internal set; }
