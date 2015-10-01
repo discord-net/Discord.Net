@@ -18,8 +18,10 @@ namespace Discord
 		public bool General_BanMembers { get { return GetBit(2); } set { SetBit(2, value); } }
 		/// <summary> If True, a user may kick users from the server. </summary>
 		public bool General_KickMembers { get { return GetBit(3); } set { SetBit(3, value); } }
-		/// <summary> If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
+		/// <summary> (Server Roles only) If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
 		public bool General_ManageRoles { get { return GetBit(4); } set { SetBit(4, value); } }
+		/// <summary> (Channels only) If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+		public bool General_ManagePermissions { get { return GetBit(4); } set { SetBit(4, value); } }
 		/// <summary> If True, a user may create, delete and modify channels. </summary>
 		public bool General_ManageChannels { get { return GetBit(5); } set { SetBit(5, value); } }
 		/// <summary> If True, a user may adjust server properties. </summary>
