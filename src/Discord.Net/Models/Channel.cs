@@ -80,7 +80,8 @@ namespace Discord
 			ServerId = serverId;
 			RecipientId = recipientId;
 			_messages = new ConcurrentDictionary<string, bool>();
-		}
+			_areMembersStale = true;
+        }
 
 		internal void Update(API.ChannelReference model)
 		{
