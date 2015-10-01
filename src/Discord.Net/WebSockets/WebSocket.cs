@@ -138,11 +138,10 @@ namespace Discord.WebSockets
 
 			if (!skipAwait)
 			{
-				Task task = _runTask ?? TaskHelper.CompletedTask;
-                await task;
+				Task task = _runTask;
+				if (_runTask != null)
+					await task.ConfigureAwait(false);
 			}
-			else
-				await TaskHelper.CompletedTask;
 		}
 
 		protected virtual async Task RunTasks()

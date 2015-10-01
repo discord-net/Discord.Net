@@ -156,7 +156,6 @@ namespace Discord
 			}
 			catch
 			{
-
 				await Disconnect().ConfigureAwait(false);
 				throw;
 			}
@@ -170,19 +169,19 @@ namespace Discord
 
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
+		protected async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
 
 			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
 			oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connecting);
-			if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
+			if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
 			hasWriterLock = oldState == (int)DiscordClientState.Connecting; //Caused state change
 			if (!hasWriterLock)
 			{
 				oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connected);
-				if (oldState == (int)DiscordClientState.Disconnected) return TaskHelper.CompletedTask; //Already disconnected
+				if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
 				hasWriterLock = oldState == (int)DiscordClientState.Connected; //Caused state change
 			}
 
@@ -192,14 +191,16 @@ namespace Discord
 				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
 
 				_cancelTokenSource.Cancel();
-				/*if (_state == DiscordClientState.Connecting) //_runTask was never made
+				/*if (_disconnectState == DiscordClientState.Connecting) //_runTask was never made
 					await Cleanup().ConfigureAwait(false);*/
 			}
 
 			if (!skipAwait)
-				return _runTask ?? TaskHelper.CompletedTask;
-			else
-				return TaskHelper.CompletedTask;
+			{
+				Task task = _runTask;
+				if (_runTask != null)
+					await task.ConfigureAwait(false);
+			}
 		}
 
 		private async Task RunTasks()
