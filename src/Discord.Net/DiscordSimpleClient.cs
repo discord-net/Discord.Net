@@ -289,23 +289,30 @@ namespace Discord
 
 		internal virtual Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
-			switch (e.Type)
+			try
 			{
-				case "READY":
-					_currentUserId = e.Payload["user"].Value<string>("id");
-					break;
-				case "VOICE_SERVER_UPDATE":
-					{
-						string guildId = e.Payload.Value<string>("guild_id");
-						
-						if (_enableVoice && guildId == _voiceSocket.CurrentServerId)
+				switch (e.Type)
+				{
+					case "READY":
+						_currentUserId = e.Payload["user"].Value<string>("id");
+						break;
+					case "VOICE_SERVER_UPDATE":
 						{
-							string token = e.Payload.Value<string>("token");
-							_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-							return _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, token, CancelToken);
+							string guildId = e.Payload.Value<string>("guild_id");
+
+							if (_enableVoice && guildId == _voiceSocket.CurrentServerId)
+							{
+								string token = e.Payload.Value<string>("token");
+								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
+								return _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, token, CancelToken);
+							}
 						}
-					}
-					break;
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
 			}
 			return TaskHelper.CompletedTask;
 		}

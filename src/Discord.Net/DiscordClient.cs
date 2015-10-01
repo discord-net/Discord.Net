@@ -337,6 +337,8 @@ namespace Discord
 
 		internal override async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
+			try
+			{
 			await base.OnReceivedEvent(e);
 
 			switch (e.Type)
@@ -682,6 +684,11 @@ namespace Discord
 				default:
 					RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
 					break;
+				}
+			}
+			catch (Exception ex)
+			{
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
 			}
 		}
 
