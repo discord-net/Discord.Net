@@ -253,6 +253,7 @@ namespace Discord
 
 			_api.Token = token;
 			string gateway = (await _api.Gateway().ConfigureAwait(false)).Url;
+			gateway.Replace("discord.gg", "discordapp.net"); //Temporary SSL workaround
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {gateway}");
 
