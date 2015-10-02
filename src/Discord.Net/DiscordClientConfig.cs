@@ -63,9 +63,6 @@ namespace Discord
 		/// <summary> (Experimental) Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
 		public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
 		private bool _trackActivity = true;
-		/// <summary> (Experimental) Uses a temporary workaround to the SSL issues via an alternate endpoint provided by the Discord developers. This option will be removed when the certificate chain is fixed on the main endpoints. </summary>
-		public bool UseAlternateEndpoint { get { return _useAlternateEndpoint; } set { SetValue(ref _useAlternateEndpoint, value); } }
-		private bool _useAlternateEndpoint = false;
 
 		//Internals
 		internal bool VoiceOnly { get { return _voiceOnly; } set { SetValue(ref _voiceOnly, value); } }
