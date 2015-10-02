@@ -106,8 +106,8 @@ namespace Discord
 		}
 
 		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
-		public Task EditChannel(Channel channel)
-			=> EditChannel(channel?.Id);
+		public Task EditChannel(Channel channel, string name = null, string topic = null)
+			=> EditChannel(channel?.Id, name: name, topic: topic);
 		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
 		public Task EditChannel(string channelId, string name = null, string topic = null)
 		{
