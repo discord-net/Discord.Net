@@ -100,8 +100,8 @@ namespace Discord
 				{
 					Type = x.Type,
 					Id = x.Id,
-					Deny = new PackedChannelPermissions(true, x.Deny),
-					Allow = new PackedChannelPermissions(true, x.Allow)
+					Deny = new PackedChannelPermissions(true,  x.Deny),
+					Allow = new PackedChannelPermissions(true,  x.Allow)
 				}).ToArray();
 			}
 			else

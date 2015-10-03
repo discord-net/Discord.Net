@@ -157,23 +157,32 @@ namespace Discord
             var server = Server;
 			if (server == null) return;
 			var channel = _client.Channels[channelId];
-			if (channel == null) return;
-			var channelOverwrites = channel.PermissionOverwrites;
 
 			PackedChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channelId, out permissions)) return;
 			uint newPermissions = 0x0;
 
-			foreach (var serverRole in Roles)
-				newPermissions |= serverRole.Permissions.RawValue;
-			foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && RoleIds.Contains(x.Id)))
-				newPermissions &= ~denyRole.Deny.RawValue;
-			foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && RoleIds.Contains(x.Id)))
-				newPermissions |= allowRole.Allow.RawValue;
-			foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Deny.RawValue != 0))
-                newPermissions &= ~denyMembers.Deny.RawValue;
-			foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Allow.RawValue != 0))
-                newPermissions |= allowMembers.Allow.RawValue;
+			if (UserId == server.OwnerId)
+				newPermissions = PackedChannelPermissions.Mask;
+			else
+			{
+				if (channel == null) return;
+				var channelOverwrites = channel.PermissionOverwrites;
+
+				foreach (var serverRole in Roles)
+					newPermissions |= serverRole.Permissions.RawValue;
+				foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && RoleIds.Contains(x.Id)))
+					newPermissions &= ~denyRole.Deny.RawValue;
+				foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && RoleIds.Contains(x.Id)))
+					newPermissions |= allowRole.Allow.RawValue;
+				foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Deny.RawValue != 0))
+					newPermissions &= ~denyMembers.Deny.RawValue;
+				foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Allow.RawValue != 0))
+					newPermissions |= allowMembers.Allow.RawValue;
+
+				if (((newPermissions >> (PackedChannelPermissions.GlobalBit - 1)) & 1) == 1)
+					newPermissions = PackedChannelPermissions.Mask;
+			}
 
 			if (permissions.RawValue != newPermissions)
 			{
