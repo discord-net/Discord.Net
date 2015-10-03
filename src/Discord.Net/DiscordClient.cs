@@ -338,351 +338,357 @@ namespace Discord
 		{
 			try
 			{
-			await base.OnReceivedEvent(e);
+				await base.OnReceivedEvent(e);
 
-			switch (e.Type)
-			{
-				//Global
-				case "READY": //Resync
-					{
-						var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-						_currentUser = _users.GetOrAdd(data.User.Id);
-						_currentUser.Update(data.User);
-						foreach (var model in data.Guilds)
+				switch (e.Type)
+				{
+					//Global
+					case "READY": //Resync
 						{
+							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
+							_currentUser = _users.GetOrAdd(data.User.Id);
+							_currentUser.Update(data.User);
+							foreach (var model in data.Guilds)
+							{
+								if (!model.Unavailable)
+								{
+									var server = _servers.GetOrAdd(model.Id);
+									server.Update(model);
+								}
+							}
+							foreach (var model in data.PrivateChannels)
+							{
+								var user = _users.GetOrAdd(model.Recipient.Id);
+								user.Update(model.Recipient);
+								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
+								channel.Update(model);
+							}
+						}
+						break;
+					case "RESUMED":
+						break;
+
+					//Servers
+					case "GUILD_CREATE":
+						{
+							var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
 							if (!model.Unavailable)
 							{
 								var server = _servers.GetOrAdd(model.Id);
 								server.Update(model);
+								RaiseServerCreated(server);
 							}
 						}
-						foreach (var model in data.PrivateChannels)
+						break;
+					case "GUILD_UPDATE":
 						{
-							var user = _users.GetOrAdd(model.Recipient.Id);
-							user.Update(model.Recipient);
-							var channel = _channels.GetOrAdd(model.Id, null, user.Id);
-							channel.Update(model);
+							var model = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
+							var server = _servers[model.Id];
+							if (server != null)
+							{
+								server.Update(model);
+								RaiseServerUpdated(server);
+							}
 						}
-					}
-					break;
-				case "RESUMED":
-					break;
+						break;
+					case "GUILD_DELETE":
+						{
+							var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
+							var server = _servers.TryRemove(data.Id);
+							if (server != null)
+								RaiseServerDestroyed(server);
+						}
+						break;
 
-				//Servers
-				case "GUILD_CREATE":
-					{
-						var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
-						if (!model.Unavailable)
+					//Channels
+					case "CHANNEL_CREATE":
 						{
-							var server = _servers.GetOrAdd(model.Id);
-							server.Update(model);
-							RaiseServerCreated(server);
-						}
-					}
-					break;
-				case "GUILD_UPDATE":
-					{
-						var model = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
-						var server = _servers[model.Id];
-						if (server != null)
-						{
-							server.Update(model);
-							RaiseServerUpdated(server);
-						}
-					}
-					break;
-				case "GUILD_DELETE":
-					{
-						var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
-						var server = _servers.TryRemove(data.Id);
-						if (server != null)
-							RaiseServerDestroyed(server);
-					}
-					break;
-
-				//Channels
-				case "CHANNEL_CREATE":
-					{
-						var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
-						Channel channel;
-						if (data.IsPrivate)
-						{
-							var user = _users.GetOrAdd(data.Recipient.Id);
-							user.Update(data.Recipient);
-							channel = _channels.GetOrAdd(data.Id, null, user.Id);
-						}
-						else
-							channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
-						channel.Update(data);
-						RaiseChannelCreated(channel);
-					}
-					break;
-				case "CHANNEL_UPDATE":
-					{
-						var data = e.Payload.ToObject<ChannelUpdateEvent>(_serializer);
-						var channel = _channels[data.Id];
-						if (channel != null)
-						{
+							var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
+							Channel channel;
+							if (data.IsPrivate)
+							{
+								var user = _users.GetOrAdd(data.Recipient.Id);
+								user.Update(data.Recipient);
+								channel = _channels.GetOrAdd(data.Id, null, user.Id);
+							}
+							else
+								channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
 							channel.Update(data);
-							RaiseChannelUpdated(channel);
+							RaiseChannelCreated(channel);
 						}
-					}
-					break;
-				case "CHANNEL_DELETE":
-					{
-						var data = e.Payload.ToObject<ChannelDeleteEvent>(_serializer);
-						var channel = _channels.TryRemove(data.Id);
-						if (channel != null)
-							RaiseChannelDestroyed(channel);
-					}
-					break;
-
-				//Members
-				case "GUILD_MEMBER_ADD":
-					{
-						var data = e.Payload.ToObject<GuildMemberAddEvent>(_serializer);
-						var user = _users.GetOrAdd(data.User.Id);
-						var member = _members.GetOrAdd(data.User.Id, data.GuildId);
-						user.Update(data.User);
-						member.Update(data);
-						if (_config.TrackActivity)
-							member.UpdateActivity();
-						RaiseUserAdded(member);
-					}
-					break;
-				case "GUILD_MEMBER_UPDATE":
-					{
-						var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_serializer);
-						var member = _members[data.User.Id, data.GuildId];
-						if (member != null)
+						break;
+					case "CHANNEL_UPDATE":
 						{
+							var data = e.Payload.ToObject<ChannelUpdateEvent>(_serializer);
+							var channel = _channels[data.Id];
+							if (channel != null)
+							{
+								channel.Update(data);
+								RaiseChannelUpdated(channel);
+							}
+						}
+						break;
+					case "CHANNEL_DELETE":
+						{
+							var data = e.Payload.ToObject<ChannelDeleteEvent>(_serializer);
+							var channel = _channels.TryRemove(data.Id);
+							if (channel != null)
+								RaiseChannelDestroyed(channel);
+						}
+						break;
+
+					//Members
+					case "GUILD_MEMBER_ADD":
+						{
+							var data = e.Payload.ToObject<GuildMemberAddEvent>(_serializer);
+							var user = _users.GetOrAdd(data.User.Id);
+							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
+							user.Update(data.User);
 							member.Update(data);
-							RaiseMemberUpdated(member);
+							if (_config.TrackActivity)
+								member.UpdateActivity();
+							RaiseUserAdded(member);
 						}
-					}
-					break;
-				case "GUILD_MEMBER_REMOVE":
-					{
-						var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_serializer);
-						var member = _members.TryRemove(data.UserId, data.GuildId);
-						if (member != null)
-							RaiseUserRemoved(member);
-					}
-					break;
+						break;
+					case "GUILD_MEMBER_UPDATE":
+						{
+							var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_serializer);
+							var member = _members[data.User.Id, data.GuildId];
+							if (member != null)
+							{
+								member.Update(data);
+								RaiseMemberUpdated(member);
+							}
+						}
+						break;
+					case "GUILD_MEMBER_REMOVE":
+						{
+							var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_serializer);
+							var member = _members.TryRemove(data.UserId, data.GuildId);
+							if (member != null)
+								RaiseUserRemoved(member);
+						}
+						break;
 
-				//Roles
-				case "GUILD_ROLE_CREATE":
-					{
-						var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
-						var role = _roles.GetOrAdd(data.Data.Id, data.GuildId, false);
-						role.Update(data.Data);
-						RaiseRoleUpdated(role);
-					}
-					break;
-				case "GUILD_ROLE_UPDATE":
-					{
-						var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_serializer);
-						var role = _roles[data.Data.Id];
-						if (role != null)
+					//Roles
+					case "GUILD_ROLE_CREATE":
+						{
+							var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
+							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId, false);
 							role.Update(data.Data);
-						RaiseRoleUpdated(role);
-					}
-					break;
-				case "GUILD_ROLE_DELETE":
-					{
-						var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_serializer);
-						var role = _roles.TryRemove(data.RoleId);
-						if (role != null)
-							RaiseRoleDeleted(role);
-					}
-					break;
-
-				//Bans
-				case "GUILD_BAN_ADD":
-					{
-						var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
-						var server = _servers[data.GuildId];
-						if (server != null)
-						{
-							server.AddBan(data.User?.Id);
-							RaiseBanAdded(data.User?.Id, server);
+							var server = _servers[data.GuildId];
+							if (server != null)
+								server.AddRole(data.Data.Id);
+							RaiseRoleUpdated(role);
 						}
-					}
-					break;
-				case "GUILD_BAN_REMOVE":
-					{
-						var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
-						var server = _servers[data.GuildId];
-						if (server != null && server.RemoveBan(data.User?.Id))
-							RaiseBanRemoved(data.User?.Id, server);
-					}
-					break;
-
-				//Messages
-				case "MESSAGE_CREATE":
-					{
-						var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
-						Message msg = null;
-
-						bool wasLocal = _config.UseMessageQueue && data.Author.Id == CurrentUserId && data.Nonce != null;
-						if (wasLocal)
+						break;
+					case "GUILD_ROLE_UPDATE":
 						{
-							msg = _messages.Remap("nonce" + data.Nonce, data.Id);
+							var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_serializer);
+							var role = _roles[data.Data.Id];
+							if (role != null)
+								role.Update(data.Data);
+							RaiseRoleUpdated(role);
+						}
+						break;
+					case "GUILD_ROLE_DELETE":
+						{
+							var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_serializer);
+							var server = _servers[data.GuildId];
+							if (server != null)
+								server.RemoveRole(data.RoleId);
+							var role = _roles.TryRemove(data.RoleId);
+							if (role != null)
+								RaiseRoleDeleted(role);
+						}
+						break;
+
+					//Bans
+					case "GUILD_BAN_ADD":
+						{
+							var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
+							var server = _servers[data.GuildId];
+							if (server != null)
+							{
+								server.AddBan(data.User?.Id);
+								RaiseBanAdded(data.User?.Id, server);
+							}
+						}
+						break;
+					case "GUILD_BAN_REMOVE":
+						{
+							var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
+							var server = _servers[data.GuildId];
+							if (server != null && server.RemoveBan(data.User?.Id))
+								RaiseBanRemoved(data.User?.Id, server);
+						}
+						break;
+
+					//Messages
+					case "MESSAGE_CREATE":
+						{
+							var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
+							Message msg = null;
+
+							bool wasLocal = _config.UseMessageQueue && data.Author.Id == CurrentUserId && data.Nonce != null;
+							if (wasLocal)
+							{
+								msg = _messages.Remap("nonce" + data.Nonce, data.Id);
+								if (msg != null)
+								{
+									msg.IsQueued = false;
+									msg.Id = data.Id;
+								}
+							}
+
+							if (msg == null)
+								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+							msg.Update(data);
+							if (_config.TrackActivity)
+							{
+								var channel = msg.Channel;
+								if (channel == null || channel.IsPrivate)
+								{
+									var user = msg.User;
+									if (user != null)
+										user.UpdateActivity(data.Timestamp);
+								}
+								else
+								{
+									var member = msg.Member;
+									if (member != null)
+										member.UpdateActivity(data.Timestamp);
+								}
+							}
+							if (wasLocal)
+								RaiseMessageSent(msg);
+							RaiseMessageCreated(msg);
+						}
+						break;
+					case "MESSAGE_UPDATE":
+						{
+							var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
+							var msg = _messages[data.Id];
 							if (msg != null)
 							{
-								msg.IsQueued = false;
-								msg.Id = data.Id;
+								msg.Update(data);
+								RaiseMessageUpdated(msg);
 							}
 						}
-
-						if (msg == null)
-							msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
-						msg.Update(data);
-						if (_config.TrackActivity)
+						break;
+					case "MESSAGE_DELETE":
 						{
-							var channel = msg.Channel;
-							if (channel == null || channel.IsPrivate)
+							var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
+							var msg = _messages.TryRemove(data.Id);
+							if (msg != null)
+								RaiseMessageDeleted(msg);
+						}
+						break;
+					case "MESSAGE_ACK":
+						{
+							var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
+							var msg = GetMessage(data.MessageId);
+							if (msg != null)
+								RaiseMessageReadRemotely(msg);
+						}
+						break;
+
+					//Statuses
+					case "PRESENCE_UPDATE":
+						{
+							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
+							var member = _members[data.User.Id, data.GuildId];
+							/*if (_config.TrackActivity)
 							{
-								var user = msg.User;
+								var user = _users[data.User.Id];
 								if (user != null)
-									user.UpdateActivity(data.Timestamp);
-							}
-							else
+									user.UpdateActivity(DateTime.UtcNow);
+							}*/
+							if (member != null)
 							{
-								var member = msg.Member;
-								if (member != null)
-									member.UpdateActivity(data.Timestamp);
+								member.Update(data);
+								RaiseUserPresenceUpdated(member);
 							}
 						}
-						if (wasLocal)
-							RaiseMessageSent(msg);
-						RaiseMessageCreated(msg);
-					}
-					break;
-				case "MESSAGE_UPDATE":
-					{
-						var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
-						var msg = _messages[data.Id];
-						if (msg != null)
+						break;
+					case "TYPING_START":
 						{
-							msg.Update(data);
-							RaiseMessageUpdated(msg);
-						}
-					}
-					break;
-				case "MESSAGE_DELETE":
-					{
-						var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
-						var msg = _messages.TryRemove(data.Id);
-						if (msg != null)
-							RaiseMessageDeleted(msg);
-					}
-					break;
-				case "MESSAGE_ACK":
-					{
-						var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
-						var msg = GetMessage(data.MessageId);
-						if (msg != null)
-							RaiseMessageReadRemotely(msg);
-					}
-					break;
+							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
+							var channel = _channels[data.ChannelId];
+							var user = _users[data.UserId];
 
-				//Statuses
-				case "PRESENCE_UPDATE":
-					{
-						var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
-						var member = _members[data.User.Id, data.GuildId];
-						/*if (_config.TrackActivity)
-						{
-							var user = _users[data.User.Id];
 							if (user != null)
-								user.UpdateActivity(DateTime.UtcNow);
-						}*/
-						if (member != null)
-						{
-							member.Update(data);
-							RaiseUserPresenceUpdated(member);
-						}
-					}
-					break;
-				case "TYPING_START":
-					{
-						var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
-						var channel = _channels[data.ChannelId];
-						var user = _users[data.UserId];
-
-						if (user != null)
-						{
-							if (channel != null)
-								RaiseUserIsTyping(user, channel);
-						}
-						if (_config.TrackActivity)
-						{
-							if (channel.IsPrivate)
 							{
+								if (channel != null)
+									RaiseUserIsTyping(user, channel);
+							}
+							if (_config.TrackActivity)
+							{
+								if (channel.IsPrivate)
+								{
+									if (user != null)
+										user.UpdateActivity();
+								}
+								else
+								{
+									var member = _members[data.UserId, channel.ServerId];
+									if (member != null)
+										member.UpdateActivity();
+								}
+							}
+						}
+						break;
+
+					//Voice
+					case "VOICE_STATE_UPDATE":
+						{
+							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
+							var member = _members[data.UserId, data.GuildId];
+							/*if (_config.TrackActivity)
+							{
+								var user = _users[data.User.Id];
 								if (user != null)
-									user.UpdateActivity();
-							}
-							else
+									user.UpdateActivity(DateTime.UtcNow);
+							}*/
+							if (member != null)
 							{
-								var member = _members[data.UserId, channel.ServerId];
-								if (member != null)
-									member.UpdateActivity();
+								member.Update(data);
+								if (member.IsSpeaking)
+								{
+									member.IsSpeaking = false;
+									RaiseUserIsSpeaking(member, false);
+								}
+								RaiseUserVoiceStateUpdated(member);
 							}
 						}
-					}
-					break;
+						break;
 
-				//Voice
-				case "VOICE_STATE_UPDATE":
-					{
-						var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
-						var member = _members[data.UserId, data.GuildId];
-						/*if (_config.TrackActivity)
+					//Settings
+					case "USER_UPDATE":
 						{
-							var user = _users[data.User.Id];
+							var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
+							var user = _users[data.Id];
 							if (user != null)
-								user.UpdateActivity(DateTime.UtcNow);
-						}*/
-						if (member != null)
-						{
-							member.Update(data);
-							if (member.IsSpeaking)
 							{
-								member.IsSpeaking = false;
-								RaiseUserIsSpeaking(member, false);
+								user.Update(data);
+								RaiseUserUpdated(user);
 							}
-							RaiseUserVoiceStateUpdated(member);
 						}
-					}
-					break;
-
-				//Settings
-				case "USER_UPDATE":
-					{
-						var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
-						var user = _users[data.Id];
-						if (user != null)
+						break;
+					case "USER_SETTINGS_UPDATE":
 						{
-							user.Update(data);
-							RaiseUserUpdated(user);
+							//TODO: Process this
 						}
-					}
-					break;
-				case "USER_SETTINGS_UPDATE":
-					{
-						//TODO: Process this
-					}
-					break;
+						break;
 
-				//Internal (handled in DiscordSimpleClient)
-				case "VOICE_SERVER_UPDATE":
-					break;
+					//Internal (handled in DiscordSimpleClient)
+					case "VOICE_SERVER_UPDATE":
+						break;
 
-				//Others
-				default:
-					RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
-					break;
+					//Others
+					default:
+						RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
+						break;
 				}
 			}
 			catch (Exception ex)
