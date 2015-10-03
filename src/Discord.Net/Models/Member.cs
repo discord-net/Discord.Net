@@ -158,7 +158,6 @@ namespace Discord
 			if (server == null) return;
 			var channel = _client.Channels[channelId];
 			if (channel == null) return;
-			var serverOverwrites = channel.PermissionOverwrites;
 			var channelOverwrites = channel.PermissionOverwrites;
 
 			PackedChannelPermissions permissions;
