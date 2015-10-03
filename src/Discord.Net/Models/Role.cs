@@ -14,7 +14,7 @@ namespace Discord
 		public string Name { get; internal set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
-		public PackedPermissions Permissions { get; }
+		public PackedServerPermissions Permissions { get; }
 
 		/// <summary> Returns the id of the server this role is a member of. </summary>
 		public string ServerId { get; }
@@ -34,7 +34,7 @@ namespace Discord
 			_client = client;
 			Id = id;
 			ServerId = serverId;
-			Permissions = new PackedPermissions(true);
+			Permissions = new PackedServerPermissions(true, 0);
 			IsEveryone = isEveryone;
         }
 

@@ -9,7 +9,7 @@ namespace Discord
 	public class Member
 	{
 		private readonly DiscordClient _client;
-		private ConcurrentDictionary<string, PackedPermissions> _permissions;
+		private ConcurrentDictionary<string, PackedChannelPermissions> _permissions;
 
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; internal set; }
@@ -67,7 +67,7 @@ namespace Discord
 			UserId = userId;
 			ServerId = serverId;
 			Status = UserStatus.Offline;
-			_permissions = new ConcurrentDictionary<string, PackedPermissions>();
+			_permissions = new ConcurrentDictionary<string, PackedChannelPermissions>();
         }
 
 		public override string ToString() => UserId;
@@ -137,12 +137,12 @@ namespace Discord
 
 		internal void AddChannel(string channelId)
 		{
-			_permissions.TryAdd(channelId, new PackedPermissions());
+			_permissions.TryAdd(channelId, new PackedChannelPermissions());
 			UpdatePermissions(channelId);
         }
 		internal bool RemoveChannel(string channelId)
 		{
-			PackedPermissions ignored;
+			PackedChannelPermissions ignored;
 			return _permissions.TryRemove(channelId, out ignored);
 		}
 		internal void UpdatePermissions()
@@ -161,7 +161,7 @@ namespace Discord
 			var serverOverwrites = channel.PermissionOverwrites;
 			var channelOverwrites = channel.PermissionOverwrites;
 
-			PackedPermissions permissions;
+			PackedChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channelId, out permissions)) return;
 			uint newPermissions = 0x0;
 
@@ -182,9 +182,10 @@ namespace Discord
 				channel._areMembersStale = true;
 			}
 		}
-		public PackedPermissions GetPermissions(string channelId)
+		//TODO: Add GetServerPermissions
+		public PackedChannelPermissions GetPermissions(string channelId)
 		{
-			PackedPermissions perms;
+			PackedChannelPermissions perms;
 			if (_permissions.TryGetValue(channelId, out perms))
 				return perms;
 			return null;

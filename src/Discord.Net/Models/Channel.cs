@@ -11,8 +11,8 @@ namespace Discord
 		{
 			public string Type { get; internal set; }
 			public string Id { get; internal set; }
-			public PackedPermissions Deny { get; internal set; }
-			public PackedPermissions Allow { get; internal set; }
+			public PackedChannelPermissions Deny { get; internal set; }
+			public PackedChannelPermissions Allow { get; internal set; }
 		}
 
 		private readonly DiscordClient _client;
@@ -100,8 +100,8 @@ namespace Discord
 				{
 					Type = x.Type,
 					Id = x.Id,
-					Deny = new PackedPermissions(true, x.Deny),
-					Allow = new PackedPermissions(true, x.Allow)
+					Deny = new PackedChannelPermissions(true, x.Deny),
+					Allow = new PackedChannelPermissions(true, x.Allow)
 				}).ToArray();
 			}
 			else

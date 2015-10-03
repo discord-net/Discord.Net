@@ -444,29 +444,29 @@ namespace Discord
 		}
 
 		//Permissions
-		public Task SetChannelUserPermissions(Channel channel, Member member, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, Member member, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channel?.Id, member?.UserId, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, Member member, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, Member member, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channelId, member?.UserId, "member", allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, User user, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, User user, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channel?.Id, user?.Id, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, User user, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, User user, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channelId, user?.Id, "member", allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, string userId, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channel?.Id, userId, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, string userId, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channelId, userId, "member", allow, deny);
 
-		public Task SetChannelRolePermissions(Channel channel, Role role, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelRolePermissions(Channel channel, Role role, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channel?.Id, role?.Id, "role", allow, deny);
-		public Task SetChannelRolePermissions(string channelId, Role role, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelRolePermissions(string channelId, Role role, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channelId, role?.Id, "role", allow, deny);
-		public Task SetChannelRolePermissions(Channel channel, string userId, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelRolePermissions(Channel channel, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channel?.Id, userId, "role", allow, deny);
-		public Task SetChannelRolePermissions(string channelId, string userId, PackedPermissions allow, PackedPermissions deny)
+		public Task SetChannelRolePermissions(string channelId, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
 			=> SetChannelPermissions(channelId, userId, "role", allow, deny);
 
-		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedPermissions allow, PackedPermissions deny)
+		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedChannelPermissions allow, PackedChannelPermissions deny)
 		{
 			CheckReady();
 			if (channelId == null) throw new NullReferenceException(nameof(channelId));
@@ -538,7 +538,7 @@ namespace Discord
 
 		public Task EditRole(Role role, string newName)
 			=> EditRole(role?.ServerId, role?.Id, newName);
-		public Task EditRole(string serverId, string roleId, string name = null, PackedPermissions permissions = null)
+		public Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null)
 		{
 			CheckReady();
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
