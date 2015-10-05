@@ -42,7 +42,7 @@ namespace Discord.WebSockets
 			{
 				_parent.RaiseOnLog(LogMessageSeverity.Error, $"Websocket Error: {e.Message}");
 				await _parent.DisconnectInternal(e.Exception, true, true);
-			}
+			};
             _webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console
 			_webSocket.Connect();
 			return TaskHelper.CompletedTask;
