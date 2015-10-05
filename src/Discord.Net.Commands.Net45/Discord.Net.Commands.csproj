@@ -46,11 +46,11 @@
     <Compile Include="..\Discord.Net.Commands\CommandParser.cs">
       <Link>CommandParser.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Commands\DiscordBotClient.cs">
-      <Link>DiscordBotClient.cs</Link>
+    <Compile Include="..\Discord.Net.Commands\CommandsPlugin.cs">
+      <Link>CommandsPlugin.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Commands\DiscordBotClient.Events.cs">
-      <Link>DiscordBotClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net.Commands\CommandsPlugin.Events.cs">
+      <Link>CommandsPlugin.Events.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

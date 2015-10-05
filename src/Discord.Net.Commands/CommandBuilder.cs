@@ -71,13 +71,13 @@ namespace Discord.Commands
 	}
 	public sealed class CommandGroupBuilder
 	{
-		private readonly DiscordBotClient _client;
+		private readonly CommandsPlugin _plugin;
 		private readonly string _prefix;
 		private int _defaultMinPermissions;
 
-		internal CommandGroupBuilder(DiscordBotClient client, string prefix, int defaultMinPermissions)
+		internal CommandGroupBuilder(CommandsPlugin plugin, string prefix, int defaultMinPermissions)
 		{
-			_client = client;
+			_plugin = plugin;
 			_prefix = prefix;
 			_defaultMinPermissions = defaultMinPermissions;
 		}
@@ -89,7 +89,7 @@ namespace Discord.Commands
 
 		public CommandGroupBuilder CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
 		{
-			config(new CommandGroupBuilder(_client, _prefix + ' ' + cmd, _defaultMinPermissions));
+			config(new CommandGroupBuilder(_plugin, _prefix + ' ' + cmd, _defaultMinPermissions));
 			return this;
 		}
 		public CommandBuilder CreateCommand()
@@ -98,7 +98,7 @@ namespace Discord.Commands
 		{
 			var command = new Command(cmd != "" ? _prefix + ' ' + cmd : _prefix);
 			command.MinPerms = _defaultMinPermissions;
-			_client._commands.Add(command);
+			_plugin._commands.Add(command);
             return new CommandBuilder(command);
 		}
 	}

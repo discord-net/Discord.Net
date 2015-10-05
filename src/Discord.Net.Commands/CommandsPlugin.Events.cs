@@ -1,7 +1,6 @@
-﻿using Discord.Commands;
-using System;
+﻿using System;
 
-namespace Discord
+namespace Discord.Commands
 {
 	public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
 	public class CommandEventArgs
@@ -38,7 +37,7 @@ namespace Discord
 			Exception = ex;
 		}
 	}
-	public partial class DiscordBotClient : DiscordClient
+	public partial class CommandsPlugin
 	{
 		public event EventHandler<CommandEventArgs> RanCommand;
 		private void RaiseRanCommand(CommandEventArgs args)

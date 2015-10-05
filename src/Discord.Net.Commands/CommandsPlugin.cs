@@ -1,13 +1,13 @@
-﻿using Discord.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Discord
+namespace Discord.Commands
 {
 	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
-	public partial class DiscordBotClient : DiscordClient
+	public partial class CommandsPlugin
     {
         internal List<Command> _commands;
+		private Func<User, Server, int> _getPermissions;
 
 		public IEnumerable<Command> Commands => _commands;
 
@@ -16,24 +16,27 @@ namespace Discord
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public DiscordBotClient(DiscordClientConfig config = null, Func<User, Server, int> getPermissions = null)
-			: base(config)
+		public CommandsPlugin(Func<User, Server, int> getPermissions = null)
 		{
+			_getPermissions = getPermissions;
 			_commands = new List<Command>();
 
-			CommandChar = '~';
-			UseCommandChar = true;
+			CommandChar = '/';
+			UseCommandChar = false;
 			RequireCommandCharInPublic = true;
 			RequireCommandCharInPrivate = true;
+		}
 
-			MessageCreated += async (s, e) =>
+		public void Install(DiscordClient client)
+		{
+			client.MessageCreated += async (s, e) =>
 			{
 				//If commands aren't being used, don't bother processing them
 				if (_commands.Count == 0)
 					return;
 
 				//Ignore messages from ourselves
-				if (e.Message.UserId == CurrentUserId)
+				if (e.Message.UserId == client.CurrentUserId)
 					return;
 
 				//Check for the command character
@@ -87,7 +90,7 @@ namespace Discord
 						newArgs[j] = args[j + cmd.Parts.Length];
 					
 					//Check Permissions
-                    int permissions = getPermissions != null ? getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
+                    int permissions = _getPermissions != null ? _getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
 					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{
