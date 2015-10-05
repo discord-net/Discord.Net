@@ -238,19 +238,25 @@ namespace Discord
 		}
 
 		//Messages
-		/// <summary> Sends a message to the provided channel. </summary>
-		public Task<Message[]> SendMessage(Channel channel, string text)
-			=> SendMessage(channel?.Id, text, new string[0]);
-		/// <summary> Sends a message to the provided channel. </summary>
-		public Task<Message[]> SendMessage(string channelId, string text)
-			=> SendMessage(channelId, text, new string[0]);
-		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
+		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(string channelId, string text, string[] mentions)
-			=> SendMessage(_channels[channelId], text, mentions);
-		/// <summary> Sends a message to the provided channel, mentioning certain users. </summary>
+		public Task<Message[]> SendMessage(Channel channel, string text, params string[] mentions)
+			=> SendMessage(channel, text, mentions, false);
+		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public async Task<Message[]> SendMessage(Channel channel, string text, string[] mentions, bool isTextToSpeech = false)
+		public Task<Message[]> SendMessage(string channelId, string text, params string[] mentions)
+			=> SendMessage(_channels[channelId], text, mentions, false);
+		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		public Task<Message[]> SendTTSMessage(Channel channel, string text, params string[] mentions)
+			=> SendMessage(channel, text, mentions, true);
+		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		public Task<Message[]> SendTTSMessage(string channelId, string text, params string[] mentions)
+			=> SendMessage(_channels[channelId], text, mentions, true);
+		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
+		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		private async Task<Message[]> SendMessage(Channel channel, string text, string[] mentions, bool isTextToSpeech)
 		{
 			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
