@@ -2,8 +2,6 @@
 using Discord.Helpers;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WSSharpNWebSocket = WebSocketSharp.WebSocket;
@@ -38,9 +36,14 @@ namespace Discord.WebSockets
 			_webSocket = new WSSharpNWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-			_webSocket.Compression = WebSocketSharp.CompressionMethod.None;
+            _webSocket.Compression = WebSocketSharp.CompressionMethod.None;
             _webSocket.OnMessage += (s, e) => RaiseProcessMessage(e.Data);
-			_webSocket.OnError += (s, e) => _parent.RaiseOnLog(LogMessageSeverity.Error, $"Websocket Error: {e.Message}");
+			_webSocket.OnError += async (s, e) =>
+			{
+				_parent.RaiseOnLog(LogMessageSeverity.Error, $"Websocket Error: {e.Message}");
+				await _parent.DisconnectInternal(e.Exception, true, true);
+			}
+            _webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console
 			_webSocket.Connect();
 			return TaskHelper.CompletedTask;
 		}

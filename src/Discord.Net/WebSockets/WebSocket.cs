@@ -115,7 +115,7 @@ namespace Discord.WebSockets
         }
 
 		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
+		protected internal async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
