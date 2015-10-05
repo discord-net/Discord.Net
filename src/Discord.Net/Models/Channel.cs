@@ -47,7 +47,7 @@ namespace Discord
 		[JsonIgnore]
 		public User Recipient => _client.Users[RecipientId];
 
-		private string[] _userIds;
+		/// <summary> Returns a collection of the IDs of all users with read access to this channel. </summary>
 		public IEnumerable<string> UserIds
 		{
 			get
@@ -60,7 +60,10 @@ namespace Discord
 				return _userIds;
 			}
 		}
-        public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);
+		private string[] _userIds;
+		/// <summary> Returns a collection of all users with read access to this channel. </summary>
+		public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);
+		/// <summary> Returns a collection of all users with read access to this channel. </summary>
 		public IEnumerable<User> Users => UserIds.Select(x => _client.Users[x]);
 
 		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
@@ -71,7 +74,8 @@ namespace Discord
 		public IEnumerable<Message> Messages => _messages.Select(x => _client.Messages[x.Key]);
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
-		public PermissionOverwrite[] PermissionOverwrites { get; internal set; }
+		private PermissionOverwrite[] _permissionOverwrites;
+		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites;
 
 		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
 		{
@@ -96,7 +100,7 @@ namespace Discord
 
 			if (model.PermissionOverwrites != null)
 			{
-				PermissionOverwrites = model.PermissionOverwrites.Select(x => new PermissionOverwrite
+				_permissionOverwrites = model.PermissionOverwrites.Select(x => new PermissionOverwrite
 				{
 					Type = x.Type,
 					Id = x.Id,
@@ -105,7 +109,7 @@ namespace Discord
 				}).ToArray();
 			}
 			else
-				PermissionOverwrites = null;
+				_permissionOverwrites = null;
 		}
 
 		public override string ToString() => Name;

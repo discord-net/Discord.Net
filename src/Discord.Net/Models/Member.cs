@@ -191,8 +191,12 @@ namespace Discord
 			}
 		}
 		//TODO: Add GetServerPermissions
-		public PackedChannelPermissions GetPermissions(string channelId)
+		public PackedChannelPermissions GetPermissions(Channel channel)
+			=> GetPermissions(channel?.Id);
+        public PackedChannelPermissions GetPermissions(string channelId)
 		{
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+
 			PackedChannelPermissions perms;
 			if (_permissions.TryGetValue(channelId, out perms))
 				return perms;
