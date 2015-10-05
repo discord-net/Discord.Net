@@ -1,4 +1,4 @@
-# Discord.Net v0.7.1-beta1
+# Discord.Net v0.7.1
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
@@ -18,5 +18,5 @@ You can download Discord.Net from NuGet:
 
 ### Known Issues
 - Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
-- The Message caches does not currently clean up when their entries are no longer referenced, and there is currently no cap to it. For now, disconnecting and reconnecting will clear all caches.
+- The Message cache does not currently clean up when their entries are no longer referenced, and there is currently no cap to it. For now, disconnecting and reconnecting will clear all caches.
 - DNX Core 5.0 is experiencing several network-related issues and support has been temporarily dropped.
