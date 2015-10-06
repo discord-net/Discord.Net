@@ -44,7 +44,16 @@ namespace Discord
 	{
 		private bool _isLocked;
 		protected uint _rawValue;
-		public uint RawValue { get { return _rawValue; } internal set { _rawValue = value; } } //Internal set bypasses isLocked for API changes.
+		public uint RawValue
+		{
+			get { return _rawValue; }
+			set
+			{
+				if (_isLocked)
+					throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
+				_rawValue = value;
+			}
+		} 
 		
 		protected PackedPermissions(bool isLocked, uint rawValue) { _isLocked = isLocked; _rawValue = rawValue; }
 
@@ -92,6 +101,11 @@ namespace Discord
 
 		//6 Unused
 
+		internal void SetRawValue(uint rawValue)
+		{
+			//Bypasses isLocked for API changes.
+			_rawValue = rawValue;
+		}
 		protected bool GetBit(int pos) => ((_rawValue >> (pos - 1)) & 1U) == 1;
 		protected void SetBit(int pos, bool value)
 		{

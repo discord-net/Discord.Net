@@ -260,7 +260,7 @@ namespace Discord.API
 	public class RoleInfo
 	{
 		[JsonProperty("permissions")]
-		public int Permissions;
+		public uint Permissions;
 		[JsonProperty("name")]
 		public string Name;
 		[JsonProperty("id")]

@@ -186,7 +186,7 @@ namespace Discord
 
 			if (permissions.RawValue != newPermissions)
 			{
-				permissions.RawValue = newPermissions;
+				permissions.SetRawValue(newPermissions);
 				channel._areMembersStale = true;
 			}
 		}

@@ -41,7 +41,7 @@ namespace Discord
 		internal void Update(API.RoleInfo model)
 		{
 			Name = model.Name;
-			Permissions.RawValue = (uint)model.Permissions;
+			Permissions.SetRawValue(model.Permissions);
 
 			foreach (var member in Members)
 				member.UpdatePermissions();
