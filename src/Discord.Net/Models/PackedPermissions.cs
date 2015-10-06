@@ -5,9 +5,9 @@ namespace Discord
 	public sealed class PackedServerPermissions : PackedPermissions
 	{
 		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
-		internal static uint Mask = Convert.ToUInt32("00000011111100111111110000111111", 2);
+		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000111111", 2);
 
-		public PackedServerPermissions() : base(false, 0) { }
+		public PackedServerPermissions(uint rawValue = 0) : base(false, rawValue) { }
 		internal PackedServerPermissions(bool isLocked, uint rawValue) : base(isLocked, rawValue) { }
 
 		/// <summary> If True, a user may ban users from the server. </summary>
@@ -27,9 +27,9 @@ namespace Discord
 	public sealed class PackedChannelPermissions : PackedPermissions
 	{
 		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
-		internal static uint Mask = Convert.ToUInt32("00000011111100111111110000011001", 2);
+		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000011001", 2);
 
-		public PackedChannelPermissions() : base(false, 0) { }
+		public PackedChannelPermissions(uint rawValue = 0) : base(false, rawValue) { }
 		internal PackedChannelPermissions(bool isLocked, uint rawValue) : base(isLocked, rawValue) { }
 		
 		/// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
