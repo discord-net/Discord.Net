@@ -55,7 +55,7 @@ namespace Discord
 			_config = config ?? new DiscordClientConfig();
 			_config.Lock();
 
-			_enableVoice = config.VoiceMode != DiscordVoiceMode.Disabled && !config.EnableVoiceMultiserver;
+			_enableVoice = _config.VoiceMode != DiscordVoiceMode.Disabled && !_config.EnableVoiceMultiserver;
 
 			_state = (int)DiscordClientState.Disconnected;
 			_cancelToken = new CancellationToken(true);
