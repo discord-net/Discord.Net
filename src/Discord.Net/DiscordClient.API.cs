@@ -99,6 +99,8 @@ namespace Discord
 			if (channel == null)
 			{
 				var response = await _api.CreatePMChannel(CurrentUserId, userId).ConfigureAwait(false);
+				user = _users.GetOrAdd(response.Recipient?.Id);
+				user.Update(response.Recipient);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 				channel.Update(response);
 			}
