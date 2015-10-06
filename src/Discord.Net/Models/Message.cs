@@ -112,7 +112,7 @@ namespace Discord
 		public User User => _client.Users[UserId];
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public Member Member => _client.Members[ServerId, UserId];
+		public Member Member => _client.Members[UserId, ServerId];
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 		{
