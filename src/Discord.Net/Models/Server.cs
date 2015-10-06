@@ -140,8 +140,8 @@ namespace Discord
 			foreach (var subModel in model.Members)
 			{
 				var user = users.GetOrAdd(subModel.User.Id);
-				var member = members.GetOrAdd(subModel.User.Id, Id);
 				user.Update(subModel.User);
+				var member = members.GetOrAdd(subModel.User.Id, Id);
 				member.Update(subModel);
 			}
 			foreach (var subModel in model.VoiceStates)

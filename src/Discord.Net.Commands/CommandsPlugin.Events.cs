@@ -13,6 +13,7 @@ namespace Discord.Commands
 
 		public User User => Message.User;
 		public string UserId => Message.UserId;
+		public Member Member => Message.Member;
 		public Channel Channel => Message.Channel;
 		public string ChannelId => Message.ChannelId;
 		public Server Server => Message.Channel.Server;
