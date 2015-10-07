@@ -233,7 +233,8 @@ namespace Discord
 			try
 			{
 				var response = await _api.Login(email, password)
-					.Timeout(_config.APITimeout);
+					.Timeout(_config.APITimeout)
+					.ConfigureAwait(false);
 				token = response.Token;
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Login successful, got token.");
@@ -254,7 +255,9 @@ namespace Discord
 				await Disconnect().ConfigureAwait(false);
 
 			_api.Token = token;
-			string gateway = (await _api.Gateway().ConfigureAwait(false)).Url;
+			string gateway = (await _api.Gateway()
+				.Timeout(_config.APITimeout)
+				.ConfigureAwait(false)).Url;
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {gateway}");
 
