@@ -4,6 +4,7 @@
 
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Discord.API
 {
@@ -42,6 +43,21 @@ namespace Discord.API
 		public string Name;
 		[JsonProperty("topic", NullValueHandling = NullValueHandling.Ignore)]
 		public string Topic;
+	}
+	internal sealed class ReorderChannelsRequest : IEnumerable<ReorderChannelsRequest.Channel>
+	{
+		public sealed class Channel
+		{
+			[JsonProperty("id")]
+			public string Id;
+			[JsonProperty("position")]
+			public uint Position;
+		}
+		private IEnumerable<Channel> _channels;
+		public ReorderChannelsRequest(IEnumerable<Channel> channels) { _channels = channels; }
+
+		public IEnumerator<Channel> GetEnumerator() =>_channels.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => _channels.GetEnumerator();
 	}
 
 	//Invites

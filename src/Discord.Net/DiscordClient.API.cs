@@ -108,16 +108,58 @@ namespace Discord
 		}
 
 		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
-		public Task EditChannel(Channel channel, string name = null, string topic = null)
-			=> EditChannel(channel?.Id, name: name, topic: topic);
+		public Task EditChannel(string channelId, string name = null, string topic = null, int? position = null)
+			=> EditChannel(_channels[channelId], name: name, topic: topic, position: position);
 		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
-		public Task EditChannel(string channelId, string name = null, string topic = null)
+        public async Task EditChannel(Channel channel, string name = null, string topic = null, int? position = null)
 		{
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-			if (topic == null) throw new ArgumentNullException(nameof(topic));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
-			return _api.EditChannel(channelId, name: name, topic: topic);
+			await _api.EditChannel(channel.Id, name: name, topic: topic);
+
+			if (position != null)
+			{
+				int oldPos = channel.Position;
+				int newPos = position.Value;
+				int minPos;
+				Channel[] channels = channel.Server.Channels.OrderBy(x => x.Position).ToArray();
+
+				if (oldPos < newPos) //Moving Down
+				{
+					minPos = oldPos;
+					for (int i = oldPos; i < newPos; i++)
+						channels[i] = channels[i + 1];
+					channels[newPos] = channel;
+                }
+				else //(oldPos > newPos) Moving Up
+				{
+					minPos = newPos;
+					for (int i = oldPos; i > newPos; i--)
+						channels[i] = channels[i - 1];
+					channels[newPos] = channel;
+				}
+				await _api.ReorderChannels(channel.ServerId, minPos, channels.Skip(minPos).Select(x => x.Id));
+			}
+		}
+
+		public Task ReorderChannels(Server server, int startPos, IEnumerable<object> channels)
+			=> ReorderChannels(server.Id, startPos, channels);
+        public Task ReorderChannels(string serverId, int startPos, IEnumerable<object> channels)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (channels == null) throw new ArgumentNullException(nameof(channels));
+			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
+
+			return _api.ReorderChannels(serverId, startPos, channels.Select(x =>
+			{
+				if (x is string)
+					return x as string;
+				else if (x is Channel)
+					return (x as Role).Id;
+				else
+					throw new ArgumentException("Channels must be a collection of string or Channel.", nameof(channels));
+			}));
 		}
 
 		/// <summary> Destroys the provided channel. </summary>
@@ -243,7 +285,7 @@ namespace Discord
 				else if (x is Role)
 					return (x as Role).Id;
 				else
-					throw new ArgumentException("Roles must be a collection of strings or roles.", nameof(roles));
+					throw new ArgumentException("Roles must be a collection of string or Role.", nameof(roles));
 			});
 
 			return _api.EditMember(serverId, userId, mute, deaf, newRoles);

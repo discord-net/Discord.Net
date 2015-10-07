@@ -1,6 +1,7 @@
 ﻿using Discord.API;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -84,6 +85,17 @@ namespace Discord
 
 			var request = new EditChannelRequest { Name = name, Topic = topic };
 			return _rest.Patch<EditChannelResponse>(Endpoints.Channel(channelId), request);
+		}
+		public Task ReorderChannels(string serverId, int startPos, IEnumerable<string> channelIds)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (channelIds == null) throw new ArgumentNullException(nameof(channelIds));
+			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
+
+			uint pos = (uint)startPos;
+			var channels = channelIds.Select(x => new ReorderChannelsRequest.Channel { Id = x, Position = pos++ });
+			var request = new ReorderChannelsRequest(channels);
+			return _rest.Patch(Endpoints.ServerChannels(serverId), request);
 		}
 		public Task<GetMessagesResponse> GetMessages(string channelId, int count)
 		{
