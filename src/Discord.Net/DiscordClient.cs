@@ -52,7 +52,7 @@ namespace Discord
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
-			: base(config, enableVoice: config.VoiceMode != DiscordVoiceMode.Disabled && !config.EnableVoiceMultiserver)
+			: base(config)
 		{
 			_rand = new Random();
 			_api = new DiscordAPIClient(_config.LogLevel, _config.UserAgent, _config.APITimeout);
@@ -740,7 +740,7 @@ namespace Discord
 				config.EnableVoiceMultiserver = false;
 				config.VoiceOnly = true;
 				config.VoiceClientId = unchecked(++_nextVoiceClientId);
-				return new DiscordSimpleClient(config, true, serverId);
+				return new DiscordSimpleClient(config, serverId);
 			});
 			client.LogMessage += (s, e) => RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}");
             await client.Connect(_gateway, _token).ConfigureAwait(false);

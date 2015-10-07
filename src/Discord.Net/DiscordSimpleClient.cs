@@ -51,14 +51,11 @@ namespace Discord
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordSimpleClient(DiscordSimpleClientConfig config = null)
-			: this(config, enableVoice: config.VoiceMode != DiscordVoiceMode.Disabled) { }
-		internal DiscordSimpleClient(DiscordSimpleClientConfig config = null, bool enableVoice = false, string voiceServerId = null)
 		{
 			_config = config ?? new DiscordSimpleClientConfig();
 			_config.Lock();
 
-			_enableVoice = enableVoice;
-			_voiceServerId = voiceServerId;
+			_enableVoice = _config.EnableVoice;
 
 			_state = (int)DiscordClientState.Disconnected;
 			_cancelToken = new CancellationToken(true);
@@ -68,6 +65,11 @@ namespace Discord
 			_dataSocket = CreateDataSocket();
 			if (_enableVoice)
 				_voiceSocket = CreateVoiceSocket();
+		}
+		internal DiscordSimpleClient(DiscordSimpleClientConfig config = null, string voiceServerId = null)
+			: this(config)
+		{
+			_voiceServerId = voiceServerId;
 		}
 
 		internal virtual DataWebSocket CreateDataSocket()

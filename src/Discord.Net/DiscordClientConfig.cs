@@ -27,6 +27,9 @@ namespace Discord
 		public bool AckMessages { get { return _ackMessages; } set { SetValue(ref _ackMessages, value); } }
 		private bool _ackMessages = false;
 
+		//Internal
+		internal override bool EnableVoice => base.EnableVoice && !EnableVoiceMultiserver;
+
 		public new DiscordClientConfig Clone()
 		{
 			var config = this.MemberwiseClone() as DiscordClientConfig;

@@ -56,6 +56,7 @@ namespace Discord
 		private bool _voiceOnly;
 		internal uint VoiceClientId { get { return _voiceClientId; } set { SetValue(ref _voiceClientId, value); } }
 		private uint _voiceClientId;
+		internal virtual bool EnableVoice => _voiceMode != DiscordVoiceMode.Disabled;
 
 		internal string UserAgent
 		{
