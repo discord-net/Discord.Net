@@ -1,5 +1,6 @@
 ﻿using Discord.API;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -133,7 +134,7 @@ namespace Discord
 		}
 
 		//Members
-		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, string[] roles = null)
+		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));

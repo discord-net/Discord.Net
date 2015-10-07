@@ -222,21 +222,31 @@ namespace Discord
 		}
 
 		//Members
-		public Task EditMember(Member member, bool? mute = null, bool? deaf = null, string[] roles = null)
+		public Task EditMember(Member member, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
 			=> EditMember(member?.ServerId, member?.UserId, mute, deaf, roles);
-		public Task EditMember(Server server, User user, bool? mute = null, bool? deaf = null, string[] roles = null)
+		public Task EditMember(Server server, User user, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
 			=> EditMember(server?.Id, user?.Id, mute, deaf, roles);
-		public Task EditMember(Server server, string userId, bool? mute = null, bool? deaf = null, string[] roles = null)
+		public Task EditMember(Server server, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 			=> EditMember(server?.Id, userId, mute, deaf, roles);
-		public Task EditMember(string serverId, User user, bool? mute = null, bool? deaf = null, string[] roles = null)
+		public Task EditMember(string serverId, User user, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
 			=> EditMember(serverId, user?.Id, mute, deaf, roles);
-        public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, string[] roles = null)
+        public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
 		{
 			CheckReady();
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
 			if (userId == null) throw new NullReferenceException(nameof(userId));
 
-			return _api.EditMember(serverId, userId, mute, deaf, roles);
+			IEnumerable<string> newRoles = roles?.Select(x =>
+			{
+				if (x is string)
+					return x as string;
+				else if (x is Role)
+					return (x as Role).Id;
+				else
+					throw new ArgumentException("Roles must be a collection of strings or roles.", nameof(roles));
+			});
+
+			return _api.EditMember(serverId, userId, mute, deaf, newRoles);
 		}
 
 		//Messages
@@ -263,7 +273,7 @@ namespace Discord
 			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (mentions == null) throw new ArgumentNullException(nameof(mentions));
+			mentions = mentions ?? new string[0];
 
 			int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
 			Message[] result = new Message[blockCount];
@@ -330,19 +340,20 @@ namespace Discord
 
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Message message, string text = null, string[] mentions = null)
+		public Task EditMessage(Message message, string text = null, params string[] mentions)
 			=> EditMessage(message?.ChannelId, message?.Id, text, mentions);
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Channel channel, string messageId, string text = null, string[] mentions = null)
+		public Task EditMessage(Channel channel, string messageId, string text = null, params string[] mentions)
 			=> EditMessage(channel?.Id, messageId, text, mentions);
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public async Task EditMessage(string channelId, string messageId, string text = null, string[] mentions = null)
+		public async Task EditMessage(string channelId, string messageId, string text = null, params string[] mentions)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
+			mentions = mentions ?? new string[0];
 
 			if (text != null && text.Length > MaxMessageSize)
 				text = text.Substring(0, MaxMessageSize);

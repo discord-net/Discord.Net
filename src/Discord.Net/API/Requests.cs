@@ -3,6 +3,7 @@
 #pragma warning disable CS0169
 
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -64,7 +65,7 @@ namespace Discord.API
 		[JsonProperty(PropertyName = "deaf", NullValueHandling = NullValueHandling.Ignore)]
 		public bool? Deaf;
 		[JsonProperty(PropertyName = "roles", NullValueHandling = NullValueHandling.Ignore)]
-		public string[] Roles;
+		public IEnumerable<string> Roles;
 	}
 
 	//Messages
@@ -73,7 +74,7 @@ namespace Discord.API
 		[JsonProperty("content")]
 		public string Content;
 		[JsonProperty("mentions")]
-		public string[] Mentions;
+		public IEnumerable<string> Mentions;
 		[JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
 		public string Nonce;
 		[JsonProperty("tts", NullValueHandling = NullValueHandling.Ignore)]
@@ -84,7 +85,7 @@ namespace Discord.API
 		[JsonProperty("content", NullValueHandling = NullValueHandling.Ignore)]
 		public string Content;
 		[JsonProperty("mentions", NullValueHandling = NullValueHandling.Ignore)]
-		public string[] Mentions;
+		public IEnumerable<string> Mentions;
 	}
 
 	//Permissions
