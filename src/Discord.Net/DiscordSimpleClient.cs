@@ -122,6 +122,9 @@ namespace Discord
 		//Connection
 		public async Task<string> Connect(string gateway, string token)
 		{
+			if (gateway == null) throw new ArgumentNullException(nameof(gateway));
+			if (token == null) throw new ArgumentNullException(nameof(token));
+
 			try
 			{
 				_state = (int)DiscordClientState.Connecting;
@@ -283,8 +286,9 @@ namespace Discord
 			try { action(); }
 			catch (Exception ex)
 			{
+				var ex2 = ex.GetBaseException();
 				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client,
-					$"{name} event handler raised an exception: ${ex.GetBaseException().Message}");
+					$"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}");
 			}
 		}
 
