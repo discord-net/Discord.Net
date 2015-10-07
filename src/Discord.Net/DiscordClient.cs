@@ -233,7 +233,7 @@ namespace Discord
 			try
 			{
 				var response = await _api.Login(email, password)
-					.Timeout(5000);
+					.Timeout(_config.APITimeout);
 				token = response.Token;
 				if (_config.LogLevel >= LogMessageSeverity.Verbose)
 					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Login successful, got token.");
