@@ -86,7 +86,7 @@ namespace Discord
 			var request = new EditChannelRequest { Name = name, Topic = topic };
 			return _rest.Patch<EditChannelResponse>(Endpoints.Channel(channelId), request);
 		}
-		public Task ReorderChannels(string serverId, int startPos, IEnumerable<string> channelIds)
+		public Task ReorderChannels(string serverId, IEnumerable<string> channelIds, int startPos = 0)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (channelIds == null) throw new ArgumentNullException(nameof(channelIds));
