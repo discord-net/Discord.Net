@@ -105,10 +105,6 @@ namespace Discord
 		}
 
 		//Incidents
-		public Task<GetIncidentsResponse> GetUnresolvedIncidents()
-		{
-			return _rest.Get<GetIncidentsResponse>(Endpoints.StatusUnresolvedMaintenance);
-		}
 		public Task<GetIncidentsResponse> GetActiveIncidents()
 		{
 			return _rest.Get<GetIncidentsResponse>(Endpoints.StatusActiveMaintenance);
@@ -207,7 +203,14 @@ namespace Discord
 			var request = new EditMessageRequest { Content = message, Mentions = mentions };
 			return _rest.Patch<EditMessageResponse>(Endpoints.ChannelMessage(channelId, messageId), request);
 		}
-		public Task SendIsTyping(string channelId)
+		public Task AckMessage(string messageId, string channelId)
+		{
+			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+
+			return _rest.Post(Endpoints.ChannelMessageAck(channelId, messageId));
+		}
+        public Task SendIsTyping(string channelId)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 

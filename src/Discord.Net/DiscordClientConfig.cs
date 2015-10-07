@@ -63,6 +63,9 @@ namespace Discord
 		/// <summary> (Experimental) Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
 		public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
 		private bool _trackActivity = true;
+		/// <summary> (Experimental) Acknowledges all incoming messages so that they appear read. </summary>
+		public bool AckMessages { get { return _ackMessages; } set { SetValue(ref _ackMessages, value); } }
+		private bool _ackMessages = false;
 
 		//Internals
 		internal bool VoiceOnly { get { return _voiceOnly; } set { SetValue(ref _voiceOnly, value); } }

@@ -19,6 +19,7 @@
 		public static string ChannelMessages(string channelId) => $"channels/{channelId}/messages";
 		public static string ChannelMessages(string channelId, int limit) => $"channels/{channelId}/messages?limit={limit}";
 		public static string ChannelMessage(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}";
+		public static string ChannelMessageAck(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}/ack";
 		public static string ChannelInvites(string channelId) => $"channels/{channelId}/invites";
         public static string ChannelPermission(string channelId, string userOrRoleId) => $"channels/{channelId}/permissions/{userOrRoleId}";
 
@@ -44,7 +45,6 @@
 		public const string VoiceIce = "voice/ice";
 
 		public const string StatusActiveMaintenance = "scheduled-maintenances/active.json";
-		public const string StatusUnresolvedMaintenance = "scheduled-maintenances/unresolved.json";
 		public const string StatusUpcomingMaintenance = "scheduled-maintenances/upcoming.json";
 	}
 }

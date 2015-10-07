@@ -534,15 +534,17 @@ namespace Discord
 							var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
 							Message msg = null;
 
-							bool wasLocal = _config.UseMessageQueue && data.Author.Id == CurrentUserId && data.Nonce != null;
-							if (wasLocal)
+							bool isAuthor = data.Author.Id == CurrentUserId;
+                            bool hasFinishedSending = false;
+							if (_config.UseMessageQueue && isAuthor && data.Nonce != null)
 							{
 								msg = _messages.Remap("nonce" + data.Nonce, data.Id);
 								if (msg != null)
 								{
 									msg.IsQueued = false;
 									msg.Id = data.Id;
-								}
+									hasFinishedSending = true;
+                                }
 							}
 
 							if (msg == null)
@@ -564,7 +566,11 @@ namespace Discord
 										member.UpdateActivity(data.Timestamp);
 								}
 							}
-							if (wasLocal)
+
+							if (_config.AckMessages && isAuthor)
+								await _api.AckMessage(data.Id, data.ChannelId);
+
+							if (hasFinishedSending)
 								RaiseMessageSent(msg);
 							RaiseMessageCreated(msg);
 						}
