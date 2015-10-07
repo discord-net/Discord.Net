@@ -13,7 +13,7 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.7.2-beta1"
+		"Discord.Net": "0.7.2-beta2"
 	},
 	"frameworks": {
 		"net45": { },
