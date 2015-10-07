@@ -89,14 +89,19 @@ namespace Discord
 
 		internal void Update(API.ChannelReference model)
 		{
-			Name = model.Name;
-			Type = model.Type;
+			if (model.Name != null)
+				Name = model.Name;
+			if (model.Type != null)
+				Type = model.Type;
 		}
 		internal void Update(API.ChannelInfo model)
 		{
 			Update(model as API.ChannelReference);
 			
-			Position = model.Position;
+			if (model.Position != null)
+				Position = model.Position.Value;
+			if (model.Topic != null)
+				Topic = model.Topic;
 
 			if (model.PermissionOverwrites != null)
 			{
