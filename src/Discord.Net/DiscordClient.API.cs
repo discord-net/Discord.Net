@@ -290,7 +290,7 @@ namespace Discord
 					throw new ArgumentException("Roles must be a collection of string or Role.", nameof(roles));
 			});
 
-			return _api.EditMember(serverId, userId, mute, deaf, newRoles);
+			return _api.EditMember(serverId, userId, mute: mute, deaf: deaf, roles: newRoles);
 		}
 
 		//Messages

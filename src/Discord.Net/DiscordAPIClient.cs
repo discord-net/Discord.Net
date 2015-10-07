@@ -148,7 +148,7 @@ namespace Discord
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, Roles = roles };
-			return _rest.Patch(Endpoints.ServerMember(serverId, userId));
+			return _rest.Patch(Endpoints.ServerMember(serverId, userId), request);
 		}
 		public Task Kick(string serverId, string userId)
 		{
