@@ -9,14 +9,24 @@ namespace Discord
 	{
 		public sealed class PermissionOverwrite
 		{
-			public string Type { get; internal set; }
-			public string Id { get; internal set; }
-			public PackedChannelPermissions Deny { get; internal set; }
-			public PackedChannelPermissions Allow { get; internal set; }
+			public string Type { get; }
+			public string TargetId { get; }
+			public PackedChannelPermissions Allow { get; }
+			public PackedChannelPermissions Deny { get; }
+
+			internal PermissionOverwrite(string type, string targetId, uint allow, uint deny)
+			{
+				Type = type;
+				TargetId = targetId;
+				Allow = new PackedChannelPermissions(allow);
+				Deny = new PackedChannelPermissions( deny);
+				Allow.Lock();
+				Deny.Lock();
+			}
 		}
 
 		private readonly DiscordClient _client;
-		private ConcurrentDictionary<string, bool> _messages;
+		private readonly ConcurrentDictionary<string, bool> _messages;
 		internal bool _areMembersStale;
 
 		/// <summary> Returns the unique identifier for this channel. </summary>
@@ -27,13 +37,13 @@ namespace Discord
 		public string Name { get { return !IsPrivate ? $"{_name}" : $"@{Recipient.Name}"; } internal set { _name = value; } }
 
 		/// <summary> Returns the topic associated with this channel. </summary>
-		public string Topic { get; internal set; }
+		public string Topic { get; private set; }
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
-		public int Position { get; internal set; }
+		public int Position { get; private set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
 		public bool IsPrivate => ServerId == null;
 		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
-		public string Type { get; internal set; }
+		public string Type { get; private set; }
 
 		/// <summary> Returns the id of the server containing this channel. </summary>
 		public string ServerId { get; }
@@ -42,7 +52,7 @@ namespace Discord
 		public Server Server => _client.Servers[ServerId];
 
 		/// For private chats, returns the Id of the target user, otherwise null.
-		public string RecipientId { get; internal set; }
+		public string RecipientId { get; set; }
 		/// For private chats, returns the target user, otherwise null.
 		[JsonIgnore]
 		public User Recipient => _client.Users[RecipientId];
@@ -74,6 +84,7 @@ namespace Discord
 		public IEnumerable<Message> Messages => _messages.Select(x => _client.Messages[x.Key]);
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
+		private static readonly PermissionOverwrite[] _initialPermissionsOverwrites = new PermissionOverwrite[0];
 		private PermissionOverwrite[] _permissionOverwrites;
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites;
 
@@ -85,6 +96,7 @@ namespace Discord
 			RecipientId = recipientId;
 			_messages = new ConcurrentDictionary<string, bool>();
 			_areMembersStale = true;
+			_permissionOverwrites = _initialPermissionsOverwrites;
         }
 
 		internal void Update(API.ChannelReference model)
@@ -105,16 +117,10 @@ namespace Discord
 
 			if (model.PermissionOverwrites != null)
 			{
-				_permissionOverwrites = model.PermissionOverwrites.Select(x => new PermissionOverwrite
-				{
-					Type = x.Type,
-					Id = x.Id,
-					Deny = new PackedChannelPermissions(true,  x.Deny),
-					Allow = new PackedChannelPermissions(true,  x.Allow)
-				}).ToArray();
+				_permissionOverwrites = model.PermissionOverwrites
+					.Select(x => new PermissionOverwrite(x.Type, x.Id, x.Allow, x.Deny))
+					.ToArray();
 			}
-			else
-				_permissionOverwrites = null;
 		}
 
 		public override string ToString() => Name;

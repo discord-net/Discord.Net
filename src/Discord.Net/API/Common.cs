@@ -47,9 +47,9 @@ namespace Discord.API
 	public class ExtendedMemberInfo : MemberInfo
 	{
 		[JsonProperty("mute")]
-		public bool IsMuted;
+		public bool? IsMuted;
 		[JsonProperty("deaf")]
-		public bool IsDeafened;
+		public bool? IsDeafened;
 	}
 	public class PresenceMemberInfo : MemberReference
 	{
@@ -71,9 +71,9 @@ namespace Discord.API
 		[JsonProperty("self_deaf")]
 		public bool? IsSelfDeafened;
 		[JsonProperty("mute")]
-		public bool IsMuted;
+		public bool? IsMuted;
 		[JsonProperty("deaf")]
-		public bool IsDeafened;
+		public bool? IsDeafened;
 		[JsonProperty("token")]
 		public string Token;
 	}
@@ -228,11 +228,11 @@ namespace Discord.API
 		}
 
 		[JsonProperty("tts")]
-		public bool IsTextToSpeech;
+		public bool? IsTextToSpeech;
 		[JsonProperty("mention_everyone")]
-		public bool IsMentioningEveryone;
+		public bool? IsMentioningEveryone;
 		[JsonProperty("timestamp")]
-		public DateTime Timestamp;
+		public DateTime? Timestamp;
 		[JsonProperty("edited_timestamp")]
 		public DateTime? EditedTimestamp;
 		[JsonProperty("mentions")]
@@ -284,16 +284,16 @@ namespace Discord.API
 	public class ExtendedInvite : Invite
 	{
 		[JsonProperty("max_age")]
-		public int MaxAge;
+		public int ?MaxAge;
 		[JsonProperty("max_uses")]
-		public int MaxUses;
+		public int? MaxUses;
 		[JsonProperty("revoked")]
-		public bool IsRevoked;
+		public bool? IsRevoked;
 		[JsonProperty("temporary")]
-		public bool IsTemporary;
+		public bool? IsTemporary;
 		[JsonProperty("uses")]
-		public int Uses;
+		public int? Uses;
 		[JsonProperty("created_at")]
-		public DateTime CreatedAt;
+		public DateTime? CreatedAt;
 	}
 }

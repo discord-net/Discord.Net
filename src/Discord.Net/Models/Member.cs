@@ -12,30 +12,30 @@ namespace Discord
 		private ConcurrentDictionary<string, PackedChannelPermissions> _permissions;
 
 		/// <summary> Returns the name of this user on this server. </summary>
-		public string Name { get; internal set; }
+		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public string Discriminator { get; internal set; }
+		public string Discriminator { get; private set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
-		public string AvatarId { get; internal set; }
+		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
 		public string AvatarUrl => API.Endpoints.UserAvatar(UserId, AvatarId);
 		/// <summary> Returns the datetime that this user joined this server. </summary>
-		public DateTime JoinedAt { get; internal set; }
+		public DateTime JoinedAt { get; private set; }
 
-		public bool IsMuted { get; internal set; }
-		public bool IsDeafened { get; internal set; }
-		public bool IsSelfMuted { get; internal set; }
-		public bool IsSelfDeafened { get; internal set; }
-		public bool IsSuppressed { get; internal set; }
+		public bool IsMuted { get; private set; }
+		public bool IsDeafened { get; private set; }
+		public bool IsSelfMuted { get; private set; }
+		public bool IsSelfDeafened { get; private set; }
+		public bool IsSuppressed { get; private set; }
 		public bool IsSpeaking { get; internal set; }
 
-		public string SessionId { get; internal set; }
-		public string Token { get; internal set; }
+		public string SessionId { get; private set; }
+		public string Token { get; private set; }
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
-		public string GameId { get; internal set; }
+		public string GameId { get; private set; }
 		/// <summary> Returns the current status for this user. </summary>
-		public string Status { get; internal set; }
+		public string Status { get; private set; }
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
 		public DateTime? LastActivityAt { get; private set; }
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
@@ -50,11 +50,12 @@ namespace Discord
 		[JsonIgnore]
 		public Server Server => _client.Servers[ServerId];
 
-		public string VoiceChannelId { get; internal set; }
+		public string VoiceChannelId { get; private set; }
 		[JsonIgnore]
 		public Channel VoiceChannel => _client.Channels[VoiceChannelId];
 
-		public string[] RoleIds { get; internal set; }
+		private static readonly string[] _initialRoleIds = new string[0];
+		public string[] RoleIds { get; private set; }
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => RoleIds.Select(x => _client.Roles[x]);
 
@@ -67,8 +68,9 @@ namespace Discord
 			UserId = userId;
 			ServerId = serverId;
 			Status = UserStatus.Offline;
+			RoleIds = _initialRoleIds;
 			_permissions = new ConcurrentDictionary<string, PackedChannelPermissions>();
-        }
+		}
 
 		public override string ToString() => UserId;
 
@@ -100,11 +102,14 @@ namespace Discord
 		internal void Update(API.ExtendedMemberInfo model)
 		{
 			Update(model as API.MemberInfo);
-			IsDeafened = model.IsDeafened;
-			IsMuted = model.IsMuted;
+			if (model.IsDeafened != null)
+				IsDeafened = model.IsDeafened.Value;
+			if (model.IsMuted != null)
+				IsMuted = model.IsMuted.Value;
 		}
 		internal void Update(API.PresenceMemberInfo model)
 		{
+			//Allows null
 			if (Status != model.Status)
 			{
                 Status = model.Status;
@@ -115,17 +120,22 @@ namespace Discord
 		}
 		internal void Update(API.VoiceMemberInfo model)
 		{
-			IsDeafened = model.IsDeafened;
-			IsMuted = model.IsMuted;
-			SessionId = model.SessionId;
-			Token = model.Token;
+			if (model.IsDeafened != null)
+				IsDeafened = model.IsDeafened.Value;
+			if (model.IsMuted != null)
+				IsMuted = model.IsMuted.Value;
+			if (model.SessionId != null)
+				SessionId = model.SessionId;
+			if (model.Token != null)
+				Token = model.Token;
 
-			VoiceChannelId = model.ChannelId;
-			if (model.IsSelfDeafened.HasValue)
+			if (model.ChannelId != null)
+				VoiceChannelId = model.ChannelId;
+			if (model.IsSelfDeafened != null)
 				IsSelfDeafened = model.IsSelfDeafened.Value;
-			if (model.IsSelfMuted.HasValue)
+			if (model.IsSelfMuted != null)
 				IsSelfMuted = model.IsSelfMuted.Value;
-			if (model.IsSuppressed.HasValue)
+			if (model.IsSuppressed != null)
 				IsSuppressed = model.IsSuppressed.Value;
 		}
 
@@ -137,7 +147,9 @@ namespace Discord
 
 		internal void AddChannel(string channelId)
 		{
-			_permissions.TryAdd(channelId, new PackedChannelPermissions());
+			var perms = new PackedChannelPermissions();
+			perms.Lock();
+            _permissions.TryAdd(channelId, perms);
 			UpdatePermissions(channelId);
         }
 		internal bool RemoveChannel(string channelId)
@@ -171,13 +183,13 @@ namespace Discord
 
 				foreach (var serverRole in Roles)
 					newPermissions |= serverRole.Permissions.RawValue;
-				foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && RoleIds.Contains(x.Id)))
+				foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && RoleIds.Contains(x.TargetId)))
 					newPermissions &= ~denyRole.Deny.RawValue;
-				foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && RoleIds.Contains(x.Id)))
+				foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && RoleIds.Contains(x.TargetId)))
 					newPermissions |= allowRole.Allow.RawValue;
-				foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Deny.RawValue != 0))
+				foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.TargetId == UserId && x.Deny.RawValue != 0))
 					newPermissions &= ~denyMembers.Deny.RawValue;
-				foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.Id == UserId && x.Allow.RawValue != 0))
+				foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.TargetId == UserId && x.Allow.RawValue != 0))
 					newPermissions |= allowMembers.Allow.RawValue;
 
 				if (((newPermissions >> (PackedChannelPermissions.GlobalBit - 1)) & 1) == 1)

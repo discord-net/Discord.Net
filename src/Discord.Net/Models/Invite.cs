@@ -10,15 +10,15 @@ namespace Discord
 		public string Id { get; }
 
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
-		public int MaxAge { get; internal set; }
+		public int MaxAge { get; private set; }
 		/// <summary> The amount  of times this invite has been used. </summary>
-		public int Uses { get; internal set; }
+		public int Uses { get; private set; }
 		/// <summary> The max amount  of times this invite may be used. </summary>
-		public int MaxUses { get; internal set; }
+		public int MaxUses { get; private set; }
 		/// <summary> Returns true if this invite has been destroyed, or you are banned from that server. </summary>
-		public bool IsRevoked { get; internal set; }
+		public bool IsRevoked { get; private set; }
 		/// <summary> If true, a user accepting this invite will be kicked from the server after closing their client. </summary>
-		public bool IsTemporary { get; internal set; }
+		public bool IsTemporary { get; private set; }
 		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
 		public string XkcdPass { get; }
 
@@ -26,19 +26,19 @@ namespace Discord
 		public string Url => API.Endpoints.InviteUrl(XkcdPass ?? Id);
 
 		/// <summary> Returns the id of the user that created this invite. </summary>
-		public string InviterId { get; internal set; }
+		public string InviterId { get; private set; }
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
 		public User Inviter => _client.Users[InviterId];
 
 		/// <summary> Returns the id of the server this invite is to. </summary>
-		public string ServerId { get; internal set; }
+		public string ServerId { get; }
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]
 		public Server Server => _client.Servers[ServerId];
 
 		/// <summary> Returns the id of the channel this invite is to. </summary>
-		public string ChannelId { get; internal set; }
+		public string ChannelId { get; private set; }
 		/// <summary> Returns the channel this invite is to. </summary>
 		[JsonIgnore]
 		public Channel Channel => _client.Channels[ChannelId];
@@ -55,19 +55,25 @@ namespace Discord
 
 		internal void Update(API.Invite model)
 		{
-			ChannelId = model.Channel.Id;
-			InviterId = model.Inviter?.Id;
-			ServerId = model.Guild.Id;
+			if (model.Channel != null)
+				ChannelId = model.Channel.Id;
+			if (model.Inviter != null)
+				InviterId = model.Inviter.Id;
 		}
 
 		internal void Update(API.ExtendedInvite model)
 		{
 			Update(model as API.Invite);
-            IsRevoked = model.IsRevoked;
-			IsTemporary = model.IsTemporary;
-			MaxAge = model.MaxAge;
-			MaxUses = model.MaxUses;
-			Uses = model.Uses;
+			if (model.IsRevoked != null)
+				IsRevoked = model.IsRevoked.Value;
+			if (model.IsTemporary != null)
+				IsTemporary = model.IsTemporary.Value;
+			if (model.MaxAge != null)
+				MaxAge = model.MaxAge.Value;
+			if (model.MaxUses != null)
+				MaxUses = model.MaxUses.Value;
+			if (model.Uses != null)
+				Uses = model.Uses.Value;
         }
 	}
 }

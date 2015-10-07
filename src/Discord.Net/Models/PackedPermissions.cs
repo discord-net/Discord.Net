@@ -7,8 +7,7 @@ namespace Discord
 		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
 		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000111111", 2);
 
-		public PackedServerPermissions(uint rawValue = 0) : base(false, rawValue) { }
-		internal PackedServerPermissions(bool isLocked, uint rawValue) : base(isLocked, rawValue) { }
+		public PackedServerPermissions(uint rawValue = 0) : base(rawValue) { }
 
 		/// <summary> If True, a user may ban users from the server. </summary>
 		public bool General_BanMembers { get { return GetBit(2); } set { SetBit(2, value); } }
@@ -21,7 +20,7 @@ namespace Discord
 		/// <summary> If True, a user may adjust server properties. </summary>
 		public bool General_ManageServer { get { return GetBit(6); } set { SetBit(6, value); } }
 
-		public PackedServerPermissions Copy() => new PackedServerPermissions(false, _rawValue);
+		public PackedServerPermissions Copy() => new PackedServerPermissions(RawValue);
 	}
 
 	public sealed class PackedChannelPermissions : PackedPermissions
@@ -29,21 +28,20 @@ namespace Discord
 		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
 		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000011001", 2);
 
-		public PackedChannelPermissions(uint rawValue = 0) : base(false, rawValue) { }
-		internal PackedChannelPermissions(bool isLocked, uint rawValue) : base(isLocked, rawValue) { }
+		public PackedChannelPermissions(uint rawValue = 0) : base(rawValue) { }
 		
 		/// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
 		public bool General_ManagePermissions { get { return GetBit(4); } set { SetBit(4, value); } }
 		/// <summary> If True, a user may create, delete and modify this channel. </summary>
 		public bool General_ManageChannel { get { return GetBit(5); } set { SetBit(5, value); } }
 
-		public PackedChannelPermissions Copy() => new PackedChannelPermissions(false, _rawValue);
+		public PackedChannelPermissions Copy() => new PackedChannelPermissions(RawValue);
 	}
 
 	public abstract class PackedPermissions
 	{
 		private bool _isLocked;
-		protected uint _rawValue;
+		private uint _rawValue;
 		public uint RawValue
 		{
 			get { return _rawValue; }
@@ -55,7 +53,7 @@ namespace Discord
 			}
 		} 
 		
-		protected PackedPermissions(bool isLocked, uint rawValue) { _isLocked = isLocked; _rawValue = rawValue; }
+		protected PackedPermissions(uint rawValue) { _rawValue = rawValue; }
 
 		/// <summary> If True, a user may create invites. </summary>
 		public bool General_CreateInstantInvite { get { return GetBit(1); } set { SetBit(1, value); } }
@@ -101,6 +99,7 @@ namespace Discord
 
 		//6 Unused
 
+		internal void Lock() => _isLocked = true;
 		internal void SetRawValue(uint rawValue)
 		{
 			//Bypasses isLocked for API changes.

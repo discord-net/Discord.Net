@@ -11,7 +11,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this role. </summary>
 		public string Id { get; }
 		/// <summary> Returns the name of this role. </summary>
-		public string Name { get; internal set; }
+		public string Name { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public PackedServerPermissions Permissions { get; }
@@ -25,16 +25,17 @@ namespace Discord
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
 		public bool IsEveryone { get; }
 		/// <summary> Returns a list of the ids of all members in this role. </summary>
-		public IEnumerable<string> MemberIds { get { return IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId); } }
+		public IEnumerable<string> MemberIds => IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId);
 		/// <summary> Returns a list of all members in this role. </summary>
-		public IEnumerable<Member> Members { get { return IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id)); } }
+		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id));
 
 		internal Role(DiscordClient client, string id, string serverId, bool isEveryone)
 		{
 			_client = client;
 			Id = id;
 			ServerId = serverId;
-			Permissions = new PackedServerPermissions(true, 0);
+			Permissions = new PackedServerPermissions(0);
+			Permissions.Lock();
 			IsEveryone = isEveryone;
         }
 

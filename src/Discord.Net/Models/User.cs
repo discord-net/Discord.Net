@@ -10,32 +10,32 @@ namespace Discord
 	public sealed class User
 	{
 		private readonly DiscordClient _client;
-		private int _refs;
+		private readonly ConcurrentDictionary<string, bool> _servers;
+		private int _refCount;
 		private DateTime? _lastPrivateActivity;
-		private ConcurrentDictionary<string, bool> _servers;
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
 		/// <summary> Returns the name of this user on this server. </summary>
-		public string Name { get; internal set; }
+		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public string Discriminator { get; internal set; }
+		public string Discriminator { get; private set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
-		public string AvatarId { get; internal set; }
+		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
 		public string AvatarUrl => API.Endpoints.UserAvatar(Id, AvatarId);
 
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		[JsonIgnore]
-		public string Email { get; internal set; }
+		public string Email { get; private set; }
 		/// <summary> Returns if the email for this user has been verified. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		[JsonIgnore]
-		public bool? IsVerified { get; internal set; }
+		public bool? IsVerified { get; private set; }
 
 		/// <summary> Returns the Id of the private messaging channel with this user, if one exists. </summary>
-		public string PrivateChannelId { get; set; }
+		public string PrivateChannelId { get; internal set; }
 		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		[JsonIgnore]
 		public Channel PrivateChannel => _client.Channels[PrivateChannelId];
@@ -112,11 +112,11 @@ namespace Discord
 
 		public void AddRef()
 		{
-			Interlocked.Increment(ref _refs);
+			Interlocked.Increment(ref _refCount);
 		}
 		public void RemoveRef()
 		{
-			if (Interlocked.Decrement(ref _refs) == 0)
+			if (Interlocked.Decrement(ref _refCount) == 0)
 				_client.Users.TryRemove(Id);
 		}
 	}

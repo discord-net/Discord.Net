@@ -9,34 +9,34 @@ namespace Discord
 	public sealed class Server
 	{
 		private readonly DiscordClient _client;
-		private ConcurrentDictionary<string, bool> _bans, _channels, _invites, _members, _roles;
+		private readonly ConcurrentDictionary<string, bool> _bans, _channels, _invites, _members, _roles;
 
 		/// <summary> Returns the unique identifier for this server. </summary>
 		public string Id { get; }
 		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get; internal set; }
+		public string Name { get; private set; }
 		/// <summary> Returns the current logged-in user's data for this server. </summary>
 		public Member CurrentMember { get; internal set; }
 
 		/// <summary> Returns the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel (see AFKChannel). </summary>
-		public int AFKTimeout { get; internal set; }
+		public int AFKTimeout { get; private set; }
 		/// <summary> Returns the date and time your joined this server. </summary>
-		public DateTime JoinedAt { get; internal set; }
+		public DateTime JoinedAt { get; private set; }
 		/// <summary> Returns the region for this server (see Regions). </summary>
-		public string Region { get; internal set; }
+		public string Region { get; private set; }
 		/*/// <summary> Returns the endpoint for this server's voice server. </summary>
 		internal string VoiceServer { get; set; }*/
 
 		/// <summary> Returns true if the current user created this server. </summary>
 		public bool IsOwner => _client.CurrentUserId == OwnerId;
 		/// <summary> Returns the id of the user that first created this server. </summary>
-		public string OwnerId { get; internal set; }
+		public string OwnerId { get; private set; }
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
 		public User Owner => _client.Users[OwnerId];
 
 		/// <summary> Returns the id of the AFK voice channel for this server (see AFKTimeout). </summary>
-		public string AFKChannelId { get; internal set; }
+		public string AFKChannelId { get; private set; }
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
 		[JsonIgnore]
 		public Channel AFKChannel => _client.Channels[AFKChannelId];

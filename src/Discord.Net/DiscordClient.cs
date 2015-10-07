@@ -368,8 +368,6 @@ namespace Discord
 							}
 						}
 						break;
-					case "RESUMED":
-						break;
 
 					//Servers
 					case "GUILD_CREATE":
@@ -676,6 +674,10 @@ namespace Discord
 						{
 							//TODO: Process this
 						}
+						break;
+
+					//Internal (handled in DataWebSocket)
+					case "RESUMED":
 						break;
 
 					//Internal (handled in DiscordSimpleClient)
