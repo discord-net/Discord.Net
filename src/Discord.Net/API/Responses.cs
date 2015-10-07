@@ -102,7 +102,7 @@ namespace Discord.API
 			[JsonProperty("url")]
 			public string Url;
 			[JsonProperty("updated-at")]
-			public DateTime UpdatedAt;
+			public DateTime? UpdatedAt;
 		}
 
 		public sealed class MaintenanceData
