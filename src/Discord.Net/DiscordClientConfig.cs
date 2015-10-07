@@ -29,7 +29,7 @@ namespace Discord
 		private int _failedReconnectDelay = 10000;
 		/// <summary> Max time (in milliseconds) to wait for an API request to complete. </summary>
 		public int APITimeout { get { return _apiTimeout; } set { SetValue(ref _apiTimeout, value); } }
-		private int _apiTimeout = 5000;
+		private int _apiTimeout = 10000;
 
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the websocket's message queue is empty before checking again. </summary>
 		public int WebSocketInterval { get { return _webSocketInterval; } set { SetValue(ref _webSocketInterval, value); } }
