@@ -326,7 +326,7 @@ namespace Discord
 				int index = i * MaxMessageSize;
 				string blockText = text.Substring(index, Math.Min(2000, text.Length - index));
 				var nonce = GenerateNonce();
-				if (_config.UseMessageQueue)
+				if (Config.UseMessageQueue)
 				{
 					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, CurrentUserId);
 					var currentMember = _members[msg.UserId, channel.ServerId];
@@ -481,7 +481,7 @@ namespace Discord
 							if (msg != null)
 							{
 								msg.Update(x);
-								if (_config.TrackActivity)
+								if (Config.TrackActivity)
 								{
 									if (channel.IsPrivate)
 									{

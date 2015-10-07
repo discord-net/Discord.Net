@@ -32,8 +32,8 @@ namespace Discord
 		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordClientConfig Config => _config;
-		protected readonly DiscordClientConfig _config;
+		public DiscordSimpleClientConfig Config => _config;
+		protected readonly DiscordSimpleClientConfig _config;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -50,26 +50,24 @@ namespace Discord
 		private CancellationToken _cancelToken;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
-		public DiscordSimpleClient(DiscordClientConfig config = null)
+		public DiscordSimpleClient(DiscordSimpleClientConfig config = null)
+			: this(config, enableVoice: config.VoiceMode != DiscordVoiceMode.Disabled) { }
+		internal DiscordSimpleClient(DiscordSimpleClientConfig config = null, bool enableVoice = false, string voiceServerId = null)
 		{
-			_config = config ?? new DiscordClientConfig();
+			_config = config ?? new DiscordSimpleClientConfig();
 			_config.Lock();
 
-			_enableVoice = _config.VoiceMode != DiscordVoiceMode.Disabled && !_config.EnableVoiceMultiserver;
+			_enableVoice = enableVoice;
+			_voiceServerId = voiceServerId;
 
 			_state = (int)DiscordClientState.Disconnected;
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
-			
+
 			_dataSocket = CreateDataSocket();
 			if (_enableVoice)
 				_voiceSocket = CreateVoiceSocket();
-		}
-		internal DiscordSimpleClient(DiscordClientConfig config = null, string serverId = null)
-			: this(config)
-		{
-			_voiceServerId = serverId;
 		}
 
 		internal virtual DataWebSocket CreateDataSocket()

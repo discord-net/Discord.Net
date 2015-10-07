@@ -157,6 +157,9 @@
     <Compile Include="..\Discord.Net\DiscordSimpleClient.Voice.cs">
       <Link>DiscordSimpleClient.Voice.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordSimpleClientConfig.cs">
+      <Link>DiscordSimpleClientConfig.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
       <Link>Enums\ChannelTypes.cs</Link>
     </Compile>

@@ -24,6 +24,8 @@ namespace Discord
 		private bool _sentInitialLog;
 		private uint _nextVoiceClientId;
 
+		public new DiscordClientConfig Config => _config as DiscordClientConfig;
+
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
         private User _currentUser;
@@ -50,13 +52,13 @@ namespace Discord
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
-			: base(config)
+			: base(config, enableVoice: config.VoiceMode != DiscordVoiceMode.Disabled && !config.EnableVoiceMultiserver)
 		{
 			_rand = new Random();
 			_api = new DiscordAPIClient(_config.LogLevel, _config.UserAgent, _config.APITimeout);
-			if (_config.UseMessageQueue)
+			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
-			if (_config.EnableVoiceMultiserver)
+			if (Config.EnableVoiceMultiserver)
 				_voiceClients = new ConcurrentDictionary<string, DiscordSimpleClient>();
 
 			object cacheLock = new object();
@@ -188,7 +190,7 @@ namespace Discord
 				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
 			}
 
-			if (_config.UseMessageQueue)
+			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 
 			_serializer = new JsonSerializer();
@@ -211,7 +213,7 @@ namespace Discord
 					{
 						member.IsSpeaking = value;
 						RaiseUserIsSpeaking(member, value);
-						if (_config.TrackActivity)
+						if (Config.TrackActivity)
 							member.UpdateActivity();
 					}
 				}
@@ -272,7 +274,7 @@ namespace Discord
 
 			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
 			{
-				if (_config.EnableVoiceMultiserver)
+				if (Config.EnableVoiceMultiserver)
 				{
 					var tasks = _voiceClients
 						.Select(x => x.Value.Disconnect())
@@ -282,7 +284,7 @@ namespace Discord
 				}
 			}
 
-			if (_config.UseMessageQueue)
+			if (Config.UseMessageQueue)
 			{
 				Message ignored;
 				while (_pendingMessages.TryDequeue(out ignored)) { }
@@ -302,7 +304,7 @@ namespace Discord
 		private Task MessageQueueLoop()
 		{
 			var cancelToken = CancelToken;
-			int interval = _config.MessageQueueInterval;
+			int interval = Config.MessageQueueInterval;
 
 			return Task.Run(async () =>
 			{
@@ -449,7 +451,7 @@ namespace Discord
 							user.Update(data.User);
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
-							if (_config.TrackActivity)
+							if (Config.TrackActivity)
 								member.UpdateActivity();
 							RaiseUserAdded(member);
 						}
@@ -536,7 +538,7 @@ namespace Discord
 
 							bool isAuthor = data.Author.Id == CurrentUserId;
                             bool hasFinishedSending = false;
-							if (_config.UseMessageQueue && isAuthor && data.Nonce != null)
+							if (Config.UseMessageQueue && isAuthor && data.Nonce != null)
 							{
 								msg = _messages.Remap("nonce" + data.Nonce, data.Id);
 								if (msg != null)
@@ -550,7 +552,7 @@ namespace Discord
 							if (msg == null)
 								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
 							msg.Update(data);
-							if (_config.TrackActivity)
+							if (Config.TrackActivity)
 							{
 								var channel = msg.Channel;
 								if (channel == null || channel.IsPrivate)
@@ -567,7 +569,7 @@ namespace Discord
 								}
 							}
 
-							if (_config.AckMessages && isAuthor)
+							if (Config.AckMessages && isAuthor)
 								await _api.AckMessage(data.Id, data.ChannelId);
 
 							if (hasFinishedSending)
@@ -632,7 +634,7 @@ namespace Discord
 								if (channel != null)
 									RaiseUserIsTyping(user, channel);
 							}
-							if (_config.TrackActivity)
+							if (Config.TrackActivity)
 							{
 								if (channel.IsPrivate)
 								{
@@ -709,7 +711,7 @@ namespace Discord
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			if (!_config.EnableVoiceMultiserver)
+			if (!Config.EnableVoiceMultiserver)
 			{
 				if (serverId == _voiceServerId)
 					return this;
@@ -725,7 +727,7 @@ namespace Discord
 		}
 		private async Task<IDiscordVoiceClient> CreateVoiceClient(string serverId)
 		{
-            if (!_config.EnableVoiceMultiserver)
+            if (!Config.EnableVoiceMultiserver)
 			{
 				_voiceServerId = serverId;
 				return this;
@@ -738,7 +740,7 @@ namespace Discord
 				config.EnableVoiceMultiserver = false;
 				config.VoiceOnly = true;
 				config.VoiceClientId = unchecked(++_nextVoiceClientId);
-				return new DiscordSimpleClient(config, serverId);
+				return new DiscordSimpleClient(config, true, serverId);
 			});
 			client.LogMessage += (s, e) => RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}");
             await client.Connect(_gateway, _token).ConfigureAwait(false);
