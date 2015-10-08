@@ -53,10 +53,6 @@ namespace Discord.API
 			=> Send<ResponseT>(_patch, path, data);
 		internal Task Patch(string path, object data) 
 			=> Send(_patch, path, data);
-		internal Task<ResponseT> Patch<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>(_patch, path);
-		internal Task Patch(string path) 
-			=> Send(_patch, path);
 
 		private static readonly HttpMethod _post = HttpMethod.Post;
 		internal Task<ResponseT> Post<ResponseT>(string path, object data) where ResponseT : class 

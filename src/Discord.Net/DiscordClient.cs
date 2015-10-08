@@ -52,7 +52,7 @@ namespace Discord
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
-			: base(config)
+			: base(config ?? new DiscordClientConfig())
 		{
 			_rand = new Random();
 			_api = new DiscordAPIClient(_config.LogLevel, _config.UserAgent, _config.APITimeout);
