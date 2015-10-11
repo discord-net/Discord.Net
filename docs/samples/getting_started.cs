@@ -5,6 +5,9 @@ class Program
     {
         var client = new DiscordClient();
         
+        //Log some info to console
+		client.LogMessage += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
+        
         //Echo any message received, provided it didn't come from us
         client.MessageCreated += async (s, e) =>
         {

@@ -8,13 +8,13 @@ The `Discord.Net.Commands`_ package DiscordBotClient extends DiscordClient with 
 Example (Simple)
 ----------------
 
-.. literalinclude:: ../samples/command.cs
+.. literalinclude:: /samples/command.cs
    :language: csharp6
    :tab-width: 2
    
 Example (Groups)
 ----------------
 
-.. literalinclude:: ../samples/command_group.cs
+.. literalinclude:: /samples/command_group.cs
    :language: csharp6
    :tab-width: 2

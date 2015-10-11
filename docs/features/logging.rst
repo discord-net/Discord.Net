@@ -6,6 +6,6 @@
 Example
 -------
 
-.. literalinclude:: samples/logging.cs
+.. literalinclude:: /samples/logging.cs
    :language: csharp6
    :tab-width: 2
