@@ -1,5 +1,5 @@
 ﻿{
-	"version": "0.7.2-beta2",
+	"version": "0.7.2",
 	"description": "A small Discord.Net extension to make bot creation easier.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
@@ -13,7 +13,7 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.7.2-beta2"
+		"Discord.Net": "0.7.2"
 	},
 	"frameworks": {
 		"net45": { },
