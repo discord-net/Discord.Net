@@ -138,6 +138,8 @@ namespace Discord
 
 				_dataSocket.Host = gateway;
 				_dataSocket.ParentCancelToken = _cancelToken;
+				if (_config.EnableVoice)
+					_voiceSocket.ParentCancelToken = _cancelToken;
 				await _dataSocket.Login(token).ConfigureAwait(false);				
 
 				_runTask = RunTasks();
