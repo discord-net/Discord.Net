@@ -134,12 +134,12 @@ namespace Discord.WebSockets.Voice
 #endif
 			}
 
-			//This thread is required to establish a connection even if we're outgoing only
 #if USE_THREAD
+			//This thread is required to establish a connection even if we're outgoing only
 			if ((_client.Config.VoiceMode & DiscordVoiceMode.Incoming) != 0)
 			{
 				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
-				_sendThread.IsBackground = true;
+				_receiveThread.IsBackground = true;
 				_receiveThread.Start();
 			}
 			else //Dont make an OS thread if we only want to capture one packet...
