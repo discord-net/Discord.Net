@@ -507,35 +507,35 @@ namespace Discord
 		}
 
 		//Permissions
-		public Task SetChannelUserPermissions(Channel channel, Member member, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channel?.Id, member?.UserId, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, Member member, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channelId, member?.UserId, "member", allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, User user, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channel?.Id, user?.Id, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, User user, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channelId, user?.Id, "member", allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channel?.Id, userId, "member", allow, deny);
-		public Task SetChannelUserPermissions(string channelId, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelUserPermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channelId, userId, "member", allow, deny);
 
-		public Task SetChannelRolePermissions(Channel channel, Role role, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelRolePermissions(Channel channel, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channel?.Id, role?.Id, "role", allow, deny);
-		public Task SetChannelRolePermissions(string channelId, Role role, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelRolePermissions(string channelId, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channelId, role?.Id, "role", allow, deny);
-		public Task SetChannelRolePermissions(Channel channel, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelRolePermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channel?.Id, userId, "role", allow, deny);
-		public Task SetChannelRolePermissions(string channelId, string userId, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		public Task SetChannelRolePermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 			=> SetChannelPermissions(channelId, userId, "role", allow, deny);
 
-		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedChannelPermissions allow, PackedChannelPermissions deny)
+		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 		{
 			CheckReady();
 			if (channelId == null) throw new NullReferenceException(nameof(channelId));
 			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
 
-			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow.RawValue, deny.RawValue);
+			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow?.RawValue ?? 0, deny?.RawValue ?? 0);
 			//TODO: Remove permission from cache
 		}
 
