@@ -27,7 +27,7 @@ namespace Discord
 
 		private readonly DiscordClient _client;
 		private readonly ConcurrentDictionary<string, bool> _messages;
-		internal bool _areMembersStale;
+		private bool _areMembersStale;
 
 		/// <summary> Returns the unique identifier for this channel. </summary>
 		public string Id { get; }
@@ -85,7 +85,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
 		private static readonly PermissionOverwrite[] _initialPermissionsOverwrites = new PermissionOverwrite[0];
-		private PermissionOverwrite[] _permissionOverwrites;
+		internal PermissionOverwrite[] _permissionOverwrites;
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites;
 
 		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
@@ -95,9 +95,9 @@ namespace Discord
 			ServerId = serverId;
 			RecipientId = recipientId;
 			_messages = new ConcurrentDictionary<string, bool>();
-			_areMembersStale = true;
 			_permissionOverwrites = _initialPermissionsOverwrites;
-        }
+			_areMembersStale = true;
+		}
 
 		internal void Update(API.ChannelReference model)
 		{
@@ -120,7 +120,8 @@ namespace Discord
 				_permissionOverwrites = model.PermissionOverwrites
 					.Select(x => new PermissionOverwrite(x.Type, x.Id, x.Allow, x.Deny))
 					.ToArray();
-			}
+				InvalidatePermissionsCache();
+            }
 		}
 
 		public override string ToString() => Name;
@@ -133,6 +134,24 @@ namespace Discord
 		{
 			bool ignored;
 			return _messages.TryRemove(messageId, out ignored);
+		}
+
+		internal void InvalidMembersCache()
+		{
+			_areMembersStale = true;
+		}
+        internal void InvalidatePermissionsCache()
+		{
+			_areMembersStale = true;
+			foreach (var member in Members)
+				member.UpdatePermissions(Id);
+		}
+		internal void InvalidatePermissionsCache(string userId)
+		{
+			_areMembersStale = true;
+			var member = _client.Members[userId, ServerId];
+			if (member != null)
+				member.UpdatePermissions(Id);
 		}
 	}
 }

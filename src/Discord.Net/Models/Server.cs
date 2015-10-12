@@ -200,7 +200,7 @@ namespace Discord
 			foreach (var channel in Channels)
 			{
 				member.AddChannel(channel.Id);
-                channel._areMembersStale = true;
+				channel.InvalidatePermissionsCache(member.UserId);
 			}
         }
 		internal bool RemoveMember(Member member)
@@ -209,7 +209,7 @@ namespace Discord
 			foreach (var channel in Channels)
 			{
 				member.RemoveChannel(channel.Id);
-				channel._areMembersStale = true;
+				channel.InvalidatePermissionsCache(member.UserId);
 			}
 			return _members.TryRemove(member.UserId, out ignored);
 		}

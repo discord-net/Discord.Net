@@ -202,7 +202,7 @@ namespace Discord
 			if (permissions.RawValue != newPermissions)
 			{
 				permissions.SetRawValue(newPermissions);
-				channel._areMembersStale = true;
+				channel.InvalidMembersCache();
 			}
 		}
 		//TODO: Add GetServerPermissions
