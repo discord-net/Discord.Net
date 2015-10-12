@@ -79,12 +79,9 @@ namespace Discord.WebSockets
 			};
         }
 
-		protected virtual async Task Connect()
+		protected async Task BeginConnect()
 		{
-			if (_state != (int)WebSocketState.Disconnected)
-				throw new InvalidOperationException("Client is already connected or connecting to the server.");
-
-            try
+			try
 			{
 				await Disconnect().ConfigureAwait(false);
 
@@ -93,19 +90,34 @@ namespace Discord.WebSockets
 				_cancelTokenSource = new CancellationTokenSource();
 				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
 
+				_state = (int)WebSocketState.Connecting;
+			}
+			catch (Exception ex)
+			{
+				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
+				throw;
+			}
+		}
+
+		protected virtual async Task Start()
+		{
+            try
+			{
+				if (_state != (int)WebSocketState.Connecting)
+					throw new InvalidOperationException("Socket is in the wrong state.");
+
 				_lastHeartbeat = DateTime.UtcNow;
 				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
 
-				_state = (int)WebSocketState.Connecting;
 				_runTask = RunTasks();
 			}
 			catch (Exception ex)
 			{
 				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
-				throw; //Dont handle this exception internally, send up it upwards
+				throw;
 			}
 		}
-		protected void CompleteConnect()
+		protected void EndConnect()
 		{
 			_state = (int)WebSocketState.Connected;
 			_connectedEvent.Set();

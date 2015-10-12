@@ -41,14 +41,14 @@ namespace Discord.WebSockets
 			_webSocket.OnError += async (s, e) =>
 			{
 				_parent.RaiseOnLog(LogMessageSeverity.Error, $"Websocket Error: {e.Message}");
-				await _parent.DisconnectInternal(e.Exception, isUnexpected: true, skipAwait: true);
+				await _parent.DisconnectInternal(e.Exception, skipAwait: true);
 			};
 			_webSocket.OnClose += async (s, e) =>
 			{
 				string code = e.WasClean ? e.Code.ToString() : "Unexpected";
 				string reason = e.Reason != "" ? e.Reason : "No Reason";
 				Exception ex = new Exception($"Got Close Message ({code}): {reason}");
-				await _parent.DisconnectInternal(ex, isUnexpected: !e.WasClean, skipAwait: true);
+				await _parent.DisconnectInternal(ex, skipAwait: true);
 			};
 			_webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console
             _webSocket.Connect();
@@ -59,7 +59,12 @@ namespace Discord.WebSockets
 		{
 			string ignored;
 			while (_sendQueue.TryDequeue(out ignored)) { }
-			_webSocket.Close();
+
+			var socket = _webSocket;
+			_webSocket = null;
+			if (socket != null)
+				socket.Close();
+
 			return TaskHelper.CompletedTask;
 		}
 
@@ -77,7 +82,7 @@ namespace Discord.WebSockets
 			{
 				try
 				{
-					while (_webSocket.IsAlive && !cancelToken.IsCancellationRequested)
+					while (!cancelToken.IsCancellationRequested)
 					{
 						string json;
 						while (_sendQueue.TryDequeue(out json))

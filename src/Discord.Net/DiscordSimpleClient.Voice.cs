@@ -24,22 +24,10 @@ namespace Discord
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			
 			await _voiceSocket.Disconnect().ConfigureAwait(false);
-			_voiceSocket.SetChannel(_voiceServerId, channelId);
+			
+			await _voiceSocket.SetChannel(_voiceServerId, channelId).ConfigureAwait(false);
 			_dataSocket.SendJoinVoice(_voiceServerId, channelId);
-
-			CancellationTokenSource tokenSource = new CancellationTokenSource();
-			try
-			{
-				await Task.Run(() => _voiceSocket.WaitForConnection(tokenSource.Token))
-					.Timeout(_config.ConnectionTimeout, tokenSource)
-					.ConfigureAwait(false);
-			}
-			catch (TimeoutException)
-			{
-				tokenSource.Cancel();
-				await _voiceSocket.Disconnect().ConfigureAwait(false);
-				throw;
-			}
+			await _voiceSocket.WaitForConnection(_config.ConnectionTimeout);
 		}
 
 		/*async Task IDiscordVoiceClient.Disconnect()

@@ -61,14 +61,16 @@ namespace Discord.WebSockets.Voice
 			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
         }
 
-		public void SetChannel(string serverId, string channelId)
+		public Task SetChannel(string serverId, string channelId)
 		{
 			_serverId = serverId;
 			_channelId = channelId;
+
+			return base.BeginConnect();
         }
 		public async Task Login(string userId, string sessionId, string token, CancellationToken cancelToken)
 		{
-			if ((WebSocketState)_state != WebSocketState.Disconnected)
+			if ((WebSocketState)_state == WebSocketState.Connected)
 			{
 				//Adjust the host and tell the system to reconnect
 				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false);
@@ -79,7 +81,7 @@ namespace Discord.WebSockets.Voice
 			_sessionId = sessionId;
 			_token = token;
 			
-			await Connect().ConfigureAwait(false);
+			await Start().ConfigureAwait(false);
 		}
 		public async Task Reconnect()
 		{
@@ -91,7 +93,7 @@ namespace Discord.WebSockets.Voice
 				{
 					try
 					{
-						await Connect().ConfigureAwait(false);
+						await Start().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -245,7 +247,7 @@ namespace Discord.WebSockets.Voice
 								int port = packet[68] | packet[69] << 8;
 								string ip = Encoding.ASCII.GetString(packet, 4, 70 - 6).TrimEnd('\0');
 
-								CompleteConnect();
+								EndConnect();
 
 								var login2 = new Login2Command();
 								login2.Payload.Protocol = "udp";
@@ -599,9 +601,20 @@ namespace Discord.WebSockets.Voice
 		{
 			_sendQueueEmptyWait.Wait(_cancelToken);
 		}
-		public void WaitForConnection(CancellationToken cancelToken)
+		public Task WaitForConnection(int timeout)
 		{
-			_connectedEvent.Wait(cancelToken);
+			return Task.Run(() =>
+			{
+				try
+				{
+					if (!_connectedEvent.Wait(timeout, _cancelToken))
+						throw new TimeoutException();
+				}
+				catch (OperationCanceledException ex)
+				{
+					ThrowError();
+				}
+			});
 		}
 	}
 }

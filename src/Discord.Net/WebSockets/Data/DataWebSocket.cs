@@ -19,7 +19,8 @@ namespace Discord.WebSockets.Data
 
         public async Task Login(string token)
 		{
-			await Connect().ConfigureAwait(false);
+			await BeginConnect().ConfigureAwait(false);
+			await Start().ConfigureAwait(false);
 			
 			LoginCommand msg = new LoginCommand();
 			msg.Payload.Token = token;
@@ -29,7 +30,9 @@ namespace Discord.WebSockets.Data
 		private async Task Redirect(string server)
 		{
 			await DisconnectInternal(isUnexpected: false).ConfigureAwait(false);
-			await Connect().ConfigureAwait(false);
+
+			await BeginConnect().ConfigureAwait(false);
+			await Start().ConfigureAwait(false);
 
 			var resumeMsg = new ResumeCommand();
 			resumeMsg.Payload.SessionId = _sessionId;
@@ -87,7 +90,7 @@ namespace Discord.WebSockets.Data
 						}
 						RaiseReceivedEvent(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
-							CompleteConnect();
+							EndConnect();
 					}
 					break;
 				case 7: //Redirect
