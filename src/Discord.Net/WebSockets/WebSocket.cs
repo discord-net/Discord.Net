@@ -74,7 +74,7 @@ namespace Discord.WebSockets
 			_engine.ProcessMessage += async (s, e) =>
 			{
 				if (_logLevel >= LogMessageSeverity.Debug)
-					RaiseOnLog(LogMessageSeverity.Debug, $"In:  " + e.Message);
+					RaiseOnLog(LogMessageSeverity.Debug, $"In:  {e.Message}");
 				await ProcessMessage(e.Message);
 			};
         }
@@ -86,14 +86,12 @@ namespace Discord.WebSockets
 
             try
 			{
-				await Disconnect().ConfigureAwait(false);				
+				await Disconnect().ConfigureAwait(false);
 
-				_cancelTokenSource = new CancellationTokenSource();
 				if (ParentCancelToken == null)
 					throw new InvalidOperationException("Parent cancel token was never set.");
+				_cancelTokenSource = new CancellationTokenSource();
 				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
-				/*else
-					_cancelToken = _cancelTokenSource.Token;*/
 
 				_lastHeartbeat = DateTime.UtcNow;
 				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
