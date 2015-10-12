@@ -167,8 +167,10 @@ namespace Discord.WebSockets.Voice
 		protected override Task Cleanup()
 		{
 #if USE_THREAD
-			_sendThread.Join();
-			_receiveThread.Join();
+			if (_sendThread != null)
+				_sendThread.Join();
+			if (_receiveThread != null)	
+				_receiveThread.Join();
 			_sendThread = null;
 			_receiveThread = null;
 #endif
