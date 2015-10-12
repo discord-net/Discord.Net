@@ -34,28 +34,32 @@ namespace Discord.Helpers
 			else
 				return await self.ConfigureAwait(false);
 		}
-		public static async Task Timeout(this Task self, int milliseconds, CancellationTokenSource cancelToken)
+		public static async Task Timeout(this Task self, int milliseconds, CancellationTokenSource timeoutToken)
 		{
 			try
 			{
-				cancelToken.CancelAfter(milliseconds);
-				await self;
+				timeoutToken.CancelAfter(milliseconds);
+				await self.ConfigureAwait(false);
 			}
 			catch (OperationCanceledException)
 			{
-				throw new TimeoutException();
+				if (timeoutToken.IsCancellationRequested)
+					throw new TimeoutException();
+				throw;
 			}
 		}
-		public static async Task<T> Timeout<T>(this Task<T> self, int milliseconds, CancellationTokenSource cancelToken)
+		public static async Task<T> Timeout<T>(this Task<T> self, int milliseconds, CancellationTokenSource timeoutToken)
 		{
 			try
 			{
-				cancelToken.CancelAfter(milliseconds);
-				return await self;
+				timeoutToken.CancelAfter(milliseconds);
+				return await self.ConfigureAwait(false);
 			}
 			catch (OperationCanceledException)
 			{
-				throw new TimeoutException();
+				if (timeoutToken.IsCancellationRequested)
+					throw new TimeoutException();
+				throw;
 			}
 		}
 	}
