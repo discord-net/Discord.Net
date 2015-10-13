@@ -610,7 +610,7 @@ namespace Discord.WebSockets.Voice
 					if (!_connectedEvent.Wait(timeout, _cancelToken))
 						throw new TimeoutException();
 				}
-				catch (OperationCanceledException ex)
+				catch (OperationCanceledException)
 				{
 					ThrowError();
 				}
