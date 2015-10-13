@@ -139,6 +139,10 @@ namespace Discord.API
 		public string Name;
 		[JsonProperty("permissions", NullValueHandling = NullValueHandling.Ignore)]
 		public uint? Permissions;
+		[JsonProperty("hoist", NullValueHandling = NullValueHandling.Ignore)]
+		public bool? Hoist;
+		[JsonProperty("color", NullValueHandling = NullValueHandling.Ignore)]
+		public uint? Color;
 	}
 
 	//Servers

@@ -270,12 +270,12 @@ namespace Discord
 
 			return _rest.Delete(Endpoints.ServerRole(serverId, roleId));
 		}
-		public Task EditRole(string serverId, string roleId, string name = null, uint? permissions = null)
+		public Task EditRole(string serverId, string roleId, string name = null, uint? permissions = null, bool? hoist = null, uint? color = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (roleId == null) throw new ArgumentNullException(nameof(roleId));
 
-			var request = new EditRoleRequest { Name = name, Permissions = permissions };
+			var request = new EditRoleRequest { Name = name, Permissions = permissions, Hoist = hoist, Color = color };
 			return _rest.Patch(Endpoints.ServerRole(serverId, roleId), request);
 		}
 
