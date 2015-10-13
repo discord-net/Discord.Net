@@ -263,6 +263,8 @@ namespace Discord.API
 		public uint? Permissions;
 		[JsonProperty("name")]
 		public string Name;
+		[JsonProperty("position")]
+		public int? Position;
 		[JsonProperty("hoist")]
 		public bool? Hoist;
 		[JsonProperty("color")]

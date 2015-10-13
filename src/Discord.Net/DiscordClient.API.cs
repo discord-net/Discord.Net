@@ -652,19 +652,43 @@ namespace Discord
 			return _api.CreateRole(serverId);
 		}
 
-		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
-			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist);
-        public Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
+		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist, position: position);
+        public async Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
 		{
 			CheckReady();
 			if (role == null) throw new NullReferenceException(nameof(role));
 
 			//TODO: Stop defaulting to cache variables once the server stops 500ing at us
-			return _api.EditRole(role.ServerId, role.Id, 
+			await _api.EditRole(role.ServerId, role.Id, 
 				name: name ?? role.Name, 
 				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
 				color: color?.RawValue ?? role.Color.RawValue, 
 				hoist: hoist ?? role.Hoist);
+
+			if (position != null)
+			{
+				int oldPos = role.Position;
+				int newPos = position.Value;
+				int minPos;
+				Role[] roles = role.Server.Roles.OrderBy(x => x.Position).ToArray();
+
+				if (oldPos < newPos) //Moving Down
+				{
+					minPos = oldPos;
+					for (int i = oldPos; i < newPos; i++)
+						roles[i] = roles[i + 1];
+					roles[newPos] = role;
+				}
+				else //(oldPos > newPos) Moving Up
+				{
+					minPos = newPos;
+					for (int i = oldPos; i > newPos; i--)
+						roles[i] = roles[i - 1];
+					roles[newPos] = role;
+				}
+				await _api.ReorderRoles(role.ServerId, roles.Skip(minPos).Select(x => x.Id), minPos);
+			}
 		}
 
 		public Task DeleteRole(Role role)
@@ -676,6 +700,27 @@ namespace Discord
 			if (roleId == null) throw new NullReferenceException(nameof(roleId));
 
 			return _api.DeleteRole(serverId, roleId);
+		}
+
+		public Task ReorderRoles(Server server, IEnumerable<object> roles, int startPos = 0)
+			=> ReorderChannels(server.Id, roles, startPos);
+		public Task ReorderRoles(string serverId, IEnumerable<object> roles, int startPos = 0)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (roles == null) throw new ArgumentNullException(nameof(roles));
+			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
+
+			var roleIds = roles.Select(x =>
+			{
+				if (x is string)
+					return x as string;
+				else if (x is Role)
+					return (x as Role).Id;
+				else
+					throw new ArgumentException("Channels must be a collection of string or Role.", nameof(roles));
+			});
+
+			return _api.ReorderRoles(serverId, roleIds, startPos);
 		}
 
 		//Servers

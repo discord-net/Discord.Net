@@ -14,6 +14,8 @@ namespace Discord
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
 		public bool Hoist { get; private set; }
+		/// <summary> Returns the position of this channel in the role list for this server. </summary>
+		public int Position { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
 		public PackedColor Color { get; private set; }
 
@@ -51,6 +53,8 @@ namespace Discord
 				Name = model.Name;
 			if (model.Hoist != null)
 				Hoist = model.Hoist.Value;
+			if (model.Position != null)
+				Position = model.Position.Value;
 			if (model.Color != null)
 				Color.SetRawValue(model.Color.Value);
 			if (model.Permissions != null)

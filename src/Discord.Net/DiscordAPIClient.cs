@@ -278,6 +278,17 @@ namespace Discord
 			var request = new EditRoleRequest { Name = name, Permissions = permissions, Hoist = hoist, Color = color };
 			return _rest.Patch(Endpoints.ServerRole(serverId, roleId), request);
 		}
+		public Task ReorderRoles(string serverId, IEnumerable<string> roleIds, int startPos = 0)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (roleIds == null) throw new ArgumentNullException(nameof(roleIds));
+			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
+
+			uint pos = (uint)startPos;
+			var roles = roleIds.Select(x => new ReorderRolesRequest.Role { Id = x, Position = pos++ });
+			var request = new ReorderRolesRequest(roles);
+			return _rest.Patch(Endpoints.ServerRoles(serverId), request);
+		}
 
 		//Servers
 		public Task<CreateServerResponse> CreateServer(string name, string region)

@@ -144,6 +144,21 @@ namespace Discord.API
 		[JsonProperty("color", NullValueHandling = NullValueHandling.Ignore)]
 		public uint? Color;
 	}
+	internal sealed class ReorderRolesRequest : IEnumerable<ReorderRolesRequest.Role>
+	{
+		public sealed class Role
+		{
+			[JsonProperty("id")]
+			public string Id;
+			[JsonProperty("position")]
+			public uint Position;
+		}
+		private IEnumerable<Role> _roles;
+		public ReorderRolesRequest(IEnumerable<Role> roles) { _roles = roles; }
+
+		public IEnumerator<Role> GetEnumerator() => _roles.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => _roles.GetEnumerator();
+	}
 
 	//Servers
 	internal sealed class CreateServerRequest
