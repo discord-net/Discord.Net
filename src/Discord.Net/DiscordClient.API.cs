@@ -635,7 +635,7 @@ namespace Discord
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 
-			return _api.EditProfile(currentPassword: currentPassword, username: username, email: email, password: password,
+			return _api.EditProfile(currentPassword: currentPassword, username: username, email: email ?? _currentUser.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 
