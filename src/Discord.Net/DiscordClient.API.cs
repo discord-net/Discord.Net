@@ -659,6 +659,7 @@ namespace Discord
 			CheckReady();
 			if (role == null) throw new NullReferenceException(nameof(role));
 
+			//TODO: Stop defaulting to cache variables once the server stops 500ing at us
 			return _api.EditRole(role.ServerId, role.Id, 
 				name: name ?? role.Name, 
 				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
