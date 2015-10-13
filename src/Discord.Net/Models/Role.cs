@@ -45,6 +45,9 @@ namespace Discord
 			Permissions.Lock();
 			Color = new PackedColor(0);
 			Color.Lock();
+
+			if (isEveryone)
+				Position = int.MinValue;
         }
 
 		internal void Update(API.RoleInfo model)
@@ -53,7 +56,7 @@ namespace Discord
 				Name = model.Name;
 			if (model.Hoist != null)
 				Hoist = model.Hoist.Value;
-			if (model.Position != null)
+			if (model.Position != null && !IsEveryone)
 				Position = model.Position.Value;
 			if (model.Color != null)
 				Color.SetRawValue(model.Color.Value);
