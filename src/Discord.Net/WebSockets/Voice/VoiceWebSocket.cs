@@ -108,7 +108,7 @@ namespace Discord.WebSockets.Voice
 			catch (OperationCanceledException) { }
 		}
 
-		protected override Task[] GetTasks()
+		protected override IEnumerable<Task> GetTasks()
 		{
 			_isClearing = false;
 			

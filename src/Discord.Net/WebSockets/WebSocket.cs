@@ -1,6 +1,7 @@
 ﻿using Discord.Helpers;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -29,7 +30,7 @@ namespace Discord.WebSockets
 		Task Connect(string host, CancellationToken cancelToken);
 		Task Disconnect();
 		void QueueMessage(string message);
-        Task[] GetTasks(CancellationToken cancelToken);
+        IEnumerable<Task> GetTasks(CancellationToken cancelToken);
     }
 
 	internal abstract partial class WebSocket
@@ -162,7 +163,7 @@ namespace Discord.WebSockets
 
 		protected virtual async Task RunTasks()
 		{
-			Task[] tasks = GetTasks();
+			Task[] tasks = GetTasks().ToArray();
 			Task firstTask = Task.WhenAny(tasks);
 			Task allTasks = Task.WhenAll(tasks);
 
@@ -180,12 +181,11 @@ namespace Discord.WebSockets
 			//Start cleanup
 			await Cleanup().ConfigureAwait(false);
 		}
-		protected virtual Task[] GetTasks()
+		protected virtual IEnumerable<Task> GetTasks()
 		{
 			var cancelToken = _cancelToken;
-            return _engine.GetTasks(cancelToken)
-				.Concat(new Task[] { HeartbeatAsync(cancelToken) })
-				.ToArray();
+			return _engine.GetTasks(cancelToken)
+				.Concat(new Task[] { HeartbeatAsync(cancelToken) });
 		}
 		protected virtual async Task Cleanup()
 		{

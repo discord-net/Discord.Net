@@ -2,6 +2,7 @@
 using Discord.Helpers;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.WebSockets;
 using System.Text;
@@ -50,7 +51,7 @@ namespace Discord.WebSockets
             return TaskHelper.CompletedTask;
 		}
 
-		public Task[] GetTasks(CancellationToken cancelToken)
+		public IEnumerable<Task> GetTasks(CancellationToken cancelToken)
 		{
 			return new Task[]
 			{

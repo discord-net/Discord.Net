@@ -1,6 +1,8 @@
 ﻿using Discord.Helpers;
 using Discord.WebSockets.Data;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -210,7 +212,7 @@ namespace Discord
 
 		private async Task RunTasks()
 		{
-			Task[] tasks = GetTasks();
+			Task[] tasks = GetTasks().ToArray();
 			Task firstTask = Task.WhenAny(tasks);
 			Task allTasks = Task.WhenAll(tasks);
 
@@ -239,7 +241,7 @@ namespace Discord
 			_connectedEvent.Reset();
 			_runTask = null;
 		}
-		protected virtual Task[] GetTasks()
+		protected virtual IEnumerable<Task> GetTasks()
 		{
 			return new Task[] { _cancelToken.Wait() };
 		}
