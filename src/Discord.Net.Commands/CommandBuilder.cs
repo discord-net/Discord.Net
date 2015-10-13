@@ -96,7 +96,22 @@ namespace Discord.Commands
 			=> CreateCommand("");
         public CommandBuilder CreateCommand(string cmd)
 		{
-			var command = new Command(cmd != "" ? _prefix + ' ' + cmd : _prefix);
+			string text;
+			if (cmd != "")
+			{
+				if (_prefix != "")
+					text = _prefix + ' ' + cmd;
+				else
+					text = cmd;
+			}
+			else
+			{
+				if (_prefix != "")
+					text = _prefix;
+				else
+					throw new ArgumentOutOfRangeException(nameof(cmd));
+			}
+            var command = new Command(text);
 			command.MinPerms = _defaultMinPermissions;
 			_plugin._commands.Add(command);
             return new CommandBuilder(command);
