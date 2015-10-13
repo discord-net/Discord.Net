@@ -12,6 +12,10 @@ namespace Discord
 		public string Id { get; }
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
+		/// <summary> If true, this role is displayed isolated from other users. </summary>
+		public bool Hoist { get; private set; }
+		/// <summary> Returns the color of this role. </summary>
+		public uint Color { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public PackedServerPermissions Permissions { get; }
@@ -41,8 +45,14 @@ namespace Discord
 
 		internal void Update(API.RoleInfo model)
 		{
-			Name = model.Name;
-			Permissions.SetRawValue(model.Permissions);
+			if (model.Name != null)
+				Name = model.Name;
+			if (model.Hoist != null)
+				Hoist = model.Hoist.Value;
+			if (model.Color != null)
+				Color = model.Color.Value;
+			if (model.Permissions != null)
+				Permissions.SetRawValue(model.Permissions.Value);
 
 			foreach (var member in Members)
 				member.UpdatePermissions();
