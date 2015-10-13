@@ -38,9 +38,10 @@ namespace Discord
 			if (_isLocked)
 				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
 
+			uint original = _rawValue;
 			int bit = 8 * (pos - 1);
-            uint mask = (uint)((1 << bit) - 1);
-			_rawValue = ((uint)value << bit) | (_rawValue & mask);
+			uint mask = (uint)~(0xFF << bit);
+            _rawValue = (_rawValue & mask) | ((uint)value << bit);
 		}
 	}
 }

@@ -652,15 +652,18 @@ namespace Discord
 			return _api.CreateRole(serverId);
 		}
 
-		public Task EditRole(Role role, string newName)
-			=> EditRole(role?.ServerId, role?.Id, newName);
-		public Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
+		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
+			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist);
+        public Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
 		{
 			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			if (role == null) throw new NullReferenceException(nameof(role));
 
-			return _api.EditRole(serverId, roleId, name: name, permissions: permissions?.RawValue, color: color?.RawValue, hoist: hoist);
+			return _api.EditRole(role.ServerId, role.Id, 
+				name: name ?? role.Name, 
+				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
+				color: color?.RawValue ?? role.Color.RawValue, 
+				hoist: hoist ?? role.Hoist);
 		}
 
 		public Task DeleteRole(Role role)
