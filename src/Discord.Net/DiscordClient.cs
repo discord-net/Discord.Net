@@ -6,6 +6,7 @@ using Discord.WebSockets.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -300,7 +301,14 @@ namespace Discord
 			_currentUser = null;
 		}
 
-		//Experimental
+		protected override IEnumerable<Task> GetTasks()
+		{
+			if (Config.UseMessageQueue)
+				return base.GetTasks().Concat(new Task[] { MessageQueueLoop() });
+			else
+				return base.GetTasks();
+		}
+		
 		private Task MessageQueueLoop()
 		{
 			var cancelToken = CancelToken;
