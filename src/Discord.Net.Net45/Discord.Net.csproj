@@ -199,6 +199,9 @@
     <Compile Include="..\Discord.Net\Models\Message.cs">
       <Link>Models\Message.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\PackedColor.cs">
+      <Link>Models\PackedColor.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\PackedPermissions.cs">
       <Link>Models\PackedPermissions.cs</Link>
     </Compile>

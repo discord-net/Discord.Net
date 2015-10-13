@@ -15,7 +15,7 @@ namespace Discord
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
 		public bool Hoist { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
-		public uint Color { get; private set; }
+		public PackedColor Color { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public PackedServerPermissions Permissions { get; }
@@ -38,9 +38,11 @@ namespace Discord
 			_client = client;
 			Id = id;
 			ServerId = serverId;
+			IsEveryone = isEveryone;
 			Permissions = new PackedServerPermissions(0);
 			Permissions.Lock();
-			IsEveryone = isEveryone;
+			Color = new PackedColor(0);
+			Color.Lock();
         }
 
 		internal void Update(API.RoleInfo model)
@@ -50,7 +52,7 @@ namespace Discord
 			if (model.Hoist != null)
 				Hoist = model.Hoist.Value;
 			if (model.Color != null)
-				Color = model.Color.Value;
+				Color.SetRawValue(model.Color.Value);
 			if (model.Permissions != null)
 				Permissions.SetRawValue(model.Permissions.Value);
 

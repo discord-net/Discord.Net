@@ -654,13 +654,13 @@ namespace Discord
 
 		public Task EditRole(Role role, string newName)
 			=> EditRole(role?.ServerId, role?.Id, newName);
-		public Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null, bool? hoist = null, uint? color = null)
+		public Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null)
 		{
 			CheckReady();
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
 			if (roleId == null) throw new NullReferenceException(nameof(roleId));
 
-			return _api.EditRole(serverId, roleId, name: name, permissions: permissions?.RawValue, hoist: hoist, color: color);
+			return _api.EditRole(serverId, roleId, name: name, permissions: permissions?.RawValue, color: color?.RawValue, hoist: hoist);
 		}
 
 		public Task DeleteRole(Role role)
