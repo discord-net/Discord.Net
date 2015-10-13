@@ -508,69 +508,122 @@ namespace Discord
 
 		//Permissions
 		public Task SetChannelUserPermissions(Channel channel, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channel?.Id, member?.UserId, "member", allow, deny);
+			=> SetChannelPermissions(channel, member?.UserId, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(string channelId, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channelId, member?.UserId, "member", allow, deny);
+			=> SetChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(Channel channel, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channel?.Id, user?.Id, "member", allow, deny);
+			=> SetChannelPermissions(channel, user?.Id, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(string channelId, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channelId, user?.Id, "member", allow, deny);
+			=> SetChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channel?.Id, userId, "member", allow, deny);
+			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channelId, userId, "member", allow, deny);
+			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, allow, deny);
 
 		public Task SetChannelRolePermissions(Channel channel, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channel?.Id, role?.Id, "role", allow, deny);
+			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, allow, deny);
 		public Task SetChannelRolePermissions(string channelId, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channelId, role?.Id, "role", allow, deny);
+			=> SetChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role, allow, deny);
 		public Task SetChannelRolePermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channel?.Id, userId, "role", allow, deny);
+			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, allow, deny);
 		public Task SetChannelRolePermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
-			=> SetChannelPermissions(channelId, userId, "role", allow, deny);
+			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, allow, deny);
 
-		private Task SetChannelPermissions(string channelId, string userOrRoleId, string idType, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 		{
 			CheckReady();
-			if (channelId == null) throw new NullReferenceException(nameof(channelId));
-			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
+			if (channel == null) throw new NullReferenceException(nameof(channel));
+			if (targetId == null) throw new NullReferenceException(nameof(targetId));
+			if (targetType == null) throw new NullReferenceException(nameof(targetType));
 
-			return _api.SetChannelPermissions(channelId, userOrRoleId, idType, allow?.RawValue ?? 0, deny?.RawValue ?? 0);
-			//TODO: Remove permission from cache
+			uint allowValue = allow?.RawValue ?? 0;
+			uint denyValue = deny?.RawValue ?? 0;
+			bool changed = false;
+
+			var perms = channel.PermissionOverwrites.Where(x => x.Type != targetType || x.TargetId != targetId).FirstOrDefault();
+			if (allowValue != 0 || denyValue != 0)
+			{
+				await _api.SetChannelPermissions(channel.Id, targetId, targetType, allowValue, denyValue);
+				if (perms != null)
+				{
+					perms.Allow.SetRawValue(allowValue);
+					perms.Deny.SetRawValue(denyValue);
+				}
+				else
+				{
+					var oldPerms = channel._permissionOverwrites;
+					var newPerms = new Channel.PermissionOverwrite[oldPerms.Length + 1];
+					Array.Copy(oldPerms, newPerms, oldPerms.Length);
+					newPerms[oldPerms.Length] = new Channel.PermissionOverwrite(targetType, targetId, allowValue, denyValue);
+					channel._permissionOverwrites = newPerms;
+				}
+				changed = true;
+			}
+			else
+			{
+				try
+				{
+					await _api.DeleteChannelPermissions(channel.Id, targetId);
+					if (perms != null)
+					{
+						channel._permissionOverwrites = channel.PermissionOverwrites.Where(x => x.Type != targetType || x.TargetId != targetId).ToArray();
+						changed = true;
+					}
+				}
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+			}
+
+			if (changed)
+			{
+				if (targetType == PermissionTarget.Role)
+					channel.InvalidatePermissionsCache();
+				else if (targetType == PermissionTarget.Member)
+					channel.InvalidatePermissionsCache(targetId);
+			}
 		}
 
 		public Task RemoveChannelUserPermissions(Channel channel, Member member)
-			=> RemoveChannelPermissions(channel?.Id, member?.UserId);
+			=> RemoveChannelPermissions(channel, member?.UserId, PermissionTarget.Member);
 		public Task RemoveChannelUserPermissions(string channelId, Member member)
-			=> RemoveChannelPermissions(channelId, member?.UserId);
+			=> RemoveChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member);
 		public Task RemoveChannelUserPermissions(Channel channel, User user)
-			=> RemoveChannelPermissions(channel?.Id, user?.Id);
+			=> RemoveChannelPermissions(channel, user?.Id, PermissionTarget.Member);
 		public Task RemoveChannelUserPermissions(string channelId, User user)
-			=> RemoveChannelPermissions(channelId, user?.Id);
+			=> RemoveChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member);
 		public Task RemoveChannelUserPermissions(Channel channel, string userId)
-			=> RemoveChannelPermissions(channel?.Id, userId);
+			=> RemoveChannelPermissions(channel, userId, PermissionTarget.Member);
 		public Task RemoveChannelUserPermissions(string channelId, string userId)
-			=> RemoveChannelPermissions(channelId, userId);
+			=> RemoveChannelPermissions(_channels[channelId], userId, PermissionTarget.Member);
 
 		public Task RemoveChannelRolePermissions(Channel channel, Role role)
-			=> RemoveChannelPermissions(channel?.Id, role?.Id);
+			=> RemoveChannelPermissions(channel, role?.Id, PermissionTarget.Role);
 		public Task RemoveChannelRolePermissions(string channelId, Role role)
-			=> RemoveChannelPermissions(channelId, role?.Id);
+			=> RemoveChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role);
 		public Task RemoveChannelRolePermissions(Channel channel, string roleId)
-			=> RemoveChannelUserPermissions(channel?.Id, roleId);
+			=> RemoveChannelPermissions(channel, roleId, PermissionTarget.Role);
 		public Task RemoveChannelRolePermissions(string channelId, string roleId)
-			=> RemoveChannelPermissions(channelId, roleId);
+			=> RemoveChannelPermissions(_channels[channelId], roleId, PermissionTarget.Role);
 
-		private async Task RemoveChannelPermissions(string channelId, string userOrRoleId)
+		private async Task RemoveChannelPermissions(Channel channel, string userOrRoleId, string idType)
 		{
 			CheckReady();
-			if (channelId == null) throw new NullReferenceException(nameof(channelId));
+			if (channel == null) throw new NullReferenceException(nameof(channel));
 			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
+			if (idType == null) throw new NullReferenceException(nameof(idType));
 
 			try
 			{
-				await _api.DeleteChannelPermissions(channelId, userOrRoleId).ConfigureAwait(false);
-				//TODO: Remove permission from cache
+				var perms = channel.PermissionOverwrites.Where(x => x.Type != idType || x.TargetId != userOrRoleId).FirstOrDefault();
+				await _api.DeleteChannelPermissions(channel.Id, userOrRoleId).ConfigureAwait(false);
+				if (perms != null)
+				{
+					channel.PermissionOverwrites.Where(x => x.Type != idType || x.TargetId != userOrRoleId).ToArray();
+
+					if (idType == PermissionTarget.Role)
+						channel.InvalidatePermissionsCache();
+					else if (idType == PermissionTarget.Member)
+						channel.InvalidatePermissionsCache(userOrRoleId);
+				}
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
