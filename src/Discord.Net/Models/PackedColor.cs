@@ -19,11 +19,11 @@ namespace Discord
 		
 		public PackedColor(uint rawValue) { _rawValue = rawValue; }
 
-		/// <summary> If True, a user may join channels. </summary>
+		/// <summary> Gets or sets the red component for this color. </summary>
 		public byte Red { get { return GetByte(3); } set { SetByte(3, value); } }
-		/// <summary> If True, a user may send messages. </summary>
+		/// <summary> Gets or sets the green component for this color. </summary>
 		public byte Green { get { return GetByte(2); } set { SetByte(2, value); } }
-		/// <summary> If True, a user may send text-to-speech messages. </summary>
+		/// <summary> Gets or sets the blue component for this color. </summary>
 		public byte Blue { get { return GetByte(1); } set { SetByte(1, value); } }
 
 		internal void Lock() => _isLocked = true;
