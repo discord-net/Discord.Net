@@ -24,6 +24,8 @@ namespace Discord
 		private readonly ConcurrentDictionary<string, DiscordSimpleClient> _voiceClients;
 		private bool _sentInitialLog;
 		private uint _nextVoiceClientId;
+		private string _status;
+		private int? _gameId;
 
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;
 
@@ -69,8 +71,13 @@ namespace Discord
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
+			_status = UserStatus.Online;
 
-			this.Connected += (s, e) => _api.CancelToken = CancelToken;
+			this.Connected += async (s, e) =>
+			{
+				_api.CancelToken = CancelToken;
+				await SendStatus();
+			};
 
 			VoiceDisconnected += (s, e) =>
 			{

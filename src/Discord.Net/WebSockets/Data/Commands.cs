@@ -2,17 +2,15 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.Helpers;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
 namespace Discord.WebSockets.Data
 {
 	internal sealed class KeepAliveCommand : WebSocketMessage<ulong>
 	{
-		public KeepAliveCommand() : base(1, GetTimestamp()) { }
-		private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		private static ulong GetTimestamp() => (ulong)(DateTime.UtcNow - epoch).TotalMilliseconds;
+		public KeepAliveCommand() : base(1, EpochTime.GetMilliseconds()) { }
 	}
 	internal sealed class LoginCommand : WebSocketMessage<LoginCommand.Data>
 	{
@@ -33,9 +31,9 @@ namespace Discord.WebSockets.Data
 		public class Data
 		{
 			[JsonProperty("idle_since")]
-			public string IdleSince;
+			public ulong? IdleSince;
 			[JsonProperty("game_id")]
-			public string GameId;
+			public int? GameId;
 		}
 	}
 	internal sealed class JoinVoiceCommand : WebSocketMessage<JoinVoiceCommand.Data>

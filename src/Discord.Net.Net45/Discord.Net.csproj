@@ -175,6 +175,9 @@
     <Compile Include="..\Discord.Net\Format.cs">
       <Link>Format.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
+      <Link>Helpers\EpochTime.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\Extensions.cs">
       <Link>Helpers\Extensions.cs</Link>
     </Compile>

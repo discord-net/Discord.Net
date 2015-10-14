@@ -80,13 +80,11 @@ namespace Discord.WebSockets.Data
 							var payload = token.ToObject<ReadyEvent>();
 							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
-							QueueMessage(new UpdateStatusCommand());
 						}
 						else if (msg.Type == "RESUMED")
 						{
 							var payload = token.ToObject<ResumedEvent>();
 							_heartbeatInterval = payload.HeartbeatInterval;
-							QueueMessage(new UpdateStatusCommand());
 						}
 						RaiseReceivedEvent(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
@@ -112,6 +110,14 @@ namespace Discord.WebSockets.Data
 		protected override object GetKeepAlive()
 		{
 			return new KeepAliveCommand();
+		}
+
+		public void SendStatus(ulong? idleSince, int? gameId)
+		{
+			var updateStatus = new UpdateStatusCommand();
+			updateStatus.Payload.IdleSince = idleSince;
+			updateStatus.Payload.GameId = gameId;
+            QueueMessage(updateStatus);
 		}
 
 		public void SendJoinVoice(string serverId, string channelId)
