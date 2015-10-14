@@ -12,7 +12,7 @@ namespace Discord
 			set
 			{
 				if (_isLocked)
-					throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
+					throw new InvalidOperationException("Unable to edit cached colors directly, use Copy() to make an editable copy.");
 				_rawValue = value;
 			}
 		} 
@@ -36,7 +36,7 @@ namespace Discord
 		protected void SetByte(int pos, byte value)
 		{
 			if (_isLocked)
-				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
+				throw new InvalidOperationException("Unable to edit cached colors directly, use Copy() to make an editable copy.");
 
 			uint original = _rawValue;
 			int bit = 8 * (pos - 1);
