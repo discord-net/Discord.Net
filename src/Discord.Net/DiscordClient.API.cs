@@ -664,7 +664,7 @@ namespace Discord
 		}
 		private Task SendStatus()
 		{
-			_dataSocket.SendStatus(_status == UserStatus.Away ? EpochTime.GetMilliseconds() : (ulong?)null, _gameId);
+			_dataSocket.SendStatus(_status == UserStatus.Away ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (ulong?)null, _gameId);
 			return TaskHelper.CompletedTask;
 		}
 
