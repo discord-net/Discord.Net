@@ -6,7 +6,8 @@ namespace Discord.Commands
 	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
 	public partial class CommandsPlugin
     {
-        internal List<Command> _commands;
+		private readonly DiscordClient _client;
+		private List<Command> _commands;
 		private Func<User, Server, int> _getPermissions;
 
 		public IEnumerable<Command> Commands => _commands;
@@ -16,8 +17,9 @@ namespace Discord.Commands
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public CommandsPlugin(Func<User, Server, int> getPermissions = null)
+		public CommandsPlugin(DiscordClient client, Func<User, Server, int> getPermissions = null)
 		{
+			_client = client;
 			_getPermissions = getPermissions;
 			_commands = new List<Command>();
 
@@ -25,10 +27,7 @@ namespace Discord.Commands
 			UseCommandChar = false;
 			RequireCommandCharInPublic = true;
 			RequireCommandCharInPrivate = true;
-		}
 
-		public void Install(DiscordClient client)
-		{
 			client.MessageCreated += async (s, e) =>
 			{
 				//If commands aren't being used, don't bother processing them
@@ -123,5 +122,10 @@ namespace Discord.Commands
 			_commands.Add(command);
 			return new CommandBuilder(command);
 		}
-    }
+
+		internal void AddCommand(Command command)
+		{
+			_commands.Add(command);
+		}
+	}
 }

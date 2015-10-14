@@ -113,7 +113,7 @@ namespace Discord.Commands
 			}
             var command = new Command(text);
 			command.MinPerms = _defaultMinPermissions;
-			_plugin._commands.Add(command);
+			_plugin.AddCommand(command);
             return new CommandBuilder(command);
 		}
 	}
