@@ -1,6 +1,6 @@
 ﻿{
 	"version": "0.7.3-beta2",
-	"description": "A small Discord.Net extension to make bot creation easier.",
+	"description": "A Discord.Net extension adding basic command support.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
 	"projectUrl": "https://github.com/RogueException/Discord.Net",

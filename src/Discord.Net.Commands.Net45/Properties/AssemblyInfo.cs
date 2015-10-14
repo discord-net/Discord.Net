@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Discord.Net.Commands")]
-[assembly: AssemblyDescription("A small Discord.Net extension to make bot creation easier.")]
+[assembly: AssemblyDescription("A Discord.Net extension adding basic command support.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RogueException")]
 [assembly: AssemblyProduct("Discord.Net.Commands")]
