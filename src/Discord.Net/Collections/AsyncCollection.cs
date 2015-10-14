@@ -96,7 +96,10 @@ namespace Discord.Collections
 				{
 					TValue result;
 					if (_dictionary.TryRemove(key, out result))
+					{
+						OnRemoved(result);
 						return result;
+					}
 				}
 			}
 			return null;
