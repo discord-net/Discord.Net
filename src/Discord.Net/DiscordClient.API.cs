@@ -639,27 +639,22 @@ namespace Discord
 			return _api.EditProfile(currentPassword: currentPassword, username: username, email: email ?? _currentUser?.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
-		public Task SetStatus(string status = null, int? gameId = null)
+		public Task SetStatus(string status)
 		{
-			if (status == null && gameId == null)
-				throw new ArgumentNullException("Either status or gameId must be non-null");
-
-			if (status != null)
+			switch (status)
 			{
-				switch (status)
-				{
-					case UserStatus.Online:
-					case UserStatus.Away:
-						_status = status;
-						break;
-					default:
-						throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Away}");
-				}
+				case UserStatus.Online:
+				case UserStatus.Away:
+					_status = status;
+					break;
+				default:
+					throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Away}");
 			}
-
-			if (gameId != null)
-				_gameId = gameId;
-
+			return SendStatus();
+		}
+		public Task SetGame(int? gameId)
+		{
+			_gameId = gameId;
 			return SendStatus();
 		}
 		private Task SendStatus()
