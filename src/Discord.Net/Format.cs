@@ -103,7 +103,12 @@ namespace Discord
 
 		/// <summary> Returns a markdown-formatted string with strikeout formatting, optionally escaping the contents. </summary>
 		public static string Code(string text, string language = null, bool escape = true)
-			=> $"```{language ?? ""}\n{(escape ? Escape(text) : text)}\n```";
+		{
+			if (text.Contains("\n"))
+				return $"```{language ?? ""}\n{(escape ? Escape(text) : text)}\n```";
+			else
+				return $"`{(escape ? Escape(text) : text)}`";
+		}
 
 		/// <summary> Returns a markdown-formatted string with multiple formatting, optionally escaping the contents. </summary>
 		public static string Multiple(string text, bool escape = true, 
