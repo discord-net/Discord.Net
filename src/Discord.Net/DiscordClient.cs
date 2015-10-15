@@ -673,12 +673,12 @@ namespace Discord
 							var member = _members[data.UserId, data.GuildId];
 							if (member != null)
 							{
-								member.Update(data);
-								if (member.IsSpeaking)
+								if (data.ChannelId != member.VoiceChannelId && member.IsSpeaking)
 								{
 									member.IsSpeaking = false;
 									RaiseUserIsSpeaking(member, false);
 								}
+								member.Update(data);
 								RaiseUserVoiceStateUpdated(member);
 							}
 						}
