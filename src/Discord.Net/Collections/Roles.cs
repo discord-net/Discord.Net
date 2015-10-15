@@ -18,7 +18,9 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Role item)
 		{
-			item.Server.RemoveRole(item.Id);
+			var server = item.Server;
+			if (server != null)
+				item.Server.RemoveRole(item.Id);
 		}
 
 		internal Role this[string id] => Get(id);

@@ -22,8 +22,12 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Message item)
 		{
-			item.Channel.RemoveMessage(item.Id);
-			item.User.RemoveRef();
+			var channel = item.Channel;
+			if (channel != null)
+				channel.RemoveMessage(item.Id);
+			var user = item.User;
+			if (user != null)
+				user.RemoveRef();
 		}
 
 		internal Message this[string id] => Get(id);

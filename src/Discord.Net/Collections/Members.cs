@@ -24,11 +24,19 @@ namespace Discord.Collections
 		}
 		protected override void OnRemoved(Member item)
 		{
-			item.Server.RemoveMember(item);
-			item.User.RemoveServer(item.ServerId);
-			item.User.RemoveRef();
-			if (item.UserId == _client.CurrentUserId)
-				item.Server.CurrentMember = null;
+			var server = item.Server;
+			if (server != null)
+			{
+				server.RemoveMember(item);
+				if (item.UserId == _client.CurrentUserId)
+					server.CurrentMember = null;
+			}
+			var user = item.User;
+			if (user != null)
+			{
+				user.RemoveServer(item.ServerId);
+				user.RemoveRef();
+			}
 		}
 		
 		internal Member this[string userId, string serverId]
