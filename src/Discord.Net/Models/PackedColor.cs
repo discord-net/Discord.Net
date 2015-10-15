@@ -49,6 +49,8 @@ namespace Discord
 		} 
 		
 		public PackedColor(uint rawValue) { _rawValue = rawValue; }
+		public PackedColor(byte r, byte g, byte b) : this(((uint)r << 16) | ((uint)g << 8) | b) { }
+		public PackedColor(float r, float g, float b) : this((byte)(r * 255.0f), (byte)(g * 255.0f), (byte)(b * 255.0f)) { }
 
 		/// <summary> Gets or sets the red component for this color. </summary>
 		public byte R { get { return GetByte(3); } set { SetByte(3, value); } }
