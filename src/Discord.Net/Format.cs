@@ -9,7 +9,7 @@ namespace Discord
 
 		static Format()
 		{
-			_patterns = new string[] { "__", "_", "**", "*", "~~", "```" };
+			_patterns = new string[] { "__", "_", "**", "*", "~~", "```", "`"};
 			_builder = new StringBuilder(DiscordClient.MaxMessageSize);
         }
 
