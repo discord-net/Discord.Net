@@ -104,7 +104,7 @@ namespace Discord
 		/// <summary> Returns a markdown-formatted string with strikeout formatting, optionally escaping the contents. </summary>
 		public static string Code(string text, string language = null, bool escape = true)
 		{
-			if (text.Contains("\n"))
+			if (language != null || text.Contains("\n"))
 				return $"```{language ?? ""}\n{(escape ? Escape(text) : text)}\n```";
 			else
 				return $"`{(escape ? Escape(text) : text)}`";
