@@ -97,7 +97,7 @@ namespace Discord.Collections
 					TValue result;
 					if (_dictionary.TryRemove(key, out result))
 					{
-						OnRemoved(result);
+						OnRemoved(result); //TODO: If this object is accessed before OnRemoved finished firing, properties such as Server.Channels will have null elements
 						return result;
 					}
 				}
