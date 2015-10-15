@@ -54,7 +54,7 @@ namespace Discord.Commands
 						return;
 				}
 
-				string[] args;
+				CommandPart[] args;
 				if (!CommandParser.ParseArgs(msg, out args))
 					return;
 
@@ -69,7 +69,7 @@ namespace Discord.Commands
                     bool isValid = true;
 					for (int j = 0; j < cmd.Parts.Length; j++)
 					{
-						if (!string.Equals(args[j], cmd.Parts[j], StringComparison.OrdinalIgnoreCase))
+						if (!string.Equals(args[j].Value, cmd.Parts[j], StringComparison.OrdinalIgnoreCase))
 						{
 							isValid = false;
 							break;
@@ -86,11 +86,18 @@ namespace Discord.Commands
 					//Clean Args
 					string[] newArgs = new string[argCount];
 					for (int j = 0; j < newArgs.Length; j++)
-						newArgs[j] = args[j + cmd.Parts.Length];
-					
+						newArgs[j] = args[j + cmd.Parts.Length].Value;
+
+					//Get ArgText
+					string argText;
+					if (argCount == 0)
+						argText = "";
+					else
+						argText = msg.Substring(args[cmd.Parts.Length].Index);
+
 					//Check Permissions
-                    int permissions = _getPermissions != null ? _getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
-					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, permissions, newArgs);
+					int permissions = _getPermissions != null ? _getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
+					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, argText, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{
 						RaiseCommandError(eventArgs, new PermissionException());

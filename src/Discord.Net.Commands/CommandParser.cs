@@ -2,6 +2,18 @@
 
 namespace Discord.Commands
 {
+	public class CommandPart
+	{
+		public string Value { get; }
+		public int Index { get; }
+
+		internal CommandPart(string value, int index)
+		{
+			Value = value;
+			Index = index;
+		}
+	}
+
 	//TODO: Check support for escaping
 	public static class CommandParser
 	{
@@ -14,24 +26,24 @@ namespace Discord.Commands
 			DoubleQuotedParameter
 		}
 
-		public static bool Parse(string input, out string command, out string[] args)
+		public static bool Parse(string input, out string command, out CommandPart[] args)
 		{
 			return Parse(input, out command, out args, true);
 		}
-		public static bool ParseArgs(string input, out string[] args)
+		public static bool ParseArgs(string input, out CommandPart[] args)
 		{
 			string ignored;
 			return Parse(input, out ignored, out args, false);
 		}
 
-		private static bool Parse(string input, out string command, out string[] args, bool parseCommand)
+		private static bool Parse(string input, out string command, out CommandPart[] args, bool parseCommand)
 		{
 			CommandParserPart currentPart = parseCommand ? CommandParserPart.CommandName : CommandParserPart.None;
 			int startPosition = 0;
 			int endPosition = 0;
 			int inputLength = input.Length;
 			bool isEscaped = false;
-			List<string> argList = new List<string>();
+			List<CommandPart> argList = new List<CommandPart>();
 
 			command = null;
 			args = null;
@@ -84,7 +96,7 @@ namespace Discord.Commands
 							else
 							{
 								currentPart = CommandParserPart.None;
-								argList.Add(temp);
+								argList.Add(new CommandPart(temp, startPosition));
 								startPosition = endPosition;
 							}
 						}
@@ -94,7 +106,7 @@ namespace Discord.Commands
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(temp);
+							argList.Add(new CommandPart(temp, startPosition));
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
@@ -105,7 +117,7 @@ namespace Discord.Commands
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(temp);
+							argList.Add(new CommandPart(temp, startPosition));
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)

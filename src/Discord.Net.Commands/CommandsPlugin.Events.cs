@@ -8,6 +8,7 @@ namespace Discord.Commands
 		public Message Message { get; }
 		public Command Command { get; }
 		public string CommandText { get; }
+		public string ArgText { get; }
 		public int? Permissions { get; }
 		public string[] Args { get; }
 
@@ -19,11 +20,12 @@ namespace Discord.Commands
 		public Server Server => Message.Channel.Server;
 		public string ServerId => Message.Channel.ServerId;
 
-		public CommandEventArgs(Message message, Command command, string commandText, int? permissions, string[] args)
+		public CommandEventArgs(Message message, Command command, string commandText, string argText, int? permissions, string[] args)
 		{
 			Message = message;
 			Command = command;
 			CommandText = commandText;
+			ArgText = argText;
 			Permissions = permissions;
 			Args = args;
 		}
@@ -33,7 +35,7 @@ namespace Discord.Commands
 		public Exception Exception { get; }
 
 		public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
-			: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.Permissions, baseArgs.Args)
+			: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.ArgText, baseArgs.Permissions, baseArgs.Args)
 		{
 			Exception = ex;
 		}
