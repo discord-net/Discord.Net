@@ -9,7 +9,7 @@ namespace Discord
 
 		static Format()
 		{
-			_patterns = new string[] { "__", "_", "**", "*", "~~" };
+			_patterns = new string[] { "__", "_", "**", "*", "~~", "```" };
 			_builder = new StringBuilder(DiscordClient.MaxMessageSize);
         }
 
@@ -101,8 +101,14 @@ namespace Discord
 		public static string Strikeout(string text, bool escape = true)
 			=> escape ? $"~~{Escape(text)}~~" : $"~~{text}~~";
 
+		/// <summary> Returns a markdown-formatted string with strikeout formatting, optionally escaping the contents. </summary>
+		public static string Code(string text, string language = null, bool escape = true)
+			=> $"```{language ?? ""}\n{(escape ? Escape(text) : text)}\n```";
+
 		/// <summary> Returns a markdown-formatted string with multiple formatting, optionally escaping the contents. </summary>
-		public static string Multiple(string text, bool escape = true, bool bold = false, bool italics = false, bool underline = false, bool strikeout = false)
+		public static string Multiple(string text, bool escape = true, 
+			bool bold = false, bool italics = false, bool underline = false, bool strikeout = false, 
+			bool code = false, string codeLanguage = null)
 		{
 			string result = text;
 			if (escape) result = Escape(result);
@@ -110,7 +116,8 @@ namespace Discord
 			if (italics) result = Italics(result, false);
 			if (underline) result = Underline(result, false);
 			if (strikeout) result = Strikeout(result, false);
-			return result;
+			if (code) result = Code(result, codeLanguage, false);
+            return result;
 		}
 	}
 }
