@@ -126,6 +126,18 @@ namespace Discord
 			if (ServerUpdated != null)
 				RaiseEvent(nameof(ServerUpdated), () => ServerUpdated(this, new ServerEventArgs(server)));
 		}
+		public event EventHandler<ServerEventArgs> ServerUnavailable;
+		private void RaiseServerUnavailable(Server server)
+		{
+			if (ServerUnavailable != null)
+				RaiseEvent(nameof(ServerUnavailable), () => ServerUnavailable(this, new ServerEventArgs(server)));
+		}
+		public event EventHandler<ServerEventArgs> ServerAvailable;
+		private void RaiseServerAvailable(Server server)
+		{
+			if (ServerAvailable != null)
+				RaiseEvent(nameof(ServerAvailable), () => ServerAvailable(this, new ServerEventArgs(server)));
+		}
 
 		//Channel
 		public event EventHandler<ChannelEventArgs> ChannelCreated;

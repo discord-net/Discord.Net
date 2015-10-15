@@ -103,6 +103,12 @@ namespace Discord
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Updated Server: {e.Server?.Name}" +
 					(showIDs ? $" ({e.ServerId})" : ""));
+				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+					$"Server Unavailable: {e.Server?.Name}" +
+					(showIDs ? $" ({e.ServerId})" : ""));
+				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+					$"Server Unavailable: {e.Server?.Name}" +
+					(showIDs ? $" ({e.ServerId})" : ""));
 				ChannelCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Created Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel.Name}" +
 					(showIDs ? $" ({e.ServerId ?? "[Private]"}/{e.ChannelId})" : ""));
@@ -392,22 +398,25 @@ namespace Discord
 					//Servers
 					case "GUILD_CREATE":
 						{
-							var model = e.Payload.ToObject<GuildCreateEvent>(_serializer);
-							if (!model.Unavailable)
+							var data = e.Payload.ToObject<GuildCreateEvent>(_serializer);
+							if (!data.Unavailable)
 							{
-								var server = _servers.GetOrAdd(model.Id);
-								server.Update(model);
-								RaiseServerCreated(server);
+								var server = _servers.GetOrAdd(data.Id);
+								server.Update(data);
+								if (data.Unavailable == false)
+									RaiseServerAvailable(server);
+								else
+									RaiseServerCreated(server);
 							}
 						}
 						break;
 					case "GUILD_UPDATE":
 						{
-							var model = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
-							var server = _servers[model.Id];
+							var data = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
+							var server = _servers[data.Id];
 							if (server != null)
 							{
-								server.Update(model);
+								server.Update(data);
 								RaiseServerUpdated(server);
 							}
 						}
@@ -417,7 +426,12 @@ namespace Discord
 							var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
-								RaiseServerDestroyed(server);
+							{
+								if (data.Unavailable == true)
+									RaiseServerAvailable(server);
+								else
+									RaiseServerDestroyed(server);
+							}
 						}
 						break;
 
