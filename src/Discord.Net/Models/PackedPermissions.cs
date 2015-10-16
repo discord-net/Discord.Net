@@ -4,8 +4,15 @@ namespace Discord
 {
 	public sealed class PackedServerPermissions : PackedPermissions
 	{
-		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
-		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000111111", 2);
+		public static PackedServerPermissions None { get; }
+		public static PackedServerPermissions All { get; }
+		static PackedServerPermissions()
+		{
+			None = new PackedServerPermissions();
+			None.Lock();
+			All = new PackedServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
+			All.Lock();
+		}
 
 		public PackedServerPermissions(uint rawValue = 0) : base(rawValue) { }
 
@@ -25,8 +32,15 @@ namespace Discord
 
 	public sealed class PackedChannelPermissions : PackedPermissions
 	{
-		internal const int GlobalBit = 4; //ManagePermissions implicitly gives all permissions
-		public static readonly uint Mask = Convert.ToUInt32("00000011111100111111110000011001", 2);
+		public static PackedChannelPermissions None { get; }
+		public static PackedChannelPermissions All { get; }
+		static PackedChannelPermissions()
+		{
+			None = new PackedChannelPermissions();
+			None.Lock();
+			All = new PackedChannelPermissions(Convert.ToUInt32("00000011111100111111110000011001", 2));
+			All.Lock();
+        }
 
 		public PackedChannelPermissions(uint rawValue = 0) : base(rawValue) { }
 		

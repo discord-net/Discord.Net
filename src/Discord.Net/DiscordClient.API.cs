@@ -541,7 +541,7 @@ namespace Discord
 			uint denyValue = deny?.RawValue ?? 0;
 			bool changed = false;
 
-			var perms = channel.PermissionOverwrites.Where(x => x.Type != targetType || x.TargetId != targetId).FirstOrDefault();
+			var perms = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).FirstOrDefault();
 			if (allowValue != 0 || denyValue != 0)
 			{
 				await _api.SetChannelPermissions(channel.Id, targetId, targetType, allowValue, denyValue);
@@ -567,7 +567,7 @@ namespace Discord
 					await _api.DeleteChannelPermissions(channel.Id, targetId);
 					if (perms != null)
 					{
-						channel._permissionOverwrites = channel.PermissionOverwrites.Where(x => x.Type != targetType || x.TargetId != targetId).ToArray();
+						channel._permissionOverwrites = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).ToArray();
 						changed = true;
 					}
 				}
@@ -614,11 +614,11 @@ namespace Discord
 
 			try
 			{
-				var perms = channel.PermissionOverwrites.Where(x => x.Type != idType || x.TargetId != userOrRoleId).FirstOrDefault();
+				var perms = channel.PermissionOverwrites.Where(x => x.TargetType != idType || x.TargetId != userOrRoleId).FirstOrDefault();
 				await _api.DeleteChannelPermissions(channel.Id, userOrRoleId).ConfigureAwait(false);
 				if (perms != null)
 				{
-					channel.PermissionOverwrites.Where(x => x.Type != idType || x.TargetId != userOrRoleId).ToArray();
+					channel.PermissionOverwrites.Where(x => x.TargetType != idType || x.TargetId != userOrRoleId).ToArray();
 
 					if (idType == PermissionTarget.Role)
 						channel.InvalidatePermissionsCache();

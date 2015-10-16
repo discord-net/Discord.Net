@@ -176,9 +176,10 @@ namespace Discord
 			PackedChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channelId, out permissions)) return;
 			uint newPermissions = 0x0;
+			uint oldPermissions = permissions.RawValue;
 
 			if (UserId == server.OwnerId)
-				newPermissions = PackedChannelPermissions.Mask;
+				newPermissions = PackedChannelPermissions.All.RawValue;
 			else
 			{
 				if (channel == null) return;
@@ -187,24 +188,26 @@ namespace Discord
 				var orderedRoles = Roles.OrderBy(x => x.Id);
 				foreach (var serverRole in orderedRoles)
 					newPermissions |= serverRole.Permissions.RawValue;
-				foreach (var denyRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Deny.RawValue != 0 && orderedRoles.Any(y => y.Id == x.TargetId)))
+				foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Deny.RawValue != 0 && orderedRoles.Any(y => y.Id == x.TargetId)))
 					newPermissions &= ~denyRole.Deny.RawValue;
-				foreach (var allowRole in channelOverwrites.Where(x => x.Type == PermissionTarget.Role && x.Allow.RawValue != 0 && orderedRoles.Any(y => y.Id == x.TargetId)))
+				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Allow.RawValue != 0 && orderedRoles.Any(y => y.Id == x.TargetId)))
 					newPermissions |= allowRole.Allow.RawValue;
-				foreach (var denyMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.TargetId == UserId && x.Deny.RawValue != 0))
+				foreach (var denyMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Member && x.TargetId == UserId && x.Deny.RawValue != 0))
 					newPermissions &= ~denyMembers.Deny.RawValue;
-				foreach (var allowMembers in channelOverwrites.Where(x => x.Type == PermissionTarget.Member && x.TargetId == UserId && x.Allow.RawValue != 0))
+				foreach (var allowMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Member && x.TargetId == UserId && x.Allow.RawValue != 0))
 					newPermissions |= allowMembers.Allow.RawValue;
 
-				if (((newPermissions >> (PackedChannelPermissions.GlobalBit - 1)) & 1) == 1)
-					newPermissions = PackedChannelPermissions.Mask;
 			}
 
-			if (permissions.RawValue != newPermissions)
-			{
-				permissions.SetRawValue(newPermissions);
+			permissions.SetRawValue(newPermissions);
+
+			if (permissions.General_ManagePermissions)
+				permissions.SetRawValue(PackedChannelPermissions.All.RawValue);
+			else if (server.DefaultChannelId == channelId)
+				permissions.Text_ReadMessages = true;
+
+			if (permissions.RawValue != oldPermissions)
 				channel.InvalidMembersCache();
-			}
 		}
 		//TODO: Add GetServerPermissions
 		public PackedChannelPermissions GetPermissions(Channel channel)

@@ -9,14 +9,14 @@ namespace Discord
 	{
 		public sealed class PermissionOverwrite
 		{
-			public string Type { get; }
+			public string TargetType { get; }
 			public string TargetId { get; }
 			public PackedChannelPermissions Allow { get; }
 			public PackedChannelPermissions Deny { get; }
 
 			internal PermissionOverwrite(string type, string targetId, uint allow, uint deny)
 			{
-				Type = type;
+				TargetType = type;
 				TargetId = targetId;
 				Allow = new PackedChannelPermissions(allow);
 				Deny = new PackedChannelPermissions( deny);
