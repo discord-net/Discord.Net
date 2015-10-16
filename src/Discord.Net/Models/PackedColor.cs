@@ -6,27 +6,28 @@ namespace Discord
 	{
 		public static readonly PackedColor Default = PresetColor(0);
 
-		public static readonly PackedColor Aqua = PresetColor(1752220);
-		public static readonly PackedColor DarkAqua = PresetColor(1146986);
-		public static readonly PackedColor Green = PresetColor(3066993);
-		public static readonly PackedColor DarkGreen = PresetColor(2067276);
-		public static readonly PackedColor Blue = PresetColor(3447003);
-		public static readonly PackedColor DarkBlue = PresetColor(2123412);
-		public static readonly PackedColor Purple = PresetColor(10181046);
-		public static readonly PackedColor DarkPurple = PresetColor(7419530);
-		public static readonly PackedColor Gold = PresetColor(15844367);
-		public static readonly PackedColor DarkGold = PresetColor(12745742);
-		public static readonly PackedColor Orange = PresetColor(15105570);
-		public static readonly PackedColor DarkOrange = PresetColor(11027200);
-		public static readonly PackedColor Red = PresetColor(15158332);
-		public static readonly PackedColor DarkRed = PresetColor(10038562);
-		public static readonly PackedColor Navy = PresetColor(3426654);
-		public static readonly PackedColor DarkNavy = PresetColor(2899536);
+		public static readonly PackedColor Cyan = PresetColor(0x1abc9c);
+		public static readonly PackedColor DarkCyan = PresetColor(0x11806a);
+		public static readonly PackedColor Green = PresetColor(0x2ecc71);
+		public static readonly PackedColor DarkGreen = PresetColor(0x1f8b4c);
+		public static readonly PackedColor Blue = PresetColor(0x3498db);
+		public static readonly PackedColor DarkBlue = PresetColor(0x206694);
+		public static readonly PackedColor Purple = PresetColor(0x9b59b6);
+		public static readonly PackedColor DarkPurple = PresetColor(0x71368a);
+		public static readonly PackedColor Red = PresetColor(0xe74c3c);
+		public static readonly PackedColor DarkRed = PresetColor(0x992d22);
+		public static readonly PackedColor Orange = PresetColor(0xe67e22);
+		public static readonly PackedColor DarkOrange = PresetColor(0xa84300);
+		public static readonly PackedColor Navy = PresetColor(0x34495e);
+		public static readonly PackedColor DarkNavy = PresetColor(0x2c3e50);
+		public static readonly PackedColor Gold = PresetColor(0xf1c40f);
+		public static readonly PackedColor DarkGold = PresetColor(0xc27c0e);
 
-		public static readonly PackedColor LighterGrey = PresetColor(12370112);
-		public static readonly PackedColor LightGrey = PresetColor(9807270);
-		public static readonly PackedColor DarkGrey = PresetColor(9936031);
-		public static readonly PackedColor DarkerGrey = PresetColor(8359053);
+		public static readonly PackedColor LighterGrey = PresetColor(0xbcc0c0);
+		public static readonly PackedColor LightGrey = PresetColor(0x95a5a6);
+		public static readonly PackedColor DarkGrey = PresetColor(0x979c9f);
+		public static readonly PackedColor DarkerGrey = PresetColor(0x7f8c8d);
+
 
 		private static PackedColor PresetColor(uint packedValue)
 		{
