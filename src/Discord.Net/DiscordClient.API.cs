@@ -665,10 +665,10 @@ namespace Discord
 
 		//Roles
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task<Role> CreateRole(Server server)
+		public Task<Role> CreateRole(Server server, string name)
 			=> CreateRole(server?.Id);
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public async Task<Role> CreateRole(string serverId)
+		public async Task<Role> CreateRole(string serverId, string name)
 		{
 			CheckReady();
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
@@ -676,6 +676,9 @@ namespace Discord
 			var response = await _api.CreateRole(serverId).ConfigureAwait(false);
 			var role = _roles.GetOrAdd(response.Id, serverId, false);
 			role.Update(response);
+
+			await EditRole(role, name: name);
+
 			return role;
 		}
 
