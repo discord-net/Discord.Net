@@ -29,7 +29,7 @@ namespace Discord.WebSockets.Voice
 		private uint _ssrc;
 		private ConcurrentDictionary<uint, string> _ssrcMapping;
 
-		private VoiceBuffer _sendQueue;
+		private VoiceBuffer _sendBuffer;
 		private UdpClient _udp;
 		private IPEndPoint _endpoint;
 		private bool _isEncrypted;
@@ -43,6 +43,7 @@ namespace Discord.WebSockets.Voice
 
 		public string CurrentServerId => _serverId;
 		public string CurrentChannelId => _channelId;
+		public VoiceBuffer OutputBuffer => _sendBuffer;
 
 		public VoiceWebSocket(DiscordSimpleClient client)
 			: base(client)
@@ -53,7 +54,7 @@ namespace Discord.WebSockets.Voice
 			_encodingBuffer = new byte[MaxOpusSize];
 			_ssrcMapping = new ConcurrentDictionary<uint, string>();
 			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
-			_sendQueue = new VoiceBuffer((int)Math.Ceiling(client.Config.VoiceBufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
+			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(client.Config.VoiceBufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 
 		public Task SetChannel(string serverId, string channelId)
@@ -378,7 +379,7 @@ namespace Discord.WebSockets.Voice
 					{
 						while (sw.ElapsedTicks > nextTicks)
 						{
-							if (_sendQueue.Pop(frame))
+							if (_sendBuffer.Pop(frame))
 							{
 								ushort sequence = unchecked(_sequence++);
 								udpPacket[2] = (byte)((sequence >> 8) & 0xFF);
@@ -518,11 +519,11 @@ namespace Discord.WebSockets.Voice
 
 		public void SendPCMFrames(byte[] data, int bytes)
 		{
-			_sendQueue.Push(data, bytes, _cancelToken);
+			_sendBuffer.Push(data, bytes, _cancelToken);
 		}
 		public void ClearPCMFrames()
 		{
-			_sendQueue.Clear(_cancelToken);
+			_sendBuffer.Clear(_cancelToken);
 		}
 
 		private void SendIsTalking(bool value)
@@ -540,7 +541,7 @@ namespace Discord.WebSockets.Voice
 
 		public void WaitForQueue()
 		{
-			_sendQueue.Wait(_cancelToken);
+			_sendBuffer.Wait(_cancelToken);
 		}
 		public Task WaitForConnection(int timeout)
 		{
