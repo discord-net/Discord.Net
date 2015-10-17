@@ -94,10 +94,13 @@ namespace Discord.WebSockets.Data
 				case 7: //Redirect
 					{
 						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>();
-						Host = payload.Url;
-						if (_logLevel >= LogMessageSeverity.Info)
-							RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
-						await Redirect(payload.Url);
+						if (payload.Url != null)
+						{
+							Host = payload.Url;
+							if (_logLevel >= LogMessageSeverity.Info)
+								RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
+							await Redirect(payload.Url);
+						}
 					}
 					break;
 				default:
