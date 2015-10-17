@@ -8,7 +8,7 @@ Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or 
 - Supports .Net 4.5 and DNX 4.5.1
 - Server Management (Servers, Channels, Messages, Invites, Roles, Users)
 - Send/Receieve Messages (Including mentions and formatting)
-- Basic Voice Support (Outgoing only, Unencrypted only)
+- Basic Voice Support (Outgoing only)
 - Command extension library (Supports permission levels)
 
 ### Installation
