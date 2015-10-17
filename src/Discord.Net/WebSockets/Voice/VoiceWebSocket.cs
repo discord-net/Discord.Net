@@ -351,7 +351,7 @@ namespace Discord.WebSockets.Voice
 				double nextTicks = 0.0;
 				double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
 				double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
-				double spinLockThreshold = 1.5 * ticksPerMillisecond;
+				double spinLockThreshold = 3 * ticksPerMillisecond;
 				uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
 				Stopwatch sw = Stopwatch.StartNew();
 
