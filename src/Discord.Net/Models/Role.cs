@@ -18,6 +18,7 @@ namespace Discord
 		public int Position { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
 		public PackedColor Color { get; private set; }
+		/// <summary> Returns whether this role is managed by server (e.g. for Twitch integration) </summary>
 		public bool IsManaged { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
