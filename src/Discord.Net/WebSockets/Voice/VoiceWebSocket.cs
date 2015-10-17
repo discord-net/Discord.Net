@@ -26,7 +26,6 @@ namespace Discord.WebSockets.Voice
 		private readonly int _targetAudioBufferLength;
 		private OpusEncoder _encoder;
 		private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
-		private ManualResetEventSlim _connectWaitOnLogin;
 		private uint _ssrc;
 		private ConcurrentDictionary<uint, string> _ssrcMapping;
 
@@ -50,7 +49,6 @@ namespace Discord.WebSockets.Voice
 			: base(client)
 		{
 			_rand = new Random();
-            _connectWaitOnLogin = new ManualResetEventSlim(false);
 			_decoders = new ConcurrentDictionary<uint, OpusDecoder>();
 			_sendQueue = new ConcurrentQueue<byte[]>();
 			_sendQueueWait = new ManualResetEventSlim(true);
@@ -246,8 +244,6 @@ namespace Discord.WebSockets.Voice
 
 								int port = packet[68] | packet[69] << 8;
 								string ip = Encoding.ASCII.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-
-								EndConnect();
 
 								var login2 = new Login2Command();
 								login2.Payload.Protocol = "udp";
@@ -503,7 +499,7 @@ namespace Discord.WebSockets.Voice
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>();
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
-						_connectWaitOnLogin.Set();
+						EndConnect();
 					}
 					break;
 				case 5:
