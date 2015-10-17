@@ -666,7 +666,7 @@ namespace Discord
 		//Roles
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
 		public Task<Role> CreateRole(Server server, string name)
-			=> CreateRole(server?.Id);
+			=> CreateRole(server?.Id, name);
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
 		public async Task<Role> CreateRole(string serverId, string name)
 		{
