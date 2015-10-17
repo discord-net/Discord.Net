@@ -153,7 +153,16 @@ namespace Discord
 		public User User => _client.Users[UserId];
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public Member Member => _client.Members[UserId, ServerId];
+		public Member Member
+		{
+			get
+			{
+				if (ServerId != null)
+					return _client.Members[UserId, ServerId];
+				else
+					throw new InvalidOperationException("Unable to access Member in a private channel. Use User instead.");
+			}
+		}
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 		{
