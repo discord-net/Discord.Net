@@ -271,6 +271,8 @@ namespace Discord.API
 		public uint? Color;
 		[JsonProperty("id")]
 		public string Id;
+		[JsonProperty("managed")]
+		public bool? Managed;
 	}
 
 	//Invites

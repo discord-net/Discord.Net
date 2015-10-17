@@ -13,11 +13,12 @@ namespace Discord
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
-		public bool Hoist { get; private set; }
+		public bool IsHoisted { get; private set; }
 		/// <summary> Returns the position of this channel in the role list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
 		public PackedColor Color { get; private set; }
+		public bool IsManaged { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public PackedServerPermissions Permissions { get; }
@@ -55,7 +56,9 @@ namespace Discord
 			if (model.Name != null)
 				Name = model.Name;
 			if (model.Hoist != null)
-				Hoist = model.Hoist.Value;
+				IsHoisted = model.Hoist.Value;
+			if (model.Managed != null)
+				IsManaged = model.Managed.Value;
 			if (model.Position != null && !IsEveryone)
 				Position = model.Position.Value;
 			if (model.Color != null)
