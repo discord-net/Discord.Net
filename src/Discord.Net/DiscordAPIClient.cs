@@ -173,12 +173,12 @@ namespace Discord
 		}
 
 		//Messages
-		public Task<SendMessageResponse> SendMessage(string channelId, string message, string[] mentions = null, string nonce = null, bool isTTS = false)
+		public Task<SendMessageResponse> SendMessage(string channelId, string message, string[] mentionedUserIds = null, string nonce = null, bool isTTS = false)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			if (message == null) throw new ArgumentNullException(nameof(message));
 
-			var request = new SendMessageRequest { Content = message, Mentions = mentions ?? new string[0], Nonce = nonce, IsTTS = isTTS ? true : false };
+			var request = new SendMessageRequest { Content = message, Mentions = mentionedUserIds ?? new string[0], Nonce = nonce, IsTTS = isTTS ? true : false };
 			return _rest.Post<SendMessageResponse>(Endpoints.ChannelMessages(channelId), request);
 		}
 		public Task<SendMessageResponse> SendFile(string channelId, string filePath)
