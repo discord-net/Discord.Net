@@ -65,7 +65,7 @@ namespace Discord
 			if (model.Color != null)
 				Color.SetRawValue(model.Color.Value);
 			if (model.Permissions != null)
-				Permissions.SetRawValue(model.Permissions.Value);
+				Permissions.SetRawValueInternal(model.Permissions.Value);
 
 			foreach (var member in Members)
 				member.UpdatePermissions();

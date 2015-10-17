@@ -547,8 +547,8 @@ namespace Discord
 				await _api.SetChannelPermissions(channel.Id, targetId, targetType, allowValue, denyValue);
 				if (perms != null)
 				{
-					perms.Allow.SetRawValue(allowValue);
-					perms.Deny.SetRawValue(denyValue);
+                    perms.Allow.SetRawValueInternal(allowValue);
+					perms.Deny.SetRawValueInternal(denyValue);
 				}
 				else
 				{

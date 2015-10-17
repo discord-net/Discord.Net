@@ -177,7 +177,7 @@ namespace Discord
 			if (!_permissions.TryGetValue(channelId, out permissions)) return;
 			uint newPermissions = 0x0;
 			uint oldPermissions = permissions.RawValue;
-
+			
 			if (UserId == server.OwnerId)
 				newPermissions = PackedChannelPermissions.All.RawValue;
 			else
@@ -199,12 +199,12 @@ namespace Discord
 
 			}
 
-			permissions.SetRawValue(newPermissions);
+			permissions.SetRawValueInternal(newPermissions);
 
 			if (permissions.General_ManagePermissions)
-				permissions.SetRawValue(PackedChannelPermissions.All.RawValue);
+				permissions.SetRawValueInternal(PackedChannelPermissions.All.RawValue);
 			else if (server.DefaultChannelId == channelId)
-				permissions.Text_ReadMessages = true;
+				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);
 
 			if (permissions.RawValue != oldPermissions)
 				channel.InvalidMembersCache();
