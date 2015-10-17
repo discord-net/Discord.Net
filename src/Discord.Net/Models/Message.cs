@@ -157,10 +157,10 @@ namespace Discord
 		{
 			get
 			{
-				if (ServerId != null)
+				if (!Channel.IsPrivate)
 					return _client.Members[UserId, ServerId];
 				else
-					throw new InvalidOperationException("Unable to access Member in a private channel. Use User instead.");
+					throw new InvalidOperationException("Unable to access Member in a private channel. Use User instead or check for Channel.IsPrivate.");
 			}
 		}
 
