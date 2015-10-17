@@ -736,6 +736,8 @@ namespace Discord
 			}
 		}
 
+		public IDiscordVoiceClient GetVoiceClient(Server server)
+			=> GetVoiceClient(server.Id);
 		public IDiscordVoiceClient GetVoiceClient(string serverId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
