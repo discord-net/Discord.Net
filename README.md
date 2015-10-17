@@ -1,4 +1,4 @@
-# Discord.Net v0.7.3-beta3
+# Discord.Net v0.7.3-beta4
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).

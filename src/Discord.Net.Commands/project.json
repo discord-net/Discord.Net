@@ -1,5 +1,5 @@
 ﻿{
-	"version": "0.7.3-beta3",
+	"version": "0.7.3-beta4",
 	"description": "A Discord.Net extension adding basic command support.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
@@ -13,7 +13,7 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.7.3-beta3"
+		"Discord.Net": "0.7.3-beta4"
 	},
 	"frameworks": {
 		"net45": { },
