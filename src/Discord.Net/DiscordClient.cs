@@ -710,11 +710,11 @@ namespace Discord
 							}
 						}
 						break;
+
+					//Ignored
 					case "USER_SETTINGS_UPDATE":
-						{
-							//TODO: Process this
-						}
-						break;
+					case "GUILD_INTEGRATIONS_UPDATE":
+                        break;
 
 					//Internal (handled in DataWebSocket)
 					case "RESUMED":
