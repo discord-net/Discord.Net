@@ -35,10 +35,6 @@ namespace Discord.WebSockets.Voice
 			{
 				for (int i = 0, pos = 0; i <= wholeFrames; i++, pos += _frameSize)
 				{
-					int write = _writeCursor;
-					int read = _readCursor;
-					Console.WriteLine($"W {read} - {write}");
-
 					//If the read cursor is in the next position, wait for it to move.
 					ushort nextPosition = _writeCursor;
 					AdvanceCursorPos(ref nextPosition);
