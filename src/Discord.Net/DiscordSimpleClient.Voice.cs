@@ -1,13 +1,24 @@
 ﻿using Discord.Helpers;
 using Discord.WebSockets;
+using Discord.WebSockets.Voice;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
 {
+	public interface IDiscordVoiceBuffer
+	{
+		int FrameSize { get; }
+		int FrameCount { get; }
+		ushort ReadPos { get; }
+		ushort WritePos { get; }
+	}
+
 	public interface IDiscordVoiceClient
 	{
+		IDiscordVoiceBuffer OutputBuffer { get; }
+
 		Task JoinChannel(string channelId);
 
         void SendVoicePCM(byte[] data, int count);
@@ -18,6 +29,8 @@ namespace Discord
 
 	public partial class DiscordSimpleClient : IDiscordVoiceClient
 	{
+		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;
+
 		async Task IDiscordVoiceClient.JoinChannel(string channelId)
 		{
 			CheckReady(checkVoice: true);

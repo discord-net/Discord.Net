@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Discord.WebSockets.Voice
 {
-    public class VoiceBuffer
+    internal class VoiceBuffer : IDiscordVoiceBuffer
 	{
 		public int FrameSize => _frameSize;
 		public int FrameCount => _frameCount;
@@ -17,7 +17,7 @@ namespace Discord.WebSockets.Voice
 		private ManualResetEventSlim _underflowEvent, _notOverflowEvent;
 		private bool _isClearing;
 
-		internal VoiceBuffer(int frameCount, int frameSize)
+		public VoiceBuffer(int frameCount, int frameSize)
 		{
 			_frameSize = frameSize;
 			_frameCount = frameCount;
@@ -30,7 +30,7 @@ namespace Discord.WebSockets.Voice
 			_notOverflowEvent = new ManualResetEventSlim(); //Notifies when an overflow is solved
         }
 
-		internal void Push(byte[] buffer, int bytes, CancellationToken cancelToken)
+		public void Push(byte[] buffer, int bytes, CancellationToken cancelToken)
 		{
             int wholeFrames = bytes / _frameSize;
 			int expectedBytes = wholeFrames * _frameSize;
@@ -74,7 +74,7 @@ namespace Discord.WebSockets.Voice
 			}
 		}
 
-		internal bool Pop(byte[] buffer)
+		public bool Pop(byte[] buffer)
 		{
             if (_writeCursor == _readCursor)
 			{
@@ -93,7 +93,7 @@ namespace Discord.WebSockets.Voice
 			return !isClearing;
 		}
 
-		internal void Clear(CancellationToken cancelToken)
+		public void Clear(CancellationToken cancelToken)
 		{
 			lock (this)
 			{
@@ -107,7 +107,7 @@ namespace Discord.WebSockets.Voice
             }
 		}
 
-		internal void Wait(CancellationToken cancelToken)
+		public void Wait(CancellationToken cancelToken)
 		{
 			_underflowEvent.Wait(cancelToken);
 		}
