@@ -18,8 +18,9 @@ namespace Discord.WebSockets.Voice
 {
 	internal partial class VoiceWebSocket : WebSocket
 	{
-		private const int MaxOpusSize = 4000;
-        private const string EncryptedMode = "xsalsa20_poly1305";
+		private const int MaxOpusSize = 4000; //Max size of a single 20ms Opus frame
+		private const double SpinLockMilliseconds = 3.0; //If we're going to send audio in the next X milliseconds, dont use Task.Delay or Thread.Sleep
+		private const string EncryptedMode = "xsalsa20_poly1305";
 		private const string UnencryptedMode = "plain";
 
 		private readonly Random _rand;
@@ -350,8 +351,8 @@ namespace Discord.WebSockets.Voice
 				uint timestamp = 0;
 				double nextTicks = 0.0;
 				double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
+				double spinLockThreshold = SpinLockMilliseconds * ticksPerMillisecond;
 				double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
-				double spinLockThreshold = 3 * ticksPerMillisecond;
 				uint samplesPerFrame = (uint)_encoder.SamplesPerFrame;
 				Stopwatch sw = Stopwatch.StartNew();
 
@@ -371,7 +372,7 @@ namespace Discord.WebSockets.Voice
 				result[10] = (byte)((_ssrc >> 8) & 0xFF);
 				result[11] = (byte)((_ssrc >> 0) & 0xFF);
 
-				if  (_isEncrypted)
+				if (_isEncrypted)
 					Buffer.BlockCopy(result, 0, nonce, 0, 12);
 
 				while (!cancelToken.IsCancellationRequested)
@@ -427,13 +428,26 @@ namespace Discord.WebSockets.Voice
 							}
 						}
 					}
-					//Dont sleep for 1 millisecond if we need to output audio in the next 1.5
-					else if (_sendQueue.Count == 0 || ticksToNextFrame >= spinLockThreshold)
+					//Dont sleep if we need to output audio in the next spinLockThreshold
+					else if (ticksToNextFrame > spinLockThreshold)
+					{
+						int time = (int)Math.Ceiling((ticksToNextFrame - spinLockThreshold) / ticksPerMillisecond);
 #if USE_THREAD
-						Thread.Sleep(1);
+						Thread.Sleep(time);
 #else
-						await Task.Delay(1).ConfigureAwait(false);
+						await Task.Delay(time).ConfigureAwait(false);
 #endif
+					}
+					//Don't spinlock if we're not actually sending audio (or buffer underrunning)
+					else if (_sendQueue.Count == 0)
+					{
+						int time = (int)Math.Ceiling(ticksToNextFrame / ticksPerMillisecond);
+#if USE_THREAD
+						Thread.Sleep(time);
+#else
+						await Task.Delay(time).ConfigureAwait(false);
+#endif
+					}
 				}
 			}
 			catch (OperationCanceledException) { }
