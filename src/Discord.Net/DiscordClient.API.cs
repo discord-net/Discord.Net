@@ -665,30 +665,34 @@ namespace Discord
 
 		//Roles
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task CreateRole(Server server)
+		public Task<Role> CreateRole(Server server)
 			=> CreateRole(server?.Id);
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task CreateRole(string serverId)
+		public async Task<Role> CreateRole(string serverId)
 		{
 			CheckReady();
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
 
-			return _api.CreateRole(serverId);
+			var response = await _api.CreateRole(serverId).ConfigureAwait(false);
+			var role = _roles.GetOrAdd(response.Id, serverId, false);
+			role.Update(response);
+			return role;
 		}
 
-		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
-			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist, position: position);
-        public async Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+		public Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+			=> EditRole(role.ServerId, role.Id, name: name, permissions: permissions, color: color, hoist: hoist, position: position);
+		public async Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
 		{
 			CheckReady();
-			if (role == null) throw new NullReferenceException(nameof(role));
+			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			
+			var response = await _api.EditRole(serverId, roleId, name: name, 
+				permissions: permissions?.RawValue, color: color?.RawValue, hoist: hoist);
 
-			//TODO: Stop defaulting to cache variables once the server stops 500ing at us
-			await _api.EditRole(role.ServerId, role.Id, 
-				name: name ?? role.Name, 
-				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
-				color: color?.RawValue ?? role.Color.RawValue, 
-				hoist: hoist ?? role.Hoist);
+			var role = _roles[response.Id];
+			if (role != null)
+				role.Update(response);
 
 			if (position != null)
 			{

@@ -47,6 +47,10 @@ namespace Discord.API
 
 	//Profile
 	public sealed class EditProfileResponse : SelfUserInfo { }
+
+	//Roles
+	public sealed class CreateRoleResponse : RoleInfo { }
+	public sealed class EditRoleResponse : RoleInfo { }
 	
 	//Servers
 	public sealed class CreateServerResponse : GuildInfo { }

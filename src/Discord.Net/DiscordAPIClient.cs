@@ -256,12 +256,11 @@ namespace Discord
 		}
 
 		//Roles
-		public Task CreateRole(string serverId)
+		public Task<RoleInfo> CreateRole(string serverId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-
-			//TODO: Return a response when Discord starts giving us one
-			return _rest.Post(Endpoints.ServerRoles(serverId));
+			
+			return _rest.Post<RoleInfo>(Endpoints.ServerRoles(serverId));
 		}
 		public Task DeleteRole(string serverId, string roleId)
 		{
@@ -270,13 +269,13 @@ namespace Discord
 
 			return _rest.Delete(Endpoints.ServerRole(serverId, roleId));
 		}
-		public Task EditRole(string serverId, string roleId, string name = null, uint? permissions = null, uint? color = null, bool? hoist = null)
+		public Task<RoleInfo> EditRole(string serverId, string roleId, string name = null, uint? permissions = null, uint? color = null, bool? hoist = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (roleId == null) throw new ArgumentNullException(nameof(roleId));
 
 			var request = new EditRoleRequest { Name = name, Permissions = permissions, Hoist = hoist, Color = color };
-			return _rest.Patch(Endpoints.ServerRole(serverId, roleId), request);
+			return _rest.Patch<RoleInfo>(Endpoints.ServerRole(serverId, roleId), request);
 		}
 		public Task ReorderRoles(string serverId, IEnumerable<string> roleIds, int startPos = 0)
 		{
