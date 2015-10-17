@@ -5,17 +5,17 @@ namespace Discord.WebSockets.Voice
 {
     internal class VoiceBuffer : IDiscordVoiceBuffer
 	{
-		public int FrameSize => _frameSize;
-		public int FrameCount => _frameCount;
-		public ushort ReadPos => _readCursor;
-		public ushort WritePos => _readCursor;
-
 		private readonly int _frameSize, _frameCount, _bufferSize;
 		private readonly byte[] _buffer;
 		private readonly byte[] _blankFrame;
 		private ushort _readCursor, _writeCursor;
 		private ManualResetEventSlim _underflowEvent, _notOverflowEvent;
 		private bool _isClearing;
+
+		public int FrameSize => _frameSize;
+		public int FrameCount => _frameCount;
+		public ushort ReadPos => _readCursor;
+		public ushort WritePos => _readCursor;
 
 		public VoiceBuffer(int frameCount, int frameSize)
 		{
