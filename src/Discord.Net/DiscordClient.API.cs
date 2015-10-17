@@ -435,7 +435,7 @@ namespace Discord
 			{
 				try
 				{
-					await _api.DeleteMessage(msg.ChannelId, msg.Id).ConfigureAwait(false);
+					await _api.DeleteMessage(msg.Id, msg.ChannelId).ConfigureAwait(false);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
@@ -449,7 +449,7 @@ namespace Discord
 			{
 				try
 				{
-					await _api.DeleteMessage(channelId, msgId).ConfigureAwait(false);
+					await _api.DeleteMessage(msgId, channelId).ConfigureAwait(false);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
