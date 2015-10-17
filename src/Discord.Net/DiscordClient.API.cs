@@ -769,12 +769,15 @@ namespace Discord
 		public Task EditServer(Server server)
 			=> EditServer(server?.Id);
 		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public Task EditServer(string serverId, string name = null, string region = null)
+		public async Task EditServer(string serverId, string name = null, string region = null)
 		{
 			CheckReady();
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			return _api.EditServer(serverId, name: name, region: region);
+			var response = await _api.EditServer(serverId, name: name, region: region);
+			var server = _servers[response.Id];
+			if (server != null)
+				server.Update(response);
 		}
 
 		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
