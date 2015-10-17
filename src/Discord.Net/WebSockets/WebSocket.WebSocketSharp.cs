@@ -9,7 +9,7 @@ using WSSharpNWebSocket = WebSocketSharp.WebSocket;
 
 namespace Discord.WebSockets
 {
-	public class WSSharpWebSocketEngine : IWebSocketEngine
+	internal class WSSharpWebSocketEngine : IWebSocketEngine
 	{
 		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly int _sendInterval;

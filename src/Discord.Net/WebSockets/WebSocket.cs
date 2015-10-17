@@ -1,10 +1,8 @@
-﻿using Discord.Helpers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +16,7 @@ namespace Discord.WebSockets
 		Disconnecting
 	}
 
-	public class WebSocketMessageEventArgs : EventArgs
+	internal class WebSocketMessageEventArgs : EventArgs
 	{
 		public readonly string Message;
 		public WebSocketMessageEventArgs(string msg) { Message = msg; }
