@@ -798,10 +798,18 @@ namespace Discord
 			CheckReady(); //checkVoice is done inside the voice client
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			DiscordSimpleClient client;
-			if (_voiceClients.TryRemove(serverId, out client))
-				await client.Disconnect();
-		}
+			if (Config.EnableVoiceMultiserver)
+			{
+				DiscordSimpleClient client;
+				if (_voiceClients.TryRemove(serverId, out client))
+					await client.Disconnect();
+			}
+			else
+			{
+				_dataSocket.SendLeaveVoice(serverId);
+				await _voiceSocket.Disconnect();
+			}
+        }
 
 		private void SendInitialLog()
 		{

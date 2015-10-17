@@ -248,10 +248,15 @@ namespace Discord
 
         protected virtual async Task Cleanup()
 		{
-			await _dataSocket.Disconnect().ConfigureAwait(false);
 			if (_enableVoice)
+			{
+				string voiceServerId = _voiceSocket.CurrentServerId;
+                if (voiceServerId != null)
+					_dataSocket.SendLeaveVoice(voiceServerId);
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
-			
+			}
+			await _dataSocket.Disconnect().ConfigureAwait(false);
+
 			_currentUserId = null;
 			_gateway = null;
 			_token = null;
