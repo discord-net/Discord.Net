@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -175,7 +176,7 @@ namespace Discord
 			MentionIds = _initialMentions;
         }
 
-		internal void Update(API.Message model)
+		internal void Update(MessageInfo model)
 		{
 			if (model.Attachments != null)
 			{

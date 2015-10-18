@@ -1,11 +1,10 @@
-﻿using Discord.WebSockets.Data;
+﻿using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using VoiceWebSocket = Discord.WebSockets.Voice.VoiceWebSocket;
 
 namespace Discord
 {

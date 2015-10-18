@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -52,7 +53,7 @@ namespace Discord
 				Position = int.MinValue;
         }
 
-		internal void Update(API.RoleInfo model)
+		internal void Update(RoleInfo model)
 		{
 			if (model.Name != null)
 				Name = model.Name;

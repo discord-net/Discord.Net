@@ -1,4 +1,5 @@
 ﻿using Discord.API;
+using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -312,7 +313,7 @@ namespace Discord
 				{
 					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, CurrentUserId);
 					var currentMember = _members[msg.UserId, channel.ServerId];
-                    msg.Update(new API.Message
+                    msg.Update(new MessageInfo
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
@@ -611,26 +612,20 @@ namespace Discord
 		}
 
 		//Profile
-		public Task<EditProfileResponse> EditProfile(string currentPassword = "",
+		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 
-			return _api.EditProfile(currentPassword: currentPassword, username: username ?? _currentUser?.Name, email: email ?? _currentUser?.Email, password: password,
+			return _api.EditUser(currentPassword: currentPassword, username: username ?? _currentUser?.Name, email: email ?? _currentUser?.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 		public Task SetStatus(string status)
 		{
-			switch (status)
-			{
-				case UserStatus.Online:
-				case UserStatus.Away:
-					_status = status;
-					break;
-				default:
-					throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Away}");
-			}
+			if (status != UserStatus.Online && status != UserStatus.Idle)
+				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}");
+			_status = status;
 			return SendStatus();
 		}
 		public Task SetGame(int? gameId)
@@ -640,7 +635,7 @@ namespace Discord
 		}
 		private Task SendStatus()
 		{
-			_dataSocket.SendStatus(_status == UserStatus.Away ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (ulong?)null, _gameId);
+			_dataSocket.SendStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (ulong?)null, _gameId);
 			return TaskHelper.CompletedTask;
 		}
 

@@ -1,7 +1,6 @@
 ﻿using Discord.API;
 using Discord.Collections;
-using Discord.WebSockets;
-using Discord.WebSockets.Data;
+using Discord.Net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -9,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using VoiceWebSocket = Discord.WebSockets.Voice.VoiceWebSocket;
 
 namespace Discord
 {
@@ -474,7 +472,7 @@ namespace Discord
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Payload.ToObject<GuildMemberAddEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberAddEvent>(_serializer);
 							var user = _users.GetOrAdd(data.User.Id);
 							user.Update(data.User);
 							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
@@ -486,7 +484,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberUpdateEvent>(_serializer);
 							var member = _members[data.User.Id, data.GuildId];
 							if (member != null)
 							{
@@ -497,7 +495,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberRemoveEvent>(_serializer);
 							var member = _members.TryRemove(data.UserId, data.GuildId);
 							if (member != null)
 								RaiseUserRemoved(member);
@@ -507,7 +505,7 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Payload.ToObject<GuildRoleCreateEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleCreateEvent>(_serializer);
 							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId, false);
 							role.Update(data.Data);
 							var server = _servers[data.GuildId];
@@ -518,7 +516,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleUpdateEvent>(_serializer);
 							var role = _roles[data.Data.Id];
 							if (role != null)
 								role.Update(data.Data);
@@ -527,7 +525,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleDeleteEvent>(_serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 								server.RemoveRole(data.RoleId);
@@ -540,7 +538,7 @@ namespace Discord
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
+							var data = e.Payload.ToObject<BanAddEvent>(_serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
@@ -551,7 +549,7 @@ namespace Discord
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
+							var data = e.Payload.ToObject<BanRemoveEvent>(_serializer);
 							var server = _servers[data.GuildId];
 							if (server != null && server.RemoveBan(data.User?.Id))
 								RaiseBanRemoved(data.User?.Id, server);
@@ -682,7 +680,7 @@ namespace Discord
 					//Voice
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_serializer);
 							var member = _members[data.UserId, data.GuildId];
 							if (member != null)
 							{

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace Discord
 
 		public override string ToString() => UserId;
 
-		internal void Update(API.UserReference model)
+		internal void Update(UserReference model)
 		{
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
@@ -86,7 +87,7 @@ namespace Discord
 			if (model.Username != null)
 				Name = model.Username;
 		}
-		internal void Update(API.MemberInfo model)
+		internal void Update(MemberInfo model)
 		{
 			if (model.User != null)
 				Update(model.User);
@@ -102,7 +103,7 @@ namespace Discord
 
 			UpdatePermissions();
         }
-		internal void Update(API.ExtendedMemberInfo model)
+		internal void Update(ExtendedMemberInfo model)
 		{
 			Update(model as API.MemberInfo);
 			if (model.IsServerDeafened != null)
@@ -110,7 +111,7 @@ namespace Discord
 			if (model.IsServerMuted != null)
 				IsServerMuted = model.IsServerMuted.Value;
 		}
-		internal void Update(API.PresenceMemberInfo model)
+		internal void Update(PresenceInfo model)
 		{
 			//Allows null
 			if (Status != model.Status)
@@ -121,7 +122,7 @@ namespace Discord
             }
 			GameId = model.GameId;
 		}
-		internal void Update(API.VoiceMemberInfo model)
+		internal void Update(VoiceMemberInfo model)
 		{
 			if (model.IsServerDeafened != null)
 				IsServerDeafened = model.IsServerDeafened.Value;

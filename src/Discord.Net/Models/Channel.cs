@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,16 +100,16 @@ namespace Discord
 			_areMembersStale = true;
 		}
 
-		internal void Update(API.ChannelReference model)
+		internal void Update(ChannelReference model)
 		{
 			if (model.Name != null)
 				Name = model.Name;
 			if (model.Type != null)
 				Type = model.Type;
 		}
-		internal void Update(API.ChannelInfo model)
+		internal void Update(ChannelInfo model)
 		{
-			Update(model as API.ChannelReference);
+			Update(model as ChannelReference);
 			
 			if (model.Position != null)
 				Position = model.Position.Value;

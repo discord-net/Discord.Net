@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 
 namespace Discord
 {
@@ -53,7 +54,7 @@ namespace Discord
 
 		public override string ToString() => XkcdPass ?? Id;
 
-		internal void Update(API.Invite model)
+		internal void Update(InviteReference model)
 		{
 			if (model.Channel != null)
 				ChannelId = model.Channel.Id;
@@ -61,9 +62,9 @@ namespace Discord
 				InviterId = model.Inviter.Id;
 		}
 
-		internal void Update(API.ExtendedInvite model)
+		internal void Update(InviteInfo model)
 		{
-			Update(model as API.Invite);
+			Update(model as InviteReference);
 			if (model.IsRevoked != null)
 				IsRevoked = model.IsRevoked.Value;
 			if (model.IsTemporary != null)

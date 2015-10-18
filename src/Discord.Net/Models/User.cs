@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace Discord
 			_servers = new ConcurrentDictionary<string, bool>();
         }
 
-		internal void Update(API.UserReference model)
+		internal void Update(UserReference model)
 		{
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
@@ -86,11 +87,14 @@ namespace Discord
 			if (model.Username != null)
 				Name = model.Username;
 		}
-		internal void Update(API.SelfUserInfo model)
+		internal void Update(UserInfo model)
 		{
-			Update(model as API.UserReference);
-			Email = model.Email;
-			IsVerified = model.IsVerified;
+			Update(model as UserReference);
+
+			if (model.Email != null)
+				Email = model.Email;
+			if (model.IsVerified != null)
+				IsVerified = model.IsVerified;
 		}
 		internal void UpdateActivity(DateTime? activity = null)
 		{
