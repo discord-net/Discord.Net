@@ -35,7 +35,7 @@ namespace Discord.Net
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
             _webSocket.Compression = WebSocketSharp.CompressionMethod.None;		
-			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials.UserName, _config.ProxyCredentials.Password);
+			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
             _webSocket.OnMessage += (s, e) => RaiseProcessMessage(e.Data);
 			_webSocket.OnError += async (s, e) =>
 			{
