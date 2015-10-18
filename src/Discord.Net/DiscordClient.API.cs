@@ -8,13 +8,6 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public enum AvatarImageType
-	{
-		None,
-		Jpeg,
-		Png
-	}
-
 	public partial class DiscordClient
 	{
 		public const int MaxMessageSize = 2000;
