@@ -18,5 +18,9 @@
 		/// <summary> Returns the string used to create a channel mention. </summary>
 		public static string Channel(string channelId)
 			=> $"<#{channelId}>";
+
+		/// <summary> Returns the string used to create a channel mention. </summary>
+		public static string Everyone()
+			=> $"@everyone";
 	}
 }
