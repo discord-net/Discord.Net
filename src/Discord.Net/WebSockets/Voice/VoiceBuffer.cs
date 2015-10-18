@@ -50,7 +50,7 @@ namespace Discord.WebSockets.Voice
 						{
 							_notOverflowEvent.Wait(cancelToken);
 						}
-						catch (OperationCanceledException) { return; }
+						catch (OperationCanceledException) { throw new InvalidOperationException("Client is not connected."); }
 					}
 
 					if (i == wholeFrames)
