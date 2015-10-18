@@ -270,24 +270,12 @@ namespace Discord
 		}
 
 		//Messages
-		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null)
-			=> SendMessage(channel, text, mentionedUsers, false);
-		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(string channelId, string text, IEnumerable<object> mentionedUsers = null)
-			=> SendMessage(_channels[channelId], text, mentionedUsers, false);
-		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendTTSMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null)
-			=> SendMessage(channel, text, mentionedUsers, true);
-		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendTTSMessage(string channelId, string text, IEnumerable<object> mentionedUsers = null)
-			=> SendMessage(_channels[channelId], text, mentionedUsers, true);
-		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
+		/// <summary> Sends a message to the provided channel. To include a mention, see the Mention static helper class. </summary>
+		public Task<Message[]> SendMessage(Channel channel, string text)
+			=> SendMessage(channel, text, MentionHelper.GetUserIds(text), false);
+		/// <summary> Sends a message to the provided channel. To include a mention, see the Mention static helper class. </summary>
+		public Task<Message[]> SendMessage(string channelId, string text)
+			=> SendMessage(_channels[channelId], text, MentionHelper.GetUserIds(text), false);
 		private async Task<Message[]> SendMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null, bool isTextToSpeech = false)
 		{
 			CheckReady();
