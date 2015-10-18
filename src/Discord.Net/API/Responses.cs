@@ -14,16 +14,6 @@ namespace Discord.API
 		[JsonProperty("url")]
 		public string Url;
 	}
-	public sealed class FingerprintResponse
-	{
-		[JsonProperty("fingerprint")]
-		public string Fingerprint;
-	}
-	public sealed class RegisterResponse
-	{
-		[JsonProperty("token")]
-		public string Token;
-	}
 	public sealed class LoginResponse
 	{
 		[JsonProperty("token")]

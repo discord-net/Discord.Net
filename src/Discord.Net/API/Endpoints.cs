@@ -4,12 +4,9 @@
 	{
 		public const string BaseStatusApi = "https://status.discordapp.com/api/v2/";
 		public const string BaseApi = "https://discordapp.com/api/";
-		//public const string Track = "track";
 		public const string Gateway = "gateway";
 
 		public const string Auth = "auth";
-        public const string AuthFingerprint = "auth/fingerprint";
-		public const string AuthRegister = "auth/register";
 		public const string AuthLogin = "auth/login";
 		public const string AuthLogout = "auth/logout";
 		

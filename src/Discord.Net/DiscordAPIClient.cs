@@ -34,16 +34,6 @@ namespace Discord
 		//Auth
 		public Task<GatewayResponse> Gateway()
 			=> _rest.Get<GatewayResponse>(Endpoints.Gateway);
-		public Task<FingerprintResponse> Fingerprint()
-			=> _rest.Post<FingerprintResponse>(Endpoints.AuthFingerprint);
-        public async Task<RegisterResponse> LoginAnonymous(string username, string fingerprint)
-		{
-			if (username == null) throw new ArgumentNullException(nameof(username));
-			if (fingerprint == null) throw new ArgumentNullException(nameof(fingerprint));
-
-			var request = new RegisterRequest { Fingerprint = fingerprint, Username = username };
-			return await _rest.Post<RegisterResponse>(Endpoints.AuthRegister, request).ConfigureAwait(false);
-        }
 		public async Task<LoginResponse> Login(string email, string password)
 		{
 			if (email == null) throw new ArgumentNullException(nameof(email));
