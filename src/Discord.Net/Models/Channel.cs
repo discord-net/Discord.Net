@@ -73,8 +73,10 @@ namespace Discord
 		}
 		private string[] _userIds;
 		/// <summary> Returns a collection of all users with read access to this channel. </summary>
+		[JsonIgnore]
 		public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);
 		/// <summary> Returns a collection of all users with read access to this channel. </summary>
+		[JsonIgnore]
 		public IEnumerable<User> Users => UserIds.Select(x => _client.Users[x]);
 
 		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
