@@ -151,16 +151,7 @@ namespace Discord
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
 			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
 
-			var channelIds = channels.Select(x =>
-			{
-				if (x is string)
-					return x as string;
-				else if (x is Channel)
-					return (x as Channel).Id;
-				else
-					throw new ArgumentException("Channels must be a collection of string or Channel.", nameof(channels));
-			});
-
+			var channelIds = CollectionHelper.FlattenChannels(channels);
             return _api.ReorderChannels(serverId, channelIds, startPos);
 		}
 
@@ -280,44 +271,35 @@ namespace Discord
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
 			if (userId == null) throw new NullReferenceException(nameof(userId));
 
-			IEnumerable<string> newRoles = roles?.Select(x =>
-			{
-				if (x is string)
-					return x as string;
-				else if (x is Role)
-					return (x as Role).Id;
-				else
-					throw new ArgumentException("Roles must be a collection of string or Role.", nameof(roles));
-			});
-
+			var newRoles = CollectionHelper.FlattenRoles(roles);
 			return _api.EditMember(serverId, userId, mute: mute, deaf: deaf, roles: newRoles);
 		}
 
 		//Messages
 		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(Channel channel, string text, params string[] mentionedUserIds)
-			=> SendMessage(channel, text, mentionedUserIds, false);
+		public Task<Message[]> SendMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null)
+			=> SendMessage(channel, text, mentionedUsers, false);
 		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendMessage(string channelId, string text, params string[] mentionedUserIds)
-			=> SendMessage(_channels[channelId], text, mentionedUserIds, false);
+		public Task<Message[]> SendMessage(string channelId, string text, IEnumerable<object> mentionedUsers = null)
+			=> SendMessage(_channels[channelId], text, mentionedUsers, false);
 		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendTTSMessage(Channel channel, string text, params string[] mentionedUserIds)
-			=> SendMessage(channel, text, mentionedUserIds, true);
+		public Task<Message[]> SendTTSMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null)
+			=> SendMessage(channel, text, mentionedUsers, true);
 		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		public Task<Message[]> SendTTSMessage(string channelId, string text, params string[] mentionedUserIds)
-			=> SendMessage(_channels[channelId], text, mentionedUserIds, true);
+		public Task<Message[]> SendTTSMessage(string channelId, string text, IEnumerable<object> mentionedUsers = null)
+			=> SendMessage(_channels[channelId], text, mentionedUsers, true);
 		/// <summary> Sends a message to the provided channel, optionally mentioning certain users. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see User.Mention). </remarks>
-		private async Task<Message[]> SendMessage(Channel channel, string text, string[] mentionedUserIds, bool isTextToSpeech)
+		private async Task<Message[]> SendMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null, bool isTextToSpeech = false)
 		{
 			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			mentionedUserIds = mentionedUserIds ?? new string[0];
+			var mentionedUserIds = CollectionHelper.FlattenUsers(mentionedUsers);
 
 			int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
 			Message[] result = new Message[blockCount];
@@ -381,28 +363,28 @@ namespace Discord
 
 			return _api.SendFile(channelId, filePath);
 		}
-
+		
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Message message, string text = null, params string[] mentions)
-			=> EditMessage(message?.ChannelId, message?.Id, text, mentions);
+		public Task EditMessage(Message message, string text = null, IEnumerable<object> mentionedUsers = null)
+			=> EditMessage(message?.ChannelId, message?.Id, text, mentionedUsers);
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Channel channel, string messageId, string text = null, params string[] mentions)
-			=> EditMessage(channel?.Id, messageId, text, mentions);
+		public Task EditMessage(Channel channel, string messageId, string text = null, IEnumerable<object> mentionedUsers = null)
+			=> EditMessage(channel?.Id, messageId, text, mentionedUsers);
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public async Task EditMessage(string channelId, string messageId, string text = null, params string[] mentions)
+		public async Task EditMessage(string channelId, string messageId, string text = null, IEnumerable<object> mentionedUsers = null)
 		{
 			CheckReady();
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-			mentions = mentions ?? new string[0];
+			var mentionedUserIds = CollectionHelper.FlattenUsers(mentionedUsers);
 
 			if (text != null && text.Length > MaxMessageSize)
 				text = text.Substring(0, MaxMessageSize);
 
-			var model = await _api.EditMessage(messageId, channelId, text, mentions).ConfigureAwait(false);
+			var model = await _api.EditMessage(messageId, channelId, text, mentionedUserIds).ConfigureAwait(false);
 			var msg = _messages[messageId];
 			if (msg != null)
 				msg.Update(model);

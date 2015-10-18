@@ -173,7 +173,7 @@ namespace Discord
 		}
 
 		//Messages
-		public Task<SendMessageResponse> SendMessage(string channelId, string message, string[] mentionedUserIds = null, string nonce = null, bool isTTS = false)
+		public Task<SendMessageResponse> SendMessage(string channelId, string message, IEnumerable<string> mentionedUserIds = null, string nonce = null, bool isTTS = false)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 			if (message == null) throw new ArgumentNullException(nameof(message));
@@ -195,12 +195,12 @@ namespace Discord
 
 			return _rest.Delete(Endpoints.ChannelMessage(channelId, messageId));
 		}
-		public Task<EditMessageResponse> EditMessage(string messageId, string channelId, string message = null, string[] mentions = null)
+		public Task<EditMessageResponse> EditMessage(string messageId, string channelId, string message = null, IEnumerable<string> mentionedUserIds = null)
 		{
 			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			var request = new EditMessageRequest { Content = message, Mentions = mentions };
+			var request = new EditMessageRequest { Content = message, Mentions = mentionedUserIds };
 			return _rest.Patch<EditMessageResponse>(Endpoints.ChannelMessage(channelId, messageId), request);
 		}
 		public Task AckMessage(string messageId, string channelId)
