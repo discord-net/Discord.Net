@@ -1,4 +1,5 @@
-﻿#if DNXCORE50
+﻿/*
+using Discord.API;
 using System;
 using System.Globalization;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.API
+namespace Discord.API
 {
 	internal class BuiltInRestEngine : IRestEngine
 	{
@@ -22,7 +23,7 @@ namespace Discord.Net.API
 				UseCookies = false,
 				PreAuthenticate = false //We do auth ourselves
 			});
-			_client.DefaultRequestHeaders.Add("accept", "*/*");
+			_client.DefaultRequestHeaders.Add("accept", "*\/*");
 			_client.DefaultRequestHeaders.Add("accept-encoding", "gzip,deflate");			
 			_client.DefaultRequestHeaders.Add("user-agent", userAgent);
 			_client.Timeout = TimeSpan.FromMilliseconds(timeout);
@@ -63,4 +64,4 @@ namespace Discord.Net.API
 		}
 	}
 }
-#endif
+*/

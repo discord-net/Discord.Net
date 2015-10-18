@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Helpers
+namespace Discord
 {
     internal static class Extensions
 	{

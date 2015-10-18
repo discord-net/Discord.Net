@@ -1,8 +1,4 @@
-﻿using Discord.Helpers;
-using Discord.WebSockets;
-using Discord.WebSockets.Voice;
-using System;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Discord

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Discord.Helpers
+namespace Discord
 {
 	//TODO: Better name please?
 	internal class MessageCleaner

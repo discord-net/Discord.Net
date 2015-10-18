@@ -39,23 +39,19 @@ namespace Discord
 		private int _voiceBufferLength = 1000;
 
 		//Experimental Features
-#if !DNXCORE50
 		/// <summary> (Experimental) Enables the voice websocket and UDP client and specifies how it will be used. Any option other than Disabled requires the opus .dll or .so be in the local lib/ folder. </summary>
 		public DiscordVoiceMode VoiceMode { get { return _voiceMode; } set { SetValue(ref _voiceMode, value); } }
 		private DiscordVoiceMode _voiceMode = DiscordVoiceMode.Disabled;
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
 		private bool _enableVoiceEncryption = true;
-#else
-		internal DiscordVoiceMode VoiceMode => DiscordVoiceMode.Disabled;
-		internal bool EnableVoiceEncryption => false;
-#endif
 
 		//Internals
 		internal bool VoiceOnly { get { return _voiceOnly; } set { SetValue(ref _voiceOnly, value); } }
 		private bool _voiceOnly;
 		internal uint VoiceClientId { get { return _voiceClientId; } set { SetValue(ref _voiceClientId, value); } }
 		private uint _voiceClientId;
+
 		internal virtual bool EnableVoice => _voiceMode != DiscordVoiceMode.Disabled;
 
 		internal string UserAgent
@@ -82,6 +78,6 @@ namespace Discord
 			var config = this.MemberwiseClone() as DiscordClientConfig;
 			config._isLocked = false;
 			return config;
-        }
+		}
 	}
 }

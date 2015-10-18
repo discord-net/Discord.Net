@@ -1,6 +1,5 @@
 ﻿#define USE_THREAD
 using Discord.Audio;
-using Discord.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -143,10 +142,8 @@ namespace Discord.WebSockets.Voice
 #else
 				tasks.Add(ReceiveVoiceAsync());
 #endif
-
-#if !DNXCORE50
+			
 			tasks.Add(WatcherAsync());
-#endif
 			if (tasks.Count > 0)
 			{
 				// We need to combine tasks into one because receiveThread is 
@@ -444,7 +441,6 @@ namespace Discord.WebSockets.Voice
 			}).ConfigureAwait(false);
 #endif
 		}
-#if !DNXCORE50
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private Task WatcherAsync()
 		{
@@ -452,7 +448,6 @@ namespace Discord.WebSockets.Voice
 			return cancelToken.Wait()
 				.ContinueWith(_ => _udp.Close());
 		}
-#endif
 
 		protected override async Task ProcessMessage(string json)
 		{

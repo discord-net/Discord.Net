@@ -1,5 +1,4 @@
-﻿#if !DNXCORE50
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -80,4 +79,3 @@ namespace Discord.API
 		}
 	}
 }
-#endif

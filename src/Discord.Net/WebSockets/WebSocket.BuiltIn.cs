@@ -1,4 +1,4 @@
-﻿#if DNXCORE50
+﻿/*
 using Discord.Helpers;
 using System;
 using System.Collections.Concurrent;
@@ -38,8 +38,7 @@ namespace Discord.WebSockets
 		public Task Connect(string host, CancellationToken cancelToken)
 		{
 			_webSocket = new ClientWebSocket();
-			_webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
-			return _webSocket.ConnectAsync(new Uri(host), cancelToken);
+            return _webSocket.ConnectAsync(new Uri(host), cancelToken);
 		}
 
 		public Task Disconnect()
@@ -151,4 +150,4 @@ namespace Discord.WebSockets
         }
 	}
 }
-#endif
+*/

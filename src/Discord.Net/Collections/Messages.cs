@@ -1,6 +1,4 @@
-﻿using Discord.Helpers;
-
-namespace Discord.Collections
+﻿namespace Discord.Collections
 {
     public sealed class Messages : AsyncCollection<Message>
 	{

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Discord
+﻿namespace Discord
 {
 	public class DiscordClientConfig : DiscordSimpleClientConfig
 	{		
@@ -10,13 +7,9 @@ namespace Discord
 		private int _messageQueueInterval = 100;
 
 		//Experimental Features
-#if !DNXCORE50
 		/// <summary> (Experimental) Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server). </summary>
 		public bool EnableVoiceMultiserver { get { return _enableVoiceMultiserver; } set { SetValue(ref _enableVoiceMultiserver, value); } }
 		private bool _enableVoiceMultiserver = false;
-#else
-		internal bool EnableVoiceMultiserver => false;
-#endif
 		/// <summary> (Experimental) Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
 		public bool UseMessageQueue { get { return _useMessageQueue; } set { SetValue(ref _useMessageQueue, value); } }
 		private bool _useMessageQueue = false;

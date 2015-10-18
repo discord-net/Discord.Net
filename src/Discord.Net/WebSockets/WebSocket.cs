@@ -64,12 +64,8 @@ namespace Discord.WebSockets
 			_loginTimeout = client.Config.ConnectionTimeout;
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
-
-#if DNXCORE50
-			_engine = new BuiltInWebSocketEngine(client.Config.WebSocketInterval);
-#else
+			
 			_engine = new WSSharpWebSocketEngine(this, client.Config.UserAgent, client.Config.WebSocketInterval);
-#endif
 			_engine.ProcessMessage += async (s, e) =>
 			{
 				if (_logLevel >= LogMessageSeverity.Debug)

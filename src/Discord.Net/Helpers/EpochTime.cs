@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord.Helpers
+namespace Discord
 {
     internal class EpochTime
 	{

@@ -2,7 +2,6 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
-using Discord.Helpers;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

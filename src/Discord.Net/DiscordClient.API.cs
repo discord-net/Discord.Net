@@ -1,5 +1,4 @@
 ﻿using Discord.API;
-using Discord.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,12 +23,8 @@ namespace Discord.API
 		public RestClient(LogMessageSeverity logLevel, string userAgent, int timeout)
 		{
 			_logLevel = logLevel;
-
-#if DNXCORE50
-			_engine = new BuiltInRestEngine(userAgent, timeout);
-#else
+			
 			_engine = new RestSharpRestEngine(userAgent, timeout);
-#endif
 		}
 
 		private static readonly HttpMethod _delete = HttpMethod.Delete;

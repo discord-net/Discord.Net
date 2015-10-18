@@ -1,6 +1,5 @@
 ﻿using Discord.API;
 using Discord.Collections;
-using Discord.Helpers;
 using Discord.WebSockets;
 using Discord.WebSockets.Data;
 using Newtonsoft.Json;
