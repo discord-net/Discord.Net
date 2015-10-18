@@ -114,7 +114,7 @@ namespace Discord
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.Messages.CleanText(RawText));
+		public string Text => _cleanText != null ? _cleanText : (_cleanText = MentionHelper.ConvertToNames(_client, RawText));
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>

@@ -2,11 +2,9 @@
 {
     public sealed class Messages : AsyncCollection<Message>
 	{
-		private readonly MessageCleaner _msgCleaner;
 		internal Messages(DiscordClient client, object writerLock)
 			: base(client, writerLock)
 		{
-			_msgCleaner = new MessageCleaner(client);
         }
 
 		internal Message GetOrAdd(string id, string channelId, string userId) => GetOrAdd(id, () => new Message(_client, id, channelId, userId));
@@ -29,7 +27,5 @@
 		}
 
 		internal Message this[string id] => Get(id);
-
-		internal string CleanText(string text) => _msgCleaner.Clean(text);
 	}
 }

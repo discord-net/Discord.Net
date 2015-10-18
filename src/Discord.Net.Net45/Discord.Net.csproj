@@ -160,6 +160,9 @@
     <Compile Include="..\Discord.Net\DiscordSimpleClientConfig.cs">
       <Link>DiscordSimpleClientConfig.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Enums\AvatarImageType.cs">
+      <Link>Enums\AvatarImageType.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
       <Link>Enums\ChannelTypes.cs</Link>
     </Compile>
@@ -184,8 +187,8 @@
     <Compile Include="..\Discord.Net\Helpers\Mention.cs">
       <Link>Helpers\Mention.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\MessageCleaner.cs">
-      <Link>Helpers\MessageCleaner.cs</Link>
+    <Compile Include="..\Discord.Net\Helpers\MentionHelper.cs">
+      <Link>Helpers\MentionHelper.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Shared\CollectionHelper.cs">
       <Link>Helpers\Shared\CollectionHelper.cs</Link>
