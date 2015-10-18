@@ -52,7 +52,10 @@
     <Compile Include="..\Discord.Net.Commands\CommandsPlugin.Events.cs">
       <Link>CommandsPlugin.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Shared\TaskHelper.cs">
+    <Compile Include="..\Discord.Net\Helpers\Shared\CollectionHelper.cs">
+      <Link>Shared\CollectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\Shared\TaskHelper.cs">
       <Link>Shared\TaskHelper.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

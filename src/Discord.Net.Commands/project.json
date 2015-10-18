@@ -1,11 +1,11 @@
 ﻿{
-	"version": "0.7.4",
+	"version": "0.8.0-beta1",
 	"description": "A Discord.Net extension adding basic command support.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
 	"projectUrl": "https://github.com/RogueException/Discord.Net",
 	"licenseUrl": "http://opensource.org/licenses/MIT",
-	"compile": ["**/*.cs", "../Discord.Net/Shared/*.cs"],
+	"compile": ["**/*.cs", "../Discord.Net/Helpers/Shared/*.cs"],
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/RogueException/Discord.Net"
@@ -14,7 +14,7 @@
 		"warningsAsErrors": true
 	},
 	"dependencies": {
-		"Discord.Net": "0.7.4"
+		"Discord.Net": "0.8.0-beta1"
 	},
 	"frameworks": {
 		"net45": { },
