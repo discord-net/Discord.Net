@@ -85,6 +85,7 @@ namespace Discord
 		/// <summary> Return the id of the role representing all users in a server. </summary>
 		public string EveryoneRoleId { get; private set; }
 		/// <summary> Return the the role representing all users in a server. </summary>
+		[JsonIgnore]
 		public Role EveryoneRole => _client.Roles[EveryoneRoleId];
 		/// <summary> Returns a collection of the ids of all roles within this server. </summary>
 		[JsonIgnore]

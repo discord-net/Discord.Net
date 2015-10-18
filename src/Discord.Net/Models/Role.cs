@@ -34,8 +34,10 @@ namespace Discord
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
 		public bool IsEveryone { get; }
 		/// <summary> Returns a list of the ids of all members in this role. </summary>
+		[JsonIgnore]
 		public IEnumerable<string> MemberIds => IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId);
 		/// <summary> Returns a list of all members in this role. </summary>
+		[JsonIgnore]
 		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id));
 
 		internal Role(DiscordClient client, string id, string serverId, bool isEveryone)

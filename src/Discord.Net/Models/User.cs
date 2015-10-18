@@ -42,12 +42,16 @@ namespace Discord
 		public Channel PrivateChannel => _client.Channels[PrivateChannelId];
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
+		[JsonIgnore]
 		public IEnumerable<Member> Memberships => _servers.Select(x => _client.GetMember(x.Key, Id));
 		/// <summary> Returns a collection of all servers this user is a member of. </summary>
+		[JsonIgnore]
 		public IEnumerable<Server> Servers => _servers.Select(x => _client.GetServer(x.Key));
 		/// <summary> Returns a collection of the ids of all servers this user is a member of. </summary>
+		[JsonIgnore]
 		public IEnumerable<string> ServersIds => _servers.Select(x => x.Key);
 		/// <summary> Returns a collection of all messages this user has sent that are still in cache. </summary>
+		[JsonIgnore]
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id);
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
