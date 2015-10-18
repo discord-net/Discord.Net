@@ -12,12 +12,8 @@ namespace Discord
 		Both = Outgoing | Incoming
 	}
 
-	public class DiscordWebSocketClientConfig
+	public class DiscordWebSocketClientConfig : DiscordAPIClientConfig
 	{
-		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
-		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
-		private LogMessageSeverity _logLevel = LogMessageSeverity.Info;
-
 		/// <summary> Max time in milliseconds to wait for DiscordClient to connect and initialize. </summary>
 		public int ConnectionTimeout { get { return _connectionTimeout; } set { SetValue(ref _connectionTimeout, value); } }
 		private int _connectionTimeout = 30000;
@@ -27,9 +23,6 @@ namespace Discord
 		/// <summary> Gets or sets the time (in milliseconds) to wait after an reconnect fails before retrying. </summary>
 		public int FailedReconnectDelay { get { return _failedReconnectDelay; } set { SetValue(ref _failedReconnectDelay, value); } }
 		private int _failedReconnectDelay = 10000;
-		/// <summary> Max time (in milliseconds) to wait for an API request to complete. </summary>
-		public int APITimeout { get { return _apiTimeout; } set { SetValue(ref _apiTimeout, value); } }
-		private int _apiTimeout = 10000;
 
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the websocket's message queue is empty before checking again. </summary>
 		public int WebSocketInterval { get { return _webSocketInterval; } set { SetValue(ref _webSocketInterval, value); } }
@@ -54,28 +47,9 @@ namespace Discord
 
 		internal virtual bool EnableVoice => _voiceMode != DiscordVoiceMode.Disabled;
 
-		internal string UserAgent
+		public new DiscordWebSocketClientConfig Clone()
 		{
-			get
-			{
-				string version = typeof(DiscordClientConfig).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-				return $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)";
-			}
-		}
-
-		//Lock
-		protected bool _isLocked;
-		internal void Lock() { _isLocked = true; }
-		protected void SetValue<T>(ref T storage, T value)
-		{
-			if (_isLocked)
-				throw new InvalidOperationException("Unable to modify a discord client's configuration after it has been created.");
-			storage = value;
-		}
-
-		public DiscordClientConfig Clone()
-		{
-			var config = this.MemberwiseClone() as DiscordClientConfig;
+			var config = MemberwiseClone() as DiscordWebSocketClientConfig;
 			config._isLocked = false;
 			return config;
 		}

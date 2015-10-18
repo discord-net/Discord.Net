@@ -25,7 +25,7 @@
 
 		public new DiscordClientConfig Clone()
 		{
-			var config = this.MemberwiseClone() as DiscordClientConfig;
+			var config = MemberwiseClone() as DiscordClientConfig;
 			config._isLocked = false;
 			return config;
         }

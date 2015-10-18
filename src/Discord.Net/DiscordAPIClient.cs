@@ -11,12 +11,15 @@ namespace Discord
 	/// <summary> A lightweight wrapper around the Discord API. </summary>
 	public class DiscordAPIClient
 	{
+		private readonly DiscordAPIClientConfig _config;
+
 		internal RestClient RestClient => _rest;
 		private readonly RestClient _rest;
 
-		public DiscordAPIClient(LogMessageSeverity logLevel, string userAgent, int timeout)
+		public DiscordAPIClient(DiscordAPIClientConfig config = null)
 		{
-			_rest = new RestClient(logLevel, userAgent, timeout);
+			_config = config ?? new DiscordAPIClientConfig();
+            _rest = new RestClient(_config);
         }
 
 		private string _token;

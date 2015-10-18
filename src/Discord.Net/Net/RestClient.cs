@@ -10,15 +10,15 @@ namespace Discord.Net
 {
 	internal partial class RestClient
 	{
-		private readonly LogMessageSeverity _logLevel;
+		private readonly DiscordAPIClientConfig _config;
 		private CancellationToken _cancelToken;
 
-		public RestClient(LogMessageSeverity logLevel, string userAgent, int timeout)
+		public RestClient(DiscordAPIClientConfig config)
 		{
-			_logLevel = logLevel;
-            Initialize(userAgent, timeout);
+			_config = config;
+            Initialize();
         }
-		partial void Initialize(string userAgent, int timeout);
+		partial void Initialize();
 
 		//DELETE
 		private static readonly HttpMethod _delete = HttpMethod.Delete;
@@ -90,7 +90,7 @@ namespace Discord.Net
 			if (content != null)
 				requestJson = JsonConvert.SerializeObject(content);
 
-			if (_logLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await SendInternal(method, path, requestJson, _cancelToken).ConfigureAwait(false);
@@ -100,10 +100,10 @@ namespace Discord.Net
 				throw new Exception("API check failed: Response is not empty.");
 #endif
 
-			if (_logLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (content != null && _logLevel >= LogMessageSeverity.Debug)
+				if (content != null && _config.LogLevel >= LogMessageSeverity.Debug)
 				{
 					if (path.StartsWith(Endpoints.Auth))
                         RaiseOnRequest(method, path, "[Hidden]", stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
@@ -129,7 +129,7 @@ namespace Discord.Net
 		{
 			Stopwatch stopwatch = null;
 
-			if (_logLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await SendFileInternal(method, path, filePath, _cancelToken).ConfigureAwait(false);
@@ -139,10 +139,10 @@ namespace Discord.Net
 				throw new Exception("API check failed: Response is not empty.");
 #endif
 
-			if (_logLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (_logLevel >= LogMessageSeverity.Debug)
+				if (_config.LogLevel >= LogMessageSeverity.Debug)
 					RaiseOnRequest(method, path, filePath, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 				else
                     RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);

@@ -55,7 +55,7 @@ namespace Discord
 			: base(config ?? new DiscordClientConfig())
 		{
 			_rand = new Random();
-			_api = new DiscordAPIClient(_config.LogLevel, _config.UserAgent, _config.APITimeout);
+			_api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 			if (Config.EnableVoiceMultiserver)
@@ -765,7 +765,6 @@ namespace Discord
 			{
 				var config = _config.Clone();
 				config.LogLevel = _config.LogLevel;// (LogMessageSeverity)Math.Min((int)_config.LogLevel, (int)LogMessageSeverity.Warning);
-				config.EnableVoiceMultiserver = false;
 				config.VoiceOnly = true;
 				config.VoiceClientId = unchecked(++_nextVoiceClientId);
 				return new DiscordWebSocketClient(config, serverId);

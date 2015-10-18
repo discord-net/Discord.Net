@@ -65,7 +65,7 @@ namespace Discord.Net
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 			
-			_engine = new WSSharpWebSocketEngine(this, client.Config.UserAgent, client.Config.WebSocketInterval);
+			_engine = new WSSharpWebSocketEngine(this, client.Config);
 			_engine.ProcessMessage += async (s, e) =>
 			{
 				if (_logLevel >= LogMessageSeverity.Debug)

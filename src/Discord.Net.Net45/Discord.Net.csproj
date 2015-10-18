@@ -151,6 +151,9 @@
     <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
       <Link>DiscordAPIClient.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordAPIClientConfig.cs">
+      <Link>DiscordAPIClientConfig.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
     </Compile>

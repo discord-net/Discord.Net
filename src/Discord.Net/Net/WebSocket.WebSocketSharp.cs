@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using WSSharpNWebSocket = WebSocketSharp.WebSocket;
@@ -9,9 +10,8 @@ namespace Discord.Net
 {
 	internal class WSSharpWebSocketEngine : IWebSocketEngine
 	{
+		private readonly DiscordWebSocketClientConfig _config;
 		private readonly ConcurrentQueue<string> _sendQueue;
-		private readonly int _sendInterval;
-		private readonly string _userAgent;
 		private readonly WebSocket _parent;
 		private WSSharpNWebSocket _webSocket;
 
@@ -22,11 +22,10 @@ namespace Discord.Net
 				ProcessMessage(this, new WebSocketMessageEventArgs(msg));
 		}
 
-		internal WSSharpWebSocketEngine(WebSocket parent, string userAgent, int sendInterval)
+		internal WSSharpWebSocketEngine(WebSocket parent, DiscordWebSocketClientConfig config)
 		{
 			_parent = parent;
-			_userAgent = userAgent;
-			_sendInterval = sendInterval;
+			_config = config;
 			_sendQueue = new ConcurrentQueue<string>();
 		}
 
@@ -35,7 +34,8 @@ namespace Discord.Net
 			_webSocket = new WSSharpNWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-            _webSocket.Compression = WebSocketSharp.CompressionMethod.None;
+            _webSocket.Compression = WebSocketSharp.CompressionMethod.None;		
+			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials.UserName, _config.ProxyCredentials.Password);
             _webSocket.OnMessage += (s, e) => RaiseProcessMessage(e.Data);
 			_webSocket.OnError += async (s, e) =>
 			{
@@ -77,6 +77,7 @@ namespace Discord.Net
 
 		private Task SendAsync(CancellationToken cancelToken)
 		{
+			var sendInterval = _config.WebSocketInterval;
 			return Task.Run(async () =>
 			{
 				try
@@ -86,7 +87,7 @@ namespace Discord.Net
 						string json;
 						while (_sendQueue.TryDequeue(out json))
 							_webSocket.Send(json);
-						await Task.Delay(_sendInterval, cancelToken).ConfigureAwait(false);
+						await Task.Delay(sendInterval, cancelToken).ConfigureAwait(false);
 					}
 				}
 				catch (OperationCanceledException) { }
