@@ -46,7 +46,11 @@ namespace Discord.WebSockets.Voice
 					if (_readCursor == nextPosition)
 					{
 						_notOverflowEvent.Reset();
-                        _notOverflowEvent.Wait(cancelToken);
+						try
+						{
+							_notOverflowEvent.Wait(cancelToken);
+						}
+						catch (OperationCanceledException) { return; }
 					}
 
 					if (i == wholeFrames)
@@ -100,7 +104,11 @@ namespace Discord.WebSockets.Voice
 				_isClearing = true;
                 for (int i = 0; i < _frameCount; i++)
 					Buffer.BlockCopy(_blankFrame, 0, _buffer, i * _frameCount, i++);
-				_underflowEvent.Wait(cancelToken);
+				try
+				{
+					_underflowEvent.Wait(cancelToken);
+				}
+				catch (OperationCanceledException) { }
 				_writeCursor = 0;
 				_readCursor = 0;
 				_isClearing = false;
