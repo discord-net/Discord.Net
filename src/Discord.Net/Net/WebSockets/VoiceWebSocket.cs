@@ -1,6 +1,7 @@
 ﻿#define USE_THREAD
 using Discord.API;
 using Discord.Interop;
+using Discord.Net.Voice;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.WebSockets
 {
 	internal partial class VoiceWebSocket : WebSocket
 	{

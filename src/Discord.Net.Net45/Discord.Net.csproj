@@ -244,41 +244,47 @@
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\DataWebSocket.cs">
-      <Link>Net\DataWebSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\DataWebSockets.Events.cs">
-      <Link>Net\DataWebSockets.Events.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Net\HttpException.cs">
       <Link>Net\HttpException.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.cs">
-      <Link>Net\RestClient.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Rest\RestClient.cs">
+      <Link>Net\Rest\RestClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.Events.cs">
-      <Link>Net\RestClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Rest\RestClient.Events.cs">
+      <Link>Net\Rest\RestClient.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\RestClient.SharpRest.cs">
-      <Link>Net\RestClient.SharpRest.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Rest\SharpRestRestClient.cs">
+      <Link>Net\Rest\SharpRestRestClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\VoiceBuffer.cs">
-      <Link>Net\VoiceBuffer.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Voice\IDiscordVoiceBuffer.cs">
+      <Link>Net\Voice\IDiscordVoiceBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\VoiceWebSocket.cs">
-      <Link>Net\VoiceWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Voice\IDiscordVoiceClient.cs">
+      <Link>Net\Voice\IDiscordVoiceClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\VoiceWebSocket.Events.cs">
-      <Link>Net\VoiceWebSocket.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Voice\VoiceBuffer.cs">
+      <Link>Net\Voice\VoiceBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSocket.cs">
-      <Link>Net\WebSocket.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSocket.cs">
+      <Link>Net\WebSockets\DataWebSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSocket.Events.cs">
-      <Link>Net\WebSocket.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSockets.Events.cs">
+      <Link>Net\WebSockets\DataWebSockets.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSocket.WebSocketSharp.cs">
-      <Link>Net\WebSocket.WebSocketSharp.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.Events.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.cs">
+      <Link>Net\WebSockets\WebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.Events.cs">
+      <Link>Net\WebSockets\WebSocket.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.WebSocketSharp.cs">
+      <Link>Net\WebSockets\WebSocket.WebSocketSharp.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

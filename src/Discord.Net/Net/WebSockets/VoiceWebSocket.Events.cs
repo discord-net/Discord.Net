@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord.Net
+namespace Discord.Net.WebSockets
 {
 	internal sealed class IsTalkingEventArgs : EventArgs
 	{

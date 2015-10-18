@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Discord.Net
+namespace Discord.Net.Voice
 {
     internal class VoiceBuffer : IDiscordVoiceBuffer
 	{

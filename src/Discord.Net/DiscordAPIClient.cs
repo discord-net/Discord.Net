@@ -1,5 +1,6 @@
 ﻿using Discord.API;
 using Discord.Net;
+using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Discord
 		public DiscordAPIClient(DiscordAPIClientConfig config = null)
 		{
 			_config = config ?? new DiscordAPIClientConfig();
-            _rest = new RestClient(_config);
+            _rest = new SharpRestRestClient(_config);
         }
 
 		private string _token;

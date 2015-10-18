@@ -1,4 +1,5 @@
 ﻿using Discord.Net;
+using Discord.Net.WebSockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;

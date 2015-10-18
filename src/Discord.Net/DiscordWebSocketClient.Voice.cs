@@ -1,28 +1,9 @@
-﻿using System;
+﻿using Discord.Net.Voice;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-	public interface IDiscordVoiceBuffer
-	{
-		int FrameSize { get; }
-		int FrameCount { get; }
-		ushort ReadPos { get; }
-		ushort WritePos { get; }
-	}
-
-	public interface IDiscordVoiceClient
-	{
-		IDiscordVoiceBuffer OutputBuffer { get; }
-
-		Task JoinChannel(string channelId);
-
-        void SendVoicePCM(byte[] data, int count);
-		void ClearVoicePCM();
-
-		Task WaitVoice();
-	}
-
 	public partial class DiscordWebSocketClient : IDiscordVoiceClient
 	{
 		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;

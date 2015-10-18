@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.WebSockets
 {
     internal partial class DataWebSocket : WebSocket
     {

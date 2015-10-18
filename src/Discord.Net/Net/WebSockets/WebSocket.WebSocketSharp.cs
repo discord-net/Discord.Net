@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WSSharpNWebSocket = WebSocketSharp.WebSocket;
 
-namespace Discord.Net
+namespace Discord.Net.WebSockets
 {
 	internal class WSSharpWebSocketEngine : IWebSocketEngine
 	{

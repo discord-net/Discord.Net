@@ -1,6 +1,8 @@
 ﻿using Discord.API;
 using Discord.Collections;
 using Discord.Net;
+using Discord.Net.Voice;
+using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;

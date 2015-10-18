@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace Discord.Net
+namespace Discord.Net.Rest
 {
-    internal partial class RestClient
+    internal abstract partial class RestClient
 	{
 		public class RequestEventArgs : EventArgs
 		{

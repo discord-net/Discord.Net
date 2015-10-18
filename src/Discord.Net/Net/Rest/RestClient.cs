@@ -6,19 +6,21 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord.Net.Rest
 {
-	internal partial class RestClient
+	internal abstract partial class RestClient
 	{
-		private readonly DiscordAPIClientConfig _config;
-		private CancellationToken _cancelToken;
+		protected readonly DiscordAPIClientConfig _config;
+		protected CancellationToken _cancelToken;
 
 		public RestClient(DiscordAPIClientConfig config)
 		{
 			_config = config;
-            Initialize();
         }
-		partial void Initialize();
+
+		protected internal abstract void SetToken(string token);
+		protected abstract Task<string> SendInternal(HttpMethod method, string path, string json, CancellationToken cancelToken);
+		protected abstract Task<string> SendFileInternal(HttpMethod method, string path, string filePath, CancellationToken cancelToken);
 
 		//DELETE
 		private static readonly HttpMethod _delete = HttpMethod.Delete;
