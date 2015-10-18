@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-	internal abstract partial class RestClient
+	internal sealed partial class RestClient
 	{
-		protected readonly DiscordAPIClientConfig _config;
-		protected CancellationToken _cancelToken;
+		private readonly DiscordAPIClientConfig _config;
+		private readonly IRestEngine _engine;
+		private CancellationToken _cancelToken;
 
 		public RestClient(DiscordAPIClientConfig config)
 		{
 			_config = config;
+			_engine = new SharpRestEngine(config);
         }
 
-		protected internal abstract void SetToken(string token);
-		protected abstract Task<string> SendInternal(HttpMethod method, string path, string json, CancellationToken cancelToken);
-		protected abstract Task<string> SendFileInternal(HttpMethod method, string path, string filePath, CancellationToken cancelToken);
+		public void SetToken(string token) => _engine.SetToken(token);
 
 		//DELETE
 		private static readonly HttpMethod _delete = HttpMethod.Delete;
@@ -95,7 +95,7 @@ namespace Discord.Net.Rest
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
-			string responseJson = await SendInternal(method, path, requestJson, _cancelToken).ConfigureAwait(false);
+			string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
 
 #if TEST_RESPONSES
 			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
@@ -134,7 +134,7 @@ namespace Discord.Net.Rest
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
-			string responseJson = await SendFileInternal(method, path, filePath, _cancelToken).ConfigureAwait(false);
+			string responseJson = await _engine.SendFile(method, path, filePath, _cancelToken).ConfigureAwait(false);
 
 #if TEST_RESPONSES
 			if (!hasResponse && !string.IsNullOrEmpty(responseJson))

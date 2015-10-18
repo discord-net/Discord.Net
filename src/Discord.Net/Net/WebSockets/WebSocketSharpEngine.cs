@@ -8,7 +8,7 @@ using WSSharpNWebSocket = WebSocketSharp.WebSocket;
 
 namespace Discord.Net.WebSockets
 {
-	internal class WSSharpWebSocketEngine : IWebSocketEngine
+	internal class WebSocketSharpEngine : IWebSocketEngine
 	{
 		private readonly DiscordWebSocketClientConfig _config;
 		private readonly ConcurrentQueue<string> _sendQueue;
@@ -22,7 +22,7 @@ namespace Discord.Net.WebSockets
 				ProcessMessage(this, new WebSocketMessageEventArgs(msg));
 		}
 
-		internal WSSharpWebSocketEngine(WebSocket parent, DiscordWebSocketClientConfig config)
+		internal WebSocketSharpEngine(WebSocket parent, DiscordWebSocketClientConfig config)
 		{
 			_parent = parent;
 			_config = config;

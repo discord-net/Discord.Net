@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    internal sealed class SharpRestRestClient : RestClient
+    internal sealed class SharpRestEngine : IRestEngine
 	{
+		private readonly DiscordAPIClientConfig _config;
 		private readonly RestSharp.RestClient _client;
 
-        public SharpRestRestClient(DiscordAPIClientConfig config)
-			: base(config)
+        public SharpRestEngine(DiscordAPIClientConfig config)
 		{
+			_config = config;
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
 				PreAuthenticate = false,
@@ -27,20 +28,20 @@ namespace Discord.Net.Rest
 			_client.AddDefaultHeader("accept-encoding", "gzip,deflate");
         }
 
-		protected internal override void SetToken(string token)
+		public void SetToken(string token)
 		{
 			_client.RemoveDefaultParameter("authorization");
 			if (token != null)
 				_client.AddDefaultHeader("authorization", token);
 		}
 
-		protected override Task<string> SendInternal(HttpMethod method, string path, string json, CancellationToken cancelToken)
+		public Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, GetMethod(method));
 			request.AddParameter("application/json", json, ParameterType.RequestBody);
 			return Send(request, cancelToken);
 		}
-		protected override Task<string> SendFileInternal(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
+		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, Method.POST);
             request.AddFile("file", filePath);

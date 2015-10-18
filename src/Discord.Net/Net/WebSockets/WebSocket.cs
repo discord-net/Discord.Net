@@ -16,21 +16,6 @@ namespace Discord.Net.WebSockets
 		Disconnecting
 	}
 
-	internal class WebSocketMessageEventArgs : EventArgs
-	{
-		public readonly string Message;
-		public WebSocketMessageEventArgs(string msg) { Message = msg; }
-	}
-    internal interface IWebSocketEngine
-	{
-		event EventHandler<WebSocketMessageEventArgs> ProcessMessage;
-
-		Task Connect(string host, CancellationToken cancelToken);
-		Task Disconnect();
-		void QueueMessage(string message);
-        IEnumerable<Task> GetTasks(CancellationToken cancelToken);
-    }
-
 	internal abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
@@ -65,7 +50,7 @@ namespace Discord.Net.WebSockets
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 			
-			_engine = new WSSharpWebSocketEngine(this, client.Config);
+			_engine = new WebSocketSharpEngine(this, client.Config);
 			_engine.ProcessMessage += async (s, e) =>
 			{
 				if (_logLevel >= LogMessageSeverity.Debug)

@@ -247,14 +247,17 @@
     <Compile Include="..\Discord.Net\Net\HttpException.cs">
       <Link>Net\HttpException.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\Rest\IRestEngine.cs">
+      <Link>Net\Rest\IRestEngine.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\RestClient.cs">
       <Link>Net\Rest\RestClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\RestClient.Events.cs">
       <Link>Net\Rest\RestClient.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\Rest\SharpRestRestClient.cs">
-      <Link>Net\Rest\SharpRestRestClient.cs</Link>
+    <Compile Include="..\Discord.Net\Net\Rest\SharpRestEngine.cs">
+      <Link>Net\Rest\SharpRestEngine.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\Voice\IDiscordVoiceBuffer.cs">
       <Link>Net\Voice\IDiscordVoiceBuffer.cs</Link>
@@ -271,6 +274,9 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSockets.Events.cs">
       <Link>Net\WebSockets\DataWebSockets.Events.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\IWebSocketEngine.cs">
+      <Link>Net\WebSockets\IWebSocketEngine.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\VoiceWebSocket.cs">
       <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
     </Compile>
@@ -283,8 +289,8 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.Events.cs">
       <Link>Net\WebSockets\WebSocket.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.WebSocketSharp.cs">
-      <Link>Net\WebSockets\WebSocket.WebSocketSharp.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
+      <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

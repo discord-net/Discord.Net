@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace Discord.Net.Rest
 {
-    internal abstract partial class RestClient
+    internal sealed partial class RestClient
 	{
 		public class RequestEventArgs : EventArgs
 		{
@@ -21,7 +21,7 @@ namespace Discord.Net.Rest
 		}
 
 		public event EventHandler<RequestEventArgs> OnRequest;
-		protected void RaiseOnRequest(HttpMethod method, string path, string payload, double milliseconds)
+		private void RaiseOnRequest(HttpMethod method, string path, string payload, double milliseconds)
 		{
 			if (OnRequest != null)
 				OnRequest(this, new RequestEventArgs(method, path, payload, milliseconds));

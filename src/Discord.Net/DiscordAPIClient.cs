@@ -20,7 +20,7 @@ namespace Discord
 		public DiscordAPIClient(DiscordAPIClientConfig config = null)
 		{
 			_config = config ?? new DiscordAPIClientConfig();
-            _rest = new SharpRestRestClient(_config);
+            _rest = new RestClient(_config);
         }
 
 		private string _token;
