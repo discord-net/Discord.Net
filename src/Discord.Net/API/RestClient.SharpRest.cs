@@ -17,7 +17,8 @@ namespace Discord.API
 			{
 				PreAuthenticate = false
 			};
-			_client.AddDefaultHeader("accept", "*/*");
+			_client.RemoveDefaultParameter("Accept");
+            _client.AddDefaultHeader("accept", "*/*");
 			_client.AddDefaultHeader("accept-encoding", "gzip,deflate");
             _client.UserAgent = userAgent;
 			_client.ReadWriteTimeout = timeout;
@@ -39,8 +40,8 @@ namespace Discord.API
 		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, Method.POST);
-            request.AddFile(Path.GetFileName(filePath), filePath);
-			return Send(request, cancelToken);
+            request.AddFile("file", filePath);
+            return Send(request, cancelToken);
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)
 		{
