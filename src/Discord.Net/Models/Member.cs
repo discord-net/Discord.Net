@@ -22,11 +22,11 @@ namespace Discord
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; private set; }
 
-		public bool IsMuted { get; private set; }
-		public bool IsDeafened { get; private set; }
 		public bool IsSelfMuted { get; private set; }
 		public bool IsSelfDeafened { get; private set; }
-		public bool IsSuppressed { get; private set; }
+		public bool IsServerMuted { get; private set; }
+		public bool IsServerDeafened { get; private set; }
+		public bool IsServerSuppressed { get; private set; }
 		public bool IsSpeaking { get; internal set; }
 
 		public string SessionId { get; private set; }
@@ -105,10 +105,10 @@ namespace Discord
 		internal void Update(API.ExtendedMemberInfo model)
 		{
 			Update(model as API.MemberInfo);
-			if (model.IsDeafened != null)
-				IsDeafened = model.IsDeafened.Value;
-			if (model.IsMuted != null)
-				IsMuted = model.IsMuted.Value;
+			if (model.IsServerDeafened != null)
+				IsServerDeafened = model.IsServerDeafened.Value;
+			if (model.IsServerMuted != null)
+				IsServerMuted = model.IsServerMuted.Value;
 		}
 		internal void Update(API.PresenceMemberInfo model)
 		{
@@ -123,10 +123,10 @@ namespace Discord
 		}
 		internal void Update(API.VoiceMemberInfo model)
 		{
-			if (model.IsDeafened != null)
-				IsDeafened = model.IsDeafened.Value;
-			if (model.IsMuted != null)
-				IsMuted = model.IsMuted.Value;
+			if (model.IsServerDeafened != null)
+				IsServerDeafened = model.IsServerDeafened.Value;
+			if (model.IsServerMuted != null)
+				IsServerMuted = model.IsServerMuted.Value;
 			if (model.SessionId != null)
 				SessionId = model.SessionId;
 			if (model.Token != null)
@@ -138,8 +138,8 @@ namespace Discord
 				IsSelfDeafened = model.IsSelfDeafened.Value;
 			if (model.IsSelfMuted != null)
 				IsSelfMuted = model.IsSelfMuted.Value;
-			if (model.IsSuppressed != null)
-				IsSuppressed = model.IsSuppressed.Value;
+			if (model.IsServerSuppressed != null)
+				IsServerSuppressed = model.IsServerSuppressed.Value;
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)

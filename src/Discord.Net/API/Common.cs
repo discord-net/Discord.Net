@@ -32,10 +32,20 @@ namespace Discord.API
 	{
 		[JsonProperty("user_id")]
 		public string UserId;
-		[JsonProperty("user")]
-		public UserReference User;
 		[JsonProperty("guild_id")]
 		public string GuildId;
+
+		[JsonProperty("user")]
+		private UserReference _user;
+		public UserReference User
+		{
+			get { return _user; }
+			set
+			{
+				_user = value;
+				UserId = User.Id;
+			}
+		}
 	}
 	public class MemberInfo : MemberReference
 	{
@@ -47,9 +57,9 @@ namespace Discord.API
 	public class ExtendedMemberInfo : MemberInfo
 	{
 		[JsonProperty("mute")]
-		public bool? IsMuted;
+		public bool? IsServerMuted;
 		[JsonProperty("deaf")]
-		public bool? IsDeafened;
+		public bool? IsServerDeafened;
 	}
 	public class PresenceMemberInfo : MemberReference
 	{
@@ -62,20 +72,21 @@ namespace Discord.API
 	{
 		[JsonProperty("channel_id")]
 		public string ChannelId;
-		[JsonProperty("suppress")]
-		public bool? IsSuppressed;
 		[JsonProperty("session_id")]
 		public string SessionId;
+		[JsonProperty("token")]
+		public string Token;
+
 		[JsonProperty("self_mute")]
 		public bool? IsSelfMuted;
 		[JsonProperty("self_deaf")]
 		public bool? IsSelfDeafened;
 		[JsonProperty("mute")]
-		public bool? IsMuted;
+		public bool? IsServerMuted;
 		[JsonProperty("deaf")]
-		public bool? IsDeafened;
-		[JsonProperty("token")]
-		public string Token;
+		public bool? IsServerDeafened;
+		[JsonProperty("suppress")]
+		public bool? IsServerSuppressed;
 	}
 
 	//Channels
