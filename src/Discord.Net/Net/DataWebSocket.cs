@@ -13,7 +13,7 @@ namespace Discord.Net
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public DataWebSocket(DiscordSimpleClient client)
+		public DataWebSocket(DiscordWebSocketClient client)
 			: base(client)
 		{
 		}

@@ -23,7 +23,7 @@ namespace Discord
 		Task WaitVoice();
 	}
 
-	public partial class DiscordSimpleClient : IDiscordVoiceClient
+	public partial class DiscordWebSocketClient : IDiscordVoiceClient
 	{
 		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;
 

@@ -12,7 +12,7 @@ namespace Discord
 		Both = Outgoing | Incoming
 	}
 
-	public class DiscordSimpleClientConfig
+	public class DiscordWebSocketClientConfig
 	{
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
 		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }

@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 namespace Discord
 {
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
-	public partial class DiscordClient : DiscordSimpleClient
+	public partial class DiscordClient : DiscordWebSocketClient
 	{
 		protected readonly DiscordAPIClient _api;
 		private readonly Random _rand;
 		private readonly JsonSerializer _serializer;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
-		private readonly ConcurrentDictionary<string, DiscordSimpleClient> _voiceClients;
+		private readonly ConcurrentDictionary<string, DiscordWebSocketClient> _voiceClients;
 		private bool _sentInitialLog;
 		private uint _nextVoiceClientId;
 		private string _status;
@@ -59,7 +59,7 @@ namespace Discord
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 			if (Config.EnableVoiceMultiserver)
-				_voiceClients = new ConcurrentDictionary<string, DiscordSimpleClient>();
+				_voiceClients = new ConcurrentDictionary<string, DiscordWebSocketClient>();
 
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
@@ -747,7 +747,7 @@ namespace Discord
 					return null;
 			}
 
-			DiscordSimpleClient client;
+			DiscordWebSocketClient client;
 			if (_voiceClients.TryGetValue(serverId, out client))
 				return client;
 			else
@@ -768,7 +768,7 @@ namespace Discord
 				config.EnableVoiceMultiserver = false;
 				config.VoiceOnly = true;
 				config.VoiceClientId = unchecked(++_nextVoiceClientId);
-				return new DiscordSimpleClient(config, serverId);
+				return new DiscordWebSocketClient(config, serverId);
 			});
 			client.LogMessage += (s, e) => RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}");
             await client.Connect(_gateway, _token).ConfigureAwait(false);
@@ -799,7 +799,7 @@ namespace Discord
 
 			if (Config.EnableVoiceMultiserver)
 			{
-				DiscordSimpleClient client;
+				DiscordWebSocketClient client;
 				if (_voiceClients.TryRemove(serverId, out client))
 					await client.Disconnect();
 			}

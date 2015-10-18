@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public class DiscordClientConfig : DiscordSimpleClientConfig
+	public class DiscordClientConfig : DiscordWebSocketClientConfig
 	{		
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get { return _messageQueueInterval; } set { SetValue(ref _messageQueueInterval, value); } }

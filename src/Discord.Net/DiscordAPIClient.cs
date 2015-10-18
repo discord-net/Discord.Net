@@ -1,11 +1,12 @@
 ﻿using Discord.API;
+using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net
+namespace Discord
 {
 	/// <summary> A lightweight wrapper around the Discord API. </summary>
 	public class DiscordAPIClient

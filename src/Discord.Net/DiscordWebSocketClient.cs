@@ -17,7 +17,7 @@ namespace Discord
 	}
 
 	/// <summary> Provides a barebones connection to the Discord service </summary>
-	public partial class DiscordSimpleClient
+	public partial class DiscordWebSocketClient
 	{
 		internal readonly DataWebSocket _dataSocket;
 		internal readonly VoiceWebSocket _voiceSocket;
@@ -32,8 +32,8 @@ namespace Discord
 		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordSimpleClientConfig Config => _config;
-		protected readonly DiscordSimpleClientConfig _config;
+		public DiscordWebSocketClientConfig Config => _config;
+		protected readonly DiscordWebSocketClientConfig _config;
 
 		/// <summary> Returns the id of the current logged-in user. </summary>
 		public string CurrentUserId => _currentUserId;
@@ -50,9 +50,9 @@ namespace Discord
 		private CancellationToken _cancelToken;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
-		public DiscordSimpleClient(DiscordSimpleClientConfig config = null)
+		public DiscordWebSocketClient(DiscordWebSocketClientConfig config = null)
 		{
-			_config = config ?? new DiscordSimpleClientConfig();
+			_config = config ?? new DiscordWebSocketClientConfig();
 			_config.Lock();
 
 			_enableVoice = _config.EnableVoice;
@@ -66,7 +66,7 @@ namespace Discord
 			if (_enableVoice)
 				_voiceSocket = CreateVoiceSocket();
 		}
-		internal DiscordSimpleClient(DiscordSimpleClientConfig config = null, string voiceServerId = null)
+		internal DiscordWebSocketClient(DiscordWebSocketClientConfig config = null, string voiceServerId = null)
 			: this(config)
 		{
 			_voiceServerId = voiceServerId;

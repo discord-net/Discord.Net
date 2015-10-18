@@ -148,6 +148,9 @@
     <Compile Include="..\Discord.Net\Collections\Users.cs">
       <Link>Collections\Users.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
+      <Link>DiscordAPIClient.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.API.cs">
       <Link>DiscordClient.API.cs</Link>
     </Compile>
@@ -163,17 +166,17 @@
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordSimpleClient.cs">
-      <Link>DiscordSimpleClient.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWebSocketClient.cs">
+      <Link>DiscordWebSocketClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordSimpleClient.Events.cs">
-      <Link>DiscordSimpleClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWebSocketClient.Events.cs">
+      <Link>DiscordWebSocketClient.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordSimpleClient.Voice.cs">
-      <Link>DiscordSimpleClient.Voice.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWebSocketClient.Voice.cs">
+      <Link>DiscordWebSocketClient.Voice.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordSimpleClientConfig.cs">
-      <Link>DiscordSimpleClientConfig.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWebSocketClientConfig.cs">
+      <Link>DiscordWebSocketClientConfig.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>
@@ -243,9 +246,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\DataWebSockets.Events.cs">
       <Link>Net\DataWebSockets.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\DiscordAPIClient.cs">
-      <Link>Net\DiscordAPIClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\HttpException.cs">
       <Link>Net\HttpException.cs</Link>
