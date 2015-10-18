@@ -79,6 +79,21 @@
     <Compile Include="..\Discord.Net\API\Endpoints.cs">
       <Link>API\Endpoints.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\AvatarImageType.cs">
+      <Link>API\Enums\AvatarImageType.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\ChannelTypes.cs">
+      <Link>API\Enums\ChannelTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\PermissionTarget.cs">
+      <Link>API\Enums\PermissionTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\Regions.cs">
+      <Link>API\Enums\Regions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\UserStatus.cs">
+      <Link>API\Enums\UserStatus.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Invites.cs">
       <Link>API\Invites.cs</Link>
     </Compile>
@@ -159,21 +174,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\DiscordSimpleClientConfig.cs">
       <Link>DiscordSimpleClientConfig.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Enums\AvatarImageType.cs">
-      <Link>Enums\AvatarImageType.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Enums\ChannelTypes.cs">
-      <Link>Enums\ChannelTypes.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Enums\PermissionTarget.cs">
-      <Link>Enums\PermissionTarget.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Enums\Regions.cs">
-      <Link>Enums\Regions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
-      <Link>Enums\UserStatus.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>
