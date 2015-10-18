@@ -2,26 +2,16 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Helpers
+namespace Discord
 {
-	internal static class TaskHelper
+    public static class TaskExtensions
 	{
-		public static Task CompletedTask { get; }
-		static TaskHelper()
-		{
-#if DNXCORE50
-			CompletedTask = Task.CompletedTask;
-#else
-			CompletedTask = Task.Delay(0);
-#endif
-		}
-
 		public static async Task Timeout(this Task self, int milliseconds)
 		{
 			Task timeoutTask = Task.Delay(milliseconds);
 			Task finishedTask = await Task.WhenAny(self, timeoutTask);
 			if (finishedTask == timeoutTask)
-                throw new TimeoutException();
+				throw new TimeoutException();
 			else
 				await self;
 		}

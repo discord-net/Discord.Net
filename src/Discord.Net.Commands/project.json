@@ -5,6 +5,7 @@
 	"tags": [ "discord", "discordapp" ],
 	"projectUrl": "https://github.com/RogueException/Discord.Net",
 	"licenseUrl": "http://opensource.org/licenses/MIT",
+	"compile": ["**/*.cs", "../Discord.Net/Shared/*.cs"],
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/RogueException/Discord.Net"

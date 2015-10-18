@@ -61,11 +61,7 @@ namespace Discord.Commands
 		}
 		public CommandBuilder Do(Action<CommandEventArgs> func)
 		{
-#if DNXCORE50
-			_command.Handler = e => { func(e); return Task.CompletedTask; };
-#else
-			_command.Handler = e => { func(e); return Task.Delay(0); };
-#endif
+			_command.Handler = e => { func(e); return TaskHelper.CompletedTask; };
 			return this;
 		}
 	}

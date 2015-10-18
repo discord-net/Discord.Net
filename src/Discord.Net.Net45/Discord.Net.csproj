@@ -184,8 +184,8 @@
     <Compile Include="..\Discord.Net\Helpers\MessageCleaner.cs">
       <Link>Helpers\MessageCleaner.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
-      <Link>Helpers\TaskHelper.cs</Link>
+    <Compile Include="..\Discord.Net\Helpers\TaskExtensions.cs">
+      <Link>Helpers\TaskExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Mention.cs">
       <Link>Mention.cs</Link>
@@ -217,6 +217,9 @@
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Shared\TaskHelper.cs">
+      <Link>Shared\TaskHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\TimeoutException.cs">
       <Link>TimeoutException.cs</Link>
     </Compile>
@@ -237,6 +240,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\WebSockets\Voice\Events.cs">
       <Link>WebSockets\Voice\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\WebSockets\Voice\VoiceBuffer.cs">
+      <Link>WebSockets\Voice\VoiceBuffer.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\WebSockets\Voice\VoiceWebSocket.cs">
       <Link>WebSockets\Voice\VoiceWebSocket.cs</Link>
