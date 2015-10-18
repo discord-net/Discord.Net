@@ -16,7 +16,8 @@ namespace Discord.Net
 		public RestClient(LogMessageSeverity logLevel, string userAgent, int timeout)
 		{
 			_logLevel = logLevel;
-		}
+            Initialize(userAgent, timeout);
+        }
 		partial void Initialize(string userAgent, int timeout);
 
 		//DELETE
