@@ -293,12 +293,12 @@ namespace Discord
 				if (Config.UseMessageQueue)
 				{
 					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, CurrentUserId);
-					var currentMember = _members[msg.UserId, channel.ServerId];
+					var currentUser = msg.User;
                     msg.Update(new MessageInfo
 					{
 						Content = blockText,
 						Timestamp = DateTime.UtcNow,
-						Author = new UserReference { Avatar = currentMember.AvatarId, Discriminator = currentMember.Discriminator, Id = CurrentUserId, Username = currentMember.Name },
+						Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = CurrentUserId, Username = currentUser.Name },
 						ChannelId = channel.Id,
 						IsTextToSpeech = isTextToSpeech
 					});
