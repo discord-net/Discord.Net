@@ -21,7 +21,7 @@
 		private bool _ackMessages = false;
 
 		//Internal
-		internal override bool EnableVoice => base.EnableVoice && !EnableVoiceMultiserver;
+		internal override bool EnableVoice => (base.EnableVoice && !EnableVoiceMultiserver) || base.VoiceOnly;
 
 		public new DiscordClientConfig Clone()
 		{

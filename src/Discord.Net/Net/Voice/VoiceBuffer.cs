@@ -32,6 +32,9 @@ namespace Discord.Net.Voice
 
 		public void Push(byte[] buffer, int bytes, CancellationToken cancelToken)
 		{
+			if (cancelToken.IsCancellationRequested)
+				throw new OperationCanceledException("Client is disconnected.", cancelToken);
+
             int wholeFrames = bytes / _frameSize;
 			int expectedBytes = wholeFrames * _frameSize;
 			int lastFrameSize = bytes - expectedBytes;
@@ -50,7 +53,10 @@ namespace Discord.Net.Voice
 						{
 							_notOverflowEvent.Wait(cancelToken);
 						}
-						catch (OperationCanceledException) { return; }
+						catch (OperationCanceledException ex)
+						{
+							throw new OperationCanceledException("Client is disconnected.", ex, cancelToken);
+						}
 					}
 
 					if (i == wholeFrames)
