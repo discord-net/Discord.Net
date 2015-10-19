@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public enum AvatarImageType
+	public enum ImageType
 	{
 		None,
 		Jpeg,

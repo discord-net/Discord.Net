@@ -72,11 +72,11 @@ namespace Discord.API
 
 	public class EditMemberRequest
 	{
-		[JsonProperty(PropertyName = "mute", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("mute", NullValueHandling = NullValueHandling.Ignore)]
 		public bool? Mute;
-		[JsonProperty(PropertyName = "deaf", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("deaf", NullValueHandling = NullValueHandling.Ignore)]
 		public bool? Deaf;
-		[JsonProperty(PropertyName = "roles", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("roles", NullValueHandling = NullValueHandling.Ignore)]
 		public IEnumerable<string> Roles;
 	}
 

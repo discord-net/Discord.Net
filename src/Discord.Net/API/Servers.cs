@@ -67,6 +67,8 @@ namespace Discord.API
 		public string Name;
 		[JsonProperty("region", NullValueHandling = NullValueHandling.Ignore)]
 		public string Region;
+		[JsonProperty("icon", NullValueHandling = NullValueHandling.Ignore)]
+		public string Icon;
 	}
 	public sealed class EditServerResponse : GuildInfo { }
 

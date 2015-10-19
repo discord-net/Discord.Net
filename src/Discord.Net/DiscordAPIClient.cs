@@ -279,31 +279,22 @@ namespace Discord
 
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(string serverId, string name = null, string region = null)
+		public Task<EditServerResponse> EditServer(string serverId, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			var request = new EditServerRequest { Name = name, Region = region };
+			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(iconType, icon) };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
 		}
 
 		//User
 		public Task<EditUserResponse> EditUser(string currentPassword = "",
 			string username = null, string email = null, string password = null,
-			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
+			ImageType avatarType = ImageType.Png, byte[] avatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
-
-			string avatarBase64 = null;
-			if (avatarType == AvatarImageType.None)
-				avatarBase64 = "";
-			else if (avatar != null)
-			{
-				string base64 = Convert.ToBase64String(avatar);
-				string type = avatarType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
-				avatarBase64 = $"data:{type},{base64}";
-			}
-			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = avatarBase64 };
+			
+			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = Base64Picture(avatarType, avatar) };
 			return _rest.Patch<EditUserResponse>(Endpoints.UserMe, request);
 		}
 
@@ -312,5 +303,18 @@ namespace Discord
 			=> _rest.Get<GetRegionsResponse>(Endpoints.VoiceRegions);
 		/*public Task<GetIceResponse> GetVoiceIce()
 			=> _rest.Get<GetIceResponse>(Endpoints.VoiceIce);*/
+
+		private string Base64Picture(ImageType type, byte[] data)
+		{
+			if (type == ImageType.None)
+				return "";
+			else if (data != null)
+			{
+				string base64 = Convert.ToBase64String(data);
+				string imageType = type == ImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
+				return $"data:{imageType},{base64}";
+			}
+			return null;
+		}
 	}
 }

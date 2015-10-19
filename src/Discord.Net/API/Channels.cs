@@ -40,7 +40,7 @@ namespace Discord.API
 		public bool IsPrivate;
 		[JsonProperty("position")]
 		public int? Position;
-		[JsonProperty(PropertyName = "topic")]
+		[JsonProperty("topic")]
 		public string Topic;
 		[JsonProperty("permission_overwrites")]
 		public PermissionOverwrite[] PermissionOverwrites;

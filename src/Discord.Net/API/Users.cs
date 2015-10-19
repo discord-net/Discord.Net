@@ -29,15 +29,15 @@ namespace Discord.API
 	//Edit
 	internal sealed class EditUserRequest
 	{
-		[JsonProperty(PropertyName = "password")]
+		[JsonProperty("password")]
 		public string CurrentPassword;
-		[JsonProperty(PropertyName = "email", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
 		public string Email;
-		[JsonProperty(PropertyName = "new_password")]
+		[JsonProperty("new_password")]
 		public string Password;
-		[JsonProperty(PropertyName = "username", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
 		public string Username;
-		[JsonProperty(PropertyName = "avatar", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("avatar", NullValueHandling = NullValueHandling.Ignore)]
 		public string Avatar;
 	}
 	public sealed class EditUserResponse : UserInfo { }
