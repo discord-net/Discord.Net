@@ -102,12 +102,12 @@ namespace Discord
 			=> escape ? $"~~{Escape(text)}~~" : $"~~{text}~~";
 
 		/// <summary> Returns a markdown-formatted string with strikeout formatting, optionally escaping the contents. </summary>
-		public static string Code(string text, string language = null, bool escape = true)
+		public static string Code(string text, string language = null)
 		{
 			if (language != null || text.Contains("\n"))
-				return $"```{language ?? ""}\n{(escape ? Escape(text) : text)}\n```";
+				return $"```{language ?? ""}\n{text}\n```";
 			else
-				return $"`{(escape ? Escape(text) : text)}`";
+				return $"`{text}`";
 		}
 
 		/// <summary> Returns a markdown-formatted string with multiple formatting, optionally escaping the contents. </summary>
@@ -121,7 +121,7 @@ namespace Discord
 			if (italics) result = Italics(result, false);
 			if (underline) result = Underline(result, false);
 			if (strikeout) result = Strikeout(result, false);
-			if (code) result = Code(result, codeLanguage, false);
+			if (code) result = Code(result, codeLanguage);
             return result;
 		}
 	}
