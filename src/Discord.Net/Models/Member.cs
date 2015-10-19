@@ -206,8 +206,8 @@ namespace Discord
 
 			if (permissions.General_ManagePermissions)
 				permissions.SetRawValueInternal(PackedChannelPermissions.All.RawValue);
-			else if (server.DefaultChannelId == channelId)
-				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);
+			/*else if (server.DefaultChannelId == channelId)
+				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);*/
 
 			if (permissions.RawValue != oldPermissions)
 				channel.InvalidMembersCache();
