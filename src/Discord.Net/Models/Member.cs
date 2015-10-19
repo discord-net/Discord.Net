@@ -112,13 +112,17 @@ namespace Discord
 		}
 		internal void Update(API.PresenceMemberInfo model)
 		{
-			//Allows null
-			if (Status != model.Status)
+			if (model.User != null)
+				Update(model.User as API.UserReference);
+
+			if (model.Status != null && Status != model.Status)
 			{
                 Status = model.Status;
 				if (Status == UserStatus.Offline)
 					_lastOnline = DateTime.UtcNow;
-            }
+			}
+
+			//Allows null
 			GameId = model.GameId;
 		}
 		internal void Update(API.VoiceMemberInfo model)
