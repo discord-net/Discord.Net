@@ -46,7 +46,7 @@ namespace Discord.Net.WebSockets
 		public string CurrentChannelId => _channelId;
 		public VoiceBuffer OutputBuffer => _sendBuffer;
 
-		public VoiceWebSocket(DiscordWebSocketClient client)
+		public VoiceWebSocket(DiscordWSClient client)
 			: base(client)
 		{
 			_rand = new Random();

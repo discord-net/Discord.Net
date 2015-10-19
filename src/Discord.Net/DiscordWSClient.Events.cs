@@ -73,7 +73,7 @@ namespace Discord
         }
 	}
 
-	public partial class DiscordWebSocketClient
+	public partial class DiscordWSClient
 	{
 		public event EventHandler Connected;
 		private void RaiseConnected()

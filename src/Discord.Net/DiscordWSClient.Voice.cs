@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public partial class DiscordWebSocketClient : IDiscordVoiceClient
+	public partial class DiscordWSClient : IDiscordVoiceClient
 	{
 		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;
 

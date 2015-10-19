@@ -10,7 +10,7 @@ namespace Discord.Net.WebSockets
 {
 	internal class WebSocketSharpEngine : IWebSocketEngine
 	{
-		private readonly DiscordWebSocketClientConfig _config;
+		private readonly DiscordWSClientConfig _config;
 		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly WebSocket _parent;
 		private WSSharpNWebSocket _webSocket;
@@ -22,7 +22,7 @@ namespace Discord.Net.WebSockets
 				ProcessMessage(this, new WebSocketMessageEventArgs(msg));
 		}
 
-		internal WebSocketSharpEngine(WebSocket parent, DiscordWebSocketClientConfig config)
+		internal WebSocketSharpEngine(WebSocket parent, DiscordWSClientConfig config)
 		{
 			_parent = parent;
 			_config = config;

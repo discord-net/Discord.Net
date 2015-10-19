@@ -169,17 +169,17 @@
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocketClient.cs">
-      <Link>DiscordWebSocketClient.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWSClient.cs">
+      <Link>DiscordWSClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocketClient.Events.cs">
-      <Link>DiscordWebSocketClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWSClient.Events.cs">
+      <Link>DiscordWSClient.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocketClient.Voice.cs">
-      <Link>DiscordWebSocketClient.Voice.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWSClient.Voice.cs">
+      <Link>DiscordWSClient.Voice.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordWebSocketClientConfig.cs">
-      <Link>DiscordWebSocketClientConfig.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordWSClientConfig.cs">
+      <Link>DiscordWSClientConfig.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>

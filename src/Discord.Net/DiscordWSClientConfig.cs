@@ -12,7 +12,7 @@ namespace Discord
 		Both = Outgoing | Incoming
 	}
 
-	public class DiscordWebSocketClientConfig : DiscordAPIClientConfig
+	public class DiscordWSClientConfig : DiscordAPIClientConfig
 	{
 		/// <summary> Max time in milliseconds to wait for DiscordClient to connect and initialize. </summary>
 		public int ConnectionTimeout { get { return _connectionTimeout; } set { SetValue(ref _connectionTimeout, value); } }
@@ -47,9 +47,9 @@ namespace Discord
 
 		internal virtual bool EnableVoice => _voiceMode != DiscordVoiceMode.Disabled;
 
-		public new DiscordWebSocketClientConfig Clone()
+		public new DiscordWSClientConfig Clone()
 		{
-			var config = MemberwiseClone() as DiscordWebSocketClientConfig;
+			var config = MemberwiseClone() as DiscordWSClientConfig;
 			config._isLocked = false;
 			return config;
 		}
