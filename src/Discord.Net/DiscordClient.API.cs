@@ -60,10 +60,10 @@ namespace Discord
 		
 		//Channels
 		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public Task<Channel> CreateChannel(Server server, string name, string type)
+		public Task<Channel> CreateChannel(Server server, string name, string type = ChannelTypes.Text)
 			=> CreateChannel(server?.Id, name, type);
 		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public async Task<Channel> CreateChannel(string serverId, string name, string type)
+		public async Task<Channel> CreateChannel(string serverId, string name, string type = ChannelTypes.Text)
 		{
 			CheckReady();
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
@@ -183,14 +183,14 @@ namespace Discord
 		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
 		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
 		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
-		public async Task<Invite> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		public async Task<Invite> CreateInvite(string serverOrChannelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
 		{
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (serverOrChannelId == null) throw new ArgumentNullException(nameof(serverOrChannelId));
 			if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
 			if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 
-			var response = await _api.CreateInvite(channelId, maxAge, maxUses, isTemporary, hasXkcdPass).ConfigureAwait(false);
+			var response = await _api.CreateInvite(serverOrChannelId, maxAge, maxUses, isTemporary, hasXkcdPass).ConfigureAwait(false);
 			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
 			invite.Update(response);
 			return invite;
