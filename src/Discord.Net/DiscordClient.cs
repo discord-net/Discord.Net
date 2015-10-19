@@ -583,13 +583,14 @@ namespace Discord
 							if (Config.TrackActivity)
 							{
 								var channel = msg.Channel;
-								if (channel == null || channel.IsPrivate)
+								/*if (channel == null || channel.IsPrivate)
 								{
 									var user = msg.User;
 									if (user != null)
 										user.UpdateActivity(data.Timestamp);
 								}
-								else
+								else*/
+								if (channel?.IsPrivate == false)
 								{
 									var member = msg.Member;
 									if (member != null)
@@ -664,12 +665,13 @@ namespace Discord
 							}
 							if (Config.TrackActivity)
 							{
-								if (channel.IsPrivate)
+								/*if (channel.IsPrivate)
 								{
 									if (user != null)
 										user.UpdateActivity();
 								}
-								else
+								else*/
+								if (!channel.IsPrivate)
 								{
 									var member = _members[data.UserId, channel.ServerId];
 									if (member != null)
