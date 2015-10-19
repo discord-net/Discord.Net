@@ -447,13 +447,14 @@ namespace Discord
 								msg.Update(x);
 								if (Config.TrackActivity)
 								{
-									if (channel.IsPrivate)
+									/*if (channel.IsPrivate)
 									{
 										var user = msg.User;
 										if (user != null)
 											user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 									}
-									else
+									else*/
+									if (!channel.IsPrivate)
 									{
 										var member = msg.Member;
 										if (member != null)

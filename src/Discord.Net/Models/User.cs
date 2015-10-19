@@ -13,7 +13,7 @@ namespace Discord
 		private readonly DiscordClient _client;
 		private readonly ConcurrentDictionary<string, bool> _servers;
 		private int _refCount;
-		private DateTime? _lastPrivateActivity;
+		//private DateTime? _lastPrivateActivity;
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
@@ -100,11 +100,11 @@ namespace Discord
 			if (model.IsVerified != null)
 				IsVerified = model.IsVerified;
 		}
-		internal void UpdateActivity(DateTime? activity = null)
+		/*internal void UpdateActivity(DateTime? activity = null)
 		{
 			if (_lastPrivateActivity == null || activity > _lastPrivateActivity.Value)
 				_lastPrivateActivity = activity ?? DateTime.UtcNow;
-		}
+		}*/
 
 		public override string ToString() => Name;
 
