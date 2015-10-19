@@ -166,31 +166,31 @@ namespace Discord
 		//Invites
 		/// <summary> Creates a new invite to the default channel of the provided server. </summary>
 		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
-		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
-		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
-		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
-		public Task<Invite> CreateInvite(Server server, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
-			=> CreateInvite(server?.DefaultChannelId, maxAge, maxUses, isTemporary, hasXkcdPass);
+		/// <param name="tempMembership"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. Set to 0 to have unlimited uses. </param>
+		public Task<Invite> CreateInvite(Server server, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
+			=> CreateInvite(server?.DefaultChannelId, maxAge, maxUses, tempMembership, hasXkcd);
 		/// <summary> Creates a new invite to the provided channel. </summary>
 		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
-		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
-		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
-		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
-		public Task<Invite> CreateInvite(Channel channel, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
-			=> CreateInvite(channel?.Id, maxAge, maxUses, isTemporary, hasXkcdPass);
+		/// <param name="tempMembership"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. Set to 0 to have unlimited uses. </param>
+		public Task<Invite> CreateInvite(Channel channel, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
+			=> CreateInvite(channel?.Id, maxAge, maxUses, tempMembership, hasXkcd);
 		/// <summary> Creates a new invite to the provided channel. </summary>
 		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
-		/// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
-		/// <param name="hasXkcdPass"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
-		/// <param name="maxUses"> The max amount  of times this invite may be used. </param>
-		public async Task<Invite> CreateInvite(string serverOrChannelId, int maxAge, int maxUses, bool isTemporary, bool hasXkcdPass)
+		/// <param name="tempMembership"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
+		/// <param name="hasXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
+		/// <param name="maxUses"> The max amount  of times this invite may be used. Set to 0 to have unlimited uses. </param>
+		public async Task<Invite> CreateInvite(string serverOrChannelId, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
 		{
 			CheckReady();
 			if (serverOrChannelId == null) throw new ArgumentNullException(nameof(serverOrChannelId));
 			if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
 			if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 
-			var response = await _api.CreateInvite(serverOrChannelId, maxAge, maxUses, isTemporary, hasXkcdPass).ConfigureAwait(false);
+			var response = await _api.CreateInvite(serverOrChannelId, maxAge, maxUses, tempMembership, hasXkcd).ConfigureAwait(false);
 			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
 			invite.Update(response);
 			return invite;
