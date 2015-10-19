@@ -90,7 +90,9 @@ namespace Discord.Net.WebSockets
 				{
 					try
 					{
-						await Start().ConfigureAwait(false);
+						//This check is needed in case we start a reconnect before the initial login completes
+						if (_state != (int)WebSocketState.Disconnected) 
+							await Start().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -533,7 +535,7 @@ namespace Discord.Net.WebSockets
 
 		protected override object GetKeepAlive()
 		{
-			return new KeepAliveCommand();
+			return new VoiceKeepAliveCommand();
 		}
 
 		public void WaitForQueue()
