@@ -39,7 +39,7 @@ namespace Discord.Net.WebSockets
             _webSocket.OnMessage += (s, e) => RaiseProcessMessage(e.Data);
 			_webSocket.OnError += async (s, e) =>
 			{
-				_parent.RaiseOnLog(LogMessageSeverity.Error, $"Websocket Error: {e.Message}");
+				_parent.RaiseOnLog(LogMessageSeverity.Error, e.Exception.GetBaseException().Message);
 				await _parent.DisconnectInternal(e.Exception, skipAwait: true);
 			};
 			_webSocket.OnClose += async (s, e) =>
