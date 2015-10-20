@@ -83,7 +83,7 @@ namespace Discord
 		public IEnumerable<User> Users => _members.Select(x => _client.Users[x.Key]);
 
 		/// <summary> Return the id of the role representing all users in a server. </summary>
-		public string EveryoneRoleId { get; private set; }
+		public string EveryoneRoleId => Id;
 		/// <summary> Return the the role representing all users in a server. </summary>
 		[JsonIgnore]
 		public Role EveryoneRole => _client.Roles[EveryoneRoleId];
@@ -116,14 +116,10 @@ namespace Discord
 			Region = model.Region;
 
 			var roles = _client.Roles;
-			bool isEveryone = true; //Assumes first role is always everyone
 			foreach (var subModel in model.Roles)
 			{
-                var role = roles.GetOrAdd(subModel.Id, Id, isEveryone);
+                var role = roles.GetOrAdd(subModel.Id, Id);
 				role.Update(subModel);
-				if (isEveryone)
-					EveryoneRoleId = subModel.Id;
-                isEveryone = false;
 			}
 		}
 		internal void Update(ExtendedGuildInfo model)

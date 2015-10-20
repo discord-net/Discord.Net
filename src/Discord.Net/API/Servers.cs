@@ -69,6 +69,10 @@ namespace Discord.API
 		public string Region;
 		[JsonProperty("icon", NullValueHandling = NullValueHandling.Ignore)]
 		public string Icon;
+		[JsonProperty("afk_channel_id", NullValueHandling = NullValueHandling.Ignore)]
+		public string AFKChannelId;
+		[JsonProperty("afk_timeout", NullValueHandling = NullValueHandling.Ignore)]
+		public int AFKTimeout;
 	}
 	public sealed class EditServerResponse : GuildInfo { }
 

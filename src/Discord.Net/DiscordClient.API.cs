@@ -632,7 +632,7 @@ namespace Discord
 			if (serverId == null) throw new NullReferenceException(nameof(serverId));
 
 			var response = await _api.CreateRole(serverId).ConfigureAwait(false);
-			var role = _roles.GetOrAdd(response.Id, serverId, false);
+			var role = _roles.GetOrAdd(response.Id, serverId);
 			role.Update(response);
 
 			await EditRole(role, name: name);
