@@ -103,7 +103,7 @@ namespace Discord
 					$"Updated Server: {e.Server?.Name}" +
 					(showIDs ? $" ({e.ServerId})" : ""));
 				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Unavailable: {e.Server?.Name}" +
+					$"Server Available: {e.Server?.Name}" +
 					(showIDs ? $" ({e.ServerId})" : ""));
 				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Unavailable: {e.Server?.Name}" +
