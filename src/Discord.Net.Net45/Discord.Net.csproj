@@ -205,6 +205,9 @@
     <Compile Include="..\Discord.Net\DiscordClient.Users.cs">
       <Link>DiscordClient.Users.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Voice.cs">
+      <Link>DiscordClient.Voice.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>
     </Compile>
