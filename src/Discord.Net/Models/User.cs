@@ -1,6 +1,5 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,6 @@ namespace Discord
 		private readonly DiscordClient _client;
 		private readonly ConcurrentDictionary<string, bool> _servers;
 		private int _refCount;
-		//private DateTime? _lastPrivateActivity;
 
 		/// <summary> Returns the unique identifier for this user. </summary>
 		public string Id { get; }
@@ -61,17 +59,7 @@ namespace Discord
 		/// <summary> Returns the time this user's status was last changed. </summary>
 		public DateTime StatusSince => Memberships.OrderByDescending(x => x.StatusSince).Select(x => x.StatusSince).First();
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data. </summary>
-		public DateTime? LastActivity
-		{
-			get
-			{
-				var lastServerActivity = Memberships.OrderByDescending(x => x.LastActivity).Select(x => x.LastActivity).FirstOrDefault();
-				if (lastServerActivity == null || (_lastPrivateActivity != null && _lastPrivateActivity.Value > lastServerActivity.Value))
-					return _lastPrivateActivity;
-				else
-					return lastServerActivity;
-			}
-		}
+		public DateTime? LastActivity => Memberships.OrderByDescending(x => x.LastActivity).Select(x => x.LastActivity).FirstOrDefault();
 		/// <summary> Returns the time this user was last seen online. </summary>
 		public DateTime? LastOnline => Memberships.OrderByDescending(x => x.LastOnline).Select(x => x.LastOnline).FirstOrDefault();*/
 
@@ -106,11 +94,6 @@ namespace Discord
 			if (model.IsVerified != null)
 				IsVerified = model.IsVerified;
 		}
-		/*internal void UpdateActivity(DateTime? activity = null)
-		{
-			if (_lastPrivateActivity == null || activity > _lastPrivateActivity.Value)
-				_lastPrivateActivity = activity ?? DateTime.UtcNow;
-		}*/
 
 		public override string ToString() => Name;
 
