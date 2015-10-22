@@ -91,9 +91,9 @@ namespace Discord
 			return role;
 		}
 
-		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+		public Task EditRole(string roleId, string name = null, ServerPermissions permissions = null, Color color = null, bool? hoist = null, int? position = null)
 			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist, position: position);
-		public async Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+		public async Task EditRole(Role role, string name = null, ServerPermissions permissions = null, Color color = null, bool? hoist = null, int? position = null)
 		{
             CheckReady();
 			if (role == null) throw new ArgumentNullException(nameof(role));

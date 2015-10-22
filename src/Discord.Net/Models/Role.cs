@@ -18,12 +18,12 @@ namespace Discord
 		/// <summary> Returns the position of this channel in the role list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
-		public PackedColor Color { get; private set; }
+		public Color Color { get; private set; }
 		/// <summary> Returns whether this role is managed by server (e.g. for Twitch integration) </summary>
 		public bool IsManaged { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
-		public PackedServerPermissions Permissions { get; }
+		public ServerPermissions Permissions { get; }
 
 		/// <summary> Returns the id of the server this role is a member of. </summary>
 		public string ServerId { get; }
@@ -45,9 +45,9 @@ namespace Discord
 			_client = client;
 			Id = id;
 			ServerId = serverId;
-			Permissions = new PackedServerPermissions(0);
+			Permissions = new ServerPermissions(0);
 			Permissions.Lock();
-			Color = new PackedColor(0);
+			Color = new Color(0);
 			Color.Lock();
 
 			if (IsEveryone)

@@ -13,15 +13,15 @@ namespace Discord
 		{
 			public string TargetType { get; }
 			public string TargetId { get; }
-			public PackedChannelPermissions Allow { get; }
-			public PackedChannelPermissions Deny { get; }
+			public ChannelPermissions Allow { get; }
+			public ChannelPermissions Deny { get; }
 
 			internal PermissionOverwrite(string type, string targetId, uint allow, uint deny)
 			{
 				TargetType = type;
 				TargetId = targetId;
-				Allow = new PackedChannelPermissions(allow);
-				Deny = new PackedChannelPermissions( deny);
+				Allow = new ChannelPermissions(allow);
+				Deny = new ChannelPermissions( deny);
 				Allow.Lock();
 				Deny.Lock();
 			}

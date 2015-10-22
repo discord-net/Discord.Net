@@ -235,6 +235,9 @@
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\Color.cs">
+      <Link>Models\Color.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Invite.cs">
       <Link>Models\Invite.cs</Link>
     </Compile>
@@ -244,11 +247,8 @@
     <Compile Include="..\Discord.Net\Models\Message.cs">
       <Link>Models\Message.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Models\PackedColor.cs">
-      <Link>Models\PackedColor.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Models\PackedPermissions.cs">
-      <Link>Models\PackedPermissions.cs</Link>
+    <Compile Include="..\Discord.Net\Models\Permissions.cs">
+      <Link>Models\Permissions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Role.cs">
       <Link>Models\Role.cs</Link>

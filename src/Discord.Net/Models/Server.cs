@@ -18,6 +18,8 @@ namespace Discord
 		public string Name { get; private set; }
 		/// <summary> Returns the current logged-in user's data for this server. </summary>
 		public Member CurrentMember { get; internal set; }
+		/// <summary> Returns true if this is a virtual server used by Discord.Net and not a real Discord server. </summary>
+		public bool IsVirtual { get; internal set; }
 
 		/// <summary> Returns the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel (see AFKChannel). </summary>
 		public int AFKTimeout { get; private set; }

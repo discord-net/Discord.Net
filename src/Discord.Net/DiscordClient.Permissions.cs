@@ -8,29 +8,29 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
-		public Task SetChannelUserPermissions(Channel channel, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(Channel channel, Member member, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, member?.UserId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, Member member, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(string channelId, Member member, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(Channel channel, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, user?.Id, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, User user, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(string channelId, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(Channel channel, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, allow, deny);
 
-		public Task SetChannelRolePermissions(Channel channel, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelRolePermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(string channelId, Role role, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelRolePermissions(string channelId, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(Channel channel, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelRolePermissions(Channel channel, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(string channelId, string userId, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		public Task SetChannelRolePermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, allow, deny);
 
-		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
+		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
 			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));

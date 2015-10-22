@@ -8,8 +8,17 @@ namespace Discord
 {
 	internal sealed class Servers : AsyncCollection<Server>
 	{
+		private const string PMServerId = "Private";
+
+		Server PMServer { get; }
+
 		public Servers(DiscordClient client, object writerLock)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached())
+		{
+			PMServer = new Server(client, PMServerId) { IsVirtual = true };
+			PMServer.Update(new API.ExtendedGuildInfo { Id = PMServerId, Name = PMServerId });
+			_dictionary[PMServerId] = PMServer;
+		}
 
 		public Server GetOrAdd(string id)
 			=> GetOrAdd(id, () => new Server(_client, id));
@@ -57,9 +66,11 @@ namespace Discord
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
-		public IEnumerable<Server> AllServers => _servers;
+		public IEnumerable<Server> AllServers => _servers.Where(x => !x.IsVirtual);
 		internal Servers Servers => _servers;
 		private readonly Servers _servers;
+
+		public Server PMServer { get; }
 
 		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
 		public Server GetServer(string id) => _servers[id];

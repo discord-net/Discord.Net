@@ -10,7 +10,7 @@ namespace Discord
 	public class Member
 	{
 		private readonly DiscordClient _client;
-		private ConcurrentDictionary<string, PackedChannelPermissions> _permissions;
+		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
 		private bool _hasRef;
 
 		/// <summary> Returns the name of this user on this server. </summary>
@@ -76,7 +76,7 @@ namespace Discord
 			ServerId = serverId;
 			Status = UserStatus.Offline;
 			RoleIds = _initialRoleIds;
-			_permissions = new ConcurrentDictionary<string, PackedChannelPermissions>();
+			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
 		}
 		internal void OnCached()
 		{
@@ -210,13 +210,13 @@ namespace Discord
 			if (server == null) return;
 			var channel = _client.Channels[channelId];
 
-			PackedChannelPermissions permissions;
+			ChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channelId, out permissions)) return;
 			uint newPermissions = 0x0;
 			uint oldPermissions = permissions.RawValue;
 			
 			if (UserId == server.OwnerId)
-				newPermissions = PackedChannelPermissions.All.RawValue;
+				newPermissions = ChannelPermissions.All.RawValue;
 			else
 			{
 				if (channel == null) return;
@@ -239,7 +239,7 @@ namespace Discord
 			permissions.SetRawValueInternal(newPermissions);
 
 			if (permissions.General_ManagePermissions)
-				permissions.SetRawValueInternal(PackedChannelPermissions.All.RawValue);
+				permissions.SetRawValueInternal(ChannelPermissions.All.RawValue);
 			/*else if (server.DefaultChannelId == channelId)
 				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);*/
 
@@ -247,13 +247,13 @@ namespace Discord
 				channel.InvalidMembersCache();
 		}
 		//TODO: Add GetServerPermissions
-		public PackedChannelPermissions GetPermissions(Channel channel)
+		public ChannelPermissions GetPermissions(Channel channel)
 			=> GetPermissions(channel?.Id);
-        public PackedChannelPermissions GetPermissions(string channelId)
+        public ChannelPermissions GetPermissions(string channelId)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			PackedChannelPermissions perms;
+			ChannelPermissions perms;
 			if (_permissions.TryGetValue(channelId, out perms))
 				return perms;
 			return null;
@@ -261,14 +261,14 @@ namespace Discord
 
 		internal void AddChannel(string channelId)
 		{
-			var perms = new PackedChannelPermissions();
+			var perms = new ChannelPermissions();
 			perms.Lock();
 			_permissions.TryAdd(channelId, perms);
 			UpdatePermissions(channelId);
 		}
 		internal bool RemoveChannel(string channelId)
 		{
-			PackedChannelPermissions ignored;
+			ChannelPermissions ignored;
 			return _permissions.TryRemove(channelId, out ignored);
 		}
 
