@@ -276,6 +276,8 @@ namespace Discord
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
 
+			await _api.Logout();
+
 			_channels.Clear();
 			_members.Clear();
 			_messages.Clear();
