@@ -44,7 +44,7 @@ namespace Discord
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
-		public bool IsPrivate => ServerId == null;
+		public bool IsPrivate => RecipientId != null;
 		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
 		public string Type { get; private set; }
 
@@ -108,15 +108,31 @@ namespace Discord
 			var server = Server;
 			if (server != null)
 				server.AddChannel(Id);
-			if (RecipientId != null)
+			if (IsPrivate)
 			{
 				var user = Recipient;
 				if (user != null)
 				{
+					Name = "@" + user.Name;
 					user.PrivateChannelId = Id;
 					user.AddRef();
 					_hasRef = true;
 				}
+				else
+					Name = "@" + RecipientId;
+				var member = _client.Members.GetOrAdd(RecipientId, ServerId);
+				member.Update(new ExtendedMemberInfo
+				{
+					GuildId = ServerId,
+					UserId = RecipientId,
+					JoinedAt = DateTime.UtcNow, 
+					Roles = new string[0]
+				});
+				_permissionOverwrites = new PermissionOverwrite[]
+				{
+					new PermissionOverwrite(PermissionTarget.Member, _client.CurrentUserId, ChannelPermissions.AllPrivate.RawValue, 0),
+					new PermissionOverwrite(PermissionTarget.Member, RecipientId, ChannelPermissions.AllPrivate.RawValue, 0)
+				};
 			}
 		}
 		internal void OnUncached()
@@ -124,7 +140,7 @@ namespace Discord
 			var server = Server;
 			if (server != null)
 				server.RemoveChannel(Id);
-			if (RecipientId != null)
+			if (IsPrivate)
 			{
 				var user = Recipient;
 				if (user != null)
@@ -133,13 +149,14 @@ namespace Discord
 					if (_hasRef)
 						user.RemoveRef();
 				}
-			}
+				_client.Members.TryRemove(RecipientId, ServerId);
+            }
 			_hasRef = false;
 		}
 
 		internal void Update(ChannelReference model)
 		{
-			if (model.Name != null)
+			if (!IsPrivate && model.Name != null)
 				Name = model.Name;
 			if (model.Type != null)
 				Type = model.Type;

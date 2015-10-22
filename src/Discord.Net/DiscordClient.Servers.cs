@@ -8,8 +8,6 @@ namespace Discord
 {
 	internal sealed class Servers : AsyncCollection<Server>
 	{
-		private const string PMServerId = "Private";
-
 		public Server PMServer { get; private set; }
 
 		public Servers(DiscordClient client, object writerLock)
@@ -17,9 +15,27 @@ namespace Discord
 
 		protected override void Initialize()
 		{
-			PMServer = new Server(_client, PMServerId) { IsVirtual = true };
-			PMServer.Update(new API.ExtendedGuildInfo { Id = PMServerId, Name = PMServerId });
-			_dictionary[PMServerId] = PMServer;
+			PMServer = CreateVirtualServer("Private");
+		}
+
+		private Server CreateVirtualServer(string name)
+		{
+			string id = $"[{name}]";
+			var server = new Server(_client, id) { IsVirtual = true };
+			_dictionary[id] = server;
+
+			var everyone = _client.Roles.CreateVirtualRole(id, "@everyone");
+			server.Update(new API.GuildInfo
+			{
+				Id = id,
+				Name = id,
+				JoinedAt = DateTime.UtcNow,
+				Roles = new API.RoleInfo[] { new API.RoleInfo {
+					Id = everyone.Id,
+					Name = everyone.Name
+				} }
+			});
+			return server;
 		}
 
 		public Server GetOrAdd(string id)

@@ -126,19 +126,28 @@ namespace Discord
 
 		internal void Update(GuildInfo model)
 		{
+			//Can be null
 			AFKChannelId = model.AFKChannelId;
-			AFKTimeout = model.AFKTimeout;
-			if (model.JoinedAt.HasValue)
-				JoinedAt = model.JoinedAt.Value;
-			Name = model.Name;
-			OwnerId = model.OwnerId;
-			Region = model.Region;
 
-			var roles = _client.Roles;
-			foreach (var subModel in model.Roles)
+			if (model.AFKTimeout != null)
+				AFKTimeout = model.AFKTimeout.Value;
+			if (model.JoinedAt != null)
+				JoinedAt = model.JoinedAt.Value;
+			if (model.Name != null)
+				Name = model.Name;
+			if (model.OwnerId != null)
+				OwnerId = model.OwnerId;
+			if (model.Region != null)
+				Region = model.Region;
+
+			if (model.Roles != null)
 			{
-                var role = roles.GetOrAdd(subModel.Id, Id);
-				role.Update(subModel);
+				var roles = _client.Roles;
+				foreach (var subModel in model.Roles)
+				{
+					var role = roles.GetOrAdd(subModel.Id, Id);
+					role.Update(subModel);
+				}
 			}
 		}
 		internal void Update(ExtendedGuildInfo model)

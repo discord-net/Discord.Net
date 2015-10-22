@@ -20,7 +20,7 @@ namespace Discord.API
 		[JsonProperty("afk_channel_id")]
 		public string AFKChannelId;
 		[JsonProperty("afk_timeout")]
-		public int AFKTimeout;
+		public int? AFKTimeout;
 		[JsonProperty("embed_channel_id")]
 		public string EmbedChannelId;
 		[JsonProperty("embed_enabled")]

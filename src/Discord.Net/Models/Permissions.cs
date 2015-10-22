@@ -4,14 +4,16 @@ namespace Discord
 {
 	public sealed class ServerPermissions : Permissions
 	{
-		public static ServerPermissions None { get; }
-		public static ServerPermissions All { get; }
+		private static readonly ServerPermissions _none, _all;
+		public static ServerPermissions None => _none;
+		public static ServerPermissions All => _all;
+
 		static ServerPermissions()
 		{
-			None = new ServerPermissions();
-			None.Lock();
-			All = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
-			All.Lock();
+			_none = new ServerPermissions();
+			_none.Lock();
+			_all = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
+			_all.Lock();
 		}
 
 		public ServerPermissions(uint rawValue = 0) : base(rawValue) { }
@@ -32,15 +34,38 @@ namespace Discord
 
 	public sealed class ChannelPermissions : Permissions
 	{
-		public static ChannelPermissions None { get; }
-		public static ChannelPermissions All { get; }
+		private static readonly ChannelPermissions _none, _all, _allText, _allVoice, _allPM;
+		public static ChannelPermissions None => _none;
+		public static ChannelPermissions AllMask => _all;
+		public static ChannelPermissions AllText => _allText;
+		public static ChannelPermissions AllVoice => _allVoice;
+		public static ChannelPermissions AllPrivate => _allPM;
+
 		static ChannelPermissions()
 		{
-			None = new ChannelPermissions();
-			None.Lock();
-			All = new ChannelPermissions(Convert.ToUInt32("00000011111100111111110000011001", 2));
-			All.Lock();
-        }
+			_none = new ChannelPermissions();
+			_none.Lock();
+			_all = new ChannelPermissions(Convert.ToUInt32("00000011111100111111110000011001", 2));
+			_all.Lock();
+			_allText = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
+			_allText.Lock();
+			_allVoice = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
+			_allVoice.Lock();
+			_allPM = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
+			_allPM.Lock();
+		}
+
+		public static ChannelPermissions All(Channel channel)
+		{
+			if (channel.IsPrivate)
+				return _allPM;
+			else if (channel.Type == ChannelTypes.Text)
+				return _allText;
+			else if (channel.Type == ChannelTypes.Voice)
+				return _allText;
+			else
+				return _none;
+		}
 
 		public ChannelPermissions(uint rawValue = 0) : base(rawValue) { }
 		

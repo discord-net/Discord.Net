@@ -42,6 +42,14 @@ namespace Discord
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
+
+			_channels.Clear();
+			_members.Clear();
+			_messages.Clear();
+			_roles.Clear();
+			_servers.Clear();
+			_users.Clear();
+
 			_status = UserStatus.Online;
 
 			this.Connected += async (s, e) =>

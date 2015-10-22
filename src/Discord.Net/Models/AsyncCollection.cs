@@ -61,7 +61,6 @@ namespace Discord
 			_dictionary = new ConcurrentDictionary<string, TValue>();
 			_onCache = onCache;
 			_onUncache = onUncache;
-			Initialize();
         }
 
 		protected virtual void Initialize() { }

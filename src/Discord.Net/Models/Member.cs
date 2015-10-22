@@ -217,7 +217,7 @@ namespace Discord
 			uint oldPermissions = permissions.RawValue;
 			
 			if (UserId == server.OwnerId)
-				newPermissions = ChannelPermissions.All.RawValue;
+				newPermissions = ChannelPermissions.All(channel).RawValue;
 			else
 			{
 				if (channel == null) return;
@@ -240,7 +240,7 @@ namespace Discord
 			permissions.SetRawValueInternal(newPermissions);
 
 			if (permissions.General_ManagePermissions)
-				permissions.SetRawValueInternal(ChannelPermissions.All.RawValue);
+				permissions.SetRawValueInternal(ChannelPermissions.All(channel).RawValue);
 			/*else if (server.DefaultChannelId == channelId)
 				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);*/
 
