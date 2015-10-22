@@ -1,4 +1,3 @@
-using Discord.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,54 +5,66 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public sealed class MemberTypingEventArgs : EventArgs
+	internal sealed class Members : AsyncCollection<Member>
+	{
+		public Members(DiscordClient client, object writerLock)
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+		private string GetKey(string userId, string serverId)
+			=> serverId + '_' + userId;
+
+		public Member this[string userId, string serverId]
+			=> this[GetKey(userId, serverId)];
+		public Member GetOrAdd(string userId, string serverId)
+			=> GetOrAdd(GetKey(userId, serverId), () => new Member(_client, userId, serverId));
+		public Member TryRemove(string userId, string serverId)
+			=> TryRemove(GetKey(userId, serverId));
+	}
+
+	public class MemberEventArgs : EventArgs
+	{
+		public Member Member { get; }
+		public User User => Member.User;
+		public string UserId => Member.UserId;
+		public Server Server => Member.Server;
+		public string ServerId => Member.ServerId;
+
+		internal MemberEventArgs(Member member) { Member = member; }
+	}
+	public class MemberChannelEventArgs : MemberEventArgs
 	{
 		public Channel Channel { get; }
 		public string ChannelId => Channel.Id;
-		public Server Server => Channel.Server;
-		public string ServerId => Channel.ServerId;
-		public Member Member { get; }
-		public string UserId => User.Id;
-		public User User => Member.User;
 
-		internal MemberTypingEventArgs(Member member, Channel channel)
+		internal MemberChannelEventArgs(Member member, Channel channel)
+			: base(member)
 		{
-			Member = member;
 			Channel = channel;
 		}
 	}
-
-	public sealed class MemberIsSpeakingEventArgs : EventArgs
+	public class MemberIsSpeakingEventArgs : MemberChannelEventArgs
 	{
-		public Channel Channel => Member.VoiceChannel;
-		public string ChannelId => Member.VoiceChannelId;
-		public Server Server => Member.Server;
-		public string ServerId => Member.ServerId;
-		public User User => Member.User;
-		public string UserId => Member.UserId;
-		public Member Member { get; }
 		public bool IsSpeaking { get; }
 
-		internal MemberIsSpeakingEventArgs(Member member, bool isSpeaking)
+		internal MemberIsSpeakingEventArgs(Member member, Channel channel, bool isSpeaking)
+			: base(member, channel)
 		{
-			Member = member;
 			IsSpeaking = isSpeaking;
 		}
 	}
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<MemberTypingEventArgs> UserIsTyping;
+		public event EventHandler<MemberChannelEventArgs> UserIsTyping;
 		private void RaiseUserIsTyping(Member member, Channel channel)
 		{
 			if (UserIsTyping != null)
-				RaiseEvent(nameof(UserIsTyping), () => UserIsTyping(this, new MemberTypingEventArgs(member, channel)));
+				RaiseEvent(nameof(UserIsTyping), () => UserIsTyping(this, new MemberChannelEventArgs(member, channel)));
 		}
 		public event EventHandler<MemberIsSpeakingEventArgs> UserIsSpeaking;
-		private void RaiseUserIsSpeaking(Member member, bool isSpeaking)
+		private void RaiseUserIsSpeaking(Member member, Channel channel, bool isSpeaking)
 		{
 			if (UserIsSpeaking != null)
-				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new MemberIsSpeakingEventArgs(member, isSpeaking)));
+				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new MemberIsSpeakingEventArgs(member, channel, isSpeaking)));
 		}
 		
 		internal Members Members => _members;

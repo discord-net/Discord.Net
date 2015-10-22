@@ -5,6 +5,21 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	public class BanEventArgs : EventArgs
+	{
+		public User User { get; }
+		public string UserId { get; }
+		public Server Server { get; }
+		public string ServerId => Server.Id;
+
+		internal BanEventArgs(User user, string userId, Server server)
+		{
+			User = user;
+			UserId = userId;
+			Server = server;
+		}
+	}
+
 	public partial class DiscordClient
 	{
 		public event EventHandler<BanEventArgs> BanAdded;

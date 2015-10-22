@@ -1,5 +1,4 @@
 using Discord.API;
-using Discord.Collections;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,30 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	internal sealed class Messages : AsyncCollection<Message>
+	{
+		public Messages(DiscordClient client, object writerLock)
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+
+		public Message GetOrAdd(string id, string channelId, string userId)
+			=> GetOrAdd(id, () => new Message(_client, id, channelId, userId));
+	}
+
+	public class MessageEventArgs : EventArgs
+	{
+		public Message Message { get; }
+		public string MessageId => Message.Id;
+		public Member Member => Message.Member;
+		public Channel Channel => Message.Channel;
+		public string ChannelId => Message.ChannelId;
+		public Server Server => Message.Server;
+		public string ServerId => Message.ServerId;
+		public User User => Member.User;
+		public string UserId => Message.UserId;
+
+		internal MessageEventArgs(Message msg) { Message = msg; }
+	}
+
 	public partial class DiscordClient
 	{
 		public const int MaxMessageSize = 2000;

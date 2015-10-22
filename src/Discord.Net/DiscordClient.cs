@@ -1,5 +1,4 @@
 ﻿using Discord.API;
-using Discord.Collections;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
@@ -10,54 +9,6 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public sealed class MessageEventArgs : EventArgs
-	{
-		public Message Message { get; }
-		public string MessageId => Message.Id;
-		public Member Member => Message.Member;
-		public Channel Channel => Message.Channel;
-		public string ChannelId => Message.ChannelId;
-		public Server Server => Message.Server;
-		public string ServerId => Message.ServerId;
-		public User User => Member.User;
-		public string UserId => Message.UserId;
-
-		internal MessageEventArgs(Message msg) { Message = msg; }
-	}
-	public sealed class RoleEventArgs : EventArgs
-	{
-		public Role Role { get; }
-		public string RoleId => Role.Id;
-		public Server Server => Role.Server;
-		public string ServerId => Role.ServerId;
-
-		internal RoleEventArgs(Role role) { Role = role; }
-	}
-	public sealed class BanEventArgs : EventArgs
-	{
-		public User User { get; }
-		public string UserId { get; }
-		public Server Server { get; }
-		public string ServerId => Server.Id;
-
-		internal BanEventArgs(User user, string userId, Server server)
-		{
-			User = user;
-			UserId = userId;
-			Server = server;
-		}
-	}
-	public sealed class MemberEventArgs : EventArgs
-	{
-		public Member Member { get; }
-		public User User => Member.User;
-		public string UserId => Member.UserId;
-		public Server Server => Member.Server;
-		public string ServerId => Member.ServerId;
-
-		internal MemberEventArgs(Member member) { Member = member; }
-	}
-
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient : DiscordWSClient
 	{
@@ -106,7 +57,7 @@ namespace Discord
 					if (member.ServerId == e.ServerId && member.IsSpeaking)
 					{
 						member.IsSpeaking = false;
-						RaiseUserIsSpeaking(member, false);
+						RaiseUserIsSpeaking(member, _channels[_voiceSocket.CurrentChannelId], false);
 					}
 				}
 			};
@@ -157,10 +108,10 @@ namespace Discord
 					$"Deleted Role: {e.Server?.Name ?? "[Private]"}/{e.Role.Name}" +
 					(showIDs ? $" ({e.ServerId ?? "[Private]"}/{e.RoleId})." : ""));
 				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Ban: {e.Server?.Name ?? "[Private]"}/{e.User?.Name ?? "Unknown"}" +
+					$"Added Ban: {e.Server?.Name ?? "[Private]"}/{e.User?.Name ?? e.UserId}" +
 					(showIDs ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.User?.Name ?? "Unknown"}" +
+					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.User?.Name ?? e.UserId}" +
 					(showIDs ? $" ({e.ServerId ?? "[Private]"}/{e.UserId})." : ""));
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.User.Name}" +
@@ -246,7 +197,8 @@ namespace Discord
 					if (member.IsSpeaking != value)
 					{
 						member.IsSpeaking = value;
-						RaiseUserIsSpeaking(member, value);
+						var channel = _channels[_voiceSocket.CurrentChannelId];
+						RaiseUserIsSpeaking(member, channel, value);
 						if (Config.TrackActivity)
 							member.UpdateActivity();
 					}
@@ -665,7 +617,7 @@ namespace Discord
 								if (data.ChannelId != member.VoiceChannelId && member.IsSpeaking)
 								{
 									member.IsSpeaking = false;
-									RaiseUserIsSpeaking(member, false);
+									RaiseUserIsSpeaking(member, _channels[member.VoiceChannelId], false);
 								}
 								member.Update(data);
 								RaiseUserVoiceStateUpdated(member);

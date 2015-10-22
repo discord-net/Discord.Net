@@ -1,4 +1,3 @@
-using Discord.Collections;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,16 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public sealed class ServerEventArgs : EventArgs
+	internal sealed class Servers : AsyncCollection<Server>
+	{
+		public Servers(DiscordClient client, object writerLock)
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+
+		public Server GetOrAdd(string id)
+			=> base.GetOrAdd(id, () => new Server(_client, id));
+	}
+
+	public class ServerEventArgs : EventArgs
 	{
 		public Server Server { get; }
 		public string ServerId => Server.Id;

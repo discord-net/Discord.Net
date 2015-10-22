@@ -80,7 +80,13 @@ namespace Discord
 			_client = client;
 			Id = id;
 			_servers = new ConcurrentDictionary<string, bool>();
-        }
+		}
+		internal void OnCached()
+		{
+		}
+		internal void OnUncached()
+		{
+		}
 
 		internal void Update(UserReference model)
 		{

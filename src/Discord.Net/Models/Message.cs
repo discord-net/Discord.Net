@@ -93,6 +93,7 @@ namespace Discord
 
 		private readonly DiscordClient _client;
 		private string _cleanText;
+		private bool _gotRef;
 
 		/// <summary> Returns the global unique identifier for this message. </summary>
 		public string Id { get; internal set; }
@@ -154,16 +155,7 @@ namespace Discord
 		public User User => _client.Users[UserId];
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public Member Member
-		{
-			get
-			{
-				if (!Channel.IsPrivate)
-					return _client.Members[UserId, ServerId];
-				else
-					throw new InvalidOperationException("Unable to access Member in a private channel. Use User instead or check for Channel.IsPrivate.");
-			}
-		}
+		public Member Member => _client.Members[UserId, ServerId];
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 		{
@@ -174,6 +166,28 @@ namespace Discord
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 			MentionIds = _initialMentions;
+		}
+		internal void OnCached()
+		{
+			var channel = Channel;
+			if (channel != null)
+				channel.AddMessage(Id);
+			var user = User;
+			if (user != null)
+			{
+				user.AddRef();
+				_gotRef = true;
+			}
+		}
+		internal void OnUncached()
+		{
+			var channel = Channel;
+			if (channel != null)
+				channel.RemoveMessage(Id);
+			var user = User;
+			if (user != null && _gotRef)
+				user.RemoveRef();
+			_gotRef = false;
         }
 
 		internal void Update(MessageInfo model)

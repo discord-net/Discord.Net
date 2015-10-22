@@ -1,5 +1,4 @@
 ﻿using Discord.API;
-using Discord.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	internal sealed class Users : AsyncCollection<User>
+	{
+		public Users(DiscordClient client, object writerLock)
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+
+		public User GetOrAdd(string id) => GetOrAdd(id, () => new User(_client, id));
+	}
+
 	public sealed class UserEventArgs : EventArgs
 	{
 		public User User { get; }

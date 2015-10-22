@@ -52,7 +52,19 @@ namespace Discord
 
 			if (IsEveryone)
 				Position = int.MinValue;
-        }
+		}
+		internal void OnCached()
+		{
+			var server = Server;
+			if (server != null)
+				server.AddRole(Id);
+		}
+		internal void OnUncached()
+		{
+			var server = Server;
+			if (server != null)
+				server.RemoveRole(Id);
+		}
 
 		internal void Update(RoleInfo model)
 		{

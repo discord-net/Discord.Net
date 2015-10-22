@@ -104,6 +104,23 @@ namespace Discord
 			_members = new ConcurrentDictionary<string, bool>();
 			_roles = new ConcurrentDictionary<string, bool>();
 		}
+		internal void OnCached()
+		{
+		}
+		internal void OnUncached()
+		{
+			var channels = _client.Channels;
+			foreach (var channelId in ChannelIds)
+				channels.TryRemove(channelId);
+
+			var members = _client.Members;
+			foreach (var userId in UserIds)
+				members.TryRemove(userId, Id);
+
+			var roles = _client.Roles;
+			foreach (var roleId in RoleIds)
+				roles.TryRemove(roleId);
+		}
 
 		internal void Update(GuildInfo model)
 		{

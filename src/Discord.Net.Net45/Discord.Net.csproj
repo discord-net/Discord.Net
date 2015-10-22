@@ -148,27 +148,6 @@
     <Compile Include="..\Discord.Net\Audio\VoiceBuffer.cs">
       <Link>Audio\VoiceBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Collections\AsyncCollection.cs">
-      <Link>Collections\AsyncCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Channels.cs">
-      <Link>Collections\Channels.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Members.cs">
-      <Link>Collections\Members.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Messages.cs">
-      <Link>Collections\Messages.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Roles.cs">
-      <Link>Collections\Roles.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Servers.cs">
-      <Link>Collections\Servers.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Collections\Users.cs">
-      <Link>Collections\Users.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
       <Link>DiscordAPIClient.cs</Link>
     </Compile>
@@ -249,6 +228,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\AsyncCollection.cs">
+      <Link>Models\AsyncCollection.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>

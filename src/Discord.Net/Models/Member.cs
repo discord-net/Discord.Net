@@ -11,6 +11,7 @@ namespace Discord
 	{
 		private readonly DiscordClient _client;
 		private ConcurrentDictionary<string, PackedChannelPermissions> _permissions;
+		private bool _hasRef;
 
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
@@ -76,6 +77,41 @@ namespace Discord
 			Status = UserStatus.Offline;
 			RoleIds = _initialRoleIds;
 			_permissions = new ConcurrentDictionary<string, PackedChannelPermissions>();
+		}
+		internal void OnCached()
+		{
+			var server = Server;
+			if (server != null)
+			{
+				server.AddMember(this);
+				if (UserId == _client.CurrentUserId)
+					server.CurrentMember = this;
+			}
+			var user = User;
+			if (user != null)
+			{
+				user.AddServer(ServerId);
+				user.AddRef();
+				_hasRef = true;
+			}
+		}
+		internal void OnUncached()
+		{
+			var server = Server;
+			if (server != null)
+			{
+				server.RemoveMember(this);
+				if (UserId == _client.CurrentUserId)
+					server.CurrentMember = null;
+			}
+			var user = User;
+			if (user != null)
+			{
+				user.RemoveServer(ServerId);
+				if (_hasRef)
+					user.RemoveRef();
+			}
+			_hasRef = false;
 		}
 
 		public override string ToString() => UserId;

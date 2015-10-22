@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord.Collections
+namespace Discord
 {
 	internal abstract class AsyncCollection<TValue> : IEnumerable<TValue>
 		where TValue : class
@@ -52,13 +52,16 @@ namespace Discord.Collections
 
 		protected readonly DiscordClient _client;
 		protected readonly ConcurrentDictionary<string, TValue> _dictionary;
+		private readonly Action<TValue> _onCache, _onUncache;
 
-		protected AsyncCollection(DiscordClient client, object writerLock)
+		protected AsyncCollection(DiscordClient client, object writerLock, Action<TValue> onCache, Action<TValue> onUncache)
 		{
 			_client = client;
 			_writerLock = writerLock;
 			_dictionary = new ConcurrentDictionary<string, TValue>();
-		}
+			_onCache = onCache;
+			_onUncache = onUncache;
+        }
 
 		public TValue this[string key]
 		{
@@ -85,7 +88,7 @@ namespace Discord.Collections
 				result = _dictionary.GetOrAdd(key, newItem);
 				if (result == newItem)
 				{
-					OnCreated(newItem);
+					_onCache(result);
 					RaiseItemCreated(result);
 				}
 			}
@@ -100,7 +103,7 @@ namespace Discord.Collections
 					TValue result;
 					if (_dictionary.TryRemove(key, out result))
 					{
-						OnRemoved(result); //TODO: If this object is accessed before OnRemoved finished firing, properties such as Server.Channels will have null elements
+						_onUncache(result); //TODO: If this object is accessed before OnRemoved finished firing, properties such as Server.Channels will have null elements
 						return result;
 					}
 				}
@@ -130,16 +133,7 @@ namespace Discord.Collections
 			}
         }
 
-		protected virtual void OnCreated(TValue item) { }
-		protected virtual void OnRemoved(TValue item) { }
-
-		public IEnumerator<TValue> GetEnumerator()
-		{
-			return _dictionary.Select(x => x.Value).GetEnumerator();
-		}
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		public IEnumerator<TValue> GetEnumerator() => _dictionary.Select(x => x.Value).GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

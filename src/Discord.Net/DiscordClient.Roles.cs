@@ -1,4 +1,3 @@
-using Discord.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +5,25 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	internal sealed class Roles : AsyncCollection<Role>
+	{
+		public Roles(DiscordClient client, object writerLock)
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+
+		public Role GetOrAdd(string id, string serverId)
+			=> GetOrAdd(id, () => new Role(_client, id, serverId));
+	}
+
+	public class RoleEventArgs : EventArgs
+	{
+		public Role Role { get; }
+		public string RoleId => Role.Id;
+		public Server Server => Role.Server;
+		public string ServerId => Role.ServerId;
+
+		internal RoleEventArgs(Role role) { Role = role; }
+	}
+
 	public partial class DiscordClient
 	{
 		public event EventHandler<RoleEventArgs> RoleCreated;

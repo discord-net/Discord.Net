@@ -1,5 +1,6 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace Discord
 		private readonly DiscordClient _client;
 		private readonly ConcurrentDictionary<string, bool> _messages;
 		private bool _areMembersStale;
+		private bool _hasRef;
 
 		/// <summary> Returns the unique identifier for this channel. </summary>
 		public string Id { get; }
@@ -100,6 +102,39 @@ namespace Discord
 			_messages = new ConcurrentDictionary<string, bool>();
 			_permissionOverwrites = _initialPermissionsOverwrites;
 			_areMembersStale = true;
+		}
+		internal void OnCached()
+		{
+			var server = Server;
+			if (server != null)
+				server.AddChannel(Id);
+			if (RecipientId != null)
+			{
+				var user = Recipient;
+				if (user != null)
+				{
+					user.PrivateChannelId = Id;
+					user.AddRef();
+					_hasRef = true;
+				}
+			}
+		}
+		internal void OnUncached()
+		{
+			var server = Server;
+			if (server != null)
+				server.RemoveChannel(Id);
+			if (RecipientId != null)
+			{
+				var user = Recipient;
+				if (user != null)
+				{
+					user.PrivateChannelId = null;
+					if (_hasRef)
+						user.RemoveRef();
+				}
+			}
+			_hasRef = false;
 		}
 
 		internal void Update(ChannelReference model)
