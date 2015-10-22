@@ -73,7 +73,7 @@ namespace Discord
 		{
 			_client = client;
 			UserId = userId;
-			ServerId = serverId;
+			ServerId = serverId ?? _client.Servers.PMServer.Id;
 			Status = UserStatus.Offline;
 			RoleIds = _initialRoleIds;
 			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
@@ -90,7 +90,8 @@ namespace Discord
 			var user = User;
 			if (user != null)
 			{
-				user.AddServer(ServerId);
+				if (server == null || !server.IsVirtual)
+					user.AddServer(ServerId);
 				user.AddRef();
 				_hasRef = true;
 			}

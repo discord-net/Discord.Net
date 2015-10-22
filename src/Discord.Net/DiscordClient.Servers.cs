@@ -10,12 +10,14 @@ namespace Discord
 	{
 		private const string PMServerId = "Private";
 
-		Server PMServer { get; }
+		public Server PMServer { get; private set; }
 
 		public Servers(DiscordClient client, object writerLock)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached())
+			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+
+		protected override void Initialize()
 		{
-			PMServer = new Server(client, PMServerId) { IsVirtual = true };
+			PMServer = new Server(_client, PMServerId) { IsVirtual = true };
 			PMServer.Update(new API.ExtendedGuildInfo { Id = PMServerId, Name = PMServerId });
 			_dictionary[PMServerId] = PMServer;
 		}

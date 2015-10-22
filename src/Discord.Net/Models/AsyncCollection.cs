@@ -61,7 +61,10 @@ namespace Discord
 			_dictionary = new ConcurrentDictionary<string, TValue>();
 			_onCache = onCache;
 			_onUncache = onUncache;
+			Initialize();
         }
+
+		protected virtual void Initialize() { }
 
 		public TValue this[string key]
 		{
@@ -129,7 +132,8 @@ namespace Discord
 			lock (_writerLock)
 			{
 				_dictionary.Clear();
-				RaiseCleared();
+				Initialize();
+                RaiseCleared();
 			}
         }
 

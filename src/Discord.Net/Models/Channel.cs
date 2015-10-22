@@ -97,7 +97,7 @@ namespace Discord
 		{
 			_client = client;
 			Id = id;
-			ServerId = serverId;
+			ServerId = serverId ?? _client.Servers.PMServer.Id;
 			RecipientId = recipientId;
 			_messages = new ConcurrentDictionary<string, bool>();
 			_permissionOverwrites = _initialPermissionsOverwrites;
