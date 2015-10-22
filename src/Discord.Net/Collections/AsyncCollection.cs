@@ -6,17 +6,17 @@ using System.Linq;
 
 namespace Discord.Collections
 {
-	public abstract class AsyncCollection<TValue> : IEnumerable<TValue>
+	internal abstract class AsyncCollection<TValue> : IEnumerable<TValue>
 		where TValue : class
 	{
 		private readonly object _writerLock;
 
-		internal class CollectionItemEventArgs : EventArgs
+		public class CollectionItemEventArgs : EventArgs
 		{
 			public TValue Item { get; }
 			public CollectionItemEventArgs(TValue item) { Item = item; }
 		}
-		internal class CollectionItemRemappedEventArgs : EventArgs
+		public class CollectionItemRemappedEventArgs : EventArgs
 		{
 			public TValue Item { get; }
 			public string OldId { get; }
@@ -24,26 +24,26 @@ namespace Discord.Collections
 			public CollectionItemRemappedEventArgs(TValue item, string oldId, string newId) { Item = item; OldId = oldId; NewId = newId; }
 		}
 
-		internal EventHandler<CollectionItemEventArgs> ItemCreated;
+		public EventHandler<CollectionItemEventArgs> ItemCreated;
 		private void RaiseItemCreated(TValue item)
 		{
 			if (ItemCreated != null)
 				ItemCreated(this, new CollectionItemEventArgs(item));
 		}
-		internal EventHandler<CollectionItemEventArgs> ItemDestroyed;
+		public EventHandler<CollectionItemEventArgs> ItemDestroyed;
 		private void RaiseItemDestroyed(TValue item)
 		{
 			if (ItemDestroyed != null)
 				ItemDestroyed(this, new CollectionItemEventArgs(item));
 		}
-		internal EventHandler<CollectionItemRemappedEventArgs> ItemRemapped;
+		public EventHandler<CollectionItemRemappedEventArgs> ItemRemapped;
 		private void RaiseItemRemapped(TValue item, string oldId, string newId)
 		{
 			if (ItemRemapped != null)
 				ItemRemapped(this, new CollectionItemRemappedEventArgs(item, oldId, newId));
 		}
 
-		internal EventHandler Cleared;
+		public EventHandler Cleared;
 		private void RaiseCleared()
 		{
 			if (Cleared != null)
@@ -121,7 +121,7 @@ namespace Discord.Collections
 			}
 			return null;
 		}
-		protected internal void Clear()
+		public void Clear()
 		{
 			lock (_writerLock)
 			{
