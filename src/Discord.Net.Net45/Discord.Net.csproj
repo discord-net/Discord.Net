@@ -154,17 +154,35 @@
     <Compile Include="..\Discord.Net\DiscordAPIClientConfig.cs">
       <Link>DiscordAPIClientConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.API.cs">
-      <Link>DiscordClient.API.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordClient.Bans.cs">
+      <Link>DiscordClient.Bans.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Cache.cs">
-      <Link>DiscordClient.Cache.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordClient.Channels.cs">
+      <Link>DiscordClient.Channels.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.cs">
       <Link>DiscordClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
-      <Link>DiscordClient.Events.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordClient.Invites.cs">
+      <Link>DiscordClient.Invites.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Members.cs">
+      <Link>DiscordClient.Members.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Messages.cs">
+      <Link>DiscordClient.Messages.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Permissions.cs">
+      <Link>DiscordClient.Permissions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Roles.cs">
+      <Link>DiscordClient.Roles.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Servers.cs">
+      <Link>DiscordClient.Servers.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DiscordClient.Users.cs">
+      <Link>DiscordClient.Users.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
       <Link>DiscordClientConfig.cs</Link>

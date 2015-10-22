@@ -13,6 +13,54 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	public sealed class MessageEventArgs : EventArgs
+	{
+		public Message Message { get; }
+		public string MessageId => Message.Id;
+		public Member Member => Message.Member;
+		public Channel Channel => Message.Channel;
+		public string ChannelId => Message.ChannelId;
+		public Server Server => Message.Server;
+		public string ServerId => Message.ServerId;
+		public User User => Member.User;
+		public string UserId => Message.UserId;
+
+		internal MessageEventArgs(Message msg) { Message = msg; }
+	}
+	public sealed class RoleEventArgs : EventArgs
+	{
+		public Role Role { get; }
+		public string RoleId => Role.Id;
+		public Server Server => Role.Server;
+		public string ServerId => Role.ServerId;
+
+		internal RoleEventArgs(Role role) { Role = role; }
+	}
+	public sealed class BanEventArgs : EventArgs
+	{
+		public User User { get; }
+		public string UserId { get; }
+		public Server Server { get; }
+		public string ServerId => Server.Id;
+
+		internal BanEventArgs(User user, string userId, Server server)
+		{
+			User = user;
+			UserId = userId;
+			Server = server;
+		}
+	}
+	public sealed class MemberEventArgs : EventArgs
+	{
+		public Member Member { get; }
+		public User User => Member.User;
+		public string UserId => Member.UserId;
+		public Server Server => Member.Server;
+		public string ServerId => Member.ServerId;
+
+		internal MemberEventArgs(Member member) { Member = member; }
+	}
+
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient : DiscordWSClient
 	{
@@ -28,29 +76,10 @@ namespace Discord
 
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;
 
-		/// <summary> Returns the current logged-in user. </summary>
-		public User CurrentUser => _currentUser;
-        private User _currentUser;
 
-		/// <summary> Returns a collection of all channels this client is a member of. </summary>
-		public Channels Channels => _channels;
-		private readonly Channels _channels;
-		/// <summary> Returns a collection of all user-server pairs this client can currently see. </summary>
-		public Members Members => _members;
-		private readonly Members _members;
-		/// <summary> Returns a collection of all messages this client has seen since logging in and currently has in cache. </summary>
-		public Messages Messages => _messages;
-		private readonly Messages _messages;
-		//TODO: Do we need the roles cache?
-		/// <summary> Returns a collection of all role-server pairs this client can currently see. </summary>
-		public Roles Roles => _roles;
-		private readonly Roles _roles;
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
 		public Servers Servers => _servers;
 		private readonly Servers _servers;
-		/// <summary> Returns a collection of all users this client can currently see. </summary>
-		public Users Users => _users;
-		private readonly Users _users;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
@@ -69,8 +98,8 @@ namespace Discord
 			_messages = new Messages(this, cacheLock);
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
-			_users = new Users(this, cacheLock);
 			_status = UserStatus.Online;
+			_users = new Users(this, cacheLock);
 
 			this.Connected += async (s, e) =>
 			{
@@ -321,47 +350,6 @@ namespace Discord
 				return base.GetTasks();
 		}
 		
-		private Task MessageQueueLoop()
-		{
-			var cancelToken = CancelToken;
-			int interval = Config.MessageQueueInterval;
-
-			return Task.Run(async () =>
-			{
-				Message msg;
-				while (!cancelToken.IsCancellationRequested)
-				{
-					while (_pendingMessages.TryDequeue(out msg))
-					{
-						bool hasFailed = false;
-						SendMessageResponse response = null;
-						try
-						{
-							response = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce, msg.IsTTS).ConfigureAwait(false);
-						}
-						catch (WebException) { break; }
-						catch (HttpException) { hasFailed = true; }
-
-						if (!hasFailed)
-						{
-							_messages.Remap(msg.Id, response.Id);
-							msg.Id = response.Id;
-							msg.Update(response);
-						}
-						msg.IsQueued = false;
-						msg.HasFailed = hasFailed;
-						RaiseMessageSent(msg);
-					}
-					await Task.Delay(interval).ConfigureAwait(false);
-				}
-			});
-		}
-		private string GenerateNonce()
-		{
-			lock (_rand)
-				return _rand.Next().ToString();
-		}
-
 		internal override async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
@@ -656,7 +644,7 @@ namespace Discord
 						{
 							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
 							var channel = _channels[data.ChannelId];
-							var user = _users[data.UserId];
+							var user = _members[data.UserId, channel.ServerId];
 
 							if (user != null)
 							{

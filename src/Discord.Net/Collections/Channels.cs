@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Collections
 {
@@ -46,29 +44,13 @@ namespace Discord.Collections
 			}
         }
 
-		internal Channel this[string id] => Get(id);
-		
-		internal IEnumerable<Channel> Find(string serverId, string name, string type = null)
+		internal Channel this[string id]
 		{
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-
-			IEnumerable<Channel> result;
-			if (name.StartsWith("#"))
+			get
 			{
-				string name2 = name.Substring(1);
-				result = this.Where(x => x.ServerId == serverId &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+				if (id == null) throw new ArgumentNullException(nameof(id));
+				return Get(id);
 			}
-			else
-			{
-				result = this.Where(x => x.ServerId == serverId &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-			}
-
-			if (type != null)
-				result = result.Where(x => x.Type == type);
-
-			return result;
 		}
 	}
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Collections
 {
@@ -23,23 +21,12 @@ namespace Discord.Collections
 				item.Server.RemoveRole(item.Id);
 		}
 
-		internal Role this[string id] => Get(id);
-		
-		internal IEnumerable<Role> Find(string serverId, string name)
+		internal Role this[string id]
 		{
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (name == null) throw new ArgumentNullException(nameof(name));
-
-			if (name.StartsWith("@"))
+			get
 			{
-				string name2 = name.Substring(1);
-				return this.Where(x => x.ServerId == serverId &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
-			}
-			else
-			{
-				return this.Where(x => x.ServerId == serverId &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+				if (id == null) throw new ArgumentNullException(nameof(id));
+				return Get(id);
 			}
 		}
 	}

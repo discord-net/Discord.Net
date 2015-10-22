@@ -127,8 +127,8 @@ namespace Discord.Collections
 			}
         }
 
-		protected abstract void OnCreated(TValue item);
-		protected abstract void OnRemoved(TValue item);
+		protected virtual void OnCreated(TValue item) { }
+		protected virtual void OnRemoved(TValue item) { }
 
 		public IEnumerator<TValue> GetEnumerator()
 		{

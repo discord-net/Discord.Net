@@ -1,11 +1,11 @@
-﻿namespace Discord.Collections
+﻿using System;
+
+namespace Discord.Collections
 {
     public sealed class Messages : AsyncCollection<Message>
 	{
 		internal Messages(DiscordClient client, object writerLock)
-			: base(client, writerLock)
-		{
-        }
+			: base(client, writerLock) { }
 
 		internal Message GetOrAdd(string id, string channelId, string userId) => GetOrAdd(id, () => new Message(_client, id, channelId, userId));
 		internal new Message TryRemove(string id) => base.TryRemove(id);
@@ -26,6 +26,13 @@
 				user.RemoveRef();
 		}
 
-		internal Message this[string id] => Get(id);
+		internal Message this[string id]
+		{
+			get
+			{
+				if (id == null) throw new ArgumentNullException(nameof(id));
+				return Get(id);
+			}
+		}
 	}
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Collections
 {
@@ -15,22 +13,12 @@ namespace Discord.Collections
 		protected override void OnCreated(User item) { }
 		protected override void OnRemoved(User item) { }
 
-		internal User this[string id] => Get(id);
-
-		internal IEnumerable<User> Find(string name)
+		internal User this[string id]
 		{
-			if (name == null) throw new ArgumentNullException(nameof(name));
-
-			if (name.StartsWith("@"))
+			get
 			{
-				string name2 = name.Substring(1);
-				return this.Where(x =>
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
-			}
-			else
-			{
-				return this.Where(x =>
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+				if (id == null) throw new ArgumentNullException(nameof(id));
+				return Get(id);
 			}
 		}
 	}
