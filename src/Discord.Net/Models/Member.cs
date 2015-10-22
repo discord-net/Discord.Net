@@ -161,18 +161,6 @@ namespace Discord
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
 
-		internal void AddChannel(string channelId)
-		{
-			var perms = new PackedChannelPermissions();
-			perms.Lock();
-            _permissions.TryAdd(channelId, perms);
-			UpdatePermissions(channelId);
-        }
-		internal bool RemoveChannel(string channelId)
-		{
-			PackedChannelPermissions ignored;
-			return _permissions.TryRemove(channelId, out ignored);
-		}
 		internal void UpdatePermissions()
 		{
 			foreach (var channel in _permissions)
@@ -234,5 +222,21 @@ namespace Discord
 				return perms;
 			return null;
 		}
+
+		internal void AddChannel(string channelId)
+		{
+			var perms = new PackedChannelPermissions();
+			perms.Lock();
+			_permissions.TryAdd(channelId, perms);
+			UpdatePermissions(channelId);
+		}
+		internal bool RemoveChannel(string channelId)
+		{
+			PackedChannelPermissions ignored;
+			return _permissions.TryRemove(channelId, out ignored);
+		}
+
+		public bool HasRole(Role role) => RoleIds.Contains(role?.Id);
+		public bool HasRole(string roleId) => RoleIds.Contains(roleId);
 	}
 }
