@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Discord.Interop
+namespace Discord.Audio
 {
 	/// <summary> Opus codec wrapper. </summary>
-	internal class OpusEncoder : IDisposable
+	internal class OpusDecoder : IDisposable
 	{
 		private readonly IntPtr _ptr;
 
@@ -21,8 +21,6 @@ namespace Discord.Interop
 		public int SampleSize { get; private set; }
 		/// <summary> Gets the bytes per frame. </summary>
 		public int FrameSize { get; private set; }
-		/// <summary> Gets the coding mode of the encoder. </summary>
-		public Opus.Application Application { get; private set; }
 
 		/// <summary> Creates a new Opus encoder. </summary>
 		/// <param name="samplingRate">Sampling rate of the input signal (Hz). Supported Values:  8000, 12000, 16000, 24000, or 48000.</param>
@@ -30,7 +28,7 @@ namespace Discord.Interop
 		/// <param name="frameLength">Length, in milliseconds, that each frame takes. Supported Values: 2.5, 5, 10, 20, 40, 60</param>
 		/// <param name="application">Coding mode.</param>
 		/// <returns>A new <c>OpusEncoder</c></returns>
-		public OpusEncoder(int samplingRate, int channels, int frameLength, Opus.Application application)
+		public OpusDecoder(int samplingRate, int channels, int frameLength)
 		{
 			if (samplingRate != 8000 && samplingRate != 12000 &&
 				samplingRate != 16000 && samplingRate != 24000 &&
@@ -41,16 +39,15 @@ namespace Discord.Interop
 
 			InputSamplingRate = samplingRate;
 			InputChannels = channels;
-			Application = application;
 			FrameLength = frameLength;
 			SampleSize = (BitRate / 8) * channels;
 			SamplesPerFrame = samplingRate / 1000 * FrameLength;
 			FrameSize = SamplesPerFrame * SampleSize;
 
 			Opus.Error error;
-			_ptr = Opus.CreateEncoder(samplingRate, channels, (int)application, out error);
+			_ptr = Opus.CreateDecoder(samplingRate, channels,  out error);
 			if (error != Opus.Error.OK)
-				throw new InvalidOperationException($"Error occured while creating encoder: {error}");
+				throw new InvalidOperationException($"Error occured while creating decoder: {error}");
 
 			SetForwardErrorCorrection(true);
 		}
@@ -60,17 +57,17 @@ namespace Discord.Interop
 		/// <param name="inputOffset">Offset of the frame in pcmSamples.</param>
 		/// <param name="output">Buffer to store the encoded frame.</param>
 		/// <returns>Length of the frame contained in outputBuffer.</returns>
-		public unsafe int EncodeFrame(byte[] input, int inputOffset, byte[] output)
+		public unsafe int DecodeFrame(byte[] input, int inputOffset, byte[] output)
 		{
 			if (disposed)
-				throw new ObjectDisposedException(nameof(OpusEncoder));
+				throw new ObjectDisposedException(nameof(OpusDecoder));
 			
 			int result = 0;
 			fixed (byte* inPtr = input)
 				result = Opus.Encode(_ptr, inPtr + inputOffset, SamplesPerFrame, output, output.Length);
 
 			if (result < 0)
-				throw new Exception("Encoding failed: " + ((Opus.Error)result).ToString());
+				throw new Exception("Decoding failed: " + ((Opus.Error)result).ToString());
 			return result;
 		}
 
@@ -78,11 +75,11 @@ namespace Discord.Interop
 		public void SetForwardErrorCorrection(bool value)
 		{
 			if (disposed)
-				throw new ObjectDisposedException(nameof(OpusEncoder));
+				throw new ObjectDisposedException(nameof(OpusDecoder));
 
 			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetInbandFECRequest, value ? 1 : 0);
 			if (result < 0)
-				throw new Exception("Encoder error: " + ((Opus.Error)result).ToString());
+				throw new Exception("Decoder error: " + ((Opus.Error)result).ToString());
 		}
 
 		#region IDisposable
@@ -99,7 +96,7 @@ namespace Discord.Interop
 
 			disposed = true;
 		}
-		~OpusEncoder()
+		~OpusDecoder()
 		{
 			Dispose();
 		}

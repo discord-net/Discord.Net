@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Discord.Net
+namespace Discord
 {
 	public class HttpException : Exception
 	{

@@ -1,7 +1,7 @@
 ﻿using Discord.API;
+using Discord.Audio;
 using Discord.Collections;
 using Discord.Net;
-using Discord.Net.Voice;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
@@ -780,19 +780,19 @@ namespace Discord
 			=> LeaveVoiceServer(server?.Id);
         public async Task LeaveVoiceServer(string serverId)
 		{
-			CheckReady(); //checkVoice is done inside the voice client
+			CheckReady(checkVoice: true);
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
 			if (Config.EnableVoiceMultiserver)
 			{
 				DiscordWSClient client;
 				if (_voiceClients.TryRemove(serverId, out client))
-					await client.Disconnect();
+					await client.Disconnect().ConfigureAwait(false);
 			}
 			else
 			{
+				await _voiceSocket.Disconnect().ConfigureAwait(false);
 				_dataSocket.SendLeaveVoice(serverId);
-				await _voiceSocket.Disconnect();
 			}
         }
 

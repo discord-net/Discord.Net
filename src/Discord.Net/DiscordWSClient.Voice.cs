@@ -1,4 +1,4 @@
-﻿using Discord.Net.Voice;
+﻿using Discord.Audio;
 using System;
 using System.Threading.Tasks;
 
@@ -19,20 +19,6 @@ namespace Discord
 			_dataSocket.SendJoinVoice(_voiceServerId, channelId);
 			await _voiceSocket.WaitForConnection(_config.ConnectionTimeout);
 		}
-
-		/*async Task IDiscordVoiceClient.Disconnect()
-		{
-			CheckReady(checkVoice: true);
-
-			if (_voiceSocket.State != WebSocketState.Disconnected)
-			{
-				if (_voiceSocket.CurrentServerId != null)
-				{
-					await _voiceSocket.Disconnect().ConfigureAwait(false);
-					_dataSocket.SendLeaveVoice(_voiceSocket.CurrentServerId);
-				}
-			}
-		}*/
 
 		/// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
 		/// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>

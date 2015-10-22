@@ -1,7 +1,6 @@
 ﻿#define USE_THREAD
 using Discord.API;
-using Discord.Interop;
-using Discord.Net.Voice;
+using Discord.Audio;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-	public enum WebSocketState : byte
+	internal enum WebSocketState : byte
 	{
 		Disconnected,
 		Connecting,

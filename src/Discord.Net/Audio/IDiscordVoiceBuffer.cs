@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.Voice
+﻿namespace Discord.Audio
 {
 	public interface IDiscordVoiceBuffer
 	{

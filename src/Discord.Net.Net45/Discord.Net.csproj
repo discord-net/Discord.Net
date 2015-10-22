@@ -127,6 +127,27 @@
     <Compile Include="..\Discord.Net\API\WebSockets.cs">
       <Link>API\WebSockets.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Audio\IDiscordVoiceBuffer.cs">
+      <Link>Audio\IDiscordVoiceBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\IDiscordVoiceClient.cs">
+      <Link>Audio\IDiscordVoiceClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\Opus.cs">
+      <Link>Audio\Opus.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\OpusDecoder.cs">
+      <Link>Audio\OpusDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\OpusEncoder.cs">
+      <Link>Audio\OpusEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\Sodium.cs">
+      <Link>Audio\Sodium.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Audio\VoiceBuffer.cs">
+      <Link>Audio\VoiceBuffer.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Collections\AsyncCollection.cs">
       <Link>Collections\AsyncCollection.cs</Link>
     </Compile>
@@ -223,17 +244,8 @@
     <Compile Include="..\Discord.Net\Helpers\TimeoutException.cs">
       <Link>Helpers\TimeoutException.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Interop\Opus.cs">
-      <Link>Interop\Opus.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Interop\OpusDecoder.cs">
-      <Link>Interop\OpusDecoder.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Interop\OpusEncoder.cs">
-      <Link>Interop\OpusEncoder.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Interop\Sodium.cs">
-      <Link>Interop\Sodium.cs</Link>
+    <Compile Include="..\Discord.Net\HttpException.cs">
+      <Link>HttpException.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
@@ -262,9 +274,6 @@
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\HttpException.cs">
-      <Link>Net\HttpException.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\IRestEngine.cs">
       <Link>Net\Rest\IRestEngine.cs</Link>
     </Compile>
@@ -276,15 +285,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\SharpRestEngine.cs">
       <Link>Net\Rest\SharpRestEngine.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\Voice\IDiscordVoiceBuffer.cs">
-      <Link>Net\Voice\IDiscordVoiceBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\Voice\IDiscordVoiceClient.cs">
-      <Link>Net\Voice\IDiscordVoiceClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Net\Voice\VoiceBuffer.cs">
-      <Link>Net\Voice\VoiceBuffer.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSocket.cs">
       <Link>Net\WebSockets\DataWebSocket.cs</Link>
@@ -326,6 +326,7 @@
       <Link>lib\opus.dll</Link>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

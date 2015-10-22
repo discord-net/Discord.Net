@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Discord.Interop
+namespace Discord.Audio
 {
 	internal unsafe static class Opus
 	{
