@@ -581,7 +581,7 @@ namespace Discord
 								}
 							}
 
-							if (Config.AckMessages && isAuthor)
+							if (Config.AckMessages && !isAuthor)
 								await _api.AckMessage(data.Id, data.ChannelId);
 
 							if (hasFinishedSending)
