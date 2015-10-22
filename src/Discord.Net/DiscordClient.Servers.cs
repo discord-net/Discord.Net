@@ -1,4 +1,3 @@
-using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace Discord
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
 
 		public Server GetOrAdd(string id)
-			=> base.GetOrAdd(id, () => new Server(_client, id));
+			=> GetOrAdd(id, () => new Server(_client, id));
 	}
 
 	public class ServerEventArgs : EventArgs
