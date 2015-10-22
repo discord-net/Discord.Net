@@ -15,11 +15,17 @@ namespace Discord.Net.WebSockets
 		private readonly WebSocket _parent;
 		private WSSharpNWebSocket _webSocket;
 
-		public event EventHandler<WebSocketMessageEventArgs> ProcessMessage;
-		private void RaiseProcessMessage(string msg)
+		public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage;
+		public event EventHandler<WebSocketTextMessageEventArgs> TextMessage;
+		private void RaiseBinaryMessage(byte[] data)
 		{
-			if (ProcessMessage != null)
-				ProcessMessage(this, new WebSocketMessageEventArgs(msg));
+			if (BinaryMessage != null)
+				BinaryMessage(this, new WebSocketBinaryMessageEventArgs(data));
+		}
+		private void RaiseTextMessage(string msg)
+		{
+			if (TextMessage != null)
+				TextMessage(this, new WebSocketTextMessageEventArgs(msg));
 		}
 
 		internal WebSocketSharpEngine(WebSocket parent, DiscordWSClientConfig config)
@@ -34,9 +40,15 @@ namespace Discord.Net.WebSockets
 			_webSocket = new WSSharpNWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-            _webSocket.Compression = WebSocketSharp.CompressionMethod.None;		
+            _webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;		
 			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
-            _webSocket.OnMessage += (s, e) => RaiseProcessMessage(e.Data);
+			_webSocket.OnMessage += (s, e) =>
+			{
+				if (e.Type == WebSocketSharp.Opcode.Binary)
+					RaiseBinaryMessage(e.RawData);
+				else if (e.Type == WebSocketSharp.Opcode.Text)
+					RaiseTextMessage(e.Data);
+			};
 			_webSocket.OnError += async (s, e) =>
 			{
 				_parent.RaiseOnLog(LogMessageSeverity.Error, e.Exception.GetBaseException().Message);

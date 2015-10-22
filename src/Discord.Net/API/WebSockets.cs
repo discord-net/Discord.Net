@@ -56,7 +56,11 @@ namespace Discord.API
 			public int Version = 3;
 			[JsonProperty("properties")]
 			public Dictionary<string, string> Properties = new Dictionary<string, string>();
-		}
+			[JsonProperty("large_threshold", NullValueHandling = NullValueHandling.Ignore)]
+			public int? LargeThreshold;
+			[JsonProperty("compress", NullValueHandling = NullValueHandling.Ignore)]
+			public bool? Compress;
+        }
 	}
 	internal sealed class ResumeCommand : WebSocketMessage<ResumeCommand.Data>
 	{

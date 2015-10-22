@@ -26,6 +26,8 @@ namespace Discord.Net.WebSockets
 			LoginCommand msg = new LoginCommand();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
+			//msg.Payload.LargeThreshold = 50;
+			msg.Payload.Compress = true;
 			QueueMessage(msg);
         }
 		private async Task Redirect(string server)
@@ -67,6 +69,7 @@ namespace Discord.Net.WebSockets
 
 		protected override async Task ProcessMessage(string json)
 		{
+			await base.ProcessMessage(json);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
 				_lastSeq = msg.Sequence.Value;

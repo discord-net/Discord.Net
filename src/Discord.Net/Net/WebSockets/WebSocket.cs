@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -51,13 +53,23 @@ namespace Discord.Net.WebSockets
 			_connectedEvent = new ManualResetEventSlim(false);
 			
 			_engine = new WebSocketSharpEngine(this, client.Config);
-			_engine.ProcessMessage += async (s, e) =>
+			_engine.BinaryMessage += async (s, e) =>
 			{
-				if (_logLevel >= LogMessageSeverity.Debug)
-					RaiseOnLog(LogMessageSeverity.Debug, $"In:  {e.Message}");
+				using (var compressed = new MemoryStream(e.Data, 2, e.Data.Length - 2))
+				using (var decompressed = new MemoryStream())
+				{
+					using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+						await zlib.CopyToAsync(decompressed);
+					decompressed.Position = 0;
+                    using (var reader = new StreamReader(decompressed))
+						await ProcessMessage(await reader.ReadToEndAsync());
+				}
+            };
+			_engine.TextMessage += async  (s, e) =>
+			{
 				await ProcessMessage(e.Message);
 			};
-        }
+		}
 
 		protected async Task BeginConnect()
 		{
@@ -185,7 +197,12 @@ namespace Discord.Net.WebSockets
 				RaiseDisconnected(wasDisconnectUnexpected, _disconnectReason?.SourceException);
 		}
 
-		protected abstract Task ProcessMessage(string json);
+		protected virtual Task ProcessMessage(string json)
+		{
+			if (_logLevel >= LogMessageSeverity.Debug)
+				RaiseOnLog(LogMessageSeverity.Debug, $"In: {json}");
+			return TaskHelper.CompletedTask;
+		}
 		protected abstract object GetKeepAlive();
 		
 		protected void QueueMessage(object message)
