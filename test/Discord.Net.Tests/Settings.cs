@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 
-namespace Discord.Net.Tests
+namespace Discord.Tests
 {
 	internal class Settings
 	{
