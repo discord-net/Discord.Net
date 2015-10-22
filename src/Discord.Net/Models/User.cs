@@ -118,11 +118,11 @@ namespace Discord
 			return _servers.TryRemove(serverId, out ignored);
 		}
 
-		public void AddRef()
+		internal void AddRef()
 		{
 			Interlocked.Increment(ref _refCount);
 		}
-		public void RemoveRef()
+		internal void RemoveRef()
 		{
 			if (Interlocked.Decrement(ref _refCount) == 0)
 				_client.Users.TryRemove(Id);
