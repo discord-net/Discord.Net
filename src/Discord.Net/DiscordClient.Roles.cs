@@ -80,7 +80,7 @@ namespace Discord
 		public async Task<Role> CreateRole(string serverId, string name)
 		{
 			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
 			var response = await _api.CreateRole(serverId).ConfigureAwait(false);
 			var role = _roles.GetOrAdd(response.Id, serverId);
@@ -91,20 +91,19 @@ namespace Discord
 			return role;
 		}
 
-		public Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
-			=> EditRole(role.ServerId, role.Id, name: name, permissions: permissions, color: color, hoist: hoist, position: position);
-		public async Task EditRole(string serverId, string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+		public Task EditRole(string roleId, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
+			=> EditRole(_roles[roleId], name: name, permissions: permissions, color: color, hoist: hoist, position: position);
+		public async Task EditRole(Role role, string name = null, PackedServerPermissions permissions = null, PackedColor color = null, bool? hoist = null, int? position = null)
 		{
-			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+            CheckReady();
+			if (role == null) throw new ArgumentNullException(nameof(role));
 
-			var response = await _api.EditRole(serverId, roleId, name: name,
-				permissions: permissions?.RawValue, color: color?.RawValue, hoist: hoist);
-
-			var role = _roles[response.Id];
-			if (role != null)
-				role.Update(response);
+			//TODO: check this null workaround later, should be fixed on Discord's end soon
+			var response = await _api.EditRole(role.ServerId, role.Id, 
+				name: name ?? role.Name,
+				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
+				color: color?.RawValue, 
+				hoist: hoist);
 
 			if (position != null)
 			{
@@ -136,8 +135,8 @@ namespace Discord
 		public Task DeleteRole(string serverId, string roleId)
 		{
 			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
-			if (roleId == null) throw new NullReferenceException(nameof(roleId));
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (roleId == null) throw new ArgumentNullException(nameof(roleId));
 
 			return _api.DeleteRole(serverId, roleId);
 		}

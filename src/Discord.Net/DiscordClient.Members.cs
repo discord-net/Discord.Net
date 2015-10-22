@@ -135,8 +135,8 @@ namespace Discord
 		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
 		{
 			CheckReady();
-			if (serverId == null) throw new NullReferenceException(nameof(serverId));
-			if (userId == null) throw new NullReferenceException(nameof(userId));
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			var newRoles = CollectionHelper.FlattenRoles(roles);
 			return _api.EditMember(serverId, userId, mute: mute, deaf: deaf, roles: newRoles);

@@ -33,9 +33,9 @@ namespace Discord
 		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, PackedChannelPermissions allow = null, PackedChannelPermissions deny = null)
 		{
 			CheckReady();
-			if (channel == null) throw new NullReferenceException(nameof(channel));
-			if (targetId == null) throw new NullReferenceException(nameof(targetId));
-			if (targetType == null) throw new NullReferenceException(nameof(targetType));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (targetId == null) throw new ArgumentNullException(nameof(targetId));
+			if (targetType == null) throw new ArgumentNullException(nameof(targetType));
 
 			uint allowValue = allow?.RawValue ?? 0;
 			uint denyValue = deny?.RawValue ?? 0;
@@ -108,9 +108,9 @@ namespace Discord
 		private async Task RemoveChannelPermissions(Channel channel, string userOrRoleId, string idType)
 		{
 			CheckReady();
-			if (channel == null) throw new NullReferenceException(nameof(channel));
-			if (userOrRoleId == null) throw new NullReferenceException(nameof(userOrRoleId));
-			if (idType == null) throw new NullReferenceException(nameof(idType));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (userOrRoleId == null) throw new ArgumentNullException(nameof(userOrRoleId));
+			if (idType == null) throw new ArgumentNullException(nameof(idType));
 
 			try
 			{

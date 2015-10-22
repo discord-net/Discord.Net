@@ -228,8 +228,8 @@ namespace Discord
 		public async Task<Message[]> DownloadMessages(string channelId, int count, string beforeMessageId = null, bool cache = true)
 		{
 			CheckReady();
-			if (channelId == null) throw new NullReferenceException(nameof(channelId));
-			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (count < 0) throw new ArgumentNullException(nameof(count));
 			if (count == 0) return new Message[0];
 
 			Channel channel = _channels[channelId];
