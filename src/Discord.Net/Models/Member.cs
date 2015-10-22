@@ -95,13 +95,8 @@ namespace Discord
 				Update(model.User);
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
-
-			//Set roles, with the everyone role added too
-			string[] newRoles = new string[model.Roles.Length + 1];
-			newRoles[0] = Server.EveryoneRoleId;
-			for (int i = 0; i < model.Roles.Length; i++)
-				newRoles[i + 1] = model.Roles[i];
-			RoleIds = newRoles;
+			if (model.Roles != null)
+				UpdateRoles(model.Roles);
 
 			UpdatePermissions();
         }
@@ -118,6 +113,8 @@ namespace Discord
 			if (model.User != null)
 				Update(model.User as UserReference);
 
+			if (model.Roles != null)
+				UpdateRoles(model.Roles);
 			if (model.Status != null && Status != model.Status)
 			{
 				Status = model.Status;
@@ -147,6 +144,15 @@ namespace Discord
 				IsSelfMuted = model.IsSelfMuted.Value;
 			if (model.IsServerSuppressed != null)
 				IsServerSuppressed = model.IsServerSuppressed.Value;
+		}
+		private void UpdateRoles(string[] roleIds)
+		{
+			//Set roles, with the everyone role added too
+			string[] newRoles = new string[roleIds.Length + 1];
+			newRoles[0] = Server.EveryoneRoleId;
+			for (int i = 0; i < roleIds.Length; i++)
+				newRoles[i + 1] = roleIds[i];
+			RoleIds = newRoles;
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)

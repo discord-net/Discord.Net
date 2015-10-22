@@ -621,13 +621,7 @@ namespace Discord
 					case "PRESENCE_UPDATE":
 						{
 							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
-							var member = _members[data.User.Id, data.GuildId];
-							/*if (_config.TrackActivity)
-							{
-								var user = _users[data.User.Id];
-								if (user != null)
-									user.UpdateActivity(DateTime.UtcNow);
-							}*/
+							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
 							if (member != null)
 							{
 								member.Update(data);

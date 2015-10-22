@@ -48,6 +48,8 @@ namespace Discord.API
 		public string GameId;
 		[JsonProperty("status")]
 		public string Status;
+		[JsonProperty("roles")] //TODO: Might be temporary
+		public string[] Roles;
 	}
 	public class VoiceMemberInfo : MemberReference
 	{
