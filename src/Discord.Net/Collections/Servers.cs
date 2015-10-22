@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Discord.Collections
 {
-    public sealed class Servers : AsyncCollection<Server>
+    internal sealed class Servers : AsyncCollection<Server>
 	{
-		internal Servers(DiscordClient client, object writerLock)
+		public Servers(DiscordClient client, object writerLock) 
 			: base(client, writerLock) { }
 
-		internal Server GetOrAdd(string id) => base.GetOrAdd(id, () => new Server(_client, id));
-		internal new Server TryRemove(string id) => base.TryRemove(id);
+		public Server GetOrAdd(string id) 
+			=> base.GetOrAdd(id, () => new Server(_client, id));
 		
 		protected override void OnRemoved(Server item)
 		{
@@ -26,7 +26,5 @@ namespace Discord.Collections
 			foreach (var roleId in item.RoleIds)
 				roles.TryRemove(roleId);
 		}
-
-		internal Server this[string id] => Get(id);
 	}
 }

@@ -55,9 +55,8 @@ namespace Discord
 			if (UserIsSpeaking != null)
 				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new MemberIsSpeakingEventArgs(member, isSpeaking)));
 		}
-
-		/// <summary> Returns a collection of all user-server pairs this client can currently see. </summary>
-		public Members Members => _members;
+		
+		internal Members Members => _members;
 		private readonly Members _members;
 		
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>

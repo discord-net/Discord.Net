@@ -13,10 +13,6 @@ namespace Discord
 	{
 		public const int MaxMessageSize = 2000;
 
-		/// <summary> Returns a collection of all messages this client has seen since logging in and currently has in cache. </summary>
-		public Messages Messages => _messages;
-		private readonly Messages _messages;
-
 		public event EventHandler<MessageEventArgs> MessageCreated;
 		private void RaiseMessageCreated(Message msg)
 		{
@@ -47,6 +43,9 @@ namespace Discord
 			if (MessageSent != null)
 				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
 		}
+		
+		internal Messages Messages => _messages;
+		private readonly Messages _messages;
 
 		/// <summary> Returns the message with the specified id, or null if none was found. </summary>
 		public Message GetMessage(string id) => _messages[id];

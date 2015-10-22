@@ -7,6 +7,19 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
+		/// <summary> Gets more info about the provided invite code. </summary>
+		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
+		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
+		{
+			CheckReady();
+			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
+
+			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
+			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
+			invite.Update(response);
+			return invite;
+		}
+
 		/// <summary> Creates a new invite to the default channel of the provided server. </summary>
 		/// <param name="maxAge"> Time (in seconds) until the invite expires. Set to 0 to never expire. </param>
 		/// <param name="tempMembership"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
@@ -53,20 +66,7 @@ namespace Discord
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
-
-		/// <summary> Gets more info about the provided invite code. </summary>
-		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
-		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
-		{
-			CheckReady();
-			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
-
-			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
-			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
-			invite.Update(response);
-			return invite;
-		}
-
+		
 		/// <summary> Accepts the provided invite. </summary>
 		public Task AcceptInvite(Invite invite)
 		{

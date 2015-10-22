@@ -20,8 +20,7 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		/// <summary> Returns a collection of all channels this client is a member of. </summary>
-		public Channels Channels => _channels;
+		internal Channels Channels => _channels;
 		private readonly Channels _channels;
 
 		public event EventHandler<ChannelEventArgs> ChannelCreated;

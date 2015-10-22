@@ -1,15 +1,12 @@
-﻿using System;
-
-namespace Discord.Collections
+﻿namespace Discord.Collections
 {
-    public sealed class Messages : AsyncCollection<Message>
+	internal sealed class Messages : AsyncCollection<Message>
 	{
-		internal Messages(DiscordClient client, object writerLock)
+		public Messages(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
-
-		internal Message GetOrAdd(string id, string channelId, string userId) => GetOrAdd(id, () => new Message(_client, id, channelId, userId));
-		internal new Message TryRemove(string id) => base.TryRemove(id);
-		internal new Message Remap(string oldKey, string newKey) => base.Remap(oldKey, newKey);
+		
+		public Message GetOrAdd(string id, string channelId, string userId) 
+			=> GetOrAdd(id, () => new Message(_client, id, channelId, userId));
 
 		protected override void OnCreated(Message item)
 		{
@@ -24,15 +21,6 @@ namespace Discord.Collections
 			var user = item.User;
 			if (user != null)
 				user.RemoveRef();
-		}
-
-		internal Message this[string id]
-		{
-			get
-			{
-				if (id == null) throw new ArgumentNullException(nameof(id));
-				return Get(id);
-			}
 		}
 	}
 }

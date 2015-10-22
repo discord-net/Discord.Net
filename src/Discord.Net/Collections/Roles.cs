@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace Discord.Collections
+﻿namespace Discord.Collections
 {
-    public sealed class Roles : AsyncCollection<Role>
+    internal sealed class Roles : AsyncCollection<Role>
 	{
-		internal Roles(DiscordClient client, object writerLock)
+		public Roles(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
 
-		internal Role GetOrAdd(string id, string serverId) => GetOrAdd(id, () => new Role(_client, id, serverId));
-		internal new Role TryRemove(string id) => base.TryRemove(id);
+		public Role GetOrAdd(string id, string serverId) 
+			=> GetOrAdd(id, () => new Role(_client, id, serverId));
 
 		protected override void OnCreated(Role item)
 		{
@@ -19,15 +17,6 @@ namespace Discord.Collections
 			var server = item.Server;
 			if (server != null)
 				item.Server.RemoveRole(item.Id);
-		}
-
-		internal Role this[string id]
-		{
-			get
-			{
-				if (id == null) throw new ArgumentNullException(nameof(id));
-				return Get(id);
-			}
 		}
 	}
 }

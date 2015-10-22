@@ -60,15 +60,18 @@ namespace Discord.Collections
 			_dictionary = new ConcurrentDictionary<string, TValue>();
 		}
 
-		protected TValue Get(string key)
+		public TValue this[string key]
 		{
-			if (key == null)
-				return null;
+			get
+			{
+				if (key == null)
+					return null;
 
-			TValue result;
-			if (!_dictionary.TryGetValue(key, out result))
-				return null;
-			return result;
+				TValue result;
+				if (!_dictionary.TryGetValue(key, out result))
+					return null;
+				return result;
+			}
 		}
 		protected TValue GetOrAdd(string key, Func<TValue> createFunc)
 		{
@@ -88,7 +91,7 @@ namespace Discord.Collections
 			}
 			return result;
 		}
-		protected TValue TryRemove(string key)
+		public TValue TryRemove(string key)
 		{
 			if (_dictionary.ContainsKey(key))
 			{
@@ -104,7 +107,7 @@ namespace Discord.Collections
 			}
 			return null;
 		}
-		protected TValue Remap(string oldKey, string newKey)
+		public TValue Remap(string oldKey, string newKey)
 		{
 			if (_dictionary.ContainsKey(oldKey))
 			{

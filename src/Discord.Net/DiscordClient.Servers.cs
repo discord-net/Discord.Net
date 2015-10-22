@@ -1,3 +1,4 @@
+using Discord.Collections;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
@@ -48,8 +49,14 @@ namespace Discord
 				RaiseEvent(nameof(ServerAvailable), () => ServerAvailable(this, new ServerEventArgs(server)));
 		}
 
+		/// <summary> Returns a collection of all servers this client is a member of. </summary>
+		public IEnumerable<Server> AllServers => _servers;
+		internal Servers Servers => _servers;
+		private readonly Servers _servers;
+
 		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
 		public Server GetServer(string id) => _servers[id];
+
 		/// <summary> Returns all servers with the specified name. </summary>
 		/// <remarks> Search is case-insensitive. </remarks>
 		public IEnumerable<Server> FindServers(string name)

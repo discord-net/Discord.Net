@@ -55,8 +55,9 @@ namespace Discord
 		}
 	
 		/// <summary> Returns a collection of all users this client can currently see. </summary>
-		public Users Users => _users;
+		internal Users Users => _users;
 		private readonly Users _users;
+
 		/// <summary> Returns the current logged-in user. </summary>
 		public User CurrentUser => _currentUser;
 		private User _currentUser;

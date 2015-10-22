@@ -2,13 +2,13 @@
 
 namespace Discord.Collections
 {
-    public sealed class Channels : AsyncCollection<Channel>
-    {
-		internal Channels(DiscordClient client, object writerLock)
+    internal sealed class Channels : AsyncCollection<Channel>
+	{
+		public Channels(DiscordClient client, object writerLock) 
 			: base(client, writerLock) { }
-
-		internal Channel GetOrAdd(string id, string serverId, string recipientId = null) => GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));
-		internal new Channel TryRemove(string id) => base.TryRemove(id);
+		
+		public Channel GetOrAdd(string id, string serverId, string recipientId = null) 
+			=> GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));
 
 		protected override void OnCreated(Channel item)
 		{
@@ -43,14 +43,5 @@ namespace Discord.Collections
 				}
 			}
         }
-
-		internal Channel this[string id]
-		{
-			get
-			{
-				if (id == null) throw new ArgumentNullException(nameof(id));
-				return Get(id);
-			}
-		}
 	}
 }

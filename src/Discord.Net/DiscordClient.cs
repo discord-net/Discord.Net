@@ -76,11 +76,6 @@ namespace Discord
 
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;
 
-
-		/// <summary> Returns a collection of all servers this client is a member of. </summary>
-		public Servers Servers => _servers;
-		private readonly Servers _servers;
-
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 			: base(config ?? new DiscordClientConfig())
@@ -98,8 +93,8 @@ namespace Discord
 			_messages = new Messages(this, cacheLock);
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
-			_status = UserStatus.Online;
 			_users = new Users(this, cacheLock);
+			_status = UserStatus.Online;
 
 			this.Connected += async (s, e) =>
 			{

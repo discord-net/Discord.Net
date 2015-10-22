@@ -27,8 +27,7 @@ namespace Discord
 				RaiseEvent(nameof(RoleUpdated), () => RoleUpdated(this, new RoleEventArgs(role)));
 		}
 		
-		/// <summary> Returns a collection of all role-server pairs this client can currently see. </summary>
-		public Roles Roles => _roles;
+		internal Roles Roles => _roles;
 		private readonly Roles _roles;
 
 		/// <summary> Returns the role with the specified id, or null if none was found. </summary>
