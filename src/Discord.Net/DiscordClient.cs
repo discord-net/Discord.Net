@@ -74,68 +74,47 @@ namespace Discord
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				ServerCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Server: {e.Server?.Name ?? e.ServerId}" +
-					(showIDs ? $" ({e.ServerId})" : ""));
+					$"Created Server: {e.Server?.Name ?? e.ServerId}");
 				ServerDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Server: {e.Server?.Name ?? e.ServerId}" +
-					(showIDs ? $" ({e.ServerId})" : ""));
+					$"Destroyed Server: {e.Server?.Name ?? e.ServerId}");
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Server: {e.Server?.Name ?? e.ServerId}" +
-					(showIDs ? $" ({e.ServerId})" : ""));
+					$"Updated Server: {e.Server?.Name ?? e.ServerId}");
 				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Available: {e.Server?.Name ?? e.ServerId}" +
-					(showIDs ? $" ({e.ServerId})" : ""));
+					$"Server Available: {e.Server?.Name ?? e.ServerId}");
 				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Unavailable: {e.Server?.Name ?? e.ServerId}" +
-					(showIDs ? $" ({e.ServerId})" : ""));
+					$"Server Unavailable: {e.Server?.Name ?? e.ServerId}");
 				ChannelCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId})" : ""));
+					$"Created Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}");
 				ChannelDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId})" : ""));
+					$"Destroyed Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}");
 				ChannelUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId})" : ""));
+					$"Updated Channel: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}");
 				MessageCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId}/{e.MessageId})" : ""));
+					$"Created Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}");
 				MessageDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId}/{e.MessageId})" : ""));
+					$"Deleted Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}");
 				MessageUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}" +
-					(showIDs ? $" ({e.ServerId}/{e.ChannelId}/{e.MessageId})" : ""));
+					$"Updated Message: {e.Server?.Name ?? e.ServerId}/{e.Channel?.Name ?? e.ChannelId}/{e.MessageId}");
 				RoleCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}" +
-					(showIDs ? $" ({e.ServerId}/{e.RoleId})" : ""));
+					$"Created Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}");
 				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}" +
-					(showIDs ? $" ({e.ServerId}/{e.RoleId})" : ""));
+					$"Updated Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}");
 				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}" +
-					(showIDs ? $" ({e.ServerId}/{e.RoleId})" : ""));
+					$"Deleted Role: {e.Server?.Name ?? e.ServerId}/{e.Role?.Name ?? e.RoleId}");
 				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Ban: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Added Ban: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Ban: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Removed Ban: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Added Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}";
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Removed Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Updated Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member (Voice State): {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}" +
-					(showIDs ? $" ({e.ServerId}/{e.UserId})" : ""));
+					$"Updated Member (Voice State): {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated User: {e.User.Name}" +
-					(showIDs ? $" ({e.UserId})" : ""));
+					$"Updated User: {e.User.Name}");
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
