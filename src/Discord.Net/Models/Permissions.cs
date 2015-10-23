@@ -58,11 +58,12 @@ namespace Discord
 		public static readonly ChannelPermissions TextOnly = Preset<ChannelPermissions>("00000000000000111111110000011001");
 		public static readonly ChannelPermissions PrivateOnly = Preset<ChannelPermissions>("00000000000000011100110000000000");
 		public static readonly ChannelPermissions VoiceOnly = Preset<ChannelPermissions>("00000011111100000000000000011001");
-		public static ChannelPermissions All(Channel channel)
+		public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
+        public static ChannelPermissions All(string channelType, bool isPrivate)
 		{
-			if (channel.IsPrivate) return PrivateOnly;
-			else if (channel.Type == ChannelTypes.Text) return TextOnly;
-			else if (channel.Type == ChannelTypes.Voice) return VoiceOnly;
+			if (isPrivate) return PrivateOnly;
+			else if (channelType == ChannelTypes.Text) return TextOnly;
+			else if (channelType == ChannelTypes.Voice) return VoiceOnly;
 			else return None;
 		}
 
