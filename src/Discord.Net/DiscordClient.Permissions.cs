@@ -1,4 +1,3 @@
-using Discord.Net;
 using System;
 using System.Linq;
 using System.Net;
@@ -20,6 +19,18 @@ namespace Discord
 			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, allow, deny);
+		public Task SetChannelUserPermissions(Channel channel, Member member, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(channel, member?.UserId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelUserPermissions(string channelId, Member member, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelUserPermissions(Channel channel, User user, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(channel, user?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelUserPermissions(string channelId, User user, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelUserPermissions(Channel channel, string userId, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelUserPermissions(string channelId, string userId, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
 
 		public Task SetChannelRolePermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, allow, deny);
@@ -29,6 +40,14 @@ namespace Discord
 			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, allow, deny);
 		public Task SetChannelRolePermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, allow, deny);
+		public Task SetChannelRolePermissions(Channel channel, Role role, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelRolePermissions(string channelId, Role role, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelRolePermissions(Channel channel, string userId, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
+		public Task SetChannelRolePermissions(string channelId, string userId, DualChannelPermissions permissions = null)
+			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
 
 		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
