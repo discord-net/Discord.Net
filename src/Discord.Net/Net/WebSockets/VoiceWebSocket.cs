@@ -1,5 +1,4 @@
-﻿#define USE_THREAD
-using Discord.API;
+﻿using Discord.API;
 using Discord.Audio;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,10 +35,8 @@ namespace Discord.Net.WebSockets
 		private byte[] _secretKey, _encodingBuffer;
 		private ushort _sequence;
 		private string _serverId, _channelId, _userId, _sessionId, _token, _encryptionMode;
-
-#if USE_THREAD
+		
 		private Thread _sendThread, _receiveThread;
-#endif
 
 		public string CurrentServerId => _serverId;
 		public string CurrentChannelId => _channelId;
@@ -109,9 +106,6 @@ namespace Discord.Net.WebSockets
 		protected override IEnumerable<Task> GetTasks()
 		{			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
-#if !DNX451 && !__MonoCS__
-			_udp.AllowNatTraversal(true);
-#endif
 
 			VoiceLoginCommand msg = new VoiceLoginCommand();
 			msg.Payload.ServerId = _serverId;
@@ -123,16 +117,11 @@ namespace Discord.Net.WebSockets
 			List<Task> tasks = new List<Task>();
 			if ((_client.Config.VoiceMode & DiscordVoiceMode.Outgoing) != 0)
 			{
-#if USE_THREAD
 				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
 				_sendThread.IsBackground = true;
                 _sendThread.Start();
-#else
-				tasks.Add(SendVoiceAsync());
-#endif
 			}
-
-#if USE_THREAD
+			
 			//This thread is required to establish a connection even if we're outgoing only
 			if ((_client.Config.VoiceMode & DiscordVoiceMode.Incoming) != 0)
 			{
@@ -142,9 +131,6 @@ namespace Discord.Net.WebSockets
 			}
 			else //Dont make an OS thread if we only want to capture one packet...
 				tasks.Add(Task.Run(() => ReceiveVoiceAsync(_cancelToken)));
-#else
-				tasks.Add(ReceiveVoiceAsync());
-#endif
 			
 			tasks.Add(WatcherAsync());
 			if (tasks.Count > 0)
@@ -162,14 +148,12 @@ namespace Discord.Net.WebSockets
 		}
 		protected override Task Cleanup()
 		{
-#if USE_THREAD
 			if (_sendThread != null)
 				_sendThread.Join();
 			if (_receiveThread != null)	
 				_receiveThread.Join();
 			_sendThread = null;
 			_receiveThread = null;
-#endif
 
 			OpusDecoder decoder;
 			foreach (var pair in _decoders)
@@ -189,18 +173,9 @@ namespace Discord.Net.WebSockets
 
 			return base.Cleanup();
 		}
-
-#if USE_THREAD
+		
 		private void ReceiveVoiceAsync(CancellationToken cancelToken)
 		{
-#else
-		private Task ReceiveVoiceAsync()
-		{
-			var cancelToken = _cancelToken;
-
-			return Task.Run(async () =>
-			{
-#endif
 			try
 			{
 				byte[] packet, decodingBuffer = null, nonce = null, result;
@@ -215,20 +190,10 @@ namespace Discord.Net.WebSockets
 
 				while (!cancelToken.IsCancellationRequested)
 				{
-#if USE_THREAD
 					Thread.Sleep(1);
-#elif DNXCORE50
-					await Task.Delay(1).ConfigureAwait(false);
-#endif
-#if USE_THREAD || DNXCORE50
 					if (_udp.Available > 0)
 					{
 						packet = _udp.Receive(ref endpoint);
-#else
-						var msg = await _udp.ReceiveAsync().ConfigureAwait(false);		
-						endpoint = msg.Endpoint;			
-						receievedPacket = msg.Buffer;
-#endif
 						packetLength = packet.Length;
 
                         if (packetLength > 0 && endpoint.Equals(_endpoint))
@@ -304,40 +269,19 @@ namespace Discord.Net.WebSockets
 									RaiseOnPacket(userId, _channelId, result, resultOffset, resultLength);
 							}
 						}
-#if USE_THREAD || DNXCORE50
 					}
-#endif
 				}
 			}
             catch (OperationCanceledException) { }
 			catch (InvalidOperationException) { } //Includes ObjectDisposedException
-#if !USE_THREAD
-			}).ConfigureAwait(false);
-#endif
 		}
-
-#if USE_THREAD
+		
 		private void SendVoiceAsync(CancellationToken cancelToken)
 		{
-#else
-		private Task SendVoiceAsync()
-		{
-			var cancelToken = _cancelToken;
-
-			return Task.Run(async () =>
-			{
-#endif
-
 			try
 			{
 				while (!cancelToken.IsCancellationRequested && _state != (int)WebSocketState.Connected)
-				{
-#if USE_THREAD
 					Thread.Sleep(1);
-#else
-					await Task.Delay(1);
-#endif
-				}
 
 				if (cancelToken.IsCancellationRequested)
 					return;
@@ -406,11 +350,7 @@ namespace Discord.Net.WebSockets
 									Buffer.BlockCopy(encodedFrame, 0, udpPacket, 12, encodedLength);
 									rtpPacketLength = encodedLength + 12;
 								}
-#if USE_THREAD
 								_udp.Send(udpPacket, rtpPacketLength);
-#else
-								await _udp.SendAsync(rtpPacket, rtpPacketLength).ConfigureAwait(false);
-#endif
 							}
 							timestamp = unchecked(timestamp + samplesPerFrame);
 							nextTicks += ticksPerFrame;
@@ -420,29 +360,12 @@ namespace Discord.Net.WebSockets
 					else if (ticksToNextFrame > spinLockThreshold)
 					{
 						int time = (int)Math.Ceiling((ticksToNextFrame - spinLockThreshold) / ticksPerMillisecond);
-#if USE_THREAD
 						Thread.Sleep(1);
-#else
-						await Task.Delay(1).ConfigureAwait(false);
-#endif
 					}
-					//Don't spinlock if we're not actually sending audio (or buffer underrunning)
-					/*else if (_sendQueue.Count == 0)
-					{
-						int time = (int)Math.Ceiling(ticksToNextFrame / ticksPerMillisecond);
-#if USE_THREAD
-						Thread.Sleep(1);
-#else
-						await Task.Delay(1).ConfigureAwait(false);
-#endif
-					}*/
 				}
 			}
 			catch (OperationCanceledException) { }
 			catch (InvalidOperationException) { } //Includes ObjectDisposedException
-#if !USE_THREAD
-			}).ConfigureAwait(false);
-#endif
 		}
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private Task WatcherAsync()
