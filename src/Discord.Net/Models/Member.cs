@@ -186,7 +186,7 @@ namespace Discord
 		{
 			//Set roles, with the everyone role added too
 			string[] newRoles = new string[roleIds.Length + 1];
-			newRoles[0] = Server.EveryoneRoleId;
+			newRoles[0] = ServerId; //Everyone
 			for (int i = 0; i < roleIds.Length; i++)
 				newRoles[i + 1] = roleIds[i];
 			RoleIds = newRoles;

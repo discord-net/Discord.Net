@@ -592,26 +592,29 @@ namespace Discord
 						{
 							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
 							var channel = _channels[data.ChannelId];
-							var user = _members[data.UserId, channel.ServerId];
+							if (channel != null)
+							{
+								var user = _members[data.UserId, channel.ServerId];
 
-							if (user != null)
-							{
-								if (channel != null)
-									RaiseUserIsTyping(user, channel);
-							}
-							if (Config.TrackActivity)
-							{
-								/*if (channel.IsPrivate)
+								if (user != null)
 								{
-									if (user != null)
-										user.UpdateActivity();
+									if (channel != null)
+										RaiseUserIsTyping(user, channel);
 								}
-								else*/
-								if (!channel.IsPrivate)
+								if (Config.TrackActivity)
 								{
-									var member = _members[data.UserId, channel.ServerId];
-									if (member != null)
-										member.UpdateActivity();
+									/*if (channel.IsPrivate)
+									{
+										if (user != null)
+											user.UpdateActivity();
+									}
+									else*/
+									if (!channel.IsPrivate)
+									{
+										var member = _members[data.UserId, channel.ServerId];
+										if (member != null)
+											member.UpdateActivity();
+									}
 								}
 							}
 						}
