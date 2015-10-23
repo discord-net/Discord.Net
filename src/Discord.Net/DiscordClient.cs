@@ -106,7 +106,7 @@ namespace Discord
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Removed Ban: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}";
+					$"Added Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Removed Member: {e.Server?.Name ?? e.ServerId}/{e.User?.Name ?? e.UserId}");
 				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
