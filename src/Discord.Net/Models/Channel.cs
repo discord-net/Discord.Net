@@ -16,12 +16,12 @@ namespace Discord
 			public ChannelPermissions Allow { get; }
 			public ChannelPermissions Deny { get; }
 
-			internal PermissionOverwrite(string type, string targetId, uint allow, uint deny)
+			internal PermissionOverwrite(string targetType, string targetId, uint allow, uint deny)
 			{
-				TargetType = type;
+				TargetType = targetType;
 				TargetId = targetId;
 				Allow = new ChannelPermissions(allow);
-				Deny = new ChannelPermissions( deny);
+				Deny = new ChannelPermissions(deny);
 				Allow.Lock();
 				Deny.Lock();
 			}
@@ -68,7 +68,7 @@ namespace Discord
 				if (!_areMembersStale)
 					return _userIds;
 				
-				_userIds = Server.Members.Where(x => x.GetPermissions(Id)?.Text_ReadMessages ?? false).Select(x => x.UserId).ToArray();
+				_userIds = Server.Members.Where(x => x.GetPermissions(Id)?.ReadMessages ?? false).Select(x => x.UserId).ToArray();
 				_areMembersStale = false;
 				return _userIds;
 			}
@@ -130,8 +130,8 @@ namespace Discord
 				});
 				_permissionOverwrites = new PermissionOverwrite[]
 				{
-					new PermissionOverwrite(PermissionTarget.Member, _client.CurrentUserId, ChannelPermissions.AllPrivate.RawValue, 0),
-					new PermissionOverwrite(PermissionTarget.Member, RecipientId, ChannelPermissions.AllPrivate.RawValue, 0)
+					new PermissionOverwrite(PermissionTarget.Member, _client.CurrentUserId, ChannelPermissions.PrivateOnly.RawValue, 0),
+					new PermissionOverwrite(PermissionTarget.Member, RecipientId, ChannelPermissions.PrivateOnly.RawValue, 0)
 				};
 			}
 		}

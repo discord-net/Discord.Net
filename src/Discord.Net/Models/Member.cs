@@ -239,7 +239,7 @@ namespace Discord
 
 			permissions.SetRawValueInternal(newPermissions);
 
-			if (permissions.General_ManagePermissions)
+			if (permissions.ManagePermissions)
 				permissions.SetRawValueInternal(ChannelPermissions.All(channel).RawValue);
 			/*else if (server.DefaultChannelId == channelId)
 				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);*/

@@ -21,7 +21,7 @@ namespace Discord
 			{
 				Id = serverId,
 				Name = name,
-				Permissions = ChannelPermissions.None.RawValue
+				Permissions = ServerPermissions.None.RawValue
 			});
 			return role;
 		}
