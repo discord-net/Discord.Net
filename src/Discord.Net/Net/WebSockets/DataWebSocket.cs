@@ -26,7 +26,8 @@ namespace Discord.Net.WebSockets
 			LoginCommand msg = new LoginCommand();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
-			msg.Payload.LargeThreshold = 50;
+			if (_client.Config.UseLargeThreshold)
+				msg.Payload.LargeThreshold = 50;
 			msg.Payload.Compress = true;
 			QueueMessage(msg);
         }

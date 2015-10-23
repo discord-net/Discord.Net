@@ -38,6 +38,9 @@ namespace Discord
 		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
 		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
 		private bool _enableVoiceEncryption = true;
+		/// <summary> (Experimental) Instructs Discord to not send send information about offline users, for servers with more than 50 users. </summary>
+		public bool UseLargeThreshold { get { return _useLargeThreshold; } set { SetValue(ref _useLargeThreshold, value); } }
+		private bool _useLargeThreshold = false;
 
 		//Internals
 		internal bool VoiceOnly { get { return _voiceOnly; } set { SetValue(ref _voiceOnly, value); } }
