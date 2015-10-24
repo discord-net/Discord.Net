@@ -60,10 +60,10 @@ namespace Discord
 		public IEnumerable<Channel> Channels => _channels.Select(x => _client.Channels[x.Key]);
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		[JsonIgnore]
-		public IEnumerable<Channel> TextChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelTypes.Text);
+		public IEnumerable<Channel> TextChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelType.Text);
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		[JsonIgnore]
-		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelTypes.Voice);
+		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => _client.Channels[x.Key]).Where(x => x.Type == ChannelType.Voice);
 		
 		/// <summary> Returns a collection of all invites to this server. </summary>
 		[JsonIgnore]

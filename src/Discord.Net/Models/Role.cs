@@ -8,7 +8,6 @@ namespace Discord
 	public sealed class Role : CachedObject
 	{
 		private readonly string _serverId;
-		private Server _server;
 		
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
@@ -26,7 +25,7 @@ namespace Discord
 		
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
-		public Server Server => _server;
+		public Server Server { get; private set; }
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
 		public bool IsEveryone => Id == _serverId;
@@ -48,14 +47,16 @@ namespace Discord
 		}
 		internal override void OnCached()
 		{
-			_server = _client.Servers[_serverId];
-			_server.AddRole(this);
+			var server = _client.Servers[_serverId];
+			server.AddRole(this);
+			Server = server;
 		}
 		internal override void OnUncached()
 		{
-			if (_server != null)
-				_server.RemoveRole(this);
-			_server = null;
+			var server = Server;
+			if (server != null)
+				server.RemoveRole(this);
+			Server = null;
         }
 
 		internal void Update(RoleInfo model)

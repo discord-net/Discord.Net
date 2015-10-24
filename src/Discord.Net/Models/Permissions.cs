@@ -62,8 +62,8 @@ namespace Discord
         public static ChannelPermissions All(string channelType, bool isPrivate)
 		{
 			if (isPrivate) return PrivateOnly;
-			else if (channelType == ChannelTypes.Text) return TextOnly;
-			else if (channelType == ChannelTypes.Voice) return VoiceOnly;
+			else if (channelType == ChannelType.Text) return TextOnly;
+			else if (channelType == ChannelType.Voice) return VoiceOnly;
 			else return None;
 		}
 

@@ -98,48 +98,43 @@ namespace Discord
 		public IEnumerable<Server> FindServers(string name)
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name));
+			CheckReady();
 
 			return _servers.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 		}
 
 		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
-		public async Task<Server> CreateServer(string name, string region)
+		public async Task<Server> CreateServer(string name, Region region)
 		{
-			CheckReady();
 			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (region == null) throw new ArgumentNullException(nameof(region));
+			if (region == (string)null) throw new ArgumentNullException(nameof(region));
+			CheckReady();
 
-			var response = await _api.CreateServer(name, region).ConfigureAwait(false);
+			var response = await _api.CreateServer(name, region.Value).ConfigureAwait(false);
 			var server = _servers.GetOrAdd(response.Id);
 			server.Update(response);
 			return server;
 		}
-
+		
 		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public Task EditServer(string serverId, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
-			=> EditServer(_servers[serverId], name: name, region: region, iconType: iconType, icon: icon);
-		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public async Task EditServer(Server server, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
+		public async Task EditServer(Server server, string name = null, Region region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
 		{
-			CheckReady();
 			if (server == null) throw new ArgumentNullException(nameof(server));
+			CheckReady();
 
-			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region, iconType: iconType, icon: icon);
+			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region.Value, iconType: iconType, icon: icon);
 			server.Update(response);
 		}
-
+		
 		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
-		public Task<Server> LeaveServer(Server server)
-			=> LeaveServer(server?.Id);
-		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
-		public async Task<Server> LeaveServer(string serverId)
+		public async Task<Server> LeaveServer(Server server)
 		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			try { await _api.LeaveServer(serverId).ConfigureAwait(false); }
+			try { await _api.LeaveServer(server.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _servers.TryRemove(serverId);
+			return _servers.TryRemove(server.Id);
 		}
 	}
 }

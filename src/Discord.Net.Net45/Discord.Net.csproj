@@ -82,14 +82,17 @@
     <Compile Include="..\Discord.Net\API\Enums\AvatarImageType.cs">
       <Link>API\Enums\AvatarImageType.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Enums\ChannelTypes.cs">
-      <Link>API\Enums\ChannelTypes.cs</Link>
+    <Compile Include="..\Discord.Net\API\Enums\ChannelType.cs">
+      <Link>API\Enums\ChannelType.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Enums\PermissionTarget.cs">
       <Link>API\Enums\PermissionTarget.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Enums\Regions.cs">
       <Link>API\Enums\Regions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\StringEnum.cs">
+      <Link>API\Enums\StringEnum.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Enums\UserStatus.cs">
       <Link>API\Enums\UserStatus.cs</Link>

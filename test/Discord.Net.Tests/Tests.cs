@@ -38,7 +38,7 @@ namespace Discord.Tests
 				_observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)));
 
 			//Create new server and invite the other bots to it
-			_testServer = _hostClient.CreateServer("Discord.Net Testing", Regions.US_East).Result;
+			_testServer = _hostClient.CreateServer("Discord.Net Testing", Region.USEast).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _hostClient.CreateInvite(_testServer, 60, 1, false, false).Result;
 			WaitAll(
@@ -49,11 +49,11 @@ namespace Discord.Tests
 		//Channels
 		[TestMethod]
 		public void TestCreateTextChannel()
-			=> TestCreateChannel(ChannelTypes.Text);
+			=> TestCreateChannel(ChannelType.Text);
 		[TestMethod]
 		public void TestCreateVoiceChannel()
-			=> TestCreateChannel(ChannelTypes.Voice);
-		private void TestCreateChannel(string type)
+			=> TestCreateChannel(ChannelType.Voice);
+		private void TestCreateChannel(ChannelType type)
 		{
 			Channel channel = null;
 			string name = $"#test_{_random.Next()}";
@@ -76,21 +76,21 @@ namespace Discord.Tests
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoName()
 		{
-			await _hostClient.CreateChannel(_testServer, $"", ChannelTypes.Text);
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.Text);
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", "");
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString(""));
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_BadType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", "badtype");
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString("badtype"));
 		}
 
 		//Messages

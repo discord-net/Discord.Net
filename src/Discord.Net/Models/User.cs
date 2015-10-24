@@ -40,7 +40,7 @@ namespace Discord
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
 		public string GameId { get; private set; }
 		/// <summary> Returns the current status for this user. </summary>
-		public string Status { get; private set; }
+		public UserStatus Status { get; private set; }
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
 		public DateTime? LastActivityAt { get; private set; }
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
@@ -152,7 +152,7 @@ namespace Discord
 				UpdateRoles(model.Roles);
 			if (model.Status != null && Status != model.Status)
 			{
-				Status = model.Status;
+				Status = UserStatus.FromString(model.Status);
 				if (Status == UserStatus.Offline)
 					_lastOnline = DateTime.UtcNow;
 			}

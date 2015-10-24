@@ -56,7 +56,7 @@ namespace Discord
 		
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(Server server, string name, string type = null)
+		public IEnumerable<Channel> FindChannels(Server server, string name, ChannelType type = null)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
@@ -74,21 +74,21 @@ namespace Discord
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
 
-			if (type != null)
+			if (type != (string)null)
 				result = result.Where(x => x.Type == type);
 
 			return result;
 		}
 
-		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public async Task<Channel> CreateChannel(Server server, string name, string type = ChannelTypes.Text)
+		/// <summary> Creates a new channel with the provided name and type. </summary>
+		public async Task<Channel> CreateChannel(Server server, string name, ChannelType type)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (type == null) throw new ArgumentNullException(nameof(type));
+			if (type == (string)null) throw new ArgumentNullException(nameof(type));
 			CheckReady();
 
-			var response = await _api.CreateChannel(server.Id, name, type).ConfigureAwait(false);
+			var response = await _api.CreateChannel(server.Id, name, type.Value).ConfigureAwait(false);
 			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 			channel.Update(response);
 			return channel;
@@ -153,15 +153,16 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
-			
+			CheckReady();
+
 			return _api.ReorderChannels(server.Id, channels.Select(x => x.Id), after.Position);
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
 		public async Task<Channel> DestroyChannel(Channel channel)
 		{
-			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			CheckReady();
 
 			try { await _api.DestroyChannel(channel.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }

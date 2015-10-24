@@ -11,12 +11,12 @@ namespace Discord
 	{
 		public sealed class PermissionOverwrite
 		{
-			public string TargetType { get; }
+			public PermissionTarget TargetType { get; }
 			public string TargetId { get; }
 			public ChannelPermissions Allow { get; }
 			public ChannelPermissions Deny { get; }
 
-			internal PermissionOverwrite(string targetType, string targetId, uint allow, uint deny)
+			internal PermissionOverwrite(PermissionTarget targetType, string targetId, uint allow, uint deny)
 			{
 				TargetType = targetType;
 				TargetId = targetId;
@@ -138,7 +138,7 @@ namespace Discord
 			if (model.PermissionOverwrites != null)
 			{
 				_permissionOverwrites = model.PermissionOverwrites
-					.Select(x => new PermissionOverwrite(x.Type, x.Id, x.Allow, x.Deny))
+					.Select(x => new PermissionOverwrite(PermissionTarget.FromString(x.Type), x.Id, x.Allow, x.Deny))
 					.ToArray();
 				InvalidatePermissionsCache();
             }

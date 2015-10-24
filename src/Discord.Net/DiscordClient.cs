@@ -19,7 +19,7 @@ namespace Discord
 		private readonly ConcurrentDictionary<string, DiscordWSClient> _voiceClients;
 		private bool _sentInitialLog;
 		private uint _nextVoiceClientId;
-		private string _status;
+		private UserStatus _status;
 		private int? _gameId;
 
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;

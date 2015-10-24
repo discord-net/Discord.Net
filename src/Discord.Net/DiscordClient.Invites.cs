@@ -10,8 +10,8 @@ namespace Discord
 		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
 		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
 		{
-			CheckReady();
 			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
+			CheckReady();
 
 			//Remove trailing slash
 			if (inviteIdOrXkcd.Length > 0 && inviteIdOrXkcd[inviteIdOrXkcd.Length - 1] == '/')
@@ -35,6 +35,8 @@ namespace Discord
 		public Task<Invite> CreateInvite(Server server, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
+			CheckReady();
+
 			return CreateInvite(server.DefaultChannel, maxAge, maxUses, tempMembership, hasXkcd);
 		}
 		/// <summary> Creates a new invite to the provided channel. </summary>
@@ -59,8 +61,8 @@ namespace Discord
 		/// <summary> Deletes the provided invite. </summary>
 		public async Task DestroyInvite(Invite invite)
 		{
-			CheckReady();
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
+			CheckReady();
 
 			try { await _api.DeleteInvite(invite.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
@@ -69,8 +71,8 @@ namespace Discord
 		/// <summary> Accepts the provided invite. </summary>
 		public Task AcceptInvite(Invite invite)
 		{
-			CheckReady();
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
+			CheckReady();
 
 			return _api.AcceptInvite(invite.Id);
 		}

@@ -19,11 +19,14 @@ namespace Discord.Net.Rest
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
 				PreAuthenticate = false,
-				Proxy = new WebProxy(_config.ProxyUrl, true, new string[0], _config.ProxyCredentials),
 				ReadWriteTimeout = _config.APITimeout,
 				UserAgent = _config.UserAgent
 			};
-			_client.RemoveDefaultParameter("Accept");
+			if (_config.ProxyUrl != null)
+				_client.Proxy = new WebProxy(_config.ProxyUrl, true, new string[0], _config.ProxyCredentials);
+			else
+				_client.Proxy = null;
+            _client.RemoveDefaultParameter("Accept");
             _client.AddDefaultHeader("accept", "*/*");
 			_client.AddDefaultHeader("accept-encoding", "gzip,deflate");
         }

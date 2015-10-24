@@ -1,12 +1,38 @@
 ﻿namespace Discord
 {
-	public static class Regions
+	public class Region : StringEnum
 	{
-		public const string US_West = "us-west";
-		public const string US_East = "us-east";
-		public const string Singapore = "singapore";
-		public const string London = "london";
-		public const string Sydney = "sydney";
-		public const string Amsterdam = "amsterdam";
+		public static readonly Region USWest = new Region("us-west");
+		public static readonly Region USEast = new Region("us-east");
+		public static readonly Region Singapore = new Region("singapore");
+		public static readonly Region London = new Region("london");
+		public static readonly Region Sydney = new Region("sydney");
+		public static readonly Region Amsterdam = new Region("amsterdam");
+
+		private Region(string value)
+			: base(value) { }
+
+		public static Region FromString(string value)
+		{
+			switch (value)
+			{
+				case null:
+					return null;
+				case "us-west":
+					return Region.USWest;
+				case "us-east":
+					return Region.USEast;
+				case "singapore":
+					return Region.Singapore;
+				case "london":
+					return Region.London;
+				case "sydney":
+					return Region.Sydney;
+				case "amsterdam":
+					return Region.Amsterdam;
+				default:
+					return new Region(value);
+			}
+		}
 	}
 }

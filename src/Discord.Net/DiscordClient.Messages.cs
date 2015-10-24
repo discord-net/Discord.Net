@@ -190,7 +190,7 @@ namespace Discord
 			CheckReady();
 
 			if (count == 0) return new Message[0];
-			if (channel != null && channel.Type == ChannelTypes.Text)
+			if (channel != null && channel.Type == ChannelType.Text)
 			{
 				try
 				{

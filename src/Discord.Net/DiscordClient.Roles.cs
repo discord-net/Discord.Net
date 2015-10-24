@@ -63,13 +63,20 @@ namespace Discord
 		private readonly Roles _roles;
 
 		/// <summary> Returns the role with the specified id, or null if none was found. </summary>
-		public Role GetRole(string id) => _roles[id];
+		public Role GetRole(string id)
+		{
+			if (id == null) throw new ArgumentNullException(nameof(id));
+			CheckReady();
+
+			return _roles[id];
+		}
 		/// <summary> Returns all roles with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public IEnumerable<Role> FindRoles(Server server, string name)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
+			CheckReady();
 
 			if (name.StartsWith("@"))
 			{
@@ -83,18 +90,16 @@ namespace Discord
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
 		}
-
+		
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public Task<Role> CreateRole(Server server, string name)
-			=> CreateRole(server?.Id, name);
-		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public async Task<Role> CreateRole(string serverId, string name)
+		public async Task<Role> CreateRole(Server server, string name)
 		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			var response = await _api.CreateRole(serverId).ConfigureAwait(false);
-			var role = _roles.GetOrAdd(response.Id, serverId);
+			var response = await _api.CreateRole(server.Id).ConfigureAwait(false);
+			var role = _roles.GetOrAdd(response.Id, server.Id);
 			role.Update(response);
 
 			await EditRole(role, name: name);

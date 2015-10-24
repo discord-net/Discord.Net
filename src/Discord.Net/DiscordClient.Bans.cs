@@ -35,8 +35,8 @@ namespace Discord
 		/// <summary> Bans a user from the provided server. </summary>
 		public Task Ban(Member member)
 		{
-			CheckReady();
 			if (member == null) throw new ArgumentNullException(nameof(member));
+			CheckReady();
 
 			return _api.Ban(member.ServerId, member.Id);
 		}
@@ -44,8 +44,8 @@ namespace Discord
 		/// <summary> Unbans a user from the provided server. </summary>
 		public async Task Unban(Member member)
 		{
-			CheckReady();
 			if (member == null) throw new ArgumentNullException(nameof(member));
+			CheckReady();
 
 			try { await _api.Unban(member.ServerId, member.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }

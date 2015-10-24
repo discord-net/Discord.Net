@@ -62,14 +62,18 @@ namespace Discord
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
+			CheckReady();
 
 			return _api.EditUser(currentPassword: currentPassword, 
 				username: username ?? _currentUser?.Name,  email: email ?? _currentUser?.GlobalUser.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 
-		public Task SetStatus(string status)
+		public Task SetStatus(UserStatus status)
 		{
+			if (status == (string)null) throw new ArgumentNullException(nameof(status));
+			CheckReady();
+
 			if (status != UserStatus.Online && status != UserStatus.Idle)
 				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}");
 			_status = status;
@@ -77,6 +81,8 @@ namespace Discord
 		}
 		public Task SetGame(int? gameId)
 		{
+			CheckReady();
+
 			_gameId = gameId;
 			return SendStatus();
 		}
