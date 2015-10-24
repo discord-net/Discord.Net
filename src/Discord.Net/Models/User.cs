@@ -213,7 +213,7 @@ namespace Discord
 			uint newPermissions = 0x0;
 			uint oldPermissions = permissions.RawValue;
 			
-			if (Id == server.Owner.Id)
+			if (server.Owner == this)
 				newPermissions = ChannelPermissions.All(channel).RawValue;
 			else
 			{

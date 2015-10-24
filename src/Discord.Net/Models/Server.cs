@@ -37,7 +37,7 @@ namespace Discord
 		public bool IsOwner => _client.CurrentUserId == _ownerId;
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
-		public Member Owner => _client.Members[_ownerId, Id];
+		public Member Owner { get; private set; }
 
 		/// <summary> Returns the id of the AFK voice channel for this server (see AFKTimeout). </summary>
 		public string AFKChannelId { get; private set; }
@@ -129,8 +129,11 @@ namespace Discord
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Name != null)
 				Name = model.Name;
-			if (model.OwnerId != null)
+			if (model.OwnerId != null && _ownerId != model.OwnerId)
+			{
 				_ownerId = model.OwnerId;
+				Owner = _client.Members[_ownerId, Id];
+			}
 			if (model.Region != null)
 				Region = model.Region;
 
