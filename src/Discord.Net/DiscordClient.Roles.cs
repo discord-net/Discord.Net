@@ -12,20 +12,7 @@ namespace Discord
 
 		public Roles(DiscordClient client, object writerLock)
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
-
-		internal Role CreateVirtualRole(string serverId, string name)
-		{
-			var role = new Role(_client, serverId, serverId);
-			_dictionary[serverId] = role;
-			role.Update(new API.RoleInfo
-			{
-				Id = serverId,
-				Name = name,
-				Permissions = ServerPermissions.None.RawValue
-			});
-			return role;
-		}
-
+		
 		public Role GetOrAdd(string id, string serverId)
 			=> GetOrAdd(id, () => new Role(_client, id, serverId));
 	}

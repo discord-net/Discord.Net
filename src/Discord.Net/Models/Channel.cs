@@ -86,7 +86,7 @@ namespace Discord
 		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
 			: base(client, id)
 		{
-			_serverId = serverId ?? _client.Servers.PMServer.Id;
+			_serverId = serverId;
 			_recipientId = recipientId;
 			_permissionOverwrites = _initialPermissionsOverwrites;
 			_areMembersStale = true;

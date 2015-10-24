@@ -70,7 +70,7 @@ namespace Discord
 		internal Member(DiscordClient client, string id, string serverId)
 			: base(client, id)
 		{
-			ServerId = serverId ?? _client.Servers.PMServer.Id;
+			ServerId = serverId;
 			Status = UserStatus.Offline;
 			_roleIds = _initialRoleIds;
 			_channels = new ConcurrentDictionary<string, Channel>();

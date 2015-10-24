@@ -63,8 +63,6 @@ namespace Discord
 			_onUncache = onUncache;
         }
 
-		protected virtual void Initialize() { }
-
 		public TValue this[string key]
 		{
 			get
@@ -131,7 +129,6 @@ namespace Discord
 			lock (_writerLock)
 			{
 				_dictionary.Clear();
-				Initialize();
                 RaiseCleared();
 			}
         }

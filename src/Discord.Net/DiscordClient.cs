@@ -46,13 +46,6 @@ namespace Discord
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
 
-			_channels.Clear();
-			_members.Clear();
-			_messages.Clear();
-			_roles.Clear();
-			_servers.Clear();
-			_users.Clear();
-
 			_status = UserStatus.Online;
 
 			this.Connected += async (s, e) =>
@@ -76,58 +69,58 @@ namespace Discord
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				ServerCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Server: {e.Server?.Name}");
+					$"Created Server: {e.Server?.Name ?? "[Private]"}");
 				ServerDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Server: {e.Server?.Name}");
+					$"Destroyed Server: {e.Server?.Name ?? "[Private]"}");
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Server: {e.Server?.Name}");
+					$"Updated Server: {e.Server?.Name ?? "[Private]"}");
 				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Available: {e.Server?.Name}");
+					$"Server Available: {e.Server?.Name ?? "[Private]"}");
 				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Unavailable: {e.Server?.Name}");
+					$"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
 				ChannelCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Channel: {e.Server?.Name}/{e.Channel?.Name}");
+					$"Created Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				ChannelDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Channel: {e.Server?.Name}/{e.Channel?.Name}");
+					$"Destroyed Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				ChannelUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Channel: {e.Server?.Name}/{e.Channel?.Name}");
+					$"Updated Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				MessageCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Message: {e.Server?.Name}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Created Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Message: {e.Server?.Name}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Deleted Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Message: {e.Server?.Name}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Updated Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				RoleCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Role: {e.Server?.Name}/{e.Role?.Name}");
+					$"Created Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Role: {e.Server?.Name}/{e.Role?.Name}");
+					$"Updated Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Role: {e.Server?.Name}/{e.Role?.Name}");
+					$"Deleted Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Added Ban: {e.Server?.Name }/{e.UserId}");
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Ban: {e.Server?.Name}/{e.UserId}");
+					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Member: {e.Server?.Name}/{e.UserId}");
+					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Member: {e.Server?.Name}/{e.UserId}");
+					$"Removed Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member: {e.Server?.Name}/{e.UserId}");
+					$"Updated Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member (Voice State): {e.Server?.Name}/{e.UserId}");
+					$"Updated Member (Voice State): {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				ProfileUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					"Updated Profile");
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				UserIsTyping += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
-					$"Updated User (Is Typing): {e.Server?.Name}/{e.Channel?.Name}/{e.Member?.Name}");
+					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Member?.Name}");
 				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Read Message (Remotely): {e.Server?.Name}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageSent += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Sent Message: {e.Server?.Name}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				UserPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Updated Member (Presence): {e.Server?.Name}/{e.Member?.Name}");
+					$"Updated Member (Presence): {e.Server?.Name ?? "[Private]"}/{e.Member?.Name}");
 				
 				_api.RestClient.OnRequest += (s, e) =>
 				{
@@ -139,18 +132,18 @@ namespace Discord
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Debug)
 			{
-				_channels.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Channel {e.Item.Server.Id}/{e.Item.Id}");
-				_channels.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Channel {e.Item.Server.Id}/{e.Item.Id}");
+				_channels.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_channels.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_channels.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Channels");
-				_members.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Member {e.Item.Server.Id}/{e.Item.Id}");
-				_members.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Member {e.Item.Server.Id}/{e.Item.Id}");
+				_members.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_members.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_members.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Members");
-				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Message {e.Item.Server.Id}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Message {e.Item.Server.Id}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Remapped Message {e.Item.Server.Id}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
+				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Remapped Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
 				_messages.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Messages");
-				_roles.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Role {e.Item.Server.Id}/{e.Item.Id}");
-				_roles.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Role {e.Item.Server.Id}/{e.Item.Id}");
+				_roles.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Role {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_roles.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Role {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_roles.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Roles");
 				_servers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Server {e.Item.Id}");
 				_servers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Server {e.Item.Id}");
@@ -293,7 +286,7 @@ namespace Discord
 					case "READY": //Resync
 						{
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-							_currentUser = _members.GetOrAdd(data.User.Id, _servers.PMServer.Id);
+							_currentUser = _members.GetOrAdd(data.User.Id, null);
 							_currentUser.Update(data.User);
 							foreach (var model in data.Guilds)
 							{
@@ -305,7 +298,7 @@ namespace Discord
 							}
 							foreach (var model in data.PrivateChannels)
 							{
-								var user = _members.GetOrAdd(model.Recipient.Id, _servers.PMServer.Id);
+								var user = _members.GetOrAdd(model.Recipient.Id, null);
 								user.Update(model.Recipient);
 								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
 								channel.Update(model);
@@ -360,7 +353,7 @@ namespace Discord
 							Channel channel;
 							if (data.IsPrivate)
 							{
-								var member = _members.GetOrAdd(data.Recipient.Id, _servers.PMServer.Id);
+								var member = _members.GetOrAdd(data.Recipient.Id, null);
 								member.Update(data.Recipient);
 								channel = _channels.GetOrAdd(data.Id, null, member.Id);
 							}
