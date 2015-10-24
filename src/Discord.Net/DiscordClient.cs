@@ -24,6 +24,9 @@ namespace Discord
 
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;
 
+		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
+		public DiscordAPIClient API => _api;
+
 		/// <summary> Returns the current logged-in user. </summary>
 		public Member CurrentUser => _currentUser;
 
