@@ -18,9 +18,7 @@ namespace Discord
 	public class ChannelEventArgs : EventArgs
 	{
 		public Channel Channel { get; }
-		public string ChannelId => Channel.Id;
 		public Server Server => Channel.Server;
-		public string ServerId => Channel.ServerId;
 
 		internal ChannelEventArgs(Channel channel) { Channel = channel; }
 	}
@@ -49,29 +47,30 @@ namespace Discord
 				RaiseEvent(nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
 		}
 
-
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
-		public Channel GetChannel(string id) => _channels[id];
-		/// <summary> Returns all channels with the specified server and name. </summary>
-		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(Server server, string name, string type = null) => FindChannels(server?.Id, name, type);
-		/// <summary> Returns all channels with the specified server and name. </summary>
-		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(string serverId, string name, string type = null)
+		public Channel GetChannel(string id)
 		{
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (id == null) throw new ArgumentNullException(nameof(id));
+			return _channels[id];
+		}
+		
+		/// <summary> Returns all channels with the specified server and name. </summary>
+		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
+		public IEnumerable<Channel> FindChannels(Server server, string name, string type = null)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
 
 			IEnumerable<Channel> result;
 			if (name.StartsWith("#"))
 			{
 				string name2 = name.Substring(1);
-				result = _channels.Where(x => x.ServerId == serverId &&
+				result = _channels.Where(x => x.Server == server &&
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) ||
 					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
 			}
 			else
 			{
-				result = _channels.Where(x => x.ServerId == serverId &&
+				result = _channels.Where(x => x.Server == server &&
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
 
@@ -82,55 +81,44 @@ namespace Discord
 		}
 
 		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public Task<Channel> CreateChannel(Server server, string name, string type = ChannelTypes.Text)
-			=> CreateChannel(server?.Id, name, type);
-		/// <summary> Creates a new channel with the provided name and type (see ChannelTypes). </summary>
-		public async Task<Channel> CreateChannel(string serverId, string name, string type = ChannelTypes.Text)
+		public async Task<Channel> CreateChannel(Server server, string name, string type = ChannelTypes.Text)
 		{
-			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			if (type == null) throw new ArgumentNullException(nameof(type));
+			CheckReady();
 
-			var response = await _api.CreateChannel(serverId, name, type).ConfigureAwait(false);
+			var response = await _api.CreateChannel(server.Id, name, type).ConfigureAwait(false);
 			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 			channel.Update(response);
 			return channel;
 		}
-
+		
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(string userId) => CreatePMChannel(_users[userId], userId);
-		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(User user) => CreatePMChannel(user, user?.Id);
-		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public Task<Channel> CreatePMChannel(Member member) => CreatePMChannel(member.User, member.UserId);
-		private async Task<Channel> CreatePMChannel(User user, string userId)
+		public async Task<Channel> CreatePMChannel(Member member)
 		{
+			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			Channel channel = null;
-			if (user != null)
-				channel = user.PrivateChannel;
+			if (member != null)
+				channel = member.GlobalUser.PrivateChannel;
 			if (channel == null)
 			{
-				var response = await _api.CreatePMChannel(CurrentUserId, userId).ConfigureAwait(false);
-				user = _users.GetOrAdd(response.Recipient?.Id);
-				user.Update(response.Recipient);
+				var response = await _api.CreatePMChannel(_userId, member.Id).ConfigureAwait(false);
+				var recipient = _members.GetOrAdd(response.Recipient?.Id, _servers.PMServer.Id);
+				recipient.Update(response.Recipient);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 				channel.Update(response);
 			}
 			return channel;
 		}
-
-		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
-		public Task EditChannel(string channelId, string name = null, string topic = null, int? position = null)
-			=> EditChannel(_channels[channelId], name: name, topic: topic, position: position);
+		
 		/// <summary> Edits the provided channel, changing only non-null attributes. </summary>
 		public async Task EditChannel(Channel channel, string name = null, string topic = null, int? position = null)
 		{
-			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			CheckReady();
 
 			await _api.EditChannel(channel.Id, name: name, topic: topic);
 
@@ -155,34 +143,29 @@ namespace Discord
 						channels[i] = channels[i - 1];
 					channels[newPos] = channel;
 				}
-				await _api.ReorderChannels(channel.ServerId, channels.Skip(minPos).Select(x => x.Id), minPos);
+				Channel after = minPos > 0 ? channels.Skip(minPos - 1).FirstOrDefault() : null;
+                await ReorderChannels(channel.Server, channels.Skip(minPos), after);
 			}
 		}
-
-		public Task ReorderChannels(Server server, IEnumerable<object> channels, int startPos = 0)
-			=> ReorderChannels(server.Id, channels, startPos);
-		public Task ReorderChannels(string serverId, IEnumerable<object> channels, int startPos = 0)
+		
+		/// <summary> Reorders the provided channels in the server's channel list and places them after a certain channel. </summary>
+        public Task ReorderChannels(Server server, IEnumerable<Channel> channels, Channel after = null)
 		{
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
-			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
-
-			var channelIds = CollectionHelper.FlattenChannels(channels);
-			return _api.ReorderChannels(serverId, channelIds, startPos);
+			
+			return _api.ReorderChannels(server.Id, channels.Select(x => x.Id), after.Position);
 		}
-
+		
 		/// <summary> Destroys the provided channel. </summary>
-		public Task<Channel> DestroyChannel(Channel channel)
-			=> DestroyChannel(channel?.Id);
-		/// <summary> Destroys the provided channel. </summary>
-		public async Task<Channel> DestroyChannel(string channelId)
+		public async Task<Channel> DestroyChannel(Channel channel)
 		{
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
-			try { await _api.DestroyChannel(channelId).ConfigureAwait(false); }
+			try { await _api.DestroyChannel(channel.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _channels.TryRemove(channelId);
+			return _channels.TryRemove(channel.Id);
 		}
 	}
 }

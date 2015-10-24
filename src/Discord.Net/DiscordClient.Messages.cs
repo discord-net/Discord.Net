@@ -20,14 +20,9 @@ namespace Discord
 	public class MessageEventArgs : EventArgs
 	{
 		public Message Message { get; }
-		public string MessageId => Message.Id;
 		public Member Member => Message.Member;
 		public Channel Channel => Message.Channel;
-		public string ChannelId => Message.ChannelId;
 		public Server Server => Message.Server;
-		public string ServerId => Message.ServerId;
-		public User User => Member.User;
-		public string UserId => Message.UserId;
 
 		internal MessageEventArgs(Message msg) { Message = msg; }
 	}
@@ -74,165 +69,127 @@ namespace Discord
 		public Message GetMessage(string id) => _messages[id];
 
 		/// <summary> Sends a message to the provided channel. To include a mention, see the Mention static helper class. </summary>
-		public Task<Message[]> SendMessage(Channel channel, string text)
-			=> SendMessage(channel, text, MentionHelper.GetUserIds(text), false);
-		/// <summary> Sends a message to the provided channel. To include a mention, see the Mention static helper class. </summary>
-		public Task<Message[]> SendMessage(string channelId, string text)
-			=> SendMessage(_channels[channelId], text, MentionHelper.GetUserIds(text), false);
-		private async Task<Message[]> SendMessage(Channel channel, string text, IEnumerable<object> mentionedUsers = null, bool isTextToSpeech = false)
+		public Task<Message> SendMessage(Channel channel, string text)
 		{
-			CheckReady();
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			var mentionedUserIds = CollectionHelper.FlattenUsers(mentionedUsers);
+			CheckReady();
 
-			int blockCount = (int)Math.Ceiling(text.Length / (double)MaxMessageSize);
-			Message[] result = new Message[blockCount];
-			for (int i = 0; i < blockCount; i++)
-			{
-				int index = i * MaxMessageSize;
-				string blockText = text.Substring(index, Math.Min(2000, text.Length - index));
-				var nonce = GenerateNonce();
-				if (Config.UseMessageQueue)
-				{
-					var msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, CurrentUserId);
-					var currentUser = msg.User;
-					msg.Update(new MessageInfo
-					{
-						Content = blockText,
-						Timestamp = DateTime.UtcNow,
-						Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = CurrentUserId, Username = currentUser.Name },
-						ChannelId = channel.Id,
-						IsTextToSpeech = isTextToSpeech
-					});
-					msg.IsQueued = true;
-					msg.Nonce = nonce;
-					result[i] = msg;
-					_pendingMessages.Enqueue(msg);
-				}
-				else
-				{
-					var model = await _api.SendMessage(channel.Id, blockText, mentionedUserIds, nonce, isTextToSpeech).ConfigureAwait(false);
-					var msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
-					msg.Update(model);
-					RaiseMessageSent(msg);
-					result[i] = msg;
-				}
-				await Task.Delay(1000).ConfigureAwait(false);
-			}
-			return result;
+			return SendMessage(channel, text, false);
 		}
-
-		/// <summary> Sends a private message to the provided user. </summary>
-		public Task<Message[]> SendPrivateMessage(Member member, string text)
-			=> SendPrivateMessage(member?.UserId, text);
-		/// <summary> Sends a private message to the provided user. </summary>
-		public Task<Message[]> SendPrivateMessage(User user, string text)
-			=> SendPrivateMessage(user?.Id, text);
-		/// <summary> Sends a private message to the provided user. </summary>
-		public async Task<Message[]> SendPrivateMessage(string userId, string text)
+		/// <summary> Sends a text-to-speech message to the provided channel. To include a mention, see the Mention static helper class. </summary>
+		public Task<Message> SendTTSMessage(Channel channel, string text)
 		{
-			var channel = await CreatePMChannel(userId).ConfigureAwait(false);
-			return await SendMessage(channel, text, new string[0]).ConfigureAwait(false);
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (text == null) throw new ArgumentNullException(nameof(text));
+			CheckReady();
+
+			return SendMessage(channel, text, false);
+        }
+		/// <summary> Sends a private message to the provided user. </summary>
+		public async Task<Message> SendPrivateMessage(Member member, string text)
+		{
+			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (text == null) throw new ArgumentNullException(nameof(text));
+			CheckReady();
+
+			var channel = await CreatePMChannel(member).ConfigureAwait(false);
+			return await SendMessage(channel, text).ConfigureAwait(false);
 		}
+		private async Task<Message> SendMessage(Channel channel, string text, bool isTextToSpeech)
+		{
+			Message msg;
+			var userIds = !channel.IsPrivate ? Mention.GetUserIds(text) : new string[0];
+			if (Config.UseMessageQueue)
+			{
+				var nonce = GenerateNonce();
+				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
+				var currentUser = msg.Member;
+				msg.Update(new MessageInfo
+				{
+					Content = text,
+                    Timestamp = DateTime.UtcNow,
+					Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _userId, Username = currentUser.Name },
+					ChannelId = channel.Id,
+					IsTextToSpeech = isTextToSpeech
+				});
+				msg.Mentions = userIds.Select(x => _members[x, channel.Server.Id]).Where(x => x != null).ToArray();
+				msg.IsQueued = true;
+				msg.Nonce = nonce;
+				_pendingMessages.Enqueue(msg);
+			}
+			else
+			{
+				var model = await _api.SendMessage(channel.Id, text, userIds, null, isTextToSpeech).ConfigureAwait(false);
+				msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
+				msg.Update(model);
+				RaiseMessageSent(msg);
+			}
+			return msg;
+		}
+
 
 		/// <summary> Sends a file to the provided channel. </summary>
 		public Task SendFile(Channel channel, string filePath)
-			=> SendFile(channel?.Id, filePath);
-		/// <summary> Sends a file to the provided channel. </summary>
-		public Task SendFile(string channelId, string filePath)
 		{
-			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+			CheckReady();
 
-			return _api.SendFile(channelId, filePath);
+			return _api.SendFile(channel.Id, filePath);
 		}
 
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Message message, string text = null, IEnumerable<object> mentionedUsers = null)
-			=> EditMessage(message?.ChannelId, message?.Id, text, mentionedUsers);
-		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public Task EditMessage(Channel channel, string messageId, string text = null, IEnumerable<object> mentionedUsers = null)
-			=> EditMessage(channel?.Id, messageId, text, mentionedUsers);
-		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
-		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public async Task EditMessage(string channelId, string messageId, string text = null, IEnumerable<object> mentionedUsers = null)
+		public async Task EditMessage(Message message, string text)
 		{
+			if (message == null) throw new ArgumentNullException(nameof(message));
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-			if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-			var mentionedUserIds = CollectionHelper.FlattenUsers(mentionedUsers);
 
 			if (text != null && text.Length > MaxMessageSize)
 				text = text.Substring(0, MaxMessageSize);
 
-			var model = await _api.EditMessage(messageId, channelId, text, mentionedUserIds).ConfigureAwait(false);
-			var msg = _messages[messageId];
-			if (msg != null)
-				msg.Update(model);
+			var model = await _api.EditMessage(message.Id, message.Channel.Id, text, Mention.GetUserIds(text)).ConfigureAwait(false);
+			message.Update(model);
 		}
 
 		/// <summary> Deletes the provided message. </summary>
-		public Task DeleteMessage(Message msg)
-			=> DeleteMessage(msg?.ChannelId, msg?.Id);
-		/// <summary> Deletes the provided message. </summary>
-		public async Task DeleteMessage(string channelId, string msgId)
+		public async Task DeleteMessage(Message message)
 		{
+			if (message == null) throw new ArgumentNullException(nameof(message));
 			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
-			if (msgId == null) throw new ArgumentNullException(nameof(msgId));
 
 			try
 			{
-				await _api.DeleteMessage(msgId, channelId).ConfigureAwait(false);
-				_messages.TryRemove(msgId);
+				await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
+				_messages.TryRemove(message.Id);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
-		public async Task DeleteMessages(IEnumerable<Message> msgs)
+		public async Task DeleteMessages(IEnumerable<Message> messages)
 		{
+			if (messages == null) throw new ArgumentNullException(nameof(messages));
 			CheckReady();
-			if (msgs == null) throw new ArgumentNullException(nameof(msgs));
 
-			foreach (var msg in msgs)
+			foreach (var message in messages)
 			{
 				try
 				{
-					await _api.DeleteMessage(msg.Id, msg.ChannelId).ConfigureAwait(false);
-				}
-				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			}
-		}
-		public async Task DeleteMessages(string channelId, IEnumerable<string> msgIds)
-		{
-			CheckReady();
-			if (msgIds == null) throw new ArgumentNullException(nameof(msgIds));
-
-			foreach (var msgId in msgIds)
-			{
-				try
-				{
-					await _api.DeleteMessage(msgId, channelId).ConfigureAwait(false);
+					await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
+					_messages.TryRemove(message.Id);
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
 		}
 
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
-		public Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null, bool cache = true)
-			=> DownloadMessages(channel.Id, count, beforeMessageId, cache);
-		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(string channelId, int count, string beforeMessageId = null, bool cache = true)
+		public async Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null, bool cache = true)
 		{
-			CheckReady();
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
-			if (count == 0) return new Message[0];
+			CheckReady();
 
-			Channel channel = _channels[channelId];
+			if (count == 0) return new Message[0];
 			if (channel != null && channel.Type == ChannelTypes.Text)
 			{
 				try
@@ -283,7 +240,7 @@ namespace Discord
 						SendMessageResponse response = null;
 						try
 						{
-							response = await _api.SendMessage(msg.ChannelId, msg.RawText, msg.MentionIds, msg.Nonce, msg.IsTTS).ConfigureAwait(false);
+							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.MentionIds, msg.Nonce, msg.IsTTS).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }

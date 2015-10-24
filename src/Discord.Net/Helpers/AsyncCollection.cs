@@ -7,7 +7,7 @@ using System.Linq;
 namespace Discord
 {
 	internal abstract class AsyncCollection<TValue> : IEnumerable<TValue>
-		where TValue : class
+		where TValue : CachedObject
 	{
 		private readonly object _writerLock;
 

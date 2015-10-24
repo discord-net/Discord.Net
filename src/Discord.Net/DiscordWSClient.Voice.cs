@@ -17,7 +17,7 @@ namespace Discord
 			
 			await _voiceSocket.SetChannel(_voiceServerId, channelId).ConfigureAwait(false);
 			_dataSocket.SendJoinVoice(_voiceServerId, channelId);
-			await _voiceSocket.WaitForConnection(_config.ConnectionTimeout);
+			await _voiceSocket.WaitForConnection(_config.ConnectionTimeout).ConfigureAwait(false);
 		}
 
 		/// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
@@ -25,12 +25,12 @@ namespace Discord
 		/// <param name="count">Number of bytes in this frame. </param>
 		void IDiscordVoiceClient.SendVoicePCM(byte[] data, int count)
 		{
-			CheckReady(checkVoice: true);
 			if (data == null) throw new ArgumentException(nameof(data));
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
-			if (count == 0) return;
-			
-			_voiceSocket.SendPCMFrames(data, count);
+			CheckReady(checkVoice: true);
+
+			if (count != 0)
+				_voiceSocket.SendPCMFrames(data, count);
 		}
 		/// <summary> Clears the PCM buffer. </summary>
 		void IDiscordVoiceClient.ClearVoicePCM()

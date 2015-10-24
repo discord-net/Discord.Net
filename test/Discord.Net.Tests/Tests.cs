@@ -59,14 +59,14 @@ namespace Discord.Tests
 			string name = $"#test_{_random.Next()}";
 			AssertEvent<ChannelEventArgs>(
 				"ChannelCreated event never received",
-				() => channel = _hostClient.CreateChannel(_testServer, name.Substring(1), type).Result,
+				async () => channel = await _hostClient.CreateChannel(_testServer, name.Substring(1), type),
 				x => _targetBot.ChannelCreated += x,
 				x => _targetBot.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
 
 			AssertEvent<ChannelEventArgs>(
 				"ChannelDestroyed event never received",
-				() => _hostClient.DestroyChannel(channel),
+				async () => await _hostClient.DestroyChannel(channel),
 				x => _targetBot.ChannelDestroyed += x,
 				x => _targetBot.ChannelDestroyed -= x,
 				(s, e) => e.Channel.Name == name);
@@ -120,15 +120,15 @@ namespace Discord.Tests
 				_observerBot.Disconnect());
 		}
 
-		private static void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+		private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
 			AssertEvent(msg, action, addEvent, removeEvent, test, true);
 		}
-		private static void AssertNoEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+		private static void AssertNoEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
 			AssertEvent(msg, action, addEvent, removeEvent, test, false);
         }
-		private static void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
+		private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
 		{
 			ManualResetEventSlim trigger = new ManualResetEventSlim(false);
 			bool result = false;
@@ -145,8 +145,9 @@ namespace Discord.Tests
 			};
 
 			addEvent(handler);
-			action();
+			var task = action();
 			trigger.Wait(EventTimeout);
+			task.Wait();
 			removeEvent(handler);
 			
 			Assert.AreEqual(assertTrue, result, msg);

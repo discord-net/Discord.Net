@@ -8,47 +8,13 @@ namespace Discord
 	public partial class DiscordClient
 	{
 		public Task SetChannelUserPermissions(Channel channel, Member member, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(channel, member?.UserId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, Member member, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(channel, user?.Id, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(Channel channel, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, allow, deny);
-		public Task SetChannelUserPermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, allow, deny);
+			=> SetChannelPermissions(channel, member?.Id, PermissionTarget.Member, allow, deny);
 		public Task SetChannelUserPermissions(Channel channel, Member member, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(channel, member?.UserId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelUserPermissions(string channelId, Member member, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelUserPermissions(Channel channel, User user, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(channel, user?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelUserPermissions(string channelId, User user, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelUserPermissions(Channel channel, string userId, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(channel, userId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelUserPermissions(string channelId, string userId, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
-
+			=> SetChannelPermissions(channel, member?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
 		public Task SetChannelRolePermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(string channelId, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(Channel channel, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, allow, deny);
-		public Task SetChannelRolePermissions(string channelId, string userId, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, allow, deny);
 		public Task SetChannelRolePermissions(Channel channel, Role role, DualChannelPermissions permissions = null)
 			=> SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelRolePermissions(string channelId, Role role, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelRolePermissions(Channel channel, string userId, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(channel, userId, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
-		public Task SetChannelRolePermissions(string channelId, string userId, DualChannelPermissions permissions = null)
-			=> SetChannelPermissions(_channels[channelId], userId, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
-
 		private async Task SetChannelPermissions(Channel channel, string targetId, string targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
 			CheckReady();
@@ -103,34 +69,23 @@ namespace Discord
 		}
 
 		public Task RemoveChannelUserPermissions(Channel channel, Member member)
-			=> RemoveChannelPermissions(channel, member?.UserId, PermissionTarget.Member);
-		public Task RemoveChannelUserPermissions(string channelId, Member member)
-			=> RemoveChannelPermissions(_channels[channelId], member?.UserId, PermissionTarget.Member);
-		public Task RemoveChannelUserPermissions(Channel channel, User user)
-			=> RemoveChannelPermissions(channel, user?.Id, PermissionTarget.Member);
-		public Task RemoveChannelUserPermissions(string channelId, User user)
-			=> RemoveChannelPermissions(_channels[channelId], user?.Id, PermissionTarget.Member);
-		public Task RemoveChannelUserPermissions(Channel channel, string userId)
-			=> RemoveChannelPermissions(channel, userId, PermissionTarget.Member);
-		public Task RemoveChannelUserPermissions(string channelId, string userId)
-			=> RemoveChannelPermissions(_channels[channelId], userId, PermissionTarget.Member);
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (member == null) throw new ArgumentNullException(nameof(member));
+			CheckReady();
 
+			return RemoveChannelPermissions(channel, member?.Id, PermissionTarget.Member);
+		}
 		public Task RemoveChannelRolePermissions(Channel channel, Role role)
-			=> RemoveChannelPermissions(channel, role?.Id, PermissionTarget.Role);
-		public Task RemoveChannelRolePermissions(string channelId, Role role)
-			=> RemoveChannelPermissions(_channels[channelId], role?.Id, PermissionTarget.Role);
-		public Task RemoveChannelRolePermissions(Channel channel, string roleId)
-			=> RemoveChannelPermissions(channel, roleId, PermissionTarget.Role);
-		public Task RemoveChannelRolePermissions(string channelId, string roleId)
-			=> RemoveChannelPermissions(_channels[channelId], roleId, PermissionTarget.Role);
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (role == null) throw new ArgumentNullException(nameof(role));
+			CheckReady();
 
+			return RemoveChannelPermissions(channel, role?.Id, PermissionTarget.Role);
+		}
 		private async Task RemoveChannelPermissions(Channel channel, string userOrRoleId, string idType)
 		{
-			CheckReady();
-			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (userOrRoleId == null) throw new ArgumentNullException(nameof(userOrRoleId));
-			if (idType == null) throw new ArgumentNullException(nameof(idType));
-
 			try
 			{
 				var perms = channel.PermissionOverwrites.Where(x => x.TargetType != idType || x.TargetId != userOrRoleId).FirstOrDefault();

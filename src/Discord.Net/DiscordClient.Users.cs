@@ -6,20 +6,12 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Users : AsyncCollection<User>
+	internal sealed class Users : AsyncCollection<GlobalUser>
 	{
 		public Users(DiscordClient client, object writerLock)
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
 
-		public User GetOrAdd(string id) => GetOrAdd(id, () => new User(_client, id));
-	}
-
-	public sealed class UserEventArgs : EventArgs
-	{
-		public User User { get; }
-		public string UserId => User.Id;
-
-		internal UserEventArgs(User user) { User = user; }
+		public GlobalUser GetOrAdd(string id) => GetOrAdd(id, () => new GlobalUser(_client, id));
 	}
 
 	public partial class DiscordClient
@@ -36,11 +28,11 @@ namespace Discord
 			if (UserRemoved != null)
 				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new MemberEventArgs(member)));
 		}
-		public event EventHandler<UserEventArgs> UserUpdated;
-		private void RaiseUserUpdated(User user)
+		public event EventHandler ProfileUpdated;
+		private void RaiseProfileUpdated(GlobalUser user)
 		{
-			if (UserUpdated != null)
-				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
+			if (ProfileUpdated != null)
+				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
 		}
 		public event EventHandler<MemberEventArgs> MemberUpdated;
 		private void RaiseMemberUpdated(Member member)
@@ -65,55 +57,14 @@ namespace Discord
 		internal Users Users => _users;
 		private readonly Users _users;
 
-		/// <summary> Returns the current logged-in user. </summary>
-		public User CurrentUser => _currentUser;
-		private User _currentUser;
-
-		/// <summary> Returns the user with the specified id, or null if none was found. </summary>
-		public User GetUser(string id) => _users[id];
-		/// <summary> Returns the user with the specified name and discriminator, or null if none was found. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public User GetUser(string username, string discriminator)
-		{
-			if (username == null) throw new ArgumentNullException(nameof(username));
-			if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
-
-			if (username.StartsWith("@"))
-				username = username.Substring(1);
-
-			return _users.Where(x =>
-					string.Equals(x.Name, username, StringComparison.OrdinalIgnoreCase) &&
-					x.Discriminator == discriminator
-				)
-				.FirstOrDefault();
-		}
-
-		/// <summary> Returns all users with the specified name across all servers. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public IEnumerable<User> FindUsers(string name)
-		{
-			if (name == null) throw new ArgumentNullException(nameof(name));
-
-			if (name.StartsWith("@"))
-			{
-				string name2 = name.Substring(1);
-				return _users.Where(x =>
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
-			}
-			else
-			{
-				return _users.Where(x =>
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-			}
-		}
-
 		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 
-			return _api.EditUser(currentPassword: currentPassword, username: username ?? _currentUser?.Name, email: email ?? _currentUser?.Email, password: password,
+			return _api.EditUser(currentPassword: currentPassword, 
+				username: username ?? _currentUser?.Name,  email: email ?? _currentUser?.GlobalUser.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 

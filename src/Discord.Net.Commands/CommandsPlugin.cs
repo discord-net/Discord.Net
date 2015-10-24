@@ -8,7 +8,7 @@ namespace Discord.Commands
     {
 		private readonly DiscordClient _client;
 		private List<Command> _commands;
-		private Func<User, Server, int> _getPermissions;
+		private Func<Member, int> _getPermissions;
 
 		public IEnumerable<Command> Commands => _commands;
 
@@ -17,7 +17,7 @@ namespace Discord.Commands
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public CommandsPlugin(DiscordClient client, Func<User, Server, int> getPermissions = null)
+		public CommandsPlugin(DiscordClient client, Func<Member, int> getPermissions = null)
 		{
 			_client = client;
 			_getPermissions = getPermissions;
@@ -96,7 +96,7 @@ namespace Discord.Commands
 						argText = msg.Substring(args[cmd.Parts.Length].Index);
 
 					//Check Permissions
-					int permissions = _getPermissions != null ? _getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
+					int permissions = _getPermissions != null ? _getPermissions(e.Message.Member) : 0;
 					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, argText, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{

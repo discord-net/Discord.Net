@@ -11,14 +11,10 @@ namespace Discord.Commands
 		public string ArgText { get; }
 		public int? Permissions { get; }
 		public string[] Args { get; }
-
-		public User User => Message.User;
-		public string UserId => Message.UserId;
+		
 		public Member Member => Message.Member;
 		public Channel Channel => Message.Channel;
-		public string ChannelId => Message.ChannelId;
 		public Server Server => Message.Channel.Server;
-		public string ServerId => Message.Channel.ServerId;
 
 		public CommandEventArgs(Message message, Command command, string commandText, string argText, int? permissions, string[] args)
 		{

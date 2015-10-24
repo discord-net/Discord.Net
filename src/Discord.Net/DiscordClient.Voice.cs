@@ -47,18 +47,13 @@ namespace Discord
 			return client;
 		}
 
-		public Task<IDiscordVoiceClient> JoinVoiceServer(Channel channel)
-			=> JoinVoiceServer(channel?.ServerId, channel?.Id);
-		public Task<IDiscordVoiceClient> JoinVoiceServer(Server server, string channelId)
-			=> JoinVoiceServer(server?.Id, channelId);
-		public async Task<IDiscordVoiceClient> JoinVoiceServer(string serverId, string channelId)
+		public async Task<IDiscordVoiceClient> JoinVoiceServer(Channel channel)
 		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady(); //checkVoice is done inside the voice client
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			var client = await CreateVoiceClient(serverId).ConfigureAwait(false);
-			await client.JoinChannel(channelId).ConfigureAwait(false);
+			var client = await CreateVoiceClient(channel.Server.Id).ConfigureAwait(false);
+			await client.JoinChannel(channel.Id).ConfigureAwait(false);
 			return client;
 		}
 

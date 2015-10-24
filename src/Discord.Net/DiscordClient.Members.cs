@@ -23,8 +23,7 @@ namespace Discord
 	public class MemberEventArgs : EventArgs
 	{
 		public Member Member { get; }
-		public User User => Member.User;
-		public string UserId => Member.UserId;
+		public string UserId => Member.Id;
 		public Server Server => Member.Server;
 		public string ServerId => Member.ServerId;
 
@@ -66,80 +65,65 @@ namespace Discord
 			if (UserIsSpeaking != null)
 				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new MemberIsSpeakingEventArgs(member, channel, isSpeaking)));
 		}
-		
+
+		private Member _currentUser;
+
 		internal Members Members => _members;
 		private readonly Members _members;
-		
+
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Member GetMember(Server server, User user) => _members[user?.Id, server?.Id];
-		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Member GetMember(Server server, string userId) => _members[userId, server?.Id];
-		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Member GetMember(string serverId, User user) => _members[user?.Id, serverId];
-		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public Member GetMember(string serverId, string userId) => _members[userId, serverId];
-		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public Member GetMember(Server server, string username, string discriminator) 
-			=> GetMember(server?.Id, username, discriminator);
-		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
-		public Member GetMember(string serverId, string username, string discriminator)
+		public Member GetMember(Server server, string userId)
 		{
-			User user = GetUser(username, discriminator);
-			return _members[user?.Id, serverId];
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+			CheckReady();
+
+			return _members[userId, server.Id];
+		}
+		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public Member GetMember(Server server, string username, string discriminator)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (username == null) throw new ArgumentNullException(nameof(username));
+			if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
+			CheckReady();
+
+			Member member = FindMembers(server, username, discriminator, true).FirstOrDefault();
+			return _members[member?.Id, server.Id];
 		}
 
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<Member> FindMembers(string serverId, string name) => FindMembers(_servers[serverId], name);
-		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<Member> FindMembers(Server server, string name)
+		public IEnumerable<Member> FindMembers(Server server, string name, string discriminator = null, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
+			CheckReady();
 
-			if (name.StartsWith("@"))
+			IEnumerable<Member> query;
+			if (!exactMatch && name.StartsWith("@"))
 			{
 				string name2 = name.Substring(1);
-				return server.Members.Where(x =>
-				{
-					var user = x.User;
-					if (user == null)
-						return false;
-					return string.Equals(user.Name, name, StringComparison.OrdinalIgnoreCase) ||
-						string.Equals(user.Name, name2, StringComparison.OrdinalIgnoreCase);
-				});
+				query = server.Members.Where(x => 
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) ||
+					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
 			}
 			else
 			{
-				return server.Members.Where(x =>
-				{
-					var user = x.User;
-					if (user == null)
-						return false;
-					return string.Equals(x.User.Name, name, StringComparison.OrdinalIgnoreCase);
-				});
+				query = server.Members.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			}
-		}
+			if (discriminator != null)
+				query = query.Where(x => x.Discriminator == discriminator);
+			return query;
+        }
 
-		public Task EditMember(Member member, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
-			=> EditMember(member?.ServerId, member?.UserId, mute, deaf, roles);
-		public Task EditMember(Server server, User user, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
-			=> EditMember(server?.Id, user?.Id, mute, deaf, roles);
-		public Task EditMember(Server server, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
-			=> EditMember(server?.Id, userId, mute, deaf, roles);
-		public Task EditMember(string serverId, User user, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
-			=> EditMember(serverId, user?.Id, mute, deaf, roles);
-		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<object> roles = null)
+		public Task EditMember(Member member, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null)
 		{
+			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
-			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
-
-			var newRoles = CollectionHelper.FlattenRoles(roles);
-			return _api.EditMember(serverId, userId, mute: mute, deaf: deaf, roles: newRoles);
+			
+			return _api.EditMember(member.ServerId, member.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 	}
 }

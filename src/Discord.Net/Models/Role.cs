@@ -5,12 +5,11 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Role
+	public sealed class Role : CachedObject
 	{
-		private readonly DiscordClient _client;
-
-		/// <summary> Returns the unique identifier for this role. </summary>
-		public string Id { get; }
+		private readonly string _serverId;
+		private Server _server;
+		
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
@@ -24,27 +23,21 @@ namespace Discord
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public ServerPermissions Permissions { get; }
-
-		/// <summary> Returns the id of the server this role is a member of. </summary>
-		public string ServerId { get; }
+		
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[ServerId];
+		public Server Server => _server;
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
-		public bool IsEveryone => Id == ServerId;
-		/// <summary> Returns a list of the ids of all members in this role. </summary>
-		[JsonIgnore]
-		public IEnumerable<string> MemberIds => IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId);
+		public bool IsEveryone => Id == _serverId;
 		/// <summary> Returns a list of all members in this role. </summary>
 		[JsonIgnore]
-		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id));
+		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this));
 
 		internal Role(DiscordClient client, string id, string serverId)
+			: base(client, id)
 		{
-			_client = client;
-			Id = id;
-			ServerId = serverId;
+			_serverId = serverId;
 			Permissions = new ServerPermissions(0);
 			Permissions.Lock();
 			Color = new Color(0);
@@ -53,18 +46,17 @@ namespace Discord
 			if (IsEveryone)
 				Position = int.MinValue;
 		}
-		internal void OnCached()
+		internal override void OnCached()
 		{
-			var server = Server;
-			if (server != null)
-				server.AddRole(Id);
+			_server = _client.Servers[_serverId];
+			_server.AddRole(this);
 		}
-		internal void OnUncached()
+		internal override void OnUncached()
 		{
-			var server = Server;
-			if (server != null)
-				server.RemoveRole(Id);
-		}
+			if (_server != null)
+				_server.RemoveRole(this);
+			_server = null;
+        }
 
 		internal void Update(RoleInfo model)
 		{

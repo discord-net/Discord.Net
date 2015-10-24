@@ -202,6 +202,9 @@
     <Compile Include="..\Discord.Net\DiscordWSClientConfig.cs">
       <Link>DiscordWSClientConfig.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\AsyncCollection.cs">
+      <Link>Helpers\AsyncCollection.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>
     </Compile>
@@ -214,14 +217,8 @@
     <Compile Include="..\Discord.Net\Helpers\Mention.cs">
       <Link>Helpers\Mention.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\MentionHelper.cs">
-      <Link>Helpers\MentionHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\Shared\CollectionHelper.cs">
-      <Link>Helpers\Shared\CollectionHelper.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Helpers\Shared\TaskHelper.cs">
-      <Link>Helpers\Shared\TaskHelper.cs</Link>
+      <Link>Helpers\TaskHelper.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\TimeoutException.cs">
       <Link>Helpers\TimeoutException.cs</Link>
@@ -229,8 +226,8 @@
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Models\AsyncCollection.cs">
-      <Link>Models\AsyncCollection.cs</Link>
+    <Compile Include="..\Discord.Net\Models\CachedObject.cs">
+      <Link>Models\CachedObject.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
@@ -238,11 +235,11 @@
     <Compile Include="..\Discord.Net\Models\Color.cs">
       <Link>Models\Color.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\GlobalUser.cs">
+      <Link>Models\GlobalUser.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Invite.cs">
       <Link>Models\Invite.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Models\Member.cs">
-      <Link>Models\Member.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Message.cs">
       <Link>Models\Message.cs</Link>

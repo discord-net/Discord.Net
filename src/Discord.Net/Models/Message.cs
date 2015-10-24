@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Message
+	public sealed class Message : CachedObject
 	{
 		public sealed class Attachment : File
 		{
@@ -91,12 +91,9 @@ namespace Discord
 			}
 		}
 
-		private readonly DiscordClient _client;
 		private string _cleanText;
-		private bool _gotRef;
-
-		/// <summary> Returns the global unique identifier for this message. </summary>
-		public string Id { get; internal set; }
+		private string _channelId, _userId;
+		
 		/// <summary> Returns the local unique identifier for this message. </summary>
 		public string Nonce { get; internal set; }
 
@@ -115,7 +112,7 @@ namespace Discord
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = MentionHelper.ConvertToNames(_client, RawText));
+		public string Text => _cleanText != null ? _cleanText : (_cleanText = Mention.ConvertToNames(_client, Server, RawText));
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>
@@ -132,19 +129,14 @@ namespace Discord
 		public string[] MentionIds { get; private set; }
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.Users[x]).Where(x => x != null);
-
-		/// <summary> Returns the id of the server containing the channel this message was sent to. </summary>
-		public string ServerId => Channel.ServerId;
+		public IEnumerable<Member> Mentions { get; internal set; }
+		
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[Channel.ServerId];
-
-		/// <summary> Returns the id of the channel this message was sent to. </summary>
-		public string ChannelId { get; }
+		public Server Server => Channel.Server;
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.Channels[ChannelId];
+		public Channel Channel { get; private set; }
 
 		/// <summary> Returns true if the current user created this message. </summary>
 		public bool IsAuthor => _client.CurrentUserId == UserId;
@@ -152,42 +144,28 @@ namespace Discord
 		public string UserId { get; }
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User User => _client.Users[UserId];
-		/// <summary> Returns the author of this message. </summary>
-		[JsonIgnore]
-		public Member Member => _client.Members[UserId, ServerId];
+		public Member Member => _client.Members[_userId, Channel.Server.Id];
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
+			: base(client, id)
 		{
-			_client = client;
-			Id = id;
-			ChannelId = channelId;
-			UserId = userId;
+			_channelId = channelId;
+			_userId = userId;
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 			MentionIds = _initialMentions;
 		}
-		internal void OnCached()
+		internal override void OnCached()
 		{
-			var channel = Channel;
-			if (channel != null)
-				channel.AddMessage(Id);
-			var user = User;
-			if (user != null)
-			{
-				user.AddRef();
-				_gotRef = true;
-			}
+			var channel = _client.Channels[_channelId];
+			channel.AddMessage(Id);
+			Channel = channel;
 		}
-		internal void OnUncached()
+		internal override void OnUncached()
 		{
 			var channel = Channel;
 			if (channel != null)
 				channel.RemoveMessage(Id);
-			var user = User;
-			if (user != null && _gotRef)
-				user.RemoveRef();
-			_gotRef = false;
         }
 
 		internal void Update(MessageInfo model)
@@ -236,6 +214,6 @@ namespace Discord
 			}
 		}
 
-		public override string ToString() => User.ToString() + ": " + RawText;
+		public override string ToString() => Member.Name + ": " + RawText;
 	}
 }

@@ -110,11 +110,11 @@ namespace Discord
 		}
 
 		//Invites
-		public Task<CreateInviteResponse> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool withXkcdPass)
+		public Task<CreateInviteResponse> CreateInvite(string channelId, int maxAge, int maxUses, bool tempMembership, bool hasXkcd)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			var request = new CreateInviteRequest { MaxAge = maxAge, MaxUses = maxUses, IsTemporary = isTemporary, WithXkcdPass = withXkcdPass };
+			var request = new CreateInviteRequest { MaxAge = maxAge, MaxUses = maxUses, IsTemporary = tempMembership, WithXkcdPass = hasXkcd };
 			return _rest.Post<CreateInviteResponse>(Endpoints.ChannelInvites(channelId), request);
 		}
 		public Task<GetInviteResponse> GetInvite(string inviteIdOrXkcd)

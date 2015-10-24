@@ -1,15 +1,14 @@
-﻿using Discord.API;
+﻿using System;
+using Discord.API;
 using Newtonsoft.Json;
 
 namespace Discord
 {
-	public sealed class Invite
+	public sealed class Invite : CachedObject
 	{
-		private readonly DiscordClient _client;
-
-		/// <summary> Returns the unique identifier for this invite. </summary>
-		public string Id { get; }
-
+		private readonly string _serverId;
+        private string _inviterId, _channelId;
+		
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
 		public int MaxAge { get; private set; }
 		/// <summary> The amount  of times this invite has been used. </summary>
@@ -25,41 +24,37 @@ namespace Discord
 
 		/// <summary> Returns a URL for this invite using XkcdPass if available or Id if not. </summary>
 		public string Url => API.Endpoints.InviteUrl(XkcdPass ?? Id);
-
-		/// <summary> Returns the id of the user that created this invite. </summary>
-		public string InviterId { get; private set; }
+		
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
-		public User Inviter => _client.Users[InviterId];
-
-		/// <summary> Returns the id of the server this invite is to. </summary>
-		public string ServerId { get; }
+		public Member Inviter => _client.Members[_inviterId, _serverId];
+		
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[ServerId];
-
-		/// <summary> Returns the id of the channel this invite is to. </summary>
-		public string ChannelId { get; private set; }
+		public Server Server => _client.Servers[_serverId];
+		
 		/// <summary> Returns the channel this invite is to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.Channels[ChannelId];
+		public Channel Channel => _client.Channels[_channelId];
 
 		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId)
+			: base(client, code)
 		{
-			_client = client;
-			Id = code;
 			XkcdPass = xkcdPass;
-			ServerId = serverId;
+			_serverId = serverId;
 		}
+		internal override void OnCached() { }
+		internal override void OnUncached() { }
 
 		public override string ToString() => XkcdPass ?? Id;
+
 
 		internal void Update(InviteReference model)
 		{
 			if (model.Channel != null)
-				ChannelId = model.Channel.Id;
+				_channelId = model.Channel.Id;
 			if (model.Inviter != null)
-				InviterId = model.Inviter.Id;
+				_inviterId = model.Inviter.Id;
 		}
 
 		internal void Update(InviteInfo model)

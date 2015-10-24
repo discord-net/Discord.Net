@@ -20,27 +20,21 @@ namespace Discord
 	/// <summary> Provides a minimalistic websocket connection to the Discord service. </summary>
 	public partial class DiscordWSClient
 	{
-		internal readonly DataWebSocket _dataSocket;
-		internal readonly VoiceWebSocket _voiceSocket;
+		protected readonly DiscordWSClientConfig _config;
 		protected readonly ManualResetEvent _disconnectedEvent;
 		protected readonly ManualResetEventSlim _connectedEvent;
-		protected readonly bool _enableVoice;
-		protected string _gateway, _token;
-		protected string _voiceServerId;
-		private Task _runTask;
-
+		internal readonly DataWebSocket _dataSocket;
+		internal readonly VoiceWebSocket _voiceSocket;
 		protected ExceptionDispatchInfo _disconnectReason;
+		protected string _gateway, _token;
+		protected string _userId, _voiceServerId;
+		private Task _runTask;
 		private bool _wasDisconnectUnexpected;
 
-		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordWSClientConfig Config => _config;
-		protected readonly DiscordWSClientConfig _config;
+		public string CurrentUserId => _userId;
 
-		/// <summary> Returns the id of the current logged-in user. </summary>
-		public string CurrentUserId => _currentUserId;
-		private string _currentUserId;
-		/*/// <summary> Returns the server this user is currently connected to for voice. </summary>
-		public string CurrentVoiceServerId => _voiceSocket.CurrentServerId;*/
+		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
+		public DiscordWSClientConfig Config => _config;		
 
 		/// <summary> Returns the current connection state of this client. </summary>
 		public DiscordClientState State => (DiscordClientState)_state;
@@ -56,15 +50,13 @@ namespace Discord
 			_config = config ?? new DiscordWSClientConfig();
 			_config.Lock();
 
-			_enableVoice = _config.EnableVoice;
-
 			_state = (int)DiscordClientState.Disconnected;
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
 			_dataSocket = CreateDataSocket();
-			if (_enableVoice)
+			if (_config.EnableVoice)
 				_voiceSocket = CreateVoiceSocket();
 		}
 		internal DiscordWSClient(DiscordWSClientConfig config = null, string voiceServerId = null)
@@ -247,7 +239,7 @@ namespace Discord
 
         protected virtual async Task Cleanup()
 		{
-			if (_enableVoice)
+			if (_config.EnableVoice)
 			{
 				string voiceServerId = _voiceSocket.CurrentServerId;
                 if (voiceServerId != null)
@@ -256,7 +248,7 @@ namespace Discord
 			}
 			await _dataSocket.Disconnect().ConfigureAwait(false);
 
-			_currentUserId = null;
+			_userId = null;
 			_gateway = null;
 			_token = null;
 		}
@@ -286,7 +278,7 @@ namespace Discord
 					throw new InvalidOperationException("The client is connecting.");
 			}
 			
-			if (checkVoice && !_enableVoice)
+			if (checkVoice && !_config.EnableVoice)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		protected void RaiseEvent(string name, Action action)
@@ -307,17 +299,17 @@ namespace Discord
 				switch (e.Type)
 				{
 					case "READY":
-						_currentUserId = e.Payload["user"].Value<string>("id");
+						_userId = e.Payload["user"].Value<string>("id");
 						break;
 					case "VOICE_SERVER_UPDATE":
 						{
 							string guildId = e.Payload.Value<string>("guild_id");
 
-							if (_enableVoice && guildId == _voiceSocket.CurrentServerId)
+							if (_config.EnableVoice && guildId == _voiceSocket.CurrentServerId)
 							{
 								string token = e.Payload.Value<string>("token");
 								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								return _voiceSocket.Login(_currentUserId, _dataSocket.SessionId, token, CancelToken);
+								return _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken);
 							}
 						}
 						break;
