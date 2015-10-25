@@ -21,58 +21,37 @@ namespace Discord
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
 		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id);
-		
+
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
-		public User Inviter { get; private set; }
-		[JsonProperty("InviterId")]
-		private readonly string _inviterId;
+		public User Inviter => _inviter.Value;
+        private readonly Reference<User> _inviter;
 
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]
-		public Server Server { get; private set; }
-		[JsonProperty("ServerId")]
-		private readonly string _serverId;
+		public Server Server => _server.Value;
+		private readonly Reference<Server> _server;
 
 		/// <summary> Returns the channel this invite is to. </summary>
 		[JsonIgnore]
-		public Channel Channel { get; private set; }
-		[JsonProperty("ChannelId")]
-		private readonly string _channelId;
+		public Channel Channel => _channel.Value;
+		private readonly Reference<Channel> _channel;
 
 		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId, string inviterId, string channelId)
 			: base(client, code)
 		{
 			XkcdCode = xkcdPass;
-			_serverId = serverId;
-			_inviterId = inviterId;
-			_channelId = channelId;
+			_server = new Reference<Server>(serverId, x => _client.Servers[x] ?? new Server(client, x));
+			_inviter = new Reference<User>(serverId, x => _client.Users[x, _server.Id] ?? new User(client, x, _server.Id));
+			_channel = new Reference<Channel>(serverId, x => _client.Channels[x] ?? new Channel(client, x, _server.Id, null));
 		}
-
-		internal override void OnCached()
+		internal override void LoadReferences()
 		{
-			var server = _client.Servers[_serverId];
-			if (server == null)
-				server = new Server(_client, _serverId);
-			Server = server;
-
-			if (_inviterId != null)
-			{
-				var inviter = _client.Users[_inviterId, _serverId];
-				if (inviter == null)
-					inviter = new User(_client, _inviterId, _serverId);
-				Inviter = inviter;
-			}
-
-			if (_channelId != null)
-			{
-				var channel = _client.Channels[_channelId];
-				if (channel == null)
-					channel = new Channel(_client, _channelId, _serverId, null);
-				Channel = channel;
-			}
+			_server.Load();
+			_inviter.Load();
+			_channel.Load();
 		}
-		internal override void OnUncached() { }
+		internal override void UnloadReferences() { }
 
 		public override string ToString() => XkcdCode ?? Id;
 		

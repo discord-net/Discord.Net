@@ -16,7 +16,7 @@ namespace Discord
 		private ServerPermissions _serverPermissions;
 
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
-		internal string UniqueId => GetId(Id, _serverId);
+		internal string UniqueId => GetId(Id, _server.Id);
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
@@ -49,11 +49,12 @@ namespace Discord
 		private DateTime _lastOnline;
 
 		[JsonIgnore]
-		internal GlobalUser GlobalUser { get; private set; }
+		internal GlobalUser GlobalUser => _globalUser.Value;
+		private readonly Reference<GlobalUser> _globalUser;
 
 		[JsonIgnore]
-		public Server Server { get; private set; }
-		private string _serverId;
+		public Server Server => _server.Value;
+        private readonly Reference<Server> _server;
 
 		[JsonIgnore]
 		public Channel VoiceChannel { get; private set; }
@@ -64,7 +65,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
-		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.User.Id == Id && x.Server.Id == _serverId);
+		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.User.Id == Id && x.Server.Id == _server.Id);
 
 		/// <summary> Returns a collection of all channels this user is a member of. </summary>
 		[JsonIgnore]
@@ -73,44 +74,41 @@ namespace Discord
 		internal User(DiscordClient client, string id, string serverId)
 			: base(client, id)
 		{
-			_serverId = serverId;
+			_globalUser = new Reference<GlobalUser>(id, 
+				x => _client.GlobalUsers.GetOrAdd(x), 
+				x => x.AddUser(this), 
+				x => x.RemoveUser(this));
+			_server = new Reference<Server>(serverId, 
+				x => _client.Servers[x], 
+				x =>
+				{
+					x.AddMember(this);
+					if (x.Id == _client.CurrentUserId)
+						x.CurrentMember = this;
+                }, 
+				x =>
+				{
+					x.RemoveMember(this);
+					if (x.Id == _client.CurrentUserId)
+						x.CurrentMember = null;
+				});
 			Status = UserStatus.Offline;
-			//_roles = new Dictionary<string, Role>();
 			_channels = new ConcurrentDictionary<string, Channel>();
 			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
 			_serverPermissions = new ServerPermissions();
-        }
-		internal override void OnCached()
-		{
-			if (_serverId != null)
-			{
-				var server = _client.Servers[_serverId];
-				server.AddMember(this);
-				if (Id == _client.CurrentUserId)
-					server.CurrentMember = this;
-				Server = server;
-			}
-			else
+
+			if (serverId == null)
 				UpdateRoles(null);
-
-			var user = _client.GlobalUsers.GetOrAdd(Id);
-			user.AddUser(this);
-			GlobalUser = user;
 		}
-		internal override void OnUncached()
+		internal override void LoadReferences()
 		{
-			//References
-			var server = Server;
-			if (server != null)
-			{
-				server.RemoveMember(this);
-				if (Id == _client.CurrentUserId)
-					server.CurrentMember = null;
-			}
-
-			var globalUser = GlobalUser;
-			if (globalUser != null)
-				globalUser.RemoveUser(this);
+			_globalUser.Load();
+			_server.Load();
+		}
+		internal override void UnloadReferences()
+		{
+			_globalUser.Unload();
+			_server.Unload();
 		}
 
 		public override string ToString() => Id;
@@ -128,6 +126,7 @@ namespace Discord
 		{
 			if (model.User != null)
 				Update(model.User);
+
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
@@ -138,6 +137,7 @@ namespace Discord
 		internal void Update(ExtendedMemberInfo model)
 		{
 			Update(model as API.MemberInfo);
+
 			if (model.IsServerDeafened != null)
 				IsServerDeafened = model.IsServerDeafened.Value;
 			if (model.IsServerMuted != null)
@@ -156,9 +156,8 @@ namespace Discord
 				if (Status == UserStatus.Offline)
 					_lastOnline = DateTime.UtcNow;
 			}
-
-			//Allows null
-			GameId = model.GameId;
+			
+			GameId = model.GameId; //Allows null
 		}
 		internal void Update(VoiceMemberInfo model)
 		{
@@ -188,7 +187,7 @@ namespace Discord
 			else
 				newRoles = new Dictionary<string, Role>();
 			Role everyone;
-			if (_serverId != null)
+			if (_server.Id != null)
 				everyone = Server.EveryoneRole;
 			else
 				everyone = _client.Roles.VirtualEveryone;

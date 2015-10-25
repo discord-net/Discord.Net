@@ -6,9 +6,7 @@ using System.Linq;
 namespace Discord
 {
 	public sealed class Role : CachedObject
-	{
-		private readonly string _serverId;
-		
+	{		
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
@@ -22,40 +20,35 @@ namespace Discord
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
 		public ServerPermissions Permissions { get; }
-		
+
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
-		public Server Server { get; private set; }
+		public Server Server => _server.Value;
+		private readonly Reference<Server> _server;
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
-		public bool IsEveryone => _serverId == null || Id == _serverId;
+		public bool IsEveryone => _server.Id == null || Id == _server.Id;
 		/// <summary> Returns a list of all members in this role. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this));
+		public IEnumerable<User> Members => _server.Id != null ? (IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this))) : new User[0];
 		//TODO: Add local members cache
 
 		internal Role(DiscordClient client, string id, string serverId)
 			: base(client, id)
 		{
-			_serverId = serverId;
+			_server = new Reference<Server>(serverId, x => _client.Servers[x], x => x.AddRole(this), x => x.RemoveRole(this));
 			Permissions = new ServerPermissions(0);
 			Permissions.Lock();
 			Color = new Color(0);
 			Color.Lock();
 		}
-		internal override void OnCached()
+		internal override void LoadReferences()
 		{
-			//References
-			var server = _client.Servers[_serverId];
-			server.AddRole(this);
-			Server = server;
+			_server.Load();
 		}
-		internal override void OnUncached()
+		internal override void UnloadReferences()
 		{
-			//References
-			var server = Server;
-			if (server != null)
-				server.RemoveRole(this);
+			_server.Unload();
         }
 
 		internal void Update(RoleInfo model)

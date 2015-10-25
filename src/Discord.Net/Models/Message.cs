@@ -129,48 +129,36 @@ namespace Discord
 		
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Server Server => Channel.Server;
+		public Server Server => _channel.Value.Server;
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Channel Channel { get; private set; }
-		private readonly string _channelId;
+		public Channel Channel => _channel.Value;
+		private readonly Reference<Channel> _channel;
 
 		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUserId == _userId;
+		public bool IsAuthor => _client.CurrentUserId == _user.Id;
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User User { get; private set; }
-		private readonly string _userId;
+		public User User => _user.Value;
+		private readonly Reference<User> _user;
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 			: base(client, id)
 		{
-			_channelId = channelId;
-			_userId = userId;
+			_channel = new Reference<Channel>(channelId, x => _client.Channels[x], x => x.AddMessage(this), x => x.RemoveMessage(this));
+			_user = new Reference<User>(userId, x => _client.Users[x]);
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 		}
-		internal override void OnCached()
+		internal override void LoadReferences()
 		{
-			//References
-			var channel = _client.Channels[_channelId];
-			channel.AddMessage(this);
-			Channel = channel;
-
-			var user = _client.Users[_userId, channel.Server?.Id];
-			//user.AddMessage(this);
-			User = user;
+			_channel.Load();
+			_user.Load();
 		}
-		internal override void OnUncached()
+		internal override void UnloadReferences()
 		{
-			//References
-			var channel = Channel;
-			if (channel != null)
-				channel.RemoveMessage(this);
-
-			/*var user = User;
-			if (user != null)
-				user.RemoveMessage(this);*/
+			_channel.Unload();
+			_user.Unload();
 		}
 
 		internal void Update(MessageInfo model)

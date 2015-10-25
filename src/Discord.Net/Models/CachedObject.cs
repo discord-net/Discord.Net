@@ -5,6 +5,8 @@
 		protected readonly DiscordClient _client;
 		private bool _isCached;
 
+		internal bool IsCached => _isCached;
+
 		internal CachedObject(DiscordClient client, string id)
 		{
 			_client = client;
@@ -18,18 +20,18 @@
 
 		internal void Cache()
 		{
-			OnCached();
+			LoadReferences();
 			_isCached = true;
 		}
 		internal void Uncache()
 		{
 			if (_isCached)
 			{
-				OnUncached();
+				UnloadReferences();
 				_isCached = false;
 			}
 		}
-		internal abstract void OnCached();
-		internal abstract void OnUncached();
+		internal abstract void LoadReferences();
+		internal abstract void UnloadReferences();
 	}
 }

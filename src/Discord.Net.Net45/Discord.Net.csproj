@@ -223,6 +223,9 @@
     <Compile Include="..\Discord.Net\Helpers\Mention.cs">
       <Link>Helpers\Mention.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\Reference.cs">
+      <Link>Helpers\Reference.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
       <Link>Helpers\TaskHelper.cs</Link>
     </Compile>

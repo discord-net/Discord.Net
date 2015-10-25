@@ -33,19 +33,19 @@ namespace Discord
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
-		public bool IsPrivate => _recipientId != null;
+		public bool IsPrivate => _recipient.Id != null;
 		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
 		public string Type { get; private set; }
 
 		/// <summary> Returns the server containing this channel. </summary>
 		[JsonIgnore]
-		public Server Server { get; private set; }
-		private readonly string _serverId;
+		public Server Server => _server.Value;
+		private readonly Reference<Server> _server;
 
 		/// For private chats, returns the target user, otherwise null.
 		[JsonIgnore]
-		public User Recipient { get; private set; }
-		private readonly string _recipientId;
+		public User Recipient => _recipient.Value;
+        private readonly Reference<User> _recipient;
 		
 		/// <summary> Returns a collection of all users with read access to this channel. </summary>
 		[JsonIgnore]
@@ -74,39 +74,35 @@ namespace Discord
 		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
 			: base(client, id)
 		{
-			_serverId = serverId;
-			_recipientId = recipientId;
+			_server = new Reference<Server>(serverId, 
+				x => _client.Servers[x], 
+				x => x.AddChannel(this), 
+				x => x.RemoveChannel(this));
+			_recipient = new Reference<User>(recipientId, 
+				x => _client.Users[x, _server.Id], 
+				x =>
+				{
+					Name = "@" + x.Name;
+					x.GlobalUser.PrivateChannel = this;
+				},
+				x => x.GlobalUser.PrivateChannel = null);
 			_permissionOverwrites = _initialPermissionsOverwrites;
 			_areMembersStale = true;
 
 			//Local Cache
 			_messages = new ConcurrentDictionary<string, Message>();
 		}
-		internal override void OnCached()
+		internal override void LoadReferences()
 		{
 			if (IsPrivate)
-			{
-				var recipient = _client.Users[_recipientId, null];
-				Name = "@" + recipient.Name;
-				recipient.GlobalUser.PrivateChannel = this;
-				Recipient = recipient;
-			}
+				_recipient.Load();
 			else
-			{
-				var server = _client.Servers[_serverId];
-				server.AddChannel(this);
-				Server = server;
-            }
+				_server.Load();
 		}
-		internal override void OnUncached()
+		internal override void UnloadReferences()
 		{
-			var server = Server;
-			if (server != null)
-				server.RemoveChannel(this);
-			
-			var recipient = Recipient;
-			if (recipient != null)
-				recipient.GlobalUser.PrivateChannel = null;
+			_server.Unload();
+			_recipient.Unload();
 			
 			var globalMessages = _client.Messages;
 			var messages = _messages;
@@ -167,7 +163,10 @@ namespace Discord
 		}
 		private void UpdateMembersCache()
 		{
-			_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
+			if (_server.Id != null)
+				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
+			else
+				_members = new Dictionary<string, User>();
 			_areMembersStale = false;
 		}
 

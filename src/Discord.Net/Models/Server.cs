@@ -84,8 +84,8 @@ namespace Discord
 			_bans = new ConcurrentDictionary<string, bool>();
 			_invites = new ConcurrentDictionary<string, Invite>();
 		}
-		internal override void OnCached() { }
-		internal override void OnUncached()
+		internal override void LoadReferences() { }
+		internal override void UnloadReferences()
 		{
 			//Global Cache
 			var globalChannels = _client.Channels;
@@ -210,21 +210,31 @@ namespace Discord
 
 		internal void AddMember(User member)
 		{
-			_members.TryAdd(member.Id, member);
-			foreach (var channel in Channels)
+			if (_members.TryAdd(member.Id, member))
 			{
-				member.AddChannel(channel);
-				channel.InvalidatePermissionsCache(member);
+				if (member.Id == _ownerId)
+					Owner = member;
+
+				foreach (var channel in Channels)
+				{
+					member.AddChannel(channel);
+					channel.InvalidatePermissionsCache(member);
+				}
 			}
         }
 		internal void RemoveMember(User member)
 		{
-			foreach (var channel in Channels)
+			if (_members.TryRemove(member.Id, out member))
 			{
-				member.RemoveChannel(channel);
-				channel.InvalidatePermissionsCache(member);
+				if (member.Id == _ownerId)
+					Owner = null;
+
+				foreach (var channel in Channels)
+				{
+					member.RemoveChannel(channel);
+					channel.InvalidatePermissionsCache(member);
+				}
 			}
-			_members.TryRemove(member.Id, out member);
 		}
 		internal void HasMember(User user) => _members.ContainsKey(user.Id);
 
