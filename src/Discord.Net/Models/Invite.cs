@@ -72,12 +72,7 @@ namespace Discord
 				Channel = channel;
 			}
 		}
-		internal override void OnUncached()
-		{
-			Server = null;
-			Inviter = null;
-			Channel = null;
-		}
+		internal override void OnUncached() { }
 
 		public override string ToString() => XkcdCode ?? Id;
 		

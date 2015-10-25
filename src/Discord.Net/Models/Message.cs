@@ -167,12 +167,10 @@ namespace Discord
 			var channel = Channel;
 			if (channel != null)
 				channel.RemoveMessage(this);
-			Channel = null;
 
-			var user = User;
-			/*if (user != null)
+			/*var user = User;
+			if (user != null)
 				user.RemoveMessage(this);*/
-			User = null;
 		}
 
 		internal void Update(MessageInfo model)

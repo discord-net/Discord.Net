@@ -56,7 +56,6 @@ namespace Discord
 			var server = Server;
 			if (server != null)
 				server.RemoveRole(this);
-			Server = null;
         }
 
 		internal void Update(RoleInfo model)

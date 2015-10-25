@@ -96,7 +96,6 @@ namespace Discord
 				var server = _client.Servers[_serverId];
 				server.AddChannel(this);
 				Server = server;
-				Recipient = null;
             }
 		}
 		internal override void OnUncached()
@@ -104,13 +103,17 @@ namespace Discord
 			var server = Server;
 			if (server != null)
 				server.RemoveChannel(this);
-			Server = null;
 			
 			var recipient = Recipient;
 			if (recipient != null)
 				recipient.GlobalUser.PrivateChannel = null;
-			Recipient = recipient;
-		}
+			
+			var globalMessages = _client.Messages;
+			var messages = _messages;
+			foreach (var message in messages)
+				globalMessages.TryRemove(message.Key);
+			_messages.Clear();
+        }
 
 		internal void Update(ChannelReference model)
 		{
@@ -148,7 +151,10 @@ namespace Discord
 				{
 					var oldest = _messages.Select(x => x.Value.Id).OrderBy(x => x).FirstOrDefault();
 					if (oldest != null)
-						_client.Messages.TryRemove(oldest);
+					{
+						if (_messages.TryRemove(oldest, out message))
+							_client.Messages.TryRemove(oldest);
+					}
 				}
 				_messages.TryAdd(message.Id, message);
 			}

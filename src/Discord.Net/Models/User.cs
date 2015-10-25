@@ -82,14 +82,16 @@ namespace Discord
         }
 		internal override void OnCached()
 		{
-			var server = _client.Servers[_serverId];
-			if (server != null)
+			if (_serverId != null)
 			{
+				var server = _client.Servers[_serverId];
 				server.AddMember(this);
 				if (Id == _client.CurrentUserId)
 					server.CurrentMember = this;
 				Server = server;
 			}
+			else
+				UpdateRoles(null);
 
 			var user = _client.GlobalUsers.GetOrAdd(Id);
 			user.AddUser(this);
@@ -105,12 +107,10 @@ namespace Discord
 				if (Id == _client.CurrentUserId)
 					server.CurrentMember = null;
 			}
-			Server = null;
 
 			var globalUser = GlobalUser;
 			if (globalUser != null)
 				globalUser.RemoveUser(this);
-			GlobalUser = null;
 		}
 
 		public override string ToString() => Id;
@@ -182,7 +182,11 @@ namespace Discord
 		}
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			var newRoles = roles.ToDictionary(x => x.Id, x => x);
+			Dictionary<string, Role> newRoles;
+			if (roles != null)
+				newRoles = roles.ToDictionary(x => x.Id, x => x);
+			else
+				newRoles = new Dictionary<string, Role>();
 			Role everyone;
 			if (_serverId != null)
 				everyone = Server.EveryoneRole;
