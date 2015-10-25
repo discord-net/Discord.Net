@@ -51,6 +51,8 @@ namespace Discord
 		public Channel GetChannel(string id)
 		{
 			if (id == null) throw new ArgumentNullException(nameof(id));
+			CheckReady();
+
 			return _channels[id];
 		}
 		

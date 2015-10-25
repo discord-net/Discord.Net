@@ -80,7 +80,13 @@ namespace Discord
 		private readonly Messages _messages;
 
 		/// <summary> Returns the message with the specified id, or null if none was found. </summary>
-		public Message GetMessage(string id) => _messages[id];
+		public Message GetMessage(string id)
+		{
+			if (id == null) throw new ArgumentNullException(nameof(id));
+			CheckReady();
+
+			return _messages[id];
+		}
 
 		/// <summary> Sends a message to the provided channel. To include a mention, see the Mention static helper class. </summary>
 		public Task<Message> SendMessage(Channel channel, string text)
