@@ -8,7 +8,7 @@ namespace Discord
 	internal sealed class Users : AsyncCollection<User>
 	{
 		public Users(DiscordClient client, object writerLock)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+			: base(client, writerLock) { }
 		private string GetKey(string userId, string serverId)
 			=> User.GetId(userId, serverId);
 

@@ -52,15 +52,12 @@ namespace Discord
 
 		protected readonly DiscordClient _client;
 		protected readonly ConcurrentDictionary<string, TValue> _dictionary;
-		private readonly Action<TValue> _onCache, _onUncache;
 
-		protected AsyncCollection(DiscordClient client, object writerLock, Action<TValue> onCache, Action<TValue> onUncache)
+		protected AsyncCollection(DiscordClient client, object writerLock)
 		{
 			_client = client;
 			_writerLock = writerLock;
 			_dictionary = new ConcurrentDictionary<string, TValue>();
-			_onCache = onCache;
-			_onUncache = onUncache;
         }
 
 		public TValue this[string key]
@@ -88,7 +85,7 @@ namespace Discord
 				result = _dictionary.GetOrAdd(key, newItem);
 				if (result == newItem)
 				{
-					_onCache(result);
+					result.Cache();
 					RaiseItemCreated(result);
 				}
 			}
@@ -103,7 +100,7 @@ namespace Discord
 					TValue result;
 					if (_dictionary.TryRemove(key, out result))
 					{
-						_onUncache(result); //TODO: If this object is accessed before OnRemoved finished firing, properties such as Server.Channels will have null elements
+						result.Uncache(); //TODO: If this object is accessed before OnRemoved finished firing, properties such as Server.Channels will have null elements
 						return result;
 					}
 				}

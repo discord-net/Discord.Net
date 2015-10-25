@@ -9,7 +9,7 @@ namespace Discord
 	internal sealed class Channels : AsyncCollection<Channel>
 	{
 		public Channels(DiscordClient client, object writerLock)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+			: base(client, writerLock) { }
 
 		public Channel GetOrAdd(string id, string serverId, string recipientId = null)
 			=> GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));

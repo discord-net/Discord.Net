@@ -13,7 +13,7 @@ namespace Discord
 		private bool _isEnabled;
 
 		public Messages(DiscordClient client, object writerLock, bool isEnabled)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached())
+			: base(client, writerLock)
 		{
 			_isEnabled = isEnabled;
         }

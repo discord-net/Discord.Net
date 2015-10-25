@@ -9,7 +9,7 @@ namespace Discord
 	internal sealed class Servers : AsyncCollection<Server>
 	{
 		public Servers(DiscordClient client, object writerLock)
-			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
+			: base(client, writerLock) { }
 
 		public Server GetOrAdd(string id)
 			=> GetOrAdd(id, () => new Server(_client, id));
