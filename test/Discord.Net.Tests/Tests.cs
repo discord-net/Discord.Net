@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Tests
+namespace Discord.Tests
 {
 	[TestClass]
 	public class Tests
@@ -33,12 +33,12 @@ namespace Discord.Net.Tests
 
 			//Cleanup existing servers
 			WaitMany(
-				_hostClient.Servers.Select(x => _hostClient.LeaveServer(x)),
-				_targetBot.Servers.Select(x => _targetBot.LeaveServer(x)),
-				_observerBot.Servers.Select(x => _observerBot.LeaveServer(x)));
+				_hostClient.AllServers.Select(x => _hostClient.LeaveServer(x)),
+				_targetBot.AllServers.Select(x => _targetBot.LeaveServer(x)),
+				_observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)));
 
 			//Create new server and invite the other bots to it
-			_testServer = _hostClient.CreateServer("Discord.Net Testing", Regions.US_East).Result;
+			_testServer = _hostClient.CreateServer("Discord.Net Testing", Region.USEast).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _hostClient.CreateInvite(_testServer, 60, 1, false, false).Result;
 			WaitAll(
@@ -49,24 +49,24 @@ namespace Discord.Net.Tests
 		//Channels
 		[TestMethod]
 		public void TestCreateTextChannel()
-			=> TestCreateChannel(ChannelTypes.Text);
+			=> TestCreateChannel(ChannelType.Text);
 		[TestMethod]
 		public void TestCreateVoiceChannel()
-			=> TestCreateChannel(ChannelTypes.Voice);
-		private void TestCreateChannel(string type)
+			=> TestCreateChannel(ChannelType.Voice);
+		private void TestCreateChannel(ChannelType type)
 		{
 			Channel channel = null;
 			string name = $"#test_{_random.Next()}";
 			AssertEvent<ChannelEventArgs>(
 				"ChannelCreated event never received",
-				() => channel = _hostClient.CreateChannel(_testServer, name.Substring(1), type).Result,
+				async () => channel = await _hostClient.CreateChannel(_testServer, name.Substring(1), type),
 				x => _targetBot.ChannelCreated += x,
 				x => _targetBot.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
 
 			AssertEvent<ChannelEventArgs>(
 				"ChannelDestroyed event never received",
-				() => _hostClient.DestroyChannel(channel),
+				async () => await _hostClient.DestroyChannel(channel),
 				x => _targetBot.ChannelDestroyed += x,
 				x => _targetBot.ChannelDestroyed -= x,
 				(s, e) => e.Channel.Name == name);
@@ -76,21 +76,21 @@ namespace Discord.Net.Tests
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoName()
 		{
-			await _hostClient.CreateChannel(_testServer, $"", ChannelTypes.Text);
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.Text);
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", "");
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString(""));
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_BadType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", "badtype");
+			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString("badtype"));
 		}
 
 		//Messages
@@ -101,8 +101,8 @@ namespace Discord.Net.Tests
 			AssertEvent<MessageEventArgs>(
 				"MessageCreated event never received",
 				() => _hostClient.SendMessage(_testServerChannel, text),
-				x => _targetBot.MessageCreated += x,
-				x => _targetBot.MessageCreated -= x,
+				x => _targetBot.MessageReceived += x,
+				x => _targetBot.MessageReceived -= x,
 				(s, e) => e.Message.Text == text);
 		}
 
@@ -110,9 +110,9 @@ namespace Discord.Net.Tests
 		public static void Cleanup()
 		{
 			WaitMany(
-				_hostClient.State == DiscordClientState.Connected ? _hostClient.Servers.Select(x => _hostClient.LeaveServer(x)) : null,
-				_targetBot.State == DiscordClientState.Connected ? _targetBot.Servers.Select(x => _targetBot.LeaveServer(x)) : null,
-				_observerBot.State == DiscordClientState.Connected ? _observerBot.Servers.Select(x => _observerBot.LeaveServer(x)) : null);
+				_hostClient.State == DiscordClientState.Connected ? _hostClient.AllServers.Select(x => _hostClient.LeaveServer(x)) : null,
+				_targetBot.State == DiscordClientState.Connected ? _targetBot.AllServers.Select(x => _targetBot.LeaveServer(x)) : null,
+				_observerBot.State == DiscordClientState.Connected ? _observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)) : null);
 
 			WaitAll(
 				_hostClient.Disconnect(),
@@ -120,15 +120,15 @@ namespace Discord.Net.Tests
 				_observerBot.Disconnect());
 		}
 
-		private static void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+		private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
 			AssertEvent(msg, action, addEvent, removeEvent, test, true);
 		}
-		private static void AssertNoEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+		private static void AssertNoEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
 			AssertEvent(msg, action, addEvent, removeEvent, test, false);
         }
-		private static void AssertEvent<TArgs>(string msg, Action action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
+		private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
 		{
 			ManualResetEventSlim trigger = new ManualResetEventSlim(false);
 			bool result = false;
@@ -145,8 +145,9 @@ namespace Discord.Net.Tests
 			};
 
 			addEvent(handler);
-			action();
+			var task = action();
 			trigger.Wait(EventTimeout);
+			task.Wait();
 			removeEvent(handler);
 			
 			Assert.AreEqual(assertTrue, result, msg);

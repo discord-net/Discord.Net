@@ -1,15 +1,13 @@
 ﻿namespace Discord.API
 {
-	internal static class Endpoints
+	public static class Endpoints
 	{
 		public const string BaseStatusApi = "https://status.discordapp.com/api/v2/";
 		public const string BaseApi = "https://discordapp.com/api/";
-		//public const string Track = "track";
+
 		public const string Gateway = "gateway";
 
 		public const string Auth = "auth";
-        public const string AuthFingerprint = "auth/fingerprint";
-		public const string AuthRegister = "auth/register";
 		public const string AuthLogin = "auth/login";
 		public const string AuthLogout = "auth/logout";
 		
@@ -42,7 +40,7 @@
 		
 		public const string Voice = "voice";
 		public const string VoiceRegions = "voice/regions";
-		public const string VoiceIce = "voice/ice";
+		//public const string VoiceIce = "voice/ice";
 
 		public const string StatusActiveMaintenance = "scheduled-maintenances/active.json";
 		public const string StatusUpcomingMaintenance = "scheduled-maintenances/upcoming.json";

@@ -1,114 +1,131 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord
 {
-	public sealed class Channel
+	public sealed class Channel : CachedObject
 	{
 		public sealed class PermissionOverwrite
 		{
-			public string TargetType { get; }
+			public PermissionTarget TargetType { get; }
 			public string TargetId { get; }
-			public PackedChannelPermissions Allow { get; }
-			public PackedChannelPermissions Deny { get; }
+			public ChannelPermissions Allow { get; }
+			public ChannelPermissions Deny { get; }
 
-			internal PermissionOverwrite(string type, string targetId, uint allow, uint deny)
+			internal PermissionOverwrite(PermissionTarget targetType, string targetId, uint allow, uint deny)
 			{
-				TargetType = type;
+				TargetType = targetType;
 				TargetId = targetId;
-				Allow = new PackedChannelPermissions(allow);
-				Deny = new PackedChannelPermissions( deny);
+				Allow = new ChannelPermissions(allow);
 				Allow.Lock();
+				Deny = new ChannelPermissions(deny);
 				Deny.Lock();
 			}
 		}
-
-		private readonly DiscordClient _client;
-		private readonly ConcurrentDictionary<string, bool> _messages;
-		private bool _areMembersStale;
-
-		/// <summary> Returns the unique identifier for this channel. </summary>
-		public string Id { get; }
-
-		private string _name;
+				
 		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get { return !IsPrivate ? $"{_name}" : $"@{Recipient.Name}"; } internal set { _name = value; } }
-
+		public string Name { get; private set; }
 		/// <summary> Returns the topic associated with this channel. </summary>
 		public string Topic { get; private set; }
 		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
-		public bool IsPrivate => ServerId == null;
+		public bool IsPrivate => _recipient.Id != null;
 		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
 		public string Type { get; private set; }
 
-		/// <summary> Returns the id of the server containing this channel. </summary>
-		public string ServerId { get; }
 		/// <summary> Returns the server containing this channel. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[ServerId];
+		public Server Server => _server.Value;
+		private readonly Reference<Server> _server;
 
-		/// For private chats, returns the Id of the target user, otherwise null.
-		public string RecipientId { get; set; }
 		/// For private chats, returns the target user, otherwise null.
 		[JsonIgnore]
-		public User Recipient => _client.Users[RecipientId];
-
-		/// <summary> Returns a collection of the IDs of all users with read access to this channel. </summary>
-		public IEnumerable<string> UserIds
+		public User Recipient => _recipient.Value;
+        private readonly Reference<User> _recipient;
+		
+		/// <summary> Returns a collection of all users with read access to this channel. </summary>
+		[JsonIgnore]
+		public IEnumerable<User> Members
 		{
 			get
 			{
-				if (!_areMembersStale)
-					return _userIds;
-				
-				_userIds = Server.Members.Where(x => x.GetPermissions(Id)?.Text_ReadMessages ?? false).Select(x => x.UserId).ToArray();
-				_areMembersStale = false;
-				return _userIds;
-			}
+				if (_areMembersStale)
+					UpdateMembersCache();
+				return _members.Select(x => x.Value);
+            }
 		}
-		private string[] _userIds;
-		/// <summary> Returns a collection of all users with read access to this channel. </summary>
-		public IEnumerable<Member> Members => UserIds.Select(x => _client.Members[x, ServerId]);
-		/// <summary> Returns a collection of all users with read access to this channel. </summary>
-		public IEnumerable<User> Users => UserIds.Select(x => _client.Users[x]);
+		private Dictionary<string, User> _members;
+		private bool _areMembersStale;
 
-		/// <summary> Returns a collection of the ids of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
-		[JsonIgnore]
-		public IEnumerable<string> MessageIds => _messages.Select(x => x.Key);
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
-		public IEnumerable<Message> Messages => _messages.Select(x => _client.Messages[x.Key]);
+		public IEnumerable<Message> Messages => _messages.Values;
+		private readonly ConcurrentDictionary<string, Message> _messages;
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
 		private static readonly PermissionOverwrite[] _initialPermissionsOverwrites = new PermissionOverwrite[0];
-		internal PermissionOverwrite[] _permissionOverwrites;
-		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites;
+		private PermissionOverwrite[] _permissionOverwrites;
+		public IEnumerable<PermissionOverwrite> PermissionOverwrites { get { return _permissionOverwrites; } internal set { _permissionOverwrites = value.ToArray(); } }
 
 		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
+			: base(client, id)
 		{
-			_client = client;
-			Id = id;
-			ServerId = serverId;
-			RecipientId = recipientId;
-			_messages = new ConcurrentDictionary<string, bool>();
+			_server = new Reference<Server>(serverId, 
+				x => _client.Servers[x], 
+				x => x.AddChannel(this), 
+				x => x.RemoveChannel(this));
+			_recipient = new Reference<User>(recipientId, 
+				x => _client.Users.GetOrAdd(x, _server.Id), 
+				x =>
+				{
+					Name = "@" + x.Name;
+					if (_server.Id == null)
+						x.GlobalUser.PrivateChannel = this;
+				},
+				x =>
+				{
+					if (_server.Id == null)
+						x.GlobalUser.PrivateChannel = null;
+                });
 			_permissionOverwrites = _initialPermissionsOverwrites;
 			_areMembersStale = true;
-		}
 
-		internal void Update(API.ChannelReference model)
+			//Local Cache
+			_messages = new ConcurrentDictionary<string, Message>();
+		}
+		internal override void LoadReferences()
 		{
-			if (model.Name != null)
+			if (IsPrivate)
+				_recipient.Load();
+			else
+				_server.Load();
+		}
+		internal override void UnloadReferences()
+		{
+			_server.Unload();
+			_recipient.Unload();
+			
+			var globalMessages = _client.Messages;
+			var messages = _messages;
+			foreach (var message in messages)
+				globalMessages.TryRemove(message.Key);
+			_messages.Clear();
+        }
+
+		internal void Update(ChannelReference model)
+		{
+			if (!IsPrivate && model.Name != null)
 				Name = model.Name;
 			if (model.Type != null)
 				Type = model.Type;
 		}
-		internal void Update(API.ChannelInfo model)
+		internal void Update(ChannelInfo model)
 		{
-			Update(model as API.ChannelReference);
+			Update(model as ChannelReference);
 			
 			if (model.Position != null)
 				Position = model.Position.Value;
@@ -118,7 +135,7 @@ namespace Discord
 			if (model.PermissionOverwrites != null)
 			{
 				_permissionOverwrites = model.PermissionOverwrites
-					.Select(x => new PermissionOverwrite(x.Type, x.Id, x.Allow, x.Deny))
+					.Select(x => new PermissionOverwrite(PermissionTarget.FromString(x.Type), x.Id, x.Allow, x.Deny))
 					.ToArray();
 				InvalidatePermissionsCache();
             }
@@ -126,32 +143,54 @@ namespace Discord
 
 		public override string ToString() => Name;
 
-		internal void AddMessage(string messageId)
+		internal void AddMessage(Message message)
 		{
-			_messages.TryAdd(messageId, true);
+			var cacheLength = _client.Config.MessageCacheLength;
+			if (cacheLength > 0)
+			{
+				while (_messages.Count > cacheLength - 1)
+				{
+					var oldest = _messages.Select(x => x.Value.Id).OrderBy(x => x).FirstOrDefault();
+					if (oldest != null)
+					{
+						if (_messages.TryRemove(oldest, out message))
+							_client.Messages.TryRemove(oldest);
+					}
+				}
+				_messages.TryAdd(message.Id, message);
+			}
 		}
-		internal bool RemoveMessage(string messageId)
+		internal void RemoveMessage(Message message) => _messages.TryRemove(message.Id, out message);
+
+		internal void InvalidateMembersCache()
 		{
-			bool ignored;
-			return _messages.TryRemove(messageId, out ignored);
+			_areMembersStale = true;
+		}
+		private void UpdateMembersCache()
+		{
+			if (_server.Id != null)
+				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
+			else
+				_members = new Dictionary<string, User>();
+			_areMembersStale = false;
 		}
 
-		internal void InvalidMembersCache()
+		internal void InvalidatePermissionsCache()
 		{
-			_areMembersStale = true;
+			UpdateMembersCache();
+			foreach (var member in _members)
+				member.Value.UpdateChannelPermissions(this);
 		}
-        internal void InvalidatePermissionsCache()
+		internal void InvalidatePermissionsCache(Role role)
 		{
 			_areMembersStale = true;
-			foreach (var member in Members)
-				member.UpdatePermissions(Id);
+			foreach (var member in role.Members)
+				member.UpdateChannelPermissions(this);
 		}
-		internal void InvalidatePermissionsCache(string userId)
+		internal void InvalidatePermissionsCache(User user)
 		{
 			_areMembersStale = true;
-			var member = _client.Members[userId, ServerId];
-			if (member != null)
-				member.UpdatePermissions(Id);
+			user.UpdateChannelPermissions(this);
 		}
 	}
 }

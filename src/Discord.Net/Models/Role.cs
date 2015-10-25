@@ -1,15 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord
 {
-	public sealed class Role
-	{
-		private readonly DiscordClient _client;
-
-		/// <summary> Returns the unique identifier for this role. </summary>
-		public string Id { get; }
+	public sealed class Role : CachedObject
+	{		
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
@@ -17,42 +14,44 @@ namespace Discord
 		/// <summary> Returns the position of this channel in the role list for this server. </summary>
 		public int Position { get; private set; }
 		/// <summary> Returns the color of this role. </summary>
-		public PackedColor Color { get; private set; }
+		public Color Color { get; private set; }
 		/// <summary> Returns whether this role is managed by server (e.g. for Twitch integration) </summary>
 		public bool IsManaged { get; private set; }
 
 		/// <summary> Returns the the permissions contained by this role. </summary>
-		public PackedServerPermissions Permissions { get; }
+		public ServerPermissions Permissions { get; }
 
-		/// <summary> Returns the id of the server this role is a member of. </summary>
-		public string ServerId { get; }
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[ServerId];
+		public Server Server => _server.Value;
+		private readonly Reference<Server> _server;
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
-		public bool IsEveryone { get; }
-		/// <summary> Returns a list of the ids of all members in this role. </summary>
-		public IEnumerable<string> MemberIds => IsEveryone ? Server.UserIds : Server.Members.Where(x => x.RoleIds.Contains(Id)).Select(x => x.UserId);
+		public bool IsEveryone => _server.Id == null || Id == _server.Id;
 		/// <summary> Returns a list of all members in this role. </summary>
-		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.RoleIds.Contains(Id));
+		[JsonIgnore]
+		public IEnumerable<User> Members => _server.Id != null ? (IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this))) : new User[0];
+		//TODO: Add local members cache
 
-		internal Role(DiscordClient client, string id, string serverId, bool isEveryone)
+		internal Role(DiscordClient client, string id, string serverId)
+			: base(client, id)
 		{
-			_client = client;
-			Id = id;
-			ServerId = serverId;
-			IsEveryone = isEveryone;
-			Permissions = new PackedServerPermissions(0);
+			_server = new Reference<Server>(serverId, x => _client.Servers[x], x => x.AddRole(this), x => x.RemoveRole(this));
+			Permissions = new ServerPermissions(0);
 			Permissions.Lock();
-			Color = new PackedColor(0);
+			Color = new Color(0);
 			Color.Lock();
-
-			if (isEveryone)
-				Position = int.MinValue;
+		}
+		internal override void LoadReferences()
+		{
+			_server.Load();
+		}
+		internal override void UnloadReferences()
+		{
+			_server.Unload();
         }
 
-		internal void Update(API.RoleInfo model)
+		internal void Update(RoleInfo model)
 		{
 			if (model.Name != null)
 				Name = model.Name;
@@ -68,7 +67,7 @@ namespace Discord
 				Permissions.SetRawValueInternal(model.Permissions.Value);
 
 			foreach (var member in Members)
-				member.UpdatePermissions();
+				member.UpdateServerPermissions();
 		}
 
 		public override string ToString() => Name;

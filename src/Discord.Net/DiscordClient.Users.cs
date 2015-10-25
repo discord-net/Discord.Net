@@ -1,0 +1,211 @@
+﻿using Discord.API;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Discord
+{
+	internal sealed class GlobalUsers : AsyncCollection<GlobalUser>
+	{
+		public GlobalUsers(DiscordClient client, object writerLock)
+			: base(client, writerLock) { }
+
+		public GlobalUser GetOrAdd(string id) => GetOrAdd(id, () => new GlobalUser(_client, id));
+	}
+	internal sealed class Users : AsyncCollection<User>
+	{
+		public Users(DiscordClient client, object writerLock)
+			: base(client, writerLock)
+		{ }
+		private string GetKey(string userId, string serverId)
+			=> User.GetId(userId, serverId);
+
+		public User this[string userId, string serverId]
+			=> this[GetKey(userId, serverId)];
+		public User GetOrAdd(string userId, string serverId)
+			=> GetOrAdd(GetKey(userId, serverId), () => new User(_client, userId, serverId));
+		public User TryRemove(string userId, string serverId)
+			=> TryRemove(GetKey(userId, serverId));
+	}
+
+	public class UserEventArgs : EventArgs
+	{
+		public User User { get; }
+		public Server Server => User.Server;
+
+		internal UserEventArgs(User user) { User = user; }
+	}
+	public class UserChannelEventArgs : UserEventArgs
+	{
+		public Channel Channel { get; }
+		public string ChannelId => Channel.Id;
+
+		internal UserChannelEventArgs(User user, Channel channel)
+			: base(user)
+		{
+			Channel = channel;
+		}
+	}
+	public class UserIsSpeakingEventArgs : UserChannelEventArgs
+	{
+		public bool IsSpeaking { get; }
+
+		internal UserIsSpeakingEventArgs(User user, Channel channel, bool isSpeaking)
+			: base(user, channel)
+		{
+			IsSpeaking = isSpeaking;
+		}
+	}
+
+	public partial class DiscordClient
+	{
+		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
+		private void RaiseUserIsTyping(User user, Channel channel)
+		{
+			if (UserIsTypingUpdated != null)
+				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
+		}
+		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
+		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
+		{
+			if (UserIsSpeakingUpdated != null)
+				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
+		}
+		public event EventHandler<UserEventArgs> UserAdded;
+		private void RaiseUserAdded(User user)
+		{
+			if (UserAdded != null)
+				RaiseEvent(nameof(UserAdded), () => UserAdded(this, new UserEventArgs(user)));
+		}
+		public event EventHandler<UserEventArgs> UserRemoved;
+		private void RaiseUserRemoved(User user)
+		{
+			if (UserRemoved != null)
+				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new UserEventArgs(user)));
+		}
+		public event EventHandler<UserEventArgs> UserUpdated;
+		private void RaiseMemberUpdated(User user)
+		{
+			if (UserUpdated != null)
+				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
+		}
+		public event EventHandler<UserEventArgs> UserPresenceUpdated;
+		private void RaiseUserPresenceUpdated(User user)
+		{
+			if (UserPresenceUpdated != null)
+				RaiseEvent(nameof(UserPresenceUpdated), () => UserPresenceUpdated(this, new UserEventArgs(user)));
+		}
+		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
+		private void RaiseUserVoiceStateUpdated(User user)
+		{
+			if (UserVoiceStateUpdated != null)
+				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
+		}
+		public event EventHandler ProfileUpdated;
+		private void RaiseProfileUpdated()
+		{
+			if (ProfileUpdated != null)
+				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
+		}
+
+		/// <summary> Returns the current logged-in user. </summary>
+		public User CurrentUser => _currentUser;
+		private User _currentUser;
+
+		/// <summary> Returns a collection of all users this client can currently see. </summary>
+		internal GlobalUsers GlobalUsers => _globalUsers;
+		private readonly GlobalUsers _globalUsers;
+
+		internal Users Users => _users;
+		private readonly Users _users;
+
+		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
+		public User GetUser(Server server, string userId)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+			CheckReady();
+
+			return _users[userId, server.Id];
+		}
+		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
+		public User GetUser(Server server, string username, string discriminator)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (username == null) throw new ArgumentNullException(nameof(username));
+			if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
+			CheckReady();
+
+			User user = FindUsers(server, username, discriminator, true).FirstOrDefault();
+			return _users[user?.Id, server.Id];
+		}
+
+		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		public IEnumerable<User> FindUsers(Server server, string name, string discriminator = null, bool exactMatch = false)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (name == null) throw new ArgumentNullException(nameof(name));
+			CheckReady();
+
+			IEnumerable<User> query;
+			if (!exactMatch && name.StartsWith("@"))
+			{
+				string name2 = name.Substring(1);
+				query = server.Members.Where(x =>
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) ||
+					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+			}
+			else
+				query = server.Members.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+			if (discriminator != null)
+				query = query.Where(x => x.Discriminator == discriminator);
+			return query;
+		}
+
+		public Task EditUser(User user, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null)
+		{
+			if (user == null) throw new ArgumentNullException(nameof(user));
+			CheckReady();
+
+			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+		}
+
+		public Task<EditUserResponse> EditProfile(string currentPassword = "",
+			string username = null, string email = null, string password = null,
+			ImageType avatarType = ImageType.Png, byte[] avatar = null)
+		{
+			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
+			CheckReady();
+
+			return _api.EditUser(currentPassword: currentPassword, 
+				username: username ?? _currentUser?.Name,  email: email ?? _currentUser?.GlobalUser.Email, password: password,
+				avatarType: avatarType, avatar: avatar);
+		}
+
+		public Task SetStatus(UserStatus status)
+		{
+			if (status == (string)null) throw new ArgumentNullException(nameof(status));
+			if (status != UserStatus.Online && status != UserStatus.Idle)
+				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
+			CheckReady();
+			
+			_status = status;
+			return SendStatus();
+		}
+		public Task SetGame(int? gameId)
+		{
+			CheckReady();
+
+			_gameId = gameId;
+			return SendStatus();
+		}
+		private Task SendStatus()
+		{
+			_dataSocket.SendStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (ulong?)null, _gameId);
+			return TaskHelper.CompletedTask;
+		}
+	}
+}

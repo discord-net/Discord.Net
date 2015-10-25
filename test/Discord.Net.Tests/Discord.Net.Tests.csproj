@@ -6,7 +6,7 @@
     <ProjectGuid>{855D6B1D-847B-42DA-BE6A-23683EA89511}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Discord.Net.Tests</RootNamespace>
+    <RootNamespace>Discord.Tests</RootNamespace>
     <AssemblyName>Discord.Net.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

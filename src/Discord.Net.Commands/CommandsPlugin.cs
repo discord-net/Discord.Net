@@ -8,7 +8,7 @@ namespace Discord.Commands
     {
 		private readonly DiscordClient _client;
 		private List<Command> _commands;
-		private Func<User, Server, int> _getPermissions;
+		private Func<User, int> _getPermissions;
 
 		public IEnumerable<Command> Commands => _commands;
 
@@ -17,7 +17,7 @@ namespace Discord.Commands
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public CommandsPlugin(DiscordClient client, Func<User, Server, int> getPermissions = null)
+		public CommandsPlugin(DiscordClient client, Func<User, int> getPermissions = null)
 		{
 			_client = client;
 			_getPermissions = getPermissions;
@@ -28,14 +28,14 @@ namespace Discord.Commands
 			RequireCommandCharInPublic = true;
 			RequireCommandCharInPrivate = true;
 
-			client.MessageCreated += async (s, e) =>
+			client.MessageReceived += async (s, e) =>
 			{
 				//If commands aren't being used, don't bother processing them
 				if (_commands.Count == 0)
 					return;
 
 				//Ignore messages from ourselves
-				if (e.Message.UserId == client.CurrentUserId)
+				if (e.Message.User == client.CurrentUser)
 					return;
 
 				//Check for the command character
@@ -96,7 +96,7 @@ namespace Discord.Commands
 						argText = msg.Substring(args[cmd.Parts.Length].Index);
 
 					//Check Permissions
-					int permissions = _getPermissions != null ? _getPermissions(e.Message.User, e.Message.Channel?.Server) : 0;
+					int permissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
 					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, argText, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{
@@ -110,7 +110,7 @@ namespace Discord.Commands
 					{
 						var task = cmd.Handler(eventArgs);
 						if (task != null)
-							await task;
+							await task.ConfigureAwait(false);
 					}
 					catch (Exception ex)
 					{

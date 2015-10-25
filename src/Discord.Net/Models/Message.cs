@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord
 {
-	public sealed class Message
+	public sealed class Message : CachedObject
 	{
 		public sealed class Attachment : File
 		{
@@ -90,11 +91,8 @@ namespace Discord
 			}
 		}
 
-		private readonly DiscordClient _client;
 		private string _cleanText;
-
-		/// <summary> Returns the global unique identifier for this message. </summary>
-		public string Id { get; internal set; }
+		
 		/// <summary> Returns the local unique identifier for this message. </summary>
 		public string Nonce { get; internal set; }
 
@@ -113,7 +111,7 @@ namespace Discord
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = _client.Messages.CleanText(RawText));
+		public string Text => _cleanText != null ? _cleanText : (_cleanText = Mention.ConvertToNames(_client, Server, RawText));
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>
@@ -124,58 +122,57 @@ namespace Discord
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; private set; }
 		private static readonly Embed[] _initialEmbeds = new Embed[0];
-
-		private static readonly string[] _initialMentions = new string[0];
-		/// <summary> Returns a collection of all user ids mentioned in this message. </summary>
-		public string[] MentionIds { get; private set; }
+		
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Mentions => MentionIds.Select(x => _client.Users[x]).Where(x => x != null);
-
-		/// <summary> Returns the id of the server containing the channel this message was sent to. </summary>
-		public string ServerId => Channel.ServerId;
+		public IEnumerable<User> Mentions { get; internal set; }
+		
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[Channel.ServerId];
-
-		/// <summary> Returns the id of the channel this message was sent to. </summary>
-		public string ChannelId { get; }
+		public Server Server => _channel.Value.Server;
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.Channels[ChannelId];
+		public Channel Channel => _channel.Value;
+		private readonly Reference<Channel> _channel;
 
 		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUserId == UserId;
-		/// <summary> Returns the id of the author of this message. </summary>
-		public string UserId { get; }
+		public bool IsAuthor => _client.CurrentUserId == _user.Id;
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User User => _client.Users[UserId];
-		/// <summary> Returns the author of this message. </summary>
-		[JsonIgnore]
-		public Member Member
-		{
-			get
-			{
-				if (!Channel.IsPrivate)
-					return _client.Members[UserId, ServerId];
-				else
-					throw new InvalidOperationException("Unable to access Member in a private channel. Use User instead or check for Channel.IsPrivate.");
-			}
-		}
+		public User User => _user.Value;
+		private readonly Reference<User> _user;
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
+			: base(client, id)
 		{
-			_client = client;
-			Id = id;
-			ChannelId = channelId;
-			UserId = userId;
+			_channel = new Reference<Channel>(channelId,
+				x => _client.Channels[x],
+				x => x.AddMessage(this),
+				x => x.RemoveMessage(this));
+			_user = new Reference<User>(userId,
+				x =>
+				{
+					var channel = Channel;
+					if (!channel.IsPrivate)
+						return _client.Users[x, channel.Server.Id];
+					else
+						return _client.Users[x, null];
+				});
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
-			MentionIds = _initialMentions;
-        }
+		}
+		internal override void LoadReferences()
+		{
+			_channel.Load();
+			_user.Load();
+		}
+		internal override void UnloadReferences()
+		{
+			_channel.Unload();
+			_user.Unload();
+		}
 
-		internal void Update(API.Message model)
+		internal void Update(MessageInfo model)
 		{
 			if (model.Attachments != null)
 			{
@@ -211,8 +208,8 @@ namespace Discord
 				EditedTimestamp = model.EditedTimestamp;
 			if (model.Mentions != null)
 			{
-				MentionIds = model.Mentions.Select(x => x.Id)?.ToArray();
-				IsMentioningMe = MentionIds.Contains(_client.CurrentUserId);
+				Mentions = model.Mentions.Select(x => _client.Users[x.Id, Channel.Server?.Id]).ToArray();
+				IsMentioningMe = model.Mentions.Any(x => x.Id == _client.CurrentUserId);
 			}
 			if (model.Content != null)
 			{
@@ -221,6 +218,6 @@ namespace Discord
 			}
 		}
 
-		public override string ToString() => User.ToString() + ": " + RawText;
+		public override string ToString() => User.Name + ": " + RawText;
 	}
 }

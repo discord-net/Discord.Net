@@ -1,4 +1,6 @@
 ﻿using Discord.API;
+using Discord.Net;
+using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +12,15 @@ namespace Discord
 	/// <summary> A lightweight wrapper around the Discord API. </summary>
 	public class DiscordAPIClient
 	{
+		private readonly DiscordAPIClientConfig _config;
+
 		internal RestClient RestClient => _rest;
 		private readonly RestClient _rest;
 
-		public DiscordAPIClient(LogMessageSeverity logLevel, string userAgent, int timeout)
+		public DiscordAPIClient(DiscordAPIClientConfig config = null)
 		{
-			_rest = new RestClient(logLevel, userAgent, timeout);
+			_config = config ?? new DiscordAPIClientConfig();
+            _rest = new RestClient(_config);
         }
 
 		private string _token;
@@ -34,16 +39,6 @@ namespace Discord
 		//Auth
 		public Task<GatewayResponse> Gateway()
 			=> _rest.Get<GatewayResponse>(Endpoints.Gateway);
-		public Task<FingerprintResponse> Fingerprint()
-			=> _rest.Post<FingerprintResponse>(Endpoints.AuthFingerprint);
-        public async Task<RegisterResponse> LoginAnonymous(string username, string fingerprint)
-		{
-			if (username == null) throw new ArgumentNullException(nameof(username));
-			if (fingerprint == null) throw new ArgumentNullException(nameof(fingerprint));
-
-			var request = new RegisterRequest { Fingerprint = fingerprint, Username = username };
-			return await _rest.Post<RegisterResponse>(Endpoints.AuthRegister, request).ConfigureAwait(false);
-        }
 		public async Task<LoginResponse> Login(string email, string password)
 		{
 			if (email == null) throw new ArgumentNullException(nameof(email));
@@ -115,11 +110,11 @@ namespace Discord
 		}
 
 		//Invites
-		public Task<CreateInviteResponse> CreateInvite(string channelId, int maxAge, int maxUses, bool isTemporary, bool withXkcdPass)
+		public Task<CreateInviteResponse> CreateInvite(string channelId, int maxAge, int maxUses, bool tempMembership, bool hasXkcd)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			var request = new CreateInviteRequest { MaxAge = maxAge, MaxUses = maxUses, IsTemporary = isTemporary, WithXkcdPass = withXkcdPass };
+			var request = new CreateInviteRequest { MaxAge = maxAge, MaxUses = maxUses, IsTemporary = tempMembership, WithXkcdPass = hasXkcd };
 			return _rest.Post<CreateInviteResponse>(Endpoints.ChannelInvites(channelId), request);
 		}
 		public Task<GetInviteResponse> GetInvite(string inviteIdOrXkcd)
@@ -142,7 +137,7 @@ namespace Discord
 		}
 
 		//Members
-		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
+		public Task EditUser(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
@@ -235,26 +230,6 @@ namespace Discord
 			return _rest.Delete(Endpoints.ChannelPermission(channelId, userOrRoleId), null);
 		}
 
-		//Profile
-		public Task<EditProfileResponse> EditProfile(string currentPassword = "",
-			string username = null, string email = null, string password = null,
-			AvatarImageType avatarType = AvatarImageType.Png, byte[] avatar = null)
-		{
-			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
-
-			string avatarBase64 = null;
-			if (avatarType == AvatarImageType.None)
-				avatarBase64 = "";
-			else if (avatar != null)
-			{
-				string base64 = Convert.ToBase64String(avatar);
-				string type = avatarType == AvatarImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
-				avatarBase64 = $"data:{type},{base64}";
-			}
-			var request = new EditProfileRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = avatarBase64 };
-			return _rest.Patch<EditProfileResponse>(Endpoints.UserMe, request);
-		}
-
 		//Roles
 		public Task<RoleInfo> CreateRole(string serverId)
 		{
@@ -304,18 +279,42 @@ namespace Discord
 
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(string serverId, string name = null, string region = null)
+		public Task<EditServerResponse> EditServer(string serverId, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 
-			var request = new EditServerRequest { Name = name, Region = region };
+			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(iconType, icon) };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
+		}
+
+		//User
+		public Task<EditUserResponse> EditUser(string currentPassword = "",
+			string username = null, string email = null, string password = null,
+			ImageType avatarType = ImageType.Png, byte[] avatar = null)
+		{
+			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
+			
+			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = Base64Picture(avatarType, avatar) };
+			return _rest.Patch<EditUserResponse>(Endpoints.UserMe, request);
 		}
 
 		//Voice
 		public Task<GetRegionsResponse> GetVoiceRegions()
 			=> _rest.Get<GetRegionsResponse>(Endpoints.VoiceRegions);
-		public Task<GetIceResponse> GetVoiceIce()
-			=> _rest.Get<GetIceResponse>(Endpoints.VoiceIce);
+		/*public Task<GetIceResponse> GetVoiceIce()
+			=> _rest.Get<GetIceResponse>(Endpoints.VoiceIce);*/
+
+		private string Base64Picture(ImageType type, byte[] data)
+		{
+			if (type == ImageType.None)
+				return "";
+			else if (data != null)
+			{
+				string base64 = Convert.ToBase64String(data);
+				string imageType = type == ImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
+				return $"data:{imageType},{base64}";
+			}
+			return null;
+		}
 	}
 }

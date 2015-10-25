@@ -1,10 +1,13 @@
 ﻿namespace Discord
 {
-	public class DiscordClientConfig : DiscordSimpleClientConfig
+	public class DiscordClientConfig : DiscordWSClientConfig
 	{		
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get { return _messageQueueInterval; } set { SetValue(ref _messageQueueInterval, value); } }
 		private int _messageQueueInterval = 100;
+		/// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
+		public int MessageCacheLength { get { return _messageCacheLength; } set { SetValue(ref _messageCacheLength, value); } }
+		private int _messageCacheLength = 100;
 
 		//Experimental Features
 		/// <summary> (Experimental) Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server). </summary>
@@ -21,11 +24,11 @@
 		private bool _ackMessages = false;
 
 		//Internal
-		internal override bool EnableVoice => base.EnableVoice && !EnableVoiceMultiserver;
+		internal override bool EnableVoice => (base.EnableVoice && !EnableVoiceMultiserver) || base.VoiceOnly;
 
 		public new DiscordClientConfig Clone()
 		{
-			var config = this.MemberwiseClone() as DiscordClientConfig;
+			var config = MemberwiseClone() as DiscordClientConfig;
 			config._isLocked = false;
 			return config;
         }

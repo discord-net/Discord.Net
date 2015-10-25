@@ -1,47 +1,48 @@
-{
-	"version": "0.7.3",
-	"description": "An unofficial .Net API wrapper for the Discord client.",
-	"authors": [ "RogueException" ],
-	"tags": [ "discord", "discordapp" ],
-	"projectUrl": "https://github.com/RogueException/Discord.Net",
-	"licenseUrl": "http://opensource.org/licenses/MIT",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/RogueException/Discord.Net"
-	},
-	"compilationOptions": {
-		"allowUnsafe": true
-	},
-	"configurations": {
-		"FullDebug": {
-			"compilationOptions": {
-				"define": [ "DEBUG", "TRACE", "TEST_RESPONSES" ]
-			}
-		}
-	},
-
-	"dependencies": {
-		"Newtonsoft.Json": "7.0.1"
-	},
-
-	"frameworks": {
-		"net45": {
-			"dependencies": {
-				"RestSharp": "105.2.3",
-				"WebSocketSharp": "1.0.3-rc9"
-			},
-			"frameworkAssemblies": {
-				"System.Net.Http": "4.0.0.0"
-			}
-		},
-		"dnx451": {
-			"dependencies": {
-				"RestSharp": "105.2.3",
-				"WebSocketSharp": "1.0.3-rc9"
-			},
-			"frameworkAssemblies": {
-				"System.Net.Http": "4.0.0.0"
-			}
-		}
-	}
+﻿{
+  "version": "0.8.0-beta1",
+  "description": "An unofficial .Net API wrapper for the Discord client.",
+  "authors": [
+    "RogueException"
+  ],
+	"tags": [
+		"discord",
+		"discordapp"
+	],
+  "projectUrl": "https://github.com/RogueException/Discord.Net",
+  "licenseUrl": "http://opensource.org/licenses/MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/RogueException/Discord.Net"
+  },
+  "compilationOptions": {
+    "allowUnsafe": true
+  },
+  "configurations": {
+    "FullDebug": {
+      "compilationOptions": {
+        "define": [
+          "DEBUG",
+          "TRACE",
+          "TEST_RESPONSES"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "Newtonsoft.Json": "7.0.1",
+    "RestSharp": "105.2.3",
+    "WebSocketSharp": "1.0.3-rc9"
+  },
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Net.Http": "4.0.0.0"
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Net.Http": "4.0.0.0"
+      }
+    }
+  }
 }
