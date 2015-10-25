@@ -549,7 +549,7 @@ namespace Discord
 							var channel = _channels[data.ChannelId];
 							if (channel != null)
 							{
-								var user = _members[data.UserId, channel.Server.Id];
+								var user = _members[data.UserId, channel.Server?.Id];
 
 								if (user != null)
 								{

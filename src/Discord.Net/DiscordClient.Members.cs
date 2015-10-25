@@ -10,7 +10,7 @@ namespace Discord
 		public Members(DiscordClient client, object writerLock)
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
 		private string GetKey(string userId, string serverId)
-			=> serverId + '_' + userId;
+			=> (serverId ?? "Private") + '_' + userId;
 
 		public User this[string userId, string serverId]
 			=> this[GetKey(userId, serverId)];
