@@ -56,12 +56,13 @@ namespace Discord
 		
 		/// <summary> Returns all channels with the specified server and name. </summary>
 		/// <remarks> Name formats supported: Name and #Name. Search is case-insensitive. </remarks>
-		public IEnumerable<Channel> FindChannels(Server server, string name, ChannelType type = null)
+		public IEnumerable<Channel> FindChannels(Server server, string name, ChannelType type = null, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
+			CheckReady();
 
 			IEnumerable<Channel> result;
-			if (name.StartsWith("#"))
+			if (!exactMatch && name.StartsWith("#"))
 			{
 				string name2 = name.Substring(1);
 				result = _channels.Where(x => x.Server == server &&
