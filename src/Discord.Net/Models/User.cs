@@ -7,13 +7,14 @@ using System.Linq;
 
 namespace Discord
 {
-	public class Member : CachedObject
+	public class User : CachedObject
 	{
 		private static readonly string[] _initialRoleIds = new string[0];
 
 		private ConcurrentDictionary<string, Channel> _channels;
 		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
-		private bool _hasRef;
+		private ServerPermissions _serverPermissions;
+        private bool _hasRef;
 		private string[] _roleIds;
 
 		/// <summary> Returns the name of this user on this server. </summary>
@@ -65,9 +66,9 @@ namespace Discord
 		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id && x.Server.Id == ServerId);
 		/// <summary> Returns a collection of all channels this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.Server.Id == ServerId && x.UserIds.Contains(Id));
+		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.Server.Id == ServerId && x.Members == this);
 
-		internal Member(DiscordClient client, string id, string serverId)
+		internal User(DiscordClient client, string id, string serverId)
 			: base(client, id)
 		{
 			ServerId = serverId;
@@ -75,7 +76,8 @@ namespace Discord
 			_roleIds = _initialRoleIds;
 			_channels = new ConcurrentDictionary<string, Channel>();
 			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
-		}
+			_serverPermissions = new ServerPermissions();
+        }
 		internal override void OnCached()
 		{
 			var server = Server;
@@ -133,7 +135,7 @@ namespace Discord
 			if (model.Roles != null)
 				UpdateRoles(model.Roles);
 
-			UpdatePermissions();
+			UpdateServerPermissions();
         }
 		internal void Update(ExtendedMemberInfo model)
 		{
@@ -195,35 +197,27 @@ namespace Discord
 			if (LastActivityAt == null || activity > LastActivityAt.Value)
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
-
-		internal void UpdatePermissions()
-		{
-			foreach (var channel in _channels)
-				UpdatePermissions(channel.Value);
-		}
-		internal void UpdatePermissions(Channel channel)
+		
+		internal void UpdateChannelPermissions(Channel channel)
 		{
 			if (_roleIds == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
 			if (server == null || channel.Server != server) return;
-			
+
 			ChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channel.Id, out permissions)) return;
-			uint newPermissions = 0x0;
+			uint newPermissions = _serverPermissions.RawValue;
 			uint oldPermissions = permissions.RawValue;
 			
 			if (server.Owner == this)
 				newPermissions = ChannelPermissions.All(channel).RawValue;
 			else
 			{
-				if (channel == null) return;
 				var channelOverwrites = channel.PermissionOverwrites;
 
 				//var roles = Roles.OrderBy(x => x.Id);
 				var roles = Roles;
-				foreach (var serverRole in roles)
-					newPermissions |= serverRole.Permissions.RawValue;
 				foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
 					newPermissions &= ~denyRole.Deny.RawValue;
 				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
@@ -234,18 +228,49 @@ namespace Discord
 					newPermissions |= allowMembers.Allow.RawValue;
 			}
 
-			permissions.SetRawValueInternal(newPermissions);
+            if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+				newPermissions = ChannelPermissions.All(channel).RawValue;
 
-			if (permissions.ManagePermissions)
-				permissions.SetRawValueInternal(ChannelPermissions.All(channel).RawValue);
-			/*else if (server.DefaultChannelId == channelId)
-				permissions.SetBitInternal(PackedPermissions.Text_ReadMessagesBit, true);*/
-
-			if (permissions.RawValue != oldPermissions)
+			if (newPermissions != oldPermissions)
+			{
+				permissions.SetRawValueInternal(newPermissions);
 				channel.InvalidMembersCache();
+			}
+
+			permissions.SetRawValueInternal(newPermissions);
 		}
-		//TODO: Add GetServerPermissions
-        public ChannelPermissions GetPermissions(Channel channel)
+		internal void UpdateServerPermissions()
+		{
+			if (_roleIds == null) return; // We don't have all our data processed yet, this will be called again soon
+
+			var server = Server;
+			if (server == null) return;
+			
+			uint newPermissions = 0x0;
+			uint oldPermissions = _serverPermissions.RawValue;
+
+			if (server.Owner == this)
+				newPermissions = ServerPermissions.All.RawValue;
+			else
+			{
+				//var roles = Roles.OrderBy(x => x.Id);
+				var roles = Roles;
+				foreach (var serverRole in roles)
+					newPermissions |= serverRole.Permissions.RawValue;
+			}
+
+			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+				newPermissions = ServerPermissions.All.RawValue;
+
+			if (newPermissions != oldPermissions)
+			{
+				_serverPermissions.SetRawValueInternal(newPermissions);
+				foreach (var channel in _channels)
+					UpdateChannelPermissions(channel.Value);
+			}
+		}
+		public ServerPermissions GetPermissions() => _serverPermissions;
+		public ChannelPermissions GetPermissions(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
@@ -261,7 +286,7 @@ namespace Discord
 			perms.Lock();
 			_channels.TryAdd(channel.Id, channel);
 			_permissions.TryAdd(channel.Id, perms);
-			UpdatePermissions(channel);
+			UpdateChannelPermissions(channel);
 		}
 		internal void RemoveChannel(Channel channel)
 		{

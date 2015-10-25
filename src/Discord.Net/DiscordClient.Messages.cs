@@ -20,7 +20,7 @@ namespace Discord
 	public class MessageEventArgs : EventArgs
 	{
 		public Message Message { get; }
-		public Member Member => Message.Member;
+		public User Member => Message.Member;
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Server;
 
@@ -87,7 +87,7 @@ namespace Discord
 			return SendMessage(channel, text, false);
         }
 		/// <summary> Sends a private message to the provided user. </summary>
-		public async Task<Message> SendPrivateMessage(Member member, string text)
+		public async Task<Message> SendPrivateMessage(User member, string text)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			if (text == null) throw new ArgumentNullException(nameof(text));
@@ -103,8 +103,11 @@ namespace Discord
 			if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
-				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
-				var currentUser = msg.Member;
+				if (_messages != null)
+					msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
+				else
+					msg = new Message(this, "nonce_" + nonce, channel.Id, _userId);
+                var currentUser = msg.Member;
 				msg.Update(new MessageInfo
 				{
 					Content = text,
@@ -121,7 +124,10 @@ namespace Discord
 			else
 			{
 				var model = await _api.SendMessage(channel.Id, text, userIds, null, isTextToSpeech).ConfigureAwait(false);
-				msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
+				if (_messages != null)
+					msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
+				else
+					msg = new Message(this, model.Id, channel.Id, _userId);
 				msg.Update(model);
 				RaiseMessageSent(msg);
 			}
@@ -197,27 +203,29 @@ namespace Discord
 					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
 					return msgs.Select(x =>
 					{
-						Message msg;
-						if (cache)
-							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
-						else
-							msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
-						if (msg != null)
+						Message msg = null;
+						if (_messages != null)
 						{
-							msg.Update(x);
-							if (Config.TrackActivity)
+							if (cache && _messages != null)
+								msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
+							else
+								msg = _messages[x.Id];
+                        }
+						if (msg == null)
+							msg = new Message(this, x.Id, x.ChannelId, x.Author.Id);
+						msg.Update(x);
+						if (Config.TrackActivity)
+						{
+							if (!channel.IsPrivate)
 							{
-								if (!channel.IsPrivate)
-								{
-									var member = msg.Member;
-									if (member != null)
-										member.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
-								}
+								var member = msg.Member;
+								if (member != null)
+									member.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 							}
 						}
 						return msg;
 					})
-						.ToArray();
+					.ToArray();
 				}
 				catch (HttpException) { } //Bad Permissions?
 			}

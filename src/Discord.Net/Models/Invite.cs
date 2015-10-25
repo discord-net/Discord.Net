@@ -27,7 +27,7 @@ namespace Discord
 		
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
-		public Member Inviter => _client.Members[_inviterId, _serverId];
+		public User Inviter => _client.Members[_inviterId, _serverId];
 		
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]

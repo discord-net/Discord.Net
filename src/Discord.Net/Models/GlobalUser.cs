@@ -27,7 +27,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<Member> Memberships => _servers.Select(x => _client.Members[Id, x.Key]);
+		public IEnumerable<User> Memberships => _servers.Select(x => _client.Members[Id, x.Key]);
 		/// <summary> Returns a collection of all servers this user is a member of. </summary>
 		[JsonIgnore]
 		public IEnumerable<Server> Servers => _servers.Select(x => _client.Servers[x.Key]);

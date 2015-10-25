@@ -8,7 +8,7 @@ namespace Discord.Commands
     {
 		private readonly DiscordClient _client;
 		private List<Command> _commands;
-		private Func<Member, int> _getPermissions;
+		private Func<User, int> _getPermissions;
 
 		public IEnumerable<Command> Commands => _commands;
 
@@ -17,7 +17,7 @@ namespace Discord.Commands
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
 
-		public CommandsPlugin(DiscordClient client, Func<Member, int> getPermissions = null)
+		public CommandsPlugin(DiscordClient client, Func<User, int> getPermissions = null)
 		{
 			_client = client;
 			_getPermissions = getPermissions;

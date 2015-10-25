@@ -33,7 +33,7 @@ namespace Discord
 		}
 
 		/// <summary> Bans a user from the provided server. </summary>
-		public Task Ban(Member member)
+		public Task Ban(User member)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
@@ -42,7 +42,7 @@ namespace Discord
 		}
 
 		/// <summary> Unbans a user from the provided server. </summary>
-		public async Task Unban(Member member)
+		public async Task Unban(User member)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();

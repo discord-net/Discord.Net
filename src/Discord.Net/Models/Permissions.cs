@@ -127,15 +127,9 @@ namespace Discord
 			_rawValue = rawValue;
 		}
 
-		internal bool GetBit(PermissionsBits pos) => ((_rawValue >> (byte)pos) & 1U) == 1;
+		internal bool GetBit(PermissionsBits pos) => BitHelper.GetBit(_rawValue, (int)pos);
 		internal void SetBit(PermissionsBits pos, bool value) { CheckLock(); SetBitInternal((byte)pos, value); }
-		internal void SetBitInternal(int pos, bool value)
-		{
-			if (value)
-				_rawValue |= (1U << pos);
-			else
-				_rawValue &= ~(1U << pos);
-		}
+		internal void SetBitInternal(int pos, bool value) => BitHelper.SetBit(ref _rawValue, pos, value);
 
 		internal void Lock() => _isLocked = true;
 		protected void CheckLock()

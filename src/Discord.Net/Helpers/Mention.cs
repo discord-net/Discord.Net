@@ -10,7 +10,7 @@ namespace Discord
 		private static readonly Regex _channelRegex = new Regex(@"<#(\d+?)>", RegexOptions.Compiled);
 
 		/// <summary> Returns the string used to create a user mention. </summary>
-		public static string User(Member member)
+		public static string User(User member)
 			=> $"<@{member.Id}>";
 		/// <summary> Returns the string used to create a channel mention. </summary>
 		public static string Channel(Channel channel)

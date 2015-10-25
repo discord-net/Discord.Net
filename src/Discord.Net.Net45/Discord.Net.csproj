@@ -208,6 +208,9 @@
     <Compile Include="..\Discord.Net\Helpers\AsyncCollection.cs">
       <Link>Helpers\AsyncCollection.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\BitHelper.cs">
+      <Link>Helpers\BitHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>
     </Compile>

@@ -95,7 +95,7 @@ namespace Discord
 		}
 		
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public async Task<Channel> CreatePMChannel(Member member)
+		public async Task<Channel> CreatePMChannel(User member)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();

@@ -28,7 +28,7 @@ namespace Discord
 		public DiscordAPIClient API => _api;
 
 		/// <summary> Returns the current logged-in user. </summary>
-		public Member CurrentUser => _currentUser;
+		public User CurrentUser => _currentUser;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
@@ -495,7 +495,12 @@ namespace Discord
 							}
 
 							if (msg == null)
-								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+							{
+								if (_messages != null)
+									msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+								else
+									msg = new Message(this, data.Id, data.ChannelId, data.Author.Id);
+							}
 							msg.Update(data);
 							if (Config.TrackActivity)
 							{

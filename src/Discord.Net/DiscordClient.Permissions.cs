@@ -7,7 +7,7 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
-		public Task SetChannelUserPermissions(Channel channel, Member member, ChannelPermissions allow = null, ChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(Channel channel, User member, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (member == null) throw new ArgumentNullException(nameof(member));
@@ -15,7 +15,7 @@ namespace Discord
 
 			return SetChannelPermissions(channel, member?.Id, PermissionTarget.Member, allow, deny);
 		}
-		public Task SetChannelUserPermissions(Channel channel, Member member, DualChannelPermissions permissions = null)
+		public Task SetChannelUserPermissions(Channel channel, User member, DualChannelPermissions permissions = null)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (member == null) throw new ArgumentNullException(nameof(member));
@@ -56,11 +56,11 @@ namespace Discord
 				}
 				else
 				{
-					var oldPerms = channel._permissionOverwrites;
+					var oldPerms = channel.PermissionOverwrites.ToArray();
 					var newPerms = new Channel.PermissionOverwrite[oldPerms.Length + 1];
 					Array.Copy(oldPerms, newPerms, oldPerms.Length);
 					newPerms[oldPerms.Length] = new Channel.PermissionOverwrite(targetType, targetId, allowValue, denyValue);
-					channel._permissionOverwrites = newPerms;
+					channel.PermissionOverwrites = newPerms;
 				}
 				changed = true;
 			}
@@ -71,7 +71,7 @@ namespace Discord
 					await _api.DeleteChannelPermissions(channel.Id, targetId);
 					if (perms != null)
 					{
-						channel._permissionOverwrites = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).ToArray();
+						channel.PermissionOverwrites = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).ToArray();
 						changed = true;
 					}
 				}
@@ -87,7 +87,7 @@ namespace Discord
 			}
 		}
 
-		public Task RemoveChannelUserPermissions(Channel channel, Member member)
+		public Task RemoveChannelUserPermissions(Channel channel, User member)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (member == null) throw new ArgumentNullException(nameof(member));

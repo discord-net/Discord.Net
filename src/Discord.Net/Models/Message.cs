@@ -129,7 +129,7 @@ namespace Discord
 		public string[] MentionIds { get; private set; }
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<Member> Mentions { get; internal set; }
+		public IEnumerable<User> Mentions { get; internal set; }
 		
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
@@ -144,7 +144,7 @@ namespace Discord
 		public string UserId { get; }
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public Member Member => _client.Members[_userId, Channel.Server.Id];
+		public User Member => _client.Members[_userId, Channel.Server.Id];
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 			: base(client, id)
@@ -158,14 +158,14 @@ namespace Discord
 		internal override void OnCached()
 		{
 			var channel = _client.Channels[_channelId];
-			channel.AddMessage(Id);
+			channel.AddMessage(this);
 			Channel = channel;
 		}
 		internal override void OnUncached()
 		{
 			var channel = Channel;
 			if (channel != null)
-				channel.RemoveMessage(Id);
+				channel.RemoveMessage(this);
         }
 
 		internal void Update(MessageInfo model)

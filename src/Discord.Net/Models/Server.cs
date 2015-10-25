@@ -11,7 +11,7 @@ namespace Discord
 	{
 		private readonly ConcurrentDictionary<string, bool> _bans;
 		private readonly ConcurrentDictionary<string, Channel> _channels;
-		private readonly ConcurrentDictionary<string, Member> _members;
+		private readonly ConcurrentDictionary<string, User> _members;
 		private readonly ConcurrentDictionary<string, Role> _roles;
 		private readonly ConcurrentDictionary<string, Invite> _invites;
 
@@ -20,7 +20,7 @@ namespace Discord
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns the current logged-in user's data for this server. </summary>
-		public Member CurrentMember { get; internal set; }
+		public User CurrentMember { get; internal set; }
 		/// <summary> Returns true if this is a virtual server used by Discord.Net and not a real Discord server. </summary>
 		public bool IsVirtual { get; internal set; }
 
@@ -37,7 +37,7 @@ namespace Discord
 		public bool IsOwner => _client.CurrentUserId == _ownerId;
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
-		public Member Owner { get; private set; }
+		public User Owner { get; private set; }
 
 		/// <summary> Returns the id of the AFK voice channel for this server (see AFKTimeout). </summary>
 		public string AFKChannelId { get; private set; }
@@ -71,7 +71,7 @@ namespace Discord
 		
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
-		public IEnumerable<Member> Members => _members.Select(x => _client.Members[x.Key, Id]);
+		public IEnumerable<User> Members => _members.Select(x => _client.Members[x.Key, Id]);
 
 		/// <summary> Return the id of the role representing all users in a server. </summary>
 		public string EveryoneRoleId => Id;
@@ -87,7 +87,7 @@ namespace Discord
 		{
 			//Global Cache
 			_channels = new ConcurrentDictionary<string, Channel>();
-			_members = new ConcurrentDictionary<string, Member>();
+			_members = new ConcurrentDictionary<string, User>();
 			_roles = new ConcurrentDictionary<string, Role>();
 
 			//Local Cache
@@ -207,7 +207,7 @@ namespace Discord
 		internal void AddInvite(Invite invite) => _invites.TryAdd(invite.Id, invite);
 		internal void RemoveInvite(Invite invite) => _invites.TryRemove(invite.Id, out invite);
 
-		internal void AddMember(Member member)
+		internal void AddMember(User member)
 		{
 			_members.TryAdd(member.Id, member);
 			foreach (var channel in Channels)
@@ -216,7 +216,7 @@ namespace Discord
 				channel.InvalidatePermissionsCache(member.Id);
 			}
         }
-		internal void RemoveMember(Member member)
+		internal void RemoveMember(User member)
 		{
 			foreach (var channel in Channels)
 			{
@@ -225,7 +225,7 @@ namespace Discord
 			}
 			_members.TryRemove(member.Id, out member);
 		}
-		internal void HasMember(Member user) => _members.ContainsKey(user.Id);
+		internal void HasMember(User user) => _members.ContainsKey(user.Id);
 
 		internal void AddRole(Role role) => _roles.TryAdd(role.Id, role);
 		internal void RemoveRole(Role role) => _roles.TryRemove(role.Id, out role);

@@ -31,7 +31,7 @@ namespace Discord
 		public bool IsEveryone => Id == _serverId;
 		/// <summary> Returns a list of all members in this role. </summary>
 		[JsonIgnore]
-		public IEnumerable<Member> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this));
+		public IEnumerable<User> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this));
 
 		internal Role(DiscordClient client, string id, string serverId)
 			: base(client, id)
@@ -75,7 +75,7 @@ namespace Discord
 				Permissions.SetRawValueInternal(model.Permissions.Value);
 
 			foreach (var member in Members)
-				member.UpdatePermissions();
+				member.UpdateServerPermissions();
 		}
 
 		public override string ToString() => Name;
