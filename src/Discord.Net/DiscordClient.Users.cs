@@ -60,17 +60,17 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<UserChannelEventArgs> UserIsTyping;
+		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
 		private void RaiseUserIsTyping(User user, Channel channel)
 		{
-			if (UserIsTyping != null)
-				RaiseEvent(nameof(UserIsTyping), () => UserIsTyping(this, new UserChannelEventArgs(user, channel)));
+			if (UserIsTypingUpdated != null)
+				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
 		}
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeaking;
+		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
 		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
 		{
-			if (UserIsSpeaking != null)
-				RaiseEvent(nameof(UserIsSpeaking), () => UserIsSpeaking(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
+			if (UserIsSpeakingUpdated != null)
+				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
 		}
 		public event EventHandler<UserEventArgs> UserAdded;
 		private void RaiseUserAdded(User user)
@@ -83,12 +83,6 @@ namespace Discord
 		{
 			if (UserRemoved != null)
 				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new UserEventArgs(user)));
-		}
-		public event EventHandler ProfileUpdated;
-		private void RaiseProfileUpdated()
-		{
-			if (ProfileUpdated != null)
-				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
 		}
 		public event EventHandler<UserEventArgs> UserUpdated;
 		private void RaiseMemberUpdated(User user)
@@ -108,7 +102,15 @@ namespace Discord
 			if (UserVoiceStateUpdated != null)
 				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
 		}
+		public event EventHandler ProfileUpdated;
+		private void RaiseProfileUpdated()
+		{
+			if (ProfileUpdated != null)
+				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
+		}
 
+		/// <summary> Returns the current logged-in user. </summary>
+		public User CurrentUser => _currentUser;
 		private User _currentUser;
 
 		/// <summary> Returns a collection of all users this client can currently see. </summary>

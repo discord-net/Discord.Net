@@ -18,17 +18,17 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<BanEventArgs> BanAdded;
-		private void RaiseBanAdded(string userId, Server server)
+		public event EventHandler<BanEventArgs> UserBanned;
+		private void RaiseUserBanned(string userId, Server server)
 		{
-			if (BanAdded != null)
-				RaiseEvent(nameof(BanAdded), () => BanAdded(this, new BanEventArgs(userId, server)));
+			if (UserBanned != null)
+				RaiseEvent(nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
 		}
-		public event EventHandler<BanEventArgs> BanRemoved;
-		private void RaiseBanRemoved(string userId, Server server)
+		public event EventHandler<BanEventArgs> UserUnbanned;
+		private void RaiseUserUnbanned(string userId, Server server)
 		{
-			if (BanRemoved != null)
-				RaiseEvent(nameof(BanRemoved), () => BanRemoved(this, new BanEventArgs(userId, server)));
+			if (UserUnbanned != null)
+				RaiseEvent(nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
 		}
 
 		/// <summary> Bans a user from the provided server. </summary>

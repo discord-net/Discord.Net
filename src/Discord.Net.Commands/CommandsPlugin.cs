@@ -28,7 +28,7 @@ namespace Discord.Commands
 			RequireCommandCharInPublic = true;
 			RequireCommandCharInPrivate = true;
 
-			client.MessageCreated += async (s, e) =>
+			client.MessageReceived += async (s, e) =>
 			{
 				//If commands aren't being used, don't bother processing them
 				if (_commands.Count == 0)

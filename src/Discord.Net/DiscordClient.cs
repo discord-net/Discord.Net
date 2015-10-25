@@ -22,14 +22,12 @@ namespace Discord
 		private UserStatus _status;
 		private int? _gameId;
 
+		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
 		public new DiscordClientConfig Config => _config as DiscordClientConfig;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
 		public DiscordAPIClient API => _api;
-
-		/// <summary> Returns the current logged-in user. </summary>
-		public User CurrentUser => _currentUser;
-
+		
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
 			: base(config ?? new DiscordClientConfig())
@@ -91,7 +89,7 @@ namespace Discord
 					$"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				ChannelUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				MessageCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				MessageReceived += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Message Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
@@ -103,9 +101,9 @@ namespace Discord
 					$"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				UserBanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
-				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				UserUnbanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
@@ -120,7 +118,7 @@ namespace Discord
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
-				UserIsTyping += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
+				UserIsTypingUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
 					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
 				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
@@ -465,7 +463,7 @@ namespace Discord
 							if (server != null)
 							{
 								server.AddBan(data.User?.Id);
-								RaiseBanAdded(data.User?.Id, server);
+								RaiseUserBanned(data.User?.Id, server);
 							}
 						}
 						break;
@@ -474,7 +472,7 @@ namespace Discord
 							var data = e.Payload.ToObject<BanRemoveEvent>(_serializer);
 							var server = _servers[data.GuildId];
 							if (server != null && server.RemoveBan(data.User?.Id))
-								RaiseBanRemoved(data.User?.Id, server);
+								RaiseUserUnbanned(data.User?.Id, server);
 						}
 						break;
 

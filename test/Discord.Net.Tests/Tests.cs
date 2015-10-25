@@ -101,8 +101,8 @@ namespace Discord.Tests
 			AssertEvent<MessageEventArgs>(
 				"MessageCreated event never received",
 				() => _hostClient.SendMessage(_testServerChannel, text),
-				x => _targetBot.MessageCreated += x,
-				x => _targetBot.MessageCreated -= x,
+				x => _targetBot.MessageReceived += x,
+				x => _targetBot.MessageReceived -= x,
 				(s, e) => e.Message.Text == text);
 		}
 

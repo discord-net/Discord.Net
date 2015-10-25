@@ -45,11 +45,17 @@ namespace Discord
 	{
 		public const int MaxMessageSize = 2000;
 
-		public event EventHandler<MessageEventArgs> MessageCreated;
+		public event EventHandler<MessageEventArgs> MessageReceived;
 		private void RaiseMessageCreated(Message msg)
 		{
-			if (MessageCreated != null)
-				RaiseEvent(nameof(MessageCreated), () => MessageCreated(this, new MessageEventArgs(msg)));
+			if (MessageReceived != null)
+				RaiseEvent(nameof(MessageReceived), () => MessageReceived(this, new MessageEventArgs(msg)));
+		}
+		public event EventHandler<MessageEventArgs> MessageSent;
+		private void RaiseMessageSent(Message msg)
+		{
+			if (MessageSent != null)
+				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageDeleted;
 		private void RaiseMessageDeleted(Message msg)
@@ -68,12 +74,6 @@ namespace Discord
 		{
 			if (MessageReadRemotely != null)
 				RaiseEvent(nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
-		}
-		public event EventHandler<MessageEventArgs> MessageSent;
-		private void RaiseMessageSent(Message msg)
-		{
-			if (MessageSent != null)
-				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
 		}
 		
 		internal Messages Messages => _messages;
