@@ -22,7 +22,17 @@ namespace Discord
 
 		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		[JsonIgnore]
-		public Channel PrivateChannel { get; internal set; }
+		public Channel PrivateChannel
+		{
+			get { return _privateChannel; }
+			internal set
+			{
+				_privateChannel = value;
+				if (value == null)
+					CheckUser();
+            }
+		}
+		private Channel _privateChannel;
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
@@ -51,10 +61,12 @@ namespace Discord
 		internal void RemoveUser(User user)
 		{
 			if (_users.TryRemove(user.UniqueId, out user))
-			{
-				if (_users.Count == 0)
-					_client.GlobalUsers.TryRemove(Id);
-			}
+				CheckUser();
+        }
+		internal void CheckUser()
+		{
+			if (_users.Count == 0 && PrivateChannel == null)
+				_client.GlobalUsers.TryRemove(Id);
 		}
 
 		public override string ToString() => Id;

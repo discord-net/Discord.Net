@@ -84,11 +84,11 @@ namespace Discord
 		}
 		internal override void OnCached()
 		{
-
 			if (IsPrivate)
 			{
-				var recipient = _client.Users[_recipientId, _serverId];
+				var recipient = _client.Users[_recipientId, null];
 				Name = "@" + recipient.Name;
+				recipient.GlobalUser.PrivateChannel = this;
 				Recipient = recipient;
 			}
 			else
@@ -96,7 +96,8 @@ namespace Discord
 				var server = _client.Servers[_serverId];
 				server.AddChannel(this);
 				Server = server;
-			}
+				Recipient = null;
+            }
 		}
 		internal override void OnUncached()
 		{
@@ -104,7 +105,7 @@ namespace Discord
 			if (server != null)
 				server.RemoveChannel(this);
 			Server = null;
-
+			
 			var recipient = Recipient;
 			if (recipient != null)
 				recipient.GlobalUser.PrivateChannel = null;

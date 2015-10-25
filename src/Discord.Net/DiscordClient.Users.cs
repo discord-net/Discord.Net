@@ -29,7 +29,7 @@ namespace Discord
 				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new MemberEventArgs(member)));
 		}
 		public event EventHandler ProfileUpdated;
-		private void RaiseProfileUpdated(GlobalUser user)
+		private void RaiseProfileUpdated()
 		{
 			if (ProfileUpdated != null)
 				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));

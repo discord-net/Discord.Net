@@ -248,7 +248,7 @@ namespace Discord
 						SendMessageResponse response = null;
 						try
 						{
-							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.MentionIds, msg.Nonce, msg.IsTTS).ConfigureAwait(false);
+							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.Mentions.Select(x => x.Id), msg.Nonce, msg.IsTTS).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }

@@ -61,8 +61,6 @@ namespace Discord
 		internal Servers Servers => _servers;
 		private readonly Servers _servers;
 
-		public Server PMServer { get; }
-
 		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
 		public Server GetServer(string id) => _servers[id];
 

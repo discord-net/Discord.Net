@@ -599,7 +599,7 @@ namespace Discord
 							if (user != null)
 							{
 								user.Update(data);
-								RaiseProfileUpdated(user);
+								RaiseProfileUpdated();
 							}
 						}
 						break;

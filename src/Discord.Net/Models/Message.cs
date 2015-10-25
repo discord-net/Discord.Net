@@ -92,7 +92,6 @@ namespace Discord
 		}
 
 		private string _cleanText;
-		private string _channelId, _userId;
 		
 		/// <summary> Returns the local unique identifier for this message. </summary>
 		public string Nonce { get; internal set; }
@@ -123,10 +122,7 @@ namespace Discord
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; private set; }
 		private static readonly Embed[] _initialEmbeds = new Embed[0];
-
-		private static readonly string[] _initialMentions = new string[0];
-		/// <summary> Returns a collection of all user ids mentioned in this message. </summary>
-		public string[] MentionIds { get; private set; }
+		
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Mentions { get; internal set; }
@@ -137,14 +133,14 @@ namespace Discord
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Channel Channel { get; private set; }
+		private readonly string _channelId;
 
 		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUserId == UserId;
-		/// <summary> Returns the id of the author of this message. </summary>
-		public string UserId { get; }
+		public bool IsAuthor => _client.CurrentUserId == _userId;
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User User => _client.Users[_userId, Channel.Server.Id];
+		public User User { get; private set; }
+		private readonly string _userId;
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 			: base(client, id)
@@ -153,7 +149,6 @@ namespace Discord
 			_userId = userId;
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
-			MentionIds = _initialMentions;
 		}
 		internal override void OnCached()
 		{
@@ -161,6 +156,10 @@ namespace Discord
 			var channel = _client.Channels[_channelId];
 			channel.AddMessage(this);
 			Channel = channel;
+
+			var user = _client.Users[_channelId, channel.Server?.Id];
+			//user.AddMessage(this);
+			User = user;
 		}
 		internal override void OnUncached()
 		{
@@ -169,7 +168,12 @@ namespace Discord
 			if (channel != null)
 				channel.RemoveMessage(this);
 			Channel = null;
-        }
+
+			var user = User;
+			/*if (user != null)
+				user.RemoveMessage(this);*/
+			User = null;
+		}
 
 		internal void Update(MessageInfo model)
 		{
@@ -207,8 +211,8 @@ namespace Discord
 				EditedTimestamp = model.EditedTimestamp;
 			if (model.Mentions != null)
 			{
-				MentionIds = model.Mentions.Select(x => x.Id)?.ToArray();
-				IsMentioningMe = MentionIds.Contains(_client.CurrentUserId);
+				Mentions = model.Mentions.Select(x => _client.Users[x.Id, Channel.Server?.Id]).ToArray();
+				IsMentioningMe = model.Mentions.Any(x => x.Id == _client.CurrentUserId);
 			}
 			if (model.Content != null)
 			{

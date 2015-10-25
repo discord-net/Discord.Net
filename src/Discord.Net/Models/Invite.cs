@@ -6,8 +6,6 @@ namespace Discord
 {
 	public sealed class Invite : CachedObject
 	{		
-		/// <summary> Returns the unique code for this invite. </summary>
-		public string Code { get; private set; }
 		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
 		public string XkcdCode { get; }
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
@@ -22,7 +20,7 @@ namespace Discord
 		public bool IsTemporary { get; private set; }
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
-		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Code);
+		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id);
 		
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
