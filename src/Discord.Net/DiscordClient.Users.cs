@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Users : AsyncCollection<GlobalUser>
+	internal sealed class GlobalUsers : AsyncCollection<GlobalUser>
 	{
-		public Users(DiscordClient client, object writerLock)
+		public GlobalUsers(DiscordClient client, object writerLock)
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
 
 		public GlobalUser GetOrAdd(string id) => GetOrAdd(id, () => new GlobalUser(_client, id));
@@ -54,8 +54,8 @@ namespace Discord
 		}
 	
 		/// <summary> Returns a collection of all users this client can currently see. </summary>
-		internal Users Users => _users;
-		private readonly Users _users;
+		internal GlobalUsers GlobalUsers => _globalUsers;
+		private readonly GlobalUsers _globalUsers;
 
 		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,

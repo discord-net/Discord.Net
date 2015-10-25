@@ -144,7 +144,7 @@ namespace Discord
 		public string UserId { get; }
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
-		public User Member => _client.Members[_userId, Channel.Server.Id];
+		public User User => _client.Users[_userId, Channel.Server.Id];
 
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 			: base(client, id)
@@ -214,6 +214,6 @@ namespace Discord
 			}
 		}
 
-		public override string ToString() => Member.Name + ": " + RawText;
+		public override string ToString() => User.Name + ": " + RawText;
 	}
 }

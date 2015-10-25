@@ -10,8 +10,8 @@ namespace Discord
 		private static readonly Regex _channelRegex = new Regex(@"<#(\d+?)>", RegexOptions.Compiled);
 
 		/// <summary> Returns the string used to create a user mention. </summary>
-		public static string User(User member)
-			=> $"<@{member.Id}>";
+		public static string User(User user)
+			=> $"<@{user.Id}>";
 		/// <summary> Returns the string used to create a channel mention. </summary>
 		public static string Channel(Channel channel)
 			=> $"<#{channel.Id}>";
@@ -24,7 +24,7 @@ namespace Discord
 			text = _userRegex.Replace(text, new MatchEvaluator(e =>
 			{
 				string id = e.Value.Substring(2, e.Value.Length - 3);
-				var user = client.Members[id, server.Id];
+				var user = client.Users[id, server.Id];
 				if (user != null)
 					return '@' + user.Name;
 				else //User not found

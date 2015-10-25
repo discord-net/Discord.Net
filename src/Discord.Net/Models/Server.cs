@@ -71,7 +71,7 @@ namespace Discord
 		
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Members => _members.Select(x => _client.Members[x.Key, Id]);
+		public IEnumerable<User> Members => _members.Select(x => _client.Users[x.Key, Id]);
 
 		/// <summary> Return the id of the role representing all users in a server. </summary>
 		public string EveryoneRoleId => Id;
@@ -102,7 +102,7 @@ namespace Discord
 			foreach (var channel in _channels)
 				channels.TryRemove(channel.Key);
 
-			var members = _client.Members;
+			var members = _client.Users;
 			foreach (var user in _members)
 				members.TryRemove(user.Key, Id);
 
@@ -132,7 +132,7 @@ namespace Discord
 			if (model.OwnerId != null && _ownerId != model.OwnerId)
 			{
 				_ownerId = model.OwnerId;
-				Owner = _client.Members[_ownerId, Id];
+				Owner = _client.Users[_ownerId, Id];
 			}
 			if (model.Region != null)
 				Region = model.Region;
@@ -158,8 +158,8 @@ namespace Discord
 				channel.Update(subModel);
 			}
 
-			var users = _client.Users;
-			var members = _client.Members;
+			var users = _client.GlobalUsers;
+			var members = _client.Users;
 			foreach (var subModel in model.Members)
 			{
 				var member = members.GetOrAdd(subModel.User.Id, Id);

@@ -43,11 +43,11 @@ namespace Discord
 
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
-			_members = new Members(this, cacheLock);
+			_users = new Users(this, cacheLock);
 			_messages = new Messages(this, cacheLock, Config.MessageCacheLength > 0);
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
-			_users = new Users(this, cacheLock);
+			_globalUsers = new GlobalUsers(this, cacheLock);
 
 			_status = UserStatus.Online;
 
@@ -59,7 +59,7 @@ namespace Discord
 
 			VoiceDisconnected += (s, e) =>
 			{
-				foreach (var member in _members)
+				foreach (var member in _users)
 				{
 					if (member.ServerId == e.ServerId && member.IsSpeaking)
 					{
@@ -117,13 +117,13 @@ namespace Discord
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				UserIsTyping += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
-					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Member?.Name}");
+					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
 				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageSent += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				UserPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Updated Member (Presence): {e.Server?.Name ?? "[Private]"}/{e.Member?.Name}");
+					$"Updated Member (Presence): {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
 				
 				_api.RestClient.OnRequest += (s, e) =>
 				{
@@ -138,9 +138,9 @@ namespace Discord
 				_channels.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_channels.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_channels.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Channels");
-				_members.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
-				_members.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
-				_members.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Members");
+				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Members");
 				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
 				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
 				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Remapped Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
@@ -151,9 +151,9 @@ namespace Discord
 				_servers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Server {e.Item.Id}");
 				_servers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Server {e.Item.Id}");
 				_servers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Servers");
-				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created User {e.Item.Id}");
-				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed User {e.Item.Id}");
-				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
+				_globalUsers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created User {e.Item.Id}");
+				_globalUsers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed User {e.Item.Id}");
+				_globalUsers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
 			}
 
 			if (Config.UseMessageQueue)
@@ -173,7 +173,7 @@ namespace Discord
 			{
 				if (_voiceSocket.State == WebSocketState.Connected)
 				{
-					var member = _members[e.UserId, socket.CurrentServerId];
+					var member = _users[e.UserId, socket.CurrentServerId];
 					bool value = e.IsSpeaking;
 					if (member.IsSpeaking != value)
 					{
@@ -260,11 +260,11 @@ namespace Discord
 			await _api.Logout();
 
 			_channels.Clear();
-			_members.Clear();
+			_users.Clear();
 			_messages.Clear();
 			_roles.Clear();
 			_servers.Clear();
-			_users.Clear();
+			_globalUsers.Clear();
 
 			_currentUser = null;
 		}
@@ -289,7 +289,7 @@ namespace Discord
 					case "READY": //Resync
 						{
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-							_currentUser = _members.GetOrAdd(data.User.Id, null);
+							_currentUser = _users.GetOrAdd(data.User.Id, null);
 							_currentUser.Update(data.User);
 							foreach (var model in data.Guilds)
 							{
@@ -301,7 +301,7 @@ namespace Discord
 							}
 							foreach (var model in data.PrivateChannels)
 							{
-								var user = _members.GetOrAdd(model.Recipient.Id, null);
+								var user = _users.GetOrAdd(model.Recipient.Id, null);
 								user.Update(model.Recipient);
 								var channel = _channels.GetOrAdd(model.Id, null, user.Id);
 								channel.Update(model);
@@ -356,7 +356,7 @@ namespace Discord
 							Channel channel;
 							if (data.IsPrivate)
 							{
-								var member = _members.GetOrAdd(data.Recipient.Id, null);
+								var member = _users.GetOrAdd(data.Recipient.Id, null);
 								member.Update(data.Recipient);
 								channel = _channels.GetOrAdd(data.Id, null, member.Id);
 							}
@@ -390,7 +390,7 @@ namespace Discord
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Payload.ToObject<MemberAddEvent>(_serializer);
-							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
+							var member = _users.GetOrAdd(data.User.Id, data.GuildId);
 							member.Update(data);
 							if (Config.TrackActivity)
 								member.UpdateActivity();
@@ -400,7 +400,7 @@ namespace Discord
 					case "GUILD_MEMBER_UPDATE":
 						{
 							var data = e.Payload.ToObject<MemberUpdateEvent>(_serializer);
-							var member = _members[data.User.Id, data.GuildId];
+							var member = _users[data.User.Id, data.GuildId];
 							if (member != null)
 							{
 								member.Update(data);
@@ -411,7 +411,7 @@ namespace Discord
 					case "GUILD_MEMBER_REMOVE":
 						{
 							var data = e.Payload.ToObject<MemberRemoveEvent>(_serializer);
-							var member = _members.TryRemove(data.UserId, data.GuildId);
+							var member = _users.TryRemove(data.UserId, data.GuildId);
 							if (member != null)
 								RaiseUserRemoved(member);
 						}
@@ -491,7 +491,7 @@ namespace Discord
 								var channel = msg.Channel;
 								if (channel?.IsPrivate == false)
 								{
-									var member = msg.Member;
+									var member = msg.User;
 									if (member != null)
 										member.UpdateActivity(data.Timestamp);
 								}
@@ -535,7 +535,7 @@ namespace Discord
 					case "PRESENCE_UPDATE":
 						{
 							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
-							var member = _members.GetOrAdd(data.User.Id, data.GuildId);
+							var member = _users.GetOrAdd(data.User.Id, data.GuildId);
 							if (member != null)
 							{
 								member.Update(data);
@@ -549,7 +549,7 @@ namespace Discord
 							var channel = _channels[data.ChannelId];
 							if (channel != null)
 							{
-								var user = _members[data.UserId, channel.Server?.Id];
+								var user = _users[data.UserId, channel.Server?.Id];
 
 								if (user != null)
 								{
@@ -560,7 +560,7 @@ namespace Discord
 								{
 									if (!channel.IsPrivate)
 									{
-										var member = _members[data.UserId, channel.Server.Id];
+										var member = _users[data.UserId, channel.Server.Id];
 										if (member != null)
 											member.UpdateActivity();
 									}
@@ -573,7 +573,7 @@ namespace Discord
 					case "VOICE_STATE_UPDATE":
 						{
 							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_serializer);
-							var member = _members[data.UserId, data.GuildId];
+							var member = _users[data.UserId, data.GuildId];
 							if (member != null)
 							{
 								if (data.ChannelId != member.VoiceChannelId && member.IsSpeaking)
@@ -591,7 +591,7 @@ namespace Discord
 					case "USER_UPDATE":
 						{
 							var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
-							var user = _users[data.Id];
+							var user = _globalUsers[data.Id];
 							if (user != null)
 							{
 								user.Update(data);

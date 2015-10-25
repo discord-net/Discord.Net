@@ -96,7 +96,7 @@ namespace Discord.Commands
 						argText = msg.Substring(args[cmd.Parts.Length].Index);
 
 					//Check Permissions
-					int permissions = _getPermissions != null ? _getPermissions(e.Message.Member) : 0;
+					int permissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
 					var eventArgs = new CommandEventArgs(e.Message, cmd, msg, argText, permissions, newArgs);
 					if (permissions < cmd.MinPerms)
 					{

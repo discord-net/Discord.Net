@@ -13,7 +13,7 @@ namespace Discord
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
 
-			return SetChannelPermissions(channel, member?.Id, PermissionTarget.Member, allow, deny);
+			return SetChannelPermissions(channel, member?.Id, PermissionTarget.User, allow, deny);
 		}
 		public Task SetChannelUserPermissions(Channel channel, User member, DualChannelPermissions permissions = null)
 		{
@@ -21,7 +21,7 @@ namespace Discord
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
 
-			return SetChannelPermissions(channel, member?.Id, PermissionTarget.Member, permissions?.Allow, permissions?.Deny);
+			return SetChannelPermissions(channel, member?.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
 		}
 		public Task SetChannelRolePermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
@@ -82,7 +82,7 @@ namespace Discord
 			{
 				if (targetType == PermissionTarget.Role)
 					channel.InvalidatePermissionsCache();
-				else if (targetType == PermissionTarget.Member)
+				else if (targetType == PermissionTarget.User)
 					channel.InvalidatePermissionsCache(targetId);
 			}
 		}
@@ -93,7 +93,7 @@ namespace Discord
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
 
-			return RemoveChannelPermissions(channel, member?.Id, PermissionTarget.Member);
+			return RemoveChannelPermissions(channel, member?.Id, PermissionTarget.User);
 		}
 		public Task RemoveChannelRolePermissions(Channel channel, Role role)
 		{
@@ -115,7 +115,7 @@ namespace Discord
 
 					if (targetType == PermissionTarget.Role)
 						channel.InvalidatePermissionsCache();
-					else if (targetType == PermissionTarget.Member)
+					else if (targetType == PermissionTarget.User)
 						channel.InvalidatePermissionsCache(userOrRoleId);
 				}
 			}

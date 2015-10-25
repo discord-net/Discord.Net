@@ -34,7 +34,7 @@ namespace Discord
 	public class MessageEventArgs : EventArgs
 	{
 		public Message Message { get; }
-		public User Member => Message.Member;
+		public User Member => Message.User;
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Server;
 
@@ -118,7 +118,7 @@ namespace Discord
 			{
 				var nonce = GenerateNonce();
 				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
-                var currentUser = msg.Member;
+                var currentUser = msg.User;
 				msg.Update(new MessageInfo
 				{
 					Content = text,
@@ -127,7 +127,7 @@ namespace Discord
 					ChannelId = channel.Id,
 					IsTextToSpeech = isTextToSpeech
 				});
-				msg.Mentions = userIds.Select(x => _members[x, channel.Server.Id]).Where(x => x != null).ToArray();
+				msg.Mentions = userIds.Select(x => _users[x, channel.Server.Id]).Where(x => x != null).ToArray();
 				msg.IsQueued = true;
 				msg.Nonce = nonce;
 				_pendingMessages.Enqueue(msg);
@@ -218,7 +218,7 @@ namespace Discord
 						{
 							if (!channel.IsPrivate)
 							{
-								var member = msg.Member;
+								var member = msg.User;
 								if (member != null)
 									member.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 							}

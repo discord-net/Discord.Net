@@ -52,7 +52,7 @@ namespace Discord
 		private DateTime _lastOnline;
 
 		[JsonIgnore]
-		internal GlobalUser GlobalUser => _client.Users[Id];
+		internal GlobalUser GlobalUser => _client.GlobalUsers[Id];
 
 		public string ServerId { get; }
 		[JsonIgnore]
@@ -213,9 +213,9 @@ namespace Discord
 					newPermissions &= ~denyRole.Deny.RawValue;
 				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
 					newPermissions |= allowRole.Allow.RawValue;
-				foreach (var denyMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Member && x.TargetId == Id && x.Deny.RawValue != 0))
+				foreach (var denyMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Deny.RawValue != 0))
 					newPermissions &= ~denyMembers.Deny.RawValue;
-				foreach (var allowMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Member && x.TargetId == Id && x.Allow.RawValue != 0))
+				foreach (var allowMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Allow.RawValue != 0))
 					newPermissions |= allowMembers.Allow.RawValue;
 			}
 

@@ -26,7 +26,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Memberships => _users.Select(x => _client.Members[Id, x.Key]);
+		public IEnumerable<User> Memberships => _users.Select(x => _client.Users[Id, x.Key]);
 
 		internal GlobalUser(DiscordClient client, string id)
 			: base(client, id)
@@ -50,7 +50,7 @@ namespace Discord
 			if (_users.TryRemove(user.Id, out user))
 			{
 				if (_users.Count == 0)
-					_client.Users.TryRemove(Id);
+					_client.GlobalUsers.TryRemove(Id);
 			}
 		}
 

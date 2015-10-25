@@ -54,14 +54,14 @@ namespace Discord
 			get
 			{
 				if (!_areMembersStale)
-					return _members;
+					return _members.Select(x => x.Value);
 
-				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToArray();
+				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
 				_areMembersStale = false;
-				return _members;
+				return _members.Select(x => x.Value);
             }
 		}
-		private User[] _members;
+		private Dictionary<string, User> _members;
 		private bool _areMembersStale;
 
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
@@ -90,7 +90,7 @@ namespace Discord
 
 			if (IsPrivate)
 			{
-				var recipient = _client.Members[_recipientId, _serverId];
+				var recipient = _client.Users[_recipientId, _serverId];
 				Name = "@" + recipient.Name;
 				Recipient = recipient;
 			}
@@ -170,9 +170,9 @@ namespace Discord
 		internal void InvalidatePermissionsCache(string userId)
 		{
 			_areMembersStale = true;
-			var member = _client.Members[userId, _serverId];
-			if (member != null)
-				member.UpdateChannelPermissions(this);
+			var user = _members[userId]
+			if (user != null)
+				user.UpdateChannelPermissions(this);
 		}
 	}
 }
