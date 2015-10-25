@@ -11,12 +11,15 @@ namespace Discord
 	{
 		private static readonly string[] _initialRoleIds = new string[0];
 
+		internal static string GetId(string userId, string serverId) => (serverId ?? "Private") + '_' + userId;
+
 		private ConcurrentDictionary<string, Channel> _channels;
 		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
 		private ServerPermissions _serverPermissions;
-        private bool _hasRef;
 		private string[] _roleIds;
 
+		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
+		internal string UniqueId => GetId(Id, ServerId);
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
@@ -81,20 +84,13 @@ namespace Discord
 		internal override void OnCached()
 		{
 			var server = Server;
-			if (server != null)
-			{
-				server.AddMember(this);
-				if (Id == _client.CurrentUserId)
-					server.CurrentMember = this;
-			}
+			server.AddMember(this);
+			if (Id == _client.CurrentUserId)
+				server.CurrentMember = this;
+
 			var user = GlobalUser;
-			if (user != null)
-			{
-				if (server == null || !server.IsVirtual)
-					user.AddServer(ServerId);
-				user.AddRef();
-				_hasRef = true;
-			}
+			if (server == null || !server.IsVirtual)
+				user.AddUser(this);
 		}
 		internal override void OnUncached()
 		{
@@ -105,14 +101,9 @@ namespace Discord
 				if (Id == _client.CurrentUserId)
 					server.CurrentMember = null;
 			}
-			var user = GlobalUser;
-			if (user != null)
-			{
-				user.RemoveServer(ServerId);
-				if (_hasRef)
-					user.RemoveRef();
-			}
-			_hasRef = false;
+			var globalUser = GlobalUser;
+			if (globalUser != null)
+				globalUser.RemoveUser(this);
 		}
 
 		public override string ToString() => Id;

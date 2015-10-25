@@ -9,9 +9,8 @@ namespace Discord
 {
 	internal sealed class GlobalUser : CachedObject
 	{
-		private readonly ConcurrentDictionary<string, bool> _servers;
-		private int _refCount;
-		
+		private readonly ConcurrentDictionary<string, User> _users;
+
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
 		[JsonIgnore]
@@ -27,15 +26,12 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Memberships => _servers.Select(x => _client.Members[Id, x.Key]);
-		/// <summary> Returns a collection of all servers this user is a member of. </summary>
-		[JsonIgnore]
-		public IEnumerable<Server> Servers => _servers.Select(x => _client.Servers[x.Key]);
+		public IEnumerable<User> Memberships => _users.Select(x => _client.Members[Id, x.Key]);
 
 		internal GlobalUser(DiscordClient client, string id)
 			: base(client, id)
 		{
-			_servers = new ConcurrentDictionary<string, bool>();
+			_users = new ConcurrentDictionary<string, User>();
 		}
 		internal override void OnCached() { }
 		internal override void OnUncached() { }
@@ -48,24 +44,14 @@ namespace Discord
 				IsVerified = model.IsVerified;
 		}
 
-		internal void AddServer(string serverId)
+		internal void AddUser(User user) => _users.TryAdd(user.Id, user);
+		internal void RemoveUser(User user)
 		{
-			_servers.TryAdd(serverId, true);
-		}
-		internal bool RemoveServer(string serverId)
-		{
-			bool ignored;
-			return _servers.TryRemove(serverId, out ignored);
-		}
-
-		internal void AddRef()
-		{
-			Interlocked.Increment(ref _refCount);
-		}
-		internal void RemoveRef()
-		{
-			if (Interlocked.Decrement(ref _refCount) == 0)
-				_client.Users.TryRemove(Id);
+			if (_users.TryRemove(user.Id, out user))
+			{
+				if (_users.Count == 0)
+					_client.Users.TryRemove(Id);
+			}
 		}
 
 		public override string ToString() => Id;
