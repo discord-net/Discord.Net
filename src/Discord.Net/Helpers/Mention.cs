@@ -28,16 +28,16 @@ namespace Discord
 				if (user != null)
 					return '@' + user.Name;
 				else //User not found
-					return e.Value;
+					return '@' + e.Value;
 			}));
 			text = _channelRegex.Replace(text, new MatchEvaluator(e =>
 			{
 				string id = e.Value.Substring(2, e.Value.Length - 3);
 				var channel = client.Channels[id];
 				if (channel != null && channel.Server.Id == server.Id)
-					return channel.Name;
+					return '#' + channel.Name;
 				else //Channel not found
-					return e.Value;
+					return '#' + e.Value;
 			}));
 			return text;
 		}
