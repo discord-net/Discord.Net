@@ -10,11 +10,22 @@ namespace Discord
 {
 	internal sealed class Messages : AsyncCollection<Message>
 	{
-		public Messages(DiscordClient client, object writerLock)
+		private bool _isEnabled;
+
+		public Messages(DiscordClient client, object writerLock, bool isEnabled)
 			: base(client, writerLock, x => x.OnCached(), x => x.OnUncached()) { }
 
 		public Message GetOrAdd(string id, string channelId, string userId)
-			=> GetOrAdd(id, () => new Message(_client, id, channelId, userId));
+		{
+			if (_isEnabled)
+				return GetOrAdd(id, () => new Message(_client, id, channelId, userId));
+			else
+			{
+				var msg = new Message(_client, id, channelId, userId);
+				msg.Cache(); //Creates references to channel/server
+				return msg;
+            }
+        }
 	}
 
 	public class MessageEventArgs : EventArgs
@@ -103,10 +114,7 @@ namespace Discord
 			if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
-				if (_messages != null)
-					msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
-				else
-					msg = new Message(this, "nonce_" + nonce, channel.Id, _userId);
+				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
                 var currentUser = msg.Member;
 				msg.Update(new MessageInfo
 				{
@@ -124,10 +132,7 @@ namespace Discord
 			else
 			{
 				var model = await _api.SendMessage(channel.Id, text, userIds, null, isTextToSpeech).ConfigureAwait(false);
-				if (_messages != null)
-					msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
-				else
-					msg = new Message(this, model.Id, channel.Id, _userId);
+				msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 				msg.Update(model);
 				RaiseMessageSent(msg);
 			}
@@ -160,32 +165,29 @@ namespace Discord
 		}
 
 		/// <summary> Deletes the provided message. </summary>
-		public async Task DeleteMessage(Message message)
+		public Task DeleteMessage(Message message)
 		{
 			if (message == null) throw new ArgumentNullException(nameof(message));
 			CheckReady();
 
-			try
-			{
-				await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
-				_messages.TryRemove(message.Id);
-			}
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-		}
+			return DeleteMessageInternal(message);
+        }
 		public async Task DeleteMessages(IEnumerable<Message> messages)
 		{
 			if (messages == null) throw new ArgumentNullException(nameof(messages));
 			CheckReady();
 
 			foreach (var message in messages)
+				await DeleteMessageInternal(message);
+		}
+		private async Task DeleteMessageInternal(Message message)
+		{
+			try
 			{
-				try
-				{
-					await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
-					_messages.TryRemove(message.Id);
-				}
-				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+				await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
+				_messages.TryRemove(message.Id);
 			}
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
@@ -204,15 +206,10 @@ namespace Discord
 					return msgs.Select(x =>
 					{
 						Message msg = null;
-						if (_messages != null)
-						{
-							if (cache && _messages != null)
-								msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
-							else
-								msg = _messages[x.Id];
-                        }
-						if (msg == null)
-							msg = new Message(this, x.Id, x.ChannelId, x.Author.Id);
+						if (cache)
+							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
+						else
+							msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
 						msg.Update(x);
 						if (Config.TrackActivity)
 						{

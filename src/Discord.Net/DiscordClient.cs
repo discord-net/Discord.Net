@@ -44,7 +44,7 @@ namespace Discord
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
 			_members = new Members(this, cacheLock);
-			_messages = new Messages(this, cacheLock);
+			_messages = new Messages(this, cacheLock, Config.MessageCacheLength > 0);
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
 			_users = new Users(this, cacheLock);
@@ -482,25 +482,9 @@ namespace Discord
 							Message msg = null;
 
 							bool isAuthor = data.Author.Id == _userId;
-                            bool hasFinishedSending = false;
-							if (Config.UseMessageQueue && isAuthor && data.Nonce != null)
-							{
-								msg = _messages.Remap("nonce" + data.Nonce, data.Id);
-								if (msg != null)
-								{
-									msg.IsQueued = false;
-									msg.Id = data.Id;
-									hasFinishedSending = true;
-                                }
-							}
 
 							if (msg == null)
-							{
-								if (_messages != null)
-									msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
-								else
-									msg = new Message(this, data.Id, data.ChannelId, data.Author.Id);
-							}
+								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
 							msg.Update(data);
 							if (Config.TrackActivity)
 							{
@@ -513,12 +497,10 @@ namespace Discord
 								}
 							}
 
+							RaiseMessageCreated(msg);
+
 							if (Config.AckMessages && !isAuthor)
 								await _api.AckMessage(data.Id, data.ChannelId);
-
-							if (hasFinishedSending)
-								RaiseMessageSent(msg);
-							RaiseMessageCreated(msg);
 						}
 						break;
 					case "MESSAGE_UPDATE":
