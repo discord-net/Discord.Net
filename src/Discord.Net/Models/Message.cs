@@ -157,7 +157,7 @@ namespace Discord
 			channel.AddMessage(this);
 			Channel = channel;
 
-			var user = _client.Users[_channelId, channel.Server?.Id];
+			var user = _client.Users[_userId, channel.Server?.Id];
 			//user.AddMessage(this);
 			User = user;
 		}
