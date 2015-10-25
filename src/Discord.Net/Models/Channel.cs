@@ -83,9 +83,14 @@ namespace Discord
 				x =>
 				{
 					Name = "@" + x.Name;
-					x.GlobalUser.PrivateChannel = this;
+					if (_server.Id == null)
+						x.GlobalUser.PrivateChannel = this;
 				},
-				x => x.GlobalUser.PrivateChannel = null);
+				x =>
+				{
+					if (_server.Id == null)
+						x.GlobalUser.PrivateChannel = null;
+                });
 			_permissionOverwrites = _initialPermissionsOverwrites;
 			_areMembersStale = true;
 
