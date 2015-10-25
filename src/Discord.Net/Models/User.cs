@@ -82,7 +82,32 @@ namespace Discord
 
 		/// <summary> Returns a collection of all channels this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
+		public IEnumerable<Channel> Channels
+		{
+			get
+			{
+				if (_server.Id != null)
+				{
+					return _permissions
+						.Where(x => x.Value.ReadMessages)
+						.Select(x =>
+						{
+							Channel channel = null;
+							_channels.TryGetValue(x.Key, out channel);
+							return channel;
+                        })
+						.Where(x => x != null);
+				}
+				else
+				{
+					var privateChannel = PrivateChannel;
+					if (privateChannel != null)
+						return new Channel[] { privateChannel };
+					else
+						return new Channel[0];
+				}
+			}
+		}
 
 		internal User(DiscordClient client, string id, string serverId)
 			: base(client, id)
@@ -309,17 +334,23 @@ namespace Discord
 
 		internal void AddChannel(Channel channel)
 		{
-			var perms = new ChannelPermissions();
-			perms.Lock();
-			_channels.TryAdd(channel.Id, channel);
-			_permissions.TryAdd(channel.Id, perms);
-			UpdateChannelPermissions(channel);
+			if (_server.Id != null)
+			{
+				var perms = new ChannelPermissions();
+				perms.Lock();
+				_channels.TryAdd(channel.Id, channel);
+				_permissions.TryAdd(channel.Id, perms);
+				UpdateChannelPermissions(channel);
+			}
 		}
 		internal void RemoveChannel(Channel channel)
 		{
-			ChannelPermissions ignored;
-			_channels.TryRemove(channel.Id, out channel);
-			_permissions.TryRemove(channel.Id, out ignored);
+			if (_server.Id != null)
+			{
+				ChannelPermissions ignored;
+				_channels.TryRemove(channel.Id, out channel);
+				_permissions.TryRemove(channel.Id, out ignored);
+			}
 		}
 
 		public bool HasRole(Role role)
