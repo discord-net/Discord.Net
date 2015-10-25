@@ -69,7 +69,16 @@ namespace Discord
 
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
-		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.User.Id == Id && x.Server.Id == _server.Id);
+		public IEnumerable<Message> Messages
+		{
+			get
+			{
+				if (_server.Id != null)
+					return Server.Channels.SelectMany(x => x.Messages.Where(y => y.User.Id == Id));
+				else
+					return GlobalUser.PrivateChannel.Messages.Where(x => x.User.Id == Id);
+            }
+		}
 
 		/// <summary> Returns a collection of all channels this user is a member of. </summary>
 		[JsonIgnore]
