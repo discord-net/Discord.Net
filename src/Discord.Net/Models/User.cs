@@ -94,8 +94,11 @@ namespace Discord
 				});
 			Status = UserStatus.Offline;
 			_channels = new ConcurrentDictionary<string, Channel>();
-			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
-			_serverPermissions = new ServerPermissions();
+			if (serverId != null)
+			{
+				_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
+				_serverPermissions = new ServerPermissions();
+			}
 
 			if (serverId == null)
 				UpdateRoles(null);
@@ -181,18 +184,20 @@ namespace Discord
 		}
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			Dictionary<string, Role> newRoles;
-			if (roles != null)
-				newRoles = roles.ToDictionary(x => x.Id, x => x);
-			else
-				newRoles = new Dictionary<string, Role>();
-			Role everyone;
 			if (_server.Id != null)
-				everyone = Server.EveryoneRole;
+			{
+				Dictionary<string, Role> newRoles;
+				if (roles != null)
+					newRoles = roles.ToDictionary(x => x.Id, x => x);
+				else
+					newRoles = new Dictionary<string, Role>();
+
+				var everyone = Server.EveryoneRole;
+				newRoles.Add(everyone.Id, everyone);
+				_roles = newRoles;
+			}
 			else
-				everyone = _client.Roles.VirtualEveryone;
-			newRoles.Add(everyone.Id, everyone);
-			_roles = newRoles;
+				_roles = new Dictionary<string, Role>();
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)
@@ -200,20 +205,51 @@ namespace Discord
 			if (LastActivityAt == null || activity > LastActivityAt.Value)
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
-		
+
+		internal void UpdateServerPermissions()
+		{
+			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
+
+			var server = Server;
+			if (server == null) return;
+
+			uint newPermissions = 0x0;
+			uint oldPermissions = _serverPermissions.RawValue;
+
+			if (server.Owner == this)
+				newPermissions = ServerPermissions.All.RawValue;
+			else
+			{
+				//var roles = Roles.OrderBy(x => x.Id);
+				var roles = Roles;
+				foreach (var serverRole in roles)
+					newPermissions |= serverRole.Permissions.RawValue;
+			}
+
+			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+				newPermissions = ServerPermissions.All.RawValue;
+
+			if (newPermissions != oldPermissions)
+			{
+				_serverPermissions.SetRawValueInternal(newPermissions);
+				foreach (var channel in _channels)
+					UpdateChannelPermissions(channel.Value);
+			}
+		}
 		internal void UpdateChannelPermissions(Channel channel)
 		{
 			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
-			if (server != null && channel.Server != server) throw new InvalidOperationException();
+			if (server == null) return;
+			if (channel.Server != server) throw new InvalidOperationException();
 
 			ChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channel.Id, out permissions)) return;
 			uint newPermissions = _serverPermissions.RawValue;
 			uint oldPermissions = permissions.RawValue;
 			
-			if (server != null && server.Owner == this)
+			if (server.Owner == this)
 				newPermissions = ChannelPermissions.All(channel).RawValue;
 			else
 			{
@@ -242,39 +278,15 @@ namespace Discord
 
 			permissions.SetRawValueInternal(newPermissions);
 		}
-		internal void UpdateServerPermissions()
-		{
-			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
-			var server = Server;
-			
-			uint newPermissions = 0x0;
-			uint oldPermissions = _serverPermissions.RawValue;
-
-			if (server != null && server.Owner == this)
-				newPermissions = ServerPermissions.All.RawValue;
-			else
-			{
-				//var roles = Roles.OrderBy(x => x.Id);
-				var roles = Roles;
-				foreach (var serverRole in roles)
-					newPermissions |= serverRole.Permissions.RawValue;
-			}
-
-			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
-				newPermissions = ServerPermissions.All.RawValue;
-
-			if (newPermissions != oldPermissions)
-			{
-				_serverPermissions.SetRawValueInternal(newPermissions);
-				foreach (var channel in _channels)
-					UpdateChannelPermissions(channel.Value);
-			}
-		}
-		public ServerPermissions GetPermissions() => _serverPermissions;
+		public ServerPermissions GetServerPermissions() => _serverPermissions;
 		public ChannelPermissions GetPermissions(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
+
+			//Return static permissions if this is a private chat
+			if (_server.Id == null)
+				return ChannelPermissions.PrivateOnly;
 
 			ChannelPermissions perms;
 			if (_permissions.TryGetValue(channel.Id, out perms))
@@ -300,7 +312,7 @@ namespace Discord
 		public bool HasRole(Role role)
 		{
 			if (role == null) throw new ArgumentNullException(nameof(role));
-
+			
 			return _roles.ContainsKey(role.Id);
 		}
 	}

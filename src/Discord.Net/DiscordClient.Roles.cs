@@ -7,13 +7,8 @@ namespace Discord
 {
 	internal sealed class Roles : AsyncCollection<Role>
 	{
-		public Role VirtualEveryone { get; private set; }
-
 		public Roles(DiscordClient client, object writerLock)
-			: base(client, writerLock)
-		{
-			VirtualEveryone = new Role(client, "Private", null);
-        }
+			: base(client, writerLock) { }
 		
 		public Role GetOrAdd(string id, string serverId)
 			=> GetOrAdd(id, () => new Role(_client, id, serverId));
