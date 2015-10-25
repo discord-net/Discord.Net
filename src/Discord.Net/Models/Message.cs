@@ -157,15 +157,18 @@ namespace Discord
 		}
 		internal override void OnCached()
 		{
+			//References
 			var channel = _client.Channels[_channelId];
 			channel.AddMessage(this);
 			Channel = channel;
 		}
 		internal override void OnUncached()
 		{
+			//References
 			var channel = Channel;
 			if (channel != null)
 				channel.RemoveMessage(this);
+			Channel = null;
         }
 
 		internal void Update(MessageInfo model)

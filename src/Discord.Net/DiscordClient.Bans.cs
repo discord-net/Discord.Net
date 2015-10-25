@@ -36,18 +36,20 @@ namespace Discord
 		public Task Ban(User member)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (member.Server == null) throw new ArgumentException("Unable to ban a user in a private chat.");
 			CheckReady();
 
-			return _api.Ban(member.ServerId, member.Id);
+			return _api.Ban(member.Server.Id, member.Id);
 		}
 
 		/// <summary> Unbans a user from the provided server. </summary>
-		public async Task Unban(User member)
+		public async Task Unban(Server server, string userId)
 		{
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
 			CheckReady();
 
-			try { await _api.Unban(member.ServerId, member.Id).ConfigureAwait(false); }
+			try { await _api.Unban(server.Id, userId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 	}

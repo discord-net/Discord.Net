@@ -121,7 +121,7 @@ namespace Discord
 			if (member == null) throw new ArgumentNullException(nameof(member));
 			CheckReady();
 			
-			return _api.EditMember(member.ServerId, member.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+			return _api.EditMember(member.Server?.Id, member.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 	}
 }

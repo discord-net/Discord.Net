@@ -90,7 +90,7 @@ namespace Discord
 				}
 			}
 
-			socket.ReceivedEvent += (s, e) => OnReceivedEvent(e);
+			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e);
 			return socket;
 		}
 		internal virtual VoiceWebSocket CreateVoiceSocket()
@@ -292,7 +292,7 @@ namespace Discord
 			}
 		}
 
-		internal virtual Task OnReceivedEvent(WebSocketEventEventArgs e)
+		internal virtual async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
 			{
@@ -309,7 +309,7 @@ namespace Discord
 							{
 								string token = e.Payload.Value<string>("token");
 								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								return _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken);
+								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken);
 							}
 						}
 						break;
@@ -319,7 +319,6 @@ namespace Discord
 			{
 				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
 			}
-			return TaskHelper.CompletedTask;
 		}
     }
 }

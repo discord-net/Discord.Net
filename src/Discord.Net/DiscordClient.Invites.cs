@@ -10,6 +10,8 @@ namespace Discord
 		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
 		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
 		{
+			//This doesn't work well if it's an invite to a different server!
+
 			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
 			CheckReady();
 
@@ -22,8 +24,8 @@ namespace Discord
 				inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
 
 			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
-			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
-			invite.Update(response);
+			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
+			invite.Cache(); //Builds references
 			return invite;
 		}
 
@@ -53,8 +55,8 @@ namespace Discord
 
 			var response = await _api.CreateInvite(channel.Id, maxAge: maxAge, maxUses: maxUses, 
 				tempMembership: tempMembership, hasXkcd: hasXkcd).ConfigureAwait(false);
-			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id);
-			invite.Update(response);
+			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
+			invite.Cache(); //Builds references
 			return invite;
 		}
 

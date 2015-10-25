@@ -57,7 +57,7 @@ namespace Discord
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
-		public IEnumerable<Server> AllServers => _servers.Where(x => !x.IsVirtual);
+		public IEnumerable<Server> AllServers => _servers;
 		internal Servers Servers => _servers;
 		private readonly Servers _servers;
 

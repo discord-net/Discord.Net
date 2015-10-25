@@ -25,7 +25,7 @@ namespace Discord
 			else
 			{
 				var msg = new Message(_client, id, channelId, userId);
-				msg.Cache(); //Creates references to channel/server
+				msg.Cache(); //Builds references
 				return msg;
             }
         }

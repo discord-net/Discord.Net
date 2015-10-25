@@ -5,10 +5,11 @@ using Newtonsoft.Json;
 namespace Discord
 {
 	public sealed class Invite : CachedObject
-	{
-		private readonly string _serverId;
-        private string _inviterId, _channelId;
-		
+	{		
+		/// <summary> Returns the unique code for this invite. </summary>
+		public string Code { get; private set; }
+		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
+		public string XkcdCode { get; }
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
 		public int MaxAge { get; private set; }
 		/// <summary> The amount  of times this invite has been used. </summary>
@@ -19,47 +20,72 @@ namespace Discord
 		public bool IsRevoked { get; private set; }
 		/// <summary> If true, a user accepting this invite will be kicked from the server after closing their client. </summary>
 		public bool IsTemporary { get; private set; }
-		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
-		public string XkcdPass { get; }
 
-		/// <summary> Returns a URL for this invite using XkcdPass if available or Id if not. </summary>
-		public string Url => API.Endpoints.InviteUrl(XkcdPass ?? Id);
+		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
+		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Code);
 		
 		/// <summary> Returns the user that created this invite. </summary>
 		[JsonIgnore]
-		public User Inviter => _client.Users[_inviterId, _serverId];
-		
+		public User Inviter { get; private set; }
+		[JsonProperty("InviterId")]
+		private readonly string _inviterId;
+
 		/// <summary> Returns the server this invite is to. </summary>
 		[JsonIgnore]
-		public Server Server => _client.Servers[_serverId];
-		
+		public Server Server { get; private set; }
+		[JsonProperty("ServerId")]
+		private readonly string _serverId;
+
 		/// <summary> Returns the channel this invite is to. </summary>
 		[JsonIgnore]
-		public Channel Channel => _client.Channels[_channelId];
+		public Channel Channel { get; private set; }
+		[JsonProperty("ChannelId")]
+		private readonly string _channelId;
 
-		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId)
+		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId, string inviterId, string channelId)
 			: base(client, code)
 		{
-			XkcdPass = xkcdPass;
+			XkcdCode = xkcdPass;
 			_serverId = serverId;
+			_inviterId = inviterId;
+			_channelId = channelId;
 		}
-		internal override void OnCached() { }
-		internal override void OnUncached() { }
 
-		public override string ToString() => XkcdPass ?? Id;
-
-
-		internal void Update(InviteReference model)
+		internal override void OnCached()
 		{
-			if (model.Channel != null)
-				_channelId = model.Channel.Id;
-			if (model.Inviter != null)
-				_inviterId = model.Inviter.Id;
+			var server = _client.Servers[_serverId];
+			if (server == null)
+				server = new Server(_client, _serverId);
+			Server = server;
+
+			if (_inviterId != null)
+			{
+				var inviter = _client.Users[_inviterId, _serverId];
+				if (inviter == null)
+					inviter = new User(_client, _inviterId, _serverId);
+				Inviter = inviter;
+			}
+
+			if (_channelId != null)
+			{
+				var channel = _client.Channels[_channelId];
+				if (channel == null)
+					channel = new Channel(_client, _channelId, _serverId, null);
+				Channel = channel;
+			}
 		}
+		internal override void OnUncached()
+		{
+			Server = null;
+			Inviter = null;
+			Channel = null;
+		}
+
+		public override string ToString() => XkcdCode ?? Id;
+		
 
 		internal void Update(InviteInfo model)
 		{
-			Update(model as InviteReference);
 			if (model.IsRevoked != null)
 				IsRevoked = model.IsRevoked.Value;
 			if (model.IsTemporary != null)

@@ -59,12 +59,16 @@ namespace Discord
 
 			VoiceDisconnected += (s, e) =>
 			{
-				foreach (var member in _users)
+				var server = _servers[e.ServerId];
+				if (server != null)
 				{
-					if (member.ServerId == e.ServerId && member.IsSpeaking)
+					foreach (var member in server.Members)
 					{
-						member.IsSpeaking = false;
-						RaiseUserIsSpeaking(member, _channels[_voiceSocket.CurrentChannelId], false);
+						if (member.IsSpeaking)
+						{
+							member.IsSpeaking = false;
+							RaiseUserIsSpeaking(member, _channels[_voiceSocket.CurrentChannelId], false);
+						}
 					}
 				}
 			};
@@ -104,13 +108,13 @@ namespace Discord
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+					$"Removed Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+					$"Updated Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member (Voice State): {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+					$"Updated Member (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				ProfileUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					"Updated Profile");
 			}
@@ -281,13 +285,12 @@ namespace Discord
 		{
 			try
 			{
-				await base.OnReceivedEvent(e);
-
 				switch (e.Type)
 				{
 					//Global
-					case "READY": //Resync
+					case "READY": //Resync 
 						{
+							base.OnReceivedEvent(e).Wait(); //This cannot be an await, or we'll get later messages before we're ready
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
 							_currentUser = _users.GetOrAdd(data.User.Id, null);
 							_currentUser.Update(data.User);
@@ -576,10 +579,11 @@ namespace Discord
 							var member = _users[data.UserId, data.GuildId];
 							if (member != null)
 							{
-								if (data.ChannelId != member.VoiceChannelId && member.IsSpeaking)
+								var voiceChannel = member.VoiceChannel;
+                                if (voiceChannel != null && data.ChannelId != voiceChannel.Id && member.IsSpeaking)
 								{
 									member.IsSpeaking = false;
-									RaiseUserIsSpeaking(member, _channels[member.VoiceChannelId], false);
+									RaiseUserIsSpeaking(member, _channels[voiceChannel.Id], false);
 								}
 								member.Update(data);
 								RaiseUserVoiceStateUpdated(member);
@@ -611,6 +615,7 @@ namespace Discord
 
 					//Internal (handled in DiscordSimpleClient)
 					case "VOICE_SERVER_UPDATE":
+						await base.OnReceivedEvent(e);
 						break;
 
 					//Others

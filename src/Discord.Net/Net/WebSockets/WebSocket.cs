@@ -53,21 +53,21 @@ namespace Discord.Net.WebSockets
 			_connectedEvent = new ManualResetEventSlim(false);
 			
 			_engine = new WebSocketSharpEngine(this, client.Config);
-			_engine.BinaryMessage += async (s, e) =>
+			_engine.BinaryMessage += (s, e) =>
 			{
 				using (var compressed = new MemoryStream(e.Data, 2, e.Data.Length - 2))
 				using (var decompressed = new MemoryStream())
 				{
 					using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-						await zlib.CopyToAsync(decompressed);
+						zlib.CopyTo(decompressed);
 					decompressed.Position = 0;
                     using (var reader = new StreamReader(decompressed))
-						await ProcessMessage(await reader.ReadToEndAsync());
+						ProcessMessage(reader.ReadToEnd()).Wait();
 				}
             };
-			_engine.TextMessage += async  (s, e) =>
+			_engine.TextMessage += (s, e) =>
 			{
-				await ProcessMessage(e.Message);
+				/*await*/ ProcessMessage(e.Message).Wait();
 			};
 		}
 

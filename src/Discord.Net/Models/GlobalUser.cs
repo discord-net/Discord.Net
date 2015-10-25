@@ -34,7 +34,10 @@ namespace Discord
 			_users = new ConcurrentDictionary<string, User>();
 		}
 		internal override void OnCached() { }
-		internal override void OnUncached() { }
+		internal override void OnUncached()
+		{
+			//Don't need to clean _users - they're considered owned by server
+		}
 		
 		internal void Update(UserInfo model)
 		{
@@ -44,10 +47,10 @@ namespace Discord
 				IsVerified = model.IsVerified;
 		}
 
-		internal void AddUser(User user) => _users.TryAdd(user.Id, user);
+		internal void AddUser(User user) => _users.TryAdd(user.UniqueId, user);
 		internal void RemoveUser(User user)
 		{
-			if (_users.TryRemove(user.Id, out user))
+			if (_users.TryRemove(user.UniqueId, out user))
 			{
 				if (_users.Count == 0)
 					_client.GlobalUsers.TryRemove(Id);

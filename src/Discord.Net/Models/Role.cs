@@ -28,10 +28,11 @@ namespace Discord
 		public Server Server { get; private set; }
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
-		public bool IsEveryone => Id == _serverId;
+		public bool IsEveryone => _serverId == null || Id == _serverId;
 		/// <summary> Returns a list of all members in this role. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members => IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this));
+		//TODO: Add local members cache
 
 		internal Role(DiscordClient client, string id, string serverId)
 			: base(client, id)
@@ -41,18 +42,17 @@ namespace Discord
 			Permissions.Lock();
 			Color = new Color(0);
 			Color.Lock();
-
-			if (IsEveryone)
-				Position = int.MinValue;
 		}
 		internal override void OnCached()
 		{
+			//References
 			var server = _client.Servers[_serverId];
 			server.AddRole(this);
 			Server = server;
 		}
 		internal override void OnUncached()
 		{
+			//References
 			var server = Server;
 			if (server != null)
 				server.RemoveRole(this);

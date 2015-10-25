@@ -81,9 +81,17 @@ namespace Discord
 			if (changed)
 			{
 				if (targetType == PermissionTarget.Role)
-					channel.InvalidatePermissionsCache();
+				{
+					var role = _roles[targetId];
+					if (role != null)
+						channel.InvalidatePermissionsCache(role);
+				}
 				else if (targetType == PermissionTarget.User)
-					channel.InvalidatePermissionsCache(targetId);
+				{
+					var user = _users[targetId, channel.Server?.Id];
+					if (user != null)
+						channel.InvalidatePermissionsCache(user);
+				}
 			}
 		}
 
@@ -114,9 +122,16 @@ namespace Discord
 					channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != userOrRoleId).ToArray();
 
 					if (targetType == PermissionTarget.Role)
-						channel.InvalidatePermissionsCache();
+					{
+						var role = _roles[userOrRoleId];
+						channel.InvalidatePermissionsCache(role);
+					}
 					else if (targetType == PermissionTarget.User)
-						channel.InvalidatePermissionsCache(userOrRoleId);
+					{
+						var user = _users[userOrRoleId, channel.Server?.Id];
+						if (user != null)
+							channel.InvalidatePermissionsCache(user);
+					}
 				}
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }

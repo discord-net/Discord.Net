@@ -9,17 +9,14 @@ namespace Discord
 {
 	public class User : CachedObject
 	{
-		private static readonly string[] _initialRoleIds = new string[0];
-
 		internal static string GetId(string userId, string serverId) => (serverId ?? "Private") + '_' + userId;
 
 		private ConcurrentDictionary<string, Channel> _channels;
 		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
 		private ServerPermissions _serverPermissions;
-		private string[] _roleIds;
 
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
-		internal string UniqueId => GetId(Id, ServerId);
+		internal string UniqueId => GetId(Id, _serverId);
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
@@ -52,48 +49,55 @@ namespace Discord
 		private DateTime _lastOnline;
 
 		[JsonIgnore]
-		internal GlobalUser GlobalUser => _client.GlobalUsers[Id];
-
-		public string ServerId { get; }
-		[JsonIgnore]
-		public Server Server => _client.Servers[ServerId];
-
-		public string VoiceChannelId { get; private set; }
-		[JsonIgnore]
-		public Channel VoiceChannel => _client.Channels[VoiceChannelId];
+		internal GlobalUser GlobalUser { get; private set; }
 
 		[JsonIgnore]
-		public IEnumerable<Role> Roles => _roleIds.Select(x => _client.Roles[x]);
+		public Server Server { get; private set; }
+		private string _serverId;
+
+		[JsonIgnore]
+		public Channel VoiceChannel { get; private set; }
+
+		[JsonIgnore]
+		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
+		private Dictionary<string, Role> _roles;
+
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
-		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id && x.Server.Id == ServerId);
+		public IEnumerable<Message> Messages => _client.Messages.Where(x => x.UserId == Id && x.Server.Id == _serverId);
+
 		/// <summary> Returns a collection of all channels this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<Channel> Channels => _client.Channels.Where(x => x.Server.Id == ServerId && x.Members == this);
+		public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
 
 		internal User(DiscordClient client, string id, string serverId)
 			: base(client, id)
 		{
-			ServerId = serverId;
+			_serverId = serverId;
 			Status = UserStatus.Offline;
-			_roleIds = _initialRoleIds;
+			//_roles = new Dictionary<string, Role>();
 			_channels = new ConcurrentDictionary<string, Channel>();
 			_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
 			_serverPermissions = new ServerPermissions();
         }
 		internal override void OnCached()
 		{
-			var server = Server;
-			server.AddMember(this);
-			if (Id == _client.CurrentUserId)
-				server.CurrentMember = this;
+			var server = _client.Servers[_serverId];
+			if (server != null)
+			{
+				server.AddMember(this);
+				if (Id == _client.CurrentUserId)
+					server.CurrentMember = this;
+				Server = server;
+			}
 
-			var user = GlobalUser;
-			if (server == null || !server.IsVirtual)
-				user.AddUser(this);
+			var user = _client.GlobalUsers.GetOrAdd(Id);
+			user.AddUser(this);
+			GlobalUser = user;
 		}
 		internal override void OnUncached()
 		{
+			//References
 			var server = Server;
 			if (server != null)
 			{
@@ -101,9 +105,12 @@ namespace Discord
 				if (Id == _client.CurrentUserId)
 					server.CurrentMember = null;
 			}
+			Server = null;
+
 			var globalUser = GlobalUser;
 			if (globalUser != null)
 				globalUser.RemoveUser(this);
+			GlobalUser = null;
 		}
 
 		public override string ToString() => Id;
@@ -124,7 +131,7 @@ namespace Discord
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
-				UpdateRoles(model.Roles);
+				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
 
 			UpdateServerPermissions();
         }
@@ -142,7 +149,7 @@ namespace Discord
 				Update(model.User as UserReference);
 
 			if (model.Roles != null)
-				UpdateRoles(model.Roles);
+				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
 			if (model.Status != null && Status != model.Status)
 			{
 				Status = UserStatus.FromString(model.Status);
@@ -165,7 +172,7 @@ namespace Discord
 				Token = model.Token;
 
 			if (model.ChannelId != null)
-				VoiceChannelId = model.ChannelId;
+				VoiceChannel = _client.Channels[model.ChannelId];
 			if (model.IsSelfDeafened != null)
 				IsSelfDeafened = model.IsSelfDeafened.Value;
 			if (model.IsSelfMuted != null)
@@ -173,14 +180,16 @@ namespace Discord
 			if (model.IsServerSuppressed != null)
 				IsServerSuppressed = model.IsServerSuppressed.Value;
 		}
-		private void UpdateRoles(string[] roleIds)
+		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			//Set roles, with the everyone role added too
-			string[] newRoles = new string[roleIds.Length + 1];
-			newRoles[0] = ServerId; //Everyone
-			for (int i = 0; i < roleIds.Length; i++)
-				newRoles[i + 1] = roleIds[i];
-			_roleIds = newRoles;
+			var newRoles = roles.ToDictionary(x => x.Id, x => x);
+			Role everyone;
+			if (_serverId != null)
+				everyone = Server.EveryoneRole;
+			else
+				everyone = _client.Roles.VirtualEveryone;
+			newRoles.Add(everyone.Id, everyone);
+			_roles = newRoles;
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)
@@ -191,7 +200,7 @@ namespace Discord
 		
 		internal void UpdateChannelPermissions(Channel channel)
 		{
-			if (_roleIds == null) return; // We don't have all our data processed yet, this will be called again soon
+			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
 			if (server == null || channel.Server != server) return;
@@ -225,14 +234,14 @@ namespace Discord
 			if (newPermissions != oldPermissions)
 			{
 				permissions.SetRawValueInternal(newPermissions);
-				channel.InvalidMembersCache();
+				channel.InvalidateMembersCache();
 			}
 
 			permissions.SetRawValueInternal(newPermissions);
 		}
 		internal void UpdateServerPermissions()
 		{
-			if (_roleIds == null) return; // We don't have all our data processed yet, this will be called again soon
+			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
 			if (server == null) return;
@@ -290,7 +299,7 @@ namespace Discord
 		{
 			if (role == null) throw new ArgumentNullException(nameof(role));
 
-			return _roleIds.Contains(role.Id);
+			return _roles.ContainsKey(role.Id);
 		}
 	}
 }

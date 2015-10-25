@@ -53,11 +53,8 @@ namespace Discord
 		{
 			get
 			{
-				if (!_areMembersStale)
-					return _members.Select(x => x.Value);
-
-				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
-				_areMembersStale = false;
+				if (_areMembersStale)
+					UpdateMembersCache();
 				return _members.Select(x => x.Value);
             }
 		}
@@ -157,22 +154,32 @@ namespace Discord
 		}
 		internal void RemoveMessage(Message message) => _messages.TryRemove(message.Id, out message);
 
-		internal void InvalidMembersCache()
+		internal void InvalidateMembersCache()
 		{
 			_areMembersStale = true;
 		}
-        internal void InvalidatePermissionsCache()
+		private void UpdateMembersCache()
+		{
+			_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
+			_areMembersStale = false;
+		}
+
+		internal void InvalidatePermissionsCache()
+		{
+			UpdateMembersCache();
+			foreach (var member in _members)
+				member.Value.UpdateChannelPermissions(this);
+		}
+		internal void InvalidatePermissionsCache(Role role)
 		{
 			_areMembersStale = true;
-			foreach (var member in Members)
+			foreach (var member in role.Members)
 				member.UpdateChannelPermissions(this);
 		}
-		internal void InvalidatePermissionsCache(string userId)
+		internal void InvalidatePermissionsCache(User user)
 		{
 			_areMembersStale = true;
-			var user = _members[userId]
-			if (user != null)
-				user.UpdateChannelPermissions(this);
+			user.UpdateChannelPermissions(this);
 		}
 	}
 }
