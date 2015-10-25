@@ -42,7 +42,7 @@ namespace Discord
 
 		public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
-		private CancellationToken _cancelToken;
+		protected CancellationToken _cancelToken;
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordWSClient(DiscordWSClientConfig config = null)
@@ -309,7 +309,7 @@ namespace Discord
 							{
 								string token = e.Payload.Value<string>("token");
 								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken).ConfigureAwait(false);
+								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, _cancelToken).ConfigureAwait(false);
 							}
 						}
 						break;

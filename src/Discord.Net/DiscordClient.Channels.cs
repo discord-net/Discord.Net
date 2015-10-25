@@ -162,7 +162,7 @@ namespace Discord
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
-		public async Task DestroyChannel(Channel channel)
+		public async Task DeleteChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();

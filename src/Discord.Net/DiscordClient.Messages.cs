@@ -239,7 +239,7 @@ namespace Discord
 
 		private Task MessageQueueLoop()
 		{
-			var cancelToken = CancelToken;
+			var cancelToken = _cancelToken;
 			int interval = Config.MessageQueueInterval;
 
 			return Task.Run(async () =>
