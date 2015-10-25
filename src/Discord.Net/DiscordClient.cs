@@ -76,47 +76,47 @@ namespace Discord
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				ServerCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Server: {e.Server?.Name ?? "[Private]"}");
+					$"Server Created: {e.Server?.Name ?? "[Private]"}");
 				ServerDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Server: {e.Server?.Name ?? "[Private]"}");
+					$"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Server: {e.Server?.Name ?? "[Private]"}");
+					$"Server Updated: {e.Server?.Name ?? "[Private]"}");
 				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Available: {e.Server?.Name ?? "[Private]"}");
 				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
 				ChannelCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+					$"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				ChannelDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Destroyed Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+					$"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				ChannelUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Channel: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+					$"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
 				MessageCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Message Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+					$"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				RoleCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Created Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+					$"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+					$"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Deleted Role: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+					$"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
 				BanAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Ban: {e.Server?.Name }/{e.UserId}");
+					$"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
 				BanRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Ban: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Added Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Removed Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
-				MemberUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Updated Member (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
 				ProfileUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					"Updated Profile");
+					"Profile Updated");
 			}
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
