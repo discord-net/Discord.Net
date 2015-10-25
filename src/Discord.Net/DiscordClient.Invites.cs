@@ -61,7 +61,7 @@ namespace Discord
 		}
 
 		/// <summary> Deletes the provided invite. </summary>
-		public async Task DestroyInvite(Invite invite)
+		public async Task DeleteInvite(Invite invite)
 		{
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
 			CheckReady();

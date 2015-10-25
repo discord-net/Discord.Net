@@ -66,7 +66,7 @@ namespace Discord.Tests
 
 			AssertEvent<ChannelEventArgs>(
 				"ChannelDestroyed event never received",
-				async () => await _hostClient.DestroyChannel(channel),
+				async () => await _hostClient.DeleteChannel(channel),
 				x => _targetBot.ChannelDestroyed += x,
 				x => _targetBot.ChannelDestroyed -= x,
 				(s, e) => e.Channel.Name == name);

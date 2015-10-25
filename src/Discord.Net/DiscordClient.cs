@@ -51,7 +51,7 @@ namespace Discord
 
 			this.Connected += async (s, e) =>
 			{
-				_api.CancelToken = CancelToken;
+				_api.CancelToken = _cancelToken;
 				await SendStatus().ConfigureAwait(false);
 			};
 
