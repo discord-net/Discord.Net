@@ -52,7 +52,7 @@ namespace Discord
 			this.Connected += async (s, e) =>
 			{
 				_api.CancelToken = CancelToken;
-				await SendStatus();
+				await SendStatus().ConfigureAwait(false);
 			};
 
 			VoiceDisconnected += (s, e) =>
@@ -212,7 +212,7 @@ namespace Discord
 			}
 			catch (TaskCanceledException) { throw new TimeoutException(); }
 
-			await Connect(token);
+			await Connect(token).ConfigureAwait(false);
 			return token;
 		}
 
@@ -227,8 +227,9 @@ namespace Discord
 
 			_api.Token = token;
 			string gateway = (await _api.Gateway()
-				.Timeout(_config.APITimeout)
-				.ConfigureAwait(false)).Url;
+					.Timeout(_config.APITimeout)
+					.ConfigureAwait(false)
+				).Url;
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {gateway}");
 
@@ -259,7 +260,7 @@ namespace Discord
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
 
-			await _api.Logout();
+			await _api.Logout().ConfigureAwait(false);
 
 			_channels.Clear();
 			_users.Clear();
@@ -501,7 +502,7 @@ namespace Discord
 							RaiseMessageCreated(msg);
 
 							if (Config.AckMessages && !isAuthor)
-								await _api.AckMessage(data.Id, data.ChannelId);
+								await _api.AckMessage(data.Id, data.ChannelId).ConfigureAwait(false);
 						}
 						break;
 					case "MESSAGE_UPDATE":
@@ -612,7 +613,7 @@ namespace Discord
 
 					//Internal (handled in DiscordSimpleClient)
 					case "VOICE_SERVER_UPDATE":
-						await base.OnReceivedEvent(e);
+						await base.OnReceivedEvent(e).ConfigureAwait(false);
 						break;
 
 					//Others

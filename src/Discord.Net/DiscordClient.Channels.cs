@@ -123,7 +123,7 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
-			await _api.EditChannel(channel.Id, name: name, topic: topic);
+			await _api.EditChannel(channel.Id, name: name, topic: topic).ConfigureAwait(false);
 
 			if (position != null)
 			{
@@ -147,7 +147,7 @@ namespace Discord
 					channels[newPos] = channel;
 				}
 				Channel after = minPos > 0 ? channels.Skip(minPos - 1).FirstOrDefault() : null;
-                await ReorderChannels(channel.Server, channels.Skip(minPos), after);
+                await ReorderChannels(channel.Server, channels.Skip(minPos), after).ConfigureAwait(false);
 			}
 		}
 		

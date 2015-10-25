@@ -70,7 +70,7 @@ namespace Discord.Net.WebSockets
 
 		protected override async Task ProcessMessage(string json)
 		{
-			await base.ProcessMessage(json);
+			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
 				_lastSeq = msg.Sequence.Value;
@@ -104,7 +104,7 @@ namespace Discord.Net.WebSockets
 							Host = payload.Url;
 							if (_logLevel >= LogMessageSeverity.Info)
 								RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
-							await Redirect(payload.Url);
+							await Redirect(payload.Url).ConfigureAwait(false);
 						}
 					}
 					break;

@@ -66,7 +66,7 @@ namespace Discord.Net.WebSockets
 			if ((WebSocketState)_state == WebSocketState.Connected)
 			{
 				//Adjust the host and tell the system to reconnect
-				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false);
+				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false).ConfigureAwait(false);
 				return;
 			}
 			

@@ -187,7 +187,7 @@ namespace Discord
 			CheckReady();
 
 			foreach (var message in messages)
-				await DeleteMessageInternal(message);
+				await DeleteMessageInternal(message).ConfigureAwait(false);
 		}
 		private async Task DeleteMessageInternal(Message message)
 		{

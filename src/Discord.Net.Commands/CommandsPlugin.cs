@@ -110,7 +110,7 @@ namespace Discord.Commands
 					{
 						var task = cmd.Handler(eventArgs);
 						if (task != null)
-							await task;
+							await task.ConfigureAwait(false);
 					}
 					catch (Exception ex)
 					{

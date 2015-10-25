@@ -86,7 +86,7 @@ namespace Discord
 			var role = _roles.GetOrAdd(response.Id, server.Id);
 			role.Update(response);
 
-			await EditRole(role, name: name);
+			await EditRole(role, name: name).ConfigureAwait(false);
 
 			return role;
 		}
@@ -101,7 +101,7 @@ namespace Discord
 				name: name ?? role.Name,
 				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
 				color: color?.RawValue, 
-				hoist: hoist);
+				hoist: hoist).ConfigureAwait(false);
 
 			if (position != null)
 			{
@@ -124,7 +124,7 @@ namespace Discord
 						roles[i] = roles[i - 1];
 					roles[newPos] = role;
 				}
-				await _api.ReorderRoles(role.Server.Id, roles.Skip(minPos).Select(x => x.Id), minPos);
+				await _api.ReorderRoles(role.Server.Id, roles.Skip(minPos).Select(x => x.Id), minPos).ConfigureAwait(false);
 			}
 		}
 

@@ -99,7 +99,7 @@ namespace Discord
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region.Value, iconType: iconType, icon: icon);
+			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region.Value, iconType: iconType, icon: icon).ConfigureAwait(false);
 			server.Update(response);
 		}
 		

@@ -48,7 +48,7 @@ namespace Discord
 			var perms = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).FirstOrDefault();
 			if (allowValue != 0 || denyValue != 0)
 			{
-				await _api.SetChannelPermissions(channel.Id, targetId, targetType.Value, allowValue, denyValue);
+				await _api.SetChannelPermissions(channel.Id, targetId, targetType.Value, allowValue, denyValue).ConfigureAwait(false);
 				if (perms != null)
 				{
 					perms.Allow.SetRawValueInternal(allowValue);
@@ -68,7 +68,7 @@ namespace Discord
 			{
 				try
 				{
-					await _api.DeleteChannelPermissions(channel.Id, targetId);
+					await _api.DeleteChannelPermissions(channel.Id, targetId).ConfigureAwait(false);
 					if (perms != null)
 					{
 						channel.PermissionOverwrites = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != targetId).ToArray();

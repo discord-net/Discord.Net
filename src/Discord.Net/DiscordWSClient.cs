@@ -77,7 +77,7 @@ namespace Discord
 			{
 				RaiseDisconnected(e);
 				if (e.WasUnexpected)
-					await socket.Reconnect(_token);
+					await socket.Reconnect(_token).ConfigureAwait(false);
 			};
 
 			if (!_config.VoiceOnly)
@@ -90,7 +90,7 @@ namespace Discord
 				}
 			}
 
-			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e);
+			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
 			return socket;
 		}
 		internal virtual VoiceWebSocket CreateVoiceSocket()
@@ -102,7 +102,7 @@ namespace Discord
 			{
 				RaiseVoiceDisconnected(socket.CurrentServerId, e);				
 				if (e.WasUnexpected)
-					await socket.Reconnect();
+					await socket.Reconnect().ConfigureAwait(false);
 			};
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
@@ -212,7 +212,7 @@ namespace Discord
 			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
 
 			//Ensure all other tasks are signaled to end.
-			await DisconnectInternal(skipAwait: true);
+			await DisconnectInternal(skipAwait: true).ConfigureAwait(false);
 
 			//Wait for the remaining tasks to complete
 			try { await allTasks.ConfigureAwait(false); }
@@ -309,7 +309,7 @@ namespace Discord
 							{
 								string token = e.Payload.Value<string>("token");
 								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken);
+								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, CancelToken).ConfigureAwait(false);
 							}
 						}
 						break;

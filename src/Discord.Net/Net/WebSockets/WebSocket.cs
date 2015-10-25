@@ -163,7 +163,7 @@ namespace Discord.Net.WebSockets
 			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
 
 			//Ensure all other tasks are signaled to end.
-			await DisconnectInternal(skipAwait: true);
+			await DisconnectInternal(skipAwait: true).ConfigureAwait(false);
 
 			//Wait for the remaining tasks to complete
 			try { await allTasks.ConfigureAwait(false); }
@@ -186,7 +186,7 @@ namespace Discord.Net.WebSockets
 			_wasDisconnectUnexpected = false;
 			//Dont reset disconnectReason, we may called ThrowError() later
 
-			await _engine.Disconnect();
+			await _engine.Disconnect().ConfigureAwait(false);
 			_cancelTokenSource = null;
 			var oldState = _state;
             _state = (int)WebSocketState.Disconnected;
@@ -227,7 +227,7 @@ namespace Discord.Net.WebSockets
 							await Task.Delay(_heartbeatInterval, cancelToken).ConfigureAwait(false);
 						}
 						else
-							await Task.Delay(100, cancelToken);
+							await Task.Delay(100, cancelToken).ConfigureAwait(false);
 					}
 				}
 				catch (OperationCanceledException) { }
