@@ -29,11 +29,12 @@ namespace Discord
 		[JsonIgnore]
 		public User Owner { get; private set; }
 		private string _ownerId;
-		
+
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
 		[JsonIgnore]
-		public Channel AFKChannel { get; private set; }
-	
+		public Channel AFKChannel => _afkChannel.Value;
+        private Reference<Channel> _afkChannel;
+
 		/// <summary> Returns the default channel for this server. </summary>
 		[JsonIgnore]
 		public Channel DefaultChannel { get; private set; }
@@ -75,6 +76,8 @@ namespace Discord
 		internal Server(DiscordClient client, string id)
 			: base(client, id)
 		{
+			_afkChannel = new Reference<Channel>(x => _client.Channels[x]);
+
 			//Global Cache
 			_channels = new ConcurrentDictionary<string, Channel>();
 			_members = new ConcurrentDictionary<string, User>();
@@ -83,8 +86,11 @@ namespace Discord
 			//Local Cache
 			_bans = new ConcurrentDictionary<string, bool>();
 			_invites = new ConcurrentDictionary<string, Invite>();
-		}
-		internal override void LoadReferences() { }
+        }
+		internal override void LoadReferences()
+		{
+			_afkChannel.Load();
+        }
 		internal override void UnloadReferences()
 		{
 			//Global Cache
@@ -113,15 +119,15 @@ namespace Discord
 			invites.Clear();
 
 			_bans.Clear();
-		}
+
+			_afkChannel.Unload();
+        }
 
 		internal void Update(GuildInfo model)
 		{
-			//Can be null
-			AFKChannel = _client.Channels[model.AFKChannelId];
-
 			if (model.AFKTimeout != null)
 				AFKTimeout = model.AFKTimeout.Value;
+			if (model.AFKChannelId != null)
 			if (model.JoinedAt != null)
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Name != null)
@@ -143,6 +149,8 @@ namespace Discord
 					role.Update(x);
                 }
             }
+			
+			_afkChannel.Id = model.AFKChannelId; //Can be null
 		}
 		internal void Update(ExtendedGuildInfo model)
 		{
