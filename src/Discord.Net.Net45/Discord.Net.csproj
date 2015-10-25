@@ -229,9 +229,6 @@
     <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
       <Link>Helpers\TaskHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\TimeoutException.cs">
-      <Link>Helpers\TimeoutException.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
@@ -300,6 +297,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
       <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\TimeoutException.cs">
+      <Link>TimeoutException.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
