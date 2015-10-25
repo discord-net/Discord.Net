@@ -121,14 +121,14 @@ namespace Discord
 				x =>
 				{
 					x.AddMember(this);
-					if (x.Id == _client.CurrentUserId)
-						x.CurrentMember = this;
+					if (Id == _client.CurrentUserId)
+						x.CurrentUser = this;
                 }, 
 				x =>
 				{
 					x.RemoveMember(this);
-					if (x.Id == _client.CurrentUserId)
-						x.CurrentMember = null;
+					if (Id == _client.CurrentUserId)
+						x.CurrentUser = null;
 				});
 			Status = UserStatus.Offline;
 			_channels = new ConcurrentDictionary<string, Channel>();

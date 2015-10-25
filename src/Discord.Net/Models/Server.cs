@@ -12,7 +12,7 @@ namespace Discord
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns the current logged-in user's data for this server. </summary>
-		public User CurrentMember { get; internal set; }
+		public User CurrentUser { get; internal set; }
 
 		/// <summary> Returns the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel (see AFKChannel). </summary>
 		public int AFKTimeout { get; private set; }
