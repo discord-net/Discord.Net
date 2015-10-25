@@ -4,7 +4,7 @@ An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
 
 ### Current Features
-- Using Discord API version 3
+- Using Discord API v3
 - Supports .Net 4.5 and DNX 4.5.1
 - Server Management (Servers, Channels, Messages, Invites, Roles, Users)
 - Send/Receieve Messages (Including mentions and formatting)
