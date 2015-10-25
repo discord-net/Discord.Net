@@ -15,13 +15,13 @@ namespace Discord
 
 			return SetChannelPermissions(channel, member?.Id, PermissionTarget.User, allow, deny);
 		}
-		public Task SetChannelUserPermissions(Channel channel, User member, DualChannelPermissions permissions = null)
+		public Task SetChannelUserPermissions(Channel channel, User user, DualChannelPermissions permissions = null)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return SetChannelPermissions(channel, member?.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
+			return SetChannelPermissions(channel, user?.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
 		}
 		public Task SetChannelRolePermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
@@ -95,13 +95,13 @@ namespace Discord
 			}
 		}
 
-		public Task RemoveChannelUserPermissions(Channel channel, User member)
+		public Task RemoveChannelUserPermissions(Channel channel, User user)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return RemoveChannelPermissions(channel, member?.Id, PermissionTarget.User);
+			return RemoveChannelPermissions(channel, user?.Id, PermissionTarget.User);
 		}
 		public Task RemoveChannelRolePermissions(Channel channel, Role role)
 		{

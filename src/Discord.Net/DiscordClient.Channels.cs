@@ -96,17 +96,17 @@ namespace Discord
 		}
 		
 		/// <summary> Returns the private channel with the provided user, creating one if it does not currently exist. </summary>
-		public async Task<Channel> CreatePMChannel(User member)
+		public async Task<Channel> CreatePMChannel(User user)
 		{
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
 			Channel channel = null;
-			if (member != null)
-				channel = member.GlobalUser.PrivateChannel;
+			if (user != null)
+				channel = user.GlobalUser.PrivateChannel;
 			if (channel == null)
 			{
-				var response = await _api.CreatePMChannel(_userId, member.Id).ConfigureAwait(false);
+				var response = await _api.CreatePMChannel(_userId, user.Id).ConfigureAwait(false);
 				var recipient = _users.GetOrAdd(response.Recipient?.Id, null);
 				recipient.Update(response.Recipient);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);

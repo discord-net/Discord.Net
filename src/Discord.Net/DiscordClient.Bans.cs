@@ -1,4 +1,3 @@
-using Discord.Net;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -33,13 +32,13 @@ namespace Discord
 		}
 
 		/// <summary> Bans a user from the provided server. </summary>
-		public Task Ban(User member)
+		public Task Ban(User user)
 		{
-			if (member == null) throw new ArgumentNullException(nameof(member));
-			if (member.Server == null) throw new ArgumentException("Unable to ban a user in a private chat.");
+			if (user == null) throw new ArgumentNullException(nameof(user));
+			if (user.Server == null) throw new ArgumentException("Unable to ban a user in a private chat.");
 			CheckReady();
 
-			return _api.Ban(member.Server.Id, member.Id);
+			return _api.Ban(user.Server.Id, user.Id);
 		}
 
 		/// <summary> Unbans a user from the provided server. </summary>

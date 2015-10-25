@@ -34,7 +34,7 @@ namespace Discord
 	public class MessageEventArgs : EventArgs
 	{
 		public Message Message { get; }
-		public User Member => Message.User;
+		public User User => Message.User;
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Server;
 
@@ -101,13 +101,13 @@ namespace Discord
 			return SendMessage(channel, text, false);
         }
 		/// <summary> Sends a private message to the provided user. </summary>
-		public async Task<Message> SendPrivateMessage(User member, string text)
+		public async Task<Message> SendPrivateMessage(User user, string text)
 		{
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			CheckReady();
 
-			var channel = await CreatePMChannel(member).ConfigureAwait(false);
+			var channel = await CreatePMChannel(user).ConfigureAwait(false);
 			return await SendMessage(channel, text).ConfigureAwait(false);
 		}
 		private async Task<Message> SendMessage(Channel channel, string text, bool isTextToSpeech)
@@ -218,9 +218,9 @@ namespace Discord
 						{
 							if (!channel.IsPrivate)
 							{
-								var member = msg.User;
-								if (member != null)
-									member.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
+								var user = msg.User;
+								if (user != null)
+									user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 							}
 						}
 						return msg;

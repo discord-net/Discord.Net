@@ -12,7 +12,7 @@ namespace Discord.Commands
 		public int? Permissions { get; }
 		public string[] Args { get; }
 		
-		public User Member => Message.User;
+		public User User => Message.User;
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Channel.Server;
 

@@ -137,7 +137,7 @@ namespace Discord
 		}
 
 		//Members
-		public Task EditMember(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
+		public Task EditUser(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
