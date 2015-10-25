@@ -177,15 +177,15 @@ namespace Discord
 			{
 				if (_voiceSocket.State == WebSocketState.Connected)
 				{
-					var member = _users[e.UserId, socket.CurrentServerId];
+					var user = _users[e.UserId, socket.CurrentServerId];
 					bool value = e.IsSpeaking;
-					if (member.IsSpeaking != value)
+					if (user.IsSpeaking != value)
 					{
-						member.IsSpeaking = value;
+						user.IsSpeaking = value;
 						var channel = _channels[_voiceSocket.CurrentChannelId];
-						RaiseUserIsSpeaking(member, channel, value);
+						RaiseUserIsSpeaking(user, channel, value);
 						if (Config.TrackActivity)
-							member.UpdateActivity();
+							user.UpdateActivity();
 					}
 				}
 			};
@@ -359,9 +359,9 @@ namespace Discord
 							Channel channel;
 							if (data.IsPrivate)
 							{
-								var member = _users.GetOrAdd(data.Recipient.Id, null);
-								member.Update(data.Recipient);
-								channel = _channels.GetOrAdd(data.Id, null, member.Id);
+								var user = _users.GetOrAdd(data.Recipient.Id, null);
+								user.Update(data.Recipient);
+								channel = _channels.GetOrAdd(data.Id, null, user.Id);
 							}
 							else
 								channel = _channels.GetOrAdd(data.Id, data.GuildId, null);
@@ -393,30 +393,30 @@ namespace Discord
 					case "GUILD_MEMBER_ADD":
 						{
 							var data = e.Payload.ToObject<MemberAddEvent>(_serializer);
-							var member = _users.GetOrAdd(data.User.Id, data.GuildId);
-							member.Update(data);
+							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
+							user.Update(data);
 							if (Config.TrackActivity)
-								member.UpdateActivity();
-							RaiseUserAdded(member);
+								user.UpdateActivity();
+							RaiseUserAdded(user);
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
 							var data = e.Payload.ToObject<MemberUpdateEvent>(_serializer);
-							var member = _users[data.User.Id, data.GuildId];
-							if (member != null)
+							var user = _users[data.User.Id, data.GuildId];
+							if (user != null)
 							{
-								member.Update(data);
-								RaiseMemberUpdated(member);
+								user.Update(data);
+								RaiseMemberUpdated(user);
 							}
 						}
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
 							var data = e.Payload.ToObject<MemberRemoveEvent>(_serializer);
-							var member = _users.TryRemove(data.UserId, data.GuildId);
-							if (member != null)
-								RaiseUserRemoved(member);
+							var user = _users.TryRemove(data.UserId, data.GuildId);
+							if (user != null)
+								RaiseUserRemoved(user);
 						}
 						break;
 
@@ -494,9 +494,9 @@ namespace Discord
 								var channel = msg.Channel;
 								if (channel?.IsPrivate == false)
 								{
-									var member = msg.User;
-									if (member != null)
-										member.UpdateActivity(data.Timestamp);
+									var user = msg.User;
+									if (user != null)
+										user.UpdateActivity(data.Timestamp);
 								}
 							}
 
@@ -538,11 +538,11 @@ namespace Discord
 					case "PRESENCE_UPDATE":
 						{
 							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
-							var member = _users.GetOrAdd(data.User.Id, data.GuildId);
-							if (member != null)
+							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
+							if (user != null)
 							{
-								member.Update(data);
-								RaiseUserPresenceUpdated(member);
+								user.Update(data);
+								RaiseUserPresenceUpdated(user);
 							}
 						}
 						break;
@@ -553,19 +553,18 @@ namespace Discord
 							if (channel != null)
 							{
 								var user = _users[data.UserId, channel.Server?.Id];
-
 								if (user != null)
 								{
 									if (channel != null)
 										RaiseUserIsTyping(user, channel);
 								}
+
 								if (Config.TrackActivity)
 								{
 									if (!channel.IsPrivate)
 									{
-										var member = _users[data.UserId, channel.Server.Id];
-										if (member != null)
-											member.UpdateActivity();
+										if (user != null)
+											user.UpdateActivity();
 									}
 								}
 							}
@@ -576,17 +575,17 @@ namespace Discord
 					case "VOICE_STATE_UPDATE":
 						{
 							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_serializer);
-							var member = _users[data.UserId, data.GuildId];
-							if (member != null)
+							var user = _users[data.UserId, data.GuildId];
+							if (user != null)
 							{
-								var voiceChannel = member.VoiceChannel;
-                                if (voiceChannel != null && data.ChannelId != voiceChannel.Id && member.IsSpeaking)
+								var voiceChannel = user.VoiceChannel;
+                                if (voiceChannel != null && data.ChannelId != voiceChannel.Id && user.IsSpeaking)
 								{
-									member.IsSpeaking = false;
-									RaiseUserIsSpeaking(member, _channels[voiceChannel.Id], false);
+									user.IsSpeaking = false;
+									RaiseUserIsSpeaking(user, _channels[voiceChannel.Id], false);
 								}
-								member.Update(data);
-								RaiseUserVoiceStateUpdated(member);
+								user.Update(data);
+								RaiseUserVoiceStateUpdated(user);
 							}
 						}
 						break;

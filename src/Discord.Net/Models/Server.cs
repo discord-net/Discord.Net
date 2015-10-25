@@ -100,10 +100,10 @@ namespace Discord
 				globalChannels.TryRemove(channel.Key);
 			channels.Clear();
 
-			var globalMembers = _client.Users;
+			var globalUsers = _client.Users;
 			var members = _members;
-			foreach (var user in members)
-				globalMembers.TryRemove(user.Key, Id);
+			foreach (var member in members)
+				globalUsers.TryRemove(member.Key, Id);
 			members.Clear();
 
 			var globalRoles = _client.Roles;
@@ -162,25 +162,24 @@ namespace Discord
 				var channel = channels.GetOrAdd(subModel.Id, Id);
 				channel.Update(subModel);
 			}
-
-			var usersCache = _client.GlobalUsers;
-			var membersCache = _client.Users;
+			
+			var usersCache = _client.Users;
 			foreach (var subModel in model.Members)
 			{
-				var member = membersCache.GetOrAdd(subModel.User.Id, Id);
-				member.Update(subModel);
+				var user = usersCache.GetOrAdd(subModel.User.Id, Id);
+				user.Update(subModel);
 			}
 			foreach (var subModel in model.VoiceStates)
 			{
-				var member = membersCache[subModel.UserId, Id];
-				if (member != null)
-					member.Update(subModel);
+				var user = usersCache[subModel.UserId, Id];
+				if (user != null)
+					user.Update(subModel);
 			}
 			foreach (var subModel in model.Presences)
 			{
-				var member = membersCache[subModel.User.Id, Id];
-				if (member != null)
-					member.Update(subModel);
+				var user = usersCache[subModel.User.Id, Id];
+				if (user != null)
+					user.Update(subModel);
 			}
 		}
 
@@ -216,31 +215,31 @@ namespace Discord
 		internal void AddInvite(Invite invite) => _invites.TryAdd(invite.Id, invite);
 		internal void RemoveInvite(Invite invite) => _invites.TryRemove(invite.Id, out invite);
 
-		internal void AddMember(User member)
+		internal void AddMember(User user)
 		{
-			if (_members.TryAdd(member.Id, member))
+			if (_members.TryAdd(user.Id, user))
 			{
-				if (member.Id == _ownerId)
-					Owner = member;
+				if (user.Id == _ownerId)
+					Owner = user;
 
 				foreach (var channel in Channels)
 				{
-					member.AddChannel(channel);
-					channel.InvalidatePermissionsCache(member);
+					user.AddChannel(channel);
+					channel.InvalidatePermissionsCache(user);
 				}
 			}
         }
-		internal void RemoveMember(User member)
+		internal void RemoveMember(User user)
 		{
-			if (_members.TryRemove(member.Id, out member))
+			if (_members.TryRemove(user.Id, out user))
 			{
-				if (member.Id == _ownerId)
+				if (user.Id == _ownerId)
 					Owner = null;
 
 				foreach (var channel in Channels)
 				{
-					member.RemoveChannel(channel);
-					channel.InvalidatePermissionsCache(member);
+					user.RemoveChannel(channel);
+					channel.InvalidatePermissionsCache(user);
 				}
 			}
 		}

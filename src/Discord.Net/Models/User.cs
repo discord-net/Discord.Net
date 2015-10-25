@@ -299,10 +299,10 @@ namespace Discord
 					newPermissions &= ~denyRole.Deny.RawValue;
 				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
 					newPermissions |= allowRole.Allow.RawValue;
-				foreach (var denyMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Deny.RawValue != 0))
-					newPermissions &= ~denyMembers.Deny.RawValue;
-				foreach (var allowMembers in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Allow.RawValue != 0))
-					newPermissions |= allowMembers.Allow.RawValue;
+				foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Deny.RawValue != 0))
+					newPermissions &= ~denyUser.Deny.RawValue;
+				foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Allow.RawValue != 0))
+					newPermissions |= allowUser.Allow.RawValue;
 			}
 
             if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))

@@ -7,13 +7,13 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
-		public Task SetChannelUserPermissions(Channel channel, User member, ChannelPermissions allow = null, ChannelPermissions deny = null)
+		public Task SetChannelUserPermissions(Channel channel, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return SetChannelPermissions(channel, member?.Id, PermissionTarget.User, allow, deny);
+			return SetChannelPermissions(channel, user?.Id, PermissionTarget.User, allow, deny);
 		}
 		public Task SetChannelUserPermissions(Channel channel, User user, DualChannelPermissions permissions = null)
 		{

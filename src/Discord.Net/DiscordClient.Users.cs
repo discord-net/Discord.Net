@@ -51,8 +51,8 @@ namespace Discord
 	{
 		public bool IsSpeaking { get; }
 
-		internal UserIsSpeakingEventArgs(User member, Channel channel, bool isSpeaking)
-			: base(member, channel)
+		internal UserIsSpeakingEventArgs(User user, Channel channel, bool isSpeaking)
+			: base(user, channel)
 		{
 			IsSpeaking = isSpeaking;
 		}
@@ -119,7 +119,7 @@ namespace Discord
 		private readonly Users _users;
 
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public User GetMember(Server server, string userId)
+		public User GetUser(Server server, string userId)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
@@ -136,13 +136,13 @@ namespace Discord
 			if (discriminator == null) throw new ArgumentNullException(nameof(discriminator));
 			CheckReady();
 
-			User user = FindMembers(server, username, discriminator, true).FirstOrDefault();
+			User user = FindUsers(server, username, discriminator, true).FirstOrDefault();
 			return _users[user?.Id, server.Id];
 		}
 
 		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
-		public IEnumerable<User> FindMembers(Server server, string name, string discriminator = null, bool exactMatch = false)
+		public IEnumerable<User> FindUsers(Server server, string name, string discriminator = null, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
@@ -165,12 +165,12 @@ namespace Discord
 			return query;
 		}
 
-		public Task EditMember(User member, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null)
+		public Task EditUser(User user, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null)
 		{
-			if (member == null) throw new ArgumentNullException(nameof(member));
+			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return _api.EditUser(member.Server?.Id, member.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 
 		public Task<EditUserResponse> EditProfile(string currentPassword = "",
