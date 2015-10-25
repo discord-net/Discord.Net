@@ -207,14 +207,14 @@ namespace Discord
 			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
-			if (server == null || channel.Server != server) return;
+			if (server != null && channel.Server != server) throw new InvalidOperationException();
 
 			ChannelPermissions permissions;
 			if (!_permissions.TryGetValue(channel.Id, out permissions)) return;
 			uint newPermissions = _serverPermissions.RawValue;
 			uint oldPermissions = permissions.RawValue;
 			
-			if (server.Owner == this)
+			if (server != null && server.Owner == this)
 				newPermissions = ChannelPermissions.All(channel).RawValue;
 			else
 			{
@@ -248,12 +248,11 @@ namespace Discord
 			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
 
 			var server = Server;
-			if (server == null) return;
 			
 			uint newPermissions = 0x0;
 			uint oldPermissions = _serverPermissions.RawValue;
 
-			if (server.Owner == this)
+			if (server != null && server.Owner == this)
 				newPermissions = ServerPermissions.All.RawValue;
 			else
 			{
