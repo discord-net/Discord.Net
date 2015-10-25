@@ -611,7 +611,7 @@ namespace Discord
 					case "RESUMED":
 						break;
 
-					//Internal (handled in DiscordSimpleClient)
+					//Pass to DiscordWSClient
 					case "VOICE_SERVER_UPDATE":
 						await base.OnReceivedEvent(e).ConfigureAwait(false);
 						break;
