@@ -211,6 +211,9 @@
     <Compile Include="..\Discord.Net\Helpers\BitHelper.cs">
       <Link>Helpers\BitHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Helpers\CachedObject.cs">
+      <Link>Helpers\CachedObject.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
       <Link>Helpers\EpochTime.cs</Link>
     </Compile>
@@ -231,9 +234,6 @@
     </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Models\CachedObject.cs">
-      <Link>Models\CachedObject.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
