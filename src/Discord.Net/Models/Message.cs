@@ -145,8 +145,19 @@ namespace Discord
 		internal Message(DiscordClient client, string id, string channelId, string userId)
 			: base(client, id)
 		{
-			_channel = new Reference<Channel>(channelId, x => _client.Channels[x], x => x.AddMessage(this), x => x.RemoveMessage(this));
-			_user = new Reference<User>(userId, x => _client.Users[x]);
+			_channel = new Reference<Channel>(channelId,
+				x => _client.Channels[x],
+				x => x.AddMessage(this),
+				x => x.RemoveMessage(this));
+			_user = new Reference<User>(userId,
+				x =>
+				{
+					var channel = Channel;
+					if (!channel.IsPrivate)
+						return _client.Users[x, channel.Server.Id];
+					else
+						return _client.Users[x, null];
+				});
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 		}

@@ -32,7 +32,7 @@ namespace Discord
 				if (v == null && _id != null)
 				{
 					v = _getItem(_id);
-					if (v != null)
+					if (v != null && _onCache != null)
 						_onCache(v);
 					_value = v;
 				}

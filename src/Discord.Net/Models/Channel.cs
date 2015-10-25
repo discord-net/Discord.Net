@@ -79,7 +79,7 @@ namespace Discord
 				x => x.AddChannel(this), 
 				x => x.RemoveChannel(this));
 			_recipient = new Reference<User>(recipientId, 
-				x => _client.Users[x, _server.Id], 
+				x => _client.Users.GetOrAdd(x, _server.Id), 
 				x =>
 				{
 					Name = "@" + x.Name;
