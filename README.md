@@ -17,5 +17,4 @@ You can download Discord.Net from NuGet:
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
 ### Known Issues
-- Due to current Discord restrictions, private messages are blocked unless both the sender and recipient are members of the same server.
 - DNX Core 5.0 is experiencing several network-related issues and support has been temporarily dropped.
