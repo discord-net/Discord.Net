@@ -162,14 +162,14 @@ namespace Discord
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
-		public async Task<Channel> DestroyChannel(Channel channel)
+		public async Task DestroyChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
 			try { await _api.DestroyChannel(channel.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _channels.TryRemove(channel.Id);
+			//return _channels.TryRemove(channel.Id);
 		}
 	}
 }

@@ -104,14 +104,14 @@ namespace Discord
 		}
 		
 		/// <summary> Leaves the provided server, destroying it if you are the owner. </summary>
-		public async Task<Server> LeaveServer(Server server)
+		public async Task LeaveServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
 			try { await _api.LeaveServer(server.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			return _servers.TryRemove(server.Id);
+			//return _servers.TryRemove(server.Id);
 		}
 	}
 }

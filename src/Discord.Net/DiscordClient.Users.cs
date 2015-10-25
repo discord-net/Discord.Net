@@ -159,9 +159,7 @@ namespace Discord
 					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
 			}
 			else
-			{
 				query = server.Members.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-			}
 			if (discriminator != null)
 				query = query.Where(x => x.Discriminator == discriminator);
 			return query;
@@ -190,10 +188,10 @@ namespace Discord
 		public Task SetStatus(UserStatus status)
 		{
 			if (status == (string)null) throw new ArgumentNullException(nameof(status));
-			CheckReady();
-
 			if (status != UserStatus.Online && status != UserStatus.Idle)
-				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}");
+				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
+			CheckReady();
+			
 			_status = status;
 			return SendStatus();
 		}

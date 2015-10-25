@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -62,17 +63,18 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			if (name.StartsWith("@"))
+			/*if (name.StartsWith("@"))
 			{
 				string name2 = name.Substring(1);
 				return _roles.Where(x => x.Server.Id == server.Id &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || 
+					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
 			}
 			else
-			{
+			{*/
 				return _roles.Where(x => x.Server.Id == server.Id &&
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-			}
+			//}
 		}
 		
 		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
@@ -84,9 +86,9 @@ namespace Discord
 
 			var response = await _api.CreateRole(server.Id).ConfigureAwait(false);
 			var role = _roles.GetOrAdd(response.Id, server.Id);
+			await _api.EditRole(server.Id, role.Id, name: name).ConfigureAwait(false);
+			response.Name = name;
 			role.Update(response);
-
-			await EditRole(role, name: name).ConfigureAwait(false);
 
 			return role;
 		}
@@ -128,13 +130,14 @@ namespace Discord
 			}
 		}
 
-		public Task DeleteRole(Role role)
+		public async Task DeleteRole(Role role)
 		{
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			return _api.DeleteRole(role.Server.Id, role.Id);
-		}
+			try { await _api.DeleteRole(role.Server.Id, role.Id); }
+			catch (HttpException ex) when(ex.StatusCode == HttpStatusCode.NotFound) { }
+	}
 
 		public Task ReorderRoles(Server server, IEnumerable<Role> roles, int startPos = 0)
 		{

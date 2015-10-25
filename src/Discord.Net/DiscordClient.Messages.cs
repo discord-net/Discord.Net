@@ -161,7 +161,7 @@ namespace Discord
 
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>
 		/// <remarks> While not required, it is recommended to include a mention reference in the text (see Mention.User). </remarks>
-		public async Task EditMessage(Message message, string text)
+		public Task EditMessage(Message message, string text)
 		{
 			if (message == null) throw new ArgumentNullException(nameof(message));
 			CheckReady();
@@ -169,8 +169,7 @@ namespace Discord
 			if (text != null && text.Length > MaxMessageSize)
 				text = text.Substring(0, MaxMessageSize);
 
-			var model = await _api.EditMessage(message.Id, message.Channel.Id, text, Mention.GetUserIds(text)).ConfigureAwait(false);
-			message.Update(model);
+			return _api.EditMessage(message.Id, message.Channel.Id, text, Mention.GetUserIds(text));
 		}
 
 		/// <summary> Deletes the provided message. </summary>
@@ -219,7 +218,7 @@ namespace Discord
 							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
 						else
 							msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
-						msg.Update(x);
+						//msg.Update(x);
 						if (Config.TrackActivity)
 						{
 							if (!channel.IsPrivate)
