@@ -48,6 +48,10 @@ namespace Discord
 		public DateTime LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
 		private DateTime _lastOnline;
 
+		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
+		[JsonIgnore]
+		public Channel PrivateChannel => GlobalUser.PrivateChannel;
+
 		[JsonIgnore]
 		internal GlobalUser GlobalUser => _globalUser.Value;
 		private readonly Reference<GlobalUser> _globalUser;
