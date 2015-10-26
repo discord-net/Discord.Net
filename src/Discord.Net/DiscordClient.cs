@@ -106,13 +106,13 @@ namespace Discord
 				UserUnbanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
 				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Id}");
+					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				ProfileUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					"Profile Updated");
 			}
