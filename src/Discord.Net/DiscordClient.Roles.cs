@@ -84,11 +84,16 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			var response = await _api.CreateRole(server.Id).ConfigureAwait(false);
-			var role = _roles.GetOrAdd(response.Id, server.Id);
-			await _api.EditRole(server.Id, role.Id, name: name).ConfigureAwait(false);
-			response.Name = name;
-			role.Update(response);
+			var response1 = await _api.CreateRole(server.Id).ConfigureAwait(false);
+			var role = _roles.GetOrAdd(response1.Id, server.Id);
+			role.Update(response1);
+
+			var response2 = await _api.EditRole(server.Id, role.Id, name: name).ConfigureAwait(false);
+			//TODO: We shouldnt have to send permissions here, should be fixed on Discord's end soon
+			await _api.EditRole(role.Server.Id, role.Id,
+				name: name,
+				permissions: role.Permissions.RawValue).ConfigureAwait(false);
+			role.Update(response2);
 
 			return role;
 		}
