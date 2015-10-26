@@ -24,7 +24,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => API.Endpoints.UserAvatar(Id, AvatarId);
+		public string AvatarUrl => AvatarId != null ? API.Endpoints.UserAvatar(Id, AvatarId) : null;
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; private set; }
 
