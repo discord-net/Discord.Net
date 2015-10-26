@@ -172,6 +172,26 @@ namespace Discord
 			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 
+		public Task KickUser(User user)
+		{
+			if (user == null) throw new ArgumentNullException(nameof(user));
+
+			return _api.KickUser(user.Server?.Id, user.Id);
+		}
+		public Task BanUser(User user)
+		{
+			if (user == null) throw new ArgumentNullException(nameof(user));
+
+			return _api.BanUser(user.Server?.Id, user.Id);
+		}
+		public Task UnbanUser(Server server, string userId)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+			return _api.UnbanUser(server.Id, userId);
+		}
+
 		public async Task<int> PruneUsers(string serverId, int days, bool simulate = false)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
