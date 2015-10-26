@@ -1,0 +1,22 @@
+﻿{
+	"version": "0.8.0-beta1",
+	"description": "A Discord.Net extension adding basic plugin support.",
+	"authors": [ "RogueException" ],
+	"tags": [ "discord", "discordapp" ],
+	"projectUrl": "https://github.com/RogueException/Discord.Net",
+	"licenseUrl": "http://opensource.org/licenses/MIT",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/RogueException/Discord.Net"
+	},
+	"compilationOptions": {
+		"warningsAsErrors": true
+	},
+	"dependencies": {
+		"Discord.Net": "0.8.0-beta1"
+	},
+	"frameworks": {
+		"net45": { },
+		"dnx451": { }
+	}
+}
