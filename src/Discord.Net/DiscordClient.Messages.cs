@@ -46,7 +46,7 @@ namespace Discord
 		public const int MaxMessageSize = 2000;
 
 		public event EventHandler<MessageEventArgs> MessageReceived;
-		private void RaiseMessageCreated(Message msg)
+		private void RaiseMessageReceived(Message msg)
 		{
 			if (MessageReceived != null)
 				RaiseEvent(nameof(MessageReceived), () => MessageReceived(this, new MessageEventArgs(msg)));

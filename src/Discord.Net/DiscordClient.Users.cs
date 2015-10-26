@@ -84,7 +84,7 @@ namespace Discord
 				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserUpdated;
-		private void RaiseMemberUpdated(User user)
+		private void RaiseUserUpdated(User user)
 		{
 			if (UserUpdated != null)
 				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));

@@ -119,13 +119,13 @@ namespace Discord
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 			{
 				UserIsTypingUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
-					$"Updated User (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
+					$"User Updated (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
 				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageSent += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
 					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				UserPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Updated Member (Presence): {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
+					$"User Updated (Presence): {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
 				
 				_api.RestClient.OnRequest += (s, e) =>
 				{
@@ -140,9 +140,9 @@ namespace Discord
 				_channels.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_channels.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Channel {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
 				_channels.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Channels");
-				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
-				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Member {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
-				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Members");
+				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created User {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed User {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Id}");
+				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
 				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
 				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
 				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Remapped Message {e.Item.Server?.Id ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
@@ -406,7 +406,7 @@ namespace Discord
 							if (user != null)
 							{
 								user.Update(data);
-								RaiseMemberUpdated(user);
+								RaiseUserUpdated(user);
 							}
 						}
 						break;
@@ -499,7 +499,7 @@ namespace Discord
 								}
 							}
 
-							RaiseMessageCreated(msg);
+							RaiseMessageReceived(msg);
 
 							if (Config.AckMessages && !isAuthor)
 								await _api.AckMessage(data.Id, data.ChannelId).ConfigureAwait(false);
