@@ -48,21 +48,30 @@ namespace Discord
 			{
 				var server = _client.Servers[x];
 				if (server == null)
+				{
 					server = _generatedServer = new Server(client, x);
+					server.Cache();
+				}
 				return server;
 			});
 			_inviter = new Reference<User>(serverId, x =>
 			{
 				var inviter = _client.Users[x, _server.Id];
 				if (inviter == null)
+				{
 					inviter = _generatedInviter = new User(client, x, _server.Id);
+					inviter.Cache();
+				}
 				return inviter;
 			});
 			_channel = new Reference<Channel>(serverId, x =>
 			{
 				var channel = _client.Channels[x];
 				if (channel == null)
+				{
 					channel = _generatedChannel = new Channel(client, x, _server.Id, null);
+					channel.Cache();
+				}
 				return channel;
 			});
 		}
@@ -75,9 +84,9 @@ namespace Discord
 		internal override void UnloadReferences() { }
 
 		public override string ToString() => XkcdCode ?? Id;
-		
 
-		internal void Update(InviteInfo model)
+
+		internal void Update(InviteReference model)
 		{
 			if (model.Guild != null && _generatedServer != null)
 				_generatedServer.Update(model.Guild);
@@ -85,6 +94,10 @@ namespace Discord
 				_generatedInviter.Update(model.Inviter);
 			if (model.Channel != null && _generatedChannel != null)
 				_generatedChannel.Update(model.Channel);
+		}
+        internal void Update(InviteInfo model)
+		{
+			Update(model as InviteReference);
 
 			if (model.IsRevoked != null)
 				IsRevoked = model.IsRevoked.Value;
@@ -96,6 +109,6 @@ namespace Discord
 				MaxUses = model.MaxUses.Value;
 			if (model.Uses != null)
 				Uses = model.Uses.Value;
-        }
+		}
 	}
 }

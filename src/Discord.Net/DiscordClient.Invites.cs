@@ -26,7 +26,8 @@ namespace Discord
 			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
 			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
 			invite.Cache(); //Builds references
-			return invite;
+			invite.Update(response);
+            return invite;
 		}
 
 		/// <summary> Creates a new invite to the default channel of the provided server. </summary>
