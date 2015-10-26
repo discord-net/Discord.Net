@@ -38,7 +38,7 @@ namespace Discord
 			if (user.Server == null) throw new ArgumentException("Unable to ban a user in a private chat.");
 			CheckReady();
 
-			return _api.Ban(user.Server.Id, user.Id);
+			return _api.BanUser(user.Server.Id, user.Id);
 		}
 
 		/// <summary> Unbans a user from the provided server. </summary>
@@ -48,7 +48,7 @@ namespace Discord
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 			CheckReady();
 
-			try { await _api.Unban(server.Id, userId).ConfigureAwait(false); }
+			try { await _api.UnbanUser(server.Id, userId).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 	}

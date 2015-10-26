@@ -173,6 +173,15 @@ namespace Discord
 			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 
+		public Task<int> PruneUsers(string serverId, int days, bool simulate = false)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
+			CheckReady();
+
+			return _api.PruneUsers(serverId, days, simulate);
+		}
+
 		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)

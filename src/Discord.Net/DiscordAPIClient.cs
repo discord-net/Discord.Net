@@ -136,7 +136,7 @@ namespace Discord
 			return _rest.Delete(Endpoints.Invite(inviteId));
 		}
 
-		//Members
+		//Users
 		public Task EditUser(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
@@ -145,27 +145,39 @@ namespace Discord
 			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, Roles = roles };
 			return _rest.Patch(Endpoints.ServerMember(serverId, userId), request);
 		}
-		public Task Kick(string serverId, string userId)
+		public Task KickUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Delete(Endpoints.ServerMember(serverId, userId));
 		}
-		public Task Ban(string serverId, string userId)
+		public Task BanUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Put(Endpoints.ServerBan(serverId, userId));
 		}
-		public Task Unban(string serverId, string userId)
+		public Task UnbanUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Delete(Endpoints.ServerBan(serverId, userId));
 		}
+		public async Task<int> PruneUsers(string serverId, int days, bool simulate)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
+
+			PruneUsersResponse response;
+            if (simulate)
+				response = await _rest.Get<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
+			else
+				response = await _rest.Post<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
+			return response.Pruned ?? 0;
+        }
 
 		//Messages
 		public Task<SendMessageResponse> SendMessage(string channelId, string message, IEnumerable<string> mentionedUserIds = null, string nonce = null, bool isTTS = false)
