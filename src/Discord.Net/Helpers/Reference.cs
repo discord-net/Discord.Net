@@ -63,6 +63,6 @@ namespace Discord
 			_getItem = getItem;
 			_onCache = onCache;
 			_onUncache = onUncache;
-		}
+        }
 	}
 }

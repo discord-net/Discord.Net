@@ -123,15 +123,21 @@ namespace Discord
 			_afkChannel.Unload();
         }
 
-		internal void Update(GuildInfo model)
+		internal void Update(GuildReference model)
 		{
+			if (model.Name != null)
+				Name = model.Name;
+		}
+
+        internal void Update(GuildInfo model)
+		{
+			Update(model as GuildReference);
+
 			if (model.AFKTimeout != null)
 				AFKTimeout = model.AFKTimeout.Value;
 			if (model.AFKChannelId != null)
 			if (model.JoinedAt != null)
 				JoinedAt = model.JoinedAt.Value;
-			if (model.Name != null)
-				Name = model.Name;
 			if (model.OwnerId != null && _ownerId != model.OwnerId)
 			{
 				_ownerId = model.OwnerId;
