@@ -210,7 +210,7 @@ namespace Discord
 			{
 				try
 				{
-					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
+					var msgs = await _api.GetMessages(channel.Id, count, beforeMessageId).ConfigureAwait(false);
 					return msgs.Select(x =>
 					{
 						Message msg = null;

@@ -16,6 +16,7 @@
 		public static string ChannelTyping(string channelId) => $"channels/{channelId}/typing";
 		public static string ChannelMessages(string channelId) => $"channels/{channelId}/messages";
 		public static string ChannelMessages(string channelId, int limit) => $"channels/{channelId}/messages?limit={limit}";
+		public static string ChannelMessages(string channelId, int limit, string beforeId) => $"channels/{channelId}/messages?limit={limit}&before={beforeId}";
 		public static string ChannelMessage(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}";
 		public static string ChannelMessageAck(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}/ack";
 		public static string ChannelInvites(string channelId) => $"channels/{channelId}/invites";
