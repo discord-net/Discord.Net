@@ -105,9 +105,9 @@ namespace Discord
 			//TODO: check this null workaround later, should be fixed on Discord's end soon
 			var response = await _api.EditRole(role.Server.Id, role.Id, 
 				name: name ?? role.Name,
-				permissions: permissions?.RawValue ?? role.Permissions.RawValue, 
-				color: color?.RawValue, 
-				hoist: hoist).ConfigureAwait(false);
+				permissions: (permissions ?? role.Permissions).RawValue, 
+				color: (color ?? role.Color).RawValue, 
+				hoist: hoist ?? role.IsHoisted).ConfigureAwait(false);
 
 			if (position != null)
 			{
