@@ -172,13 +172,14 @@ namespace Discord
 			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
 		}
 
-		public Task<int> PruneUsers(string serverId, int days, bool simulate = false)
+		public async Task<int> PruneUsers(string serverId, int days, bool simulate = false)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
 			CheckReady();
 
-			return _api.PruneUsers(serverId, days, simulate);
+			var response = await _api.PruneUsers(serverId, days, simulate);
+			return response.Pruned ?? 0;
 		}
 
 		public Task EditProfile(string currentPassword = "",

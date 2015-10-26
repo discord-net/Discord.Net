@@ -166,17 +166,15 @@ namespace Discord
 
 			return _rest.Delete(Endpoints.ServerBan(serverId, userId));
 		}
-		public async Task<int> PruneUsers(string serverId, int days, bool simulate)
+		public Task<PruneUsersResponse> PruneUsers(string serverId, int days, bool simulate)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
-
-			PruneUsersResponse response;
+			
             if (simulate)
-				response = await _rest.Get<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
+				return _rest.Get<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
 			else
-				response = await _rest.Post<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
-			return response.Pruned ?? 0;
+				return _rest.Post<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
         }
 
 		//Messages
