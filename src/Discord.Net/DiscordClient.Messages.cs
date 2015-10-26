@@ -119,7 +119,7 @@ namespace Discord
 		private async Task<Message> SendMessage(Channel channel, string text, bool isTextToSpeech)
 		{
 			Message msg;
-			var userIds = !channel.IsPrivate ? Mention.GetUserIds(text) : new string[0];
+			var userIds = !channel.IsPrivate ? Mention.GetUserIds(text).Distinct() : new string[0];
 			if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
