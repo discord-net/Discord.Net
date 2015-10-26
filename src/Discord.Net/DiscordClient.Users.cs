@@ -1,5 +1,4 @@
-﻿using Discord.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -182,7 +181,7 @@ namespace Discord
 			return _api.PruneUsers(serverId, days, simulate);
 		}
 
-		public Task<EditUserResponse> EditProfile(string currentPassword = "",
+		public Task EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)
 		{
