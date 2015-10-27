@@ -92,5 +92,10 @@ namespace Discord.API
 	internal sealed class MemberAddEvent : MemberInfo { }
 	internal sealed class MemberUpdateEvent : MemberInfo { }
 	internal sealed class MemberRemoveEvent : MemberInfo { }
-	internal sealed class MemberVoiceStateUpdateEvent : VoiceMemberInfo { }
+    internal sealed class MemberVoiceStateUpdateEvent : VoiceMemberInfo { }
+	internal sealed class MembersChunkEvent
+	{
+		[JsonProperty("members")]
+		public MemberInfo[] Members;
+	}
 }
