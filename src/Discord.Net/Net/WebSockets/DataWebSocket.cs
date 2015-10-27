@@ -141,5 +141,11 @@ namespace Discord.Net.WebSockets
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}
+		public void SendGetUsers(string serverId, string query = "", int limit = 0)
+		{
+			var getOfflineUsers = new GetUsersCommand();
+			getOfflineUsers.Payload.ServerId = serverId;
+			QueueMessage(getOfflineUsers);
+		}
 	}
 }

@@ -182,6 +182,14 @@ namespace Discord
 			return response.Pruned ?? 0;
 		}
 
+		/// <summary>When Config.UseLargeThreshold is enabled, running this command will request the Discord server to provide you with all offline users for a particular server.</summary>
+		public void RequestOfflineUsers(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			_dataSocket.SendGetUsers(serverId);
+		}
+
 		public Task EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)
