@@ -55,11 +55,6 @@ namespace Discord
 		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
 		private ConcurrentDictionary<string, Channel> _channels;
 
-		/// <summary> Returns a collection of all invites to this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Invite> Invites => _invites.Values;
-		private ConcurrentDictionary<string, Invite> _invites;
-
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members => _members.Select(x => x.Value);
@@ -85,7 +80,6 @@ namespace Discord
 
 			//Local Cache
 			_bans = new ConcurrentDictionary<string, bool>();
-			_invites = new ConcurrentDictionary<string, Invite>();
         }
 		internal override void LoadReferences()
 		{
@@ -113,11 +107,6 @@ namespace Discord
 			roles.Clear();
 
 			//Local Cache
-			var invites = _invites;
-			foreach (var invite in invites)
-				invite.Value.Uncache();
-			invites.Clear();
-
 			_bans.Clear();
 
 			_afkChannel.Unload();
@@ -217,9 +206,6 @@ namespace Discord
 				member.RemoveChannel(channel);
 			_channels.TryRemove(channel.Id, out channel);
 		}
-
-		internal void AddInvite(Invite invite) => _invites.TryAdd(invite.Id, invite);
-		internal void RemoveInvite(Invite invite) => _invites.TryRemove(invite.Id, out invite);
 
 		internal void AddMember(User user)
 		{

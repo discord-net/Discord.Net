@@ -93,6 +93,7 @@ namespace Discord
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
+			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
 			return SendMessage(channel, text, false);
@@ -102,6 +103,7 @@ namespace Discord
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
+			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
 			return SendMessage(channel, text, false);
@@ -111,7 +113,8 @@ namespace Discord
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			CheckReady();
+			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
+            CheckReady();
 
 			var channel = await CreatePMChannel(user).ConfigureAwait(false);
 			return await SendMessage(channel, text).ConfigureAwait(false);
@@ -164,6 +167,8 @@ namespace Discord
 		public Task EditMessage(Message message, string text)
 		{
 			if (message == null) throw new ArgumentNullException(nameof(message));
+			if (text == null) throw new ArgumentNullException(nameof(text));
+			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
 			if (text != null && text.Length > MaxMessageSize)
@@ -210,7 +215,7 @@ namespace Discord
 			{
 				try
 				{
-					var msgs = await _api.GetMessages(channel.Id, count).ConfigureAwait(false);
+					var msgs = await _api.GetMessages(channel.Id, count, beforeMessageId).ConfigureAwait(false);
 					return msgs.Select(x =>
 					{
 						Message msg = null;

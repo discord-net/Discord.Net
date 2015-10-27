@@ -92,11 +92,14 @@ namespace Discord
 			var request = new ReorderChannelsRequest(channels);
 			return _rest.Patch(Endpoints.ServerChannels(serverId), request);
 		}
-		public Task<GetMessagesResponse> GetMessages(string channelId, int count)
+		public Task<GetMessagesResponse> GetMessages(string channelId, int count, string beforeMessageId = null)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count));
+			if (beforeMessageId != null)
+				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count, beforeMessageId));
+			else
+				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count));
 		}
 
 		//Incidents
@@ -122,6 +125,12 @@ namespace Discord
 			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
 
 			return _rest.Get<GetInviteResponse>(Endpoints.Invite(inviteIdOrXkcd));
+		}
+		public Task<GetInvitesResponse> GetInvites(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			return _rest.Get<GetInvitesResponse>(Endpoints.ServerInvites(serverId));
 		}
 		public Task<AcceptInviteResponse> AcceptInvite(string inviteId)
 		{
