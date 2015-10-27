@@ -126,6 +126,12 @@ namespace Discord
 
 			return _rest.Get<GetInviteResponse>(Endpoints.Invite(inviteIdOrXkcd));
 		}
+		public Task<GetInvitesResponse> GetInvites(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			return _rest.Get<GetInvitesResponse>(Endpoints.ServerInvites(serverId));
+		}
 		public Task<AcceptInviteResponse> AcceptInvite(string inviteId)
 		{
 			if (inviteId == null) throw new ArgumentNullException(nameof(inviteId));

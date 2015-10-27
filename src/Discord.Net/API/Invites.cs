@@ -4,6 +4,7 @@
 
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -53,6 +54,7 @@ namespace Discord.API
 
 	//Get
 	public class GetInviteResponse : InviteReference { }
+	public class GetInvitesResponse : List<InviteReference> { }
 
 	//Accept
 	public class AcceptInviteResponse : InviteReference { }
