@@ -169,7 +169,10 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+			var everyoneId = user.Server.Id;
+            return _api.EditUser(user.Server?.Id, user.Id, 
+				mute: mute, deaf: deaf, 
+				roles: roles.Select(x => x.Id).Where(x  => x != everyoneId));
 		}
 
 		public Task KickUser(User user)
