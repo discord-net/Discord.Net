@@ -125,6 +125,21 @@ namespace Discord.API
 	//Get
 	public sealed class GetMessagesResponse : List<MessageInfo> { }
 
+	//Commands
+	internal sealed class GetUsersCommand : WebSocketMessage<GetUsersCommand.Data>
+	{
+		public GetUsersCommand() : base(8) { }
+		public class Data
+		{
+			[JsonProperty("guild_id")]
+			public string ServerId;
+			[JsonProperty("query")]
+			public string Query;
+			[JsonProperty("limit")]
+			public int Limit;
+		}
+	}
+
 	//Events
 	internal sealed class MessageCreateEvent : MessageInfo { }
 	internal sealed class MessageUpdateEvent : MessageInfo { }

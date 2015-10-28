@@ -92,11 +92,14 @@ namespace Discord
 			var request = new ReorderChannelsRequest(channels);
 			return _rest.Patch(Endpoints.ServerChannels(serverId), request);
 		}
-		public Task<GetMessagesResponse> GetMessages(string channelId, int count)
+		public Task<GetMessagesResponse> GetMessages(string channelId, int count, string beforeMessageId = null)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count));
+			if (beforeMessageId != null)
+				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count, beforeMessageId));
+			else
+				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count));
 		}
 
 		//Incidents
@@ -123,6 +126,12 @@ namespace Discord
 
 			return _rest.Get<GetInviteResponse>(Endpoints.Invite(inviteIdOrXkcd));
 		}
+		public Task<GetInvitesResponse> GetInvites(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			return _rest.Get<GetInvitesResponse>(Endpoints.ServerInvites(serverId));
+		}
 		public Task<AcceptInviteResponse> AcceptInvite(string inviteId)
 		{
 			if (inviteId == null) throw new ArgumentNullException(nameof(inviteId));
@@ -136,7 +145,7 @@ namespace Discord
 			return _rest.Delete(Endpoints.Invite(inviteId));
 		}
 
-		//Members
+		//Users
 		public Task EditUser(string serverId, string userId, bool? mute = null, bool? deaf = null, IEnumerable<string> roles = null)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
@@ -145,27 +154,37 @@ namespace Discord
 			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, Roles = roles };
 			return _rest.Patch(Endpoints.ServerMember(serverId, userId), request);
 		}
-		public Task Kick(string serverId, string userId)
+		public Task KickUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Delete(Endpoints.ServerMember(serverId, userId));
 		}
-		public Task Ban(string serverId, string userId)
+		public Task BanUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Put(Endpoints.ServerBan(serverId, userId));
 		}
-		public Task Unban(string serverId, string userId)
+		public Task UnbanUser(string serverId, string userId)
 		{
 			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
 			if (userId == null) throw new ArgumentNullException(nameof(userId));
 
 			return _rest.Delete(Endpoints.ServerBan(serverId, userId));
 		}
+		public Task<PruneUsersResponse> PruneUsers(string serverId, int days, bool simulate)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
+			
+            if (simulate)
+				return _rest.Get<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
+			else
+				return _rest.Post<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
+        }
 
 		//Messages
 		public Task<SendMessageResponse> SendMessage(string channelId, string message, IEnumerable<string> mentionedUserIds = null, string nonce = null, bool isTTS = false)

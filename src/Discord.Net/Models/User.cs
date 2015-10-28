@@ -24,7 +24,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => API.Endpoints.UserAvatar(Id, AvatarId);
+		public string AvatarUrl => AvatarId != null ? API.Endpoints.UserAvatar(Id, AvatarId) : null;
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; private set; }
 
@@ -61,7 +61,8 @@ namespace Discord
         private readonly Reference<Server> _server;
 
 		[JsonIgnore]
-		public Channel VoiceChannel { get; private set; }
+		public Channel VoiceChannel => _voiceChannel.Value;
+		private Reference<Channel> _voiceChannel;
 
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
@@ -130,6 +131,8 @@ namespace Discord
 					if (Id == _client.CurrentUserId)
 						x.CurrentUser = null;
 				});
+			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);
+
 			Status = UserStatus.Offline;
 			_channels = new ConcurrentDictionary<string, Channel>();
 			if (serverId != null)
@@ -210,16 +213,16 @@ namespace Discord
 				SessionId = model.SessionId;
 			if (model.Token != null)
 				Token = model.Token;
-
-			if (model.ChannelId != null)
-				VoiceChannel = _client.Channels[model.ChannelId];
+			
 			if (model.IsSelfDeafened != null)
 				IsSelfDeafened = model.IsSelfDeafened.Value;
 			if (model.IsSelfMuted != null)
 				IsSelfMuted = model.IsSelfMuted.Value;
 			if (model.IsServerSuppressed != null)
 				IsServerSuppressed = model.IsServerSuppressed.Value;
-		}
+
+			_voiceChannel.Id = model.ChannelId; //Can be null
+        }
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
 			if (_server.Id != null)

@@ -82,9 +82,20 @@ namespace Discord.API
 		public IEnumerable<string> Roles;
 	}
 
+	public class PruneUsersResponse
+	{
+		[JsonProperty("pruned")]
+		public int? Pruned;
+	}
+
 	//Events
 	internal sealed class MemberAddEvent : MemberInfo { }
 	internal sealed class MemberUpdateEvent : MemberInfo { }
 	internal sealed class MemberRemoveEvent : MemberInfo { }
-	internal sealed class MemberVoiceStateUpdateEvent : VoiceMemberInfo { }
+    internal sealed class MemberVoiceStateUpdateEvent : VoiceMemberInfo { }
+	internal sealed class MembersChunkEvent
+	{
+		[JsonProperty("members")]
+		public MemberInfo[] Members;
+	}
 }

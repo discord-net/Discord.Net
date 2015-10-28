@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -10,8 +11,6 @@ namespace Discord
 		/// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
 		public async Task<Invite> GetInvite(string inviteIdOrXkcd)
 		{
-			//This doesn't work well if it's an invite to a different server!
-
 			if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
 			CheckReady();
 
@@ -26,7 +25,24 @@ namespace Discord
 			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
 			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
 			invite.Cache(); //Builds references
-			return invite;
+			invite.Update(response);
+            return invite;
+		}
+
+		/// <summary> Gets all active (non-expired) invites to a provided server. </summary>
+		public async Task<Invite[]> GetInvites(Server server)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			CheckReady();
+
+			var response = await _api.GetInvites(server.Id).ConfigureAwait(false);
+			return response.Select(x =>
+			{
+				var invite = new Invite(this, x.Code, x.XkcdPass, x.Guild.Id, x.Inviter?.Id, x.Channel?.Id);
+				invite.Cache(); //Builds references
+				invite.Update(x);
+				return invite;
+			}).ToArray();
 		}
 
 		/// <summary> Creates a new invite to the default channel of the provided server. </summary>

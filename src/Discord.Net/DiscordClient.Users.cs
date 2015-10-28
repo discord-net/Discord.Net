@@ -1,5 +1,4 @@
-﻿using Discord.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,7 +84,7 @@ namespace Discord
 				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserUpdated;
-		private void RaiseMemberUpdated(User user)
+		private void RaiseUserUpdated(User user)
 		{
 			if (UserUpdated != null)
 				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
@@ -170,10 +169,51 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+			var serverId = user.Server?.Id;
+            return _api.EditUser(serverId, user.Id, 
+				mute: mute, deaf: deaf, 
+				roles: roles.Select(x => x.Id).Where(x  => x != serverId));
 		}
 
-		public Task<EditUserResponse> EditProfile(string currentPassword = "",
+		public Task KickUser(User user)
+		{
+			if (user == null) throw new ArgumentNullException(nameof(user));
+
+			return _api.KickUser(user.Server?.Id, user.Id);
+		}
+		public Task BanUser(User user)
+		{
+			if (user == null) throw new ArgumentNullException(nameof(user));
+
+			return _api.BanUser(user.Server?.Id, user.Id);
+		}
+		public Task UnbanUser(Server server, string userId)
+		{
+			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+			return _api.UnbanUser(server.Id, userId);
+		}
+
+		public async Task<int> PruneUsers(string serverId, int days, bool simulate = false)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
+			CheckReady();
+
+			var response = await _api.PruneUsers(serverId, days, simulate);
+			return response.Pruned ?? 0;
+		}
+
+		/// <summary>When Config.UseLargeThreshold is enabled, running this command will request the Discord server to provide you with all offline users for a particular server.</summary>
+		public void RequestOfflineUsers(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			_dataSocket.SendGetUsers(serverId);
+		}
+
+		public Task EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			ImageType avatarType = ImageType.Png, byte[] avatar = null)
 		{
