@@ -57,17 +57,18 @@ namespace Discord
 
 		public async Task LeaveVoiceServer(Server server)
 		{
-			if (server == null) throw new ArgumentNullException(nameof(server));
-			CheckReady(checkVoice: true);
+			if (server == null) throw new ArgumentNullException(nameof(server));			
 
 			if (Config.EnableVoiceMultiserver)
 			{
+				//client.CheckReady();
 				DiscordWSClient client;
 				if (_voiceClients.TryRemove(server.Id, out client))
 					await client.Disconnect().ConfigureAwait(false);
 			}
 			else
 			{
+				CheckReady(checkVoice: true);
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 				_dataSocket.SendLeaveVoice(server.Id);
 			}
