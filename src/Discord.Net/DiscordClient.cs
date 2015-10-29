@@ -418,6 +418,17 @@ namespace Discord
 								RaiseUserRemoved(user);
 						}
 						break;
+					case "GUILD_MEMBERS_CHUNK":
+						{
+							var data = e.Payload.ToObject<MembersChunkEvent>(_serializer);
+							foreach (var memberData in data.Members)
+							{
+								var user = _users.GetOrAdd(memberData.User.Id, memberData.GuildId);
+								user.Update(memberData);
+								//RaiseUserAdded(user);
+							}
+						}
+						break;
 
 					//Roles
 					case "GUILD_ROLE_CREATE":

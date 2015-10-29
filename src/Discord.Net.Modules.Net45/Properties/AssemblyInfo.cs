@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Discord.Net")]
-[assembly: AssemblyDescription("An unofficial .Net API wrapper for the Discord client.")]
+[assembly: AssemblyTitle("Discord.Net.Modules")]
+[assembly: AssemblyDescription("A Discord.Net extension adding basic plugin support.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RogueException")]
-[assembly: AssemblyProduct("Discord.Net")]
+[assembly: AssemblyProduct("Discord.Net.Modules")]
 [assembly: AssemblyCopyright("Copyright © 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -15,3 +15,4 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.8.1.0")]
 [assembly: AssemblyFileVersion("0.8.1.0")]
+

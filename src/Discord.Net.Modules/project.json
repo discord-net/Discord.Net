@@ -1,6 +1,6 @@
 ﻿{
 	"version": "0.8.1-beta1",
-	"description": "A Discord.Net extension adding basic command support.",
+	"description": "A Discord.Net extension adding basic plugin support.",
 	"authors": [ "RogueException" ],
 	"tags": [ "discord", "discordapp" ],
 	"projectUrl": "https://github.com/RogueException/Discord.Net",

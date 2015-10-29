@@ -27,7 +27,7 @@ namespace Discord.Net.WebSockets
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			if (_client.Config.UseLargeThreshold)
-				msg.Payload.LargeThreshold = 50;
+				msg.Payload.LargeThreshold = 100;
 			msg.Payload.Compress = true;
 			QueueMessage(msg);
         }
@@ -140,6 +140,12 @@ namespace Discord.Net.WebSockets
 			var leaveVoice = new JoinVoiceCommand();
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
+		}
+		public void SendGetUsers(string serverId, string query = "", int limit = 0)
+		{
+			var getOfflineUsers = new GetUsersCommand();
+			getOfflineUsers.Payload.ServerId = serverId;
+			QueueMessage(getOfflineUsers);
 		}
 	}
 }

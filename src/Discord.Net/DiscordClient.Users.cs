@@ -169,7 +169,10 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return _api.EditUser(user.Server?.Id, user.Id, mute: mute, deaf: deaf, roles: roles.Select(x => x.Id));
+			var serverId = user.Server?.Id;
+            return _api.EditUser(serverId, user.Id, 
+				mute: mute, deaf: deaf, 
+				roles: roles.Select(x => x.Id).Where(x  => x != serverId));
 		}
 
 		public Task KickUser(User user)
@@ -200,6 +203,14 @@ namespace Discord
 
 			var response = await _api.PruneUsers(serverId, days, simulate);
 			return response.Pruned ?? 0;
+		}
+
+		/// <summary>When Config.UseLargeThreshold is enabled, running this command will request the Discord server to provide you with all offline users for a particular server.</summary>
+		public void RequestOfflineUsers(string serverId)
+		{
+			if (serverId == null) throw new ArgumentNullException(nameof(serverId));
+
+			_dataSocket.SendGetUsers(serverId);
 		}
 
 		public Task EditProfile(string currentPassword = "",
