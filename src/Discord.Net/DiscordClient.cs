@@ -162,6 +162,7 @@ namespace Discord
 				_pendingMessages = new ConcurrentQueue<Message>();
 
 			_serializer = new JsonSerializer();
+			_serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 #if TEST_RESPONSES
 			_serializer.CheckAdditionalContent = true;
 			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
