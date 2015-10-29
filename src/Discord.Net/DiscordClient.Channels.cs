@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,8 +9,28 @@ namespace Discord
 {
 	internal sealed class Channels : AsyncCollection<Channel>
 	{
+		public IEnumerable<Channel> PrivateChannels => _privateChannels.Select(x => x.Value);
+		private ConcurrentDictionary<string, Channel> _privateChannels;
+
 		public Channels(DiscordClient client, object writerLock)
-			: base(client, writerLock) { }
+			: base(client, writerLock)
+		{
+			_privateChannels = new ConcurrentDictionary<string, Channel>();
+			ItemCreated += (s, e) =>
+			{
+				if (e.Item.IsPrivate)
+					_privateChannels.TryAdd(e.Item.Id, e.Item);
+			};
+			ItemDestroyed += (s, e) =>
+			{
+				if (e.Item.IsPrivate)
+				{
+					Channel ignored;
+					_privateChannels.TryRemove(e.Item.Id, out ignored);
+				}
+			};
+			Cleared += (s, e) => _privateChannels.Clear();
+        }
 
 		public Channel GetOrAdd(string id, string serverId, string recipientId = null)
 			=> GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));
@@ -25,9 +46,6 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		internal Channels Channels => _channels;
-		private readonly Channels _channels;
-
 		public event EventHandler<ChannelEventArgs> ChannelCreated;
 		private void RaiseChannelCreated(Channel channel)
 		{
@@ -46,6 +64,11 @@ namespace Discord
 			if (ChannelUpdated != null)
 				RaiseEvent(nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
 		}
+
+		/// <summary> Returns a collection of all servers this client is a member of. </summary>
+		public IEnumerable<Channel> PrivateChannels => _channels.PrivateChannels;
+		internal Channels Channels => _channels;
+		private readonly Channels _channels;
 
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
 		public Channel GetChannel(string id)
