@@ -145,9 +145,15 @@ namespace Discord.Commands
                         for (int j = 0; j < newArgs.Length; j++)
                             newArgs[j] = args[j].Value;
                     }
+                    else if (comm.MaxArgs == null && comm.MinArgs == null)
+                    {
+                        newArgs = new string[argCount];
+                        for (int j = 0; j < newArgs.Length; j++)
+                            newArgs[j] = args[j].Value;
+                    }
 
-                    // Check permissions here
-                    int permissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
+                        // Check permissions here
+                        int permissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
                     var eventArgs = new CommandEventArgs(e.Message, comm, msg, cmd, argText, permissions, newArgs);
                     if (permissions < comm.MinPerms)
                     {
@@ -182,7 +188,7 @@ namespace Discord.Commands
                     CommandEventArgs eventArgs = new CommandEventArgs(e.Message, null, msg, cmd, null, null, null);
                     RaiseUnknownCommand(eventArgs);
                     if (builtInHelp)
-                        await Reply(eventArgs, $"Command `cmd` does not exist.");
+                        await Reply(eventArgs, $"The command `{cmd}` does not exist.");
                     return;
                 }
             };
