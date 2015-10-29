@@ -218,6 +218,6 @@ namespace Discord
 			}
 		}
 
-		public override string ToString() => User.Name + ": " + RawText;
+		public override string ToString() => $"{User}: {RawText}";
 	}
 }

@@ -70,6 +70,6 @@ namespace Discord
 				member.UpdateServerPermissions();
 		}
 
-		public override string ToString() => Name;
+		public override string ToString() => Name ?? Id;
 	}
 }

@@ -83,8 +83,6 @@ namespace Discord
 		}
 		internal override void UnloadReferences() { }
 
-		public override string ToString() => XkcdCode ?? Id;
-
 
 		internal void Update(InviteReference model)
 		{
@@ -110,5 +108,7 @@ namespace Discord
 			if (model.Uses != null)
 				Uses = model.Uses.Value;
 		}
+
+		public override string ToString() => XkcdCode ?? Id;
 	}
 }

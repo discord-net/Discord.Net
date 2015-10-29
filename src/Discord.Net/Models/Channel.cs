@@ -141,8 +141,6 @@ namespace Discord
             }
 		}
 
-		public override string ToString() => Name;
-
 		internal void AddMessage(Message message)
 		{
 			var cacheLength = _client.Config.MessageCacheLength;
@@ -208,5 +206,7 @@ namespace Discord
 			_areMembersStale = true;
 			user.UpdateChannelPermissions(this);
 		}
+
+		public override string ToString() => Name ?? Id;
 	}
 }

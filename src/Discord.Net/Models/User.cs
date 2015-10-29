@@ -155,8 +155,6 @@ namespace Discord
 			_server.Unload();
 		}
 
-		public override string ToString() => Id;
-
 		internal void Update(UserReference model)
 		{
 			if (model.Avatar != null)
@@ -376,5 +374,7 @@ namespace Discord
 			
 			return _roles.ContainsKey(role.Id);
 		}
+
+		public override string ToString() => Name ?? Id;
 	}
 }

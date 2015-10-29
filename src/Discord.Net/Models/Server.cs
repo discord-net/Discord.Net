@@ -178,8 +178,6 @@ namespace Discord
 			}
 		}
 
-		public override string ToString() => Name;
-
 		internal void AddBan(string banId)
 		{
 			_bans.TryAdd(banId, true);
@@ -253,5 +251,7 @@ namespace Discord
 					EveryoneRole = null;
 			}
 		}
+
+		public override string ToString() => Name ?? Id;
 	}
 }
