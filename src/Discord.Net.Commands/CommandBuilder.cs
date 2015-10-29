@@ -54,6 +54,18 @@ namespace Discord.Commands
             return this;
 		}
 
+        public CommandBuilder Desc(string desc)
+        {
+            _command.Description = desc;
+            return this;
+        }
+
+        public CommandBuilder IsHidden()
+        {
+            _command.IsHidden = true;
+            return this;
+        }
+
 		public CommandBuilder Do(Func<CommandEventArgs, Task> func)
 		{
 			_command.Handler = func;
