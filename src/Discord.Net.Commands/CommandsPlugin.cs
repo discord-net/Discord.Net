@@ -124,6 +124,25 @@ namespace Discord.Commands
                 if (!CommandParser.Parse(msg, out cmd, out args))
                     return;
 
+                while (!_commands.ContainsKey(cmd))
+                {
+                    if (args.Length != 0)
+                    {
+                        cmd = $"{cmd} {args[0].Value}";
+                        CommandPart[] tempArgs = new CommandPart[args.Length - 1];
+                        if (args.Length - 1 > 0)
+                        {
+                            for (int i = 0; i < args.Length - 1; i++)
+                            {
+                                tempArgs[i] = args[i + 1];
+                            }
+                        }
+                        args = tempArgs;
+                    }
+                    else
+                        break;
+                }
+
                 if (_commands.ContainsKey(cmd))
                 {
                     Command comm = _commands[cmd];
@@ -146,6 +165,12 @@ namespace Discord.Commands
                             newArgs[j] = args[j].Value;
                     }
                     else if (comm.MaxArgs == null && comm.MinArgs == null)
+                    {
+                        newArgs = new string[argCount];
+                        for (int j = 0; j < newArgs.Length; j++)
+                            newArgs[j] = args[j].Value;
+                    }
+                    else if (comm.MaxArgs == null && comm.MinArgs != null)
                     {
                         newArgs = new string[argCount];
                         for (int j = 0; j < newArgs.Length; j++)
