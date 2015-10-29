@@ -168,10 +168,26 @@ namespace Discord
 		}
 		private void UpdateMembersCache()
 		{
-			if (_server.Id != null)
-				_members = Server.Members.Where(x => x.GetPermissions(this)?.ReadMessages ?? false).ToDictionary(x => x.Id, x => x);
-			else
-				_members = new Dictionary<string, User>();
+			if (IsPrivate)
+			{
+				_members = new Dictionary<string, User>()
+				{
+					{ _client.CurrentUserId, _client.CurrentUser },
+					{ _recipient.Id, _recipient.Value }
+				};
+			}
+			else if (Type == ChannelType.Text)
+			{
+				_members = Server.Members
+					.Where(x => x.GetPermissions(this)?.ReadMessages ?? false)
+					.ToDictionary(x => x.Id, x => x);
+			}
+			else if (Type == ChannelType.Voice)
+			{
+				_members = Server.Members
+					.Where(x => x.VoiceChannel == this)
+					.ToDictionary(x => x.Id, x => x);
+			}
 			_areMembersStale = false;
 		}
 
@@ -181,12 +197,12 @@ namespace Discord
 			foreach (var member in _members)
 				member.Value.UpdateChannelPermissions(this);
 		}
-		internal void InvalidatePermissionsCache(Role role)
+		/*internal void InvalidatePermissionsCache(Role role)
 		{
 			_areMembersStale = true;
 			foreach (var member in role.Members)
 				member.UpdateChannelPermissions(this);
-		}
+		}*/
 		internal void InvalidatePermissionsCache(User user)
 		{
 			_areMembersStale = true;

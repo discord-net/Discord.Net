@@ -221,7 +221,18 @@ namespace Discord
 			if (model.IsServerSuppressed != null)
 				IsServerSuppressed = model.IsServerSuppressed.Value;
 
-			_voiceChannel.Id = model.ChannelId; //Can be null
+			if (_voiceChannel.Id != model.ChannelId)
+			{
+				var oldChannel = _voiceChannel.Value;
+				if (oldChannel != null)
+					oldChannel.InvalidateMembersCache();
+
+				_voiceChannel.Id = model.ChannelId; //Can be null
+
+				var newChannel = _voiceChannel.Value;
+				if (newChannel != null)
+					newChannel.InvalidateMembersCache();
+			}
         }
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{

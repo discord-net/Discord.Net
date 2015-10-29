@@ -214,7 +214,7 @@ namespace Discord
 				if (user.Id == _ownerId)
 					Owner = user;
 
-				foreach (var channel in Channels)
+				foreach (var channel in TextChannels)
 				{
 					user.AddChannel(channel);
 					channel.InvalidatePermissionsCache(user);
