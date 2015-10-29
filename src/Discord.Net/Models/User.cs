@@ -132,6 +132,7 @@ namespace Discord
 						x.CurrentUser = null;
 				});
 			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);
+			_roles = new Dictionary<string, Role>();
 
 			Status = UserStatus.Offline;
 			_channels = new ConcurrentDictionary<string, Channel>();
@@ -234,20 +235,18 @@ namespace Discord
         }
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
+			Dictionary<string, Role> newRoles;
+			if (roles != null)
+				newRoles = roles.ToDictionary(x => x.Id, x => x);
+			else
+				newRoles = new Dictionary<string, Role>();
+
 			if (_server.Id != null)
 			{
-				Dictionary<string, Role> newRoles;
-				if (roles != null)
-					newRoles = roles.ToDictionary(x => x.Id, x => x);
-				else
-					newRoles = new Dictionary<string, Role>();
-
 				var everyone = Server.EveryoneRole;
 				newRoles.Add(everyone.Id, everyone);
-				_roles = newRoles;
 			}
-			else
-				_roles = new Dictionary<string, Role>();
+			_roles = newRoles;
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)
@@ -258,8 +257,6 @@ namespace Discord
 
 		internal void UpdateServerPermissions()
 		{
-			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
-
 			var server = Server;
 			if (server == null) return;
 
@@ -288,8 +285,6 @@ namespace Discord
 		}
 		internal void UpdateChannelPermissions(Channel channel)
 		{
-			if (_roles == null) return; // We don't have all our data processed yet, this will be called again soon
-
 			var server = Server;
 			if (server == null) return;
 			if (channel.Server != server) throw new InvalidOperationException();
