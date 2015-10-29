@@ -46,9 +46,7 @@ namespace Discord.Commands
                     .Do(async e =>
                     {
                         if (e.Command.Text != "help")
-                        {
                             await Reply(e, CommandDetails(e.Command));
-                        }
                         else
                         {
                             if (e.Args == null)
@@ -95,16 +93,11 @@ namespace Discord.Commands
             client.MessageReceived += async (s, e) =>
             {
                 // This will need to be changed once a built in help command is made
-                if (_commands.Count == 0) 
-                    return;
-
-                if (e.Message.IsAuthor)
-                    return;
+                if (_commands.Count == 0)  return;
+                if (e.Message.IsAuthor) return;
 
                 string msg = e.Message.Text;
-
-                if (msg.Length == 0)
-                    return;
+                if (msg.Length == 0) return;
 
                 if (UseCommandChar)
                 {
@@ -127,17 +120,10 @@ namespace Discord.Commands
                 if (_commands.ContainsKey(cmd))
                 {
                     Command comm = _commands[cmd];
-                    
-                    //Get ArgText
-                    int argCount = args.Length;
-                    string argText;
-                    if (argCount == 0)
-                        argText = "";
-                    else
-                        argText = msg.Substring(args[0].Index);
-
-                    //Clean Args
-                    string[] newArgs = null;
+					
+					//Clean args
+					int argCount = args.Length;
+					string[] newArgs = null;
 
                     if (comm.MaxArgs != null && argCount > 0)
                     {
@@ -152,74 +138,67 @@ namespace Discord.Commands
                             newArgs[j] = args[j].Value;
                     }
 
-                        // Check permissions here
-                        int permissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
-                    var eventArgs = new CommandEventArgs(e.Message, comm, msg, cmd, argText, permissions, newArgs);
-                    if (permissions < comm.MinPerms)
-                    {
-                        RaiseCommandError(eventArgs, new PermissionException());
-                        return;
-                    }
-                    
-                    //Check Arg Count
-                    if (argCount < comm.MinArgs)
-                    {
-                        RaiseCommandError(eventArgs, new ArgumentException());
-                        if (builtInHelp)
-                            await _commands["help"].Handler(eventArgs);
-                        return;
-                    }
+					int userPermissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
+					var eventArgs = new CommandEventArgs(e.Message, comm, userPermissions, newArgs);
 
-                    // Actually run the command here
-                    RaiseRanCommand(eventArgs);
-                    try
-                    {
+					// Check permissions
+					if (userPermissions < comm.MinPerms)
+					{
+						RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
+						return;
+					}
+                    
+					//Check arg count
+					if (argCount < comm.MinArgs)
+					{
+						RaiseCommandError(CommandErrorType.BadArgCount, eventArgs);
+						return;
+					}
+
+					// Run the command
+					try
+					{
+						RaiseRanCommand(eventArgs);
                         var task = comm.Handler(eventArgs);
                         if (task != null)
                             await task.ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        RaiseCommandError(eventArgs, ex);
+                        RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
                     }
                 }
                 else
                 {
-                    CommandEventArgs eventArgs = new CommandEventArgs(e.Message, null, msg, cmd, null, null, null);
-                    RaiseUnknownCommand(eventArgs);
-                    if (builtInHelp)
-                        await Reply(eventArgs, $"The command `{cmd}` does not exist.");
+                    CommandEventArgs eventArgs = new CommandEventArgs(e.Message, null, null, null);
+					RaiseCommandError(CommandErrorType.UnknownCommand, eventArgs);
                     return;
                 }
             };
         }
         
-        internal string CommandDetails(Command comm)
+        private string CommandDetails(Command command)
         {
             StringBuilder output = new StringBuilder();
 
-            output.Append($"`{comm.Text}`");
+            output.Append($"`{command.Text}`");
 
-            if (comm.MinArgs != null && comm.MaxArgs != null)
+            if (command.MinArgs != null && command.MaxArgs != null)
             {
-                if (comm.MinArgs == comm.MaxArgs)
+                if (command.MinArgs == command.MaxArgs)
                 {
-                    if (comm.MaxArgs != 0)
-                        output.Append($" {comm.MinArgs.ToString()} Args");
+                    if (command.MaxArgs != 0)
+                        output.Append($" {command.MinArgs.ToString()} Args");
                 }
                 else
-                    output.Append($" {comm.MinArgs.ToString()} - {comm.MaxArgs.ToString()} Args");
+                    output.Append($" {command.MinArgs.ToString()} - {command.MaxArgs.ToString()} Args");
             }
-            else if (comm.MinArgs != null && comm.MaxArgs == null)
-            {
-                output.Append($" ≥{comm.MinArgs.ToString()} Args");
-            }
-            else if (comm.MinArgs == null && comm.MaxArgs != null)
-            {
-                output.Append($" ≤{comm.MaxArgs.ToString()} Args");
-            }
+            else if (command.MinArgs != null && command.MaxArgs == null)
+                output.Append($" ≥{command.MinArgs.ToString()} Args");
+            else if (command.MinArgs == null && command.MaxArgs != null)
+                output.Append($" ≤{command.MaxArgs.ToString()} Args");
 
-            output.Append($": {comm.Description}");
+            output.Append($": {command.Description}");
 
             return output.ToString();
         }

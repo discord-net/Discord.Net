@@ -2,43 +2,40 @@
 
 namespace Discord.Commands
 {
-	public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
-    public class ArgumentException : Exception { public ArgumentException() : base("This command requires more arguments.") { } }
 	public class CommandEventArgs
 	{
 		public Message Message { get; }
 		public Command Command { get; }
-        public string MessageText { get; }
-		public string CommandText { get; }
-		public string ArgText { get; }
-		public int? Permissions { get; }
+		public int? UserPermissions { get; }
 		public string[] Args { get; }
 		
 		public User User => Message.User;
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Channel.Server;
 
-		public CommandEventArgs(Message message, Command command, string messageText, string commandText, string argText, int? permissions, string[] args)
+		public CommandEventArgs(Message message, Command command, int? userPermissions, string[] args)
 		{
 			Message = message;
 			Command = command;
-            MessageText = messageText;
-			CommandText = commandText;
-			ArgText = argText;
-			Permissions = permissions;
+			UserPermissions = userPermissions;
 			Args = args;
 		}
 	}
+
+	public enum CommandErrorType { Exception, UnknownCommand, BadPermissions, BadArgCount }
 	public class CommandErrorEventArgs : CommandEventArgs
 	{
+		public CommandErrorType ErrorType { get; }
 		public Exception Exception { get; }
 
-		public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
-			: base(baseArgs.Message, baseArgs.Command, baseArgs.MessageText, baseArgs.CommandText, baseArgs.ArgText, baseArgs.Permissions, baseArgs.Args)
+		public CommandErrorEventArgs(CommandErrorType errorType, CommandEventArgs baseArgs, Exception ex)
+			: base(baseArgs.Message, baseArgs.Command, baseArgs.UserPermissions, baseArgs.Args)
 		{
 			Exception = ex;
-		}
+			ErrorType = errorType;
+        }
 	}
+
 	public partial class CommandsPlugin
 	{
 		public event EventHandler<CommandEventArgs> RanCommand;
@@ -47,17 +44,11 @@ namespace Discord.Commands
 			if (RanCommand != null)
 				RanCommand(this, args);
 		}
-		public event EventHandler<CommandEventArgs> UnknownCommand;
-		private void RaiseUnknownCommand(CommandEventArgs args)
-		{
-			if (UnknownCommand != null)
-				UnknownCommand(this, args);
-		}
 		public event EventHandler<CommandErrorEventArgs> CommandError;
-		private void RaiseCommandError(CommandEventArgs args, Exception ex)
+		private void RaiseCommandError(CommandErrorType errorType, CommandEventArgs args, Exception ex = null)
 		{
 			if (CommandError != null)
-				CommandError(this, new CommandErrorEventArgs(args, ex));
+				CommandError(this, new CommandErrorEventArgs(errorType, args, ex));
 		}
 	}
 }
