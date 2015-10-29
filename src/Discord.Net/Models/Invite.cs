@@ -18,6 +18,7 @@ namespace Discord
 		public bool IsRevoked { get; private set; }
 		/// <summary> If true, a user accepting this invite will be kicked from the server after closing their client. </summary>
 		public bool IsTemporary { get; private set; }
+		public DateTime CreatedAt { get; private set; }
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
 		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id);
@@ -107,6 +108,8 @@ namespace Discord
 				MaxUses = model.MaxUses.Value;
 			if (model.Uses != null)
 				Uses = model.Uses.Value;
+			if (model.CreatedAt != null)
+				CreatedAt = model.CreatedAt.Value;
 		}
 
 		public override string ToString() => XkcdCode ?? Id;
