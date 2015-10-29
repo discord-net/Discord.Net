@@ -319,8 +319,11 @@ namespace Discord
 					newPermissions |= allowUser.Allow.RawValue;
 			}
 
-            if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+			var mask = ChannelPermissions.All(channel).RawValue;
+			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
 				newPermissions = ChannelPermissions.All(channel).RawValue;
+			else
+				newPermissions &= mask;
 
 			if (newPermissions != oldPermissions)
 			{
