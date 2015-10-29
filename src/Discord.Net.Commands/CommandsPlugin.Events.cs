@@ -3,10 +3,12 @@
 namespace Discord.Commands
 {
 	public class PermissionException : Exception { public PermissionException() : base("User does not have permission to run this command.") { } }
+    public class ArgumentException : Exception { public ArgumentException() : base("This command requires more arguments.") { } }
 	public class CommandEventArgs
 	{
 		public Message Message { get; }
 		public Command Command { get; }
+        public string MessageText { get; }
 		public string CommandText { get; }
 		public string ArgText { get; }
 		public int? Permissions { get; }
@@ -16,10 +18,11 @@ namespace Discord.Commands
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Channel.Server;
 
-		public CommandEventArgs(Message message, Command command, string commandText, string argText, int? permissions, string[] args)
+		public CommandEventArgs(Message message, Command command, string messageText, string commandText, string argText, int? permissions, string[] args)
 		{
 			Message = message;
 			Command = command;
+            MessageText = messageText;
 			CommandText = commandText;
 			ArgText = argText;
 			Permissions = permissions;
@@ -31,7 +34,7 @@ namespace Discord.Commands
 		public Exception Exception { get; }
 
 		public CommandErrorEventArgs(CommandEventArgs baseArgs, Exception ex)
-			: base(baseArgs.Message, baseArgs.Command, baseArgs.CommandText, baseArgs.ArgText, baseArgs.Permissions, baseArgs.Args)
+			: base(baseArgs.Message, baseArgs.Command, baseArgs.MessageText, baseArgs.CommandText, baseArgs.ArgText, baseArgs.Permissions, baseArgs.Args)
 		{
 			Exception = ex;
 		}
