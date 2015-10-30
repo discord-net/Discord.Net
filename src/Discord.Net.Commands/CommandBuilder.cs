@@ -1,50 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
 	public sealed class CommandBuilder
 	{
+		private readonly CommandsPlugin _plugin;
 		private readonly Command _command;
-		public CommandBuilder(Command command)
+		private List<CommandParameter> _params;
+		private bool _hasOptional, _hasCatchAll;
+		private string _prefix;
+
+		public CommandBuilder(CommandsPlugin plugin, Command command, string prefix)
 		{
+			_plugin = plugin;
 			_command = command;
-		}
-		
-		public CommandBuilder ArgsEqual(int argCount)
+			_params = new List<CommandParameter>();
+			_prefix = prefix;
+        }
+
+		public CommandBuilder Alias(params string[] aliases)
 		{
-			_command.MinArgs = argCount;
-			_command.MaxArgs = argCount;
+			aliases = aliases.Select(x => AppendPrefix(_prefix, x)).ToArray();
+            _command.SetAliases(aliases);
 			return this;
 		}
-		public CommandBuilder ArgsAtLeast(int minArgCount)
+		public CommandBuilder Info(string description)
 		{
-			_command.MinArgs = minArgCount;
-			_command.MaxArgs = null;
+			_command.Description = description;
 			return this;
 		}
-		public CommandBuilder ArgsAtMost(int maxArgCount)
+		public CommandBuilder Parameter(string name, bool isOptional = false, bool isCatchAll = false)
 		{
-			_command.MinArgs = null;
-			_command.MaxArgs = maxArgCount;
+			if (_hasCatchAll)
+				throw new Exception("No parameters may be added after the catch-all");
+			if (_hasOptional && isOptional)
+				throw new Exception("Non-optional parameters may not be added after an optional one");
+
+			_params.Add(new CommandParameter(name, isOptional, isCatchAll));
+
+			if (isOptional)
+				_hasOptional = true;
+            if (isCatchAll)
+				_hasCatchAll = true;
 			return this;
 		}
-		public CommandBuilder ArgsBetween(int minArgCount, int maxArgCount)
+		public CommandBuilder IsHidden()
 		{
-			_command.MinArgs = minArgCount;
-			_command.MaxArgs = maxArgCount;
-			return this;
-		}
-		public CommandBuilder NoArgs()
-		{
-			_command.MinArgs = 0;
-			_command.MaxArgs = 0;
-			return this;
-		}
-		public CommandBuilder AnyArgs()
-		{
-			_command.MinArgs = null;
-			_command.MaxArgs = null;
+			_command.IsHidden = true;
 			return this;
 		}
 
@@ -54,32 +59,45 @@ namespace Discord.Commands
             return this;
 		}
 
-        public CommandBuilder Desc(string desc)
-        {
-            _command.Description = desc;
-            return this;
-        }
-
-        public CommandBuilder IsHidden()
-        {
-            _command.IsHidden = true;
-            return this;
-        }
-
-		public CommandBuilder Do(Func<CommandEventArgs, Task> func)
+		public void Do(Func<CommandEventArgs, Task> func)
 		{
-			_command.Handler = func;
-            return this;
+			_command.SetHandler(func);
+			Build();
 		}
-		public CommandBuilder Do(Action<CommandEventArgs> func)
+		public void Do(Action<CommandEventArgs> func)
 		{
-			_command.Handler = e => { func(e); return TaskHelper.CompletedTask; };
-			return this;
+			_command.SetHandler(func);
+			Build();
+		}
+		private void Build()
+		{
+			_command.SetParameters(_params.ToArray());
+			foreach (var alias in _command.Aliases)
+				_plugin.Map.AddCommand(alias, _command);
+			_plugin.AddCommand(_command);
+		}
+
+		internal static string AppendPrefix(string prefix, string cmd)
+		{
+			if (cmd != "")
+			{
+				if (prefix != "")
+					return prefix + ' ' + cmd;
+				else
+					return cmd;
+			}
+			else
+			{
+				if (prefix != "")
+					return prefix;
+				else
+					throw new ArgumentOutOfRangeException(nameof(cmd));
+			}
 		}
 	}
 	public sealed class CommandGroupBuilder
 	{
-		private readonly CommandsPlugin _plugin;
+		internal readonly CommandsPlugin _plugin;
 		private readonly string _prefix;
 		private int _defaultMinPermissions;
 
@@ -104,25 +122,9 @@ namespace Discord.Commands
 			=> CreateCommand("");
         public CommandBuilder CreateCommand(string cmd)
 		{
-			string text;
-			if (cmd != "")
-			{
-				if (_prefix != "")
-					text = _prefix + ' ' + cmd;
-				else
-					text = cmd;
-			}
-			else
-			{
-				if (_prefix != "")
-					text = _prefix;
-				else
-					throw new ArgumentOutOfRangeException(nameof(cmd));
-			}
-            var command = new Command(text);
+            var command = new Command(CommandBuilder.AppendPrefix(_prefix, cmd));
 			command.MinPerms = _defaultMinPermissions;
-			_plugin.AddCommand(command);
-            return new CommandBuilder(command);
+            return new CommandBuilder(_plugin, command, _prefix);
 		}
 	}
 }
