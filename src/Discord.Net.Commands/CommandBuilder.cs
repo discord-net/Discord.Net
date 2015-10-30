@@ -7,15 +7,15 @@ namespace Discord.Commands
 {
 	public sealed class CommandBuilder
 	{
-		private readonly CommandsPlugin _plugin;
+		private readonly CommandService _service;
 		private readonly Command _command;
 		private List<CommandParameter> _params;
 		private bool _allowRequired, _isClosed;
 		private string _prefix;
 
-		public CommandBuilder(CommandsPlugin plugin, Command command, string prefix)
+		public CommandBuilder(CommandService service, Command command, string prefix)
 		{
-			_plugin = plugin;
+			_service = service;
 			_command = command;
 			_params = new List<CommandParameter>();
 			_prefix = prefix;
@@ -75,8 +75,8 @@ namespace Discord.Commands
 		{
 			_command.SetParameters(_params.ToArray());
 			foreach (var alias in _command.Aliases)
-				_plugin.Map.AddCommand(alias, _command);
-			_plugin.AddCommand(_command);
+				_service.Map.AddCommand(alias, _command);
+			_service.AddCommand(_command);
 		}
 
 		internal static string AppendPrefix(string prefix, string cmd)
@@ -99,13 +99,13 @@ namespace Discord.Commands
 	}
 	public sealed class CommandGroupBuilder
 	{
-		internal readonly CommandsPlugin _plugin;
+		internal readonly CommandService _service;
 		private readonly string _prefix;
 		private int _defaultMinPermissions;
 
-		internal CommandGroupBuilder(CommandsPlugin plugin, string prefix, int defaultMinPermissions)
+		internal CommandGroupBuilder(CommandService service, string prefix, int defaultMinPermissions)
 		{
-			_plugin = plugin;
+			_service = service;
 			_prefix = prefix;
 			_defaultMinPermissions = defaultMinPermissions;
 		}
@@ -117,7 +117,7 @@ namespace Discord.Commands
 
 		public CommandGroupBuilder CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
 		{
-			config(new CommandGroupBuilder(_plugin, _prefix + ' ' + cmd, _defaultMinPermissions));
+			config(new CommandGroupBuilder(_service, _prefix + ' ' + cmd, _defaultMinPermissions));
 			return this;
 		}
 		public CommandBuilder CreateCommand()
@@ -126,7 +126,7 @@ namespace Discord.Commands
 		{
             var command = new Command(CommandBuilder.AppendPrefix(_prefix, cmd));
 			command.MinPermissions = _defaultMinPermissions;
-            return new CommandBuilder(_plugin, command, _prefix);
+            return new CommandBuilder(_service, command, _prefix);
 		}
 	}
 }

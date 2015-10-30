@@ -7,7 +7,7 @@
     <ProjectGuid>{1B5603B4-6F8F-4289-B945-7BAAE523D740}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Discord</RootNamespace>
+    <RootNamespace>Discord.Commands</RootNamespace>
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -43,17 +43,23 @@
     <Compile Include="..\Discord.Net.Commands\CommandBuilder.cs">
       <Link>CommandBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandExtensions.cs">
+      <Link>CommandExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandMap.cs">
       <Link>CommandMap.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandParser.cs">
       <Link>CommandParser.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Commands\CommandsPlugin.cs">
-      <Link>CommandsPlugin.cs</Link>
+    <Compile Include="..\Discord.Net.Commands\CommandService.cs">
+      <Link>CommandService.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Commands\CommandsPlugin.Events.cs">
-      <Link>CommandsPlugin.Events.cs</Link>
+    <Compile Include="..\Discord.Net.Commands\CommandService.Events.cs">
+      <Link>CommandService.Events.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandServiceConfig.cs">
+      <Link>CommandServiceConfig.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
