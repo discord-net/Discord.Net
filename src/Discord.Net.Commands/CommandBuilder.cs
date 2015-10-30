@@ -10,7 +10,7 @@ namespace Discord.Commands
 		private readonly CommandsPlugin _plugin;
 		private readonly Command _command;
 		private List<CommandParameter> _params;
-		private bool _hasOptional, _hasCatchAll;
+		private bool _allowRequired, _isClosed;
 		private string _prefix;
 
 		public CommandBuilder(CommandsPlugin plugin, Command command, string prefix)
@@ -19,6 +19,8 @@ namespace Discord.Commands
 			_command = command;
 			_params = new List<CommandParameter>();
 			_prefix = prefix;
+			_allowRequired = true;
+			_isClosed = false;
         }
 
 		public CommandBuilder Alias(params string[] aliases)
@@ -32,19 +34,19 @@ namespace Discord.Commands
 			_command.Description = description;
 			return this;
 		}
-		public CommandBuilder Parameter(string name, bool isOptional = false, bool isCatchAll = false)
+		public CommandBuilder Parameter(string name, ParameterType type = ParameterType.Required)
 		{
-			if (_hasCatchAll)
-				throw new Exception("No parameters may be added after the catch-all");
-			if (_hasOptional && !isOptional)
-				throw new Exception("Non-optional parameters may not be added after an optional one");
+			if (_isClosed)
+				throw new Exception($"No parameters may be added after a {nameof(ParameterType.Multiple)} or {nameof(ParameterType.Unparsed)} parameter.");
+			if (!_allowRequired && type != ParameterType.Required)
+				throw new Exception($"{nameof(ParameterType.Required)} parameters may not be added after an optional one");
 
-			_params.Add(new CommandParameter(name, isOptional, isCatchAll));
+			_params.Add(new CommandParameter(name, type));
 
-			if (isOptional)
-				_hasOptional = true;
-            if (isCatchAll)
-				_hasCatchAll = true;
+			if (type == ParameterType.Optional)
+				_allowRequired = false;
+            if (type == ParameterType.Multiple || type == ParameterType.Unparsed)
+				_isClosed = true;
 			return this;
 		}
 		public CommandBuilder IsHidden()

@@ -41,7 +41,7 @@ namespace Discord.Commands
             if (builtInHelp)
             {
                 CreateCommand("help")
-					.Parameter("command", isOptional: true)
+					.Parameter("command", ParameterType.Optional)
                     .IsHidden()
                     .Info("Returns information about commands.")
                     .Do(async e =>
