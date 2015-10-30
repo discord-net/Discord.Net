@@ -207,6 +207,8 @@ namespace Discord
 			user.UpdateChannelPermissions(this);
 		}
 
+		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }

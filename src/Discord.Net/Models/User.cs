@@ -370,6 +370,8 @@ namespace Discord
 			return _roles.ContainsKey(role.Id);
 		}
 
+		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }

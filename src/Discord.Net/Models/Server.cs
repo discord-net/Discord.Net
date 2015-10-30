@@ -252,6 +252,8 @@ namespace Discord
 			}
 		}
 
+		public override bool Equals(object obj) => obj is Server && (obj as Server).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }

@@ -137,6 +137,9 @@ namespace Discord
 			if (_isLocked)
 				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
 		}
+
+		public override bool Equals(object obj) => obj is Permissions && (obj as Permissions)._rawValue == _rawValue;
+		public override int GetHashCode() => _rawValue.GetHashCode();
 	}
 
 	public sealed class DualChannelPermissions
@@ -214,5 +217,10 @@ namespace Discord
 				Deny.SetBit(pos, false);
 			}
 		}
+
+		public override bool Equals(object obj) => obj is DualChannelPermissions && 
+			(obj as DualChannelPermissions).Allow.Equals(Allow) &&
+			(obj as DualChannelPermissions).Deny.Equals(Deny);
+		public override int GetHashCode() => unchecked(Allow.GetHashCode() + Deny.GetHashCode());
 	}
 }

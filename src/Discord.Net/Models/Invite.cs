@@ -112,6 +112,8 @@ namespace Discord
 				CreatedAt = model.CreatedAt.Value;
 		}
 
+		public override bool Equals(object obj) => obj is Invite && (obj as Invite).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => XkcdCode ?? Id;
 	}
 }
