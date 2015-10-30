@@ -18,7 +18,8 @@ namespace Discord.Commands
 		internal CommandMap Map => _map;
 		private readonly CommandMap _map;
 
-		public IEnumerable<char> CommandChars { get { return _commandChars; } set { _commandChars = value.ToArray(); } }
+		public char ComamndChar { get { return _commandChars[0]; } set { _commandChars = new char[] { value }; } }
+        public IEnumerable<char> CommandChars { get { return _commandChars; } set { _commandChars = value.ToArray(); } }
         private char[] _commandChars;
 		
 		public bool RequireCommandCharInPublic { get; set; }
