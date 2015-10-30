@@ -4,17 +4,26 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+	public enum ParameterType
+	{
+		/// <summary> Catches a single required parameter. </summary>
+		Required,
+		/// <summary> Catches a single optional parameter. </summary>
+		Optional,
+		/// <summary> Catches a zero or more optional parameters. </summary>
+		Multiple,
+		/// <summary> Catches all remaining text as a single optional parameter. </summary>
+		Unparsed
+	}
 	public sealed class CommandParameter
 	{
 		public string Name { get; }
-		public bool IsOptional { get; }
-		public bool IsCatchAll { get; }
+		public ParameterType Type { get; }
 
-		public CommandParameter(string name, bool isOptional, bool isCatchAll)
+		public CommandParameter(string name, ParameterType type)
 		{
 			Name = name;
-			IsOptional = isOptional;
-			IsCatchAll = isCatchAll;
+			Type = type;
 		}
 	}
 
@@ -60,7 +69,7 @@ namespace Discord.Commands
                 }
 				else
 				{
-					if (parameters[parameters.Length - 1].IsCatchAll)
+					if (parameters[parameters.Length - 1].Type == ParameterType.Multiple)
 						MaxArgs = null;
 					else
 						MaxArgs = parameters.Length;
@@ -68,7 +77,7 @@ namespace Discord.Commands
 					int? optionalStart = null;
 					for (int i = parameters.Length - 1; i >= 0; i--)
 					{
-						if (parameters[i].IsOptional)
+						if (parameters[i].Type == ParameterType.Optional)
 							optionalStart = i;
 						else
 							break;
