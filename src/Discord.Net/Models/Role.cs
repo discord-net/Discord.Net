@@ -70,6 +70,8 @@ namespace Discord
 				member.UpdateServerPermissions();
 		}
 
+		public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }
