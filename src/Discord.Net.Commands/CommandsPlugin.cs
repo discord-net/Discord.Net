@@ -10,29 +10,30 @@ namespace Discord.Commands
 	public partial class CommandsPlugin
     {
 		private readonly DiscordClient _client;
-		private Func<User, int> _getPermissions;
-
-        private Dictionary<string, Command> _commands;
+		private readonly Func<User, int> _getPermissions;
         
-        public Dictionary<string, Command> Commands => _commands;
+		public IEnumerable<Command> Commands => _commands;
+		private readonly List<Command> _commands;
 
-		public char CommandChar { get { return CommandChars[0]; } set { CommandChars = new List<char> { value }; } } // This could possibly be removed entirely. Not sure.
-        public List<char> CommandChars { get; set; }
-		public bool UseCommandChar { get; set; }
+		internal CommandMap Map => _map;
+		private readonly CommandMap _map;
+
+		public IEnumerable<char> CommandChars { get { return _commandChars; } set { _commandChars = value.ToArray(); } }
+        private char[] _commandChars;
+		
 		public bool RequireCommandCharInPublic { get; set; }
 		public bool RequireCommandCharInPrivate { get; set; }
         public bool HelpInPublic { get; set; }
 
         public CommandsPlugin(DiscordClient client, Func<User, int> getPermissions = null, bool builtInHelp = false)
         {
-            _client = client; // Wait why is this even set
+            _client = client;
             _getPermissions = getPermissions;
             
-            _commands = new Dictionary<string, Command>();
+            _commands = new List<Command>();
+			_map = new CommandMap(null);
 
-            CommandChar = '!'; // Kept around to keep from possibly throwing an error. Might not be necessary.
-            CommandChars = new List<char> { '!', '?', '/' };
-            UseCommandChar = true;
+			_commandChars = new char[] { '!' };
             RequireCommandCharInPublic = true;
             RequireCommandCharInPrivate = true;
             HelpInPublic = true;
@@ -40,9 +41,9 @@ namespace Discord.Commands
             if (builtInHelp)
             {
                 CreateCommand("help")
-                    .ArgsBetween(0, 1)
+					.Parameter("command", isOptional: true)
                     .IsHidden()
-                    .Desc("Returns information about commands.")
+                    .Info("Returns information about commands.")
                     .Do(async e =>
                     {
                         if (e.Command.Text != "help")
@@ -50,29 +51,18 @@ namespace Discord.Commands
                         else
                         {
                             if (e.Args == null)
-                            {
-                                StringBuilder output = new StringBuilder();
-                                bool first = true;
+							{
+								int permissions = getPermissions(e.User);
+								StringBuilder output = new StringBuilder();
                                 output.AppendLine("These are the commands you can use:");
                                 output.Append("`");
-                                int permissions = getPermissions(e.User);
-                                foreach (KeyValuePair<string, Command> k in _commands)
-                                {
-                                    if (permissions >= k.Value.MinPerms && !k.Value.IsHidden)
-                                        if (first)
-                                        {
-                                            output.Append(k.Key);
-                                            first = false;
-                                        }
-                                        else
-                                            output.Append($", {k.Key}");
-                                }
+								output.Append(string.Join(", ", _commands.Select(x => permissions >= x.MinPerms && !x.IsHidden)));
                                 output.Append("`");
 
-                                if (CommandChars.Count == 1)
-                                    output.AppendLine($"{Environment.NewLine}You can use `{CommandChars[0]}` to call a command.");
+                                if (_commandChars.Length == 1)
+                                    output.AppendLine($"\nYou can use `{_commandChars[0]}` to call a command.");
                                 else
-                                    output.AppendLine($"{Environment.NewLine}You can use `{String.Join(" ", CommandChars.Take(CommandChars.Count - 1))}` and `{CommandChars.Last()}` to call a command.");
+                                    output.AppendLine($"\nYou can use `{string.Join(" ", CommandChars.Take(_commandChars.Length - 1))}` and `{_commandChars.Last()}` to call a command.");
 
                                 output.AppendLine("`help <command>` can tell you more about how to use a command.");
 
@@ -80,8 +70,9 @@ namespace Discord.Commands
                             }
                             else
                             {
-                                if (_commands.ContainsKey(e.Args[0]))
-                                    await Reply(e, CommandDetails(_commands[e.Args[0]]));
+								var cmd = _map.GetCommand(e.Args[0]);
+                                if (cmd != null)
+                                    await Reply(e, CommandDetails(cmd));
                                 else
                                     await Reply(e, $"`{e.Args[0]}` is not a valid command.");
                             }
@@ -99,7 +90,7 @@ namespace Discord.Commands
                 string msg = e.Message.Text;
                 if (msg.Length == 0) return;
 
-                if (UseCommandChar)
+                if (_commandChars.Length > 0)
                 {
                     bool isPrivate = e.Message.Channel.IsPrivate;
                     bool hasCommandChar = CommandChars.Contains(msg[0]);
@@ -112,44 +103,41 @@ namespace Discord.Commands
                         return; // Same, but public.
                 }
 
-                string cmd;
-                CommandPart[] args;
-                if (!CommandParser.Parse(msg, out cmd, out args))
-                    return;
-
-                if (_commands.ContainsKey(cmd))
-                {
-                    Command comm = _commands[cmd];
-					
-					//Clean args
+				//Parse command
+				Command command;
+				int argPos;
+				CommandParser.ParseCommand(msg, _map, out command, out argPos);				
+				if (command == null)
+				{
+					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null, null);
+					RaiseCommandError(CommandErrorType.UnknownCommand, errorArgs);
+					return;
+				}
+				else
+				{
+					//Parse arguments
+					CommandPart[] args;
+					if (!CommandParser.ParseArgs(msg, argPos, command, out args))
+					{
+						CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null, null);
+						RaiseCommandError(CommandErrorType.InvalidInput, errorArgs);
+						return;
+					}
 					int argCount = args.Length;
-					string[] newArgs = null;
 
-                    if (comm.MaxArgs != null && argCount > 0)
-                    {
-                        newArgs = new string[(int)comm.MaxArgs];
-                        for (int j = 0; j < newArgs.Length; j++)
-                            newArgs[j] = args[j].Value;
-                    }
-                    else if (comm.MaxArgs == null && comm.MinArgs == null)
-                    {
-                        newArgs = new string[argCount];
-                        for (int j = 0; j < newArgs.Length; j++)
-                            newArgs[j] = args[j].Value;
-                    }
-
+					//Get information for the rest of the steps
 					int userPermissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
-					var eventArgs = new CommandEventArgs(e.Message, comm, userPermissions, newArgs);
+					var eventArgs = new CommandEventArgs(e.Message, command, userPermissions, args.Select(x => x.Value).ToArray());
 
 					// Check permissions
-					if (userPermissions < comm.MinPerms)
+					if (userPermissions < command.MinPerms)
 					{
 						RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
 						return;
 					}
-                    
+
 					//Check arg count
-					if (argCount < comm.MinArgs)
+					if (argCount < command.MinArgs)
 					{
 						RaiseCommandError(CommandErrorType.BadArgCount, eventArgs);
 						return;
@@ -159,21 +147,13 @@ namespace Discord.Commands
 					try
 					{
 						RaiseRanCommand(eventArgs);
-                        var task = comm.Handler(eventArgs);
-                        if (task != null)
-                            await task.ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
-                    }
-                }
-                else
-                {
-                    CommandEventArgs eventArgs = new CommandEventArgs(e.Message, null, null, null);
-					RaiseCommandError(CommandErrorType.UnknownCommand, eventArgs);
-                    return;
-                }
+						await command.Run(eventArgs).ConfigureAwait(false);
+					}
+					catch (Exception ex)
+					{
+						RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
+					}
+				}
             };
         }
         
@@ -198,7 +178,7 @@ namespace Discord.Commands
             else if (command.MinArgs == null && command.MaxArgs != null)
                 output.Append($" ≤{command.MaxArgs.ToString()} Args");
 
-            output.Append($": {command.Description}");
+            output.Append($": {command.Description ?? "No description set for this command."}");
 
             return output.ToString();
         }
@@ -216,13 +196,14 @@ namespace Discord.Commands
 		public CommandBuilder CreateCommand(string cmd)
 		{
 			var command = new Command(cmd);
-			_commands.Add(cmd, command);
-			return new CommandBuilder(command);
+			_commands.Add(command);
+			return new CommandBuilder(null, command, "");
 		}
 
 		internal void AddCommand(Command command)
 		{
-			_commands.Add(command.Text, command);
+			_commands.Add(command);
+			_map.AddCommand(command.Text, command);
 		}
 	}
 }

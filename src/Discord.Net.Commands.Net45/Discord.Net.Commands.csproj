@@ -43,6 +43,9 @@
     <Compile Include="..\Discord.Net.Commands\CommandBuilder.cs">
       <Link>CommandBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandMap.cs">
+      <Link>CommandMap.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandParser.cs">
       <Link>CommandParser.cs</Link>
     </Compile>

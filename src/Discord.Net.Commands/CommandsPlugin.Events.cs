@@ -22,7 +22,7 @@ namespace Discord.Commands
 		}
 	}
 
-	public enum CommandErrorType { Exception, UnknownCommand, BadPermissions, BadArgCount }
+	public enum CommandErrorType { Exception, UnknownCommand, BadPermissions, BadArgCount, InvalidInput }
 	public class CommandErrorEventArgs : CommandEventArgs
 	{
 		public CommandErrorType ErrorType { get; }
