@@ -32,7 +32,7 @@ namespace Discord.Commands
 		public string Text { get; }
 		public int? MinArgs { get; private set; }
 		public int? MaxArgs { get; private set; }
-		public int MinPerms { get; internal set; }
+		public int MinPermissions { get; internal set; }
         public bool IsHidden { get; internal set; }
         public string Description { get; internal set; }
 
@@ -40,7 +40,7 @@ namespace Discord.Commands
 		private string[] _aliases;
 
 		public IEnumerable<CommandParameter> Parameters => _parameters;
-		private CommandParameter[] _parameters;
+		internal CommandParameter[] _parameters;
 
 		private Func<CommandEventArgs, Task> _handler;
 

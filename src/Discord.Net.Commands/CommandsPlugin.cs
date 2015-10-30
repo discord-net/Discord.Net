@@ -18,7 +18,11 @@ namespace Discord.Commands
 		internal CommandMap Map => _map;
 		private readonly CommandMap _map;
 
-		public char ComamndChar { get { return _commandChars[0]; } set { _commandChars = new char[] { value }; } }
+		public char? ComamndChar
+		{
+			get { return _commandChars.Length > 0 ? _commandChars[0] : (char?)null; }
+			set { _commandChars = value != null ? new char[] { value.Value } : new char[0]; }
+		}
         public IEnumerable<char> CommandChars { get { return _commandChars; } set { _commandChars = value.ToArray(); } }
         private char[] _commandChars;
 		
@@ -54,16 +58,20 @@ namespace Discord.Commands
                             if (e.Args == null)
 							{
 								int permissions = getPermissions(e.User);
+
 								StringBuilder output = new StringBuilder();
                                 output.AppendLine("These are the commands you can use:");
                                 output.Append("`");
-								output.Append(string.Join(", ", _commands.Select(x => permissions >= x.MinPerms && !x.IsHidden)));
+								output.Append(string.Join(", ", _commands.Select(x => permissions >= x.MinPermissions && !x.IsHidden)));
                                 output.Append("`");
 
-                                if (_commandChars.Length == 1)
-                                    output.AppendLine($"\nYou can use `{_commandChars[0]}` to call a command.");
-                                else
-                                    output.AppendLine($"\nYou can use `{string.Join(" ", CommandChars.Take(_commandChars.Length - 1))}` and `{_commandChars.Last()}` to call a command.");
+								if (_commandChars.Length > 0)
+								{
+									if (_commandChars.Length == 1)
+										output.AppendLine($"\nYou can use `{_commandChars[0]}` to call a command.");
+									else
+										output.AppendLine($"\nYou can use `{string.Join(" ", CommandChars.Take(_commandChars.Length - 1))}` and `{_commandChars.Last()}` to call a command.");
+								}
 
                                 output.AppendLine("`help <command>` can tell you more about how to use a command.");
 
@@ -84,17 +92,17 @@ namespace Discord.Commands
 
             client.MessageReceived += async (s, e) =>
             {
-                // This will need to be changed once a built in help command is made
                 if (_commands.Count == 0)  return;
                 if (e.Message.IsAuthor) return;
 
                 string msg = e.Message.Text;
                 if (msg.Length == 0) return;
 
+				//Check for command char if one is provided
                 if (_commandChars.Length > 0)
                 {
                     bool isPrivate = e.Message.Channel.IsPrivate;
-                    bool hasCommandChar = CommandChars.Contains(msg[0]);
+                    bool hasCommandChar = _commandChars.Contains(msg[0]);
                     if (hasCommandChar)
                         msg = msg.Substring(1);
 
@@ -116,31 +124,24 @@ namespace Discord.Commands
 				}
 				else
 				{
+					int userPermissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
+
 					//Parse arguments
-					CommandPart[] args;
-					if (!CommandParser.ParseArgs(msg, argPos, command, out args))
+					string[] args;
+					var error = CommandParser.ParseArgs(msg, argPos, command, out args);
+                    if (error != null)
 					{
-						CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null, null);
-						RaiseCommandError(CommandErrorType.InvalidInput, errorArgs);
+						var errorArgs = new CommandEventArgs(e.Message, command, userPermissions, null);
+						RaiseCommandError(error.Value, errorArgs);
 						return;
 					}
-					int argCount = args.Length;
-
-					//Get information for the rest of the steps
-					int userPermissions = _getPermissions != null ? _getPermissions(e.Message.User) : 0;
-					var eventArgs = new CommandEventArgs(e.Message, command, userPermissions, args.Select(x => x.Value).ToArray());
+					
+					var eventArgs = new CommandEventArgs(e.Message, command, userPermissions, args);
 
 					// Check permissions
-					if (userPermissions < command.MinPerms)
+					if (userPermissions < command.MinPermissions)
 					{
 						RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
-						return;
-					}
-
-					//Check arg count
-					if (argCount < command.MinArgs)
-					{
-						RaiseCommandError(CommandErrorType.BadArgCount, eventArgs);
 						return;
 					}
 
