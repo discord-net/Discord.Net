@@ -49,5 +49,12 @@ namespace Discord
 				.Select(x => x.Groups[1].Value)
 				.Where(x => x != null);
 		}
+		internal static IEnumerable<string> GetChannelIds(string text)
+		{
+			return _channelRegex.Matches(text)
+				.OfType<Match>()
+				.Select(x => x.Groups[1].Value)
+				.Where(x => x != null);
+		}
 	}
 }

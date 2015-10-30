@@ -125,6 +125,7 @@ namespace Discord
 			var userIds = !channel.IsPrivate ? Mention.GetUserIds(text).Distinct() : new string[0];
 			if (Config.UseMessageQueue)
 			{
+				var channelIds = !channel.IsPrivate ? Mention.GetChannelIds(text).Distinct() : new string[0];
 				var nonce = GenerateNonce();
 				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
                 var currentUser = msg.User;
@@ -136,9 +137,19 @@ namespace Discord
 					ChannelId = channel.Id,
 					IsTextToSpeech = isTextToSpeech
 				});
-				msg.Mentions = userIds.Select(x => _users[x, channel.Server.Id]).Where(x => x != null).ToArray();
-				msg.IsQueued = true;
 				msg.Nonce = nonce;
+				msg.IsQueued = true;
+
+				//IsPrivate check is already done earlier
+				msg.MentionedUsers = userIds
+					.Select(x => _users[x, channel.Server.Id])
+					.Where(x => x != null)
+					.ToArray();
+				msg.MentionedChannels = channelIds
+					.Select(x => _channels[x])
+					.Where(x => x != null && x.Server == channel.Server)
+					.ToArray();
+
 				_pendingMessages.Enqueue(msg);
 			}
 			else
@@ -258,7 +269,7 @@ namespace Discord
 						SendMessageResponse response = null;
 						try
 						{
-							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.Mentions.Select(x => x.Id), msg.Nonce, msg.IsTTS).ConfigureAwait(false);
+							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.MentionedUsers.Select(x => x.Id), msg.Nonce, msg.IsTTS).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }

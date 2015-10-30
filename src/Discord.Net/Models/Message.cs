@@ -125,8 +125,12 @@ namespace Discord
 		
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Mentions { get; internal set; }
-		
+		public IEnumerable<User> MentionedUsers { get; internal set; }
+
+		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
+		[JsonIgnore]
+		public IEnumerable<Channel> MentionedChannels { get; internal set; }
+
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Server Server => _channel.Value.Server;
@@ -208,13 +212,26 @@ namespace Discord
 				EditedTimestamp = model.EditedTimestamp;
 			if (model.Mentions != null)
 			{
-				Mentions = model.Mentions.Select(x => _client.Users[x.Id, Channel.Server?.Id]).ToArray();
-				IsMentioningMe = model.Mentions.Any(x => x.Id == _client.CurrentUserId);
+				MentionedUsers = model.Mentions
+					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
+					.ToArray();
+				IsMentioningMe = model.Mentions
+					.Any(x => x.Id == _client.CurrentUserId);
 			}
 			if (model.Content != null)
 			{
 				RawText = model.Content;
 				_cleanText = null;
+				
+				if (!Channel.IsPrivate)
+				{
+					MentionedChannels = Mention.GetChannelIds(model.Content)
+						.Select(x => _client.Channels[x])
+						.Where(x => x.Server == Channel.Server)
+						.ToArray();
+				}
+				else
+					MentionedChannels = new Channel[0];
 			}
 		}
 
