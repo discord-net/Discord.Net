@@ -49,7 +49,7 @@ namespace Discord.Commands
 				_isClosed = true;
 			return this;
 		}
-		public CommandBuilder IsHidden()
+		public CommandBuilder Hide()
 		{
 			_command.IsHidden = true;
 			return this;

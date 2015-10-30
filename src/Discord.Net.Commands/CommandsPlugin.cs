@@ -42,7 +42,7 @@ namespace Discord.Commands
             {
                 CreateCommand("help")
 					.Parameter("command", ParameterType.Optional)
-                    .IsHidden()
+                    .Hide()
                     .Info("Returns information about commands.")
                     .Do(async e =>
                     {
