@@ -51,7 +51,7 @@ namespace Discord
 				if (server == null)
 				{
 					server = _generatedServer = new Server(client, x);
-					server.Cache();
+					//server.Cache();
 				}
 				return server;
 			});
@@ -61,7 +61,7 @@ namespace Discord
 				if (inviter == null)
 				{
 					inviter = _generatedInviter = new User(client, x, _server.Id);
-					inviter.Cache();
+					//inviter.Cache();
 				}
 				return inviter;
 			});
@@ -71,7 +71,7 @@ namespace Discord
 				if (channel == null)
 				{
 					channel = _generatedChannel = new Channel(client, x, _server.Id, null);
-					channel.Cache();
+					//channel.Cache();
 				}
 				return channel;
 			});
