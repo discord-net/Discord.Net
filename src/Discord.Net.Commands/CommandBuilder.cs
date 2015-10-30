@@ -36,7 +36,7 @@ namespace Discord.Commands
 		{
 			if (_hasCatchAll)
 				throw new Exception("No parameters may be added after the catch-all");
-			if (_hasOptional && isOptional)
+			if (_hasOptional && !isOptional)
 				throw new Exception("Non-optional parameters may not be added after an optional one");
 
 			_params.Add(new CommandParameter(name, isOptional, isCatchAll));
