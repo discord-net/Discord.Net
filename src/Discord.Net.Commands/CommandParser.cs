@@ -2,19 +2,6 @@
 
 namespace Discord.Commands
 {
-	public class CommandPart
-	{
-		public string Value { get; }
-		public int Index { get; }
-
-		internal CommandPart(string value, int index)
-		{
-			Value = value;
-			Index = index;
-		}
-	}
-
-	//TODO: Check support for escaping
 	internal static class CommandParser
 	{
 		private enum CommandParserPart
@@ -69,23 +56,40 @@ namespace Discord.Commands
 			return command != null;
 		}
 
-		public static bool ParseArgs(string input, int startPos, Command command, out CommandPart[] args)
+		//TODO: Check support for escaping
+		public static CommandErrorType? ParseArgs(string input, int startPos, Command command, out string[] args)
 		{
 			CommandParserPart currentPart = CommandParserPart.None;
 			int startPosition = startPos;
 			int endPosition = startPos;
 			int inputLength = input.Length;
 			bool isEscaped = false;
-			List<CommandPart> argList = new List<CommandPart>();
+
+			var expectedArgs = command._parameters;
+			List<string> argList = new List<string>();
+			CommandParameter parameter = null;
 			
 			args = null;
 
 			if (input == "")
-				return false;
+				return CommandErrorType.InvalidInput;
 
 			while (endPosition < inputLength)
 			{
-				char currentChar = input[endPosition++];
+				if (startPosition == endPosition && (parameter == null || parameter.Type != ParameterType.Multiple)) //Is first char of a new arg
+				{
+					if (argList.Count == command.MaxArgs)
+						return CommandErrorType.BadArgCount;
+
+					parameter = command._parameters[argList.Count];
+					if (parameter.Type == ParameterType.Unparsed)
+					{
+						argList.Add(input.Substring(startPosition));
+						break;
+					}
+				}
+
+                char currentChar = input[endPosition++];
 				if (isEscaped)
 					isEscaped = false;
 				else if (currentChar == '\\')
@@ -113,7 +117,7 @@ namespace Discord.Commands
 							else
 							{
 								currentPart = CommandParserPart.None;
-								argList.Add(new CommandPart(temp, startPosition));
+								argList.Add(temp);
 								startPosition = endPosition;
 							}
 						}
@@ -123,28 +127,31 @@ namespace Discord.Commands
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(new CommandPart(temp, startPosition));
+							argList.Add(temp);
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
-							return false;
+							return CommandErrorType.InvalidInput;
 						break;
 					case CommandParserPart.DoubleQuotedParameter:
 						if ((!isEscaped && currentChar == '\"'))
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(new CommandPart(temp, startPosition));
+							argList.Add(temp);
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
-							return false;
+							return CommandErrorType.InvalidInput;
 						break;
 				}
 			}
 
+			if (argList.Count < command.MinArgs)
+				return CommandErrorType.BadArgCount;
+
 			args = argList.ToArray();
-			return true;
+			return null;
 		}
 	}
 }

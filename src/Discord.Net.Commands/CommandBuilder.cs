@@ -38,7 +38,7 @@ namespace Discord.Commands
 		{
 			if (_isClosed)
 				throw new Exception($"No parameters may be added after a {nameof(ParameterType.Multiple)} or {nameof(ParameterType.Unparsed)} parameter.");
-			if (!_allowRequired && type != ParameterType.Required)
+			if (!_allowRequired && type == ParameterType.Required)
 				throw new Exception($"{nameof(ParameterType.Required)} parameters may not be added after an optional one");
 
 			_params.Add(new CommandParameter(name, type));
@@ -57,7 +57,7 @@ namespace Discord.Commands
 
 		public CommandBuilder MinPermissions(int level)
 		{
-			_command.MinPerms = level;
+			_command.MinPermissions = level;
             return this;
 		}
 
@@ -125,7 +125,7 @@ namespace Discord.Commands
         public CommandBuilder CreateCommand(string cmd)
 		{
             var command = new Command(CommandBuilder.AppendPrefix(_prefix, cmd));
-			command.MinPerms = _defaultMinPermissions;
+			command.MinPermissions = _defaultMinPermissions;
             return new CommandBuilder(_plugin, command, _prefix);
 		}
 	}
