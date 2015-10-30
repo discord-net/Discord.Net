@@ -36,7 +36,7 @@ namespace Discord.Commands
         }
 	}
 
-	public partial class CommandsPlugin
+	public partial class CommandService
 	{
 		public event EventHandler<CommandEventArgs> RanCommand;
 		private void RaiseRanCommand(CommandEventArgs args)

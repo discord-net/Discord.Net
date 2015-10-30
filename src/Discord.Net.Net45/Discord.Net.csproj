@@ -232,6 +232,9 @@
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\IService.cs">
+      <Link>IService.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
     </Compile>
