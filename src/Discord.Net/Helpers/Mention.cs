@@ -24,7 +24,7 @@ namespace Discord
 			text = _userRegex.Replace(text, new MatchEvaluator(e =>
 			{
 				string id = e.Value.Substring(2, e.Value.Length - 3);
-				var user = client.Users[id, server.Id];
+				var user = client.Users[id, server?.Id];
 				if (user != null)
 					return '@' + user.Name;
 				else //User not found
@@ -34,7 +34,7 @@ namespace Discord
 			{
 				string id = e.Value.Substring(2, e.Value.Length - 3);
 				var channel = client.Channels[id];
-				if (channel != null && channel.Server.Id == server.Id)
+				if (channel != null && channel.Server?.Id == server?.Id)
 					return '#' + channel.Name;
 				else //Channel not found
 					return '#' + e.Value;
