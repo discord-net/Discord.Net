@@ -88,8 +88,8 @@
     <Compile Include="..\Discord.Net\API\Enums\PermissionTarget.cs">
       <Link>API\Enums\PermissionTarget.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Enums\Regions.cs">
-      <Link>API\Enums\Regions.cs</Link>
+    <Compile Include="..\Discord.Net\API\Enums\Region.cs">
+      <Link>API\Enums\Region.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Enums\StringEnum.cs">
       <Link>API\Enums\StringEnum.cs</Link>

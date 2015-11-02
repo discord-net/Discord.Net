@@ -24,5 +24,11 @@
 					return new PermissionTarget(value);
 			}
 		}
+
+		public static implicit operator PermissionTarget(string value) => FromString(value);
+		public static bool operator ==(PermissionTarget a, PermissionTarget b) => a?._value == b?._value;
+		public static bool operator !=(PermissionTarget a, PermissionTarget b) => a?._value != b?._value;
+		public override bool Equals(object obj) => (obj as PermissionTarget)?._value == _value;
+		public override int GetHashCode() => _value.GetHashCode();
 	}
 }

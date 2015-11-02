@@ -28,5 +28,11 @@
 					return new UserStatus(value);
 			}
 		}
+
+		public static implicit operator UserStatus(string value) => FromString(value);
+		public static bool operator ==(UserStatus a, UserStatus b) => a?._value == b?._value;
+		public static bool operator !=(UserStatus a, UserStatus b) => a?._value != b?._value;
+		public override bool Equals(object obj) => (obj as UserStatus)?._value == _value;
+		public override int GetHashCode() => _value.GetHashCode();
 	}
 }
