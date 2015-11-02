@@ -98,10 +98,10 @@ namespace Discord
 					if (channel != null)
 						query = query.Concat(new Channel[] { channel });
 				}
-				else if (name[0] == '#') //If we somehow get text starting with # but isn't a mention
+				else if (name[0] == '#' && (type == (ChannelType)null || type == ChannelType.Text)) //If we somehow get text starting with # but isn't a mention
 				{
 					string name2 = name.Substring(1);
-					query = query.Concat(server.Channels.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
+					query = query.Concat(server.TextChannels.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
 				}
 			}
 
