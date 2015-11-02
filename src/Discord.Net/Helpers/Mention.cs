@@ -15,7 +15,7 @@ namespace Discord
 		/// <summary> Returns the string used to create a channel mention. </summary>
 		public static string Channel(Channel channel)
 			=> $"<#{channel.Id}>";
-		/// <summary> Returns the string used to create a channel mention. </summary>
+		/// <summary> Returns the string used to create a mention to everyone in a channel. </summary>
 		public static string Everyone()
 			=> $"@everyone";
 
