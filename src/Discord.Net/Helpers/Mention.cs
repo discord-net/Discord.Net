@@ -52,11 +52,12 @@ namespace Discord
 					return '#' + e.Value;
 			}));
 		}
-		internal static string CleanRoleMentions(DiscordClient client, Server server, string text, List<Role> roles = null)
+		internal static string CleanRoleMentions(DiscordClient client, User user, Channel channel, string text, List<Role> roles = null)
 		{
 			return _roleRegex.Replace(text, new MatchEvaluator(e =>
 			{
-				roles.Add(server.EveryoneRole);
+				if (roles != null && user.GetPermissions(channel).MentionEveryone)
+					roles.Add(channel.Server.EveryoneRole);
 				return e.Value;
 			}));
 		}

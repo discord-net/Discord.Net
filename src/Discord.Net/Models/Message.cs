@@ -177,7 +177,8 @@ namespace Discord
 
 		internal void Update(MessageInfo model)
 		{
-			var server = Server;
+			var channel = Channel;
+			var server = channel.Server;
 			if (model.Attachments != null)
 			{
 				Attachments = model.Attachments
@@ -226,7 +227,7 @@ namespace Discord
 				if (server != null)
 				{
 					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
-					text = Mention.CleanRoleMentions(_client, server, text, mentionedRoles);
+					text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
 				}
 				Text = text;
 
