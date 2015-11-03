@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Commands
 {
@@ -9,19 +10,29 @@ namespace Discord.Commands
 		private Command _command;
 		private readonly Dictionary<string, CommandMap> _subCommands;
 
+		public Command Command => _command;
+		public IEnumerable<Command> SubCommands => _subCommands.Select(x => x.Value.Command).Where(x => x != null);
+
 		public CommandMap(CommandMap parent)
 		{
 			_parent = parent;
 			_subCommands = new Dictionary<string, CommandMap>();
 		}
-
+		
 		public CommandMap GetMap(string text)
 		{
-			CommandMap map;
-			if (_subCommands.TryGetValue(text, out map))
-				return map;
-			else
-				return null;
+			return GetMap(0, text.Split(' '));
+		}
+		public CommandMap GetMap(int index, string[] parts)
+		{
+			if (index != parts.Length)
+			{
+				string nextPart = parts[index];
+				CommandMap nextGroup;
+				if (_subCommands.TryGetValue(nextPart, out nextGroup))
+					return nextGroup.GetMap(index + 1, parts);
+			}
+			return this;
 		}
 
 		public Command GetCommand()
