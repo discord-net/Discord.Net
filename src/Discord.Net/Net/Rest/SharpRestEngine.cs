@@ -52,19 +52,15 @@ namespace Discord.Net.Rest
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)
 		{
-			bool hasRetried = false;
+			int retryCount = 0;
 			while (true)
 			{
 				var response = await _client.ExecuteTaskAsync(request, cancelToken).ConfigureAwait(false);
 				int statusCode = (int)response.StatusCode;
 				if (statusCode == 0) //Internal Error
 				{
-					if (!hasRetried)
-					{
-						//SSL/TTS Error seems to work if we immediately retry
-						hasRetried = true;
-						continue;
-					}
+					if (response.ErrorException.HResult == -2146233079 && retryCount++ < 5) //The request was aborted: Could not create SSL/TLS secure channel.
+						continue; //Seems to work if we immediately retry
 					throw response.ErrorException;
 				}
 				if (statusCode < 200 || statusCode >= 300) //2xx = Success
