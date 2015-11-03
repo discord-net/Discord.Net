@@ -97,8 +97,6 @@ namespace Discord
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
 		public bool IsMentioningMe { get; private set; }
-		/// <summary> Returns true if @everyone was mentioned by someone with permissions to do so. </summary>
-		public bool IsMentioningEveryone { get; private set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns true if the message is still in the outgoing message queue. </summary>
@@ -202,9 +200,7 @@ namespace Discord
 					return new Embed(x.Url, x.Type, x.Title, x.Description, author, provider, thumbnail);
 				}).ToArray();
 			}
-
-			if (model.IsMentioningEveryone != null)
-				IsMentioningEveryone = model.IsMentioningEveryone.Value;
+			
 			if (model.IsTextToSpeech != null)
 				IsTTS = model.IsTextToSpeech.Value;
 			if (model.Timestamp != null)
