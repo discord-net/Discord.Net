@@ -228,15 +228,24 @@ namespace Discord
 					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
 					text = Mention.CleanRoleMentions(_client, server, text, mentionedRoles);
 				}
+				Text = text;
 
 				//MentionedUsers = mentionedUsers;
 				MentionedChannels = mentionedChannels;
 				MentionedRoles = mentionedRoles;
 			}
-			
-			IsMentioningMe = model.Mentions
-				.Any(x => x.Id == _client.CurrentUserId) ||
-				(server != null && MentionedRoles.Any(x => server.CurrentUser.HasRole(x)));
+
+			if (server != null)
+			{
+				var me = server.CurrentUser;
+				IsMentioningMe = (MentionedUsers?.Contains(me) ?? false) || 
+					(MentionedRoles?.Any(x => me.HasRole(x)) ?? false);
+			}
+			else
+			{
+				var me = _client.CurrentUser;
+				IsMentioningMe = MentionedUsers?.Contains(me) ?? false;
+            }
         }
 
 		public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
