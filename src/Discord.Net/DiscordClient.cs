@@ -310,7 +310,8 @@ namespace Discord
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
 							_currentUser = _users.GetOrAdd(data.User.Id, null);
 							_currentUser.Update(data.User);
-							foreach (var model in data.Guilds)
+							_currentUser.GlobalUser.Update(data.User);
+                            foreach (var model in data.Guilds)
 							{
 								if (!model.Unavailable)
 								{
