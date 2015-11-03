@@ -24,5 +24,11 @@
 					return new ChannelType(value);
 			}
 		}
+
+		public static implicit operator ChannelType(string value) => FromString(value);
+		public static bool operator ==(ChannelType a, ChannelType b) => a?._value == b?._value;
+		public static bool operator !=(ChannelType a, ChannelType b) => a?._value != b?._value;
+		public override bool Equals(object obj) => (obj as ChannelType)?._value == _value;
+		public override int GetHashCode() => _value.GetHashCode();
 	}
 }

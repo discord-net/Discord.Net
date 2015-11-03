@@ -98,14 +98,14 @@ namespace Discord
 					if (channel != null)
 						query = query.Concat(new Channel[] { channel });
 				}
-				else if (name[0] == '#') //If we somehow get text starting with # but isn't a mention
+				else if (name[0] == '#' && (type == null || type == ChannelType.Text)) //If we somehow get text starting with # but isn't a mention
 				{
 					string name2 = name.Substring(1);
-					query = query.Concat(server.Channels.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
+					query = query.Concat(server.TextChannels.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
 				}
 			}
 
-			if (type != (string)null)
+			if (type != null)
 				query = query.Where(x => x.Type == type);
 			return query;
 		}
@@ -115,7 +115,7 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (type == (string)null) throw new ArgumentNullException(nameof(type));
+			if (type == null) throw new ArgumentNullException(nameof(type));
 			CheckReady();
 
 			var response = await _api.CreateChannel(server.Id, name, type.Value).ConfigureAwait(false);

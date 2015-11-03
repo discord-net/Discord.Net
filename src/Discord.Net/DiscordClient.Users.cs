@@ -250,7 +250,7 @@ namespace Discord
 
 		public Task SetStatus(UserStatus status)
 		{
-			if (status == (string)null) throw new ArgumentNullException(nameof(status));
+			if (status == null) throw new ArgumentNullException(nameof(status));
 			if (status != UserStatus.Online && status != UserStatus.Idle)
 				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
 			CheckReady();

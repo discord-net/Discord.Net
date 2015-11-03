@@ -84,7 +84,7 @@ namespace Discord
 		public async Task<Server> CreateServer(string name, Region region)
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (region == (string)null) throw new ArgumentNullException(nameof(region));
+			if (region == null) throw new ArgumentNullException(nameof(region));
 			CheckReady();
 
 			var response = await _api.CreateServer(name, region.Value).ConfigureAwait(false);
