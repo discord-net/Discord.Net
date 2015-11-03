@@ -93,7 +93,6 @@ namespace Discord
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
 			return SendMessage(channel, text, false);
@@ -103,7 +102,6 @@ namespace Discord
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
 			return SendMessage(channel, text, false);
@@ -113,7 +111,6 @@ namespace Discord
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
             CheckReady();
 
 			var channel = await CreatePMChannel(user).ConfigureAwait(false);
@@ -122,10 +119,10 @@ namespace Discord
 		private async Task<Message> SendMessage(Channel channel, string text, bool isTextToSpeech)
 		{
 			Message msg;
-			var userIds = !channel.IsPrivate ? Mention.GetUserIds(text).Distinct() : new string[0];
+			var server = channel.Server;
+
 			if (Config.UseMessageQueue)
 			{
-				var channelIds = !channel.IsPrivate ? Mention.GetChannelIds(text).Distinct() : new string[0];
 				var nonce = GenerateNonce();
 				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
                 var currentUser = msg.User;
@@ -140,21 +137,21 @@ namespace Discord
 				msg.Nonce = nonce;
 				msg.IsQueued = true;
 
-				//IsPrivate check is already done earlier
-				msg.MentionedUsers = userIds
-					.Select(x => _users[x, channel.Server.Id])
-					.Where(x => x != null)
-					.ToArray();
-				msg.MentionedChannels = channelIds
-					.Select(x => _channels[x])
-					.Where(x => x != null && x.Server == channel.Server)
-					.ToArray();
+				if (text.Length > MaxMessageSize)
+					throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 
 				_pendingMessages.Enqueue(msg);
 			}
 			else
 			{
-				var model = await _api.SendMessage(channel.Id, text, userIds, null, isTextToSpeech).ConfigureAwait(false);
+				var mentionedUsers = new List<User>();
+				if (!channel.IsPrivate)
+					text = Mention.CleanUserMentions(this, server, text, mentionedUsers);
+
+				if (text.Length > MaxMessageSize)
+					throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
+
+				var model = await _api.SendMessage(channel.Id, text, mentionedUsers.Select(x => x.Id), null, isTextToSpeech).ConfigureAwait(false);
 				msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 				msg.Update(model);
 				RaiseMessageSent(msg);
@@ -179,13 +176,17 @@ namespace Discord
 		{
 			if (message == null) throw new ArgumentNullException(nameof(message));
 			if (text == null) throw new ArgumentNullException(nameof(text));
-			if (text.Length > MaxMessageSize) throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
 			CheckReady();
 
-			if (text != null && text.Length > MaxMessageSize)
-				text = text.Substring(0, MaxMessageSize);
+			var channel = message.Channel;
+			var mentionedUsers = new List<User>();
+			if (!channel.IsPrivate)
+				text = Mention.CleanUserMentions(this, channel.Server, text, mentionedUsers);
 
-			return _api.EditMessage(message.Id, message.Channel.Id, text, Mention.GetUserIds(text));
+			if (text.Length > MaxMessageSize)
+				throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
+
+			return _api.EditMessage(message.Id, message.Channel.Id, text, mentionedUsers.Select(x => x.Id));
 		}
 
 		/// <summary> Deletes the provided message. </summary>

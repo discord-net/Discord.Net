@@ -90,9 +90,7 @@ namespace Discord
 				Height = height;
 			}
 		}
-
-		private string _cleanText;
-		
+				
 		/// <summary> Returns the local unique identifier for this message. </summary>
 		public string Nonce { get; internal set; }
 
@@ -110,8 +108,7 @@ namespace Discord
 		/// <summary> Returns the raw content of this message as it was received from the server.. </summary>
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
-		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = Mention.ConvertToNames(_client, Server, RawText));
+		public string Text { get; private set; } 
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>
@@ -130,6 +127,10 @@ namespace Discord
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
+
+		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
+		[JsonIgnore]
+		public IEnumerable<Role> MentionedRoles { get; internal set; }
 
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
@@ -220,18 +221,23 @@ namespace Discord
 			}
 			if (model.Content != null)
 			{
-				RawText = model.Content;
-				_cleanText = null;
-				
-				if (!Channel.IsPrivate)
+				var server = Server;
+				string text = model.Content;
+				RawText = text;
+
+				//var mentionedUsers = new List<User>();
+				var mentionedChannels = new List<Channel>();
+				var mentionedRoles = new List<Role>();
+				text = Mention.CleanUserMentions(_client, server, text/*, mentionedUsers*/);
+				if (server != null)
 				{
-					MentionedChannels = Mention.GetChannelIds(model.Content)
-						.Select(x => _client.Channels[x])
-						.Where(x => x.Server == Channel.Server)
-						.ToArray();
+					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
+					text = Mention.CleanRoleMentions(_client, server, text, mentionedRoles);
 				}
-				else
-					MentionedChannels = new Channel[0];
+
+				//MentionedUsers = mentionedUsers;
+				MentionedChannels = mentionedChannels;
+				MentionedRoles = mentionedRoles;
 			}
 		}
 
