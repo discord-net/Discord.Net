@@ -177,6 +177,7 @@ namespace Discord
 
 		internal void Update(MessageInfo model)
 		{
+			var server = Server;
 			if (model.Attachments != null)
 			{
 				Attachments = model.Attachments
@@ -212,12 +213,9 @@ namespace Discord
 				MentionedUsers = model.Mentions
 					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
 					.ToArray();
-				IsMentioningMe = model.Mentions
-					.Any(x => x.Id == _client.CurrentUserId);
 			}
 			if (model.Content != null)
 			{
-				var server = Server;
 				string text = model.Content;
 				RawText = text;
 
@@ -235,7 +233,11 @@ namespace Discord
 				MentionedChannels = mentionedChannels;
 				MentionedRoles = mentionedRoles;
 			}
-		}
+			
+			IsMentioningMe = model.Mentions
+				.Any(x => x.Id == _client.CurrentUserId) ||
+				(server != null && MentionedRoles.Any(x => server.CurrentUser.HasRole(x)));
+        }
 
 		public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
 		public override int GetHashCode() => Id.GetHashCode();
