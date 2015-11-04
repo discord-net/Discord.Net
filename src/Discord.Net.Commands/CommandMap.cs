@@ -31,6 +31,8 @@ namespace Discord.Commands
 				CommandMap nextGroup;
 				if (_subCommands.TryGetValue(nextPart, out nextGroup))
 					return nextGroup.GetMap(index + 1, parts);
+				else
+					return null;
 			}
 			return this;
 		}

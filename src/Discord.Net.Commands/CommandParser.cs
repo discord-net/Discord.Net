@@ -148,7 +148,12 @@ namespace Discord.Commands
 			}
 
 			if (argList.Count < command.MinArgs)
-				return CommandErrorType.BadArgCount;
+			{
+				/*if (command._parameters[command._parameters.Length - 1].Type == ParameterType.Unparsed)
+					argList.Add("");
+				else*/
+					return CommandErrorType.BadArgCount;
+			}
 
 			args = argList.ToArray();
 			return null;
