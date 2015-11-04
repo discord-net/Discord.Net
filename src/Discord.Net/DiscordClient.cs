@@ -17,6 +17,7 @@ namespace Discord
 		private readonly JsonSerializer _serializer;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly ConcurrentDictionary<string, DiscordWSClient> _voiceClients;
+		private readonly Dictionary<Type, IService> _services;
 		private bool _sentInitialLog;
 		private uint _nextVoiceClientId;
 		private UserStatus _status;
@@ -46,6 +47,7 @@ namespace Discord
 			_roles = new Roles(this, cacheLock);
 			_servers = new Servers(this, cacheLock);
 			_globalUsers = new GlobalUsers(this, cacheLock);
+			_services = new Dictionary<Type, IService>();
 
 			_status = UserStatus.Online;
 
@@ -168,7 +170,6 @@ namespace Discord
 			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #endif
 		}
-
 		internal override VoiceWebSocket CreateVoiceSocket()
 		{
 			var socket = base.CreateVoiceSocket();
@@ -216,7 +217,6 @@ namespace Discord
 			await Connect(token).ConfigureAwait(false);
 			return token;
 		}
-
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
 		{
@@ -273,6 +273,22 @@ namespace Discord
 			_currentUser = null;
 		}
 
+		public void AddService<T>(T obj)
+			where T : class, IService
+		{
+			_services.Add(typeof(T), obj);
+			obj.Install(this);
+		}
+		public T GetService<T>()
+			where T : class, IService
+		{
+			IService service;
+			if (_services.TryGetValue(typeof(T), out service))
+				return service as T;
+			else
+				return null;
+		}
+
 		protected override IEnumerable<Task> GetTasks()
 		{
 			if (Config.UseMessageQueue)
@@ -294,7 +310,8 @@ namespace Discord
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
 							_currentUser = _users.GetOrAdd(data.User.Id, null);
 							_currentUser.Update(data.User);
-							foreach (var model in data.Guilds)
+							_currentUser.GlobalUser.Update(data.User);
+                            foreach (var model in data.Guilds)
 							{
 								if (!model.Unavailable)
 								{

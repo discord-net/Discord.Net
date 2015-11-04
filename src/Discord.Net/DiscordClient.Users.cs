@@ -141,7 +141,7 @@ namespace Discord
 			return _users[user?.Id, server.Id];
 		}
 
-		/// <summary> Returns all users in with the specified server and name, along with their server-specific data. </summary>
+		/// <summary> Returns all users with the specified server and name, along with their server-specific data. </summary>
 		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
 		public IEnumerable<User> FindUsers(Server server, string name, string discriminator = null, bool exactMatch = false)
 		{
@@ -149,16 +149,39 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			IEnumerable<User> query;
-			if (!exactMatch && name.StartsWith("@"))
+			return FindUsers(server.Members, server.Id, name, discriminator, exactMatch);
+		}
+		/// <summary> Returns all users with the specified channel and name, along with their server-specific data. </summary>
+		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		public IEnumerable<User> FindUsers(Channel channel, string name, string discriminator = null, bool exactMatch = false)
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (name == null) throw new ArgumentNullException(nameof(name));
+			CheckReady();
+
+			return FindUsers(channel.Members, channel.IsPrivate ? null : channel.Server.Id, name, discriminator, exactMatch);
+        }
+
+		private IEnumerable<User> FindUsers(IEnumerable<User> users, string serverId, string name, string discriminator = null, bool exactMatch = false)
+		{
+			var query = users.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+
+			if (!exactMatch && name.Length >= 2)
 			{
-				string name2 = name.Substring(1);
-				query = server.Members.Where(x =>
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) ||
-					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
+				if (name[0] == '<' && name[1] == '@' && name[name.Length - 1] == '>') //Parse mention
+				{
+					string id = name.Substring(2, name.Length - 3);
+					var channel = _users[id, serverId];
+					if (channel != null)
+						query = query.Concat(new User[] { channel });
+				}
+				else if (name[0] == '@') //If we somehow get text starting with @ but isn't a mention
+				{
+					string name2 = name.Substring(1);
+					query = query.Concat(users.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
+				}
 			}
-			else
-				query = server.Members.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+
 			if (discriminator != null)
 				query = query.Where(x => x.Discriminator == discriminator);
 			return query;
@@ -227,7 +250,7 @@ namespace Discord
 
 		public Task SetStatus(UserStatus status)
 		{
-			if (status == (string)null) throw new ArgumentNullException(nameof(status));
+			if (status == null) throw new ArgumentNullException(nameof(status));
 			if (status != UserStatus.Online && status != UserStatus.Idle)
 				throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
 			CheckReady();

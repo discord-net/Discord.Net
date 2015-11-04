@@ -34,5 +34,11 @@
 					return new Region(value);
 			}
 		}
+
+		public static implicit operator Region(string value) => FromString(value);
+		public static bool operator ==(Region a, Region b) => a?._value == b?._value;
+		public static bool operator !=(Region a, Region b) => a?._value != b?._value;
+		public override bool Equals(object obj) => (obj as Region)?._value == _value;
+		public override int GetHashCode() => _value.GetHashCode();
 	}
 }

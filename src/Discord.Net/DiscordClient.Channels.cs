@@ -84,26 +84,30 @@ namespace Discord
 		public IEnumerable<Channel> FindChannels(Server server, string name, ChannelType type = null, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
+			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
+			
+			var query = server.Channels.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 
-			IEnumerable<Channel> result;
-			if (!exactMatch && name.StartsWith("#"))
+			if (!exactMatch && name.Length >= 2)
 			{
-				string name2 = name.Substring(1);
-				result = _channels.Where(x => x.Server == server &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) ||
-					string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
-			}
-			else
-			{
-				result = _channels.Where(x => x.Server == server &&
-					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+				if (name[0] == '<' && name[1] == '#' && name[name.Length - 1] == '>') //Parse mention
+				{					
+					string id = name.Substring(2, name.Length - 3);
+					var channel = _channels[id];
+					if (channel != null)
+						query = query.Concat(new Channel[] { channel });
+				}
+				else if (name[0] == '#' && (type == null || type == ChannelType.Text)) //If we somehow get text starting with # but isn't a mention
+				{
+					string name2 = name.Substring(1);
+					query = query.Concat(server.TextChannels.Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
+				}
 			}
 
-			if (type != (string)null)
-				result = result.Where(x => x.Type == type);
-
-			return result;
+			if (type != null)
+				query = query.Where(x => x.Type == type);
+			return query;
 		}
 
 		/// <summary> Creates a new channel with the provided name and type. </summary>
@@ -111,7 +115,7 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (type == (string)null) throw new ArgumentNullException(nameof(type));
+			if (type == null) throw new ArgumentNullException(nameof(type));
 			CheckReady();
 
 			var response = await _api.CreateChannel(server.Id, name, type.Value).ConfigureAwait(false);

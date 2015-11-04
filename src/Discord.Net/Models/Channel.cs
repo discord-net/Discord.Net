@@ -146,14 +146,12 @@ namespace Discord
 			var cacheLength = _client.Config.MessageCacheLength;
 			if (cacheLength > 0)
 			{
-				while (_messages.Count > cacheLength - 1)
+				var oldestIds = _messages.Select(x => x.Value.Id).OrderBy(x => x).Take(_messages.Count - cacheLength);
+				foreach (var id in oldestIds)
 				{
-					var oldest = _messages.Select(x => x.Value.Id).OrderBy(x => x).FirstOrDefault();
-					if (oldest != null)
-					{
-						if (_messages.TryRemove(oldest, out message))
-							_client.Messages.TryRemove(oldest);
-					}
+					Message removed;
+					if (_messages.TryRemove(id, out removed))
+						_client.Messages.TryRemove(id);
 				}
 				_messages.TryAdd(message.Id, message);
 			}
@@ -207,6 +205,8 @@ namespace Discord
 			user.UpdateChannelPermissions(this);
 		}
 
+		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }

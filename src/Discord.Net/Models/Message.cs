@@ -90,17 +90,13 @@ namespace Discord
 				Height = height;
 			}
 		}
-
-		private string _cleanText;
-		
+				
 		/// <summary> Returns the local unique identifier for this message. </summary>
 		public string Nonce { get; internal set; }
 
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
 		public bool IsMentioningMe { get; private set; }
-		/// <summary> Returns true if @everyone was mentioned by someone with permissions to do so. </summary>
-		public bool IsMentioningEveryone { get; private set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns true if the message is still in the outgoing message queue. </summary>
@@ -110,8 +106,7 @@ namespace Discord
 		/// <summary> Returns the raw content of this message as it was received from the server.. </summary>
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
-		/// <remarks> This value is lazy loaded and only processed on first request. Each subsequent request will pull from cache. </remarks>
-		public string Text => _cleanText != null ? _cleanText : (_cleanText = Mention.ConvertToNames(_client, Server, RawText));
+		public string Text { get; private set; } 
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>
@@ -125,8 +120,16 @@ namespace Discord
 		
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Mentions { get; internal set; }
-		
+		public IEnumerable<User> MentionedUsers { get; internal set; }
+
+		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
+		[JsonIgnore]
+		public IEnumerable<Channel> MentionedChannels { get; internal set; }
+
+		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
+		[JsonIgnore]
+		public IEnumerable<Role> MentionedRoles { get; internal set; }
+
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Server Server => _channel.Value.Server;
@@ -174,6 +177,8 @@ namespace Discord
 
 		internal void Update(MessageInfo model)
 		{
+			var channel = Channel;
+			var server = channel.Server;
 			if (model.Attachments != null)
 			{
 				Attachments = model.Attachments
@@ -197,9 +202,7 @@ namespace Discord
 					return new Embed(x.Url, x.Type, x.Title, x.Description, author, provider, thumbnail);
 				}).ToArray();
 			}
-
-			if (model.IsMentioningEveryone != null)
-				IsMentioningEveryone = model.IsMentioningEveryone.Value;
+			
 			if (model.IsTextToSpeech != null)
 				IsTTS = model.IsTextToSpeech.Value;
 			if (model.Timestamp != null)
@@ -208,16 +211,46 @@ namespace Discord
 				EditedTimestamp = model.EditedTimestamp;
 			if (model.Mentions != null)
 			{
-				Mentions = model.Mentions.Select(x => _client.Users[x.Id, Channel.Server?.Id]).ToArray();
-				IsMentioningMe = model.Mentions.Any(x => x.Id == _client.CurrentUserId);
+				MentionedUsers = model.Mentions
+					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
+					.ToArray();
 			}
 			if (model.Content != null)
 			{
-				RawText = model.Content;
-				_cleanText = null;
-			}
-		}
+				string text = model.Content;
+				RawText = text;
 
+				//var mentionedUsers = new List<User>();
+				var mentionedChannels = new List<Channel>();
+				var mentionedRoles = new List<Role>();
+				text = Mention.CleanUserMentions(_client, server, text/*, mentionedUsers*/);
+				if (server != null)
+				{
+					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
+					text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
+				}
+				Text = text;
+
+				//MentionedUsers = mentionedUsers;
+				MentionedChannels = mentionedChannels;
+				MentionedRoles = mentionedRoles;
+			}
+
+			if (server != null)
+			{
+				var me = server.CurrentUser;
+				IsMentioningMe = (MentionedUsers?.Contains(me) ?? false) || 
+					(MentionedRoles?.Any(x => me.HasRole(x)) ?? false);
+			}
+			else
+			{
+				var me = _client.CurrentUser;
+				IsMentioningMe = MentionedUsers?.Contains(me) ?? false;
+            }
+        }
+
+		public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => $"{User}: {RawText}";
 	}
 }

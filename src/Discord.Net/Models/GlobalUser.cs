@@ -69,6 +69,8 @@ namespace Discord
 				_client.GlobalUsers.TryRemove(Id);
 		}
 
+		public override bool Equals(object obj) => obj is GlobalUser && (obj as GlobalUser).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Id;
 	}
 }

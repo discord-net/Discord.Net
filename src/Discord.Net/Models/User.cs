@@ -10,6 +10,7 @@ namespace Discord
 	public class User : CachedObject
 	{
 		internal static string GetId(string userId, string serverId) => (serverId ?? "Private") + '_' + userId;
+		internal static string GetAvatarUrl(string userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
 
 		private ConcurrentDictionary<string, Channel> _channels;
 		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
@@ -24,7 +25,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => AvatarId != null ? API.Endpoints.UserAvatar(Id, AvatarId) : null;
+		public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; private set; }
 
@@ -370,6 +371,8 @@ namespace Discord
 			return _roles.ContainsKey(role.Id);
 		}
 
+		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => Name ?? Id;
 	}
 }

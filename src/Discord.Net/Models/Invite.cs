@@ -5,7 +5,62 @@ using Newtonsoft.Json;
 namespace Discord
 {
 	public sealed class Invite : CachedObject
-	{		
+	{
+		public sealed class ServerInfo
+		{
+			/// <summary> Returns the unique identifier of this server. </summary>
+			public string Id { get; }
+			/// <summary> Returns the name of this server. </summary>
+			public string Name { get; }
+
+			internal ServerInfo(string id, string name)
+			{
+				Id = id;
+				Name = name;
+			}
+		}
+		public sealed class ChannelInfo
+		{
+			/// <summary> Returns the unique identifier of this channel. </summary>
+			public string Id { get; }
+			/// <summary> Returns the name of this channel. </summary>
+			public string Name { get; }
+
+			internal ChannelInfo(string id, string name)
+			{
+				Id = id;
+				Name = name;
+			}
+		}
+		public sealed class InviterInfo
+		{
+			/// <summary> Returns the unique identifier for this user. </summary>
+			public string Id { get; }
+			/// <summary> Returns the name of this user. </summary>
+			public string Name { get; }
+			/// <summary> Returns the by-name unique identifier for this user. </summary>
+			public string Discriminator { get; }
+			/// <summary> Returns the unique identifier for this user's avatar. </summary>
+			public string AvatarId { get; }
+			/// <summary> Returns the full path to this user's avatar. </summary>
+			public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
+
+			internal InviterInfo(string id, string name, string discriminator, string avatarId)
+			{
+				Id = id;
+				Name = name;
+				Discriminator = discriminator;
+				AvatarId = avatarId;
+			}
+		}
+
+		/// <summary> Returns information about the server this invite is attached to. </summary>
+		public ServerInfo Server { get; private set; }
+		/// <summary> Returns information about the channel this invite is attached to. </summary>
+		public ChannelInfo Channel { get; private set; }
+		/// <summary> Returns information about the user that created this invite. </summary>
+		public InviterInfo Inviter { get; private set; }
+
 		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
 		public string XkcdCode { get; }
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
@@ -23,77 +78,23 @@ namespace Discord
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
 		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id);
 
-		/// <summary> Returns the user that created this invite. </summary>
-		[JsonIgnore]
-		public User Inviter => _inviter.Value;
-        private readonly Reference<User> _inviter;
-		private User _generatedInviter;
-
-		/// <summary> Returns the server this invite is to. </summary>
-		[JsonIgnore]
-		public Server Server => _server.Value;
-		private readonly Reference<Server> _server;
-		private Server _generatedServer;
-
-		/// <summary> Returns the channel this invite is to. </summary>
-		[JsonIgnore]
-		public Channel Channel => _channel.Value;
-		private readonly Reference<Channel> _channel;
-		private Channel _generatedChannel;
-
 		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId, string inviterId, string channelId)
 			: base(client, code)
 		{
 			XkcdCode = xkcdPass;
-			_server = new Reference<Server>(serverId, x =>
-			{
-				var server = _client.Servers[x];
-				if (server == null)
-				{
-					server = _generatedServer = new Server(client, x);
-					server.Cache();
-				}
-				return server;
-			});
-			_inviter = new Reference<User>(serverId, x =>
-			{
-				var inviter = _client.Users[x, _server.Id];
-				if (inviter == null)
-				{
-					inviter = _generatedInviter = new User(client, x, _server.Id);
-					inviter.Cache();
-				}
-				return inviter;
-			});
-			_channel = new Reference<Channel>(serverId, x =>
-			{
-				var channel = _client.Channels[x];
-				if (channel == null)
-				{
-					channel = _generatedChannel = new Channel(client, x, _server.Id, null);
-					channel.Cache();
-				}
-				return channel;
-			});
 		}
-		internal override void LoadReferences()
-		{
-			_server.Load();
-			_inviter.Load();
-			_channel.Load();
-		}
+		internal override void LoadReferences() { }
 		internal override void UnloadReferences() { }
-
 
 		internal void Update(InviteReference model)
 		{
-			if (model.Guild != null && _generatedServer != null)
-				_generatedServer.Update(model.Guild);
-			if (model.Inviter != null && _generatedInviter != null)
-				_generatedInviter.Update(model.Inviter);
-			if (model.Channel != null && _generatedChannel != null)
-				_generatedChannel.Update(model.Channel);
-		}
+			if (model.Guild != null)
+				Server = new ServerInfo(model.Guild.Id, model.Guild.Name);
+			if (model.Channel != null)
+				Channel = new ChannelInfo(model.Channel.Id, model.Channel.Name);
+			if (model.Inviter != null)
+				Inviter = new InviterInfo(model.Inviter.Id, model.Inviter.Username, model.Inviter.Discriminator, model.Inviter.Avatar);
+        }
         internal void Update(InviteInfo model)
 		{
 			Update(model as InviteReference);
@@ -112,6 +113,8 @@ namespace Discord
 				CreatedAt = model.CreatedAt.Value;
 		}
 
+		public override bool Equals(object obj) => obj is Invite && (obj as Invite).Id == Id;
+		public override int GetHashCode() => Id.GetHashCode();
 		public override string ToString() => XkcdCode ?? Id;
 	}
 }

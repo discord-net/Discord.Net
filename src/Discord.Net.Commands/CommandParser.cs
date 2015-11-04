@@ -2,51 +2,24 @@
 
 namespace Discord.Commands
 {
-	public class CommandPart
-	{
-		public string Value { get; }
-		public int Index { get; }
-
-		internal CommandPart(string value, int index)
-		{
-			Value = value;
-			Index = index;
-		}
-	}
-
-	//TODO: Check support for escaping
-	public static class CommandParser
+	internal static class CommandParser
 	{
 		private enum CommandParserPart
 		{
 			None,
-			CommandName,
 			Parameter,
 			QuotedParameter,
 			DoubleQuotedParameter
 		}
 
-		public static bool Parse(string input, out string command, out CommandPart[] args)
+		public static bool ParseCommand(string input, CommandMap map, out Command command, out int endPos)
 		{
-			return Parse(input, out command, out args, true);
-		}
-		public static bool ParseArgs(string input, out CommandPart[] args)
-		{
-			string ignored;
-			return Parse(input, out ignored, out args, false);
-		}
-
-		private static bool Parse(string input, out string command, out CommandPart[] args, bool parseCommand)
-		{
-			CommandParserPart currentPart = parseCommand ? CommandParserPart.CommandName : CommandParserPart.None;
 			int startPosition = 0;
 			int endPosition = 0;
-			int inputLength = input.Length;
+            int inputLength = input.Length;
 			bool isEscaped = false;
-			List<CommandPart> argList = new List<CommandPart>();
-
 			command = null;
-			args = null;
+			endPos = 0;
 
 			if (input == "")
 				return false;
@@ -59,23 +32,71 @@ namespace Discord.Commands
 				else if (currentChar == '\\')
 					isEscaped = true;
 
+				if ((!isEscaped && currentChar == ' ') || endPosition >= inputLength)
+				{
+					int length = (currentChar == ' ' ? endPosition - 1 : endPosition) - startPosition;
+					string temp = input.Substring(startPosition, length);
+					if (temp == "")
+						startPosition = endPosition;
+					else
+					{
+						var newMap = map.GetMap(temp);
+						if (newMap != null)
+						{
+							map = newMap;
+							endPos = endPosition;
+                        }
+						else
+							break;
+						startPosition = endPosition;
+					}
+				}
+			}
+			command = map.GetCommand(); //Work our way backwards to find a command that matches our input
+			return command != null;
+		}
+
+		//TODO: Check support for escaping
+		public static CommandErrorType? ParseArgs(string input, int startPos, Command command, out string[] args)
+		{
+			CommandParserPart currentPart = CommandParserPart.None;
+			int startPosition = startPos;
+			int endPosition = startPos;
+			int inputLength = input.Length;
+			bool isEscaped = false;
+
+			var expectedArgs = command._parameters;
+			List<string> argList = new List<string>();
+			CommandParameter parameter = null;
+			
+			args = null;
+
+			if (input == "")
+				return CommandErrorType.InvalidInput;
+
+			while (endPosition < inputLength)
+			{
+				if (startPosition == endPosition && (parameter == null || parameter.Type != ParameterType.Multiple)) //Is first char of a new arg
+				{
+					if (argList.Count == command.MaxArgs)
+						return CommandErrorType.BadArgCount;
+
+					parameter = command._parameters[argList.Count];
+					if (parameter.Type == ParameterType.Unparsed)
+					{
+						argList.Add(input.Substring(startPosition));
+						break;
+					}
+				}
+
+                char currentChar = input[endPosition++];
+				if (isEscaped)
+					isEscaped = false;
+				else if (currentChar == '\\')
+					isEscaped = true;
+
 				switch (currentPart)
 				{
-					case CommandParserPart.CommandName:
-						if ((!isEscaped && currentChar == ' ') || endPosition >= inputLength)
-						{
-							int length = (currentChar == ' ' ? endPosition - 1 : endPosition) - startPosition;
-							string temp = input.Substring(startPosition, length);
-							if (temp == "")
-								startPosition = endPosition;
-							else
-							{
-								currentPart = CommandParserPart.None;
-								command = temp;
-								startPosition = endPosition;
-							}
-						}
-						break;
 					case CommandParserPart.None:
 						if ((!isEscaped && currentChar == '\"'))
 						{
@@ -96,7 +117,7 @@ namespace Discord.Commands
 							else
 							{
 								currentPart = CommandParserPart.None;
-								argList.Add(new CommandPart(temp, startPosition));
+								argList.Add(temp);
 								startPosition = endPosition;
 							}
 						}
@@ -106,31 +127,36 @@ namespace Discord.Commands
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(new CommandPart(temp, startPosition));
+							argList.Add(temp);
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
-							return false;
+							return CommandErrorType.InvalidInput;
 						break;
 					case CommandParserPart.DoubleQuotedParameter:
 						if ((!isEscaped && currentChar == '\"'))
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
 							currentPart = CommandParserPart.None;
-							argList.Add(new CommandPart(temp, startPosition));
+							argList.Add(temp);
 							startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
-							return false;
+							return CommandErrorType.InvalidInput;
 						break;
 				}
 			}
 
-			if (parseCommand && (command == null || command == ""))
-				return false;
+			if (argList.Count < command.MinArgs)
+			{
+				/*if (command._parameters[command._parameters.Length - 1].Type == ParameterType.Unparsed)
+					argList.Add("");
+				else*/
+					return CommandErrorType.BadArgCount;
+			}
 
 			args = argList.ToArray();
-			return true;
+			return null;
 		}
 	}
 }

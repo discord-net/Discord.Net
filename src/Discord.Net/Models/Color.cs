@@ -77,5 +77,9 @@ namespace Discord
 			uint mask = (uint)~(0xFF << bit);
             _rawValue = (_rawValue & mask) | ((uint)value << bit);
 		}
+
+		public override bool Equals(object obj) => obj is Color && (obj as Color)._rawValue == _rawValue;
+		public override int GetHashCode() => _rawValue.GetHashCode();
+		public override string ToString() => '#' + _rawValue.ToString("X");
 	}
 }
