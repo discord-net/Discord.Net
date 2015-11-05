@@ -7,13 +7,25 @@ using System.Linq;
 
 namespace Discord
 {
+	public struct ChannelPermissionsPair
+	{
+		public Channel Channel;
+		public ChannelPermissions Permissions;
+
+		public ChannelPermissionsPair(Channel channel)
+		{
+			Channel = channel;
+			Permissions = new ChannelPermissions();
+			Permissions.Lock();
+        }
+	}
+
 	public class User : CachedObject
 	{
 		internal static string GetId(string userId, string serverId) => (serverId ?? "Private") + '_' + userId;
 		internal static string GetAvatarUrl(string userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
-
-		private ConcurrentDictionary<string, Channel> _channels;
-		private ConcurrentDictionary<string, ChannelPermissions> _permissions;
+		
+		private ConcurrentDictionary<string, ChannelPermissionsPair> _permissions;
 		private ServerPermissions _serverPermissions;
 
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
@@ -91,13 +103,8 @@ namespace Discord
 				if (_server.Id != null)
 				{
 					return _permissions
-						.Where(x => x.Value.ReadMessages)
-						.Select(x =>
-						{
-							Channel channel = null;
-							_channels.TryGetValue(x.Key, out channel);
-							return channel;
-                        })
+						.Where(x => x.Value.Permissions.ReadMessages)
+						.Select(x => x.Value.Channel)
 						.Where(x => x != null);
 				}
 				else
@@ -136,10 +143,10 @@ namespace Discord
 			_roles = new Dictionary<string, Role>();
 
 			Status = UserStatus.Offline;
-			_channels = new ConcurrentDictionary<string, Channel>();
+			//_channels = new ConcurrentDictionary<string, Channel>();
 			if (serverId != null)
 			{
-				_permissions = new ConcurrentDictionary<string, ChannelPermissions>();
+				_permissions = new ConcurrentDictionary<string, ChannelPermissionsPair>();
 				_serverPermissions = new ServerPermissions();
 			}
 
@@ -268,7 +275,6 @@ namespace Discord
 				newPermissions = ServerPermissions.All.RawValue;
 			else
 			{
-				//var roles = Roles.OrderBy(x => x.Id);
 				var roles = Roles;
 				foreach (var serverRole in roles)
 					newPermissions |= serverRole.Permissions.RawValue;
@@ -280,8 +286,8 @@ namespace Discord
 			if (newPermissions != oldPermissions)
 			{
 				_serverPermissions.SetRawValueInternal(newPermissions);
-				foreach (var channel in _channels)
-					UpdateChannelPermissions(channel.Value);
+				foreach (var permission in _permissions)
+					UpdateChannelPermissions(permission.Value.Channel);
 			}
 		}
 		internal void UpdateChannelPermissions(Channel channel)
@@ -290,10 +296,10 @@ namespace Discord
 			if (server == null) return;
 			if (channel.Server != server) throw new InvalidOperationException();
 
-			ChannelPermissions permissions;
-			if (!_permissions.TryGetValue(channel.Id, out permissions)) return;
+			ChannelPermissionsPair chanPerms;
+			if (!_permissions.TryGetValue(channel.Id, out chanPerms)) return;
 			uint newPermissions = _serverPermissions.RawValue;
-			uint oldPermissions = permissions.RawValue;
+			uint oldPermissions = chanPerms.Permissions.RawValue;
 			
 			if (server.Owner == this)
 				newPermissions = ChannelPermissions.All(channel).RawValue;
@@ -321,11 +327,11 @@ namespace Discord
 
 			if (newPermissions != oldPermissions)
 			{
-				permissions.SetRawValueInternal(newPermissions);
+				chanPerms.Permissions.SetRawValueInternal(newPermissions);
 				channel.InvalidateMembersCache();
 			}
 
-			permissions.SetRawValueInternal(newPermissions);
+			chanPerms.Permissions.SetRawValueInternal(newPermissions);
 		}
 
 		public ServerPermissions GetServerPermissions() => _serverPermissions;
@@ -337,9 +343,9 @@ namespace Discord
 			if (_server.Id == null)
 				return ChannelPermissions.PrivateOnly;
 
-			ChannelPermissions perms;
-			if (_permissions.TryGetValue(channel.Id, out perms))
-				return perms;
+			ChannelPermissionsPair chanPerms;
+			if (_permissions.TryGetValue(channel.Id, out chanPerms))
+				return chanPerms.Permissions;
 			return null;
 		}
 
@@ -347,10 +353,7 @@ namespace Discord
 		{
 			if (_server.Id != null)
 			{
-				var perms = new ChannelPermissions();
-				perms.Lock();
-				_channels.TryAdd(channel.Id, channel);
-				_permissions.TryAdd(channel.Id, perms);
+				_permissions.TryAdd(channel.Id, new ChannelPermissionsPair(channel));
 				UpdateChannelPermissions(channel);
 			}
 		}
@@ -358,8 +361,8 @@ namespace Discord
 		{
 			if (_server.Id != null)
 			{
-				ChannelPermissions ignored;
-				_channels.TryRemove(channel.Id, out channel);
+				ChannelPermissionsPair ignored;
+				//_channels.TryRemove(channel.Id, out channel);
 				_permissions.TryRemove(channel.Id, out ignored);
 			}
 		}
