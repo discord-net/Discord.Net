@@ -116,62 +116,71 @@ namespace Discord.Commands
             };
         }
 
-		public Task ShowHelp(User user, Channel channel)
-		{
-			int permissions = Config.PermissionResolver(user);
+        public Task ShowHelp(User user, Channel channel)
+        {
+            int permissions = Config.PermissionResolver(user);
 
-			StringBuilder output = new StringBuilder();
-			output.AppendLine("These are the commands you can use:");
-			output.Append(string.Join(", ", _commands
-				.Where(x => permissions >= x.MinPermissions && !x.IsHidden)
-				.Select(x => '`' + x.Text + '`')));
+            StringBuilder output = new StringBuilder();
+            output.AppendLine("These are the commands you can use:");
 
-			var chars = Config.CommandChars;
-			if (chars.Length > 0)
-			{
-				if (chars.Length == 1)
-					output.AppendLine($"\nYou can use `{chars[0]}` to call a command.");
-				else
-					output.AppendLine($"\nYou can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
-			}
+            output.Append(string.Join(", ", _map.SubCommands.Distinct()
+                .Where(x => permissions >= x.MinPermissions && !x.IsHidden)
+                .Select(x => '`' + x.Text + '`' +
+                (x.Aliases.Count() > 0 ? ", `" + string.Join("`, `", x.Aliases) + '`' : ""))));
 
-			output.AppendLine("`help <command>` can tell you more about how to use a command.");
+            var chars = Config.CommandChars;
+            if (chars.Length > 0)
+            {
+                if (chars.Length == 1)
+                    output.AppendLine($"\nYou can use `{chars[0]}` to call a command.");
+                else
+                    output.AppendLine($"\nYou can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
+            }
 
-			return _client.SendMessage(channel, output.ToString());
-		}
-        
+            output.AppendLine("`help` `<command>` can tell you more about how to use a command.");
+
+            return _client.SendMessage(channel, output.ToString());
+        }
+
         public Task ShowHelp(Command command, User user, Channel channel)
         {
             StringBuilder output = new StringBuilder();
-
             output.Append($"`{command.Text}`");
 
-            if (command.MinArgs != null && command.MaxArgs != null)
+            foreach (string s in command.Parameters.Where(x => x.Type == ParameterType.Required)
+                .Select(x => x.Name))
+                output.Append($" <`{s}`>");
+            foreach (string s in command.Parameters.Where(x => x.Type == ParameterType.Optional)
+                .Select(x => x.Name))
+                output.Append($" [`{s}`]");
+
+            if (command.Parameters.LastOrDefault(x => x.Type == ParameterType.Multiple) != null)
+                output.Append(" [`...`]");
+
+            if (command.Parameters.LastOrDefault(x => x.Type == ParameterType.Unparsed) != null)
+                output.Append(" [`--`]");
+
+            output.AppendLine($": {command.Description ?? "No description set for this command."}");
+
+            var sub = _map.GetMap(command.Text).SubCommands;
+            if (sub.Count() > 0)
             {
-                if (command.MinArgs == command.MaxArgs)
-                {
-                    if (command.MaxArgs != 0)
-                        output.Append($" {command.MinArgs.ToString()} Args");
-                }
-                else
-                    output.Append($" {command.MinArgs.ToString()} - {command.MaxArgs.ToString()} Args");
+                int permissions = Config.PermissionResolver(user);
+                output.AppendLine("Sub Commands: `" + string.Join("`, `", sub.Where(x => permissions >= x.MinPermissions && !x.IsHidden)
+                    .Select(x => x.Text.Substring(command.Text.Length + 1))) + '`');
             }
-            else if (command.MinArgs != null && command.MaxArgs == null)
-                output.Append($" ≥{command.MinArgs.ToString()} Args");
-            else if (command.MinArgs == null && command.MaxArgs != null)
-                output.Append($" ≤{command.MaxArgs.ToString()} Args");
 
-            output.Append($": {command.Description ?? "No description set for this command."}");
+            if (command.Aliases.Count() > 0)
+                output.Append($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');
 
-			return _client.SendMessage(channel, output.ToString());
-		}
+            return _client.SendMessage(channel, output.ToString());
+        }
 
-		public void CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
+        public void CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
 			=> config(new CommandGroupBuilder(this, cmd, 0));
 		public CommandBuilder CreateCommand(string cmd)
 		{
 			var command = new Command(cmd);
-			_commands.Add(command);
 			return new CommandBuilder(this, command, "");
 		}
 
