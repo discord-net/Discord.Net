@@ -26,6 +26,7 @@ namespace Discord.Commands
 			_parent = parent;
 			_text = text;
 			_items = new Dictionary<string, CommandMap>();
+			_minPermission = int.MaxValue;
 			_isHidden = true;
         }
 		
