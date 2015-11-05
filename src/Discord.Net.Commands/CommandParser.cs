@@ -40,7 +40,7 @@ namespace Discord.Commands
 						startPosition = endPosition;
 					else
 					{
-						var newMap = map.GetMap(temp);
+						var newMap = map.GetItem(temp);
 						if (newMap != null)
 						{
 							map = newMap;

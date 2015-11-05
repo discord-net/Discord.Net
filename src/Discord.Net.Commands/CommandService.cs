@@ -22,7 +22,7 @@ namespace Discord.Commands
 		{
 			Config = config;
 			_commands = new List<Command>();
-			_map = new CommandMap(null);
+			_map = new CommandMap(null, null);
 		}
 
 		void IService.Install(DiscordClient client)
@@ -121,14 +121,17 @@ namespace Discord.Commands
             int permissions = Config.PermissionResolver(user);
 
             StringBuilder output = new StringBuilder();
-            output.AppendLine("These are the commands you can use:");
-
+			output.AppendLine("These are the commands you can use:");
             output.Append(string.Join(", ", _map.SubCommands.Distinct()
                 .Where(x => permissions >= x.MinPermissions && !x.IsHidden)
                 .Select(x => '`' + x.Text + '`' +
                 (x.Aliases.Count() > 0 ? ", `" + string.Join("`, `", x.Aliases) + '`' : ""))));
+			output.AppendLine("\nThese are the groups you can access:");
+			output.Append(string.Join(", ", _map.SubGroups.Distinct()
+				.Where(x => permissions >= x.MinPermissions && !x.IsHidden)
+				.Select(x => '`' + x.Text + '`')));
 
-            var chars = Config.CommandChars;
+			var chars = Config.CommandChars;
             if (chars.Length > 0)
             {
                 if (chars.Length == 1)
@@ -162,7 +165,7 @@ namespace Discord.Commands
 
             output.AppendLine($": {command.Description ?? "No description set for this command."}");
 
-            var sub = _map.GetMap(command.Text).SubCommands;
+            var sub = _map.GetItem(command.Text).SubCommands;
             if (sub.Count() > 0)
             {
                 int permissions = Config.PermissionResolver(user);

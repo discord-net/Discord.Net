@@ -4,33 +4,43 @@ using System.Linq;
 
 namespace Discord.Commands
 {
-    internal class CommandMap
+	//Represents either a single function, command group, or both
+	internal class CommandMap
 	{
-		private CommandMap _parent;
+		private readonly CommandMap _parent;
+		private readonly string _text;
+
 		private Command _command;
-		private readonly Dictionary<string, CommandMap> _subCommands;
+		private readonly Dictionary<string, CommandMap> _items;
+		private int _minPermission;
+		private bool _isHidden;
 
-		public Command Command => _command;
-		public IEnumerable<Command> SubCommands => _subCommands.Select(x => x.Value.Command).Where(x => x != null);
+		public string Text => _text;
+		public int MinPermissions => _minPermission;
+		public bool IsHidden => _isHidden;
+		public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
+		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);
 
-		public CommandMap(CommandMap parent)
+		public CommandMap(CommandMap parent, string text)
 		{
 			_parent = parent;
-			_subCommands = new Dictionary<string, CommandMap>();
-		}
+			_text = text;
+			_items = new Dictionary<string, CommandMap>();
+			_isHidden = true;
+        }
 		
-		public CommandMap GetMap(string text)
+		public CommandMap GetItem(string text)
 		{
-			return GetMap(0, text.Split(' '));
+			return GetItem(0, text.Split(' '));
 		}
-		public CommandMap GetMap(int index, string[] parts)
+		public CommandMap GetItem(int index, string[] parts)
 		{
 			if (index != parts.Length)
 			{
 				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (_subCommands.TryGetValue(nextPart, out nextGroup))
-					return nextGroup.GetMap(index + 1, parts);
+				if (_items.TryGetValue(nextPart, out nextGroup))
+					return nextGroup.GetItem(index + 1, parts);
 				else
 					return null;
 			}
@@ -56,7 +66,7 @@ namespace Discord.Commands
 			{
 				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (_subCommands.TryGetValue(nextPart, out nextGroup))
+				if (_items.TryGetValue(nextPart, out nextGroup))
 				{
 					var cmd = nextGroup.GetCommand(index + 1, parts);
 					if (cmd != null)
@@ -77,12 +87,17 @@ namespace Discord.Commands
 		{
 			if (index != parts.Length)
 			{
+				if (command.MinPermissions < _minPermission)
+					_minPermission = command.MinPermissions;
+				if (!command.IsHidden && _isHidden)
+					_isHidden = false;
+
 				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (!_subCommands.TryGetValue(nextPart, out nextGroup))
+				if (!_items.TryGetValue(nextPart, out nextGroup))
 				{
-					nextGroup = new CommandMap(this);
-					_subCommands.Add(nextPart, nextGroup);
+					nextGroup = new CommandMap(this, nextPart);
+					_items.Add(nextPart, nextGroup);
 				}
 				nextGroup.AddCommand(index + 1, parts, command);
             }
