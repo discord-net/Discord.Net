@@ -273,11 +273,12 @@ namespace Discord
 			_currentUser = null;
 		}
 
-		public void AddService<T>(T obj)
+		public T AddService<T>(T obj)
 			where T : class, IService
 		{
 			_services.Add(typeof(T), obj);
 			obj.Install(this);
+			return obj;
 		}
 		public T GetService<T>()
 			where T : class, IService
