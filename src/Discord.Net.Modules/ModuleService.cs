@@ -24,7 +24,8 @@ namespace Discord.Modules
 
 		public void Install(IModule module, FilterType type)
 		{
-			if (_modules.ContainsKey(module)) throw new InvalidOperationException("This module has already been added.");
+			if (_client == null) throw new InvalidOperationException("Service needs to be added to a DiscordClient before modules can be installed.");
+            if (_modules.ContainsKey(module)) throw new InvalidOperationException("This module has already been added.");
 
 			var manager = new ModuleManager(_client, type);
 			_modules.Add(module, manager);
