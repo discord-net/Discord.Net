@@ -38,7 +38,7 @@ namespace Discord
 		public Channel Channel => Message.Channel;
 		public Server Server => Message.Server;
 
-		internal MessageEventArgs(Message msg) { Message = msg; }
+		public MessageEventArgs(Message msg) { Message = msg; }
 	}
 
 	public partial class DiscordClient

@@ -20,7 +20,7 @@ namespace Discord
 		public Role Role { get; }
 		public Server Server => Role.Server;
 
-		internal RoleEventArgs(Role role) { Role = role; }
+		public RoleEventArgs(Role role) { Role = role; }
 	}
 
 	public partial class DiscordClient

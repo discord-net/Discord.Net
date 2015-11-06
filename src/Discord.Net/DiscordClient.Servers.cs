@@ -20,7 +20,7 @@ namespace Discord
 		public Server Server { get; }
 		public string ServerId => Server.Id;
 
-		internal ServerEventArgs(Server server) { Server = server; }
+		public ServerEventArgs(Server server) { Server = server; }
 	}
 
 	public partial class DiscordClient

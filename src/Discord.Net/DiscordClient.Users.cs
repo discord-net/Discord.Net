@@ -33,14 +33,14 @@ namespace Discord
 		public User User { get; }
 		public Server Server => User.Server;
 
-		internal UserEventArgs(User user) { User = user; }
+		public UserEventArgs(User user) { User = user; }
 	}
 	public class UserChannelEventArgs : UserEventArgs
 	{
 		public Channel Channel { get; }
 		public string ChannelId => Channel.Id;
 
-		internal UserChannelEventArgs(User user, Channel channel)
+		public UserChannelEventArgs(User user, Channel channel)
 			: base(user)
 		{
 			Channel = channel;
@@ -50,7 +50,7 @@ namespace Discord
 	{
 		public bool IsSpeaking { get; }
 
-		internal UserIsSpeakingEventArgs(User user, Channel channel, bool isSpeaking)
+		public UserIsSpeakingEventArgs(User user, Channel channel, bool isSpeaking)
 			: base(user, channel)
 		{
 			IsSpeaking = isSpeaking;

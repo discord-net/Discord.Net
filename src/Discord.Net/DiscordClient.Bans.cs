@@ -9,7 +9,7 @@ namespace Discord
 		public string UserId { get; }
 		public Server Server { get; }
 
-		internal BanEventArgs(string userId, Server server)
+		public BanEventArgs(string userId, Server server)
 		{
 			UserId = userId;
 			Server = server;

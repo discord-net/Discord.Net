@@ -41,7 +41,7 @@ namespace Discord
 		public Channel Channel { get; }
 		public Server Server => Channel.Server;
 
-		internal ChannelEventArgs(Channel channel) { Channel = channel; }
+		public ChannelEventArgs(Channel channel) { Channel = channel; }
 	}
 
 	public partial class DiscordClient
