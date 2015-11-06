@@ -47,13 +47,15 @@ namespace Discord
 		public LogMessageSeverity Severity { get; }
 		public LogMessageSource Source { get; }
 		public string Message { get; }
+		public Exception Exception { get; }
 
-		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg) 
+		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg, Exception exception)
 		{ 
 			Severity = severity; 
 			Source = source; 
-			Message = msg; 
-		}
+			Message = msg;
+			Exception = exception;
+        }
 	}
 
 	public sealed class VoicePacketEventArgs
@@ -88,10 +90,10 @@ namespace Discord
 				RaiseEvent(nameof(Disconnected), () => Disconnected(this, e));
 		}
 		public event EventHandler<LogMessageEventArgs> LogMessage;
-		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message)
+		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message, Exception exception = null)
 		{
 			if (LogMessage != null)
-				RaiseEvent(nameof(LogMessage), () => LogMessage(this, new LogMessageEventArgs(severity, source, message)));
+				RaiseEvent(nameof(LogMessage), () => LogMessage(this, new LogMessageEventArgs(severity, source, message, exception)));
 		}
 
 		public event EventHandler VoiceConnected;

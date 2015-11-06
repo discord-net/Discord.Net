@@ -82,7 +82,7 @@ namespace Discord
 
 			if (!_config.VoiceOnly)
 			{
-				socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message);
+				socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message, e.Exception);
 				if (_config.LogLevel >= LogMessageSeverity.Info)
 				{
 					socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
@@ -96,7 +96,7 @@ namespace Discord
 		internal virtual VoiceWebSocket CreateVoiceSocket()
 		{
 			var socket = new VoiceWebSocket(this);
-			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message);
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
 			socket.Connected += (s, e) => RaiseVoiceConnected();
 			socket.Disconnected += async (s, e) =>
 			{
@@ -288,7 +288,7 @@ namespace Discord
 			{
 				var ex2 = ex.GetBaseException();
 				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client,
-					$"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}");
+					$"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}", ex);
 			}
 		}
 
