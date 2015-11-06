@@ -37,6 +37,18 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Discord.Net.Modules\IModule.cs">
+      <Link>IModule.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleManager.cs">
+      <Link>ModuleManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleService.cs">
+      <Link>ModuleService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleType.cs">
+      <Link>ModuleType.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
