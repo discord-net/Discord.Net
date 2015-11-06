@@ -59,29 +59,17 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
-		private void RaiseUserIsTyping(User user, Channel channel)
+		public event EventHandler<UserEventArgs> UserJoined;
+		private void RaiseUserJoined(User user)
 		{
-			if (UserIsTypingUpdated != null)
-				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
+			if (UserJoined != null)
+				RaiseEvent(nameof(UserJoined), () => UserJoined(this, new UserEventArgs(user)));
 		}
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
-		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
+		public event EventHandler<UserEventArgs> UserLeft;
+		private void RaiseUserLeft(User user)
 		{
-			if (UserIsSpeakingUpdated != null)
-				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
-		}
-		public event EventHandler<UserEventArgs> UserAdded;
-		private void RaiseUserAdded(User user)
-		{
-			if (UserAdded != null)
-				RaiseEvent(nameof(UserAdded), () => UserAdded(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserEventArgs> UserRemoved;
-		private void RaiseUserRemoved(User user)
-		{
-			if (UserRemoved != null)
-				RaiseEvent(nameof(UserRemoved), () => UserRemoved(this, new UserEventArgs(user)));
+			if (UserLeft != null)
+				RaiseEvent(nameof(UserLeft), () => UserLeft(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserUpdated;
 		private void RaiseUserUpdated(User user)
@@ -100,6 +88,18 @@ namespace Discord
 		{
 			if (UserVoiceStateUpdated != null)
 				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
+		}
+		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
+		private void RaiseUserIsTyping(User user, Channel channel)
+		{
+			if (UserIsTypingUpdated != null)
+				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
+		}
+		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
+		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
+		{
+			if (UserIsSpeakingUpdated != null)
+				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
 		}
 		public event EventHandler ProfileUpdated;
 		private void RaiseProfileUpdated()

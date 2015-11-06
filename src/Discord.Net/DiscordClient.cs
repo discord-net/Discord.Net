@@ -75,9 +75,9 @@ namespace Discord
 			
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				ServerCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				JoinedServer += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Created: {e.Server?.Name ?? "[Private]"}");
-				ServerDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				LeftServer += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
 				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Server Updated: {e.Server?.Name ?? "[Private]"}");
@@ -107,9 +107,9 @@ namespace Discord
 					$"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
 				UserUnbanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
-				UserAdded += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				UserJoined += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserRemoved += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
+				UserLeft += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
 					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
@@ -340,7 +340,7 @@ namespace Discord
 								if (data.Unavailable == false)
 									RaiseServerAvailable(server);
 								else
-									RaiseServerCreated(server);
+									RaiseJoinedServer(server);
 							}
 						}
 						break;
@@ -364,7 +364,7 @@ namespace Discord
 								if (data.Unavailable == true)
 									RaiseServerAvailable(server);
 								else
-									RaiseServerDestroyed(server);
+									RaiseLeftServer(server);
 							}
 						}
 						break;
@@ -414,7 +414,7 @@ namespace Discord
 							user.Update(data);
 							if (Config.TrackActivity)
 								user.UpdateActivity();
-							RaiseUserAdded(user);
+							RaiseUserJoined(user);
 						}
 						break;
 					case "GUILD_MEMBER_UPDATE":
@@ -433,7 +433,7 @@ namespace Discord
 							var data = e.Payload.ToObject<MemberRemoveEvent>(_serializer);
 							var user = _users.TryRemove(data.UserId, data.GuildId);
 							if (user != null)
-								RaiseUserRemoved(user);
+								RaiseUserLeft(user);
 						}
 						break;
 					case "GUILD_MEMBERS_CHUNK":

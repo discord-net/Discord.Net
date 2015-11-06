@@ -25,17 +25,17 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<ServerEventArgs> ServerCreated;
-		private void RaiseServerCreated(Server server)
+		public event EventHandler<ServerEventArgs> JoinedServer;
+		private void RaiseJoinedServer(Server server)
 		{
-			if (ServerCreated != null)
-				RaiseEvent(nameof(ServerCreated), () => ServerCreated(this, new ServerEventArgs(server)));
+			if (JoinedServer != null)
+				RaiseEvent(nameof(JoinedServer), () => JoinedServer(this, new ServerEventArgs(server)));
 		}
-		public event EventHandler<ServerEventArgs> ServerDestroyed;
-		private void RaiseServerDestroyed(Server server)
+		public event EventHandler<ServerEventArgs> LeftServer;
+		private void RaiseLeftServer(Server server)
 		{
-			if (ServerDestroyed != null)
-				RaiseEvent(nameof(ServerDestroyed), () => ServerDestroyed(this, new ServerEventArgs(server)));
+			if (LeftServer != null)
+				RaiseEvent(nameof(LeftServer), () => LeftServer(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerUpdated;
 		private void RaiseServerUpdated(Server server)
