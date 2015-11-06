@@ -8,9 +8,9 @@ namespace Discord.Modules
     public class ModuleManager
 	{
 		public event EventHandler<ServerEventArgs> ServerEnabled;
-		public event EventHandler<ServerEventArgs> ServerDisbled;
-		public event EventHandler<ServerEventArgs> ChannelEnabled;
-		public event EventHandler<ServerEventArgs> ChannelDisbled;
+		public event EventHandler<ServerEventArgs> ServerDisabled;
+		public event EventHandler<ChannelEventArgs> ChannelEnabled;
+		public event EventHandler<ChannelEventArgs> ChannelDisabled;
 
 		public event EventHandler<ServerEventArgs> LeftServer;
 		public event EventHandler<ServerEventArgs> ServerUpdated;
@@ -41,17 +41,20 @@ namespace Discord.Modules
 		public event EventHandler<MessageEventArgs> MessageDeleted;
 		public event EventHandler<MessageEventArgs> MessageUpdated;
 		public event EventHandler<MessageEventArgs> MessageReadRemotely;
-		
+
+		private readonly DiscordClient _client;
 		private readonly bool _allowServerWhitelist, _allowChannelWhitelist, _allowPrivate;
 		private readonly ConcurrentDictionary<string, Server> _enabledServers;
 		private readonly ConcurrentDictionary<string, Channel> _enabledChannels;
 		private readonly ConcurrentDictionary<string, int> _indirectServers;
 
+		public DiscordClient Client => _client;
 		public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
 		public IEnumerable<Channel> EnabledChannels => _enabledChannels.Select(x => x.Value);
 
 		internal ModuleManager(DiscordClient client, FilterType type)
 		{
+			_client = client;
 			_allowServerWhitelist = type.HasFlag(FilterType.Server);
 			_allowChannelWhitelist = type.HasFlag(FilterType.Channel);
 			_allowPrivate = type.HasFlag(FilterType.AllowPrivate);
@@ -100,50 +103,71 @@ namespace Discord.Modules
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
-			if (_enabledServers.TryAdd(server.Id, server))
+			lock (this)
 			{
-				if (ServerEnabled != null)
-					ServerEnabled(this, new ServerEventArgs(server));
-				return true;
+				if (_enabledServers.TryAdd(server.Id, server))
+				{
+					if (ServerEnabled != null)
+						ServerEnabled(this, new ServerEventArgs(server));
+					return true;
+				}
+				return false;
 			}
-			return false;
 		}
 		public bool DisableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
-			if (_enabledServers.TryRemove(server.Id, out server))
+			lock (this)
 			{
-				if (ServerDisbled != null)
-					ServerDisbled(this, new ServerEventArgs(server));
-				return true;
+				if (_enabledServers.TryRemove(server.Id, out server))
+				{
+					if (ServerDisabled != null)
+						ServerDisabled(this, new ServerEventArgs(server));
+					return true;
+				}
+				return false;
 			}
-			return false;
 		}
 		public void DisableAllServers()
 		{
 			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
-			_enabledServers.Clear();
+			lock (this)
+			{
+				if (ServerDisabled != null)
+				{
+					foreach (var server in _enabledServers)
+						ServerDisabled(this, new ServerEventArgs(server.Value));
+				}
+					
+				_enabledServers.Clear();
+			}
 		}
 
-		public void EnableChannel(Channel channel)
+		public bool EnableChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (!_allowChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
 			{
-				_enabledChannels[channel.Id] = channel;
-				var server = channel.Server;
-				if (server != null)
+				if (_enabledChannels.TryAdd(channel.Id, channel))
 				{
-					int value = 0;
-					_indirectServers.TryGetValue(server.Id, out value);
-					value++;
-					_indirectServers[server.Id] = value;
+					var server = channel.Server;
+					if (server != null)
+					{
+						int value = 0;
+						_indirectServers.TryGetValue(server.Id, out value);
+						value++;
+						_indirectServers[server.Id] = value;
+					}
+					if (ChannelEnabled != null)
+						ChannelEnabled(this, new ChannelEventArgs(channel));
+					return true;
 				}
+				return false;
 			}
 		}
 		public bool DisableChannel(Channel channel)
@@ -167,6 +191,8 @@ namespace Discord.Modules
 						else
 							_indirectServers[server.Id] = value;
 					}
+					if (ChannelDisabled != null)
+						ChannelDisabled(this, new ChannelEventArgs(channel));
 					return true;
 				}
 				return false;
@@ -178,6 +204,12 @@ namespace Discord.Modules
 
 			lock (this)
 			{
+				if (ChannelDisabled != null)
+				{
+					foreach (var channel in _enabledChannels)
+						ChannelDisabled(this, new ChannelEventArgs(channel.Value));
+				}
+
 				_enabledChannels.Clear();
 				_indirectServers.Clear();
 			}
