@@ -1,4 +1,4 @@
-﻿namespace Discord
+﻿namespace Discord.Modules
 {
     public interface IModule
 	{

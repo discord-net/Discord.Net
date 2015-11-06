@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord
+namespace Discord.Modules
 {
 	[Flags]
     public enum FilterType

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Discord
+namespace Discord.Modules
 {
 	public class ModuleService : IService
 	{
