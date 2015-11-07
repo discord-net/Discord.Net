@@ -234,8 +234,10 @@ namespace Discord
 						if (cache)
 							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
 						else
+						{
 							msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
-						//msg.Update(x);
+							msg.Update(x); //TODO: Look into updating when cache is true, but only if we actually generated a new message.
+						}
 						if (Config.TrackActivity)
 						{
 							if (!channel.IsPrivate)
