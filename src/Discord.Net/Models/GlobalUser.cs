@@ -24,7 +24,7 @@ namespace Discord
 		internal Channel PrivateChannel
 		{
 			get { return _privateChannel; }
-			internal set
+			set
 			{
 				_privateChannel = value;
 				if (value == null)
