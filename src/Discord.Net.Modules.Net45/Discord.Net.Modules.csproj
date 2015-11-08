@@ -40,6 +40,9 @@
     <Compile Include="..\Discord.Net.Modules\IModule.cs">
       <Link>IModule.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleExtensions.cs">
+      <Link>ModuleExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Modules\ModuleManager.cs">
       <Link>ModuleManager.cs</Link>
     </Compile>
