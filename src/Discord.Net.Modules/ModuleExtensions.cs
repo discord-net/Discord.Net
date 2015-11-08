@@ -2,7 +2,7 @@
 {
     public static class ModuleExtensions
     {
-		public static ModuleService Commands(this DiscordClient client)
+		public static ModuleService Modules(this DiscordClient client)
 			=> client.GetService<ModuleService>();
     }
 }
