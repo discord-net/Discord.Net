@@ -17,7 +17,6 @@ namespace Discord.Commands
 		private readonly List<Command> _allCommands;
 
 		//Command map stores all commands by their input text, used for fast resolving and parsing
-		internal CommandMap Map => _map;
 		private readonly CommandMap _map;
 
 		//Groups store all commands by their module, used for more informative help
@@ -49,11 +48,11 @@ namespace Discord.Commands
 						Channel channel = Config.HelpMode == HelpMode.Public ? e.Channel : await client.CreatePMChannel(e.User);
 						if (e.Args.Length > 0) //Show command help
 						{
-							var cmd = _map.GetCommand(string.Join(" ", e.Args));
-							if (cmd != null)
-								await ShowHelp(cmd, e.User, channel);
+							var map = _map.GetItem(string.Join(" ", e.Args));
+							if (map != null)
+								await ShowHelp(map, e.User, channel);
 							else
-								await client.SendMessage(channel, "Unable to display help: unknown command.");
+								await client.SendMessage(channel, "Unable to display help: Unknown command.");
 						}
                         else //Show general help
 							await ShowHelp(e.User, channel);
@@ -139,10 +138,9 @@ namespace Discord.Commands
 			foreach (var category in _categories)
 			{
 				bool isFirstItem = true;
-				foreach (var item in category.Value.Items)
+				foreach (var group in category.Value.SubGroups)
 				{
-					var map = item.Value;
-					if (!map.IsHidden && map.CanRun(user, channel))
+					if (!group.IsHidden && group.CanRun(user, channel))
 					{
 						if (isFirstItem)
 						{
@@ -165,9 +163,9 @@ namespace Discord.Commands
 						else
 							output.Append(", ");
 						output.Append('`');
-						output.Append(map.Text);
-						if (map.Items.Any())
-							output.Append(@"\*");
+						output.Append(group.Text);
+						if (group.SubGroups.Any())
+							output.Append("*");
 						output.Append('`');
                     }
 				}
@@ -177,7 +175,7 @@ namespace Discord.Commands
 				output.Append("There are no commands you have permission to run.");
 			else
 			{
-				output.AppendLine();
+				output.Append("\n\n");
 
 				var chars = Config.CommandChars;
 				if (chars.Length > 0)
@@ -186,45 +184,81 @@ namespace Discord.Commands
 						output.AppendLine($"You can use `{chars[0]}` to call a command.");
 					else
 						output.AppendLine($"You can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
+					output.AppendLine($"`{chars[0]}help <command>` can tell you more about how to use a command.");
 				}
-
-				output.AppendLine("`help <command>` can tell you more about how to use a command.");
+				else
+					output.AppendLine($"`help <command>` can tell you more about how to use a command.");
 			}
 
             return _client.SendMessage(channel, output.ToString());
         }
 
-        public Task ShowHelp(Command command, User user, Channel channel)
+		private Task ShowHelp(CommandMap map, User user, Channel channel)
         {
-            StringBuilder output = new StringBuilder();
-            output.Append($"`{command.Text}`");
+			StringBuilder output = new StringBuilder();
 
-            foreach (string s in command.Parameters.Where(x => x.Type == ParameterType.Required)
-                .Select(x => x.Name))
-                output.Append($" <`{s}`>");
-            foreach (string s in command.Parameters.Where(x => x.Type == ParameterType.Optional)
-                .Select(x => x.Name))
-                output.Append($" [`{s}`]");
+			Command cmd = map.Command;
+			if (cmd != null)
+				ShowHelpInternal(cmd, user, channel, output);
+			else
+			{
+				output.Append('`');
+				output.Append(map.Text);
+				output.Append("`\n");
+			}
 
-            if (command.Parameters.LastOrDefault(x => x.Type == ParameterType.Multiple) != null)
-                output.Append(" [`...`]");
+			bool isFirst = true;
+			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel) && !x.IsHidden))
+			{
+				if (isFirst)
+				{
+					isFirst = false;
+					output.AppendLine("Sub Commands: ");
+				}
+				else
+					output.Append(", ");
+				output.Append('`');
+				output.Append(subCmd.Text);
+				if (subCmd.SubGroups.Any())
+					output.Append("*");
+				output.Append('`');
+			}
 
-            if (command.Parameters.LastOrDefault(x => x.Type == ParameterType.Unparsed) != null)
-                output.Append(" [`--`]");
-
-            output.AppendLine($": {command.Description ?? "No description set for this command."}");
-
-            var sub = _map.GetItem(command.Text).SubCommands;
-            if (sub.Count() > 0)
-            {
-                output.AppendLine("Sub Commands: `" + string.Join("`, `", sub.Where(x => x.CanRun(user, channel) && !x.IsHidden)
-                    .Select(x => x.Text.Substring(command.Text.Length + 1))) + '`');
-            }
-
-            if (command.Aliases.Count() > 0)
-                output.Append($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');
-
+			return _client.SendMessage(channel, output.ToString());
+		}
+		public Task ShowHelp(Command command, User user, Channel channel)
+		{
+			StringBuilder output = new StringBuilder();
+			ShowHelpInternal(command, user, channel, output);
             return _client.SendMessage(channel, output.ToString());
+		}
+		private void ShowHelpInternal(Command command, User user, Channel channel, StringBuilder output)
+		{
+			output.Append('`');
+			output.Append(command.Text);
+			foreach (var param in command.Parameters)
+			{
+				switch (param.Type)
+				{
+					case ParameterType.Required:
+						output.Append($" <{param.Name}>");
+						break;
+					case ParameterType.Optional:
+						output.Append($" [{param.Name}]");
+						break;
+					case ParameterType.Multiple:
+						output.Append(" [...]");
+						break;
+					case ParameterType.Unparsed:
+						output.Append(" [--]");
+						break;
+				}
+			}
+			output.Append('`');
+			output.AppendLine($": {command.Description ?? "No description set for this command."}");
+
+			if (command.Aliases.Any())
+				output.AppendLine($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');
         }
 
 		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
@@ -242,6 +276,8 @@ namespace Discord.Commands
 		internal void AddCommand(Command command)
 		{
 			_allCommands.Add(command);
+
+			//Get category
 			CommandMap category;
             string categoryName = command.Category ?? "";
 			if (!_categories.TryGetValue(categoryName, out category))
@@ -249,7 +285,17 @@ namespace Discord.Commands
 				category = new CommandMap(null, "");
 				_categories.Add(categoryName, category);
 			}
-			_map.AddCommand(command.Text, command);
+
+			//Add main command
+			category.AddCommand(command.Text, command);
+            _map.AddCommand(command.Text, command);
+
+			//Add aliases
+			foreach (var alias in command.Aliases)
+			{
+				category.AddCommand(alias, command);
+				_map.AddCommand(alias, command);
+			}
 		}
 	}
 }

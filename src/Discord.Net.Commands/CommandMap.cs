@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Commands
 {
@@ -16,9 +15,10 @@ namespace Discord.Commands
 
 		public string Text => _text;
 		public bool IsHidden => _isHidden;
-		public IEnumerable<KeyValuePair<string, CommandMap>> Items => _items;
-		public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
-		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);
+		public Command Command => _command;
+		public IEnumerable<CommandMap> SubGroups => _items.Values;
+		/*public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
+		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);*/
 
 		public CommandMap(CommandMap parent, string text)
 		{
@@ -84,11 +84,11 @@ namespace Discord.Commands
 		}
 		public void AddCommand(int index, string[] parts, Command command)
 		{
+			if (!command.IsHidden && _isHidden)
+				_isHidden = false;
+
 			if (index != parts.Length)
 			{
-				if (!command.IsHidden && _isHidden)
-					_isHidden = false;
-
 				string nextPart = parts[index];
 				CommandMap nextGroup;
 				if (!_items.TryGetValue(nextPart, out nextGroup))

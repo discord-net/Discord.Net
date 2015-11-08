@@ -75,8 +75,6 @@ namespace Discord.Commands
 		{
 			_command.SetParameters(_params.ToArray());
             _service.AddCommand(_command);
-            foreach (var alias in _command.Aliases)
-				_service.Map.AddCommand(alias, _command);
 		}
 
 		internal static string AppendPrefix(string prefix, string cmd)
