@@ -244,7 +244,7 @@ namespace Discord
 			}
 			else
 			{
-				var me = _client.CurrentUser;
+				var me = _client.PrivateUser;
 				IsMentioningMe = MentionedUsers?.Contains(me) ?? false;
             }
         }

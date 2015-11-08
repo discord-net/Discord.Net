@@ -270,7 +270,7 @@ namespace Discord
 			_servers.Clear();
 			_globalUsers.Clear();
 
-			_currentUser = null;
+			_privateUser = null;
 		}
 
 		public T AddService<T>(T obj)
@@ -309,9 +309,9 @@ namespace Discord
 						{
 							base.OnReceivedEvent(e).Wait(); //This cannot be an await, or we'll get later messages before we're ready
 							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-							_currentUser = _users.GetOrAdd(data.User.Id, null);
-							_currentUser.Update(data.User);
-							_currentUser.GlobalUser.Update(data.User);
+							_privateUser = _users.GetOrAdd(data.User.Id, null);
+							_privateUser.Update(data.User);
+							_privateUser.GlobalUser.Update(data.User);
                             foreach (var model in data.Guilds)
 							{
 								if (!model.Unavailable)

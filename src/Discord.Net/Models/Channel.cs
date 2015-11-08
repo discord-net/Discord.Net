@@ -168,7 +168,7 @@ namespace Discord
 			{
 				_members = new Dictionary<string, User>()
 				{
-					{ _client.CurrentUserId, _client.CurrentUser },
+					{ _client.CurrentUserId, _client.PrivateUser },
 					{ _recipient.Id, _recipient.Value }
 				};
 			}

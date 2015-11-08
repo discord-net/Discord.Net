@@ -108,9 +108,12 @@ namespace Discord
 				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
 		}
 
-		/// <summary> Returns the current logged-in user. </summary>
-		public User CurrentUser => _currentUser;
-		private User _currentUser;
+		/// <summary> Returns the current logged-in user in a private channel. </summary>
+		internal User PrivateUser => _privateUser;
+		private User _privateUser;
+
+		/// <summary> Returns information about the currently logged-in account. </summary>
+		public GlobalUser CurrentUser => _privateUser.GlobalUser;
 
 		/// <summary> Returns a collection of all users this client can currently see. </summary>
 		internal GlobalUsers GlobalUsers => _globalUsers;
@@ -244,7 +247,7 @@ namespace Discord
 			CheckReady();
 
 			return _api.EditUser(currentPassword: currentPassword, 
-				username: username ?? _currentUser?.Name,  email: email ?? _currentUser?.GlobalUser.Email, password: password,
+				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.GlobalUser.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 

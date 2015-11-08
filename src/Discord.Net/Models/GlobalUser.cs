@@ -3,11 +3,10 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Discord
 {
-	internal sealed class GlobalUser : CachedObject
+	public sealed class GlobalUser : CachedObject
 	{
 		private readonly ConcurrentDictionary<string, User> _users;
 
@@ -22,7 +21,7 @@ namespace Discord
 
 		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		[JsonIgnore]
-		public Channel PrivateChannel
+		internal Channel PrivateChannel
 		{
 			get { return _privateChannel; }
 			internal set
@@ -36,7 +35,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Memberships => _users.Select(x => _client.Users[Id, x.Key]);
+		internal IEnumerable<User> Memberships => _users.Select(x => _client.Users[Id, x.Key]);
 
 		internal GlobalUser(DiscordClient client, string id)
 			: base(client, id)
