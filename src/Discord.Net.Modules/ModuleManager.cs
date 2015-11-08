@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,21 +44,29 @@ namespace Discord.Modules
 		public event EventHandler<MessageEventArgs> MessageReadRemotely;
 
 		private readonly DiscordClient _client;
+		private readonly string _name, _id;
+		private readonly FilterType _filterType;
 		private readonly bool _allowServerWhitelist, _allowChannelWhitelist, _allowPrivate;
 		private readonly ConcurrentDictionary<string, Server> _enabledServers;
 		private readonly ConcurrentDictionary<string, Channel> _enabledChannels;
 		private readonly ConcurrentDictionary<string, int> _indirectServers;
 
 		public DiscordClient Client => _client;
+		public string Name => _name;
+		public string Id => _id;
+		public FilterType FilterType => _filterType;
 		public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
 		public IEnumerable<Channel> EnabledChannels => _enabledChannels.Select(x => x.Value);
 
-		internal ModuleManager(DiscordClient client, FilterType type)
+		internal ModuleManager(DiscordClient client, string name, FilterType filterType)
 		{
 			_client = client;
-			_allowServerWhitelist = type.HasFlag(FilterType.Server);
-			_allowChannelWhitelist = type.HasFlag(FilterType.Channel);
-			_allowPrivate = type.HasFlag(FilterType.AllowPrivate);
+			_name = name;
+			_id = name.ToLowerInvariant();
+			_filterType = filterType;
+            _allowServerWhitelist = filterType.HasFlag(FilterType.Server);
+			_allowChannelWhitelist = filterType.HasFlag(FilterType.Channel);
+			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
 
 			_enabledServers = new ConcurrentDictionary<string, Server>();
 			_enabledChannels = new ConcurrentDictionary<string, Channel>();
@@ -98,6 +107,18 @@ namespace Discord.Modules
 			}
         }
 
+		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
+		{
+			var commandService = _client.Commands();
+			if (commandService == null)
+				throw new InvalidOperationException($"{nameof(CommandService)} must be added to DiscordClient before this property is accessed.");
+			commandService.CreateGroup(prefix, x =>
+			{
+				x.Category(_name);
+				config(x);
+            });
+
+		}
 		public bool EnableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
