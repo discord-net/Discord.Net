@@ -12,12 +12,11 @@ namespace Discord.Commands
 
 		private Command _command;
 		private readonly Dictionary<string, CommandMap> _items;
-		private int _minPermission;
 		private bool _isHidden;
 
 		public string Text => _text;
-		public int MinPermissions => _minPermission;
 		public bool IsHidden => _isHidden;
+		public IEnumerable<KeyValuePair<string, CommandMap>> Items => _items;
 		public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
 		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);
 
@@ -26,7 +25,6 @@ namespace Discord.Commands
 			_parent = parent;
 			_text = text;
 			_items = new Dictionary<string, CommandMap>();
-			_minPermission = int.MaxValue;
 			_isHidden = true;
         }
 		
@@ -88,8 +86,6 @@ namespace Discord.Commands
 		{
 			if (index != parts.Length)
 			{
-				if (command.MinPermissions < _minPermission)
-					_minPermission = command.MinPermissions;
 				if (!command.IsHidden && _isHidden)
 					_isHidden = false;
 
@@ -108,6 +104,18 @@ namespace Discord.Commands
 					throw new InvalidOperationException("A command has already been added with this path.");
 				_command = command;
 			}
+		}
+
+		public bool CanRun(User user, Channel channel)
+		{
+			if (_command != null && _command.CanRun(user, channel))
+				return true;
+			foreach (var item in _items)
+			{
+				if (item.Value.CanRun(user, channel))
+					return true;
+			}
+			return false;
 		}
 	}
 }

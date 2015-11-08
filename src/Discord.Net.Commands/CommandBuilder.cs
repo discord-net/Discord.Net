@@ -13,10 +13,11 @@ namespace Discord.Commands
 		private bool _allowRequired, _isClosed;
 		private string _prefix;
 
-		public CommandBuilder(CommandService service, Command command, string prefix)
+		internal CommandBuilder(CommandService service, Command command, string prefix, string category)
 		{
 			_service = service;
 			_command = command;
+			_command.Category = category;
 			_params = new List<CommandParameter>();
 			_prefix = prefix;
 			_allowRequired = true;
@@ -29,6 +30,11 @@ namespace Discord.Commands
             _command.SetAliases(aliases);
 			return this;
 		}
+		/*public CommandBuilder Category(string category)
+		{
+			_command.Category = category;
+			return this;
+        }*/
 		public CommandBuilder Info(string description)
 		{
 			_command.Description = description;
@@ -53,12 +59,6 @@ namespace Discord.Commands
 		{
 			_command.IsHidden = true;
 			return this;
-		}
-
-		public CommandBuilder MinPermissions(int level)
-		{
-			_command.MinPermissions = level;
-            return this;
 		}
 
 		public void Do(Func<CommandEventArgs, Task> func)
@@ -101,23 +101,23 @@ namespace Discord.Commands
 	{
 		internal readonly CommandService _service;
 		private readonly string _prefix;
-		private int _defaultMinPermissions;
+		private string _category;
 
-		internal CommandGroupBuilder(CommandService service, string prefix, int defaultMinPermissions)
+		internal CommandGroupBuilder(CommandService service, string prefix)
 		{
 			_service = service;
 			_prefix = prefix;
-			_defaultMinPermissions = defaultMinPermissions;
 		}
 
-		public void DefaultMinPermissions(int level)
+		public CommandGroupBuilder Category(string category)
 		{
-			_defaultMinPermissions = level;
+			_category = category;
+			return this;
 		}
 
-		public CommandGroupBuilder CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
+		public CommandGroupBuilder CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
 		{
-			config(new CommandGroupBuilder(_service, _prefix + ' ' + cmd, _defaultMinPermissions));
+			config(new CommandGroupBuilder(_service, _prefix + ' ' + cmd));
 			return this;
 		}
 		public CommandBuilder CreateCommand()
@@ -125,8 +125,7 @@ namespace Discord.Commands
         public CommandBuilder CreateCommand(string cmd)
 		{
             var command = new Command(CommandBuilder.AppendPrefix(_prefix, cmd));
-			command.MinPermissions = _defaultMinPermissions;
-            return new CommandBuilder(_service, command, _prefix);
+            return new CommandBuilder(_service, command, _prefix, _category);
 		}
 	}
 }

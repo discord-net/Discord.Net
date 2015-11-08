@@ -30,11 +30,11 @@ namespace Discord.Commands
 	public sealed class Command
 	{
 		public string Text { get; }
-		public int? MinArgs { get; private set; }
-		public int? MaxArgs { get; private set; }
-		public int MinPermissions { get; internal set; }
+		public string Category { get; internal set; }
         public bool IsHidden { get; internal set; }
         public string Description { get; internal set; }
+		public int? MinArgs { get; private set; }
+		public int? MaxArgs { get; private set; }
 
 		public IEnumerable<string> Aliases => _aliases;
 		private string[] _aliases;
@@ -98,7 +98,12 @@ namespace Discord.Commands
 		{
 			_handler = e => { func(e); return TaskHelper.CompletedTask; };
 		}
-		
+
+		internal bool CanRun(User user, Channel channel)
+		{
+			return true;
+		}
+
 		internal Task Run(CommandEventArgs args)
 		{
 			var task = _handler(args);

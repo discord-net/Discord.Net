@@ -13,8 +13,8 @@ namespace Discord.Commands
 	}
 	public class CommandServiceConfig
 	{
-		public Func<User, int> PermissionResolver { get { return _permissionsResolver; } set { SetValue(ref _permissionsResolver, value); } }
-        private Func<User, int> _permissionsResolver;
+		/*public Func<User, int> PermissionResolver { get { return _permissionsResolver; } set { SetValue(ref _permissionsResolver, value); } }
+        private Func<User, int> _permissionsResolver;*/
 
 		public char? CommandChar
 		{

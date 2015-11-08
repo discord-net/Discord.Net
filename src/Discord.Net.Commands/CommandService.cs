@@ -10,27 +10,35 @@ namespace Discord.Commands
 	public partial class CommandService : IService
     {
 		private DiscordClient _client;
+		public CommandServiceConfig Config { get; }
 
-		CommandServiceConfig Config { get; }
-		public IEnumerable<Command> Commands => _commands;
-		private readonly List<Command> _commands;
+		//AllCommands store a flattened collection of all commands
+		public IEnumerable<Command> AllCommands => _allCommands;
+		private readonly List<Command> _allCommands;
 
+		//Command map stores all commands by their input text, used for fast resolving and parsing
 		internal CommandMap Map => _map;
 		private readonly CommandMap _map;
+
+		//Groups store all commands by their module, used for more informative help
+		internal IEnumerable<CommandMap> Categories => _categories.Values;
+        private readonly Dictionary<string, CommandMap> _categories;
+
 
 		public CommandService(CommandServiceConfig config)
 		{
 			Config = config;
-			_commands = new List<Command>();
+			_allCommands = new List<Command>();
 			_map = new CommandMap(null, null);
-		}
+			_categories = new Dictionary<string, CommandMap>();
+        }
 
 		void IService.Install(DiscordClient client)
 		{
 			_client = client;
 			Config.Lock();
 
-            if (Config.HelpMode != HelpMode.Disable)
+			if (Config.HelpMode != HelpMode.Disable)
             {
                 CreateCommand("help")
 					.Parameter("command", ParameterType.Multiple)
@@ -54,7 +62,7 @@ namespace Discord.Commands
 
             client.MessageReceived += async (s, e) =>
             {
-                if (_commands.Count == 0)  return;
+                if (_allCommands.Count == 0)  return;
                 if (e.Message.IsAuthor) return;
 
                 string msg = e.Message.Text;
@@ -75,28 +83,26 @@ namespace Discord.Commands
 				CommandParser.ParseCommand(msg, _map, out command, out argPos);				
 				if (command == null)
 				{
-					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null, null);
+					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null);
 					RaiseCommandError(CommandErrorType.UnknownCommand, errorArgs);
 					return;
 				}
 				else
 				{
-					int userPermissions = Config.PermissionResolver?.Invoke(e.Message.User) ?? 0;
-
 					//Parse arguments
 					string[] args;
 					var error = CommandParser.ParseArgs(msg, argPos, command, out args);
                     if (error != null)
 					{
-						var errorArgs = new CommandEventArgs(e.Message, command, userPermissions, null);
+						var errorArgs = new CommandEventArgs(e.Message, command, null);
 						RaiseCommandError(error.Value, errorArgs);
 						return;
 					}
 					
-					var eventArgs = new CommandEventArgs(e.Message, command, userPermissions, args);
+					var eventArgs = new CommandEventArgs(e.Message, command, args);
 
 					// Check permissions
-					if (userPermissions < command.MinPermissions)
+					if (!command.CanRun(eventArgs.User, eventArgs.Channel))
 					{
 						RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
 						return;
@@ -118,29 +124,72 @@ namespace Discord.Commands
 
         public Task ShowHelp(User user, Channel channel)
         {
-            int permissions = Config.PermissionResolver(user);
-
             StringBuilder output = new StringBuilder();
-			output.AppendLine("These are the commands you can use:");
-            output.Append(string.Join(", ", _map.SubCommands.Distinct()
-                .Where(x => permissions >= x.MinPermissions && !x.IsHidden)
+			/*output.AppendLine("These are the commands you can use:");
+			output.Append(string.Join(", ", _map.SubCommands
+                .Where(x => x.CanRun(user, channel) && !x.IsHidden)
                 .Select(x => '`' + x.Text + '`' +
                 (x.Aliases.Count() > 0 ? ", `" + string.Join("`, `", x.Aliases) + '`' : ""))));
 			output.AppendLine("\nThese are the groups you can access:");
-			output.Append(string.Join(", ", _map.SubGroups.Distinct()
-				.Where(x => permissions >= x.MinPermissions && !x.IsHidden)
-				.Select(x => '`' + x.Text + '`')));
+			output.Append(string.Join(", ", _map.SubGroups
+				.Where(x => /*x.CanRun(user, channel)*//* && !x.IsHidden)
+				.Select(x => '`' + x.Text + '`')));*/
 
-			var chars = Config.CommandChars;
-            if (chars.Length > 0)
-            {
-                if (chars.Length == 1)
-                    output.AppendLine($"\nYou can use `{chars[0]}` to call a command.");
-                else
-                    output.AppendLine($"\nYou can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
-            }
+			bool isFirstCategory = true;
+			foreach (var category in _categories)
+			{
+				bool isFirstItem = true;
+				foreach (var item in category.Value.Items)
+				{
+					var map = item.Value;
+					if (!map.IsHidden && map.CanRun(user, channel))
+					{
+						if (isFirstItem)
+						{
+							isFirstItem = false;
+							//This is called for the first item in each category. If we never get here, we dont bother writing the header for a category type (since it's empty)
+							if (isFirstCategory)
+							{
+								isFirstCategory = false;
+								//Called for the first non-empty category
+								output.AppendLine("These are the commands you can use:");
+							}
+							else
+								output.AppendLine();
+							if (category.Key != "")
+							{
+								output.Append(Format.Bold(category.Key));
+								output.Append(": ");
+							}
+						}
+						else
+							output.Append(", ");
+						output.Append('`');
+						output.Append(map.Text);
+						if (map.Items.Any())
+							output.Append(@"\*");
+						output.Append('`');
+                    }
+				}
+			}
 
-            output.AppendLine("`help` `<command>` can tell you more about how to use a command.");
+			if (output.Length == 0)
+				output.Append("There are no commands you have permission to run.");
+			else
+			{
+				output.AppendLine();
+
+				var chars = Config.CommandChars;
+				if (chars.Length > 0)
+				{
+					if (chars.Length == 1)
+						output.AppendLine($"You can use `{chars[0]}` to call a command.");
+					else
+						output.AppendLine($"You can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
+				}
+
+				output.AppendLine("`help <command>` can tell you more about how to use a command.");
+			}
 
             return _client.SendMessage(channel, output.ToString());
         }
@@ -168,8 +217,7 @@ namespace Discord.Commands
             var sub = _map.GetItem(command.Text).SubCommands;
             if (sub.Count() > 0)
             {
-                int permissions = Config.PermissionResolver(user);
-                output.AppendLine("Sub Commands: `" + string.Join("`, `", sub.Where(x => permissions >= x.MinPermissions && !x.IsHidden)
+                output.AppendLine("Sub Commands: `" + string.Join("`, `", sub.Where(x => x.CanRun(user, channel) && !x.IsHidden)
                     .Select(x => x.Text.Substring(command.Text.Length + 1))) + '`');
             }
 
@@ -179,17 +227,28 @@ namespace Discord.Commands
             return _client.SendMessage(channel, output.ToString());
         }
 
-        public void CreateCommandGroup(string cmd, Action<CommandGroupBuilder> config = null)
-			=> config(new CommandGroupBuilder(this, cmd, 0));
+		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
+		{
+			var builder = new CommandGroupBuilder(this, cmd);
+            if (config != null)
+				config(builder);
+		}
 		public CommandBuilder CreateCommand(string cmd)
 		{
 			var command = new Command(cmd);
-			return new CommandBuilder(this, command, "");
+			return new CommandBuilder(this, command, "", "");
 		}
 
 		internal void AddCommand(Command command)
 		{
-			_commands.Add(command);
+			_allCommands.Add(command);
+			CommandMap category;
+            string categoryName = command.Category ?? "";
+			if (!_categories.TryGetValue(categoryName, out category))
+			{
+				category = new CommandMap(null, "");
+				_categories.Add(categoryName, category);
+			}
 			_map.AddCommand(command.Text, command);
 		}
 	}
