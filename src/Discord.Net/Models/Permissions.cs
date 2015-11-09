@@ -195,9 +195,9 @@ namespace Discord
 			if (Allow.GetBit(pos))
 				return true;
 			else if (Deny.GetBit(pos))
-				return true;
-			else
 				return false;
+			else
+				return null;
 		}
 		private void SetBit(PermissionsBits pos, bool? value)
 		{
