@@ -25,7 +25,7 @@ namespace Discord
 			CheckReady();
 
 			return channel.PermissionOverwrites
-				.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == role.Id)
+				.Where(x => x.TargetType == PermissionTarget.Role && x.TargetId == role.Id)
 				.Select(x => x.Permissions)
 				.FirstOrDefault();
 		}
