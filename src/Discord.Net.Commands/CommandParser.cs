@@ -147,12 +147,18 @@ namespace Discord.Commands
 				}
 			}
 
-			if (argList.Count < command.MinArgs)
+			for (int i = argList.Count; i < command._parameters.Length; i++)
 			{
-				/*if (command._parameters[command._parameters.Length - 1].Type == ParameterType.Unparsed)
-					argList.Add("");
-				else*/
-					return CommandErrorType.BadArgCount;
+				var param = command._parameters[i];
+				switch (param.Type)
+				{
+					case ParameterType.Required:
+						return CommandErrorType.BadArgCount;
+					case ParameterType.Optional:
+					case ParameterType.Unparsed:
+						argList.Add("");
+						break;
+				}
 			}
 
 			args = argList.ToArray();
