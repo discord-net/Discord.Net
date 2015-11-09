@@ -31,5 +31,13 @@ namespace Discord.Modules
 			_modules.Add(module, manager);
 			module.Install(manager);
         }
+
+		public ModuleManager GetManager(IModule module)
+		{
+			if (module == null) throw new ArgumentNullException(nameof(module));
+			ModuleManager result = null;
+			_modules.TryGetValue(module, out result);
+			return result;
+		}
 	}
 }
