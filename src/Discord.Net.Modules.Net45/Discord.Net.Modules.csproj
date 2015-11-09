@@ -7,7 +7,7 @@
     <ProjectGuid>{3091164F-66AE-4543-A63D-167C1116241D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Discord</RootNamespace>
+    <RootNamespace>Discord.Modules</RootNamespace>
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -39,6 +39,9 @@
   <ItemGroup>
     <Compile Include="..\Discord.Net.Modules\IModule.cs">
       <Link>IModule.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleChecker.cs">
+      <Link>ModuleChecker.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Modules\ModuleExtensions.cs">
       <Link>ModuleExtensions.cs</Link>

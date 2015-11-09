@@ -61,6 +61,39 @@
     <Compile Include="..\Discord.Net.Commands\CommandServiceConfig.cs">
       <Link>CommandServiceConfig.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\IPermissionChecker.cs">
+      <Link>Permissions\IPermissionChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Levels\PermissionLevelChecker.cs">
+      <Link>Permissions\Levels\PermissionLevelChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Levels\PermissionLevelExtensions.cs">
+      <Link>Permissions\Levels\PermissionLevelExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Levels\PermissionLevelService.cs">
+      <Link>Permissions\Levels\PermissionLevelService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\BlacklistChecker.cs">
+      <Link>Permissions\Userlist\BlacklistChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\BlacklistExtensions.cs">
+      <Link>Permissions\Userlist\BlacklistExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\BlacklistService.cs">
+      <Link>Permissions\Userlist\BlacklistService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\UserlistService.cs">
+      <Link>Permissions\Userlist\UserlistService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\WhitelistChecker.cs">
+      <Link>Permissions\Userlist\WhitelistChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\WhitelistExtensions.cs">
+      <Link>Permissions\Userlist\WhitelistExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\WhitelistService.cs">
+      <Link>Permissions\Userlist\WhitelistService.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

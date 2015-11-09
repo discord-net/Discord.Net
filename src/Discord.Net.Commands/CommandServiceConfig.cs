@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Commands.Permissions;
+using System;
 
 namespace Discord.Commands
 {
@@ -13,9 +14,6 @@ namespace Discord.Commands
 	}
 	public class CommandServiceConfig
 	{
-		/*public Func<User, int> PermissionResolver { get { return _permissionsResolver; } set { SetValue(ref _permissionsResolver, value); } }
-        private Func<User, int> _permissionsResolver;*/
-
 		public char? CommandChar
 		{
 			get

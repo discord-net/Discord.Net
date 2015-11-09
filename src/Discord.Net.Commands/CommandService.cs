@@ -9,8 +9,12 @@ namespace Discord.Commands
 	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
 	public partial class CommandService : IService
     {
+		private readonly CommandServiceConfig _config;
+		private readonly CommandGroupBuilder _root;
 		private DiscordClient _client;
-		public CommandServiceConfig Config { get; }
+
+		public DiscordClient Client => _client;
+		public CommandGroupBuilder Root => _root;
 
 		//AllCommands store a flattened collection of all commands
 		public IEnumerable<Command> AllCommands => _allCommands;
@@ -23,40 +27,47 @@ namespace Discord.Commands
 		internal IEnumerable<CommandMap> Categories => _categories.Values;
         private readonly Dictionary<string, CommandMap> _categories;
 
-
 		public CommandService(CommandServiceConfig config)
 		{
-			Config = config;
+			_config = config;
 			_allCommands = new List<Command>();
-			_map = new CommandMap(null, null);
+			_map = new CommandMap(null, "", "");
 			_categories = new Dictionary<string, CommandMap>();
-        }
+			_root = new CommandGroupBuilder(this, "", null);
+		}
 
 		void IService.Install(DiscordClient client)
 		{
 			_client = client;
-			Config.Lock();
+			_config.Lock();
 
-			if (Config.HelpMode != HelpMode.Disable)
+			if (_config.HelpMode != HelpMode.Disable)
             {
-                CreateCommand("help")
+				CreateCommand("help")
 					.Parameter("command", ParameterType.Multiple)
                     .Hide()
-                    .Info("Returns information about commands.")
-                    .Do(async e =>
+                    .Description("Returns information about commands.")
+                    .Do((Func<CommandEventArgs, Task>)(async e =>
                     {
-						Channel channel = Config.HelpMode == HelpMode.Public ? e.Channel : await client.CreatePMChannel(e.User);
+						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await client.CreatePMChannel(e.User);
 						if (e.Args.Length > 0) //Show command help
 						{
 							var map = _map.GetItem(string.Join(" ", e.Args));
 							if (map != null)
-								await ShowHelp(map, e.User, channel);
+								await ShowCommandHelp(map, e.User, e.Channel, replyChannel);
 							else
-								await client.SendMessage(channel, "Unable to display help: Unknown command.");
+								await client.SendMessage(replyChannel, "Unable to display help: Unknown command.");
 						}
                         else //Show general help
-							await ShowHelp(e.User, channel);
-                    });
+
+/* Unmerged change from project 'Discord.Net.Commands'
+Before:
+							await ShowHelp(e.User, e.Channel, replyChannel);
+After:
+							await this.ShowHelp((User)e.User, e.Channel, replyChannel);
+*/
+							await this.ShowGeneralHelp(e.User, (Channel)e.Channel, (Channel)replyChannel);
+                    }));
             }
 
             client.MessageReceived += async (s, e) =>
@@ -68,7 +79,7 @@ namespace Discord.Commands
                 if (msg.Length == 0) return;
 
 				//Check for command char if one is provided
-				var chars = Config.CommandChars;
+				var chars = _config.CommandChars;
                 if (chars.Length > 0)
                 {
 					if (!chars.Contains(msg[0]))
@@ -121,7 +132,7 @@ namespace Discord.Commands
             };
         }
 
-        public Task ShowHelp(User user, Channel channel)
+        public Task ShowGeneralHelp(User user, Channel channel, Channel replyChannel = null)
         {
             StringBuilder output = new StringBuilder();
 			/*output.AppendLine("These are the commands you can use:");
@@ -163,7 +174,7 @@ namespace Discord.Commands
 						else
 							output.Append(", ");
 						output.Append('`');
-						output.Append(group.Text);
+						output.Append(group.Name);
 						if (group.SubGroups.Any())
 							output.Append("*");
 						output.Append('`');
@@ -177,7 +188,7 @@ namespace Discord.Commands
 			{
 				output.Append("\n\n");
 
-				var chars = Config.CommandChars;
+				var chars = _config.CommandChars;
 				if (chars.Length > 0)
 				{
 					if (chars.Length == 1)
@@ -190,20 +201,20 @@ namespace Discord.Commands
 					output.AppendLine($"`help <command>` can tell you more about how to use a command.");
 			}
 
-            return _client.SendMessage(channel, output.ToString());
+            return _client.SendMessage(replyChannel ?? channel, output.ToString());
         }
 
-		private Task ShowHelp(CommandMap map, User user, Channel channel)
+		private Task ShowCommandHelp(CommandMap map, User user, Channel channel, Channel replyChannel = null)
         {
 			StringBuilder output = new StringBuilder();
 
 			Command cmd = map.Command;
 			if (cmd != null)
-				ShowHelpInternal(cmd, user, channel, output);
+				ShowCommandHelpInternal(cmd, user, channel, output);
 			else
 			{
 				output.Append('`');
-				output.Append(map.Text);
+				output.Append(map.FullName);
 				output.Append("`\n");
 			}
 
@@ -218,21 +229,21 @@ namespace Discord.Commands
 				else
 					output.Append(", ");
 				output.Append('`');
-				output.Append(subCmd.Text);
+				output.Append(subCmd.Name);
 				if (subCmd.SubGroups.Any())
 					output.Append("*");
 				output.Append('`');
 			}
 
-			return _client.SendMessage(channel, output.ToString());
+			return _client.SendMessage(replyChannel ?? channel, output.ToString());
 		}
-		public Task ShowHelp(Command command, User user, Channel channel)
+		public Task ShowCommandHelp(Command command, User user, Channel channel, Channel replyChannel = null)
 		{
 			StringBuilder output = new StringBuilder();
-			ShowHelpInternal(command, user, channel, output);
-            return _client.SendMessage(channel, output.ToString());
+			ShowCommandHelpInternal(command, user, channel, output);
+            return _client.SendMessage(replyChannel ?? channel, output.ToString());
 		}
-		private void ShowHelpInternal(Command command, User user, Channel channel, StringBuilder output)
+		private void ShowCommandHelpInternal(Command command, User user, Channel channel, StringBuilder output)
 		{
 			output.Append('`');
 			output.Append(command.Text);
@@ -261,17 +272,8 @@ namespace Discord.Commands
 				output.AppendLine($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');
         }
 
-		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
-		{
-			var builder = new CommandGroupBuilder(this, cmd);
-            if (config != null)
-				config(builder);
-		}
-		public CommandBuilder CreateCommand(string cmd)
-		{
-			var command = new Command(cmd);
-			return new CommandBuilder(this, command, "", "");
-		}
+		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null) => _root.CreateGroup(cmd, config);
+		public CommandBuilder CreateCommand(string cmd) => _root.CreateCommand(cmd);
 
 		internal void AddCommand(Command command)
 		{
@@ -282,7 +284,7 @@ namespace Discord.Commands
             string categoryName = command.Category ?? "";
 			if (!_categories.TryGetValue(categoryName, out category))
 			{
-				category = new CommandMap(null, "");
+				category = new CommandMap(null, "", "");
 				_categories.Add(categoryName, category);
 			}
 

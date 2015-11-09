@@ -64,8 +64,8 @@ namespace Discord.Modules
 			_name = name;
 			_id = name.ToLowerInvariant();
 			_filterType = filterType;
-            _allowServerWhitelist = filterType.HasFlag(FilterType.Server);
-			_allowChannelWhitelist = filterType.HasFlag(FilterType.Channel);
+            _allowServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
+			_allowChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
 			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
 
 			_enabledServers = new ConcurrentDictionary<string, Server>();
@@ -115,6 +115,7 @@ namespace Discord.Modules
 			commandService.CreateGroup(prefix, x =>
 			{
 				x.Category(_name);
+				x.AddCheck(new ModuleChecker(this));
 				config(x);
             });
 
@@ -244,12 +245,12 @@ namespace Discord.Modules
 				DisableAllChannels();
 		}
 
-		private bool HasServer(Server server) => 
+		internal bool HasServer(Server server) => 
 			_allowServerWhitelist && _enabledServers.ContainsKey(server.Id);
-		private bool HasIndirectServer(Server server) => 
+		internal bool HasIndirectServer(Server server) => 
 			(_allowServerWhitelist && _enabledServers.ContainsKey(server.Id)) || 
 			(_allowChannelWhitelist && _indirectServers.ContainsKey(server.Id));
-		private bool HasChannel(Channel channel)
+		internal bool HasChannel(Channel channel)
 		{
 			if (channel.IsPrivate) return _allowPrivate;
 

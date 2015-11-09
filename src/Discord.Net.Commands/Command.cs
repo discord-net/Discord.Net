@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Commands.Permissions;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -41,8 +42,9 @@ namespace Discord.Commands
 
 		public IEnumerable<CommandParameter> Parameters => _parameters;
 		internal CommandParameter[] _parameters;
-
-		private Func<CommandEventArgs, Task> _handler;
+		
+		private IPermissionChecker[] _checks;
+		private Func<CommandEventArgs, Task> _runFunc;
 
 		internal Command(string text)
 		{
@@ -56,7 +58,6 @@ namespace Discord.Commands
 		{
 			_aliases = aliases;
 		}
-
 		internal void SetParameters(CommandParameter[] parameters)
 		{
 			_parameters = parameters;
@@ -89,24 +90,32 @@ namespace Discord.Commands
 				}
 			}
 		}
-
-		internal void SetHandler(Func<CommandEventArgs, Task> func)
+		internal void SetChecks(IPermissionChecker[] checks)
 		{
-			_handler = func;
-		}
-		internal void SetHandler(Action<CommandEventArgs> func)
-		{
-			_handler = e => { func(e); return TaskHelper.CompletedTask; };
+			_checks = checks;
 		}
 
 		internal bool CanRun(User user, Channel channel)
 		{
+			for (int i = 0; i < _checks.Length; i++)
+			{
+				if (!_checks[i].CanRun(this, user, channel))
+                    return false;
+			}
 			return true;
 		}
 
+		internal void SetRunFunc(Func<CommandEventArgs, Task> func)
+		{
+			_runFunc = func;
+		}
+		internal void SetRunFunc(Action<CommandEventArgs> func)
+		{
+			_runFunc = e => { func(e); return TaskHelper.CompletedTask; };
+		}
 		internal Task Run(CommandEventArgs args)
 		{
-			var task = _handler(args);
+			var task = _runFunc(args);
 			if (task != null)
 				return task;
 			else

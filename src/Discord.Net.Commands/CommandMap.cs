@@ -7,24 +7,26 @@ namespace Discord.Commands
 	internal class CommandMap
 	{
 		private readonly CommandMap _parent;
-		private readonly string _text;
+		private readonly string _name, _fullName;
 
 		private Command _command;
 		private readonly Dictionary<string, CommandMap> _items;
 		private bool _isHidden;
 
-		public string Text => _text;
+		public string Name => _name;
+		public string FullName => _fullName;
 		public bool IsHidden => _isHidden;
 		public Command Command => _command;
 		public IEnumerable<CommandMap> SubGroups => _items.Values;
 		/*public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
 		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);*/
 
-		public CommandMap(CommandMap parent, string text)
+		public CommandMap(CommandMap parent, string name, string fullName)
 		{
 			_parent = parent;
-			_text = text;
-			_items = new Dictionary<string, CommandMap>();
+			_name = name;
+			_fullName = fullName;
+            _items = new Dictionary<string, CommandMap>();
 			_isHidden = true;
         }
 		
@@ -82,19 +84,20 @@ namespace Discord.Commands
 		{
 			AddCommand(0, text.Split(' '), command);
 		}
-		public void AddCommand(int index, string[] parts, Command command)
+		private void AddCommand(int index, string[] parts, Command command)
 		{
 			if (!command.IsHidden && _isHidden)
 				_isHidden = false;
 
 			if (index != parts.Length)
 			{
-				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (!_items.TryGetValue(nextPart, out nextGroup))
+				string name = parts[index];
+				string fullName = string.Join(" ", parts, 0, index + 1);
+                if (!_items.TryGetValue(name, out nextGroup))
 				{
-					nextGroup = new CommandMap(this, nextPart);
-					_items.Add(nextPart, nextGroup);
+					nextGroup = new CommandMap(this, name, fullName);
+					_items.Add(name, nextGroup);
 				}
 				nextGroup.AddCommand(index + 1, parts, command);
             }
