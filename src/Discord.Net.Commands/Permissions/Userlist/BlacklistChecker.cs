@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord.Commands.Permissions.Userlist
+﻿namespace Discord.Commands.Permissions.Userlist
 {
     public class BlacklistChecker : IPermissionChecker
 	{
@@ -8,9 +6,7 @@ namespace Discord.Commands.Permissions.Userlist
 
 		internal BlacklistChecker(DiscordClient client)
 		{
-			_service = client.GetService<BlacklistService>();
-			if (_service == null)
-				throw new InvalidOperationException($"{nameof(BlacklistService)} must be added to {nameof(DiscordClient)} before this function is called.");
+			_service = client.GetService<BlacklistService>(true);
 		}
 
 		public bool CanRun(Command command, User user, Channel channel)

@@ -109,9 +109,7 @@ namespace Discord.Modules
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
 		{
-			var commandService = _client.Commands();
-			if (commandService == null)
-				throw new InvalidOperationException($"{nameof(CommandService)} must be added to DiscordClient before this property is accessed.");
+			var commandService = _client.Commands(true);
 			commandService.CreateGroup(prefix, x =>
 			{
 				x.Category(_name);

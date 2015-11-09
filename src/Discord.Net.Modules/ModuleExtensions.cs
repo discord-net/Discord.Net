@@ -2,7 +2,7 @@
 {
     public static class ModuleExtensions
     {
-		public static ModuleService Modules(this DiscordClient client)
-			=> client.GetService<ModuleService>();
+		public static ModuleService Modules(this DiscordClient client, bool required = true)
+			=> client.GetService<ModuleService>(required);
     }
 }

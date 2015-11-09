@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord.Commands.Permissions.Levels
+﻿namespace Discord.Commands.Permissions.Levels
 {
 	public class PermissionLevelChecker : IPermissionChecker
 	{
@@ -12,10 +10,8 @@ namespace Discord.Commands.Permissions.Levels
 
 		internal PermissionLevelChecker(DiscordClient client, int minPermissions)
 		{
-			_service = client.GetService<PermissionLevelService>();
+			_service = client.GetService<PermissionLevelService>(true);
 			_minPermissions = minPermissions;
-            if (_service == null)
-				throw new InvalidOperationException($"{nameof(PermissionLevelService)} must be added to {nameof(DiscordClient)} before this function is called.");
         }
 
 		public bool CanRun(Command command, User user, Channel channel)
