@@ -12,17 +12,14 @@ namespace Discord
 		{
 			public PermissionTarget TargetType { get; }
 			public string TargetId { get; }
-			public ChannelPermissions Allow { get; }
-			public ChannelPermissions Deny { get; }
+			public DualChannelPermissions Permissions { get; }
 
 			internal PermissionOverwrite(PermissionTarget targetType, string targetId, uint allow, uint deny)
 			{
 				TargetType = targetType;
 				TargetId = targetId;
-				Allow = new ChannelPermissions(allow);
-				Allow.Lock();
-				Deny = new ChannelPermissions(deny);
-				Deny.Lock();
+				Permissions = new DualChannelPermissions(allow, deny);
+				Permissions.Lock();
 			}
 		}
 				

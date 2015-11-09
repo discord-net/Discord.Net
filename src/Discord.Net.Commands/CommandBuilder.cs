@@ -102,12 +102,7 @@ namespace Discord.Commands
 					return cmd;
 			}
 			else
-			{
-				if (prefix != "")
-					return prefix;
-				else
-					throw new ArgumentOutOfRangeException(nameof(cmd));
-			}
+				return prefix;
 		}
 	}
 	public sealed class CommandGroupBuilder

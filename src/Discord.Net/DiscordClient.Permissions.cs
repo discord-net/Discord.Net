@@ -7,6 +7,29 @@ namespace Discord
 {
 	public partial class DiscordClient
 	{
+		public DualChannelPermissions GetChannelPermissions(Channel channel, User user)
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (user == null) throw new ArgumentNullException(nameof(user));
+			CheckReady();
+
+			return channel.PermissionOverwrites
+				.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id)
+				.Select(x => x.Permissions)
+				.FirstOrDefault();
+		}
+		public DualChannelPermissions GetChannelPermissions(Channel channel, Role role)
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (role == null) throw new ArgumentNullException(nameof(role));
+			CheckReady();
+
+			return channel.PermissionOverwrites
+				.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == role.Id)
+				.Select(x => x.Permissions)
+				.FirstOrDefault();
+		}
+
 		public Task SetChannelPermissions(Channel channel, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));

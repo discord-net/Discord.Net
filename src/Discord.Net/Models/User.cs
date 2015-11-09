@@ -309,14 +309,14 @@ namespace Discord
 
 				//var roles = Roles.OrderBy(x => x.Id);
 				var roles = Roles;
-				foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-					newPermissions &= ~denyRole.Deny.RawValue;
-				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-					newPermissions |= allowRole.Allow.RawValue;
-				foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Deny.RawValue != 0))
-					newPermissions &= ~denyUser.Deny.RawValue;
-				foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Allow.RawValue != 0))
-					newPermissions |= allowUser.Allow.RawValue;
+				foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+					newPermissions &= ~denyRole.Permissions.Deny.RawValue;
+				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+					newPermissions |= allowRole.Permissions.Allow.RawValue;
+				foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
+					newPermissions &= ~denyUser.Permissions.Deny.RawValue;
+				foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
+					newPermissions |= allowUser.Permissions.Allow.RawValue;
 			}
 
 			var mask = ChannelPermissions.All(channel).RawValue;

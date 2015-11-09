@@ -218,6 +218,13 @@ namespace Discord
 			}
 		}
 
+		internal void Lock()
+		{
+			Allow.Lock();
+			Deny.Lock();
+		}
+		public DualChannelPermissions Copy() => new DualChannelPermissions(Allow.RawValue, Deny.RawValue);
+
 		public override bool Equals(object obj) => obj is DualChannelPermissions && 
 			(obj as DualChannelPermissions).Allow.Equals(Allow) &&
 			(obj as DualChannelPermissions).Deny.Equals(Deny);
