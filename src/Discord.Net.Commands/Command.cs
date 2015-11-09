@@ -34,8 +34,8 @@ namespace Discord.Commands
 		public string Category { get; internal set; }
         public bool IsHidden { get; internal set; }
         public string Description { get; internal set; }
-		public int? MinArgs { get; private set; }
-		public int? MaxArgs { get; private set; }
+		//public int? MinArgs { get; private set; }
+		//public int? MaxArgs { get; private set; }
 
 		public IEnumerable<string> Aliases => _aliases;
 		private string[] _aliases;
@@ -61,7 +61,7 @@ namespace Discord.Commands
 		internal void SetParameters(CommandParameter[] parameters)
 		{
 			_parameters = parameters;
-			if (parameters != null)
+			/*if (parameters != null)
 			{
 				if (parameters.Length == 0)
 				{
@@ -88,7 +88,7 @@ namespace Discord.Commands
 					else
 						MinArgs = optionalStart.Value;
 				}
-			}
+			}*/
 		}
 		internal void SetChecks(IPermissionChecker[] checks)
 		{

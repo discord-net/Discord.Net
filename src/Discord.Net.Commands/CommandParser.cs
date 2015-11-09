@@ -78,10 +78,7 @@ namespace Discord.Commands
 			{
 				if (startPosition == endPosition && (parameter == null || parameter.Type != ParameterType.Multiple)) //Is first char of a new arg
 				{
-					if (argList.Count == command.MaxArgs)
-						return CommandErrorType.BadArgCount;
-
-					parameter = command._parameters[argList.Count];
+					parameter = expectedArgs[argList.Count];
 					if (parameter.Type == ParameterType.Unparsed)
 					{
 						argList.Add(input.Substring(startPosition));
@@ -147,9 +144,9 @@ namespace Discord.Commands
 				}
 			}
 
-			for (int i = argList.Count; i < command._parameters.Length; i++)
+			for (int i = argList.Count; i < expectedArgs.Length; i++)
 			{
-				var param = command._parameters[i];
+				var param = expectedArgs[i];
 				switch (param.Type)
 				{
 					case ParameterType.Required:
@@ -160,6 +157,12 @@ namespace Discord.Commands
 						break;
 				}
 			}
+
+			if (argList.Count > expectedArgs.Length)
+			{
+				if (expectedArgs.Length == 0 || expectedArgs[expectedArgs.Length - 1].Type != ParameterType.Multiple)
+					return CommandErrorType.BadArgCount;
+            }
 
 			args = argList.ToArray();
 			return null;
