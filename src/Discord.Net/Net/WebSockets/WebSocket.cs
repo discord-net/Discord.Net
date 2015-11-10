@@ -51,8 +51,12 @@ namespace Discord.Net.WebSockets
 			_loginTimeout = client.Config.ConnectionTimeout;
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
-			
+
+#if !DNXCORE50
 			_engine = new WebSocketSharpEngine(this, client.Config);
+#else
+			//_engine = new BuiltInWebSocketEngine(this, client.Config);
+#endif
 			_engine.BinaryMessage += (s, e) =>
 			{
 				using (var compressed = new MemoryStream(e.Data, 2, e.Data.Length - 2))

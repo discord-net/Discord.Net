@@ -1,4 +1,5 @@
-﻿using Discord.Helpers;
+﻿#if DNXCORE50zzz
+using Discord.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -149,3 +150,4 @@ namespace Discord.Net.WebSockets
         }
 	}
 }
+#endif

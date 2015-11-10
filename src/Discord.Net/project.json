@@ -17,32 +17,57 @@
   "compilationOptions": {
     "allowUnsafe": true
   },
-  "configurations": {
-    "FullDebug": {
-      "compilationOptions": {
-        "define": [
-          "DEBUG",
-          "TRACE",
-          "TEST_RESPONSES"
-        ]
-      }
-    }
-  },
-  "dependencies": {
-    "Newtonsoft.Json": "7.0.1",
-    "RestSharp": "105.2.3",
-    "WebSocketSharp": "1.0.3-rc9"
-  },
+	"configurations": {
+		"FullDebug": {
+			"compilationOptions": {
+				"define": [
+					"DEBUG",
+					"TRACE",
+					"TEST_RESPONSES"
+				]
+			}
+		}
+	},
+
+	"dependencies": {
+		"Newtonsoft.Json": "7.0.1"
+	},
+
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
         "System.Net.Http": "4.0.0.0"
-      }
+      },
+			"dependencies": {
+				"RestSharp": "105.2.3",
+				"WebSocketSharp": "1.0.3-rc9"
+			}
     },
     "dnx451": {
       "frameworkAssemblies": {
         "System.Net.Http": "4.0.0.0"
-      }
-    }
+      },
+			"dependencies": {
+				"RestSharp": "105.2.3",
+				"WebSocketSharp": "1.0.3-rc9"
+			}
+    },
+		"dnxcore50": {
+			"dependencies": {
+				"System.Collections": "4.0.11-beta-23409",
+				"System.Collections.Concurrent": "4.0.11-beta-23409",
+				"System.IO.Compression": "4.0.1-beta-23409",
+				"System.Linq": "4.0.1-beta-23409",
+				"System.Net.Http": "4.0.1-beta-23409",
+				"System.Net.NameResolution": "4.0.0-beta-23409",
+				"System.Net.Sockets": "4.1.0-beta-23409",
+				"System.Net.Requests": "4.0.11-beta-23409",
+				"System.Net.WebSockets.Client": "4.0.0-beta-23409",
+				"System.Runtime.InteropServices": "4.0.21-beta-23409",
+				"System.Text.RegularExpressions": "4.0.11-beta-23409",
+				"System.Threading": "4.0.11-beta-23409",
+				"System.Threading.Thread": "4.0.0-beta-23409"
+			}
+		}
   }
 }

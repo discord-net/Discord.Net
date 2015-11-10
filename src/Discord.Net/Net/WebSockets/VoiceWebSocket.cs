@@ -131,8 +131,10 @@ namespace Discord.Net.WebSockets
 			}
 			else //Dont make an OS thread if we only want to capture one packet...
 				tasks.Add(Task.Run(() => ReceiveVoiceAsync(_cancelToken)));
-			
+
+#if !DNXCORE50
 			tasks.Add(WatcherAsync());
+#endif
 			if (tasks.Count > 0)
 			{
 				// We need to combine tasks into one because receiveThread is 
@@ -176,6 +178,7 @@ namespace Discord.Net.WebSockets
 		
 		private void ReceiveVoiceAsync(CancellationToken cancelToken)
 		{
+			var closeTask = cancelToken.Wait();
 			try
 			{
 				byte[] packet, decodingBuffer = null, nonce = null, result;
@@ -193,7 +196,18 @@ namespace Discord.Net.WebSockets
 					Thread.Sleep(1);
 					if (_udp.Available > 0)
 					{
+#if !DNXCORE50
 						packet = _udp.Receive(ref endpoint);
+#else
+						//TODO: Is this really the only way to end a Receive call in DNXCore?
+						var receiveTask = _udp.ReceiveAsync();
+                        var task = Task.WhenAny(closeTask, receiveTask).Result;
+						if (task == closeTask)
+							break;
+						var udpPacket = receiveTask.Result;
+                        packet = udpPacket.Buffer;
+						endpoint = udpPacket.RemoteEndPoint;
+#endif
 						packetLength = packet.Length;
 
                         if (packetLength > 0 && endpoint.Equals(_endpoint))
@@ -367,6 +381,7 @@ namespace Discord.Net.WebSockets
 			catch (OperationCanceledException) { }
 			catch (InvalidOperationException) { } //Includes ObjectDisposedException
 		}
+#if !DNXCORE50
 		//Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
 		private Task WatcherAsync()
 		{
@@ -374,6 +389,7 @@ namespace Discord.Net.WebSockets
 			return cancelToken.Wait()
 				.ContinueWith(_ => _udp.Close());
 		}
+#endif
 
 		protected override async Task ProcessMessage(string json)
 		{

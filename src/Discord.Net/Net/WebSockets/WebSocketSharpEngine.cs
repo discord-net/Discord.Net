@@ -1,7 +1,7 @@
-﻿using System;
+﻿#if !DNXCORE50
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using WSSharpNWebSocket = WebSocketSharp.WebSocket;
@@ -112,3 +112,4 @@ namespace Discord.Net.WebSockets
 		}
 	}
 }
+#endif

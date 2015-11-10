@@ -17,8 +17,12 @@ namespace Discord.Net.Rest
 		public RestClient(DiscordAPIClientConfig config)
 		{
 			_config = config;
+#if !DNXCORE50
 			_engine = new SharpRestEngine(config);
-        }
+#else
+			//_engine = new BuiltInRestEngine(config);
+#endif
+		}
 
 		public void SetToken(string token) => _engine.SetToken(token);
 
