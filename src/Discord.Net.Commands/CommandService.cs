@@ -236,7 +236,10 @@ After:
 			}
 
 			if (isFirst)
-				output.Append("There are no subcommands you have permission to run.");
+			{
+				output.Clear();
+				output.AppendLine("You do not have permission to access this command.");
+			}
 
 			return _client.SendMessage(replyChannel ?? channel, output.ToString());
 		}
@@ -248,6 +251,12 @@ After:
 		}
 		private void ShowCommandHelpInternal(Command command, User user, Channel channel, StringBuilder output)
 		{
+			if (!command.CanRun(user, channel))
+			{
+				output.AppendLine("You do not have permission to access this command.");
+				return;
+			}
+
 			output.Append('`');
 			output.Append(command.Text);
 			foreach (var param in command.Parameters)
