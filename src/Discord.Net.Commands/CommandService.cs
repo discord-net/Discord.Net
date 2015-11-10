@@ -88,10 +88,10 @@ After:
                 }
 
 				//Parse command
-				Command command;
+				IEnumerable<Command> commands;
 				int argPos;
-				CommandParser.ParseCommand(msg, _map, out command, out argPos);				
-				if (command == null)
+				CommandParser.ParseCommand(msg, _map, out commands, out argPos);				
+				if (commands == null)
 				{
 					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null);
 					RaiseCommandError(CommandErrorType.UnknownCommand, errorArgs);
@@ -99,35 +99,46 @@ After:
 				}
 				else
 				{
-					//Parse arguments
-					string[] args;
-					var error = CommandParser.ParseArgs(msg, argPos, command, out args);
-                    if (error != null)
+					foreach (var command in commands)
 					{
-						var errorArgs = new CommandEventArgs(e.Message, command, null);
-						RaiseCommandError(error.Value, errorArgs);
+						//Parse arguments
+						string[] args;
+						var error = CommandParser.ParseArgs(msg, argPos, command, out args);
+						if (error != null)
+						{
+							if (error == CommandErrorType.BadArgCount)
+								continue;
+							else
+							{
+								var errorArgs = new CommandEventArgs(e.Message, command, null);
+								RaiseCommandError(error.Value, errorArgs);
+								return;
+							}
+						}
+
+						var eventArgs = new CommandEventArgs(e.Message, command, args);
+
+						// Check permissions
+						if (!command.CanRun(eventArgs.User, eventArgs.Channel))
+						{
+							RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
+							return;
+						}
+
+						// Run the command
+						try
+						{
+							RaiseRanCommand(eventArgs);
+							await command.Run(eventArgs).ConfigureAwait(false);
+						}
+						catch (Exception ex)
+						{
+							RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
+						}
 						return;
 					}
-					
-					var eventArgs = new CommandEventArgs(e.Message, command, args);
-
-					// Check permissions
-					if (!command.CanRun(eventArgs.User, eventArgs.Channel))
-					{
-						RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
-						return;
-					}
-
-					// Run the command
-					try
-					{
-						RaiseRanCommand(eventArgs);
-						await command.Run(eventArgs).ConfigureAwait(false);
-					}
-					catch (Exception ex)
-					{
-						RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
-					}
+					var errorArgs2 = new CommandEventArgs(e.Message, null, null);
+					RaiseCommandError(CommandErrorType.BadArgCount, errorArgs2);
 				}
             };
         }
@@ -208,9 +219,19 @@ After:
         {
 			StringBuilder output = new StringBuilder();
 
-			Command cmd = map.Command;
-			if (cmd != null)
-				ShowCommandHelpInternal(cmd, user, channel, output);
+			IEnumerable<Command> cmds = map.Commands;
+			bool isFirstCmd = true;
+			if (cmds != null)
+			{
+				foreach (var cmd in cmds)
+				{
+					if (isFirstCmd)
+						isFirstCmd = false;
+					/*else
+						output.AppendLine();*/
+					ShowCommandHelpInternal(cmd, user, channel, output);
+				}
+			}
 			else
 			{
 				output.Append('`');
@@ -218,12 +239,12 @@ After:
 				output.Append("`\n");
 			}
 
-			bool isFirst = true;
+			bool isFirstSubCmd = true;
 			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel) && !x.IsHidden))
 			{
-				if (isFirst)
+				if (isFirstSubCmd)
 				{
-					isFirst = false;
+					isFirstSubCmd = false;
 					output.AppendLine("Sub Commands: ");
 				}
 				else
@@ -235,7 +256,7 @@ After:
 				output.Append('`');
 			}
 
-			if (isFirst)
+			if (isFirstCmd && isFirstSubCmd) //Had no commands and no subcommands
 			{
 				output.Clear();
 				output.AppendLine("You do not have permission to access this command.");
@@ -246,17 +267,14 @@ After:
 		public Task ShowCommandHelp(Command command, User user, Channel channel, Channel replyChannel = null)
 		{
 			StringBuilder output = new StringBuilder();
-			ShowCommandHelpInternal(command, user, channel, output);
+			if (!command.CanRun(user, channel))
+				output.AppendLine("You do not have permission to access this command.");
+			else
+				ShowCommandHelpInternal(command, user, channel, output);
             return _client.SendMessage(replyChannel ?? channel, output.ToString());
 		}
 		private void ShowCommandHelpInternal(Command command, User user, Channel channel, StringBuilder output)
 		{
-			if (!command.CanRun(user, channel))
-			{
-				output.AppendLine("You do not have permission to access this command.");
-				return;
-			}
-
 			output.Append('`');
 			output.Append(command.Text);
 			foreach (var param in command.Parameters)

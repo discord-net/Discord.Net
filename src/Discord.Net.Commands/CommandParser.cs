@@ -12,13 +12,13 @@ namespace Discord.Commands
 			DoubleQuotedParameter
 		}
 
-		public static bool ParseCommand(string input, CommandMap map, out Command command, out int endPos)
+		public static bool ParseCommand(string input, CommandMap map, out IEnumerable<Command> commands, out int endPos)
 		{
 			int startPosition = 0;
 			int endPosition = 0;
             int inputLength = input.Length;
 			bool isEscaped = false;
-			command = null;
+			commands = null;
 			endPos = 0;
 
 			if (input == "")
@@ -52,8 +52,8 @@ namespace Discord.Commands
 					}
 				}
 			}
-			command = map.GetCommand(); //Work our way backwards to find a command that matches our input
-			return command != null;
+			commands = map.GetCommands(); //Work our way backwards to find a command that matches our input
+			return commands != null;
 		}
 
 		//TODO: Check support for escaping
@@ -78,6 +78,8 @@ namespace Discord.Commands
 			{
 				if (startPosition == endPosition && (parameter == null || parameter.Type != ParameterType.Multiple)) //Is first char of a new arg
 				{
+					if (argList.Count >= expectedArgs.Length)
+						return CommandErrorType.BadArgCount; //Too many args
 					parameter = expectedArgs[argList.Count];
 					if (parameter.Type == ParameterType.Unparsed)
 					{
@@ -144,6 +146,7 @@ namespace Discord.Commands
 				}
 			}
 
+			//Too few args
 			for (int i = argList.Count; i < expectedArgs.Length; i++)
 			{
 				var param = expectedArgs[i];
@@ -158,11 +161,11 @@ namespace Discord.Commands
 				}
 			}
 
-			if (argList.Count > expectedArgs.Length)
+			/*if (argList.Count > expectedArgs.Length)
 			{
 				if (expectedArgs.Length == 0 || expectedArgs[expectedArgs.Length - 1].Type != ParameterType.Multiple)
 					return CommandErrorType.BadArgCount;
-            }
+            }*/
 
 			args = argList.ToArray();
 			return null;

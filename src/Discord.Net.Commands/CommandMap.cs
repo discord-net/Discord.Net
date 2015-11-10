@@ -9,14 +9,14 @@ namespace Discord.Commands
 		private readonly CommandMap _parent;
 		private readonly string _name, _fullName;
 
-		private Command _command;
+		private readonly List<Command> _commands;
 		private readonly Dictionary<string, CommandMap> _items;
 		private bool _isHidden;
 
 		public string Name => _name;
 		public string FullName => _fullName;
 		public bool IsHidden => _isHidden;
-		public Command Command => _command;
+		public IEnumerable<Command> Commands => _commands;
 		public IEnumerable<CommandMap> SubGroups => _items.Values;
 		/*public IEnumerable<Command> SubCommands => _items.Select(x => x.Value._command).Where(x => x != null);
 		public IEnumerable<CommandMap> SubGroups => _items.Select(x => x.Value).Where(x => x._items.Count > 0);*/
@@ -27,6 +27,7 @@ namespace Discord.Commands
 			_name = name;
 			_fullName = fullName;
             _items = new Dictionary<string, CommandMap>();
+			_commands = new List<Command>();
 			_isHidden = true;
         }
 		
@@ -48,20 +49,20 @@ namespace Discord.Commands
 			return this;
 		}
 
-		public Command GetCommand()
+		public IEnumerable<Command> GetCommands()
 		{
-			if (_command != null)
-				return _command;
+			if (_commands.Count > 0)
+				return _commands;
 			else if (_parent != null)
-				return _parent.GetCommand();
+				return _parent.GetCommands();
 			else
 				return null;
 		}
-		public Command GetCommand(string text)
+		public IEnumerable<Command> GetCommands(string text)
 		{
-			return GetCommand(0, text.Split(' '));
+			return GetCommands(0, text.Split(' '));
 		}
-		public Command GetCommand(int index, string[] parts)
+		public IEnumerable<Command> GetCommands(int index, string[] parts)
 		{
 			if (index != parts.Length)
 			{
@@ -69,14 +70,14 @@ namespace Discord.Commands
 				CommandMap nextGroup;
 				if (_items.TryGetValue(nextPart, out nextGroup))
 				{
-					var cmd = nextGroup.GetCommand(index + 1, parts);
+					var cmd = nextGroup.GetCommands(index + 1, parts);
 					if (cmd != null)
 						return cmd;
 				}
 			}
 
-			if (_command != null)
-				return _command;
+			if (_commands != null)
+				return _commands;
 			return null;
 		}
 
@@ -102,21 +103,26 @@ namespace Discord.Commands
 				nextGroup.AddCommand(index + 1, parts, command);
             }
 			else
-			{
-				if (_command != null)
-					throw new InvalidOperationException("A command has already been added with this path.");
-				_command = command;
-			}
+				_commands.Add(command);
 		}
 
 		public bool CanRun(User user, Channel channel)
 		{
-			if (_command != null && _command.CanRun(user, channel))
-				return true;
-			foreach (var item in _items)
+			if (_commands.Count > 0)
 			{
-				if (item.Value.CanRun(user, channel))
-					return true;
+				foreach (var cmd in _commands)
+				{
+					if (cmd.CanRun(user, channel))
+						return true;
+				}
+			}
+			if (_items.Count > 0)
+			{
+				foreach (var item in _items)
+				{
+					if (item.Value.CanRun(user, channel))
+						return true;
+				}
 			}
 			return false;
 		}
