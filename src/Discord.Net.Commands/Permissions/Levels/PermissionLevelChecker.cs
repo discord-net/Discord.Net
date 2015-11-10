@@ -14,8 +14,9 @@
 			_minPermissions = minPermissions;
         }
 
-		public bool CanRun(Command command, User user, Channel channel)
+		public bool CanRun(Command command, User user, Channel channel, out string error)
 		{
+			error = null; //Use default error text.
 			int permissions = _service.GetPermissionLevel(user, channel);
 			return permissions >= _minPermissions;
 		}

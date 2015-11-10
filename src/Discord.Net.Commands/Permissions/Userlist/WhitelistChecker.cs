@@ -9,8 +9,9 @@
 			_service = client.GetService<WhitelistService>(true);
 		}
 
-		public bool CanRun(Command command, User user, Channel channel)
+		public bool CanRun(Command command, User user, Channel channel, out string error)
 		{
+			error = null; //Use default error text.
 			return _service.CanRun(user);
 		}
 	}

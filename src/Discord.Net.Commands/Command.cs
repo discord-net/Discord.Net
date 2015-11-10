@@ -95,13 +95,14 @@ namespace Discord.Commands
 			_checks = checks;
 		}
 
-		internal bool CanRun(User user, Channel channel)
+		internal bool CanRun(User user, Channel channel, out string error)
 		{
 			for (int i = 0; i < _checks.Length; i++)
 			{
-				if (!_checks[i].CanRun(this, user, channel))
+				if (!_checks[i].CanRun(this, user, channel, out error))
                     return false;
 			}
+			error = null;
 			return true;
 		}
 

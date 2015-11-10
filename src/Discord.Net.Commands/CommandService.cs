@@ -9,7 +9,9 @@ namespace Discord.Commands
 	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
 	public partial class CommandService : IService
     {
-		private readonly CommandServiceConfig _config;
+		private const string DefaultPermissionError = "You do not have permission to access this command.";
+
+        private readonly CommandServiceConfig _config;
 		private readonly CommandGroupBuilder _root;
 		private DiscordClient _client;
 
@@ -119,9 +121,10 @@ After:
 						var eventArgs = new CommandEventArgs(e.Message, command, args);
 
 						// Check permissions
-						if (!command.CanRun(eventArgs.User, eventArgs.Channel))
+						string errorText;
+						if (!command.CanRun(eventArgs.User, eventArgs.Channel, out errorText))
 						{
-							RaiseCommandError(CommandErrorType.BadPermissions, eventArgs);
+							RaiseCommandError(CommandErrorType.BadPermissions, eventArgs, new Exception(errorText ?? DefaultPermissionError));
 							return;
 						}
 
@@ -162,7 +165,8 @@ After:
 				bool isFirstItem = true;
 				foreach (var group in category.Value.SubGroups)
 				{
-					if (!group.IsHidden && group.CanRun(user, channel))
+					string error;
+					if (!group.IsHidden && group.CanRun(user, channel, out error))
 					{
 						if (isFirstItem)
 						{
@@ -221,15 +225,21 @@ After:
 
 			IEnumerable<Command> cmds = map.Commands;
 			bool isFirstCmd = true;
+			string error;
 			if (cmds != null)
 			{
 				foreach (var cmd in cmds)
 				{
-					if (isFirstCmd)
-						isFirstCmd = false;
-					/*else
-						output.AppendLine();*/
-					ShowCommandHelpInternal(cmd, user, channel, output);
+					if (!cmd.CanRun(user, channel, out error)) { }
+						//output.AppendLine(error ?? DefaultPermissionError);
+					else
+					{
+						if (isFirstCmd)
+							isFirstCmd = false;
+						else
+							output.AppendLine();
+						ShowCommandHelpInternal(cmd, user, channel, output);
+					}
 				}
 			}
 			else
@@ -240,7 +250,7 @@ After:
 			}
 
 			bool isFirstSubCmd = true;
-			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel) && !x.IsHidden))
+			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel, out error) && !x.IsHidden))
 			{
 				if (isFirstSubCmd)
 				{
@@ -259,7 +269,7 @@ After:
 			if (isFirstCmd && isFirstSubCmd) //Had no commands and no subcommands
 			{
 				output.Clear();
-				output.AppendLine("You do not have permission to access this command.");
+				output.AppendLine("There are no commands you have permission to run.");
 			}
 
 			return _client.SendMessage(replyChannel ?? channel, output.ToString());
@@ -267,8 +277,9 @@ After:
 		public Task ShowCommandHelp(Command command, User user, Channel channel, Channel replyChannel = null)
 		{
 			StringBuilder output = new StringBuilder();
-			if (!command.CanRun(user, channel))
-				output.AppendLine("You do not have permission to access this command.");
+			string error;
+			if (!command.CanRun(user, channel, out error))
+				output.AppendLine(error ?? DefaultPermissionError);
 			else
 				ShowCommandHelpInternal(command, user, channel, output);
             return _client.SendMessage(replyChannel ?? channel, output.ToString());

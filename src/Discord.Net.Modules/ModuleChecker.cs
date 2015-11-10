@@ -14,9 +14,18 @@ namespace Discord.Modules
 			_filterType = manager.FilterType;
         }
 
-		public bool CanRun(Command command, User user, Channel channel)
+		public bool CanRun(Command command, User user, Channel channel, out string error)
 		{
-			return _filterType == FilterType.Unrestricted || _filterType == FilterType.AllowPrivate || _manager.HasChannel(channel);
+			if (_filterType == FilterType.Unrestricted || _filterType == FilterType.AllowPrivate || _manager.HasChannel(channel))
+			{
+				error = null;
+				return true;
+			}
+			else
+			{
+				error = "This module is currently disabled.";
+				return false;
+			}
 		}
 	}
 }

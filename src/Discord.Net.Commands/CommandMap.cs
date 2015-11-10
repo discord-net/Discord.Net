@@ -106,25 +106,26 @@ namespace Discord.Commands
 				_commands.Add(command);
 		}
 
-		public bool CanRun(User user, Channel channel)
+		public bool CanRun(User user, Channel channel, out string error)
 		{
 			if (_commands.Count > 0)
 			{
 				foreach (var cmd in _commands)
 				{
-					if (cmd.CanRun(user, channel))
-						return true;
+					if (!cmd.CanRun(user, channel, out error))
+						return false;
 				}
 			}
 			if (_items.Count > 0)
 			{
 				foreach (var item in _items)
 				{
-					if (item.Value.CanRun(user, channel))
-						return true;
+					if (!item.Value.CanRun(user, channel, out error))
+						return false;
 				}
 			}
-			return false;
+			error = null;
+			return true;
 		}
 	}
 }
