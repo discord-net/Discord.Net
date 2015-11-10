@@ -235,6 +235,9 @@ After:
 				output.Append('`');
 			}
 
+			if (isFirst)
+				output.Append("There are no subcommands you have permission to run.");
+
 			return _client.SendMessage(replyChannel ?? channel, output.ToString());
 		}
 		public Task ShowCommandHelp(Command command, User user, Channel channel, Channel replyChannel = null)
