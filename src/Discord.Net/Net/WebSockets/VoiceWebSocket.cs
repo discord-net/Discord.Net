@@ -433,6 +433,12 @@ namespace Discord.Net.WebSockets
 						}
 					}
 					break;
+				case 3: //PONG
+					{
+						//var payload = (msg.Payload as JToken).ToObject<VoiceKeepAliveCommand>();
+						//TODO: Use this to estimate latency
+					}
+					break;
 				case 4: //SESSION_DESCRIPTION
 					{
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>();
