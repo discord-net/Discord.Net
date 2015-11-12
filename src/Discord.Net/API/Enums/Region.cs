@@ -8,6 +8,7 @@
 		public static readonly Region London = new Region("london");
 		public static readonly Region Sydney = new Region("sydney");
 		public static readonly Region Amsterdam = new Region("amsterdam");
+		public static readonly Region Frankfurt = new Region("frankfurt");
 
 		private Region(string value)
 			: base(value) { }
