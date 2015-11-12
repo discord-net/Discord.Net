@@ -58,8 +58,8 @@ namespace Discord
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
 		public DateTime? LastActivityAt { get; private set; }
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
-		public DateTime LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
-		private DateTime _lastOnline;
+		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
+		private DateTime? _lastOnline;
 
 		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		[JsonIgnore]
