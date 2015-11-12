@@ -215,6 +215,13 @@ namespace Discord
 					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
 					.ToArray();
 			}
+			if (model.IsMentioningEveryone != null)
+			{
+				if (model.IsMentioningEveryone.Value && User.GetPermissions(channel).MentionEveryone)
+					MentionedRoles = new Role[] { Server.EveryoneRole };
+				else
+					MentionedRoles = new Role[0];
+            }
 			if (model.Content != null)
 			{
 				string text = model.Content;
@@ -222,18 +229,18 @@ namespace Discord
 
 				//var mentionedUsers = new List<User>();
 				var mentionedChannels = new List<Channel>();
-				var mentionedRoles = new List<Role>();
+				//var mentionedRoles = new List<Role>();
 				text = Mention.CleanUserMentions(_client, server, text/*, mentionedUsers*/);
 				if (server != null)
 				{
 					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
-					text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
+					//text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
 				}
 				Text = text;
 
 				//MentionedUsers = mentionedUsers;
 				MentionedChannels = mentionedChannels;
-				MentionedRoles = mentionedRoles;
+				//MentionedRoles = mentionedRoles;
 			}
 
 			if (server != null)
