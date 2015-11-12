@@ -41,7 +41,7 @@ namespace Discord.Commands
 			{
 				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (_items.TryGetValue(nextPart, out nextGroup))
+				if (_items.TryGetValue(nextPart.ToLowerInvariant(), out nextGroup))
 					return nextGroup.GetItem(index + 1, parts);
 				else
 					return null;
@@ -68,7 +68,7 @@ namespace Discord.Commands
 			{
 				string nextPart = parts[index];
 				CommandMap nextGroup;
-				if (_items.TryGetValue(nextPart, out nextGroup))
+				if (_items.TryGetValue(nextPart.ToLowerInvariant(), out nextGroup))
 				{
 					var cmd = nextGroup.GetCommands(index + 1, parts);
 					if (cmd != null)
@@ -93,7 +93,7 @@ namespace Discord.Commands
 			if (index != parts.Length)
 			{
 				CommandMap nextGroup;
-				string name = parts[index];
+				string name = parts[index].ToLowerInvariant();
 				string fullName = string.Join(" ", parts, 0, index + 1);
                 if (!_items.TryGetValue(name, out nextGroup))
 				{
