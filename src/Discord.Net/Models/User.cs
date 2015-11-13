@@ -321,7 +321,7 @@ namespace Discord
 
 			var mask = ChannelPermissions.All(channel).RawValue;
 			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
-				newPermissions = ChannelPermissions.All(channel).RawValue;
+				newPermissions = mask;
 			else if (!BitHelper.GetBit(newPermissions, (int)PermissionsBits.ReadMessages))
 				newPermissions = ChannelPermissions.None.RawValue;
 			else
