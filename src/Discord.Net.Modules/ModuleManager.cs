@@ -103,7 +103,6 @@ namespace Discord.Modules
 				client.MessageDeleted += (s, e) => { if (MessageDeleted != null && HasChannel(e.Channel)) MessageDeleted(s, e); };
 				client.MessageUpdated += (s, e) => { if (MessageUpdated != null && HasChannel(e.Channel)) MessageUpdated(s, e); };
 				client.MessageReadRemotely += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
-				client.MessageReceived += (s, e) => { if (MessageReceived != null && HasChannel(e.Channel)) MessageReceived(s, e); };
 			}
         }
 
