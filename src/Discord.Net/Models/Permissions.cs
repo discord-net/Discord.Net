@@ -139,7 +139,7 @@ namespace Discord
 		}
 
 		public override bool Equals(object obj) => obj is Permissions && (obj as Permissions)._rawValue == _rawValue;
-		public override int GetHashCode() => _rawValue.GetHashCode();
+		public override int GetHashCode() => unchecked(_rawValue.GetHashCode() + 393);
 	}
 
 	public sealed class DualChannelPermissions
@@ -228,6 +228,6 @@ namespace Discord
 		public override bool Equals(object obj) => obj is DualChannelPermissions && 
 			(obj as DualChannelPermissions).Allow.Equals(Allow) &&
 			(obj as DualChannelPermissions).Deny.Equals(Deny);
-		public override int GetHashCode() => unchecked(Allow.GetHashCode() + Deny.GetHashCode());
+		public override int GetHashCode() => unchecked(Allow.GetHashCode() + Deny.GetHashCode() + 1724);
 	}
 }

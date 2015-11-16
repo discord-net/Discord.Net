@@ -71,7 +71,7 @@ namespace Discord
 		}
 
 		public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
-		public override int GetHashCode() => Id.GetHashCode();
+		public override int GetHashCode() => unchecked(Id.GetHashCode() + 6653);
 		public override string ToString() => Name ?? Id;
 	}
 }

@@ -79,7 +79,7 @@ namespace Discord
 		}
 
 		public override bool Equals(object obj) => obj is Color && (obj as Color)._rawValue == _rawValue;
-		public override int GetHashCode() => _rawValue.GetHashCode();
+		public override int GetHashCode() => unchecked(_rawValue.GetHashCode() + 1678);
 		public override string ToString() => '#' + _rawValue.ToString("X");
 	}
 }

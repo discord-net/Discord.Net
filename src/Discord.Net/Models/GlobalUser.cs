@@ -69,7 +69,7 @@ namespace Discord
 		}
 
 		public override bool Equals(object obj) => obj is GlobalUser && (obj as GlobalUser).Id == Id;
-		public override int GetHashCode() => Id.GetHashCode();
+		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7891);
 		public override string ToString() => Id;
 	}
 }
