@@ -46,7 +46,7 @@ namespace Discord.Modules
 		private readonly DiscordClient _client;
 		private readonly string _name, _id;
 		private readonly FilterType _filterType;
-		private readonly bool _allowServerWhitelist, _allowChannelWhitelist, _allowPrivate;
+		private readonly bool _useServerWhitelist, _useChannelWhitelist, _allowAll, _allowPrivate;
 		private readonly ConcurrentDictionary<string, Server> _enabledServers;
 		private readonly ConcurrentDictionary<string, Channel> _enabledChannels;
 		private readonly ConcurrentDictionary<string, int> _indirectServers;
@@ -64,15 +64,16 @@ namespace Discord.Modules
 			_name = name;
 			_id = name.ToLowerInvariant();
 			_filterType = filterType;
-            _allowServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
-			_allowChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
+			_allowAll = filterType == FilterType.Unrestricted;
+			_useServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
+			_useChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
 			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
 
 			_enabledServers = new ConcurrentDictionary<string, Server>();
 			_enabledChannels = new ConcurrentDictionary<string, Channel>();
 			_indirectServers = new ConcurrentDictionary<string, int>();
 
-			if (_allowServerWhitelist) //Server-only events
+			if (_useServerWhitelist) //Server-only events
 			{
 				client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) DisableServer(e.Server); LeftServer(s, e); };
 				client.ServerUpdated += (s, e) => { if (ServerUpdated != null && HasIndirectServer(e.Server)) ServerUpdated(s, e); };
@@ -120,7 +121,7 @@ namespace Discord.Modules
 		public bool EnableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
 			{
@@ -136,7 +137,7 @@ namespace Discord.Modules
 		public bool DisableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
 			{
@@ -151,7 +152,7 @@ namespace Discord.Modules
 		}
 		public void DisableAllServers()
 		{
-			if (!_allowServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
 			{
@@ -168,7 +169,7 @@ namespace Discord.Modules
 		public bool EnableChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-            if (!_allowChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+            if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
 			{
@@ -192,7 +193,7 @@ namespace Discord.Modules
 		public bool DisableChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (!_allowChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
 			{
@@ -219,7 +220,7 @@ namespace Discord.Modules
 		}
 		public void DisableAllChannels()
 		{
-			if (!_allowChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
 			{
@@ -236,23 +237,26 @@ namespace Discord.Modules
 
 		public void DisableAll()
 		{
-			if (_allowServerWhitelist)
+			if (_useServerWhitelist)
 				DisableAllServers();
-			if (_allowChannelWhitelist)
+			if (_useChannelWhitelist)
 				DisableAllChannels();
 		}
 
-		internal bool HasServer(Server server) => 
-			_allowServerWhitelist && _enabledServers.ContainsKey(server.Id);
-		internal bool HasIndirectServer(Server server) => 
-			(_allowServerWhitelist && _enabledServers.ContainsKey(server.Id)) || 
-			(_allowChannelWhitelist && _indirectServers.ContainsKey(server.Id));
+		internal bool HasServer(Server server) =>
+			_allowAll ||
+			_useServerWhitelist && _enabledServers.ContainsKey(server.Id);
+		internal bool HasIndirectServer(Server server) =>
+			_allowAll ||
+			(_useServerWhitelist && _enabledServers.ContainsKey(server.Id)) || 
+			(_useChannelWhitelist && _indirectServers.ContainsKey(server.Id));
 		internal bool HasChannel(Channel channel)
 		{
-			if (channel.IsPrivate) return _allowPrivate;
+			if (_allowAll) return true;
+            if (channel.IsPrivate) return _allowPrivate;
 
-			if (_allowChannelWhitelist && _enabledChannels.ContainsKey(channel.Id)) return true;
-			if (_allowServerWhitelist)
+			if (_useChannelWhitelist && _enabledChannels.ContainsKey(channel.Id)) return true;
+			if (_useServerWhitelist)
 			{
 				var server = channel.Server;
 				if (server == null) return false;
