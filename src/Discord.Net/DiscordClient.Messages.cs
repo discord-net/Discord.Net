@@ -223,6 +223,8 @@ namespace Discord
 			if (count < 0) throw new ArgumentNullException(nameof(count));
 			CheckReady();
 
+			bool trackActivity = Config.TrackActivity;
+
 			if (count == 0) return new Message[0];
 			if (channel != null && channel.Type == ChannelType.Text)
 			{
@@ -233,20 +235,19 @@ namespace Discord
 					{
 						Message msg = null;
 						if (cache)
+						{
 							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
-						else
-						{
-							msg = _messages[x.Id] ?? new Message(this, x.Id, x.ChannelId, x.Author.Id);
-							msg.Update(x); //TODO: Look into updating when cache is true, but only if we actually generated a new message.
-						}
-						if (Config.TrackActivity)
-						{
-							if (!channel.IsPrivate)
+							if (trackActivity)
 							{
 								var user = msg.User;
 								if (user != null)
 									user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 							}
+						}
+						else
+						{
+							msg = /*_messages[x.Id] ??*/ new Message(this, x.Id, x.ChannelId, x.Author.Id);
+							msg.Update(x);
 						}
 						return msg;
 					})
