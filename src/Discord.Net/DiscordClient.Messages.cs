@@ -217,7 +217,7 @@ namespace Discord
 
 
 		/// <summary> Downloads last count messages from the server, returning all messages before or after relativeMessageId, if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(Channel channel, int count, string relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool cache = true)
+		public async Task<Message[]> DownloadMessages(Channel channel, int count, string relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool cache = false)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
@@ -252,7 +252,7 @@ namespace Discord
 					})
 					.ToArray();
 				}
-				catch (HttpException) { } //Bad Permissions?
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.Forbidden){ } //Bad Permissions
 			}
 			return null;
 		}
