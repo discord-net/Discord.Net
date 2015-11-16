@@ -1,5 +1,4 @@
 ﻿using Discord.API;
-using Discord.Net;
 using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+	public enum RelativeDirection { Before, After }
+
 	/// <summary> A lightweight wrapper around the Discord API. </summary>
 	public class DiscordAPIClient
 	{
@@ -92,12 +93,12 @@ namespace Discord
 			var request = new ReorderChannelsRequest(channels);
 			return _rest.Patch(Endpoints.ServerChannels(serverId), request);
 		}
-		public Task<GetMessagesResponse> GetMessages(string channelId, int count, string beforeMessageId = null)
+		public Task<GetMessagesResponse> GetMessages(string channelId, int count, string relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before)
 		{
 			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
 
-			if (beforeMessageId != null)
-				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count, beforeMessageId));
+			if (relativeMessageId != null)
+				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count, relativeMessageId, relativeDir == RelativeDirection.Before ? "before" : "after"));
 			else
 				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count));
 		}

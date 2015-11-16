@@ -215,8 +215,9 @@ namespace Discord
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
-		/// <summary> Downloads last count messages from the server, starting at beforeMessageId if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(Channel channel, int count, string beforeMessageId = null, bool cache = true)
+
+		/// <summary> Downloads last count messages from the server, returning all messages before or after relativeMessageId, if it's provided. </summary>
+		public async Task<Message[]> DownloadMessages(Channel channel, int count, string relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool cache = true)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
@@ -227,8 +228,8 @@ namespace Discord
 			{
 				try
 				{
-					var msgs = await _api.GetMessages(channel.Id, count, beforeMessageId).ConfigureAwait(false);
-					return msgs.Select(x =>
+					var msgs = await _api.GetMessages(channel.Id, count, relativeMessageId, relativeDir).ConfigureAwait(false);
+                    var result = msgs.Select(x =>
 					{
 						Message msg = null;
 						if (cache)
