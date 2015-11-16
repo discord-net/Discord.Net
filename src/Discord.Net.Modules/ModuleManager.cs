@@ -63,6 +63,7 @@ namespace Discord.Modules
 			_client = client;
 			_name = name;
 			_id = name.ToLowerInvariant();
+
 			_filterType = filterType;
 			_allowAll = filterType == FilterType.Unrestricted;
 			_useServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
@@ -73,39 +74,41 @@ namespace Discord.Modules
 			_enabledChannels = new ConcurrentDictionary<string, Channel>();
 			_indirectServers = new ConcurrentDictionary<string, int>();
 
-			if (_useServerWhitelist) //Server-only events
+			if (_allowAll || _useServerWhitelist) //Server-only events
 			{
-				client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) DisableServer(e.Server); LeftServer(s, e); };
-				client.ServerUpdated += (s, e) => { if (ServerUpdated != null && HasIndirectServer(e.Server)) ServerUpdated(s, e); };
-				client.ServerUnavailable += (s, e) => { if (ServerUnavailable != null && HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
-				client.ServerAvailable += (s, e) => { if (ServerAvailable != null && HasIndirectServer(e.Server)) ServerAvailable(s, e); };
-
-				client.UserBanned += (s, e) => { if (UserBanned != null && HasIndirectServer(e.Server)) UserBanned(s, e); };
-				client.UserUnbanned += (s, e) => { if (UserUnbanned != null && HasIndirectServer(e.Server)) UserUnbanned(s, e); };
-
 				client.ChannelCreated += (s, e) => { if (ChannelCreated != null && HasServer(e.Server)) ChannelCreated(s, e); };
-				client.ChannelDestroyed += (s, e) => { if (ChannelDestroyed != null && HasChannel(e.Channel)) ChannelDestroyed(s, e); };
-				client.ChannelUpdated += (s, e) => { if (ChannelUpdated != null && HasChannel(e.Channel)) ChannelUpdated(s, e); };
 
-				client.RoleCreated += (s, e) => { if (RoleCreated != null && HasIndirectServer(e.Server)) RoleCreated(s, e); };
-				client.RoleUpdated += (s, e) => { if (RoleUpdated != null && HasIndirectServer(e.Server)) RoleUpdated(s, e); };
-				client.RoleDeleted += (s, e) => { if (RoleDeleted != null && HasIndirectServer(e.Server)) RoleDeleted(s, e); };
-
-				client.UserJoined += (s, e) => { if (UserJoined != null && HasIndirectServer(e.Server)) UserJoined(s, e); };
-				client.UserLeft += (s, e) => { if (UserLeft != null && HasIndirectServer(e.Server)) UserLeft(s, e); };
-				client.UserUpdated += (s, e) => { if (UserUpdated != null && HasIndirectServer(e.Server)) UserUpdated(s, e); };
-				client.UserPresenceUpdated += (s, e) => { if (UserPresenceUpdated != null && HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
 				client.UserVoiceStateUpdated += (s, e) => { if (UserVoiceStateUpdated != null && HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
-				client.UserIsTypingUpdated += (s, e) => { if (UserIsSpeakingUpdated != null && HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
 				client.UserIsSpeakingUpdated += (s, e) => { if (UserIsSpeakingUpdated != null && HasServer(e.Server)) UserIsSpeakingUpdated(s, e); };
-
-				client.MessageReceived += (s, e) => { if (MessageReceived != null && HasChannel(e.Channel)) MessageReceived(s, e); };
-				client.MessageSent += (s, e) => { if (MessageSent != null && HasChannel(e.Channel)) MessageSent(s, e); };
-				client.MessageDeleted += (s, e) => { if (MessageDeleted != null && HasChannel(e.Channel)) MessageDeleted(s, e); };
-				client.MessageUpdated += (s, e) => { if (MessageUpdated != null && HasChannel(e.Channel)) MessageUpdated(s, e); };
-				client.MessageReadRemotely += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
 			}
-        }
+
+			client.ChannelDestroyed += (s, e) => { if (ChannelDestroyed != null && HasChannel(e.Channel)) ChannelDestroyed(s, e); };
+			client.ChannelUpdated += (s, e) => { if (ChannelUpdated != null && HasChannel(e.Channel)) ChannelUpdated(s, e); };
+
+			client.MessageReceived += (s, e) => { if (MessageReceived != null && HasChannel(e.Channel)) MessageReceived(s, e); };
+			client.MessageSent += (s, e) => { if (MessageSent != null && HasChannel(e.Channel)) MessageSent(s, e); };
+			client.MessageDeleted += (s, e) => { if (MessageDeleted != null && HasChannel(e.Channel)) MessageDeleted(s, e); };
+			client.MessageUpdated += (s, e) => { if (MessageUpdated != null && HasChannel(e.Channel)) MessageUpdated(s, e); };
+			client.MessageReadRemotely += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
+
+			client.RoleCreated += (s, e) => { if (RoleCreated != null && HasIndirectServer(e.Server)) RoleCreated(s, e); };
+			client.RoleUpdated += (s, e) => { if (RoleUpdated != null && HasIndirectServer(e.Server)) RoleUpdated(s, e); };
+			client.RoleDeleted += (s, e) => { if (RoleDeleted != null && HasIndirectServer(e.Server)) RoleDeleted(s, e); };
+
+			client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) DisableServer(e.Server); LeftServer(s, e); };
+			client.ServerUpdated += (s, e) => { if (ServerUpdated != null && HasIndirectServer(e.Server)) ServerUpdated(s, e); };
+			client.ServerUnavailable += (s, e) => { if (ServerUnavailable != null && HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
+			client.ServerAvailable += (s, e) => { if (ServerAvailable != null && HasIndirectServer(e.Server)) ServerAvailable(s, e); };
+
+			client.UserJoined += (s, e) => { if (UserJoined != null && HasIndirectServer(e.Server)) UserJoined(s, e); };
+			client.UserLeft += (s, e) => { if (UserLeft != null && HasIndirectServer(e.Server)) UserLeft(s, e); };
+			client.UserUpdated += (s, e) => { if (UserUpdated != null && HasIndirectServer(e.Server)) UserUpdated(s, e); };
+			client.UserIsTypingUpdated += (s, e) => { if (UserIsSpeakingUpdated != null && HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
+			//TODO: We aren't getting events from UserPresence if AllowPrivate is enabled, but the server we know that user through isn't on the whitelist
+			client.UserPresenceUpdated += (s, e) => { if (UserPresenceUpdated != null && HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
+			client.UserBanned += (s, e) => { if (UserBanned != null && HasIndirectServer(e.Server)) UserBanned(s, e); };
+			client.UserUnbanned += (s, e) => { if (UserUnbanned != null && HasIndirectServer(e.Server)) UserUnbanned(s, e); };
+		}
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
 		{
