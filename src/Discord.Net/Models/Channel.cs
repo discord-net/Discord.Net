@@ -140,10 +140,11 @@ namespace Discord
 
 		internal void AddMessage(Message message)
 		{
+			//Race conditions are okay here - it just means the queue will occasionally go higher than the requested cache size, and fixed later.
 			var cacheLength = _client.Config.MessageCacheLength;
 			if (cacheLength > 0)
 			{
-				var oldestIds = _messages.Select(x => x.Value.Id).OrderBy(x => x).Take(_messages.Count - cacheLength);
+				var oldestIds = _messages.Where(x => x.Value.Timestamp < message.Timestamp).Select(x => x.Key).OrderBy(x => x).Take(_messages.Count - cacheLength);
 				foreach (var id in oldestIds)
 				{
 					Message removed;
