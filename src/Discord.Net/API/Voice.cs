@@ -90,41 +90,41 @@ namespace Discord.API
 			public string Token;
 		}
 	}
-internal sealed class VoiceLogin2Command : WebSocketMessage<VoiceLogin2Command.Data>
-{
-	public VoiceLogin2Command() : base(1) { }
-	public class Data
+	internal sealed class VoiceLogin2Command : WebSocketMessage<VoiceLogin2Command.Data>
 	{
-		public class SocketInfo
+		public VoiceLogin2Command() : base(1) { }
+		public class Data
 		{
-			[JsonProperty("address")]
-			public string Address;
-			[JsonProperty("port")]
-			public int Port;
-			[JsonProperty("mode")]
-			public string Mode = "xsalsa20_poly1305";
+			public class SocketInfo
+			{
+				[JsonProperty("address")]
+				public string Address;
+				[JsonProperty("port")]
+				public int Port;
+				[JsonProperty("mode")]
+				public string Mode = "xsalsa20_poly1305";
+			}
+			[JsonProperty("protocol")]
+			public string Protocol = "udp";
+			[JsonProperty("data")]
+			public SocketInfo SocketData = new SocketInfo();
 		}
-		[JsonProperty("protocol")]
-		public string Protocol = "udp";
-		[JsonProperty("data")]
-		public SocketInfo SocketData = new SocketInfo();
 	}
-}
-internal sealed class VoiceKeepAliveCommand : WebSocketMessage<object>
-{
-	public VoiceKeepAliveCommand() : base(3, null) { }
-}
-internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
-{
-	public IsTalkingCommand() : base(5) { }
-	public class Data
+	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<object>
 	{
-		[JsonProperty("delay")]
-		public int Delay;
-		[JsonProperty("speaking")]
-		public bool IsSpeaking;
+		public VoiceKeepAliveCommand() : base(3, null) { }
 	}
-}
+	internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
+	{
+		public IsTalkingCommand() : base(5) { }
+		public class Data
+		{
+			[JsonProperty("delay")]
+			public int Delay;
+			[JsonProperty("speaking")]
+			public bool IsSpeaking;
+		}
+	}
 
 	//Events (Voice)
 	public class VoiceReadyEvent
