@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Role : CachedObject
+	public sealed class Role : CachedObject<long>
 	{		
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
@@ -33,7 +33,7 @@ namespace Discord
 		public IEnumerable<User> Members => _server.Id != null ? (IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this))) : new User[0];
 		//TODO: Add local members cache
 
-		internal Role(DiscordClient client, string id, string serverId)
+		internal Role(DiscordClient client, long id, long serverId)
 			: base(client, id)
 		{
 			_server = new Reference<Server>(serverId, x => _client.Servers[x], x => x.AddRole(this), x => x.RemoveRole(this));
@@ -72,6 +72,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 6653);
-		public override string ToString() => Name ?? Id;
+		public override string ToString() => Name ?? IdConvert.ToString(Id);
 	}
 }

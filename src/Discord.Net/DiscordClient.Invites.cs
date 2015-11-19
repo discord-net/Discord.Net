@@ -23,7 +23,7 @@ namespace Discord
 				inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
 
 			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
-			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
+			var invite = new Invite(this, response.Code, response.XkcdPass);
 			invite.Cache(); //Builds references
 			invite.Update(response);
             return invite;
@@ -38,7 +38,7 @@ namespace Discord
 			var response = await _api.GetInvites(server.Id).ConfigureAwait(false);
 			return response.Select(x =>
 			{
-				var invite = new Invite(this, x.Code, x.XkcdPass, x.Guild.Id, x.Inviter?.Id, x.Channel?.Id);
+				var invite = new Invite(this, x.Code, x.XkcdPass);
 				invite.Cache(); //Builds references
 				invite.Update(x);
 				return invite;
@@ -71,7 +71,7 @@ namespace Discord
 
 			var response = await _api.CreateInvite(channel.Id, maxAge: maxAge, maxUses: maxUses, 
 				tempMembership: tempMembership, hasXkcd: hasXkcd).ConfigureAwait(false);
-			var invite = new Invite(this, response.Code, response.XkcdPass, response.Guild.Id, response.Inviter?.Id, response.Channel?.Id);
+			var invite = new Invite(this, response.Code, response.XkcdPass);
 			invite.Cache(); //Builds references
 			return invite;
 		}

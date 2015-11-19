@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Message : CachedObject
+	public sealed class Message : CachedObject<long>
 	{
 		public sealed class Attachment : File
 		{
@@ -90,9 +90,6 @@ namespace Discord
 				Height = height;
 			}
 		}
-				
-		/// <summary> Returns the local unique identifier for this message. </summary>
-		public string Nonce { get; internal set; }
 
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
@@ -145,7 +142,7 @@ namespace Discord
 		public User User => _user.Value;
 		private readonly Reference<User> _user;
 
-		internal Message(DiscordClient client, string id, string channelId, string userId)
+		internal Message(DiscordClient client, long id, long channelId, long userId)
 			: base(client, id)
 		{
 			_channel = new Reference<Channel>(channelId,

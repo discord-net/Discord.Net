@@ -27,11 +27,11 @@ namespace Discord
 		internal readonly VoiceWebSocket _voiceSocket;
 		protected ExceptionDispatchInfo _disconnectReason;
 		protected string _gateway, _token;
-		protected string _userId, _voiceServerId;
+		protected long? _userId, _voiceServerId;
 		private Task _runTask;
 		private bool _wasDisconnectUnexpected;
 
-		public string CurrentUserId => _userId;
+		public long CurrentUserId => _userId.Value;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
 		public DiscordWSClientConfig Config => _config;		
@@ -59,7 +59,7 @@ namespace Discord
 			if (_config.EnableVoice)
 				_voiceSocket = CreateVoiceSocket();
 		}
-		internal DiscordWSClient(DiscordWSClientConfig config = null, string voiceServerId = null)
+		internal DiscordWSClient(DiscordWSClientConfig config = null, long? voiceServerId = null)
 			: this(config)
 		{
 			_voiceServerId = voiceServerId;
@@ -100,7 +100,7 @@ namespace Discord
 			socket.Connected += (s, e) => RaiseVoiceConnected();
 			socket.Disconnected += async (s, e) =>
 			{
-				RaiseVoiceDisconnected(socket.CurrentServerId, e);				
+				RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);				
 				if (e.WasUnexpected)
 					await socket.Reconnect().ConfigureAwait(false);
 			};
@@ -241,9 +241,9 @@ namespace Discord
 		{
 			if (_config.EnableVoice)
 			{
-				string voiceServerId = _voiceSocket.CurrentServerId;
+				var voiceServerId = _voiceSocket.CurrentServerId;
                 if (voiceServerId != null)
-					_dataSocket.SendLeaveVoice(voiceServerId);
+					_dataSocket.SendLeaveVoice(voiceServerId.Value);
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 			}
 			await _dataSocket.Disconnect().ConfigureAwait(false);
@@ -303,17 +303,17 @@ namespace Discord
 				switch (e.Type)
 				{
 					case "READY":
-						_userId = e.Payload["user"].Value<string>("id");
+						_userId = IdConvert.ToLong(e.Payload["user"].Value<string>("id"));
 						break;
 					case "VOICE_SERVER_UPDATE":
 						{
-							string guildId = e.Payload.Value<string>("guild_id");
+							long guildId = IdConvert.ToLong(e.Payload.Value<string>("guild_id"));
 
 							if (_config.EnableVoice && guildId == _voiceSocket.CurrentServerId)
 							{
 								string token = e.Payload.Value<string>("token");
 								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								await _voiceSocket.Login(_userId, _dataSocket.SessionId, token, _cancelToken).ConfigureAwait(false);
+								await _voiceSocket.Login(_userId.Value, _dataSocket.SessionId, token, _cancelToken).ConfigureAwait(false);
 							}
 						}
 						break;

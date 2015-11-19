@@ -47,9 +47,9 @@ namespace Discord.Modules
 		private readonly string _name, _id;
 		private readonly FilterType _filterType;
 		private readonly bool _useServerWhitelist, _useChannelWhitelist, _allowAll, _allowPrivate;
-		private readonly ConcurrentDictionary<string, Server> _enabledServers;
-		private readonly ConcurrentDictionary<string, Channel> _enabledChannels;
-		private readonly ConcurrentDictionary<string, int> _indirectServers;
+		private readonly ConcurrentDictionary<long, Server> _enabledServers;
+		private readonly ConcurrentDictionary<long, Channel> _enabledChannels;
+		private readonly ConcurrentDictionary<long, int> _indirectServers;
 
 		public DiscordClient Client => _client;
 		public string Name => _name;
@@ -70,9 +70,9 @@ namespace Discord.Modules
 			_useChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
 			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
 
-			_enabledServers = new ConcurrentDictionary<string, Server>();
-			_enabledChannels = new ConcurrentDictionary<string, Channel>();
-			_indirectServers = new ConcurrentDictionary<string, int>();
+			_enabledServers = new ConcurrentDictionary<long, Server>();
+			_enabledChannels = new ConcurrentDictionary<long, Channel>();
+			_indirectServers = new ConcurrentDictionary<long, int>();
 
 			if (_allowAll || _useServerWhitelist) //Server-only events
 			{

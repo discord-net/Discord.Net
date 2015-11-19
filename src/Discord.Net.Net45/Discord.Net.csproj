@@ -76,6 +76,15 @@
     <Compile Include="..\Discord.Net\API\Channels.cs">
       <Link>API\Channels.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Converters\LongCollectionConverter.cs">
+      <Link>API\Converters\LongCollectionConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Converters\LongStringConverter.cs">
+      <Link>API\Converters\LongStringConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Converters\ShortStringConverter.cs">
+      <Link>API\Converters\ShortStringConverter.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Endpoints.cs">
       <Link>API\Endpoints.cs</Link>
     </Compile>
@@ -219,6 +228,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Format.cs">
       <Link>Helpers\Format.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\IdConvert.cs">
+      <Link>Helpers\IdConvert.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Mention.cs">
       <Link>Helpers\Mention.cs</Link>

@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -10,7 +11,8 @@ namespace Discord.API
 	internal sealed class SetChannelPermissionsRequest
 	{
 		[JsonProperty("id")]
-		public string Id;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("type")]
 		public string Type;
 		[JsonProperty("allow")]

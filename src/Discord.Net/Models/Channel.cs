@@ -6,15 +6,15 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Channel : CachedObject
+	public sealed class Channel : CachedObject<long>
 	{
 		public sealed class PermissionOverwrite
 		{
 			public PermissionTarget TargetType { get; }
-			public string TargetId { get; }
+			public long TargetId { get; }
 			public DualChannelPermissions Permissions { get; }
 
-			internal PermissionOverwrite(PermissionTarget targetType, string targetId, uint allow, uint deny)
+			internal PermissionOverwrite(PermissionTarget targetType, long targetId, uint allow, uint deny)
 			{
 				TargetType = targetType;
 				TargetId = targetId;
@@ -55,20 +55,20 @@ namespace Discord
 				return _members.Select(x => x.Value);
             }
 		}
-		private Dictionary<string, User> _members;
+		private Dictionary<long, User> _members;
 		private bool _areMembersStale;
 
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
-		public IEnumerable<Message> Messages => _messages.Values;
-		private readonly ConcurrentDictionary<string, Message> _messages;
+		public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
+		private readonly ConcurrentDictionary<long, Message> _messages;
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
 		private static readonly PermissionOverwrite[] _initialPermissionsOverwrites = new PermissionOverwrite[0];
 		private PermissionOverwrite[] _permissionOverwrites;
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites { get { return _permissionOverwrites; } internal set { _permissionOverwrites = value.ToArray(); } }
 
-		internal Channel(DiscordClient client, string id, string serverId, string recipientId)
+		internal Channel(DiscordClient client, long id, long? serverId, long? recipientId)
 			: base(client, id)
 		{
 			_server = new Reference<Server>(serverId, 
@@ -92,7 +92,8 @@ namespace Discord
 			_areMembersStale = true;
 
 			//Local Cache
-			_messages = new ConcurrentDictionary<string, Message>();
+			if (client.Config.MessageCacheLength > 0)
+				_messages = new ConcurrentDictionary<long, Message>();
 		}
 		internal override void LoadReferences()
 		{
@@ -164,10 +165,10 @@ namespace Discord
 		{
 			if (IsPrivate)
 			{
-				_members = new Dictionary<string, User>()
+				_members = new Dictionary<long, User>()
 				{
 					{ _client.CurrentUserId, _client.PrivateUser },
-					{ _recipient.Id, _recipient.Value }
+					{ _recipient.Id.Value, _recipient.Value }
 				};
 			}
 			else if (Type == ChannelType.Text)
@@ -205,6 +206,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 5658);
-		public override string ToString() => Name ?? Id;
+		public override string ToString() => Name ?? IdConvert.ToString(Id);
 	}
 }

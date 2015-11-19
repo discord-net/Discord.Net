@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System;
 
@@ -17,7 +18,8 @@ namespace Discord.API
 		public sealed class PageData
 		{
 			[JsonProperty("id")]
-			public string Id;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long Id;
 			[JsonProperty("name")]
 			public string Name;
 			[JsonProperty("url")]

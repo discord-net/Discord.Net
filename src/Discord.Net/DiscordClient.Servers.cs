@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Servers : AsyncCollection<Server>
+	internal sealed class Servers : AsyncCollection<long, Server>
 	{
 		public Servers(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
-
-		public Server GetOrAdd(string id)
+		
+		public Server GetOrAdd(long id)
 			=> GetOrAdd(id, () => new Server(_client, id));
 	}
 
 	public class ServerEventArgs : EventArgs
 	{
 		public Server Server { get; }
-		public string ServerId => Server.Id;
 
 		public ServerEventArgs(Server server) { Server = server; }
 	}
@@ -62,9 +61,9 @@ namespace Discord
 		private readonly Servers _servers;
 
 		/// <summary> Returns the server with the specified id, or null if none was found. </summary>
-		public Server GetServer(string id)
+		public Server GetServer(long id)
 		{
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
 			CheckReady();
 
 			return _servers[id];

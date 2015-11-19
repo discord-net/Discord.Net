@@ -24,7 +24,7 @@ namespace Discord
 		{
 			return _userRegex.Replace(text, new MatchEvaluator(e =>
 			{
-				string id = e.Value.Substring(2, e.Value.Length - 3);
+				long id = IdConvert.ToLong(e.Value.Substring(2, e.Value.Length - 3));
 				var user = client.Users[id, server?.Id];
 				if (user != null)
 				{
@@ -40,7 +40,7 @@ namespace Discord
 		{
 			return _channelRegex.Replace(text, new MatchEvaluator(e =>
 			{
-				string id = e.Value.Substring(2, e.Value.Length - 3);
+				long id = IdConvert.ToLong(e.Value.Substring(2, e.Value.Length - 3));
 				var channel = client.Channels[id];
 				if (channel != null && channel.Server.Id == server.Id)
 				{
@@ -52,7 +52,7 @@ namespace Discord
 					return '#' + e.Value;
 			}));
 		}
-		internal static string CleanRoleMentions(DiscordClient client, User user, Channel channel, string text, List<Role> roles = null)
+		/*internal static string CleanRoleMentions(DiscordClient client, User user, Channel channel, string text, List<Role> roles = null)
 		{
 			return _roleRegex.Replace(text, new MatchEvaluator(e =>
 			{
@@ -60,6 +60,6 @@ namespace Discord
 					roles.Add(channel.Server.EveryoneRole);
 				return e.Value;
 			}));
-		}
+		}*/
 	}
 }

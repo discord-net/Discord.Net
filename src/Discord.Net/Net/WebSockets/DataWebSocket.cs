@@ -128,20 +128,20 @@ namespace Discord.Net.WebSockets
             QueueMessage(updateStatus);
 		}
 
-		public void SendJoinVoice(string serverId, string channelId)
+		public void SendJoinVoice(long serverId, long channelId)
 		{
 			var joinVoice = new JoinVoiceCommand();
 			joinVoice.Payload.ServerId = serverId;
 			joinVoice.Payload.ChannelId = channelId;
 			QueueMessage(joinVoice);
 		}
-		public void SendLeaveVoice(string serverId)
+		public void SendLeaveVoice(long serverId)
 		{
 			var leaveVoice = new JoinVoiceCommand();
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}
-		public void SendGetUsers(string serverId, string query = "", int limit = 0)
+		public void SendGetUsers(long serverId, string query = "", int limit = 0)
 		{
 			var getOfflineUsers = new GetUsersCommand();
 			getOfflineUsers.Payload.ServerId = serverId;

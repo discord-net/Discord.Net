@@ -26,7 +26,7 @@ namespace Discord.Net.WebSockets
 		private OpusEncoder _encoder;
 		private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
 		private uint _ssrc;
-		private ConcurrentDictionary<uint, string> _ssrcMapping;
+		private ConcurrentDictionary<uint, long> _ssrcMapping;
 
 		private VoiceBuffer _sendBuffer;
 		private UdpClient _udp;
@@ -34,12 +34,13 @@ namespace Discord.Net.WebSockets
 		private bool _isEncrypted;
 		private byte[] _secretKey, _encodingBuffer;
 		private ushort _sequence;
-		private string _serverId, _channelId, _userId, _sessionId, _token, _encryptionMode;
+		private long? _serverId, _channelId, _userId;
+		private string _sessionId, _token, _encryptionMode;
 		
 		private Thread _sendThread, _receiveThread;
 
-		public string CurrentServerId => _serverId;
-		public string CurrentChannelId => _channelId;
+		public long? CurrentServerId => _serverId;
+		public long? CurrentChannelId => _channelId;
 		public VoiceBuffer OutputBuffer => _sendBuffer;
 
 		public VoiceWebSocket(DiscordWSClient client)
@@ -49,19 +50,19 @@ namespace Discord.Net.WebSockets
 			_decoders = new ConcurrentDictionary<uint, OpusDecoder>();
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
-			_ssrcMapping = new ConcurrentDictionary<uint, string>();
+			_ssrcMapping = new ConcurrentDictionary<uint, long>();
 			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(client.Config.VoiceBufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 
-		public Task SetChannel(string serverId, string channelId)
+		public Task SetChannel(long serverId, long channelId)
 		{
 			_serverId = serverId;
 			_channelId = channelId;
 
 			return base.BeginConnect();
         }
-		public async Task Login(string userId, string sessionId, string token, CancellationToken cancelToken)
+		public async Task Login(long userId, string sessionId, string token, CancellationToken cancelToken)
 		{
 			if ((WebSocketState)_state == WebSocketState.Connected)
 			{
@@ -108,10 +109,10 @@ namespace Discord.Net.WebSockets
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 
 			VoiceLoginCommand msg = new VoiceLoginCommand();
-			msg.Payload.ServerId = _serverId;
+			msg.Payload.ServerId = _serverId.Value;
 			msg.Payload.SessionId = _sessionId;
 			msg.Payload.Token = _token;
-			msg.Payload.UserId = _userId;
+			msg.Payload.UserId = _userId.Value;
 			QueueMessage(msg);
 
 			List<Task> tasks = new List<Task>();
@@ -232,16 +233,9 @@ namespace Discord.Net.WebSockets
 							else
 							{
 								//Parse RTP Data
-								if (packetLength < 12)
-									return;
-
-								byte flags = packet[0];
-								if (flags != 0x80)
-									return;
-
-								byte payloadType = packet[1];
-								if (payloadType != 0x78)
-									return;
+								if (packetLength < 12) return;
+								if (packet[0] != 0x80) return; //Flags
+								if (packet[1] != 0x78) return; //Payload Type
 
 								ushort sequenceNumber = (ushort)((packet[2] << 8) |
 																  packet[3] << 0);
@@ -278,9 +272,9 @@ namespace Discord.Net.WebSockets
 								/*if (_logLevel >= LogMessageSeverity.Debug)
 									RaiseOnLog(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");*/
 
-								string userId;
+								long userId;
 								if (_ssrcMapping.TryGetValue(ssrc, out userId))
-									RaiseOnPacket(userId, _channelId, result, resultOffset, resultLength);
+									RaiseOnPacket(userId, _channelId.Value, result, resultOffset, resultLength);
 							}
 						}
 					}
@@ -302,9 +296,9 @@ namespace Discord.Net.WebSockets
 
 				byte[] frame = new byte[_encoder.FrameSize];
 				byte[] encodedFrame = new byte[MaxOpusSize];
-				byte[] udpPacket, nonce = null;
+				byte[] voicePacket, pingPacket, nonce = null;
 				uint timestamp = 0;
-				double nextTicks = 0.0;
+				double nextTicks = 0.0, nextPingTicks = 0.0;
 				double ticksPerMillisecond = Stopwatch.Frequency / 1000.0;
 				double ticksPerFrame = ticksPerMillisecond * _encoder.FrameLength;
 				double spinLockThreshold = 3 * ticksPerMillisecond;
@@ -314,38 +308,58 @@ namespace Discord.Net.WebSockets
 				if (_isEncrypted)
 				{
 					nonce = new byte[24];
-					udpPacket = new byte[MaxOpusSize + 12 + 16];
+					voicePacket = new byte[MaxOpusSize + 12 + 16];
 				}
 				else
-					udpPacket = new byte[MaxOpusSize + 12];
+					voicePacket = new byte[MaxOpusSize + 12];
+				
+				pingPacket = new byte[8];
+				pingPacket[0] = 0x80; //Flags;
+				pingPacket[1] = 0x78; //Payload Type
+				pingPacket[3] = 0x00; //Length
+				pingPacket[4] = 0x01; //Length (1*8 bytes)
+				pingPacket[5] = (byte)((_ssrc >> 24) & 0xFF);
+				pingPacket[6] = (byte)((_ssrc >> 16) & 0xFF);
+				pingPacket[7] = (byte)((_ssrc >> 8) & 0xFF);
+				pingPacket[8] = (byte)((_ssrc >> 0) & 0xFF);
+				if (_isEncrypted)
+				{
+					Buffer.BlockCopy(pingPacket, 0, nonce, 0, 8);
+					int ret = Sodium.Encrypt(pingPacket, 8, encodedFrame, 0, nonce, _secretKey);
+					if (ret != 0)
+						throw new InvalidOperationException("Failed to encrypt ping packet");
+					pingPacket = new byte[ret];
+					Buffer.BlockCopy(encodedFrame, 0, pingPacket, 0, ret);
+                }
 
 				int rtpPacketLength = 0;
-				udpPacket[0] = 0x80; //Flags;
-				udpPacket[1] = 0x78; //Payload Type
-				udpPacket[8] = (byte)((_ssrc >> 24) & 0xFF);
-				udpPacket[9] = (byte)((_ssrc >> 16) & 0xFF);
-				udpPacket[10] = (byte)((_ssrc >> 8) & 0xFF);
-				udpPacket[11] = (byte)((_ssrc >> 0) & 0xFF);
+				voicePacket[0] = 0x80; //Flags;
+				voicePacket[1] = 0xC9; //Payload Type
+				voicePacket[8] = (byte)((_ssrc >> 24) & 0xFF);
+				voicePacket[9] = (byte)((_ssrc >> 16) & 0xFF);
+				voicePacket[10] = (byte)((_ssrc >> 8) & 0xFF);
+				voicePacket[11] = (byte)((_ssrc >> 0) & 0xFF);
 
 				if  (_isEncrypted)
-					Buffer.BlockCopy(udpPacket, 0, nonce, 0, 12);
+					Buffer.BlockCopy(voicePacket, 0, nonce, 0, 12);
 
 				while (!cancelToken.IsCancellationRequested)
 				{
 					double ticksToNextFrame = nextTicks - sw.ElapsedTicks;
 					if (ticksToNextFrame <= 0.0)
 					{
-						while (sw.ElapsedTicks > nextTicks)
+						long currentTicks = sw.ElapsedTicks;
+						while (currentTicks > nextTicks)
 						{
 							if (_sendBuffer.Pop(frame))
 							{
 								ushort sequence = unchecked(_sequence++);
-								udpPacket[2] = (byte)((sequence >> 8) & 0xFF);
-								udpPacket[3] = (byte)((sequence >> 0) & 0xFF);
-								udpPacket[4] = (byte)((timestamp >> 24) & 0xFF);
-								udpPacket[5] = (byte)((timestamp >> 16) & 0xFF);
-								udpPacket[6] = (byte)((timestamp >> 8) & 0xFF);
-								udpPacket[7] = (byte)((timestamp >> 0) & 0xFF);
+								voicePacket[2] = (byte)((sequence >> 8) & 0xFF);
+								voicePacket[3] = (byte)((sequence >> 0) & 0xFF);
+								voicePacket[4] = (byte)((timestamp >> 24) & 0xFF);
+								voicePacket[5] = (byte)((timestamp >> 16) & 0xFF);
+								voicePacket[6] = (byte)((timestamp >> 8) & 0xFF);
+								voicePacket[7] = (byte)((timestamp >> 0) & 0xFF);
 
 								//Encode
 								int encodedLength = _encoder.EncodeFrame(frame, 0, encodedFrame);
@@ -353,23 +367,28 @@ namespace Discord.Net.WebSockets
 								//Encrypt
 								if (_isEncrypted)
 								{
-									Buffer.BlockCopy(udpPacket, 2, nonce, 2, 6); //Update nonce
-									int ret = Sodium.Encrypt(encodedFrame, encodedLength, udpPacket, 12, nonce, _secretKey);
+									Buffer.BlockCopy(voicePacket, 2, nonce, 2, 6); //Update nonce
+									int ret = Sodium.Encrypt(encodedFrame, encodedLength, voicePacket, 12, nonce, _secretKey);
 									if (ret != 0)
 										continue;
 									rtpPacketLength = encodedLength + 12 + 16;
 								}
 								else
 								{
-									Buffer.BlockCopy(encodedFrame, 0, udpPacket, 12, encodedLength);
+									Buffer.BlockCopy(encodedFrame, 0, voicePacket, 12, encodedLength);
 									rtpPacketLength = encodedLength + 12;
 								}
-								_udp.Send(udpPacket, rtpPacketLength);
+								_udp.Send(voicePacket, rtpPacketLength);
 							}
 							timestamp = unchecked(timestamp + samplesPerFrame);
 							nextTicks += ticksPerFrame;
 						}
-					}
+						if (currentTicks > nextPingTicks)
+						{
+							_udp.Send(pingPacket, pingPacket.Length);
+							nextPingTicks = currentTicks + 5 * Stopwatch.Frequency;
+                        }
+                    }
 					//Dont sleep if we need to output audio in the next spinLockThreshold
 					else if (ticksToNextFrame > spinLockThreshold)
 					{

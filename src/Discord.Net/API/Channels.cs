@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,9 +13,11 @@ namespace Discord.API
 	public class ChannelReference
 	{
 		[JsonProperty("id")]
-		public string Id;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long GuildId;
 		[JsonProperty("name")]
 		public string Name;
 		[JsonProperty("type")]
@@ -27,7 +30,8 @@ namespace Discord.API
 			[JsonProperty("type")]
 			public string Type;
 			[JsonProperty("id")]
-			public string Id;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long Id;
 			[JsonProperty("deny")]
 			public uint Deny;
 			[JsonProperty("allow")]
@@ -35,7 +39,8 @@ namespace Discord.API
 		}
 
 		[JsonProperty("last_message_id")]
-		public string LastMessageId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? LastMessageId;
 		[JsonProperty("is_private")]
 		public bool IsPrivate;
 		[JsonProperty("position")]
@@ -59,7 +64,8 @@ namespace Discord.API
 	public class CreatePMChannelRequest
 	{
 		[JsonProperty("recipient_id")]
-		public string RecipientId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long RecipientId;
 	}
 	public class CreateChannelResponse : ChannelInfo { }
 
@@ -82,7 +88,8 @@ namespace Discord.API
 		public sealed class Channel
 		{
 			[JsonProperty("id")]
-			public string Id;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long Id;
 			[JsonProperty("position")]
 			public uint Position;
 		}

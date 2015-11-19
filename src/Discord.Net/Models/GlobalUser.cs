@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class GlobalUser : CachedObject
+	public sealed class GlobalUser : CachedObject<long>
 	{
-		private readonly ConcurrentDictionary<string, User> _users;
+		private readonly ConcurrentDictionary<long, User> _users;
 
 		/// <summary> Returns the email for this user. </summary>
 		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
@@ -35,12 +35,12 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		internal IEnumerable<User> Memberships => _users.Select(x => _client.Users[Id, x.Key]);
+		internal IEnumerable<User> Memberships => _users.Select(x => x.Value);
 
-		internal GlobalUser(DiscordClient client, string id)
+		internal GlobalUser(DiscordClient client, long id)
 			: base(client, id)
 		{
-			_users = new ConcurrentDictionary<string, User>();
+			_users = new ConcurrentDictionary<long, User>();
 		}
 		internal override void LoadReferences() { }
 		internal override void UnloadReferences()
@@ -56,10 +56,10 @@ namespace Discord
 				IsVerified = model.IsVerified;
 		}
 
-		internal void AddUser(User user) => _users.TryAdd(user.UniqueId, user);
+		internal void AddUser(User user) => _users.TryAdd(user.Server?.Id ?? 0, user);
 		internal void RemoveUser(User user)
 		{
-			if (_users.TryRemove(user.UniqueId, out user))
+			if (_users.TryRemove(user.Server?.Id ?? 0, out user))
 				CheckUser();
         }
 		internal void CheckUser()
@@ -70,6 +70,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is GlobalUser && (obj as GlobalUser).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7891);
-		public override string ToString() => Id;
+		public override string ToString() => IdConvert.ToString(Id);
 	}
 }

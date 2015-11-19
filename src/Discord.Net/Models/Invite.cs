@@ -1,19 +1,18 @@
 ﻿using System;
 using Discord.API;
-using Newtonsoft.Json;
 
 namespace Discord
 {
-	public sealed class Invite : CachedObject
+	public sealed class Invite : CachedObject<string>
 	{
 		public sealed class ServerInfo
 		{
 			/// <summary> Returns the unique identifier of this server. </summary>
-			public string Id { get; }
+			public long Id { get; }
 			/// <summary> Returns the name of this server. </summary>
 			public string Name { get; }
 
-			internal ServerInfo(string id, string name)
+			internal ServerInfo(long id, string name)
 			{
 				Id = id;
 				Name = name;
@@ -22,11 +21,11 @@ namespace Discord
 		public sealed class ChannelInfo
 		{
 			/// <summary> Returns the unique identifier of this channel. </summary>
-			public string Id { get; }
+			public long Id { get; }
 			/// <summary> Returns the name of this channel. </summary>
 			public string Name { get; }
 
-			internal ChannelInfo(string id, string name)
+			internal ChannelInfo(long id, string name)
 			{
 				Id = id;
 				Name = name;
@@ -35,17 +34,17 @@ namespace Discord
 		public sealed class InviterInfo
 		{
 			/// <summary> Returns the unique identifier for this user. </summary>
-			public string Id { get; }
+			public long Id { get; }
 			/// <summary> Returns the name of this user. </summary>
 			public string Name { get; }
 			/// <summary> Returns the by-name unique identifier for this user. </summary>
-			public string Discriminator { get; }
+			public int Discriminator { get; }
 			/// <summary> Returns the unique identifier for this user's avatar. </summary>
 			public string AvatarId { get; }
 			/// <summary> Returns the full path to this user's avatar. </summary>
 			public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
 
-			internal InviterInfo(string id, string name, string discriminator, string avatarId)
+			internal InviterInfo(long id, string name, int discriminator, string avatarId)
 			{
 				Id = id;
 				Name = name;
@@ -76,9 +75,9 @@ namespace Discord
 		public DateTime CreatedAt { get; private set; }
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
-		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id);
+		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id.ToString());
 
-		internal Invite(DiscordClient client, string code, string xkcdPass, string serverId, string inviterId, string channelId)
+		internal Invite(DiscordClient client, string code, string xkcdPass)
 			: base(client, code)
 		{
 			XkcdCode = xkcdPass;
@@ -93,7 +92,7 @@ namespace Discord
 			if (model.Channel != null)
 				Channel = new ChannelInfo(model.Channel.Id, model.Channel.Name);
 			if (model.Inviter != null)
-				Inviter = new InviterInfo(model.Inviter.Id, model.Inviter.Username, model.Inviter.Discriminator, model.Inviter.Avatar);
+				Inviter = new InviterInfo(model.Inviter.Id, model.Inviter.Username, model.Inviter.Discriminator.Value, model.Inviter.Avatar);
         }
         internal void Update(InviteInfo model)
 		{

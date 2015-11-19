@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Roles : AsyncCollection<Role>
+	internal sealed class Roles : AsyncCollection<long, Role>
 	{
 		public Roles(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
 		
-		public Role GetOrAdd(string id, string serverId)
+		public Role GetOrAdd(long id, long serverId)
 			=> GetOrAdd(id, () => new Role(_client, id, serverId));
 	}
 
@@ -48,9 +48,9 @@ namespace Discord
 		private readonly Roles _roles;
 
 		/// <summary> Returns the role with the specified id, or null if none was found. </summary>
-		public Role GetRole(string id)
+		public Role GetRole(long id)
 		{
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
 			CheckReady();
 
 			return _roles[id];

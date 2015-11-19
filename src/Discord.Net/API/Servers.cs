@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System;
 
@@ -11,18 +12,21 @@ namespace Discord.API
 	public class GuildReference
 	{
 		[JsonProperty("id")]
-		public string Id;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("name")]
 		public string Name;
 	}
 	public class GuildInfo : GuildReference
 	{
 		[JsonProperty("afk_channel_id")]
-		public string AFKChannelId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? AFKChannelId;
 		[JsonProperty("afk_timeout")]
 		public int? AFKTimeout;
 		[JsonProperty("embed_channel_id")]
-		public string EmbedChannelId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? EmbedChannelId;
 		[JsonProperty("embed_enabled")]
 		public bool EmbedEnabled;
 		[JsonProperty("icon")]
@@ -30,7 +34,8 @@ namespace Discord.API
 		[JsonProperty("joined_at")]
 		public DateTime? JoinedAt;
 		[JsonProperty("owner_id")]
-		public string OwnerId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? OwnerId;
 		[JsonProperty("region")]
 		public string Region;
 		[JsonProperty("roles")]
@@ -70,7 +75,8 @@ namespace Discord.API
 		[JsonProperty("icon", NullValueHandling = NullValueHandling.Ignore)]
 		public string Icon;
 		[JsonProperty("afk_channel_id", NullValueHandling = NullValueHandling.Ignore)]
-		public string AFKChannelId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? AFKChannelId;
 		[JsonProperty("afk_timeout", NullValueHandling = NullValueHandling.Ignore)]
 		public int AFKTimeout;
 	}

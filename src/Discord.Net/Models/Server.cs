@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Server : CachedObject
+	public sealed class Server : CachedObject<long>
 	{		
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; private set; }
@@ -28,7 +28,7 @@ namespace Discord
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
 		public User Owner { get; private set; }
-		private string _ownerId;
+		private long _ownerId;
 
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
 		[JsonIgnore]
@@ -41,8 +41,8 @@ namespace Discord
 
 		/// <summary> Returns a collection of the ids of all users banned on this server. </summary>
 		[JsonIgnore]
-		public IEnumerable<string> Bans => _bans.Select(x => x.Key);
-		private ConcurrentDictionary<string, bool> _bans;
+		public IEnumerable<long> Bans => _bans.Select(x => x.Key);
+		private ConcurrentDictionary<long, bool> _bans;
 		
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		[JsonIgnore]
@@ -53,12 +53,12 @@ namespace Discord
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
-		private ConcurrentDictionary<string, Channel> _channels;
+		private ConcurrentDictionary<long, Channel> _channels;
 
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members => _members.Select(x => x.Value);
-		private ConcurrentDictionary<string, User> _members;
+		private ConcurrentDictionary<long, User> _members;
 
 		/// <summary> Return the the role representing all users in a server. </summary>
 		[JsonIgnore]
@@ -66,20 +66,20 @@ namespace Discord
 		/// <summary> Returns a collection of all roles within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-		private ConcurrentDictionary<string, Role> _roles;
+		private ConcurrentDictionary<long, Role> _roles;
 
-		internal Server(DiscordClient client, string id)
+		internal Server(DiscordClient client, long id)
 			: base(client, id)
 		{
 			_afkChannel = new Reference<Channel>(x => _client.Channels[x]);
 
 			//Global Cache
-			_channels = new ConcurrentDictionary<string, Channel>();
-			_members = new ConcurrentDictionary<string, User>();
-			_roles = new ConcurrentDictionary<string, Role>();
+			_channels = new ConcurrentDictionary<long, Channel>();
+			_members = new ConcurrentDictionary<long, User>();
+			_roles = new ConcurrentDictionary<long, Role>();
 
 			//Local Cache
-			_bans = new ConcurrentDictionary<string, bool>();
+			_bans = new ConcurrentDictionary<long, bool>();
         }
 		internal override void LoadReferences()
 		{
@@ -129,7 +129,7 @@ namespace Discord
 				JoinedAt = model.JoinedAt.Value;
 			if (model.OwnerId != null && _ownerId != model.OwnerId)
 			{
-				_ownerId = model.OwnerId;
+				_ownerId = model.OwnerId.Value;
 				Owner = _client.Users[_ownerId, Id];
 			}
 			if (model.Region != null)
@@ -178,11 +178,11 @@ namespace Discord
 			}
 		}
 
-		internal void AddBan(string banId)
+		internal void AddBan(long banId)
 		{
 			_bans.TryAdd(banId, true);
 		}
-		internal bool RemoveBan(string banId)
+		internal bool RemoveBan(long banId)
 		{
 			bool ignored;
 			return _bans.TryRemove(banId, out ignored);
@@ -254,6 +254,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is Server && (obj as Server).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 5175);
-		public override string ToString() => Name ?? Id;
+		public override string ToString() => Name ?? IdConvert.ToString(Id);
 	}
 }

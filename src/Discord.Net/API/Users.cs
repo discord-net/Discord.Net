@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -12,9 +13,10 @@ namespace Discord.API
 		[JsonProperty("username")]
 		public string Username;
 		[JsonProperty("id")]
-		public string Id;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("discriminator")]
-		public string Discriminator;
+		public short? Discriminator;
 		[JsonProperty("avatar")]
 		public string Avatar;
 	}

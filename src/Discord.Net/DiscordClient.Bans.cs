@@ -6,10 +6,10 @@ namespace Discord
 {
 	public class BanEventArgs : EventArgs
 	{
-		public string UserId { get; }
+		public long UserId { get; }
 		public Server Server { get; }
 
-		public BanEventArgs(string userId, Server server)
+		public BanEventArgs(long userId, Server server)
 		{
 			UserId = userId;
 			Server = server;
@@ -19,13 +19,13 @@ namespace Discord
 	public partial class DiscordClient
 	{
 		public event EventHandler<BanEventArgs> UserBanned;
-		private void RaiseUserBanned(string userId, Server server)
+		private void RaiseUserBanned(long userId, Server server)
 		{
 			if (UserBanned != null)
 				RaiseEvent(nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
 		}
 		public event EventHandler<BanEventArgs> UserUnbanned;
-		private void RaiseUserUnbanned(string userId, Server server)
+		private void RaiseUserUnbanned(long userId, Server server)
 		{
 			if (UserUnbanned != null)
 				RaiseEvent(nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
@@ -42,10 +42,10 @@ namespace Discord
 		}
 
 		/// <summary> Unbans a user from the provided server. </summary>
-		public async Task Unban(Server server, string userId)
+		public async Task Unban(Server server, long userId)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (userId == null) throw new ArgumentNullException(nameof(userId));
+			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 			CheckReady();
 
 			try { await _api.UnbanUser(server.Id, userId).ConfigureAwait(false); }

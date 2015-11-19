@@ -36,7 +36,7 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return SetChannelPermissions(channel, user?.Id, PermissionTarget.User, allow, deny);
+			return SetChannelPermissions(channel, user.Id, PermissionTarget.User, allow, deny);
 		}
 		public Task SetChannelPermissions(Channel channel, User user, DualChannelPermissions permissions = null)
 		{
@@ -44,7 +44,7 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return SetChannelPermissions(channel, user?.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
+			return SetChannelPermissions(channel, user.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
 		}
 		public Task SetChannelPermissions(Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
 		{
@@ -52,7 +52,7 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			return SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, allow, deny);
+			return SetChannelPermissions(channel, role.Id, PermissionTarget.Role, allow, deny);
 		}
 		public Task SetChannelPermissions(Channel channel, Role role, DualChannelPermissions permissions = null)
 		{
@@ -60,9 +60,9 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			return SetChannelPermissions(channel, role?.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
+			return SetChannelPermissions(channel, role.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
 		}
-		private Task SetChannelPermissions(Channel channel, string targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
+		private Task SetChannelPermissions(Channel channel, long targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> _api.SetChannelPermissions(channel.Id, targetId, targetType.Value, allow?.RawValue ?? 0, deny?.RawValue ?? 0);
 
 		public Task RemoveChannelPermissions(Channel channel, User user)
@@ -71,7 +71,7 @@ namespace Discord
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			CheckReady();
 
-			return RemoveChannelPermissions(channel, user?.Id, PermissionTarget.User);
+			return RemoveChannelPermissions(channel, user.Id, PermissionTarget.User);
 		}
 		public Task RemoveChannelPermissions(Channel channel, Role role)
 		{
@@ -79,9 +79,9 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			return RemoveChannelPermissions(channel, role?.Id, PermissionTarget.Role);
+			return RemoveChannelPermissions(channel, role.Id, PermissionTarget.Role);
 		}
-		private async Task RemoveChannelPermissions(Channel channel, string userOrRoleId, PermissionTarget targetType)
+		private async Task RemoveChannelPermissions(Channel channel, long userOrRoleId, PermissionTarget targetType)
 		{
 			try
 			{

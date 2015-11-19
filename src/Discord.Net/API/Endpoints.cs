@@ -12,33 +12,35 @@
 		public const string AuthLogout = "auth/logout";
 		
 		public const string Channels = "channels";
-		public static string Channel(string channelId) => $"channels/{channelId}";
-		public static string ChannelInvites(string channelId) => $"channels/{channelId}/invites";
-		public static string ChannelMessages(string channelId) => $"channels/{channelId}/messages";
-		public static string ChannelMessages(string channelId, int limit) => $"channels/{channelId}/messages?limit={limit}";
-		public static string ChannelMessages(string channelId, int limit, string relativeId, string relativeDir) => $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
-        public static string ChannelMessage(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}";
-		public static string ChannelMessageAck(string channelId, string msgId) => $"channels/{channelId}/messages/{msgId}/ack";
-        public static string ChannelPermission(string channelId, string userOrRoleId) => $"channels/{channelId}/permissions/{userOrRoleId}";
-		public static string ChannelTyping(string channelId) => $"channels/{channelId}/typing";
+		public static string Channel(long channelId) => $"channels/{channelId}";
+		public static string ChannelInvites(long channelId) => $"channels/{channelId}/invites";
+		public static string ChannelMessages(long channelId) => $"channels/{channelId}/messages";
+		public static string ChannelMessages(long channelId, int limit) => $"channels/{channelId}/messages?limit={limit}";
+		public static string ChannelMessages(long channelId, int limit, long relativeId, string relativeDir) => $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
+        public static string ChannelMessage(long channelId, long msgId) => $"channels/{channelId}/messages/{msgId}";
+		public static string ChannelMessageAck(long channelId, long msgId) => $"channels/{channelId}/messages/{msgId}/ack";
+        public static string ChannelPermission(long channelId, long userOrRoleId) => $"channels/{channelId}/permissions/{userOrRoleId}";
+		public static string ChannelTyping(long channelId) => $"channels/{channelId}/typing";
 
 		public const string Servers = "guilds";
-		public static string Server(string serverId) => $"guilds/{serverId}";
-		public static string ServerBan(string serverId, string userId) => $"guilds/{serverId}/bans/{userId}";
-		public static string ServerChannels(string serverId) => $"guilds/{serverId}/channels";
-		public static string ServerInvites(string serverId) => $"guilds/{serverId}/invites";
-		public static string ServerMember(string serverId, string userId) => $"guilds/{serverId}/members/{userId}";
-		public static string ServerPrune(string serverId, int days) => $"guilds/{serverId}/prune?days={days}";
-		public static string ServerRoles(string serverId) => $"guilds/{serverId}/roles";
-		public static string ServerRole(string serverId, string roleId) => $"guilds/{serverId}/roles/{roleId}";
+		public static string Server(long serverId) => $"guilds/{serverId}";
+		public static string ServerBan(long serverId, long userId) => $"guilds/{serverId}/bans/{userId}";
+		public static string ServerChannels(long serverId) => $"guilds/{serverId}/channels";
+		public static string ServerInvites(long serverId) => $"guilds/{serverId}/invites";
+		public static string ServerMember(long serverId, long userId) => $"guilds/{serverId}/members/{userId}";
+		public static string ServerPrune(long serverId, int days) => $"guilds/{serverId}/prune?days={days}";
+		public static string ServerRoles(long serverId) => $"guilds/{serverId}/roles";
+		public static string ServerRole(long serverId, long roleId) => $"guilds/{serverId}/roles/{roleId}";
 
 		public const string Invites = "invite";
-		public static string Invite(string inviteId) => $"invite/{inviteId}";
-		public static string InviteUrl(string inviteId) => $"https://discord.gg/{inviteId}";
+		public static string Invite(long inviteId) => $"invite/{inviteId}";
+		public static string Invite(string inviteIdOrXkcd) => $"invite/{inviteIdOrXkcd}";
+		public static string InviteUrl(long inviteId) => $"https://discord.gg/{inviteId}";
+		public static string InviteUrl(string inviteIdOrXkcd) => $"https://discord.gg/{inviteIdOrXkcd}";
 
 		public const string Users = "users";
-		public static string UserAvatar(string userId, string avatarId) => $"users/{userId}/avatars/{avatarId}.jpg";
-        public static string UserChannels(string userId) => $"users/{userId}/channels";
+		public static string UserAvatar(long userId, string avatarId) => $"users/{userId}/avatars/{avatarId}.jpg";
+        public static string UserChannels(long userId) => $"users/{userId}/channels";
 		public static string UserMe => $"users/@me";
 
 		public const string Voice = "voice";

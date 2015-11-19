@@ -8,7 +8,7 @@ namespace Discord
 	{
 		public IDiscordVoiceClient GetVoiceClient(Server server)
 		{
-			if (server.Id == null) throw new ArgumentNullException(nameof(server.Id));
+			if (server.Id <= 0) throw new ArgumentOutOfRangeException(nameof(server.Id));
 
 			if (!Config.EnableVoiceMultiserver)
 			{
@@ -16,7 +16,7 @@ namespace Discord
 					return this;
 				else
 					return null;
-			}
+            }
 
 			DiscordWSClient client;
 			if (_voiceClients.TryGetValue(server.Id, out client))

@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -23,9 +24,11 @@ namespace Discord.API
 	internal sealed class TypingStartEvent
 	{
 		[JsonProperty("user_id")]
-		public string UserId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long UserId;
 		[JsonProperty("channel_id")]
-		public string ChannelId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long ChannelId;
 		[JsonProperty("timestamp")]
 		public int Timestamp;
 	}

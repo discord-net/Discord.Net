@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Channels : AsyncCollection<Channel>
+	internal sealed class Channels : AsyncCollection<long, Channel>
 	{
 		public IEnumerable<Channel> PrivateChannels => _privateChannels.Select(x => x.Value);
-		private ConcurrentDictionary<string, Channel> _privateChannels;
+		private ConcurrentDictionary<long, Channel> _privateChannels;
 
 		public Channels(DiscordClient client, object writerLock)
 			: base(client, writerLock)
 		{
-			_privateChannels = new ConcurrentDictionary<string, Channel>();
+			_privateChannels = new ConcurrentDictionary<long, Channel>();
 			ItemCreated += (s, e) =>
 			{
 				if (e.Item.IsPrivate)
@@ -31,8 +31,8 @@ namespace Discord
 			};
 			Cleared += (s, e) => _privateChannels.Clear();
         }
-
-		public Channel GetOrAdd(string id, string serverId, string recipientId = null)
+		
+		public Channel GetOrAdd(long id, long? serverId, long? recipientId = null)
 			=> GetOrAdd(id, () => new Channel(_client, id, serverId, recipientId));
 	}
 
@@ -71,9 +71,9 @@ namespace Discord
 		private readonly Channels _channels;
 
 		/// <summary> Returns the channel with the specified id, or null if none was found. </summary>
-		public Channel GetChannel(string id)
+		public Channel GetChannel(long id)
 		{
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
 			CheckReady();
 
 			return _channels[id];
@@ -93,7 +93,7 @@ namespace Discord
 			{
 				if (name[0] == '<' && name[1] == '#' && name[name.Length - 1] == '>') //Parse mention
 				{					
-					string id = name.Substring(2, name.Length - 3);
+					long id = IdConvert.ToLong(name.Substring(2, name.Length - 3));
 					var channel = _channels[id];
 					if (channel != null)
 						query = query.Concat(new Channel[] { channel });
@@ -135,10 +135,10 @@ namespace Discord
 				channel = user.GlobalUser.PrivateChannel;
 			if (channel == null)
 			{
-				var response = await _api.CreatePMChannel(_userId, user.Id).ConfigureAwait(false);
-				var recipient = _users.GetOrAdd(response.Recipient?.Id, null);
+				var response = await _api.CreatePMChannel(_userId.Value, user.Id).ConfigureAwait(false);
+				var recipient = _users.GetOrAdd(response.Recipient.Id, null);
 				recipient.Update(response.Recipient);
-				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
+				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient.Id);
 				channel.Update(response);
 			}
 			return channel;

@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -22,7 +23,7 @@ namespace Discord.API
 		}
 	}
 
-	public class GetIceResponse
+	/*public class GetIceResponse
 	{
 		[JsonProperty("ttl")]
 		public string TTL;
@@ -38,7 +39,7 @@ namespace Discord.API
 			[JsonProperty("credential")]
 			public string Credential;
 		}
-	}
+	}*/
 
 	//Commands
 	internal sealed class JoinVoiceCommand : WebSocketMessage<JoinVoiceCommand.Data>
@@ -47,9 +48,11 @@ namespace Discord.API
 		public class Data
 		{
 			[JsonProperty("guild_id")]
-			public string ServerId;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ServerId;
 			[JsonProperty("channel_id")]
-			public string ChannelId;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ChannelId;
 			[JsonProperty("self_mute")]
 			public string SelfMute;
 			[JsonProperty("self_deaf")]
@@ -61,7 +64,8 @@ namespace Discord.API
 	internal sealed class VoiceServerUpdateEvent
 	{
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long ServerId;
 		[JsonProperty("endpoint")]
 		public string Endpoint;
 		[JsonProperty("token")]
@@ -75,50 +79,52 @@ namespace Discord.API
 		public class Data
 		{
 			[JsonProperty("server_id")]
-			public string ServerId;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ServerId;
 			[JsonProperty("user_id")]
-			public string UserId;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long UserId;
 			[JsonProperty("session_id")]
 			public string SessionId;
 			[JsonProperty("token")]
 			public string Token;
 		}
 	}
-	internal sealed class VoiceLogin2Command : WebSocketMessage<VoiceLogin2Command.Data>
+internal sealed class VoiceLogin2Command : WebSocketMessage<VoiceLogin2Command.Data>
+{
+	public VoiceLogin2Command() : base(1) { }
+	public class Data
 	{
-		public VoiceLogin2Command() : base(1) { }
-		public class Data
+		public class SocketInfo
 		{
-			public class SocketInfo
-			{
-				[JsonProperty("address")]
-				public string Address;
-				[JsonProperty("port")]
-				public int Port;
-				[JsonProperty("mode")]
-				public string Mode = "xsalsa20_poly1305";
-			}
-			[JsonProperty("protocol")]
-			public string Protocol = "udp";
-			[JsonProperty("data")]
-			public SocketInfo SocketData = new SocketInfo();
+			[JsonProperty("address")]
+			public string Address;
+			[JsonProperty("port")]
+			public int Port;
+			[JsonProperty("mode")]
+			public string Mode = "xsalsa20_poly1305";
 		}
+		[JsonProperty("protocol")]
+		public string Protocol = "udp";
+		[JsonProperty("data")]
+		public SocketInfo SocketData = new SocketInfo();
 	}
-	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<object>
+}
+internal sealed class VoiceKeepAliveCommand : WebSocketMessage<object>
+{
+	public VoiceKeepAliveCommand() : base(3, null) { }
+}
+internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
+{
+	public IsTalkingCommand() : base(5) { }
+	public class Data
 	{
-		public VoiceKeepAliveCommand() : base(3, null) { }
+		[JsonProperty("delay")]
+		public int Delay;
+		[JsonProperty("speaking")]
+		public bool IsSpeaking;
 	}
-	internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
-	{
-		public IsTalkingCommand() : base(5) { }
-		public class Data
-		{
-			[JsonProperty("delay")]
-			public int Delay;
-			[JsonProperty("speaking")]
-			public bool IsSpeaking;
-		}
-	}
+}
 
 	//Events (Voice)
 	public class VoiceReadyEvent
@@ -144,7 +150,8 @@ namespace Discord.API
 	public class IsTalkingEvent
 	{
 		[JsonProperty("user_id")]
-		public string UserId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long UserId;
 		[JsonProperty("ssrc")]
 		public uint SSRC;
 		[JsonProperty("speaking")]

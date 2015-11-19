@@ -20,20 +20,34 @@ namespace Discord
         }
 	}
 
-	public class User : CachedObject
+	public class User : CachedObject<long>
 	{
-		internal static string GetId(string userId, string serverId) => (serverId ?? "Private") + '_' + userId;
-		internal static string GetAvatarUrl(string userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
+		internal struct CompositeKey : IEquatable<CompositeKey>
+		{
+			public long ServerId, UserId;
+			public CompositeKey(long userId, long? serverId)
+			{
+				ServerId = serverId ?? 0;
+				UserId = userId;
+			}
+
+			public bool Equals(CompositeKey other)
+				=> UserId == other.UserId && ServerId == other.ServerId;
+			public override int GetHashCode()
+				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
+		}
+
+		internal static string GetAvatarUrl(long userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
 		
-		private ConcurrentDictionary<string, ChannelPermissionsPair> _permissions;
+		private ConcurrentDictionary<long, ChannelPermissionsPair> _permissions;
 		private ServerPermissions _serverPermissions;
 
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
-		internal string UniqueId => GetId(Id, _server.Id);
+		internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public string Discriminator { get; private set; }
+		public short Discriminator { get; private set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
@@ -47,6 +61,7 @@ namespace Discord
 		public bool IsServerDeafened { get; private set; }
 		public bool IsServerSuppressed { get; private set; }
 		public bool IsSpeaking { get; internal set; }
+		public bool IsPrivate => _server.Id == null;
 
 		public string SessionId { get; private set; }
 		public string Token { get; private set; }
@@ -79,7 +94,7 @@ namespace Discord
 
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-		private Dictionary<string, Role> _roles;
+		private Dictionary<long, Role> _roles;
 
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
@@ -118,7 +133,7 @@ namespace Discord
 			}
 		}
 
-		internal User(DiscordClient client, string id, string serverId)
+		internal User(DiscordClient client, long id, long? serverId)
 			: base(client, id)
 		{
 			_globalUser = new Reference<GlobalUser>(id, 
@@ -140,13 +155,13 @@ namespace Discord
 						x.CurrentUser = null;
 				});
 			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);
-			_roles = new Dictionary<string, Role>();
+			_roles = new Dictionary<long, Role>();
 
 			Status = UserStatus.Offline;
 			//_channels = new ConcurrentDictionary<string, Channel>();
 			if (serverId != null)
 			{
-				_permissions = new ConcurrentDictionary<string, ChannelPermissionsPair>();
+				_permissions = new ConcurrentDictionary<long, ChannelPermissionsPair>();
 				_serverPermissions = new ServerPermissions();
 			}
 
@@ -169,7 +184,7 @@ namespace Discord
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
 			if (model.Discriminator != null)
-				Discriminator = model.Discriminator;
+				Discriminator = model.Discriminator.Value;
 			if (model.Username != null)
 				Name = model.Username;
 		}
@@ -243,11 +258,11 @@ namespace Discord
         }
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			Dictionary<string, Role> newRoles;
+			Dictionary<long, Role> newRoles;
 			if (roles != null)
 				newRoles = roles.ToDictionary(x => x.Id, x => x);
 			else
-				newRoles = new Dictionary<string, Role>();
+				newRoles = new Dictionary<long, Role>();
 
 			if (_server.Id != null)
 			{
@@ -378,6 +393,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7230);
-		public override string ToString() => Name ?? Id;
+		public override string ToString() => Name ?? IdConvert.ToString(Id);
 	}
 }

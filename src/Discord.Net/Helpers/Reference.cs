@@ -3,12 +3,12 @@
 namespace Discord
 {
     internal struct Reference<T>
-		where T : CachedObject
-    {
+		where T : CachedObject<long>
+	{
 		private Action<T> _onCache, _onUncache;
-		private Func<string, T> _getItem;
-        private string _id;
-		public string Id
+		private Func<long, T> _getItem;
+        private long? _id;
+		public long? Id
 		{
 			get { return _id; }
 			set
@@ -24,14 +24,15 @@ namespace Discord
 			get
 			{
 				var v = _value; //A little trickery to make this threadsafe
+				var id = _id;
 				if (v != null && !_value.IsCached)
 				{
 					v = null;
 					_value = null;
 				}
-				if (v == null && _id != null)
+				if (v == null && id != null)
 				{
-					v = _getItem(_id);
+					v = _getItem(id.Value);
 					if (v != null && _onCache != null)
 						_onCache(v);
 					_value = v;
@@ -55,9 +56,9 @@ namespace Discord
 			}
 		}
 
-		public Reference(Func<string, T> onUpdate, Action<T> onCache = null, Action<T> onUncache = null)
+		public Reference(Func<long, T> onUpdate, Action<T> onCache = null, Action<T> onUncache = null)
 			: this(null, onUpdate, onCache, onUncache) { }
-		public Reference(string id, Func<string, T> getItem, Action<T> onCache = null, Action<T> onUncache = null)
+		public Reference(long? id, Func<long, T> getItem, Action<T> onCache = null, Action<T> onUncache = null)
 		{
 			_id = id;
 			_getItem = getItem;

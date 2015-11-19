@@ -1,5 +1,4 @@
 using Discord.API;
-using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Messages : AsyncCollection<Message>
+	internal sealed class Messages : AsyncCollection<long, Message>
 	{
 		private bool _isEnabled;
 
@@ -17,8 +16,8 @@ namespace Discord
 		{
 			_isEnabled = isEnabled;
         }
-
-		public Message GetOrAdd(string id, string channelId, string userId)
+		
+		public Message GetOrAdd(long id, long channelId, long userId)
 		{
 			if (_isEnabled)
 				return GetOrAdd(id, () => new Message(_client, id, channelId, userId));
@@ -80,9 +79,9 @@ namespace Discord
 		private readonly Messages _messages;
 
 		/// <summary> Returns the message with the specified id, or null if none was found. </summary>
-		public Message GetMessage(string id)
+		public Message GetMessage(long id)
 		{
-			if (id == null) throw new ArgumentNullException(nameof(id));
+			if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
 			CheckReady();
 
 			return _messages[id];
@@ -124,17 +123,16 @@ namespace Discord
 			if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
-				msg = _messages.GetOrAdd("nonce_" + nonce, channel.Id, _userId);
+				msg = _messages.GetOrAdd(nonce, channel.Id, _userId.Value);
                 var currentUser = msg.User;
 				msg.Update(new MessageInfo
 				{
 					Content = text,
                     Timestamp = DateTime.UtcNow,
-					Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _userId, Username = currentUser.Name },
+					Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _userId.Value, Username = currentUser.Name },
 					ChannelId = channel.Id,
 					IsTextToSpeech = isTextToSpeech
 				});
-				msg.Nonce = nonce;
 				msg.IsQueued = true;
 
 				if (text.Length > MaxMessageSize)
@@ -217,7 +215,7 @@ namespace Discord
 
 
 		/// <summary> Downloads last count messages from the server, returning all messages before or after relativeMessageId, if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(Channel channel, int count, string relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+		public async Task<Message[]> DownloadMessages(Channel channel, int count, long? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
@@ -274,7 +272,7 @@ namespace Discord
 						SendMessageResponse response = null;
 						try
 						{
-							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.MentionedUsers.Select(x => x.Id), msg.Nonce, msg.IsTTS).ConfigureAwait(false);
+							response = await _api.SendMessage(msg.Channel.Id, msg.RawText, msg.MentionedUsers.Select(x => x.Id), IdConvert.ToString(msg.Id), msg.IsTTS).ConfigureAwait(false);
 						}
 						catch (WebException) { break; }
 						catch (HttpException) { hasFailed = true; }
@@ -293,10 +291,10 @@ namespace Discord
 				}
 			});
 		}
-		private string GenerateNonce()
+		private long GenerateNonce()
 		{
 			lock (_rand)
-				return _rand.Next().ToString();
+				return -_rand.Next(1, int.MaxValue - 1);
 		}
 	}
 }

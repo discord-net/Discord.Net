@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,12 +13,17 @@ namespace Discord.API
 	public class RoleReference
 	{
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long GuildId;
 		[JsonProperty("role_id")]
-		public string RoleId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long RoleId;
 	}
 	public class RoleInfo
 	{
+		[JsonProperty("id")]
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("permissions")]
 		public uint? Permissions;
 		[JsonProperty("name")]
@@ -28,8 +34,6 @@ namespace Discord.API
 		public bool? Hoist;
 		[JsonProperty("color")]
 		public uint? Color;
-		[JsonProperty("id")]
-		public string Id;
 		[JsonProperty("managed")]
 		public bool? Managed;
 	}
@@ -57,7 +61,8 @@ namespace Discord.API
 		public sealed class Role
 		{
 			[JsonProperty("id")]
-			public string Id;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long Id;
 			[JsonProperty("position")]
 			public uint Position;
 		}
@@ -72,14 +77,16 @@ namespace Discord.API
 	internal sealed class RoleCreateEvent
 	{
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long GuildId;
 		[JsonProperty("role")]
 		public RoleInfo Data;
 	}
 	internal sealed class RoleUpdateEvent
 	{
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long GuildId;
 		[JsonProperty("role")]
 		public RoleInfo Data;
 	}

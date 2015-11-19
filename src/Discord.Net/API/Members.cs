@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,11 @@ namespace Discord.API
 	public class MemberReference
 	{
 		[JsonProperty("user_id")]
-		public string UserId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long UserId;
 		[JsonProperty("guild_id")]
-		public string GuildId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long GuildId;
 
 		[JsonProperty("user")]
 		private UserReference _user;
@@ -33,7 +36,8 @@ namespace Discord.API
 		[JsonProperty("joined_at")]
 		public DateTime? JoinedAt;
 		[JsonProperty("roles")]
-		public string[] Roles;
+		[JsonConverter(typeof(LongArrayStringConverter))]
+		public long[] Roles;
 	}
 	public class ExtendedMemberInfo : MemberInfo
 	{
@@ -49,12 +53,14 @@ namespace Discord.API
 		[JsonProperty("status")]
 		public string Status;
 		[JsonProperty("roles")] //TODO: Might be temporary
-		public string[] Roles;
+		[JsonConverter(typeof(LongArrayStringConverter))]
+		public long[] Roles;
 	}
 	public class VoiceMemberInfo : MemberReference
 	{
 		[JsonProperty("channel_id")]
-		public string ChannelId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long ChannelId;
 		[JsonProperty("session_id")]
 		public string SessionId;
 		[JsonProperty("token")]
@@ -79,7 +85,8 @@ namespace Discord.API
 		[JsonProperty("deaf", NullValueHandling = NullValueHandling.Ignore)]
 		public bool? Deaf;
 		[JsonProperty("roles", NullValueHandling = NullValueHandling.Ignore)]
-		public IEnumerable<string> Roles;
+		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		public IEnumerable<long> Roles;
 	}
 
 	public class PruneUsersResponse

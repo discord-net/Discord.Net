@@ -8,15 +8,15 @@ namespace Discord
 	{
 		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;
 
-		async Task IDiscordVoiceClient.JoinChannel(string channelId)
+		async Task IDiscordVoiceClient.JoinChannel(long channelId)
 		{
 			CheckReady(checkVoice: true);
-			if (channelId == null) throw new ArgumentNullException(nameof(channelId));
+			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
 			
 			await _voiceSocket.Disconnect().ConfigureAwait(false);
 			
-			await _voiceSocket.SetChannel(_voiceServerId, channelId).ConfigureAwait(false);
-			_dataSocket.SendJoinVoice(_voiceServerId, channelId);
+			await _voiceSocket.SetChannel(_voiceServerId.Value, channelId).ConfigureAwait(false);
+			_dataSocket.SendJoinVoice(_voiceServerId.Value, channelId);
 			await _voiceSocket.WaitForConnection(_config.ConnectionTimeout).ConfigureAwait(false);
 		}
 

@@ -4,7 +4,7 @@ namespace Discord.Commands.Permissions.Userlist
 {
     public class BlacklistService : UserlistService
 	{
-		public BlacklistService(IEnumerable<string> initialList = null)
+		public BlacklistService(IEnumerable<long> initialList = null)
 			: base(initialList)
 		{
 		}

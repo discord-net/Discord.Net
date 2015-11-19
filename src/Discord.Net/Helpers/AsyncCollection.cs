@@ -6,7 +6,8 @@ using System.Linq;
 
 namespace Discord
 {
-	internal abstract class AsyncCollection<TValue> : IEnumerable<TValue>
+	internal abstract class AsyncCollection<TKey, TValue> : IEnumerable<TValue>
+		where TKey : struct, IEquatable<TKey>
 		where TValue : CachedObject
 	{
 		private readonly object _writerLock;
@@ -19,9 +20,9 @@ namespace Discord
 		public class CollectionItemRemappedEventArgs : EventArgs
 		{
 			public TValue Item { get; }
-			public string OldId { get; }
-			public string NewId { get; }
-			public CollectionItemRemappedEventArgs(TValue item, string oldId, string newId) { Item = item; OldId = oldId; NewId = newId; }
+			public TKey OldId { get; }
+			public TKey NewId { get; }
+			public CollectionItemRemappedEventArgs(TValue item, TKey oldId, TKey newId) { Item = item; OldId = oldId; NewId = newId; }
 		}
 
 		public EventHandler<CollectionItemEventArgs> ItemCreated;
@@ -37,7 +38,7 @@ namespace Discord
 				ItemDestroyed(this, new CollectionItemEventArgs(item));
 		}
 		public EventHandler<CollectionItemRemappedEventArgs> ItemRemapped;
-		private void RaiseItemRemapped(TValue item, string oldId, string newId)
+		private void RaiseItemRemapped(TValue item, TKey oldId, TKey newId)
 		{
 			if (ItemRemapped != null)
 				ItemRemapped(this, new CollectionItemRemappedEventArgs(item, oldId, newId));
@@ -51,20 +52,22 @@ namespace Discord
 		}
 
 		protected readonly DiscordClient _client;
-		protected readonly ConcurrentDictionary<string, TValue> _dictionary;
+		protected readonly ConcurrentDictionary<TKey, TValue> _dictionary;
 
 		protected AsyncCollection(DiscordClient client, object writerLock)
 		{
 			_client = client;
 			_writerLock = writerLock;
-			_dictionary = new ConcurrentDictionary<string, TValue>();
+			_dictionary = new ConcurrentDictionary<TKey, TValue>();
         }
 
-		public TValue this[string key]
+		public TValue this[TKey? key]
+			=> key == null ? null : this[key.Value];
+        public TValue this[TKey key]
 		{
 			get
 			{
-				if (key == null)
+				if (key.Equals(default(TKey)))
 					return null;
 
 				TValue result;
@@ -73,7 +76,7 @@ namespace Discord
 				return result;
 			}
 		}
-		protected TValue GetOrAdd(string key, Func<TValue> createFunc)
+		protected TValue GetOrAdd(TKey key, Func<TValue> createFunc)
 		{
 			TValue result;
 			if (_dictionary.TryGetValue(key, out result))
@@ -91,7 +94,7 @@ namespace Discord
 			}
 			return result;
 		}
-		public TValue TryRemove(string key)
+		public TValue TryRemove(TKey key)
 		{
 			if (_dictionary.ContainsKey(key))
 			{
@@ -107,7 +110,7 @@ namespace Discord
 			}
 			return null;
 		}
-		public TValue Remap(string oldKey, string newKey)
+		public TValue Remap(TKey oldKey, TKey newKey)
 		{
 			if (_dictionary.ContainsKey(oldKey))
 			{

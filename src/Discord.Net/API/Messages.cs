@@ -2,6 +2,7 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,14 @@ namespace Discord.API
 	public class MessageReference
 	{
 		[JsonProperty("id")]
-		public string Id;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long Id;
 		[JsonProperty("channel_id")]
-		public string ChannelId;
+		[JsonConverter(typeof(LongStringConverter))]
+		public long ChannelId;
 		[JsonProperty("message_id")]
-		public string MessageId { get { return Id; } set { Id = value; } }
+		[JsonConverter(typeof(LongStringConverter))]
+		public long MessageId { get { return Id; } set { Id = value; } }
 	}
 	public class MessageInfo : MessageReference
 	{
@@ -104,7 +108,8 @@ namespace Discord.API
 		[JsonProperty("content")]
 		public string Content;
 		[JsonProperty("mentions")]
-		public IEnumerable<string> Mentions;
+		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		public IEnumerable<long> Mentions;
 		[JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
 		public string Nonce;
 		[JsonProperty("tts", NullValueHandling = NullValueHandling.Ignore)]
@@ -118,7 +123,8 @@ namespace Discord.API
 		[JsonProperty("content", NullValueHandling = NullValueHandling.Ignore)]
 		public string Content;
 		[JsonProperty("mentions", NullValueHandling = NullValueHandling.Ignore)]
-		public IEnumerable<string> Mentions;
+		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		public IEnumerable<long> Mentions;
 	}
 	public sealed class EditMessageResponse : MessageInfo { }
 
@@ -132,7 +138,8 @@ namespace Discord.API
 		public class Data
 		{
 			[JsonProperty("guild_id")]
-			public string ServerId;
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ServerId;
 			[JsonProperty("query")]
 			public string Query;
 			[JsonProperty("limit")]

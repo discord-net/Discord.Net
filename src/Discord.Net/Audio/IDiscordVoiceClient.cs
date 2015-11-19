@@ -6,7 +6,7 @@ namespace Discord.Audio
 	{
 		IDiscordVoiceBuffer OutputBuffer { get; }
 
-		Task JoinChannel(string channelId);
+		Task JoinChannel(long channelId);
 
 		void SendVoicePCM(byte[] data, int count);
 		void ClearVoicePCM();

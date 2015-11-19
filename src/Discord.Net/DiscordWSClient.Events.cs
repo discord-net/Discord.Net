@@ -34,9 +34,9 @@ namespace Discord
 	}
 	public class VoiceDisconnectedEventArgs : DisconnectedEventArgs
 	{
-		public readonly string ServerId;
+		public readonly long ServerId;
 
-		internal VoiceDisconnectedEventArgs(string serverId, DisconnectedEventArgs e)
+		internal VoiceDisconnectedEventArgs(long serverId, DisconnectedEventArgs e)
 			: base(e.WasUnexpected, e.Error)
 		{
 			ServerId = serverId;
@@ -60,13 +60,13 @@ namespace Discord
 
 	public sealed class VoicePacketEventArgs
 	{
-		public string UserId { get; }
-		public string ChannelId { get; }
+		public long UserId { get; }
+		public long ChannelId { get; }
 		public byte[] Buffer { get; }
 		public int Offset { get; }
 		public int Count { get; }
 
-		internal VoicePacketEventArgs(string userId, string channelId, byte[] buffer, int offset, int count)
+		internal VoicePacketEventArgs(long userId, long channelId, byte[] buffer, int offset, int count)
 		{
 			UserId = userId;
 			Buffer = buffer;
@@ -103,7 +103,7 @@ namespace Discord
 				RaiseEvent(nameof(VoiceConnected), () => VoiceConnected(this, EventArgs.Empty));
 		}
 		public event EventHandler<VoiceDisconnectedEventArgs> VoiceDisconnected;
-		private void RaiseVoiceDisconnected(string serverId, DisconnectedEventArgs e)
+		private void RaiseVoiceDisconnected(long serverId, DisconnectedEventArgs e)
 		{
 			if (VoiceDisconnected != null)
 				RaiseEvent(nameof(VoiceDisconnected), () => VoiceDisconnected(this, new VoiceDisconnectedEventArgs(serverId, e)));
