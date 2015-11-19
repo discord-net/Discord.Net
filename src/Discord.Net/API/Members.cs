@@ -59,8 +59,8 @@ namespace Discord.API
 	public class VoiceMemberInfo : MemberReference
 	{
 		[JsonProperty("channel_id")]
-		[JsonConverter(typeof(LongStringConverter))]
-		public long ChannelId;
+		[JsonConverter(typeof(NullableLongStringConverter))]
+		public long? ChannelId;
 		[JsonProperty("session_id")]
 		public string SessionId;
 		[JsonProperty("token")]
