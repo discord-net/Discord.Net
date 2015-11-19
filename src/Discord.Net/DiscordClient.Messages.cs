@@ -229,7 +229,7 @@ namespace Discord
 				try
 				{
 					var msgs = await _api.GetMessages(channel.Id, count, relativeMessageId, relativeDir).ConfigureAwait(false);
-                    var result = msgs.Select(x =>
+                    return msgs.Select(x =>
 					{
 						Message msg = null;
 						if (useCache)
