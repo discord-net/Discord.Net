@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -53,6 +54,17 @@ namespace Discord
 			IsSpeaking = isSpeaking;
 		}
 	}
+	public class BanEventArgs : EventArgs
+	{
+		public long UserId { get; }
+		public Server Server { get; }
+
+		public BanEventArgs(long userId, Server server)
+		{
+			UserId = userId;
+			Server = server;
+		}
+	}
 
 	public partial class DiscordClient
 	{
@@ -103,6 +115,18 @@ namespace Discord
 		{
 			if (ProfileUpdated != null)
 				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
+		}
+		public event EventHandler<BanEventArgs> UserBanned;
+		private void RaiseUserBanned(long userId, Server server)
+		{
+			if (UserBanned != null)
+				RaiseEvent(nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
+		}
+		public event EventHandler<BanEventArgs> UserUnbanned;
+		private void RaiseUserUnbanned(long userId, Server server)
+		{
+			if (UserUnbanned != null)
+				RaiseEvent(nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
 		}
 
 		/// <summary> Returns the current logged-in user in a private channel. </summary>
@@ -202,6 +226,7 @@ namespace Discord
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to kick users from a private channel");
+			CheckReady();
 
 			return _api.KickUser(user.Server.Id, user.Id);
 		}
@@ -209,15 +234,18 @@ namespace Discord
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to ban users from a private channel");
+			CheckReady();
 
 			return _api.BanUser(user.Server.Id, user.Id);
 		}
-		public Task UnbanUser(Server server, long userId)
+		public async Task UnbanUser(Server server, long userId)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
+			CheckReady();
 
-			return _api.UnbanUser(server.Id, userId);
+			try { await _api.UnbanUser(server.Id, userId).ConfigureAwait(false); }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 		public async Task<int> PruneUsers(Server server, int days, bool simulate = false)

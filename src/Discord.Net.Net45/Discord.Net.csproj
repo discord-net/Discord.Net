@@ -166,9 +166,6 @@
     <Compile Include="..\Discord.Net\DiscordAPIClientConfig.cs">
       <Link>DiscordAPIClientConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Bans.cs">
-      <Link>DiscordClient.Bans.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.Channels.cs">
       <Link>DiscordClient.Channels.cs</Link>
     </Compile>
