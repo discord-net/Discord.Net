@@ -61,6 +61,9 @@
     <Compile Include="..\Discord.Net.Commands\CommandServiceConfig.cs">
       <Link>CommandServiceConfig.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\GenericPermissionChecker.cs">
+      <Link>Permissions\GenericPermissionChecker.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\Permissions\IPermissionChecker.cs">
       <Link>Permissions\IPermissionChecker.cs</Link>
     </Compile>
@@ -93,6 +96,18 @@
     </Compile>
     <Compile Include="..\Discord.Net.Commands\Permissions\Userlist\WhitelistService.cs">
       <Link>Permissions\Userlist\WhitelistService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Visibility\PrivateChecker.cs">
+      <Link>Permissions\Visibility\PrivateChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Visibility\PrivateExtensions.cs">
+      <Link>Permissions\Visibility\PrivateExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Visibility\PublicChecker.cs">
+      <Link>Permissions\Visibility\PublicChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\Permissions\Visibility\PublicExtensions.cs">
+      <Link>Permissions\Visibility\PublicExtensions.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

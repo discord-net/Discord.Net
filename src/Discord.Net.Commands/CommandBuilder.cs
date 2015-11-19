@@ -74,6 +74,11 @@ namespace Discord.Commands
 			_checks.Add(check);
 			return this;
 		}
+		public CommandBuilder AddCheck(Func<Command, User, Channel, bool> checkFunc)
+		{
+			_checks.Add(new GenericPermissionChecker(checkFunc));
+			return this;
+		}
 
 		public void Do(Func<CommandEventArgs, Task> func)
 		{
@@ -129,9 +134,13 @@ namespace Discord.Commands
 			_category = category;
 			return this;
 		}
-		public void AddCheck(IPermissionChecker check)
+		public void AddCheck(IPermissionChecker checker)
 		{
-			_checks.Add(check);
+			_checks.Add(checker);
+		}
+		public void AddCheck(Func<Command, User, Channel, bool> checkFunc)
+		{
+			_checks.Add(new GenericPermissionChecker(checkFunc));
 		}
 
 		public CommandGroupBuilder CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
