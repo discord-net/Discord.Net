@@ -95,7 +95,7 @@ namespace Discord.Modules
 			client.RoleUpdated += (s, e) => { if (RoleUpdated != null && HasIndirectServer(e.Server)) RoleUpdated(s, e); };
 			client.RoleDeleted += (s, e) => { if (RoleDeleted != null && HasIndirectServer(e.Server)) RoleDeleted(s, e); };
 
-			client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) DisableServer(e.Server); LeftServer(s, e); };
+			client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
 			client.ServerUpdated += (s, e) => { if (ServerUpdated != null && HasIndirectServer(e.Server)) ServerUpdated(s, e); };
 			client.ServerUnavailable += (s, e) => { if (ServerUnavailable != null && HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
 			client.ServerAvailable += (s, e) => { if (ServerAvailable != null && HasIndirectServer(e.Server)) ServerAvailable(s, e); };
