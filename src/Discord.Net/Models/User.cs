@@ -258,11 +258,12 @@ namespace Discord
         }
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			Dictionary<long, Role> newRoles;
+			Dictionary<long, Role> newRoles = new Dictionary<long, Role>();
 			if (roles != null)
-				newRoles = roles.ToDictionary(x => x.Id, x => x);
-			else
-				newRoles = new Dictionary<long, Role>();
+			{
+				foreach (var r in roles)
+					newRoles[r.Id] = r;
+			}
 
 			if (_server.Id != null)
 			{
