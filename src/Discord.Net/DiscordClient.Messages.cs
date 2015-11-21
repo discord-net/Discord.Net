@@ -251,7 +251,7 @@ namespace Discord
 				}
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.Forbidden){ } //Bad Permissions
 			}
-			return null;
+			return new Message[0];
 		}
 
 		private Task MessageQueueLoop()
