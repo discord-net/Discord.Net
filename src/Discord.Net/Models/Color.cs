@@ -6,27 +6,27 @@ namespace Discord
 	{
 		public static readonly Color Default = PresetColor(0);
 
-		public static readonly Color Cyan = PresetColor(0x1abc9c);
-		public static readonly Color DarkCyan = PresetColor(0x11806a);
-		public static readonly Color Green = PresetColor(0x2ecc71);
-		public static readonly Color DarkGreen = PresetColor(0x1f8b4c);
-		public static readonly Color Blue = PresetColor(0x3498db);
+		public static readonly Color Teal = PresetColor(0x1ABC9C);
+		public static readonly Color DarkTeal = PresetColor(0x11806A);
+		public static readonly Color Green = PresetColor(0x2ECC71);
+		public static readonly Color DarkGreen = PresetColor(0x1F8B4C);
+		public static readonly Color Blue = PresetColor(0x3498DB);
 		public static readonly Color DarkBlue = PresetColor(0x206694);
-		public static readonly Color Purple = PresetColor(0x9b59b6);
-		public static readonly Color DarkPurple = PresetColor(0x71368a);
-		public static readonly Color Red = PresetColor(0xe74c3c);
-		public static readonly Color DarkRed = PresetColor(0x992d22);
-		public static readonly Color Orange = PresetColor(0xe67e22);
-		public static readonly Color DarkOrange = PresetColor(0xa84300);
-		public static readonly Color Navy = PresetColor(0x34495e);
-		public static readonly Color DarkNavy = PresetColor(0x2c3e50);
-		public static readonly Color Gold = PresetColor(0xf1c40f);
-		public static readonly Color DarkGold = PresetColor(0xc27c0e);
+		public static readonly Color Purple = PresetColor(0x9B59B6);
+		public static readonly Color DarkPurple = PresetColor(0x71368A);
+		public static readonly Color Magenta = PresetColor(0xE91E63);
+		public static readonly Color DarkMagenta = PresetColor(0xAD1457);
+		public static readonly Color Gold = PresetColor(0xF1C40F);
+		public static readonly Color DarkGold = PresetColor(0xC27C0E);
+		public static readonly Color Orange = PresetColor(0xE67E22);
+		public static readonly Color DarkOrange = PresetColor(0xA84300);
+		public static readonly Color Red = PresetColor(0xE74C3C);
+		public static readonly Color DarkRed = PresetColor(0x992D22);
 
-		public static readonly Color LighterGrey = PresetColor(0xbcc0c0);
-		public static readonly Color LightGrey = PresetColor(0x95a5a6);
-		public static readonly Color DarkGrey = PresetColor(0x979c9f);
-		public static readonly Color DarkerGrey = PresetColor(0x7f8c8d);
+		public static readonly Color LighterGrey = PresetColor(0x95A5A6);
+		public static readonly Color DarkGrey = PresetColor(0x607D8B);
+		public static readonly Color LightGrey = PresetColor(0x979C9F);
+		public static readonly Color DarkerGrey = PresetColor(0x546E7A);
 
 
 		private static Color PresetColor(uint packedValue)
