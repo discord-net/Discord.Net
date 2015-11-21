@@ -243,10 +243,8 @@ namespace Discord
 							}
 						}
 						else
-						{
 							msg = /*_messages[x.Id] ??*/ new Message(this, x.Id, x.ChannelId, x.Author.Id);
-							msg.Update(x);
-						}
+						msg.Update(x);
 						return msg;
 					})
 					.ToArray();
