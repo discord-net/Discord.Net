@@ -12,6 +12,7 @@ namespace Discord.Commands
 		private readonly Command _command;
 		private readonly List<CommandParameter> _params;
 		private readonly List<IPermissionChecker> _checks;
+		private readonly List<string> _aliases;
 		private readonly string _prefix;
 		private bool _allowRequiredParams, _areParamsClosed;
 
@@ -28,15 +29,20 @@ namespace Discord.Commands
 			else
 				_checks = new List<IPermissionChecker>();
 			_prefix = prefix;
+			_aliases = new List<string>();
 
 			_allowRequiredParams = true;
 			_areParamsClosed = false;
         }
 
-		public CommandBuilder Alias(params string[] aliases)
+		public CommandBuilder Alias(string alias)
 		{
-			aliases = aliases.Select(x => AppendPrefix(_prefix, x)).ToArray();
-            _command.SetAliases(aliases);
+			_aliases.Add(alias);
+			return this;
+		}
+		public CommandBuilder Alias(string[] aliases)
+		{
+			_aliases.AddRange(aliases);
 			return this;
 		}
 		/*public CommandBuilder Category(string category)
@@ -94,7 +100,8 @@ namespace Discord.Commands
 		{
 			_command.SetParameters(_params.ToArray());
 			_command.SetChecks(_checks.ToArray());
-            _service.AddCommand(_command);
+			_command.SetAliases(_aliases.Select(x => AppendPrefix(_prefix, x)).ToArray());
+			_service.AddCommand(_command);
 		}
 
 		internal static string AppendPrefix(string prefix, string cmd)
