@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    internal struct Reference<T>
+    internal class Reference<T>
 		where T : CachedObject<long>
 	{
 		private Action<T> _onCache, _onUncache;
