@@ -9,7 +9,7 @@ namespace Discord.Audio
 		private readonly byte[] _buffer;
 		private readonly byte[] _blankFrame;
 		private ushort _readCursor, _writeCursor;
-		private ManualResetEventSlim _underflowEvent, _notOverflowEvent;
+		private ManualResetEventSlim _notOverflowEvent;
 		private bool _isClearing;
 
 		public int FrameSize => _frameSize;
@@ -26,7 +26,6 @@ namespace Discord.Audio
 			_writeCursor = 0;
 			_buffer = new byte[_bufferSize];
 			_blankFrame = new byte[_frameSize];
-			_underflowEvent = new ManualResetEventSlim(); //Notifies when an underflow has occurred
 			_notOverflowEvent = new ManualResetEventSlim(); //Notifies when an overflow is solved
         }
 
@@ -79,7 +78,6 @@ namespace Discord.Audio
 
 					//Advance the write cursor to the next position
 					AdvanceCursorPos(ref _writeCursor);
-					_underflowEvent.Set();
                 }
 			}
 		}
@@ -88,7 +86,6 @@ namespace Discord.Audio
 		{
             if (_writeCursor == _readCursor)
 			{
-				_underflowEvent.Set();
 				_notOverflowEvent.Set();
 				return false;
 			}
@@ -112,8 +109,8 @@ namespace Discord.Audio
 					Buffer.BlockCopy(_blankFrame, 0, _buffer, i * _frameCount, i++);
 				try
 				{
-					_underflowEvent.Wait(cancelToken);
-				}
+					Wait(cancelToken);
+                }
 				catch (OperationCanceledException) { }
 				_writeCursor = 0;
 				_readCursor = 0;
@@ -123,7 +120,12 @@ namespace Discord.Audio
 
 		public void Wait(CancellationToken cancelToken)
 		{
-			_underflowEvent.Wait(cancelToken);
+			while (true)
+			{
+				_notOverflowEvent.Wait(cancelToken);
+				if (_writeCursor == _readCursor)
+					break;
+			}
 		}
 
 		private void AdvanceCursorPos(ref ushort pos)
