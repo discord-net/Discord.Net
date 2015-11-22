@@ -34,13 +34,8 @@ namespace Discord.Commands
 			_allowRequiredParams = true;
 			_areParamsClosed = false;
         }
-
-		public CommandBuilder Alias(string alias)
-		{
-			_aliases.Add(alias);
-			return this;
-		}
-		public CommandBuilder Alias(string[] aliases)
+		
+		public CommandBuilder Alias(params string[] aliases)
 		{
 			_aliases.AddRange(aliases);
 			return this;
