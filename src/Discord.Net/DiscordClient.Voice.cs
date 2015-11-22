@@ -48,7 +48,7 @@ namespace Discord
 		public async Task<IDiscordVoiceClient> JoinVoiceServer(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			CheckReady(); //checkVoice is done inside the voice client
+			CheckReady(true); //checkVoice is done inside the voice client
 
 			var client = await CreateVoiceClient(channel.Server).ConfigureAwait(false);
 			await client.JoinChannel(channel.Id).ConfigureAwait(false);

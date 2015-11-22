@@ -23,24 +23,6 @@ namespace Discord.API
 		}
 	}
 
-	/*public class GetIceResponse
-	{
-		[JsonProperty("ttl")]
-		public string TTL;
-		[JsonProperty("servers")]
-		public ServerData[] Servers;
-
-		public sealed class ServerData
-		{
-			[JsonProperty("url")]
-			public string URL;
-			[JsonProperty("username")]
-			public string Username;
-			[JsonProperty("credential")]
-			public string Credential;
-		}
-	}*/
-
 	//Commands
 	internal sealed class JoinVoiceCommand : WebSocketMessage<JoinVoiceCommand.Data>
 	{
@@ -110,9 +92,9 @@ namespace Discord.API
 			public SocketInfo SocketData = new SocketInfo();
 		}
 	}
-	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<object>
+	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<ulong>
 	{
-		public VoiceKeepAliveCommand() : base(3, null) { }
+		public VoiceKeepAliveCommand() : base(3, EpochTime.GetMilliseconds()) { }
 	}
 	internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
 	{

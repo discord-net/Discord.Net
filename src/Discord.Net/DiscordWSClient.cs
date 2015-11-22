@@ -282,7 +282,7 @@ namespace Discord
 					throw new InvalidOperationException("The client is connecting.");
 			}
 			
-			if (checkVoice && !_config.EnableVoice)
+			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		protected void RaiseEvent(string name, Action action)

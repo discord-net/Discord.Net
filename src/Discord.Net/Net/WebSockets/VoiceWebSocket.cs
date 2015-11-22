@@ -36,12 +36,14 @@ namespace Discord.Net.WebSockets
 		private ushort _sequence;
 		private long? _serverId, _channelId, _userId;
 		private string _sessionId, _token, _encryptionMode;
+		private ulong _ping;
 		
 		private Thread _sendThread, _receiveThread;
 
 		public long? CurrentServerId => _serverId;
 		public long? CurrentChannelId => _channelId;
 		public VoiceBuffer OutputBuffer => _sendBuffer;
+		public int Ping => (int)_ping;
 
 		public VoiceWebSocket(DiscordWSClient client)
 			: base(client)
@@ -312,29 +314,30 @@ namespace Discord.Net.WebSockets
 				}
 				else
 					voicePacket = new byte[MaxOpusSize + 12];
-				
+
 				pingPacket = new byte[8];
 				pingPacket[0] = 0x80; //Flags;
-				pingPacket[1] = 0x78; //Payload Type
-				pingPacket[3] = 0x00; //Length
-				pingPacket[4] = 0x01; //Length (1*8 bytes)
-				pingPacket[5] = (byte)((_ssrc >> 24) & 0xFF);
-				pingPacket[6] = (byte)((_ssrc >> 16) & 0xFF);
-				pingPacket[7] = (byte)((_ssrc >> 8) & 0xFF);
-				pingPacket[8] = (byte)((_ssrc >> 0) & 0xFF);
+				pingPacket[1] = 0xC9; //Payload Type
+				pingPacket[2] = 0x00; //Length
+				pingPacket[3] = 0x01; //Length (1*8 bytes)
+				pingPacket[4] = (byte)((_ssrc >> 24) & 0xFF);
+				pingPacket[5] = (byte)((_ssrc >> 16) & 0xFF);
+				pingPacket[6] = (byte)((_ssrc >> 8) & 0xFF);
+				pingPacket[7] = (byte)((_ssrc >> 0) & 0xFF);
 				if (_isEncrypted)
 				{
 					Buffer.BlockCopy(pingPacket, 0, nonce, 0, 8);
 					int ret = Sodium.Encrypt(pingPacket, 8, encodedFrame, 0, nonce, _secretKey);
 					if (ret != 0)
 						throw new InvalidOperationException("Failed to encrypt ping packet");
-					pingPacket = new byte[ret];
-					Buffer.BlockCopy(encodedFrame, 0, pingPacket, 0, ret);
+					pingPacket = new byte[pingPacket.Length + 16];
+					Buffer.BlockCopy(encodedFrame, 0, pingPacket, 0, pingPacket.Length);
+					Array.Clear(nonce, 0, nonce.Length);
                 }
 
 				int rtpPacketLength = 0;
 				voicePacket[0] = 0x80; //Flags;
-				voicePacket[1] = 0xC9; //Payload Type
+				voicePacket[1] = 0x78; //Payload Type
 				voicePacket[8] = (byte)((_ssrc >> 24) & 0xFF);
 				voicePacket[9] = (byte)((_ssrc >> 16) & 0xFF);
 				voicePacket[10] = (byte)((_ssrc >> 8) & 0xFF);
@@ -385,7 +388,7 @@ namespace Discord.Net.WebSockets
 						}
 						if (currentTicks > nextPingTicks)
 						{
-							_udp.Send(pingPacket, pingPacket.Length);
+							//_udp.Send(pingPacket, pingPacket.Length);
 							nextPingTicks = currentTicks + 5 * Stopwatch.Frequency;
                         }
                     }
@@ -412,6 +415,7 @@ namespace Discord.Net.WebSockets
 
 		protected override async Task ProcessMessage(string json)
 		{
+			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			switch (msg.Operation)
 			{
@@ -454,7 +458,9 @@ namespace Discord.Net.WebSockets
 					break;
 				case 3: //PONG
 					{
-						//var payload = (msg.Payload as JToken).ToObject<VoiceKeepAliveCommand>();
+						ulong time = EpochTime.GetMilliseconds();
+						var payload = (ulong)(long)msg.Payload;
+						_ping = payload - time;
 						//TODO: Use this to estimate latency
 					}
 					break;
