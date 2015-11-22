@@ -150,14 +150,18 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
-			await _api.EditChannel(channel.Id, name: name, topic: topic).ConfigureAwait(false);
+			if (name != null || topic != null)
+				await _api.EditChannel(channel.Id, name: name, topic: topic).ConfigureAwait(false);
 
 			if (position != null)
 			{
-				int oldPos = channel.Position;
-				int newPos = position.Value;
-				int minPos;
 				Channel[] channels = channel.Server.Channels.Where(x => x.Type == channel.Type).OrderBy(x => x.Position).ToArray();
+				int oldPos = Array.IndexOf(channels, channel);
+				var newPosChannel = channels.Where(x => x.Position > position).FirstOrDefault();
+                int newPos = (newPosChannel != null ? Array.IndexOf(channels, newPosChannel) : channels.Length) - 1;
+				if (newPos < 0)
+					newPos = 0;
+				int minPos;
 
 				if (oldPos < newPos) //Moving Down
 				{
@@ -185,7 +189,7 @@ namespace Discord
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
 			CheckReady();
 
-			return _api.ReorderChannels(server.Id, channels.Select(x => x.Id), after.Position);
+			return _api.ReorderChannels(server.Id, channels.Select(x => x.Id), after?.Position ?? 0);
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
