@@ -157,7 +157,7 @@ namespace Discord
 				int oldPos = channel.Position;
 				int newPos = position.Value;
 				int minPos;
-				Channel[] channels = channel.Server.Channels.OrderBy(x => x.Position).ToArray();
+				Channel[] channels = channel.Server.Channels.Where(x => x.Type == channel.Type).OrderBy(x => x.Position).ToArray();
 
 				if (oldPos < newPos) //Moving Down
 				{
