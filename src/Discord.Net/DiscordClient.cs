@@ -287,8 +287,6 @@ namespace Discord
 			T serviceT = null;
 			if (_services.TryGetValue(typeof(T), out service))
 				serviceT = service as T;
-			else
-				return null;
 
 			if (serviceT == null && required)
 				throw new InvalidOperationException($"This operation requires {nameof(T)} to be added to {nameof(DiscordClient)}.");
