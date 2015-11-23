@@ -61,14 +61,8 @@ namespace Discord.Commands
 								await client.SendMessage(replyChannel, "Unable to display help: Unknown command.");
 						}
                         else //Show general help
-
-/* Unmerged change from project 'Discord.Net.Commands'
-Before:
-							await ShowHelp(e.User, e.Channel, replyChannel);
-After:
-							await this.ShowHelp((User)e.User, e.Channel, replyChannel);
-*/
-							await this.ShowGeneralHelp(e.User, (Channel)e.Channel, (Channel)replyChannel);
+							
+							await ShowGeneralHelp(e.User, e.Channel, replyChannel);
                     }));
             }
 

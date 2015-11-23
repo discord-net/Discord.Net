@@ -4,9 +4,10 @@ namespace Discord.Commands
 {
 	public class CommandEventArgs
 	{
+		private readonly string[] _args;
+
 		public Message Message { get; }
 		public Command Command { get; }
-		public string[] Args { get; }
 		
 		public User User => Message.User;
 		public Channel Channel => Message.Channel;
@@ -16,8 +17,12 @@ namespace Discord.Commands
 		{
 			Message = message;
 			Command = command;
-			Args = args;
+			_args = args;
 		}
+
+		public string[] Args => _args;
+		public string GetArg(int index) => _args[index];
+		public string GetArg(string name) => _args[Command[name].Id];
 	}
 
 	public enum CommandErrorType { Exception, UnknownCommand, BadPermissions, BadArgCount, InvalidInput }

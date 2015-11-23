@@ -35,8 +35,6 @@ namespace Discord.Commands
 		public string Category { get; internal set; }
         public bool IsHidden { get; internal set; }
         public string Description { get; internal set; }
-		//public int? MinArgs { get; private set; }
-		//public int? MaxArgs { get; private set; }
 
 		public IEnumerable<string> Aliases => _aliases;
 		private string[] _aliases;
@@ -46,7 +44,7 @@ namespace Discord.Commands
 		
 		private IPermissionChecker[] _checks;
 		private Func<CommandEventArgs, Task> _runFunc;
-		private Dictionary<string, CommandParameter> _parametersByName;
+		internal readonly Dictionary<string, CommandParameter> _parametersByName;
 
 		internal Command(string text)
 		{
