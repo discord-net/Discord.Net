@@ -67,7 +67,7 @@ namespace Discord
 		public string Token { get; private set; }
 
 		/// <summary> Returns the id for the game this user is currently playing. </summary>
-		public string GameId { get; private set; }
+		public int? GameId { get; private set; }
 		/// <summary> Returns the current status for this user. </summary>
 		public UserStatus Status { get; private set; }
 		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>

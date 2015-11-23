@@ -49,7 +49,7 @@ namespace Discord.API
 	public class PresenceInfo : MemberReference
 	{
 		[JsonProperty("game_id")]
-		public string GameId;
+		public int? GameId;
 		[JsonProperty("status")]
 		public string Status;
 		[JsonProperty("roles")] //TODO: Might be temporary

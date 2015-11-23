@@ -82,9 +82,6 @@
     <Compile Include="..\Discord.Net\API\Converters\LongStringConverter.cs">
       <Link>API\Converters\LongStringConverter.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Converters\ShortStringConverter.cs">
-      <Link>API\Converters\ShortStringConverter.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\API\Endpoints.cs">
       <Link>API\Endpoints.cs</Link>
     </Compile>
