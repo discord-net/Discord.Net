@@ -19,6 +19,7 @@ namespace Discord.Commands
 	public sealed class CommandParameter
 	{
 		public string Name { get; }
+		public int Id { get; internal set; }
 		public ParameterType Type { get; }
 
 		public CommandParameter(string name, ParameterType type)
@@ -45,6 +46,7 @@ namespace Discord.Commands
 		
 		private IPermissionChecker[] _checks;
 		private Func<CommandEventArgs, Task> _runFunc;
+		private Dictionary<string, CommandParameter> _parametersByName;
 
 		internal Command(string text)
 		{
@@ -52,7 +54,10 @@ namespace Discord.Commands
             IsHidden = false;
 			_aliases = new string[0];
 			_parameters = new CommandParameter[0];
+			_parametersByName = new Dictionary<string, CommandParameter>();
         }
+
+		public CommandParameter this[string name] => _parametersByName[name];
 
 		internal void SetAliases(string[] aliases)
 		{
@@ -60,36 +65,14 @@ namespace Discord.Commands
 		}
 		internal void SetParameters(CommandParameter[] parameters)
 		{
-			_parameters = parameters;
-			/*if (parameters != null)
+			_parametersByName.Clear();
+			for (int i = 0; i < parameters.Length; i++)
 			{
-				if (parameters.Length == 0)
-				{
-					MinArgs = 0;
-					MaxArgs = 0;
-                }
-				else
-				{
-					if (parameters[parameters.Length - 1].Type == ParameterType.Multiple)
-						MaxArgs = null;
-					else
-						MaxArgs = parameters.Length;
-
-					int? optionalStart = null;
-					for (int i = parameters.Length - 1; i >= 0; i--)
-					{
-						if (parameters[i].Type == ParameterType.Optional)
-							optionalStart = i;
-						else
-							break;
-					}
-					if (optionalStart == null)
-						MinArgs = MaxArgs;
-					else
-						MinArgs = optionalStart.Value;
-				}
-			}*/
-		}
+				parameters[i].Id = i;
+				_parametersByName[parameters[i].Name] = parameters[i];
+            }
+			_parameters = parameters;
+        }
 		internal void SetChecks(IPermissionChecker[] checks)
 		{
 			_checks = checks;
