@@ -200,7 +200,6 @@ namespace Discord
 
 			try { await _api.DestroyChannel(channel.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			//return _channels.TryRemove(channel.Id);
 		}
 	}
 }

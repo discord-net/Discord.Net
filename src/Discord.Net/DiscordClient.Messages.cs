@@ -188,29 +188,30 @@ namespace Discord
 		}
 
 		/// <summary> Deletes the provided message. </summary>
-		public Task DeleteMessage(Message message)
+		public async Task DeleteMessage(Message message)
 		{
 			if (message == null) throw new ArgumentNullException(nameof(message));
 			CheckReady();
 
-			return DeleteMessageInternal(message);
-        }
+			try
+			{
+				await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
+			}
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+		}
 		public async Task DeleteMessages(IEnumerable<Message> messages)
 		{
 			if (messages == null) throw new ArgumentNullException(nameof(messages));
 			CheckReady();
 
 			foreach (var message in messages)
-				await DeleteMessageInternal(message).ConfigureAwait(false);
-		}
-		private async Task DeleteMessageInternal(Message message)
-		{
-			try
 			{
-				await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
-				_messages.TryRemove(message.Id);
+				try
+				{
+					await _api.DeleteMessage(message.Id, message.Channel.Id).ConfigureAwait(false);
+				}
+				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
-			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
 
