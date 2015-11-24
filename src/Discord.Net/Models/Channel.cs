@@ -8,6 +8,19 @@ namespace Discord
 {
 	public sealed class Channel : CachedObject<long>
 	{
+		private struct ChannelMember
+		{
+			public readonly User User;
+			public readonly ChannelPermissions Permissions;
+
+			public ChannelMember(User user)
+			{
+				User = user;
+				Permissions = new ChannelPermissions();
+				Permissions.Lock();
+			}
+		}
+
 		public sealed class PermissionOverwrite
 		{
 			public PermissionTarget TargetType { get; }
@@ -22,7 +35,7 @@ namespace Discord
 				Permissions.Lock();
 			}
 		}
-				
+
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns the topic associated with this channel. </summary>
@@ -50,13 +63,15 @@ namespace Discord
 		{
 			get
 			{
-				if (_areMembersStale)
-					UpdateMembersCache();
-				return _members.Select(x => x.Value);
+				if (Type == ChannelType.Text)
+					return _members.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
+				else if (Type == ChannelType.Voice)
+					return Server.Members.Where(x => x.VoiceChannel == this);
+				else
+					return Enumerable.Empty<User>();
             }
 		}
-		private Dictionary<long, User> _members;
-		private bool _areMembersStale;
+		private ConcurrentDictionary<long, ChannelMember> _members;
 
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
@@ -89,7 +104,13 @@ namespace Discord
 						x.GlobalUser.PrivateChannel = null;
                 });
 			_permissionOverwrites = _initialPermissionsOverwrites;
-			_areMembersStale = true;
+			_members = new ConcurrentDictionary<long, ChannelMember>();
+
+			if (recipientId != null)
+			{
+				AddMember(client.PrivateUser);
+				AddMember(Recipient);
+			}
 
 			//Local Cache
 			if (client.Config.MessageCacheLength > 0)
@@ -135,7 +156,7 @@ namespace Discord
 				_permissionOverwrites = model.PermissionOverwrites
 					.Select(x => new PermissionOverwrite(PermissionTarget.FromString(x.Type), x.Id, x.Allow, x.Deny))
 					.ToArray();
-				InvalidatePermissionsCache();
+				UpdatePermissions();
             }
 		}
 
@@ -156,52 +177,82 @@ namespace Discord
 			}
 		}
 		internal void RemoveMessage(Message message) => _messages.TryRemove(message.Id, out message);
-
-		internal void InvalidateMembersCache()
+		
+		internal void AddMember(User user)
 		{
-			_areMembersStale = true;
+			var member = new ChannelMember(user);
+            if (_members.TryAdd(user.Id, member))
+				UpdatePermissions(user, member.Permissions);
+        }
+		internal void RemoveMember(User user)
+		{
+			ChannelMember ignored;
+			_members.TryRemove(user.Id, out ignored);
 		}
-		private void UpdateMembersCache()
+
+		internal ChannelPermissions GetPermissions(User user)
 		{
-			if (IsPrivate)
+			ChannelMember member;
+			if (_members.TryGetValue(user.Id, out member))
+				return member.Permissions;
+			else
+				return null;
+		}
+		internal void UpdatePermissions()
+		{
+			foreach (var pair in _members)
 			{
-				_members = new Dictionary<long, User>()
+				ChannelMember member = pair.Value;
+				UpdatePermissions(member.User, member.Permissions);
+			}
+		}
+		internal void UpdatePermissions(User user)
+		{
+			ChannelMember member;
+			if (_members.TryGetValue(user.Id, out member))
+				UpdatePermissions(member.User, member.Permissions);
+        }
+        private void UpdatePermissions(User user, ChannelPermissions permissions)
+		{
+			uint newPermissions = 0;
+			var server = Server;
+
+			//Load the mask of all permissions supported by this channel type
+			var mask = ChannelPermissions.All(this).RawValue;
+
+			if (server != null)
+			{
+				//Start with this user's server permissions
+				newPermissions = server.GetPermissions(user).RawValue;
+
+				if (IsPrivate || server.Owner == user)
+					newPermissions = mask; //Owners always have all permissions
+				else
 				{
-					{ _client.CurrentUserId, _client.PrivateUser },
-					{ _recipient.Id.Value, _recipient.Value }
-				};
-			}
-			else if (Type == ChannelType.Text)
-			{
-				_members = Server.Members
-					.Where(x => x.GetPermissions(this)?.ReadMessages ?? false)
-					.ToDictionary(x => x.Id, x => x);
-			}
-			else if (Type == ChannelType.Voice)
-			{
-				_members = Server.Members
-					.Where(x => x.VoiceChannel == this)
-					.ToDictionary(x => x.Id, x => x);
-			}
-			_areMembersStale = false;
-		}
+					var channelOverwrites = PermissionOverwrites;
 
-		internal void InvalidatePermissionsCache()
-		{
-			UpdateMembersCache();
-			foreach (var member in _members)
-				member.Value.UpdateChannelPermissions(this);
-		}
-		/*internal void InvalidatePermissionsCache(Role role)
-		{
-			_areMembersStale = true;
-			foreach (var member in role.Members)
-				member.UpdateChannelPermissions(this);
-		}*/
-		internal void InvalidatePermissionsCache(User user)
-		{
-			_areMembersStale = true;
-			user.UpdateChannelPermissions(this);
+					var roles = user.Roles;
+					foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+						newPermissions &= ~denyRole.Permissions.Deny.RawValue;
+					foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+						newPermissions |= allowRole.Permissions.Allow.RawValue;
+					foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
+						newPermissions &= ~denyUser.Permissions.Deny.RawValue;
+					foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
+						newPermissions |= allowUser.Permissions.Allow.RawValue;
+
+					if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+						newPermissions = mask; //ManageRolesOrPermissions gives all permisions
+					else if (Type == ChannelType.Text && !BitHelper.GetBit(newPermissions, (int)PermissionsBits.ReadMessages))
+						newPermissions = 0; //No read permission on a text channel removes all other permissions
+					else
+						newPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from serverPerms, for example)
+				}
+			}
+			else
+				newPermissions = mask; //Private messages always have all permissions
+
+			permissions.SetRawValueInternal(newPermissions);
 		}
 
 		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;

@@ -7,19 +7,6 @@ using System.Linq;
 
 namespace Discord
 {
-	public struct ChannelPermissionsPair
-	{
-		public Channel Channel;
-		public ChannelPermissions Permissions;
-
-		public ChannelPermissionsPair(Channel channel)
-		{
-			Channel = channel;
-			Permissions = new ChannelPermissions();
-			Permissions.Lock();
-        }
-	}
-
 	public class User : CachedObject<long>
 	{
 		internal struct CompositeKey : IEquatable<CompositeKey>
@@ -38,9 +25,6 @@ namespace Discord
 		}
 
 		internal static string GetAvatarUrl(long userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
-		
-		private ConcurrentDictionary<long, ChannelPermissionsPair> _permissions;
-		private ServerPermissions _serverPermissions;
 
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
 		internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
@@ -117,10 +101,8 @@ namespace Discord
 			{
 				if (_server.Id != null)
 				{
-					return _permissions
-						.Where(x => x.Value.Permissions.ReadMessages)
-						.Select(x => x.Value.Channel)
-						.Where(x => x != null);
+					return Server.Channels
+						.Where(x => x.GetPermissions(this).ReadMessages);
 				}
 				else
 				{
@@ -158,12 +140,6 @@ namespace Discord
 			_roles = new Dictionary<long, Role>();
 
 			Status = UserStatus.Offline;
-			//_channels = new ConcurrentDictionary<string, Channel>();
-			if (serverId != null)
-			{
-				_permissions = new ConcurrentDictionary<long, ChannelPermissionsPair>();
-				_serverPermissions = new ServerPermissions();
-			}
 
 			if (serverId == null)
 				UpdateRoles(null);
@@ -197,8 +173,6 @@ namespace Discord
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
 				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
-
-			UpdateServerPermissions();
         }
 		internal void Update(ExtendedMemberInfo model)
 		{
@@ -242,20 +216,9 @@ namespace Discord
 				IsSelfMuted = model.IsSelfMuted.Value;
 			if (model.IsServerSuppressed != null)
 				IsServerSuppressed = model.IsServerSuppressed.Value;
-
-			if (_voiceChannel.Id != model.ChannelId)
-			{
-				var oldChannel = _voiceChannel.Value;
-				if (oldChannel != null)
-					oldChannel.InvalidateMembersCache();
-
-				_voiceChannel.Id = model.ChannelId; //Can be null
-
-				var newChannel = _voiceChannel.Value;
-				if (newChannel != null)
-					newChannel.InvalidateMembersCache();
-			}
-        }
+			
+			_voiceChannel.Id = model.ChannelId; //Allows null
+		}
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
 			Dictionary<long, Role> newRoles = new Dictionary<long, Role>();
@@ -271,6 +234,9 @@ namespace Discord
 				newRoles.Add(everyone.Id, everyone);
 			}
 			_roles = newRoles;
+
+			if (!IsPrivate)
+				Server.UpdatePermissions(this);
 		}
 
 		internal void UpdateActivity(DateTime? activity = null)
@@ -278,111 +244,13 @@ namespace Discord
 			if (LastActivityAt == null || activity > LastActivityAt.Value)
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
-
-		internal void UpdateServerPermissions()
-		{
-			var server = Server;
-			if (server == null) return;
-
-			uint newPermissions = 0x0;
-			uint oldPermissions = _serverPermissions.RawValue;
-
-			if (server.Owner == this)
-				newPermissions = ServerPermissions.All.RawValue;
-			else
-			{
-				var roles = Roles;
-				foreach (var serverRole in roles)
-					newPermissions |= serverRole.Permissions.RawValue;
-			}
-
-			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
-				newPermissions = ServerPermissions.All.RawValue;
-
-			if (newPermissions != oldPermissions)
-			{
-				_serverPermissions.SetRawValueInternal(newPermissions);
-				foreach (var permission in _permissions)
-					UpdateChannelPermissions(permission.Value.Channel);
-			}
-		}
-		internal void UpdateChannelPermissions(Channel channel)
-		{
-			var server = Server;
-			if (server == null) return;
-			if (channel.Server != server) throw new InvalidOperationException();
-
-			ChannelPermissionsPair chanPerms;
-			if (!_permissions.TryGetValue(channel.Id, out chanPerms)) return;
-			uint newPermissions = _serverPermissions.RawValue;
-			uint oldPermissions = chanPerms.Permissions.RawValue;
-			
-			if (server.Owner == this)
-				newPermissions = ChannelPermissions.All(channel).RawValue;
-			else
-			{
-				var channelOverwrites = channel.PermissionOverwrites;
-
-				//var roles = Roles.OrderBy(x => x.Id);
-				var roles = Roles;
-				foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-					newPermissions &= ~denyRole.Permissions.Deny.RawValue;
-				foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-					newPermissions |= allowRole.Permissions.Allow.RawValue;
-				foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
-					newPermissions &= ~denyUser.Permissions.Deny.RawValue;
-				foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
-					newPermissions |= allowUser.Permissions.Allow.RawValue;
-			}
-
-			var mask = ChannelPermissions.All(channel).RawValue;
-			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
-				newPermissions = mask;
-			else if (!BitHelper.GetBit(newPermissions, (int)PermissionsBits.ReadMessages))
-				newPermissions = ChannelPermissions.None.RawValue;
-			else
-				newPermissions &= mask;
-
-			if (newPermissions != oldPermissions)
-			{
-				chanPerms.Permissions.SetRawValueInternal(newPermissions);
-				channel.InvalidateMembersCache();
-			}
-
-			chanPerms.Permissions.SetRawValueInternal(newPermissions);
-		}
-
-		public ServerPermissions GetServerPermissions() => _serverPermissions;
+		
+		public ServerPermissions ServerPermissions => Server.GetPermissions(this);
 		public ChannelPermissions GetPermissions(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 
-			//Return static permissions if this is a private chat
-			if (_server.Id == null)
-				return ChannelPermissions.PrivateOnly;
-
-			ChannelPermissionsPair chanPerms;
-			if (_permissions.TryGetValue(channel.Id, out chanPerms))
-				return chanPerms.Permissions;
-			return null;
-		}
-
-		internal void AddChannel(Channel channel)
-		{
-			if (_server.Id != null)
-			{
-				_permissions.TryAdd(channel.Id, new ChannelPermissionsPair(channel));
-				UpdateChannelPermissions(channel);
-			}
-		}
-		internal void RemoveChannel(Channel channel)
-		{
-			if (_server.Id != null)
-			{
-				ChannelPermissionsPair ignored;
-				//_channels.TryRemove(channel.Id, out channel);
-				_permissions.TryRemove(channel.Id, out ignored);
-			}
+			return channel.GetPermissions(this);
 		}
 
 		public bool HasRole(Role role)

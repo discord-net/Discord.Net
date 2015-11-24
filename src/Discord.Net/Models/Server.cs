@@ -8,7 +8,20 @@ using System.Linq;
 namespace Discord
 {
 	public sealed class Server : CachedObject<long>
-	{		
+	{
+		private struct ServerMember
+		{
+			public readonly User User;
+			public readonly ServerPermissions Permissions;
+
+			public ServerMember(User user)
+			{
+				User = user;
+				Permissions = new ServerPermissions();
+				Permissions.Lock();
+			}
+		}
+		
 		/// <summary> Returns the name of this channel. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns the current logged-in user's data for this server. </summary>
@@ -20,8 +33,6 @@ namespace Discord
 		public DateTime JoinedAt { get; private set; }
 		/// <summary> Returns the region for this server (see Regions). </summary>
 		public string Region { get; private set; }
-		/*/// <summary> Returns the endpoint for this server's voice server. </summary>
-		internal string VoiceServer { get; set; }*/
 
 		/// <summary> Returns true if the current user created this server. </summary>
 		public bool IsOwner => _client.CurrentUserId == _ownerId;
@@ -47,18 +58,18 @@ namespace Discord
 		/// <summary> Returns a collection of all channels within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
-		/// <summary> Returns a collection of all channels within this server. </summary>
+		/// <summary> Returns a collection of all text channels within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> TextChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Text);
-		/// <summary> Returns a collection of all channels within this server. </summary>
+		/// <summary> Returns a collection of all voice channels within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
 		private ConcurrentDictionary<long, Channel> _channels;
 
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
-		public IEnumerable<User> Members => _members.Select(x => x.Value);
-		private ConcurrentDictionary<long, User> _members;
+		public IEnumerable<User> Members => _members.Select(x => x.Value.User);
+		private ConcurrentDictionary<long, ServerMember> _members;
 
 		/// <summary> Return the the role representing all users in a server. </summary>
 		[JsonIgnore]
@@ -75,8 +86,8 @@ namespace Discord
 
 			//Global Cache
 			_channels = new ConcurrentDictionary<long, Channel>();
-			_members = new ConcurrentDictionary<long, User>();
 			_roles = new ConcurrentDictionary<long, Role>();
+			_members = new ConcurrentDictionary<long, ServerMember>();
 
 			//Local Cache
 			_bans = new ConcurrentDictionary<long, bool>();
@@ -194,43 +205,34 @@ namespace Discord
 			{
 				if (channel.Id == Id)
 					DefaultChannel = channel;
-				foreach (var member in Members)
-					member.AddChannel(channel);
 			}
 		}
 		internal void RemoveChannel(Channel channel)
 		{
-			foreach (var member in Members)
-				member.RemoveChannel(channel);
 			_channels.TryRemove(channel.Id, out channel);
 		}
 
 		internal void AddMember(User user)
 		{
-			if (_members.TryAdd(user.Id, user))
+			if (_members.TryAdd(user.Id, new ServerMember(user)))
 			{
 				if (user.Id == _ownerId)
 					Owner = user;
 
 				foreach (var channel in TextChannels)
-				{
-					user.AddChannel(channel);
-					channel.InvalidatePermissionsCache(user);
-				}
+					channel.AddMember(user);
 			}
         }
 		internal void RemoveMember(User user)
 		{
-			if (_members.TryRemove(user.Id, out user))
+			ServerMember ignored;
+			if (_members.TryRemove(user.Id, out ignored))
 			{
 				if (user.Id == _ownerId)
 					Owner = null;
 
 				foreach (var channel in Channels)
-				{
-					user.RemoveChannel(channel);
-					channel.InvalidatePermissionsCache(user);
-				}
+					channel.RemoveMember(user);
 			}
 		}
 		internal void HasMember(User user) => _members.ContainsKey(user.Id);
@@ -249,6 +251,45 @@ namespace Discord
 			{
 				if (role.Id == Id)
 					EveryoneRole = null;
+			}
+		}
+
+		internal ServerPermissions GetPermissions(User user)
+		{
+			ServerMember member;
+			if (_members.TryGetValue(user.Id, out member))
+				return member.Permissions;
+			else
+				return null;
+		}
+		internal void UpdatePermissions(User user)
+		{
+			ServerMember member;
+			if (_members.TryGetValue(user.Id, out member))
+				UpdatePermissions(member.User, member.Permissions);
+		}
+        private void UpdatePermissions(User user, ServerPermissions permissions)
+		{
+			uint oldPermissions = permissions.RawValue;
+			uint newPermissions = 0;
+
+			if (Owner == user)
+				newPermissions = ServerPermissions.All.RawValue;
+			else
+			{
+				var roles = Roles;
+				foreach (var serverRole in roles)
+					newPermissions |= serverRole.Permissions.RawValue;
+			}
+
+			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+				newPermissions = ServerPermissions.All.RawValue;
+
+			if (newPermissions != oldPermissions)
+			{
+				permissions.SetRawValueInternal(newPermissions);
+				foreach (var channel in _channels)
+					channel.Value.UpdatePermissions(user);
 			}
 		}
 

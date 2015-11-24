@@ -67,7 +67,7 @@ namespace Discord
 				Permissions.SetRawValueInternal(model.Permissions.Value);
 
 			foreach (var member in Members)
-				member.UpdateServerPermissions();
+				Server.UpdatePermissions(member);
 		}
 
 		public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
