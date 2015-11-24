@@ -30,6 +30,9 @@ namespace Discord
 		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. This value is the target maximum but is not guaranteed, the buffer will often go slightly above this value. </summary>
 		public int VoiceBufferLength { get { return _voiceBufferLength; } set { SetValue(ref _voiceBufferLength, value); } }
 		private int _voiceBufferLength = 1000;
+		/// <summary> Gets or sets the bitrate used (in kbit/s, between 1 and 512) for outgoing voice packets. A null value will use default opus settings. </summary>
+		public int? VoiceBitrate { get { return _voiceBitrate; } set { SetValue(ref _voiceBitrate, value); } }
+		private int? _voiceBitrate = null;
 
 		//Experimental Features
 		/// <summary> (Experimental) Enables the voice websocket and UDP client and specifies how it will be used. Any option other than Disabled requires the opus .dll or .so be in the local lib/ folder. </summary>
