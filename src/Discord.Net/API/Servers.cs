@@ -52,7 +52,7 @@ namespace Discord.API
 		[JsonProperty("voice_states")]
 		public VoiceMemberInfo[] VoiceStates;
 		[JsonProperty("unavailable")]
-		public bool Unavailable;
+		public bool? Unavailable;
 	}
 
 	//Create
