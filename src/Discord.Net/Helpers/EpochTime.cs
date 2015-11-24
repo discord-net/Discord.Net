@@ -4,7 +4,8 @@ namespace Discord
 {
     internal class EpochTime
 	{
-		private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		public static ulong GetMilliseconds() => (ulong)(DateTime.UtcNow - epoch).TotalMilliseconds;
+		private const long epoch = 621355968000000000L; //1/1/1970 in Ticks
+
+		public static long GetMilliseconds() => (DateTime.UtcNow.Ticks - epoch) / TimeSpan.TicksPerMillisecond;
 	}
 }

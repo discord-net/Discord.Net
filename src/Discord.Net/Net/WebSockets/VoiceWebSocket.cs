@@ -36,14 +36,14 @@ namespace Discord.Net.WebSockets
 		private ushort _sequence;
 		private long? _serverId, _channelId, _userId;
 		private string _sessionId, _token, _encryptionMode;
-		private ulong _ping;
+		private int _ping;
 		
 		private Thread _sendThread, _receiveThread;
 
 		public long? CurrentServerId => _serverId;
 		public long? CurrentChannelId => _channelId;
 		public VoiceBuffer OutputBuffer => _sendBuffer;
-		public int Ping => (int)_ping;
+		public int Ping => _ping;
 
 		public VoiceWebSocket(DiscordWSClient client)
 			: base(client)
@@ -471,9 +471,9 @@ namespace Discord.Net.WebSockets
 					break;
 				case 3: //PONG
 					{
-						ulong time = EpochTime.GetMilliseconds();
-						var payload = (ulong)(long)msg.Payload;
-						_ping = payload - time;
+						long time = EpochTime.GetMilliseconds();
+						var payload = (long)msg.Payload;
+						_ping = (int)(payload - time);
 						//TODO: Use this to estimate latency
 					}
 					break;

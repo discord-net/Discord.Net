@@ -41,7 +41,7 @@ namespace Discord.API
 	}
 
 	//Commands
-	internal sealed class KeepAliveCommand : WebSocketMessage<ulong>
+	internal sealed class KeepAliveCommand : WebSocketMessage<long>
 	{
 		public KeepAliveCommand() : base(1, EpochTime.GetMilliseconds()) { }
 	}

@@ -92,7 +92,7 @@ namespace Discord.API
 			public SocketInfo SocketData = new SocketInfo();
 		}
 	}
-	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<ulong>
+	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<long>
 	{
 		public VoiceKeepAliveCommand() : base(3, EpochTime.GetMilliseconds()) { }
 	}

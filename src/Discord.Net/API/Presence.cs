@@ -14,7 +14,7 @@ namespace Discord.API
 		public class Data
 		{
 			[JsonProperty("idle_since")]
-			public ulong? IdleSince;
+			public long? IdleSince;
 			[JsonProperty("game_id")]
 			public int? GameId;
 		}

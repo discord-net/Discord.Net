@@ -120,7 +120,7 @@ namespace Discord.Net.WebSockets
 			return new KeepAliveCommand();
 		}
 
-		public void SendStatus(ulong? idleSince, int? gameId)
+		public void SendStatus(long? idleSince, int? gameId)
 		{
 			var updateStatus = new UpdateStatusCommand();
 			updateStatus.Payload.IdleSince = idleSince;
