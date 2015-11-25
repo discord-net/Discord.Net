@@ -10,12 +10,10 @@ namespace Discord
 	{
 		private readonly ConcurrentDictionary<long, User> _users;
 
-		/// <summary> Returns the email for this user. </summary>
-		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
+		/// <summary> Returns the email for this user. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
 		public string Email { get; private set; }
-		/// <summary> Returns if the email for this user has been verified. </summary>
-		/// <remarks> This field is only ever populated for the current logged in user. </remarks>
+		/// <summary> Returns if the email for this user has been verified. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
 		public bool? IsVerified { get; private set; }
 
@@ -35,7 +33,7 @@ namespace Discord
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
-		internal IEnumerable<User> Memberships => _users.Select(x => x.Value);
+		public IEnumerable<User> Memberships => _users.Select(x => x.Value);
 
 		internal GlobalUser(DiscordClient client, long id)
 			: base(client, id)

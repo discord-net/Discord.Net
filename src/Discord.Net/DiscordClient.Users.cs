@@ -136,7 +136,8 @@ namespace Discord
 		/// <summary> Returns information about the currently logged-in account. </summary>
 		public GlobalUser CurrentUser => _privateUser.GlobalUser;
 
-		/// <summary> Returns a collection of all users this client can currently see. </summary>
+		/// <summary> Returns a collection of all unique users this client can currently see. </summary>
+		public IEnumerable<GlobalUser> AllUsers => _globalUsers;
 		internal GlobalUsers GlobalUsers => _globalUsers;
 		private readonly GlobalUsers _globalUsers;
 
