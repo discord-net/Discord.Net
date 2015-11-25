@@ -53,7 +53,7 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = client.Config.VoiceBufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
 			_ssrcMapping = new ConcurrentDictionary<uint, long>();
-			_encoder = new OpusEncoder(48000, 1, 20, Opus.Application.Audio);
+			_encoder = new OpusEncoder(48000, 1, 20, client.Config.VoiceBitrate, Opus.Application.Audio);
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(client.Config.VoiceBufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 

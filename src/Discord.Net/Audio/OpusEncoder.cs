@@ -8,7 +8,7 @@ namespace Discord.Audio
 		private readonly IntPtr _ptr;
 
 		/// <summary> Gets the bit rate of the encoder. </summary>
-		public const int BitRate = 16;
+		public const int BitsPerSample = 16;
 		/// <summary> Gets the input sampling rate of the encoder. </summary>
 		public int InputSamplingRate { get; private set; }
 		/// <summary> Gets the number of channels of the encoder. </summary>
@@ -21,6 +21,8 @@ namespace Discord.Audio
 		public int SampleSize { get; private set; }
 		/// <summary> Gets the bytes per frame. </summary>
 		public int FrameSize { get; private set; }
+		/// <summary> Gets the bit rate in kbit/s. </summary>
+		public int? BitRate { get; private set; }
 		/// <summary> Gets the coding mode of the encoder. </summary>
 		public Opus.Application Application { get; private set; }
 
@@ -28,9 +30,10 @@ namespace Discord.Audio
 		/// <param name="samplingRate">Sampling rate of the input signal (Hz). Supported Values:  8000, 12000, 16000, 24000, or 48000.</param>
 		/// <param name="channels">Number of channels (1 or 2) in input signal.</param>
 		/// <param name="frameLength">Length, in milliseconds, that each frame takes. Supported Values: 2.5, 5, 10, 20, 40, 60</param>
+		/// <param name="bitrate">Bitrate (kbit/s) used for this encoder. Supported Values: 1-512. Null will use the recommended bitrate. </param>
 		/// <param name="application">Coding mode.</param>
 		/// <returns>A new <c>OpusEncoder</c></returns>
-		public OpusEncoder(int samplingRate, int channels, int frameLength, Opus.Application application)
+		public OpusEncoder(int samplingRate, int channels, int frameLength, int? bitrate, Opus.Application application)
 		{
 			if (samplingRate != 8000 && samplingRate != 12000 &&
 				samplingRate != 16000 && samplingRate != 24000 &&
@@ -38,14 +41,17 @@ namespace Discord.Audio
 				throw new ArgumentOutOfRangeException(nameof(samplingRate));
 			if (channels != 1 && channels != 2)
 				throw new ArgumentOutOfRangeException(nameof(channels));
+			if (bitrate != null && (bitrate < 1 || bitrate > 512))
+				throw new ArgumentOutOfRangeException(nameof(bitrate));
 
 			InputSamplingRate = samplingRate;
 			InputChannels = channels;
 			Application = application;
 			FrameLength = frameLength;
-			SampleSize = (BitRate / 8) * channels;
+			SampleSize = (BitsPerSample / 8) * channels;
 			SamplesPerFrame = samplingRate / 1000 * FrameLength;
 			FrameSize = SamplesPerFrame * SampleSize;
+			BitRate = bitrate;
 
 			Opus.Error error;
 			_ptr = Opus.CreateEncoder(samplingRate, channels, (int)application, out error);
@@ -53,6 +59,8 @@ namespace Discord.Audio
 				throw new InvalidOperationException($"Error occured while creating encoder: {error}");
 
 			SetForwardErrorCorrection(true);
+			if (bitrate != null)
+				SetBitrate(bitrate.Value);
 		}
 
 		/// <summary> Produces Opus encoded audio from PCM samples. </summary>
@@ -81,6 +89,17 @@ namespace Discord.Audio
 				throw new ObjectDisposedException(nameof(OpusEncoder));
 
 			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetInbandFECRequest, value ? 1 : 0);
+			if (result < 0)
+				throw new Exception("Encoder error: " + ((Opus.Error)result).ToString());
+		}
+
+		/// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
+		public void SetBitrate(int value)
+		{
+			if (disposed)
+				throw new ObjectDisposedException(nameof(OpusEncoder));
+
+			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetBitrateRequest, value * 1000);
 			if (result < 0)
 				throw new Exception("Encoder error: " + ((Opus.Error)result).ToString());
 		}
