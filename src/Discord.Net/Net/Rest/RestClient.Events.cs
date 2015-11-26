@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http;
 
 namespace Discord.Net.Rest
 {
@@ -7,11 +6,11 @@ namespace Discord.Net.Rest
 	{
 		public class RequestEventArgs : EventArgs
 		{
-			public HttpMethod Method { get; }
+			public string Method { get; }
 			public string Path { get; }
 			public string Payload { get; }
 			public double ElapsedMilliseconds { get; }
-			public RequestEventArgs(HttpMethod method, string path, string payload, double milliseconds)
+			public RequestEventArgs(string method, string path, string payload, double milliseconds)
 			{
 				Method = method;
 				Path = path;
@@ -21,7 +20,7 @@ namespace Discord.Net.Rest
 		}
 
 		public event EventHandler<RequestEventArgs> OnRequest;
-		private void RaiseOnRequest(HttpMethod method, string path, string payload, double milliseconds)
+		private void RaiseOnRequest(string method, string path, string payload, double milliseconds)
 		{
 			if (OnRequest != null)
 				OnRequest(this, new RequestEventArgs(method, path, payload, milliseconds));

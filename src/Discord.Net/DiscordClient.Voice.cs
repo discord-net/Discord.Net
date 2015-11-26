@@ -40,7 +40,11 @@ namespace Discord
 				config.VoiceClientId = unchecked(++_nextVoiceClientId);
 				return new DiscordWSClient(config, server.Id);
 			});
-			client.LogMessage += (s, e) => RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}", e.Exception);
+			client.LogMessage += (s, e) =>
+			{
+				if (e.Source != LogMessageSource.DataWebSocket)
+					RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}", e.Exception);
+			};
 			await client.Connect(_gateway, _token).ConfigureAwait(false);
 			return client;
 		}

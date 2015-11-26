@@ -3,7 +3,6 @@ using Discord.API;
 using RestSharp;
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,13 +38,13 @@ namespace Discord.Net.Rest
 				_client.AddDefaultHeader("authorization", token);
 		}
 
-		public Task<string> Send(HttpMethod method, string path, string json, CancellationToken cancelToken)
+		public Task<string> Send(string method, string path, string json, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, GetMethod(method));
 			request.AddParameter("application/json", json, ParameterType.RequestBody);
 			return Send(request, cancelToken);
 		}
-		public Task<string> SendFile(HttpMethod method, string path, string filePath, CancellationToken cancelToken)
+		public Task<string> SendFile(string method, string path, string filePath, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, Method.POST);
             request.AddFile("file", filePath);
@@ -70,9 +69,9 @@ namespace Discord.Net.Rest
 			}
 		}
 
-		private Method GetMethod(HttpMethod method)
+		private Method GetMethod(string method)
 		{
-			switch (method.Method)
+			switch (method)
 			{
 				case "DELETE": return Method.DELETE;
 				case "GET": return Method.GET;

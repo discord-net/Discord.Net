@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,69 +26,64 @@ namespace Discord.Net.Rest
 		public void SetToken(string token) => _engine.SetToken(token);
 
 		//DELETE
-		private static readonly HttpMethod _delete = HttpMethod.Delete;
 		internal Task<ResponseT> Delete<ResponseT>(string path, object data) where ResponseT : class  
-			=> Send<ResponseT>(_delete, path, data);
+			=> Send<ResponseT>("DELETE", path, data);
 		internal Task<ResponseT> Delete<ResponseT>(string path) where ResponseT : class  
-			=> Send<ResponseT>(_delete, path);
+			=> Send<ResponseT>("DELETE", path);
 		internal Task Delete(string path, object data) 
-			=> Send(_delete, path, data);
+			=> Send("DELETE", path, data);
 		internal Task Delete(string path) 
-			=> Send(_delete, path);
+			=> Send("DELETE", path);
 
 		//GET
-		private static readonly HttpMethod _get = HttpMethod.Get;
 		internal Task<ResponseT> Get<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>(_get, path);
+			=> Send<ResponseT>("GET", path);
 		internal Task Get(string path) 
-			=> Send(_get, path);
+			=> Send("GET", path);
 
 		//PATCH
-		private static readonly HttpMethod _patch = new HttpMethod("PATCH");
 		internal Task<ResponseT> Patch<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>(_patch, path, data);
+			=> Send<ResponseT>("PATCH", path, data);
 		internal Task Patch(string path, object data) 
-			=> Send(_patch, path, data);
-
-		private static readonly HttpMethod _post = HttpMethod.Post;
+			=> Send("PATCH", path, data);
+		
 		internal Task<ResponseT> Post<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>(_post, path, data);
+			=> Send<ResponseT>("POST", path, data);
 		internal Task<ResponseT> Post<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>(_post, path);
+			=> Send<ResponseT>("POST", path);
 		internal Task Post(string path, object data) 
-			=> Send(_post, path, data);
+			=> Send("POST", path, data);
 		internal Task Post(string path) 
-			=> Send(_post, path);
-
-		private static readonly HttpMethod _put = HttpMethod.Put;
+			=> Send("POST", path);
+		
 		internal Task<ResponseT> Put<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>(_put, path, data);
+			=> Send<ResponseT>("PUT", path, data);
 		internal Task<ResponseT> Put<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>(_put, path);
+			=> Send<ResponseT>("PUT", path);
 		internal Task Put(string path, object data) 
-			=> Send(_put, path, data);
+			=> Send("PUT", path, data);
 		internal Task Put(string path) 
-			=> Send(_put, path);
+			=> Send("PUT", path);
 
 		internal Task<ResponseT> PostFile<ResponseT>(string path, string filePath) where ResponseT : class 
-			=> SendFile<ResponseT>(_post, path, filePath);
+			=> SendFile<ResponseT>("POST", path, filePath);
 		internal Task PostFile(string path, string filePath) 
-			=> SendFile(_post, path, filePath);
+			=> SendFile("POST", path, filePath);
 
 		internal Task<ResponseT> PutFile<ResponseT>(string path, string filePath) where ResponseT : class 
-			=> SendFile<ResponseT>(_put, path, filePath);
+			=> SendFile<ResponseT>("PUT", path, filePath);
 		internal Task PutFile(string path, string filePath) 
-			=> SendFile(_put, path, filePath);
+			=> SendFile("PUT", path, filePath);
 
-		private async Task<ResponseT> Send<ResponseT>(HttpMethod method, string path, object content = null)
+		private async Task<ResponseT> Send<ResponseT>(string method, string path, object content = null)
 			where ResponseT : class
 		{
 			string responseJson = await Send(method, path, content, true).ConfigureAwait(false);
 			return DeserializeResponse<ResponseT>(responseJson);
 		}
-		private Task Send(HttpMethod method, string path, object content = null)
+		private Task Send(string method, string path, object content = null)
 			=> Send(method, path, content, false);
-		private async Task<string> Send(HttpMethod method, string path, object content, bool hasResponse)
+		private async Task<string> Send(string method, string path, object content, bool hasResponse)
 		{
 			Stopwatch stopwatch = null;
 			string requestJson = null;
@@ -123,15 +117,15 @@ namespace Discord.Net.Rest
 			return responseJson;
 		}
 
-		private async Task<ResponseT> SendFile<ResponseT>(HttpMethod method, string path, string filePath)
+		private async Task<ResponseT> SendFile<ResponseT>(string method, string path, string filePath)
 			where ResponseT : class
 		{
 			string responseJson = await SendFile(method, path, filePath, true).ConfigureAwait(false);
 			return DeserializeResponse<ResponseT>(responseJson);
 		}
-		private Task SendFile(HttpMethod method, string path, string filePath)
+		private Task SendFile(string method, string path, string filePath)
 			=> SendFile(method, path, filePath, false);
-		private async Task<string> SendFile(HttpMethod method, string path, string filePath, bool hasResponse)
+		private async Task<string> SendFile(string method, string path, string filePath, bool hasResponse)
 		{
 			Stopwatch stopwatch = null;
 

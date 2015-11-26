@@ -35,18 +35,12 @@
 
   "frameworks": {
     "net45": {
-      "frameworkAssemblies": {
-        "System.Net.Http": "4.0.0.0"
-      },
 			"dependencies": {
 				"RestSharp": "105.2.3",
 				"WebSocketSharp": "1.0.3-rc9"
 			}
     },
     "dnx451": {
-      "frameworkAssemblies": {
-        "System.Net.Http": "4.0.0.0"
-      },
 			"dependencies": {
 				"RestSharp": "105.2.3",
 				"WebSocketSharp": "1.0.3-rc9"

@@ -79,15 +79,12 @@ namespace Discord
 				if (e.WasUnexpected)
 					await socket.Reconnect(_token).ConfigureAwait(false);
 			};
-
-			if (!_config.VoiceOnly)
+			
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message, e.Exception);
+			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message, e.Exception);
-				if (_config.LogLevel >= LogMessageSeverity.Info)
-				{
-					socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
-					socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
-				}
+				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
+				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 			}
 
 			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
@@ -96,7 +93,6 @@ namespace Discord
 		internal virtual VoiceWebSocket CreateVoiceSocket()
 		{
 			var socket = new VoiceWebSocket(this);
-			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
 			socket.Connected += (s, e) => RaiseVoiceConnected();
 			socket.Disconnected += async (s, e) =>
 			{
@@ -104,11 +100,14 @@ namespace Discord
 				if (e.WasUnexpected)
 					await socket.Reconnect().ConfigureAwait(false);
 			};
+
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
 				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
 				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
 			}
+
 			return socket;
 		}
 
