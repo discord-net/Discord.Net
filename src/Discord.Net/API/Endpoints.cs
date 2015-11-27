@@ -39,7 +39,7 @@
 		public static string InviteUrl(string inviteIdOrXkcd) => $"https://discord.gg/{inviteIdOrXkcd}";
 
 		public const string Users = "users";
-		public static string UserAvatar(long userId, string avatarId) => $"users/{userId}/avatars/{avatarId}.jpg";
+		public static string UserAvatar(long userId, string avatarId) => BaseApi + $"users/{userId}/avatars/{avatarId}.jpg";
         public static string UserChannels(long userId) => $"users/{userId}/channels";
 		public static string UserMe => $"users/@me";
 
