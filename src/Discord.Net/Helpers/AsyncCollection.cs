@@ -94,6 +94,15 @@ namespace Discord
 			}
 			return result;
 		}
+		protected void Import(IEnumerable<KeyValuePair<TKey, TValue>> items)
+		{
+			lock (_writerLock)
+			{
+				foreach (var pair in items)
+					_dictionary.TryAdd(pair.Key, pair.Value);
+			}
+		}
+
 		public TValue TryRemove(TKey key)
 		{
 			if (_dictionary.ContainsKey(key))
@@ -110,6 +119,15 @@ namespace Discord
 			}
 			return null;
 		}
+		public void Clear()
+		{
+			lock (_writerLock)
+			{
+				_dictionary.Clear();
+                RaiseCleared();
+			}
+        }
+
 		public TValue Remap(TKey oldKey, TKey newKey)
 		{
 			if (_dictionary.ContainsKey(oldKey))
@@ -124,14 +142,6 @@ namespace Discord
 			}
 			return null;
 		}
-		public void Clear()
-		{
-			lock (_writerLock)
-			{
-				_dictionary.Clear();
-                RaiseCleared();
-			}
-        }
 
 		public IEnumerator<TValue> GetEnumerator() => _dictionary.Select(x => x.Value).GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

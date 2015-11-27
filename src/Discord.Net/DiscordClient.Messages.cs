@@ -1,4 +1,5 @@
 using Discord.API;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +28,10 @@ namespace Discord
 				msg.Cache(); //Builds references
 				return msg;
             }
-        }
-	}
+		}
+		public void Import(Message[] messages)
+			=> Import(messages.ToDictionary(x => x.Id));
+    }
 
 	public class MessageEventArgs : EventArgs
 	{
@@ -214,7 +217,6 @@ namespace Discord
 			}
 		}
 
-
 		/// <summary> Downloads last count messages from the server, returning all messages before or after relativeMessageId, if it's provided. </summary>
 		public async Task<Message[]> DownloadMessages(Channel channel, int count, long? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
 		{
@@ -253,6 +255,22 @@ namespace Discord
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.Forbidden){ } //Bad Permissions
 			}
 			return new Message[0];
+		}
+		
+		/// <summary> Deserializes messages from JSON format and imports them into the message cache.</summary>
+		public void ImportMessages(string json)
+		{
+			if (json == null) throw new ArgumentNullException(nameof(json));
+
+			var msgs = JsonConvert.DeserializeObject<Message[]>(json);
+			_messages.Import(msgs);
+		}
+		/// <summary> Serializes the message cache for a given channel to JSON.</summary>
+		public string ExportMessages(Channel channel)
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+
+			return JsonConvert.SerializeObject(channel.Messages);
 		}
 
 		private Task MessageQueueLoop()
