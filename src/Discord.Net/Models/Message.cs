@@ -233,6 +233,7 @@ namespace Discord
 			{
 				MentionedUsers = model.Mentions
 					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
+					.Where(x => x != null)
 					.ToArray();
 			}
 			if (model.IsMentioningEveryone != null)
