@@ -96,7 +96,7 @@ namespace Discord
             }
 		}
 
-		/// <summary> Returns a collection of all channels this user is a member of. </summary>
+		/// <summary> Returns a collection of all channels this user has permissions to join on this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> Channels
 		{
@@ -105,7 +105,8 @@ namespace Discord
 				if (_server.Id != null)
 				{
 					return Server.Channels
-						.Where(x => x.GetPermissions(this).ReadMessages);
+						.Where(x => (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
+						(x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
 				}
 				else
 				{
