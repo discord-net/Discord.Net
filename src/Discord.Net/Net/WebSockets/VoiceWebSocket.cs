@@ -388,7 +388,14 @@ namespace Discord.Net.WebSockets
 					{
 						if (hasFrame)
 						{
-							_udp.Send(voicePacket, rtpPacketLength);
+							try
+							{
+								_udp.Send(voicePacket, rtpPacketLength);
+							}
+							catch (SocketException ex)
+							{
+								RaiseOnLog(LogMessageSeverity.Error, "Failed to send UDP packet.", ex);
+							}
 							hasFrame = false;
 						}
 						nextTicks += ticksPerFrame;
