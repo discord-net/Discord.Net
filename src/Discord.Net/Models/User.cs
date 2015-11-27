@@ -1,7 +1,6 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -60,25 +59,29 @@ namespace Discord
 		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
 		private DateTime? _lastOnline;
 
-		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
+		//References
 		[JsonIgnore]
-		public Channel PrivateChannel => GlobalUser.PrivateChannel;
-
-		[JsonIgnore]
-		internal GlobalUser GlobalUser => _globalUser.Value;
+		public GlobalUser Global => _globalUser.Value;
 		private readonly Reference<GlobalUser> _globalUser;
 
 		[JsonIgnore]
 		public Server Server => _server.Value;
         private readonly Reference<Server> _server;
+		[JsonProperty]
+		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 
 		[JsonIgnore]
 		public Channel VoiceChannel => _voiceChannel.Value;
 		private Reference<Channel> _voiceChannel;
+		[JsonProperty]
+		private long? VoiceChannelId { get { return _voiceChannel.Id; } set { _voiceChannel.Id = value; } }
 
+		//Collections
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
 		private Dictionary<long, Role> _roles;
+		[JsonProperty]
+		private IEnumerable<long> RoleIds => _roles.Select(x => x.Key);
 
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
@@ -89,7 +92,7 @@ namespace Discord
 				if (_server.Id != null)
 					return Server.Channels.SelectMany(x => x.Messages.Where(y => y.User.Id == Id));
 				else
-					return GlobalUser.PrivateChannel.Messages.Where(x => x.User.Id == Id);
+					return Global.PrivateChannel.Messages.Where(x => x.User.Id == Id);
             }
 		}
 
@@ -106,7 +109,7 @@ namespace Discord
 				}
 				else
 				{
-					var privateChannel = PrivateChannel;
+					var privateChannel = Global.PrivateChannel;
 					if (privateChannel != null)
 						return new Channel[] { privateChannel };
 					else

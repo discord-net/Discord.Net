@@ -132,7 +132,7 @@ namespace Discord
 
 			Channel channel = null;
 			if (user != null)
-				channel = user.GlobalUser.PrivateChannel;
+				channel = user.Global.PrivateChannel;
 			if (channel == null)
 			{
 				var response = await _api.CreatePMChannel(_userId.Value, user.Id).ConfigureAwait(false);

@@ -50,13 +50,18 @@ namespace Discord
 		/// <summary> Returns the server containing this channel. </summary>
 		[JsonIgnore]
 		public Server Server => _server.Value;
+		[JsonProperty]
+		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 		private readonly Reference<Server> _server;
 
 		/// For private chats, returns the target user, otherwise null.
 		[JsonIgnore]
 		public User Recipient => _recipient.Value;
-        private readonly Reference<User> _recipient;
-		
+		[JsonProperty]
+		private long? RecipientId { get { return _recipient.Id; } set { _recipient.Id = value; } }
+		private readonly Reference<User> _recipient;
+
+		//Collections
 		/// <summary> Returns a collection of all users with read access to this channel. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members
@@ -66,20 +71,23 @@ namespace Discord
 				if (Type == ChannelType.Text)
 					return _members.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
 				else if (Type == ChannelType.Voice)
-					return Server.Members.Where(x => x.VoiceChannel == this);
+					return _members.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
 				else
 					return Enumerable.Empty<User>();
             }
 		}
+		[JsonProperty]
+		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
 		private ConcurrentDictionary<long, ChannelMember> _members;
 
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
 		public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
+		[JsonProperty]
+		private IEnumerable<long> MessageIds => Messages.Select(x => x.Id);
 		private readonly ConcurrentDictionary<long, Message> _messages;
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
-		private static readonly PermissionOverwrite[] _initialPermissionsOverwrites = new PermissionOverwrite[0];
 		private PermissionOverwrite[] _permissionOverwrites;
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites { get { return _permissionOverwrites; } internal set { _permissionOverwrites = value.ToArray(); } }
 
@@ -96,14 +104,14 @@ namespace Discord
 				{
 					Name = "@" + x.Name;
 					if (_server.Id == null)
-						x.GlobalUser.PrivateChannel = this;
+						x.Global.PrivateChannel = this;
 				},
 				x =>
 				{
 					if (_server.Id == null)
-						x.GlobalUser.PrivateChannel = null;
+						x.Global.PrivateChannel = null;
                 });
-			_permissionOverwrites = _initialPermissionsOverwrites;
+			_permissionOverwrites = new PermissionOverwrite[0];
 			_members = new ConcurrentDictionary<long, ChannelMember>();
 
 			if (recipientId != null)

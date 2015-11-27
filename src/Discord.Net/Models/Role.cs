@@ -24,13 +24,18 @@ namespace Discord
 		/// <summary> Returns the server this role is a member of. </summary>
 		[JsonIgnore]
 		public Server Server => _server.Value;
+		[JsonProperty]
+		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 		private readonly Reference<Server> _server;
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
 		public bool IsEveryone => _server.Id == null || Id == _server.Id;
+
 		/// <summary> Returns a list of all members in this role. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members => _server.Id != null ? (IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this))) : new User[0];
+		[JsonProperty]
+		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
 		//TODO: Add local members cache
 
 		internal Role(DiscordClient client, long id, long serverId)

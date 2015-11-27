@@ -8,7 +8,6 @@ namespace Discord
 {
 	public sealed class GlobalUser : CachedObject<long>
 	{
-		private readonly ConcurrentDictionary<long, User> _users;
 
 		/// <summary> Returns the email for this user. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
@@ -19,7 +18,7 @@ namespace Discord
 
 		/// <summary> Returns the private messaging channel with this user, if one exists. </summary>
 		[JsonIgnore]
-		internal Channel PrivateChannel
+		public Channel PrivateChannel
 		{
 			get { return _privateChannel; }
 			set
@@ -29,11 +28,16 @@ namespace Discord
 					CheckUser();
             }
 		}
-		private Channel _privateChannel;
+		[JsonProperty]
+		private long? PrivateChannelId => _privateChannel?.Id;
+        private Channel _privateChannel;
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Memberships => _users.Select(x => x.Value);
+		[JsonProperty]
+		private IEnumerable<long> ServerIds => _users.Select(x => x.Key);
+		private readonly ConcurrentDictionary<long, User> _users;
 
 		internal GlobalUser(DiscordClient client, long id)
 			: base(client, id)

@@ -94,6 +94,8 @@ namespace Discord
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
 		public bool IsMentioningMe { get; private set; }
+		/// <summary> Returns true if the current user created this message. </summary>
+		public bool IsAuthor => _client.CurrentUserId == _user.Id;
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns true if the message is still in the outgoing message queue. </summary>
@@ -118,28 +120,49 @@ namespace Discord
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> MentionedUsers { get; internal set; }
+		[JsonProperty]
+		private IEnumerable<long> MentionedUserIds
+		{
+			get { return MentionedUsers.Select(x => x.Id); }
+			set { MentionedUsers = value.Select(x => _client.GetUser(Server, x)).Where(x => x != null); }
+		}
 
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
+		[JsonProperty]
+		private IEnumerable<long> MentionedChannelIds
+		{
+			get { return MentionedChannels.Select(x => x.Id); }
+			set { MentionedChannels = value.Select(x => _client.GetChannel(x)).Where(x => x != null); }
+		}
 
 		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
 		[JsonIgnore]
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
+		[JsonProperty]
+		private IEnumerable<long> MentionedRoleIds
+		{
+			get { return MentionedRoles.Select(x => x.Id); }
+			set { MentionedRoles = value.Select(x => _client.GetRole(x)).Where(x => x != null); }
+		}
 
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Server Server => _channel.Value.Server;
+
 		/// <summary> Returns the channel this message was sent to. </summary>
 		[JsonIgnore]
 		public Channel Channel => _channel.Value;
+		[JsonProperty]
+		private long? ChannelId { get { return _channel.Id; } set { _channel.Id = value; } }
 		private readonly Reference<Channel> _channel;
 
-		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUserId == _user.Id;
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
 		public User User => _user.Value;
+		[JsonProperty]
+		private long? UserId { get { return _user.Id; } set { _user.Id = value; } }
 		private readonly Reference<User> _user;
 
 		internal Message(DiscordClient client, long id, long channelId, long userId)

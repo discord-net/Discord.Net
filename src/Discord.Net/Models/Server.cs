@@ -35,15 +35,20 @@ namespace Discord
 		public string Region { get; private set; }
 
 		/// <summary> Returns true if the current user created this server. </summary>
-		public bool IsOwner => _client.CurrentUserId == _ownerId;
+		public bool IsOwner => _client.CurrentUserId == _owner.Id;
+
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
-		public User Owner { get; private set; }
-		private long _ownerId;
+		public User Owner => _owner.Value;
+		[JsonProperty]
+		private long? OwnerId => _owner.Id;
+		private Reference<User> _owner;
 
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
 		[JsonIgnore]
 		public Channel AFKChannel => _afkChannel.Value;
+		[JsonProperty]
+		private long? AFKChannelId => _afkChannel.Id;
         private Reference<Channel> _afkChannel;
 
 		/// <summary> Returns the default channel for this server. </summary>
@@ -51,8 +56,7 @@ namespace Discord
 		public Channel DefaultChannel { get; private set; }
 
 		/// <summary> Returns a collection of the ids of all users banned on this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<long> Bans => _bans.Select(x => x.Key);
+		public IEnumerable<long> BannedUsers => _bans.Select(x => x.Key);
 		private ConcurrentDictionary<long, bool> _bans;
 		
 		/// <summary> Returns a collection of all channels within this server. </summary>
@@ -64,11 +68,15 @@ namespace Discord
 		/// <summary> Returns a collection of all voice channels within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
+		[JsonProperty]
+		private IEnumerable<long> ChannelIds => Channels.Select(x => x.Id);
 		private ConcurrentDictionary<long, Channel> _channels;
 
 		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Members => _members.Select(x => x.Value.User);
+		[JsonProperty]
+		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
 		private ConcurrentDictionary<long, ServerMember> _members;
 
 		/// <summary> Return the the role representing all users in a server. </summary>
@@ -77,11 +85,14 @@ namespace Discord
 		/// <summary> Returns a collection of all roles within this server. </summary>
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
+		[JsonProperty]
+		private IEnumerable<long> RoleIds => Roles.Select(x => x.Id);
 		private ConcurrentDictionary<long, Role> _roles;
 
 		internal Server(DiscordClient client, long id)
 			: base(client, id)
 		{
+			_owner = new Reference<User>(x => _client.Users[x, Id]);
 			_afkChannel = new Reference<Channel>(x => _client.Channels[x]);
 
 			//Global Cache
@@ -138,11 +149,8 @@ namespace Discord
 			if (model.AFKChannelId != null)
 			if (model.JoinedAt != null)
 				JoinedAt = model.JoinedAt.Value;
-			if (model.OwnerId != null && _ownerId != model.OwnerId)
-			{
-				_ownerId = model.OwnerId.Value;
-				Owner = _client.Users[_ownerId, Id];
-			}
+			if (model.OwnerId != null)
+				_owner.Id = model.OwnerId.Value;
 			if (model.Region != null)
 				Region = model.Region;
 
@@ -216,9 +224,6 @@ namespace Discord
 		{
 			if (_members.TryAdd(user.Id, new ServerMember(user)))
 			{
-				if (user.Id == _ownerId)
-					Owner = user;
-
 				foreach (var channel in TextChannels)
 					channel.AddMember(user);
 			}
@@ -228,9 +233,6 @@ namespace Discord
 			ServerMember ignored;
 			if (_members.TryRemove(user.Id, out ignored))
 			{
-				if (user.Id == _ownerId)
-					Owner = null;
-
 				foreach (var channel in Channels)
 					channel.RemoveMember(user);
 			}

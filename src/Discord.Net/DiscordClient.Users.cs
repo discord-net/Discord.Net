@@ -134,7 +134,7 @@ namespace Discord
 		private User _privateUser;
 
 		/// <summary> Returns information about the currently logged-in account. </summary>
-		public GlobalUser CurrentUser => _privateUser.GlobalUser;
+		public GlobalUser CurrentUser => _privateUser.Global;
 
 		/// <summary> Returns a collection of all unique users this client can currently see. </summary>
 		public IEnumerable<GlobalUser> AllUsers => _globalUsers;
@@ -275,7 +275,7 @@ namespace Discord
 			CheckReady();
 
 			return _api.EditUser(currentPassword: currentPassword, 
-				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.GlobalUser.Email, password: password,
+				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
 				avatarType: avatarType, avatar: avatar);
 		}
 
