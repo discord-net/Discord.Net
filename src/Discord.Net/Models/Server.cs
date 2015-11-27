@@ -224,7 +224,7 @@ namespace Discord
 		{
 			if (_members.TryAdd(user.Id, new ServerMember(user)))
 			{
-				foreach (var channel in TextChannels)
+				foreach (var channel in Channels)
 					channel.AddMember(user);
 			}
         }
