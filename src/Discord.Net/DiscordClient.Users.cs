@@ -144,6 +144,10 @@ namespace Discord
 		internal Users Users => _users;
 		private readonly Users _users;
 
+		public GlobalUser GetUser(long userId)
+		{
+			return _globalUsers[userId];
+		}
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
 		public User GetUser(Server server, long userId)
 		{
