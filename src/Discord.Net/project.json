@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "0.8.1-beta2",
   "description": "An unofficial .Net API wrapper for the Discord client.",
   "authors": [
@@ -29,39 +29,32 @@
 		}
 	},
 
-	"dependencies": {
-		"Newtonsoft.Json": "7.0.1"
-	},
+  "dependencies": {
+    "Newtonsoft.Json": "7.0.1"
+  },
 
-  "frameworks": {
-    "net45": {
+	"frameworks": {
+		"net45": {
 			"dependencies": {
 				"RestSharp": "105.2.3",
 				"WebSocketSharp": "1.0.3-rc9"
 			}
-    },
-    "dnx451": {
+		},
+		"dotnet5.4": {
 			"dependencies": {
-				"RestSharp": "105.2.3",
-				"WebSocketSharp": "1.0.3-rc9"
-			}
-    },
-		"dnxcore50": {
-			"dependencies": {
-				"System.Collections": "4.0.11-beta-23409",
-				"System.Collections.Concurrent": "4.0.11-beta-23409",
-				"System.IO.Compression": "4.0.1-beta-23409",
-				"System.Linq": "4.0.1-beta-23409",
-				"System.Net.Http": "4.0.1-beta-23409",
-				"System.Net.NameResolution": "4.0.0-beta-23409",
-				"System.Net.Sockets": "4.1.0-beta-23409",
-				"System.Net.Requests": "4.0.11-beta-23409",
-				"System.Net.WebSockets.Client": "4.0.0-beta-23409",
-				"System.Runtime.InteropServices": "4.0.21-beta-23409",
-				"System.Text.RegularExpressions": "4.0.11-beta-23409",
-				"System.Threading": "4.0.11-beta-23409",
-				"System.Threading.Thread": "4.0.0-beta-23409"
+				"System.Collections": "4.0.11-beta-23516",
+				"System.Collections.Concurrent": "4.0.11-beta-23516",
+				"System.IO.Compression": "4.1.0-beta-23516",
+				"System.Linq": "4.0.1-beta-23516",
+				"System.Net.NameResolution": "4.0.0-beta-23516",
+				"System.Net.Sockets": "4.1.0-beta-23516",
+				"System.Net.Requests": "4.0.11-beta-23516",
+				"System.Net.WebSockets.Client": "4.0.0-beta-23516",
+				"System.Runtime.InteropServices": "4.0.21-beta-23516",
+				"System.Text.RegularExpressions": "4.0.11-beta-23516",
+				"System.Threading": "4.0.11-beta-23516",
+				"System.Threading.Thread": "4.0.0-beta-23516"
 			}
 		}
-  }
+	}
 }
