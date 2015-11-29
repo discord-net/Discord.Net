@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -66,10 +67,20 @@ namespace Discord
 		}*/
 
 		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
-		internal static string Clean(Message msg, string text)
+		public static string Resolve(Message source, string text)
 		{
-			var client = msg.Client;
-			var server = msg.Server;
+			if (source == null) throw new ArgumentNullException(nameof(source));
+			if (text == null) throw new ArgumentNullException(nameof(text));
+
+			return Resolve(source.Server, text);
+        }
+
+		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
+		public static string Resolve(Server server, string text)
+		{
+			if (text == null) throw new ArgumentNullException(nameof(text));
+
+			var client = server.Client;
             text = Mention.CleanUserMentions(client, server, text);
 			if (server != null)
 			{
