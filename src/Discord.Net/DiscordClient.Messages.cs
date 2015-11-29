@@ -260,7 +260,7 @@ namespace Discord
 		}
 		
 		/// <summary> Deserializes messages from JSON format and imports them into the message cache.</summary>
-		public void ImportMessages(string json)
+		public IEnumerable<Message> ImportMessages(string json)
 		{
 			if (json == null) throw new ArgumentNullException(nameof(json));
 			
@@ -278,6 +278,7 @@ namespace Discord
 				})
 				.ToDictionary(x => x.Id);
 			_messages.Import(dic);
+			return dic.Values;
 		}
 
 		/// <summary> Serializes the message cache for a given channel to JSON.</summary>
