@@ -16,10 +16,6 @@ namespace Discord
 	}
 	internal class MessageImporterResolver : DefaultContractResolver
 	{
-		protected override List<System.Reflection.MemberInfo> GetSerializableMembers(Type objectType)
-		{
-			return base.GetSerializableMembers(objectType);
-		}
 		protected override JsonProperty CreateProperty(System.Reflection.MemberInfo member, MemberSerialization memberSerialization)
 		{
 			var property = base.CreateProperty(member, memberSerialization);
