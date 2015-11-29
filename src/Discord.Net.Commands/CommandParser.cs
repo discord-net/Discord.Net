@@ -32,9 +32,10 @@ namespace Discord.Commands
 				else if (currentChar == '\\')
 					isEscaped = true;
 
-				if ((!isEscaped && IsWhiteSpace(currentChar)) || endPosition >= inputLength)
+				bool isWhitespace = IsWhiteSpace(currentChar);
+                if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
 				{
-					int length = (currentChar == ' ' ? endPosition - 1 : endPosition) - startPosition;
+					int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
 					string temp = input.Substring(startPosition, length);
 					if (temp == "")
 						startPosition = endPosition;
@@ -95,7 +96,7 @@ namespace Discord.Commands
 				else if (currentChar == '\\')
 					isEscaped = true;
 
-				if (endPosition == startPosition + 1 && IsWhiteSpace(currentChar)) //Has no text yet, and is another whitespace
+				if (endPosition == startPosition + 1 && isWhitespace) //Has no text yet, and is another whitespace
 				{
 					startPosition = endPosition;
                     continue;
@@ -114,17 +115,21 @@ namespace Discord.Commands
 							currentPart = ParserPart.QuotedParameter;
 							startPosition = endPosition;
 						}
-						else if ((!isEscaped && IsWhiteSpace(currentChar)) || endPosition >= inputLength)
+						else
 						{
-							int length = (currentChar == ' ' ? endPosition - 1 : endPosition) - startPosition;
-							string temp = input.Substring(startPosition, length);
-							if (temp == "")
-								startPosition = endPosition;
-							else
+							bool isWhitespace = IsWhiteSpace(currentChar);
+							if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
 							{
-								currentPart = ParserPart.None;
-								argList.Add(temp);
-								startPosition = endPosition;
+								int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
+								string temp = input.Substring(startPosition, length);
+								if (temp == "")
+									startPosition = endPosition;
+								else
+								{
+									currentPart = ParserPart.None;
+									argList.Add(temp);
+									startPosition = endPosition;
+								}
 							}
 						}
 						break;
