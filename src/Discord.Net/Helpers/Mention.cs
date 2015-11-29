@@ -64,5 +64,19 @@ namespace Discord
 				return e.Value;
 			}));
 		}*/
-	}
+
+		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
+		internal static string Clean(Message msg, string text)
+		{
+			var client = msg.Client;
+			var server = msg.Server;
+            text = Mention.CleanUserMentions(client, server, text);
+			if (server != null)
+			{
+				text = Mention.CleanChannelMentions(client, server, text);
+				//text = Mention.CleanRoleMentions(_client, User, channel, text);
+			}
+			return text;
+		}
+    }
 }

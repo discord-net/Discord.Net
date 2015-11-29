@@ -23,6 +23,7 @@ namespace Discord
 		protected readonly DiscordClient _client;
 		private bool _isCached;
 
+		internal DiscordClient Client => _client;
 		internal bool IsCached => _isCached;
 
         internal CachedObject(DiscordClient client)
