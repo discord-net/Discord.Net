@@ -71,7 +71,7 @@ namespace Discord.Commands
                 if (_allCommands.Count == 0)  return;
                 if (e.Message.IsAuthor) return;
 
-                string msg = e.Message.Text;
+                string msg = e.Message.RawText;
                 if (msg.Length == 0) return;
 
 				//Check for command char if one is provided
