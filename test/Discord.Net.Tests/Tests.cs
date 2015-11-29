@@ -38,7 +38,7 @@ namespace Discord.Tests
 				_observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)));
 
 			//Create new server and invite the other bots to it
-			_testServer = _hostClient.CreateServer("Discord.Net Testing", Region.USEast).Result;
+			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.GetVoiceRegions().Result.First()).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _hostClient.CreateInvite(_testServer, 60, 1, false, false).Result;
 			WaitAll(
