@@ -138,7 +138,7 @@ namespace Discord
 					ChannelId = channel.Id,
 					IsTextToSpeech = isTextToSpeech
 				});
-				msg.IsQueued = true;
+				msg.State = MessageState.Queued;
 
 				if (text.Length > MaxMessageSize)
 					throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {MaxMessageSize} characters or less.");
@@ -314,9 +314,10 @@ namespace Discord
 							_messages.Remap(msg.Id, response.Id);
 							msg.Id = response.Id;
 							msg.Update(response);
-						}
-						msg.IsQueued = false;
-						msg.HasFailed = hasFailed;
+							msg.State = MessageState.Normal;
+                        }
+						else
+							msg.State = MessageState.Failed;
 						RaiseMessageSent(msg);
 					}
 					await Task.Delay(interval).ConfigureAwait(false);

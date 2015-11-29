@@ -6,6 +6,12 @@ using System.Linq;
 
 namespace Discord
 {
+	public enum MessageState : byte
+	{
+		Normal = 0,
+		Queued,
+		Failed
+	}
 	public sealed class Message : CachedObject<long>
 	{
 		public sealed class Attachment : File
@@ -98,11 +104,9 @@ namespace Discord
 		public bool IsAuthor => _client.CurrentUserId == _user.Id;
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
-		/// <summary> Returns true if the message is still in the outgoing message queue. </summary>
-		public bool IsQueued { get; internal set; }
-		/// <summary> Returns true if the message was rejected by the server. </summary>
-		public bool HasFailed { get; internal set; }
-		/// <summary> Returns the raw content of this message as it was received from the server.. </summary>
+		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
+		public MessageState State { get; internal set; }
+		/// <summary> Returns the raw content of this message as it was received from the server. </summary>
 		public string RawText { get; private set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		public string Text { get; private set; } 
@@ -155,14 +159,14 @@ namespace Discord
 		[JsonIgnore]
 		public Channel Channel => _channel.Value;
 		[JsonProperty]
-		private long? ChannelId { get { return _channel.Id; } set { _channel.Id = value; } }
+		private long? ChannelId => _channel.Id;
 		private readonly Reference<Channel> _channel;
 
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
 		public User User => _user.Value;
 		[JsonProperty]
-		private long? UserId { get { return _user.Id; } set { _user.Id = value; } }
+		private long? UserId => _user.Id;
 		private readonly Reference<User> _user;
 
 		internal Message(DiscordClient client, long id, long channelId, long userId)
