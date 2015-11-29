@@ -96,6 +96,7 @@ namespace Discord.Commands
 				else if (currentChar == '\\')
 					isEscaped = true;
 
+				bool isWhitespace = IsWhiteSpace(currentChar);
 				if (endPosition == startPosition + 1 && isWhitespace) //Has no text yet, and is another whitespace
 				{
 					startPosition = endPosition;
@@ -115,23 +116,19 @@ namespace Discord.Commands
 							currentPart = ParserPart.QuotedParameter;
 							startPosition = endPosition;
 						}
-						else
+						else if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
 						{
-							bool isWhitespace = IsWhiteSpace(currentChar);
-							if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
+							int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
+							string temp = input.Substring(startPosition, length);
+							if (temp == "")
+								startPosition = endPosition;
+							else
 							{
-								int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
-								string temp = input.Substring(startPosition, length);
-								if (temp == "")
-									startPosition = endPosition;
-								else
-								{
-									currentPart = ParserPart.None;
-									argList.Add(temp);
-									startPosition = endPosition;
-								}
+								currentPart = ParserPart.None;
+								argList.Add(temp);
+								startPosition = endPosition;
 							}
-						}
+						} 
 						break;
 					case ParserPart.QuotedParameter:
 						if ((!isEscaped && currentChar == '\''))
