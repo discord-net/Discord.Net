@@ -363,7 +363,7 @@ namespace Discord
 							if (server != null)
 							{
 								if (data.Unavailable == true)
-									RaiseServerAvailable(server);
+									RaiseServerUnavailable(server);
 								else
 									RaiseLeftServer(server);
 							}
