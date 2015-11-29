@@ -1,6 +1,7 @@
 using Discord.API;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace Discord
 		}
 		public void Import(Dictionary<long, Message> messages)
 			=> base.Import(messages);
-    }
+	}
 
 	public class MessageEventArgs : EventArgs
 	{
@@ -274,6 +275,7 @@ namespace Discord
 
 					var reader = x.CreateReader();
 					_messageImporter.Populate(reader, msg);
+					msg.Text = Mention.Resolve(msg, msg.RawText);
 					return msg;
 				})
 				.ToDictionary(x => x.Id);

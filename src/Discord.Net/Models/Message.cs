@@ -1,8 +1,10 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Discord
 {
@@ -12,6 +14,26 @@ namespace Discord
 		Queued,
 		Failed
 	}
+	internal class MessageImporterResolver : DefaultContractResolver
+	{
+		protected override List<System.Reflection.MemberInfo> GetSerializableMembers(Type objectType)
+		{
+			return base.GetSerializableMembers(objectType);
+		}
+		protected override JsonProperty CreateProperty(System.Reflection.MemberInfo member, MemberSerialization memberSerialization)
+		{
+			var property = base.CreateProperty(member, memberSerialization);
+			if (member is PropertyInfo)
+			{
+				if (!(member as PropertyInfo).CanWrite)
+					return null;
+
+				property.Writable = true; //Handles private setters
+			}
+			return property;
+		}
+	}
+
 	public sealed class Message : CachedObject<long>
 	{
 		public sealed class Attachment : File
@@ -108,8 +130,9 @@ namespace Discord
 		public MessageState State { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server. </summary>
 		public string RawText { get; private set; }
+		[JsonIgnore]
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
-		public string Text { get; private set; } 
+		public string Text { get; internal set; } 
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
 		public DateTime Timestamp { get; private set; }
 		/// <summary> Returns the timestamp for when this message was last edited. </summary>

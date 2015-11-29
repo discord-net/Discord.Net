@@ -171,7 +171,8 @@ namespace Discord
 #endif
 
 			_messageImporter = new JsonSerializer();
-		}
+			_messageImporter.ContractResolver = new MessageImporterResolver();
+        }
 		internal override VoiceWebSocket CreateVoiceSocket()
 		{
 			var socket = base.CreateVoiceSocket();
