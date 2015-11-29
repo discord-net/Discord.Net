@@ -99,7 +99,12 @@ namespace Discord
 			lock (_writerLock)
 			{
 				foreach (var pair in items)
-					_dictionary.TryAdd(pair.Key, pair.Value);
+				{
+					var value = pair.Value;
+					_dictionary.TryAdd(pair.Key, value);
+					value.Cache();
+					RaiseItemCreated(value);
+				}
 			}
 		}
 
