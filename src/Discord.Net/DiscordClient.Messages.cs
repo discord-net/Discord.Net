@@ -1,7 +1,9 @@
 using Discord.API;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -29,8 +31,8 @@ namespace Discord
 				return msg;
             }
 		}
-		public void Import(Message[] messages)
-			=> Import(messages.ToDictionary(x => x.Id));
+		public void Import(Dictionary<long, Message> messages)
+			=> base.Import(messages);
     }
 
 	public class MessageEventArgs : EventArgs
@@ -261,10 +263,23 @@ namespace Discord
 		public void ImportMessages(string json)
 		{
 			if (json == null) throw new ArgumentNullException(nameof(json));
+			
+			var dic = JArray.Parse(json)
+				.Select(x =>
+				{
+					var msg = new Message(this, 
+						x["Id"].Value<long>(), 
+						x["ChannelId"].Value<long>(), 
+						x["UserId"].Value<long>());
 
-			var msgs = JsonConvert.DeserializeObject<Message[]>(json);
-			_messages.Import(msgs);
+					var reader = x.CreateReader();
+					_messageImporter.Populate(reader, msg);
+					return msg;
+				})
+				.ToDictionary(x => x.Id);
+			_messages.Import(dic);
 		}
+
 		/// <summary> Serializes the message cache for a given channel to JSON.</summary>
 		public string ExportMessages(Channel channel)
 		{

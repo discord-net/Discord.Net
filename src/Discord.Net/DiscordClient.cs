@@ -14,7 +14,7 @@ namespace Discord
 	{
 		private readonly DiscordAPIClient _api;
 		private readonly Random _rand;
-		private readonly JsonSerializer _serializer;
+		private readonly JsonSerializer _socketSerializer, _messageImporter;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly ConcurrentDictionary<long, DiscordWSClient> _voiceClients;
 		private readonly Dictionary<Type, IService> _services;
@@ -163,12 +163,14 @@ namespace Discord
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
 
-			_serializer = new JsonSerializer();
-			_serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+			_socketSerializer = new JsonSerializer();
+            _socketSerializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 #if TEST_RESPONSES
 			_serializer.CheckAdditionalContent = true;
 			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #endif
+
+			_messageImporter = new JsonSerializer();
 		}
 		internal override VoiceWebSocket CreateVoiceSocket()
 		{
@@ -311,7 +313,7 @@ namespace Discord
 					case "READY": //Resync 
 						{
 							base.OnReceivedEvent(e).Wait(); //This cannot be an await, or we'll get later messages before we're ready
-							var data = e.Payload.ToObject<ReadyEvent>(_serializer);
+							var data = e.Payload.ToObject<ReadyEvent>(_socketSerializer);
 							_privateUser = _users.GetOrAdd(data.User.Id, null);
 							_privateUser.Update(data.User);
 							_privateUser.Global.Update(data.User);
@@ -336,7 +338,7 @@ namespace Discord
 					//Servers
 					case "GUILD_CREATE":
 						{
-							var data = e.Payload.ToObject<GuildCreateEvent>(_serializer);
+							var data = e.Payload.ToObject<GuildCreateEvent>(_socketSerializer);
 							if (data.Unavailable != true)
 							{
 								var server = _servers.GetOrAdd(data.Id);
@@ -350,7 +352,7 @@ namespace Discord
 						break;
 					case "GUILD_UPDATE":
 						{
-							var data = e.Payload.ToObject<GuildUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<GuildUpdateEvent>(_socketSerializer);
 							var server = _servers[data.Id];
 							if (server != null)
 							{
@@ -361,7 +363,7 @@ namespace Discord
 						break;
 					case "GUILD_DELETE":
 						{
-							var data = e.Payload.ToObject<GuildDeleteEvent>(_serializer);
+							var data = e.Payload.ToObject<GuildDeleteEvent>(_socketSerializer);
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
 							{
@@ -376,7 +378,7 @@ namespace Discord
 					//Channels
 					case "CHANNEL_CREATE":
 						{
-							var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
+							var data = e.Payload.ToObject<ChannelCreateEvent>(_socketSerializer);
 							Channel channel;
 							if (data.IsPrivate)
 							{
@@ -392,7 +394,7 @@ namespace Discord
 						break;
 					case "CHANNEL_UPDATE":
 						{
-							var data = e.Payload.ToObject<ChannelUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<ChannelUpdateEvent>(_socketSerializer);
 							var channel = _channels[data.Id];
 							if (channel != null)
 							{
@@ -403,7 +405,7 @@ namespace Discord
 						break;
 					case "CHANNEL_DELETE":
 						{
-							var data = e.Payload.ToObject<ChannelDeleteEvent>(_serializer);
+							var data = e.Payload.ToObject<ChannelDeleteEvent>(_socketSerializer);
 							var channel = _channels.TryRemove(data.Id);
 							if (channel != null)
 								RaiseChannelDestroyed(channel);
@@ -413,7 +415,7 @@ namespace Discord
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Payload.ToObject<MemberAddEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberAddEvent>(_socketSerializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							user.Update(data);
 							if (Config.TrackActivity)
@@ -423,7 +425,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberUpdateEvent>(_socketSerializer);
 							var user = _users[data.User.Id, data.GuildId];
 							if (user != null)
 							{
@@ -434,7 +436,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Payload.ToObject<MemberRemoveEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberRemoveEvent>(_socketSerializer);
 							var user = _users.TryRemove(data.UserId, data.GuildId);
 							if (user != null)
 								RaiseUserLeft(user);
@@ -442,7 +444,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBERS_CHUNK":
 						{
-							var data = e.Payload.ToObject<MembersChunkEvent>(_serializer);
+							var data = e.Payload.ToObject<MembersChunkEvent>(_socketSerializer);
 							foreach (var memberData in data.Members)
 							{
 								var user = _users.GetOrAdd(memberData.User.Id, memberData.GuildId);
@@ -455,7 +457,7 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Payload.ToObject<RoleCreateEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleCreateEvent>(_socketSerializer);
 							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
 							role.Update(data.Data);
 							var server = _servers[data.GuildId];
@@ -466,7 +468,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Payload.ToObject<RoleUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleUpdateEvent>(_socketSerializer);
 							var role = _roles[data.Data.Id];
 							if (role != null)
 							{
@@ -477,7 +479,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Payload.ToObject<RoleDeleteEvent>(_serializer);
+							var data = e.Payload.ToObject<RoleDeleteEvent>(_socketSerializer);
 							var role = _roles.TryRemove(data.RoleId);
 							if (role != null)
 							{
@@ -492,7 +494,7 @@ namespace Discord
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Payload.ToObject<BanAddEvent>(_serializer);
+							var data = e.Payload.ToObject<BanAddEvent>(_socketSerializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
@@ -504,7 +506,7 @@ namespace Discord
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Payload.ToObject<BanRemoveEvent>(_serializer);
+							var data = e.Payload.ToObject<BanRemoveEvent>(_socketSerializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
@@ -518,7 +520,7 @@ namespace Discord
 					//Messages
 					case "MESSAGE_CREATE":
 						{
-							var data = e.Payload.ToObject<MessageCreateEvent>(_serializer);
+							var data = e.Payload.ToObject<MessageCreateEvent>(_socketSerializer);
 							Message msg = null;
 
 							bool isAuthor = data.Author.Id == _userId;
@@ -545,7 +547,7 @@ namespace Discord
 						break;
 					case "MESSAGE_UPDATE":
 						{
-							var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<MessageUpdateEvent>(_socketSerializer);
 							var msg = _messages[data.Id];
 							if (msg != null)
 							{
@@ -556,7 +558,7 @@ namespace Discord
 						break;
 					case "MESSAGE_DELETE":
 						{
-							var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
+							var data = e.Payload.ToObject<MessageDeleteEvent>(_socketSerializer);
 							var msg = _messages.TryRemove(data.Id);
 							if (msg != null)
 								RaiseMessageDeleted(msg);
@@ -564,7 +566,7 @@ namespace Discord
 						break;
 					case "MESSAGE_ACK":
 						{
-							var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
+							var data = e.Payload.ToObject<MessageAckEvent>(_socketSerializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
 								RaiseMessageReadRemotely(msg);
@@ -574,7 +576,7 @@ namespace Discord
 					//Statuses
 					case "PRESENCE_UPDATE":
 						{
-							var data = e.Payload.ToObject<PresenceUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<PresenceUpdateEvent>(_socketSerializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							if (user != null)
 							{
@@ -585,7 +587,7 @@ namespace Discord
 						break;
 					case "TYPING_START":
 						{
-							var data = e.Payload.ToObject<TypingStartEvent>(_serializer);
+							var data = e.Payload.ToObject<TypingStartEvent>(_socketSerializer);
 							var channel = _channels[data.ChannelId];
 							if (channel != null)
 							{
@@ -611,7 +613,7 @@ namespace Discord
 					//Voice
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_socketSerializer);
 							var user = _users[data.UserId, data.GuildId];
 							if (user != null)
 							{
@@ -630,7 +632,7 @@ namespace Discord
 					//Settings
 					case "USER_UPDATE":
 						{
-							var data = e.Payload.ToObject<UserUpdateEvent>(_serializer);
+							var data = e.Payload.ToObject<UserUpdateEvent>(_socketSerializer);
 							var user = _globalUsers[data.Id];
 							if (user != null)
 							{

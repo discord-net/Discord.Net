@@ -123,7 +123,7 @@ namespace Discord
 		[JsonProperty]
 		private IEnumerable<long> MentionedUserIds
 		{
-			get { return MentionedUsers.Select(x => x.Id); }
+			get { return MentionedUsers?.Select(x => x.Id); }
 			set { MentionedUsers = value.Select(x => _client.GetUser(Server, x)).Where(x => x != null); }
 		}
 
@@ -133,7 +133,7 @@ namespace Discord
 		[JsonProperty]
 		private IEnumerable<long> MentionedChannelIds
 		{
-			get { return MentionedChannels.Select(x => x.Id); }
+			get { return MentionedChannels?.Select(x => x.Id); }
 			set { MentionedChannels = value.Select(x => _client.GetChannel(x)).Where(x => x != null); }
 		}
 
@@ -143,7 +143,7 @@ namespace Discord
 		[JsonProperty]
 		private IEnumerable<long> MentionedRoleIds
 		{
-			get { return MentionedRoles.Select(x => x.Id); }
+			get { return MentionedRoles?.Select(x => x.Id); }
 			set { MentionedRoles = value.Select(x => _client.GetRole(x)).Where(x => x != null); }
 		}
 
