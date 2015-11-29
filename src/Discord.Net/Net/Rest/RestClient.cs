@@ -16,8 +16,8 @@ namespace Discord.Net.Rest
 		public RestClient(DiscordAPIClientConfig config)
 		{
 			_config = config;
-#if !DNXCORE50
-			_engine = new SharpRestEngine(config);
+#if !DOTNET5_4
+			_engine = new RestSharpEngine(config);
 #else
 			//_engine = new BuiltInRestEngine(config);
 #endif

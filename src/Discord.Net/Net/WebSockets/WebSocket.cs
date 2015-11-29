@@ -52,7 +52,7 @@ namespace Discord.Net.WebSockets
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
-#if !DNXCORE50
+#if !DOTNET5_4
 			_engine = new WebSocketSharpEngine(this, client.Config);
 #else
 			//_engine = new BuiltInWebSocketEngine(this, client.Config);

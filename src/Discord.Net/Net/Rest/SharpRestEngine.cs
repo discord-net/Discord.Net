@@ -1,4 +1,4 @@
-﻿#if !DNXCORE50
+﻿#if !DOTNET5_4
 using Discord.API;
 using RestSharp;
 using System;
@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    internal sealed class SharpRestEngine : IRestEngine
+    internal sealed class RestSharpEngine : IRestEngine
 	{
 		private readonly DiscordAPIClientConfig _config;
 		private readonly RestSharp.RestClient _client;
 
-        public SharpRestEngine(DiscordAPIClientConfig config)
+        public RestSharpEngine(DiscordAPIClientConfig config)
 		{
 			_config = config;
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)

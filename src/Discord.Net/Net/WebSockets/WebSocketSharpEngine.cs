@@ -1,4 +1,4 @@
-﻿#if !DNXCORE50
+﻿#if !DOTNET5_4
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -40,13 +40,13 @@ namespace Discord.Net.WebSockets
 			_webSocket = new WSSharpNWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-            _webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;		
+			_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;	
 			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
 			_webSocket.OnMessage += (s, e) =>
 			{
-				if (e.Type == WebSocketSharp.Opcode.Binary)
+				if (e.IsBinary)
 					RaiseBinaryMessage(e.RawData);
-				else if (e.Type == WebSocketSharp.Opcode.Text)
+				else if (e.IsText)
 					RaiseTextMessage(e.Data);
 			};
 			_webSocket.OnError += async (s, e) =>

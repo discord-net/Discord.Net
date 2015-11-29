@@ -18,7 +18,7 @@
     "allowUnsafe": true
   },
 	"configurations": {
-		"FullDebug": {
+		"TestResponses": {
 			"compilationOptions": {
 				"define": [
 					"DEBUG",
@@ -29,15 +29,15 @@
 		}
 	},
 
-  "dependencies": {
-    "Newtonsoft.Json": "7.0.1"
-  },
+	"dependencies": {
+		"Newtonsoft.Json": "7.0.1"
+	},
 
 	"frameworks": {
 		"net45": {
 			"dependencies": {
-				"RestSharp": "105.2.3",
-				"WebSocketSharp": "1.0.3-rc9"
+				"WebSocketSharp": "1.0.3-rc10",
+				"RestSharp": "105.2.3"
 			}
 		},
 		"dotnet5.4": {
@@ -47,7 +47,7 @@
 				"System.IO.Compression": "4.1.0-beta-23516",
 				"System.Linq": "4.0.1-beta-23516",
 				"System.Net.NameResolution": "4.0.0-beta-23516",
-				"System.Net.Sockets": "4.1.0-beta-23516",
+				"System.Net.Sockets": "4.1.0-beta-23409",
 				"System.Net.Requests": "4.0.11-beta-23516",
 				"System.Net.WebSockets.Client": "4.0.0-beta-23516",
 				"System.Runtime.InteropServices": "4.0.21-beta-23516",

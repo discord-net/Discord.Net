@@ -1,6 +1,5 @@
-﻿#if DNXCORE50zzz
-using Discord.Helpers;
-using System;
+﻿#if DOTNET5_4
+/*using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -149,5 +148,5 @@ namespace Discord.Net.WebSockets
 			_sendQueue.Enqueue(message);
         }
 	}
-}
+}*/
 #endif
