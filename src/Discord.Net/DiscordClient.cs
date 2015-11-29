@@ -337,12 +337,15 @@ namespace Discord
 					case "GUILD_CREATE":
 						{
 							var data = e.Payload.ToObject<GuildCreateEvent>(_serializer);
-							var server = _servers.GetOrAdd(data.Id);
-							server.Update(data);
-							if (data.Unavailable == false)
-								RaiseServerAvailable(server);
-							else
-								RaiseJoinedServer(server);
+							if (data.Unavailable != true)
+							{
+								var server = _servers.GetOrAdd(data.Id);
+								server.Update(data);
+								if (data.Unavailable == false)
+									RaiseServerAvailable(server);
+								else
+									RaiseJoinedServer(server);
+							}
 						}
 						break;
 					case "GUILD_UPDATE":
