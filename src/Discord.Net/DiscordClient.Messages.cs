@@ -108,7 +108,7 @@ namespace Discord
 			if (text == null) throw new ArgumentNullException(nameof(text));
 			CheckReady();
 
-			return SendMessage(channel, text, false);
+			return SendMessage(channel, text, true);
         }
 		/// <summary> Sends a private message to the provided user. </summary>
 		public async Task<Message> SendPrivateMessage(User user, string text)
