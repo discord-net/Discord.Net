@@ -24,7 +24,7 @@ namespace Discord
 			public TKey NewId { get; }
 			public CollectionItemRemappedEventArgs(TValue item, TKey oldId, TKey newId) { Item = item; OldId = oldId; NewId = newId; }
 		}
-
+		
 		public EventHandler<CollectionItemEventArgs> ItemCreated;
 		private void RaiseItemCreated(TValue item)
 		{
@@ -53,6 +53,8 @@ namespace Discord
 
 		protected readonly DiscordClient _client;
 		protected readonly ConcurrentDictionary<TKey, TValue> _dictionary;
+
+		public int Count => _dictionary.Count;
 
 		protected AsyncCollection(DiscordClient client, object writerLock)
 		{

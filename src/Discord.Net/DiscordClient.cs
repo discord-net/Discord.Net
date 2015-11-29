@@ -680,5 +680,15 @@ namespace Discord
 				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Config: {JsonConvert.SerializeObject(_config)}");
 			_sentInitialLog = true;
         }
+		
+		public void GetCacheStats(out int serverCount, out int channelCount, out int userCount, out int uniqueUserCount, out int messageCount, out int roleCount)
+		{
+			serverCount = _servers.Count;
+			channelCount = _channels.Count;
+			userCount = _users.Count;
+			uniqueUserCount = _globalUsers.Count;
+			messageCount = _messages.Count;
+			roleCount = _roles.Count;
+		}
 	}
 }
