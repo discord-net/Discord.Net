@@ -60,8 +60,7 @@ namespace Discord.Commands
 							else
 								await client.SendMessage(replyChannel, "Unable to display help: Unknown command.");
 						}
-                        else //Show general help
-							
+                        else //Show general help							
 							await ShowGeneralHelp(e.User, e.Channel, replyChannel);
                     }));
             }
@@ -143,16 +142,6 @@ namespace Discord.Commands
         public Task ShowGeneralHelp(User user, Channel channel, Channel replyChannel = null)
         {
             StringBuilder output = new StringBuilder();
-			/*output.AppendLine("These are the commands you can use:");
-			output.Append(string.Join(", ", _map.SubCommands
-                .Where(x => x.CanRun(user, channel) && !x.IsHidden)
-                .Select(x => '`' + x.Text + '`' +
-                (x.Aliases.Count() > 0 ? ", `" + string.Join("`, `", x.Aliases) + '`' : ""))));
-			output.AppendLine("\nThese are the groups you can access:");
-			output.Append(string.Join(", ", _map.SubGroups
-				.Where(x => /*x.CanRun(user, channel)*//* && !x.IsHidden)
-				.Select(x => '`' + x.Text + '`')));*/
-
 			bool isFirstCategory = true;
 			foreach (var category in _categories)
 			{
@@ -160,9 +149,9 @@ namespace Discord.Commands
 				foreach (var group in category.Value.SubGroups)
 				{
 					string error;
-					if (!group.IsHidden && group.CanRun(user, channel, out error))
+					if (group.IsVisible && (group.HasSubGroups || group.HasNonAliases) && group.CanRun(user, channel, out error))
 					{
-						if (isFirstItem)
+                        if (isFirstItem)
 						{
 							isFirstItem = false;
 							//This is called for the first item in each category. If we never get here, we dont bother writing the header for a category type (since it's empty)
@@ -184,7 +173,7 @@ namespace Discord.Commands
 							output.Append(", ");
 						output.Append('`');
 						output.Append(group.Name);
-						if (group.SubGroups.Any())
+						if (group.HasSubGroups)
 							output.Append("*");
 						output.Append('`');
                     }
@@ -244,7 +233,7 @@ namespace Discord.Commands
 			}
 
 			bool isFirstSubCmd = true;
-			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel, out error) && !x.IsHidden))
+			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel, out error) && !x.IsVisible))
 			{
 				if (isFirstSubCmd)
 				{
@@ -324,14 +313,14 @@ namespace Discord.Commands
 			}
 
 			//Add main command
-			category.AddCommand(command.Text, command);
-            _map.AddCommand(command.Text, command);
+			category.AddCommand(command.Text, command, false);
+            _map.AddCommand(command.Text, command, false);
 
 			//Add aliases
 			foreach (var alias in command.Aliases)
 			{
-				category.AddCommand(alias, command);
-				_map.AddCommand(alias, command);
+				category.AddCommand(alias, command, true);
+				_map.AddCommand(alias, command, true);
 			}
 		}
 	}
