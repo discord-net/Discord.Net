@@ -148,10 +148,10 @@ namespace Discord
 			if (serverId == null)
 				UpdateRoles(null);
 		}
-		internal override void LoadReferences()
+		internal override bool LoadReferences()
 		{
-			_globalUser.Load();
-			_server.Load();
+			return _globalUser.Load() && 
+				(IsPrivate || _server.Load());
 		}
 		internal override void UnloadReferences()
 		{

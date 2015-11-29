@@ -82,13 +82,13 @@ namespace Discord.Net.WebSockets
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
 						{
-							var payload = token.ToObject<ReadyEvent>();
+							var payload = token.ToObject<ReadyEvent>(_client.DataSocketSerializer);
 							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
 						else if (msg.Type == "RESUMED")
 						{
-							var payload = token.ToObject<ResumedEvent>();
+							var payload = token.ToObject<ResumedEvent>(_client.DataSocketSerializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
 						RaiseReceivedEvent(msg.Type, token);
@@ -98,7 +98,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 7: //Redirect
 					{
-						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>();
+						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_client.DataSocketSerializer);
 						if (payload.Url != null)
 						{
 							Host = payload.Url;

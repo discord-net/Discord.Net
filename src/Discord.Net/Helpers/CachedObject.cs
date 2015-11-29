@@ -31,10 +31,14 @@ namespace Discord
 			_client = client;
 		}
 
-		internal void Cache()
+		internal bool Cache()
 		{
-			LoadReferences();
-			_isCached = true;
+			if (LoadReferences())
+			{
+				_isCached = true;
+				return true;
+			}
+			return false;
 		}
 		internal void Uncache()
 		{
@@ -44,7 +48,7 @@ namespace Discord
 				_isCached = false;
 			}
 		}
-		internal abstract void LoadReferences();
+		internal abstract bool LoadReferences();
 		internal abstract void UnloadReferences();
 	}
 }

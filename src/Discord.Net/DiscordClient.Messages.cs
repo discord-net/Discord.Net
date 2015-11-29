@@ -261,7 +261,7 @@ namespace Discord
 		}
 		
 		/// <summary> Deserializes messages from JSON format and imports them into the message cache.</summary>
-		public IEnumerable<Message> ImportMessages(string json)
+		public IEnumerable<Message> ImportMessages(Channel channel, string json)
 		{
 			if (json == null) throw new ArgumentNullException(nameof(json));
 			
@@ -269,8 +269,8 @@ namespace Discord
 				.Select(x =>
 				{
 					var msg = new Message(this, 
-						x["Id"].Value<long>(), 
-						x["ChannelId"].Value<long>(), 
+						x["Id"].Value<long>(),
+						channel.Id,
 						x["UserId"].Value<long>());
 
 					var reader = x.CreateReader();

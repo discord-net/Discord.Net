@@ -20,7 +20,7 @@ namespace Discord.Net.Rest
 			{
 				PreAuthenticate = false,
 				ReadWriteTimeout = _config.APITimeout,
-				UserAgent = _config.UserAgent
+				UserAgent = DiscordAPIClientConfig.UserAgent
 			};
 			if (_config.ProxyUrl != null)
 				_client.Proxy = new WebProxy(_config.ProxyUrl, true, new string[0], _config.ProxyCredentials);

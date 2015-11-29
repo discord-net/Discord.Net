@@ -94,9 +94,6 @@
     <Compile Include="..\Discord.Net\API\Enums\PermissionTarget.cs">
       <Link>API\Enums\PermissionTarget.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Enums\Region.cs">
-      <Link>API\Enums\Region.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\API\Enums\StringEnum.cs">
       <Link>API\Enums\StringEnum.cs</Link>
     </Compile>
@@ -258,6 +255,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Models\Permissions.cs">
       <Link>Models\Permissions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\Region.cs">
+      <Link>Models\Region.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Role.cs">
       <Link>Models\Role.cs</Link>

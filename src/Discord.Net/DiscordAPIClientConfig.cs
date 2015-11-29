@@ -6,6 +6,8 @@ namespace Discord
 {
 	public class DiscordAPIClientConfig
 	{
+		internal static readonly string UserAgent = $"Discord.Net/{DiscordClient.Version} (https://github.com/RogueException/Discord.Net)";
+
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
 		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
 		private LogMessageSeverity _logLevel = LogMessageSeverity.Info;
@@ -20,15 +22,6 @@ namespace Discord
 		/// <summary> The credentials to use for this proxy. </summary>
 		public NetworkCredential ProxyCredentials { get { return _proxyCredentials; } set { SetValue(ref _proxyCredentials, value); } }
 		private NetworkCredential _proxyCredentials = null;
-
-		internal string UserAgent
-		{
-			get
-			{
-				string version = typeof(DiscordClientConfig).GetTypeInfo().Assembly.GetName().Version.ToString(2);
-				return $"Discord.Net/{version} (https://github.com/RogueException/Discord.Net)";
-			}
-		}
 
 		//Lock
 		protected bool _isLocked;

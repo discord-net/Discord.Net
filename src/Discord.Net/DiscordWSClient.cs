@@ -1,5 +1,6 @@
 ﻿using Discord.Net;
 using Discord.Net.WebSockets;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,9 @@ namespace Discord
 		protected readonly DiscordWSClientConfig _config;
 		protected readonly ManualResetEvent _disconnectedEvent;
 		protected readonly ManualResetEventSlim _connectedEvent;
+		protected ExceptionDispatchInfo _disconnectReason;
 		internal readonly DataWebSocket _dataSocket;
 		internal readonly VoiceWebSocket _voiceSocket;
-		protected ExceptionDispatchInfo _disconnectReason;
 		protected string _gateway, _token;
 		protected long? _userId, _voiceServerId;
 		private Task _runTask;
@@ -44,6 +45,10 @@ namespace Discord
 		private CancellationTokenSource _cancelTokenSource;
 		protected CancellationToken _cancelToken;
 
+		internal JsonSerializer DataSocketSerializer => _dataSocketSerializer;
+		internal JsonSerializer VoiceSocketSerializer => _voiceSocketSerializer;
+		protected readonly JsonSerializer _dataSocketSerializer, _voiceSocketSerializer;
+
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordWSClient(DiscordWSClientConfig config = null)
 		{
@@ -54,6 +59,32 @@ namespace Discord
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
+
+			_dataSocketSerializer = new JsonSerializer();
+			_dataSocketSerializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+#if TEST_RESPONSES
+			_dataSocketSerializer.CheckAdditionalContent = true;
+			_dataSocketSerializer.MissingMemberHandling = MissingMemberHandling.Error;
+#else
+			_dataSocketSerializer.Error += (s, e) =>
+			{
+				e.ErrorContext.Handled = true;
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.DataWebSocket, "Serialization Failed", e.ErrorContext.Error);
+			};
+#endif
+
+			_voiceSocketSerializer = new JsonSerializer();
+			_voiceSocketSerializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+#if TEST_RESPONSES
+			_voiceSocketSerializer.CheckAdditionalContent = true;
+			_voiceSocketSerializer.MissingMemberHandling = MissingMemberHandling.Error;
+#else
+			_voiceSocketSerializer.Error += (s, e) =>
+			{
+				e.ErrorContext.Handled = true;
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.VoiceWebSocket, "Serialization Failed", e.ErrorContext.Error);
+			};
+#endif
 
 			_dataSocket = CreateDataSocket();
 			if (_config.EnableVoice)

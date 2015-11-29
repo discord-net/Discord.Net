@@ -82,7 +82,7 @@ namespace Discord
 		{
 			XkcdCode = xkcdPass;
 		}
-		internal override void LoadReferences() { }
+		internal override bool LoadReferences() { return true; }
 		internal override void UnloadReferences() { }
 
 		internal void Update(InviteReference model)

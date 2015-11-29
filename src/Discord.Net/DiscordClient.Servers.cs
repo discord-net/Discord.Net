@@ -86,19 +86,19 @@ namespace Discord
 			if (region == null) throw new ArgumentNullException(nameof(region));
 			CheckReady();
 
-			var response = await _api.CreateServer(name, region.Value).ConfigureAwait(false);
+			var response = await _api.CreateServer(name, region.Id).ConfigureAwait(false);
 			var server = _servers.GetOrAdd(response.Id);
 			server.Update(response);
 			return server;
 		}
 		
 		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public async Task EditServer(Server server, string name = null, Region region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
+		public async Task EditServer(Server server, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region.Value, iconType: iconType, icon: icon).ConfigureAwait(false);
+			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region, iconType: iconType, icon: icon).ConfigureAwait(false);
 			server.Update(response);
 		}
 		
@@ -111,6 +111,13 @@ namespace Discord
 			try { await _api.LeaveServer(server.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			//return _servers.TryRemove(server.Id);
+		}
+
+		public async Task<IEnumerable<Region>> GetVoiceRegions()
+		{
+			CheckReady();
+
+			return (await _api.GetVoiceRegions()).Select(x => new Region { Id = x.Id, Name = x.Name, Hostname = x.Hostname, Port = x.Port });
 		}
 	}
 }

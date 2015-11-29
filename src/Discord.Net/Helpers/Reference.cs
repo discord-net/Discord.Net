@@ -41,9 +41,9 @@ namespace Discord
 			}
 		}
 
-		public T Load()
+		public bool Load()
 		{
-			return Value; //Used for precaching
+			return Value != null; //Used for precaching
 		}
 
 		public void Unload()

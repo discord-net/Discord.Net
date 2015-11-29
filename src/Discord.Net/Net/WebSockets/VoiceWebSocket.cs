@@ -443,7 +443,7 @@ namespace Discord.Net.WebSockets
 					{
 						if (_state != (int)WebSocketState.Connected)
 						{
-							var payload = (msg.Payload as JToken).ToObject<VoiceReadyEvent>();
+							var payload = (msg.Payload as JToken).ToObject<VoiceReadyEvent>(_client.VoiceSocketSerializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
 							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
@@ -486,7 +486,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 4: //SESSION_DESCRIPTION
 					{
-						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>();
+						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_client.VoiceSocketSerializer);
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
 						EndConnect();
@@ -494,7 +494,7 @@ namespace Discord.Net.WebSockets
 					break;
 				case 5:
 					{
-						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>();
+						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>(_client.VoiceSocketSerializer);
 						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
 					}
 					break;

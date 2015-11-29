@@ -103,9 +103,10 @@ namespace Discord
 			//Local Cache
 			_bans = new ConcurrentDictionary<long, bool>();
         }
-		internal override void LoadReferences()
+		internal override bool LoadReferences()
 		{
 			_afkChannel.Load();
+			return true;
         }
 		internal override void UnloadReferences()
 		{

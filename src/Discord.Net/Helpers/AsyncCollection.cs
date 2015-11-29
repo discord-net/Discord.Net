@@ -84,15 +84,21 @@ namespace Discord
 
 			lock (_writerLock)
 			{
-				TValue newItem = createFunc();
-				result = _dictionary.GetOrAdd(key, newItem);
-				if (result == newItem)
+				if (!_dictionary.ContainsKey(key))
 				{
-					result.Cache();
-					RaiseItemCreated(result);
+					result = createFunc();
+					if (result.Cache())
+					{
+						_dictionary.TryAdd(key, result);
+						RaiseItemCreated(result);
+					}
+					else
+						result.Uncache();
+					return result;
 				}
+				else
+					return _dictionary[key];
 			}
-			return result;
 		}
 		protected void Import(IEnumerable<KeyValuePair<TKey, TValue>> items)
 		{
@@ -101,9 +107,13 @@ namespace Discord
 				foreach (var pair in items)
 				{
 					var value = pair.Value;
-					_dictionary.TryAdd(pair.Key, value);
-					value.Cache();
-					RaiseItemCreated(value);
+					if (value.Cache())
+					{
+						_dictionary.TryAdd(pair.Key, value);
+						RaiseItemCreated(value);
+					}
+					else
+						value.Uncache();
 				}
 			}
 		}

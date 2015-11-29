@@ -44,7 +44,7 @@ namespace Discord
 		{
 			_users = new ConcurrentDictionary<long, User>();
 		}
-		internal override void LoadReferences() { }
+		internal override bool LoadReferences() { return true; }
 		internal override void UnloadReferences()
 		{
 			//Don't need to clean _users - they're considered owned by server

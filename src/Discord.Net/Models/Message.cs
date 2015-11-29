@@ -15,24 +15,25 @@ namespace Discord
 		Queued,
 		Failed
 	}
-	internal class MessageImporterResolver : DefaultContractResolver
-	{
-		protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-		{
-			var property = base.CreateProperty(member, memberSerialization);
-			if (member is PropertyInfo)
-			{
-				if (!(member as PropertyInfo).CanWrite)
-					return null;
-
-				property.Writable = true; //Handles private setters
-			}
-			return property;
-		}
-	}
 
 	public sealed class Message : CachedObject<long>
 	{
+		internal class ImportResolver : DefaultContractResolver
+		{
+			protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+			{
+				var property = base.CreateProperty(member, memberSerialization);
+				if (member is PropertyInfo)
+				{
+					if (member.Name == nameof(ChannelId) || !(member as PropertyInfo).CanWrite)
+						return null;
+
+					property.Writable = true; //Handles private setters
+				}
+				return property;
+			}
+		}
+
 		public sealed class Attachment : File
 		{
 			/// <summary> Unique identifier for this file. </summary>
@@ -173,6 +174,8 @@ namespace Discord
 				x =>
 				{
 					var channel = Channel;
+					if (channel == null) return null;
+
 					if (!channel.IsPrivate)
 						return _client.Users[x, channel.Server.Id];
 					else
@@ -181,10 +184,9 @@ namespace Discord
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 		}
-		internal override void LoadReferences()
+		internal override bool LoadReferences()
 		{
-			_channel.Load();
-			_user.Load();
+			return _channel.Load() && _user.Load();
 		}
 		internal override void UnloadReferences()
 		{

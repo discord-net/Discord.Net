@@ -47,9 +47,9 @@ namespace Discord
 			Color = new Color(0);
 			Color.Lock();
 		}
-		internal override void LoadReferences()
+		internal override bool LoadReferences()
 		{
-			_server.Load();
+			return _server.Load();
 		}
 		internal override void UnloadReferences()
 		{

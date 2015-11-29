@@ -124,12 +124,12 @@ namespace Discord
 			if (client.Config.MessageCacheLength > 0)
 				_messages = new ConcurrentDictionary<long, Message>();
 		}
-		internal override void LoadReferences()
+		internal override bool LoadReferences()
 		{
 			if (IsPrivate)
-				_recipient.Load();
+				return _recipient.Load();
 			else
-				_server.Load();
+				return _server.Load();
 		}
 		internal override void UnloadReferences()
 		{
