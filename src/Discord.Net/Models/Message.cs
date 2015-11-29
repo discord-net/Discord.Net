@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using MemberInfo = System.Reflection.MemberInfo;
 
 namespace Discord
 {
@@ -35,84 +36,57 @@ namespace Discord
 		public sealed class Attachment : File
 		{
 			/// <summary> Unique identifier for this file. </summary>
-			public string Id { get; }
+			public string Id { get; internal set; }
 			/// <summary> Size, in bytes, of this file file. </summary>
-			public int Size { get; }
+			public int Size { get; internal set; }
 			/// <summary> Filename of this file. </summary>
-			public string Filename { get; }
+			public string Filename { get; internal set; }
 
-			internal Attachment(string id, string url, string proxyUrl, 
-				int? width, int? height, int size, string filename)
-				: base(url, proxyUrl, width, height)
-			{
-				Id = id;
-				Size = size;
-				Filename = filename;
-			}
+			internal Attachment() { }
 		}
 
 		public sealed class Embed
 		{
 			/// <summary> URL of this embed. </summary>
-			public string Url { get; }
+			public string Url { get; internal set; }
 			/// <summary> Type of this embed. </summary>
-			public string Type { get; }
+			public string Type { get; internal set; }
 			/// <summary> Title for this embed. </summary>
-			public string Title { get; }
+			public string Title { get; internal set; }
 			/// <summary> Summary of this embed. </summary>
-			public string Description { get; }
+			public string Description { get; internal set; }
 			/// <summary> Returns information about the author of this embed. </summary>
-			public EmbedReference Author { get; }
+			public EmbedReference Author { get; internal set; }
 			/// <summary> Returns information about the providing website of this embed. </summary>
-			public EmbedReference Provider { get; }
+			public EmbedReference Provider { get; internal set; }
 			/// <summary> Returns the thumbnail of this embed. </summary>
-			public File Thumbnail { get; }
+			public File Thumbnail { get; internal set; }
 
-			internal Embed(string url, string type, string title, string description, 
-				EmbedReference author, EmbedReference provider, File thumbnail)
-			{
-				Url = url;
-				Type = type;
-				Title = title;
-				Description = description;
-				Author = author;
-				Provider = provider;
-				Thumbnail = thumbnail;
-            }
+			internal Embed() { }
 		}
 
 		public sealed class EmbedReference
 		{
 			/// <summary> URL of this embed provider. </summary>
-			public string Url { get; }
+			public string Url { get; internal set; }
 			/// <summary> Name of this embed provider. </summary>
-			public string Name { get; }
+			public string Name { get; internal set; }
 
-			internal EmbedReference(string url, string name)
-			{
-				Url = url;
-				Name = name;
-			}
+			internal EmbedReference() { }
 		}
 
 		public class File
 		{
 			/// <summary> Download url for this file. </summary>
-			public string Url { get; }
+			public string Url { get; internal set; }
 			/// <summary> Preview url for this file. </summary>
-			public string ProxyUrl { get; }
+			public string ProxyUrl { get; internal set; }
 			/// <summary> Width of the this file, if it is an image. </summary>
-			public int? Width { get; }
+			public int? Width { get; internal set; }
 			/// <summary> Height of this file, if it is an image. </summary>
-			public int? Height { get; }
+			public int? Height { get; internal set; }
 
-			internal File(string url, string proxyUrl, int? width, int? height)
-			{
-				Url = url;
-				ProxyUrl = proxyUrl;
-				Width = width;
-				Height = height;
-			}
+			internal File() { }
 		}
 
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
@@ -225,7 +199,16 @@ namespace Discord
 			if (model.Attachments != null)
 			{
 				Attachments = model.Attachments
-					.Select(x => new Attachment(x.Id, x.Url, x.ProxyUrl, x.Width, x.Height, x.Size, x.Filename))
+					.Select(x => new Attachment()
+					{
+						Id = x.Id,
+						Url = x.Url,
+						ProxyUrl = x.ProxyUrl,
+						Width = x.Width,
+						Height = x.Height,
+						Size = x.Size,
+						Filename = x.Filename
+					})
 					.ToArray();
 			}
 			if (model.Embeds != null)
@@ -236,13 +219,22 @@ namespace Discord
 					File thumbnail = null;
 
 					if (x.Author != null)
-						author = new EmbedReference(x.Author.Url, x.Author.Name);
+						author = new EmbedReference { Url = x.Author.Url, Name = x.Author.Name };
 					if (x.Provider != null)
-						provider = new EmbedReference(x.Provider.Url, x.Provider.Name);
+						provider = new EmbedReference { Url = x.Provider.Url, Name = x.Provider.Name };
 					if (x.Thumbnail != null)
-						thumbnail = new File(x.Thumbnail.Url, x.Thumbnail.ProxyUrl, x.Thumbnail.Width, x.Thumbnail.Height);
+						thumbnail = new File { Url = x.Thumbnail.Url, ProxyUrl = x.Thumbnail.ProxyUrl, Width = x.Thumbnail.Width, Height = x.Thumbnail.Height };
 
-					return new Embed(x.Url, x.Type, x.Title, x.Description, author, provider, thumbnail);
+					return new Embed
+					{
+						Url = x.Url,
+						Type = x.Type,
+						Title = x.Title,
+						Description = x.Description,
+						Author = author,
+						Provider = provider,
+						Thumbnail = thumbnail
+					};
 				}).ToArray();
 			}
 			
