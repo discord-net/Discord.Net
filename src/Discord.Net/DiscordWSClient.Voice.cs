@@ -7,6 +7,8 @@ namespace Discord
 	public partial class DiscordWSClient : IDiscordVoiceClient
 	{
 		IDiscordVoiceBuffer IDiscordVoiceClient.OutputBuffer => _voiceSocket.OutputBuffer;
+		long? IDiscordVoiceClient.ServerId => _voiceSocket.CurrentServerId;
+		long? IDiscordVoiceClient.ChannelId => _voiceSocket.CurrentChannelId;
 
 		async Task IDiscordVoiceClient.JoinChannel(long channelId)
 		{

@@ -4,6 +4,8 @@ namespace Discord.Audio
 {
 	public interface IDiscordVoiceClient
 	{
+		long? ChannelId { get; }
+		long? ServerId { get; }
 		IDiscordVoiceBuffer OutputBuffer { get; }
 
 		Task JoinChannel(long channelId);
