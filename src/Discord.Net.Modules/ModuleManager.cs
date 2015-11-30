@@ -127,16 +127,30 @@ namespace Discord.Modules
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
-			{
-				if (_enabledServers.TryAdd(server.Id, server))
-				{
-					if (ServerEnabled != null)
-						ServerEnabled(this, new ServerEventArgs(server));
-					return true;
-				}
-				return false;
-			}
+				return EnableServerInternal(server);
 		}
+		public void EnableServers(IEnumerable<Server> servers)
+		{
+			if (servers == null) throw new ArgumentNullException(nameof(servers));
+			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+
+			lock (this)
+			{
+				foreach (var server in servers)
+					EnableServerInternal(server);
+            }
+		}
+		private bool EnableServerInternal(Server server)
+		{
+			if (_enabledServers.TryAdd(server.Id, server))
+			{
+				if (ServerEnabled != null)
+					ServerEnabled(this, new ServerEventArgs(server));
+				return true;
+			}
+			return false;
+		}
+
 		public bool DisableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
@@ -175,24 +189,38 @@ namespace Discord.Modules
             if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
-			{
-				if (_enabledChannels.TryAdd(channel.Id, channel))
-				{
-					var server = channel.Server;
-					if (server != null)
-					{
-						int value = 0;
-						_indirectServers.TryGetValue(server.Id, out value);
-						value++;
-						_indirectServers[server.Id] = value;
-					}
-					if (ChannelEnabled != null)
-						ChannelEnabled(this, new ChannelEventArgs(channel));
-					return true;
-				}
-				return false;
-			}
+				return EnableChannelInternal(channel);
 		}
+		public void EnableChannels(IEnumerable<Channel> channels)
+		{
+			if (channels == null) throw new ArgumentNullException(nameof(channels));
+			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+
+			lock (this)
+			{
+				foreach (var channel in channels)
+					EnableChannelInternal(channel);
+            }
+		}
+		private bool EnableChannelInternal(Channel channel)
+		{
+			if (_enabledChannels.TryAdd(channel.Id, channel))
+			{
+				var server = channel.Server;
+				if (server != null)
+				{
+					int value = 0;
+					_indirectServers.TryGetValue(server.Id, out value);
+					value++;
+					_indirectServers[server.Id] = value;
+				}
+				if (ChannelEnabled != null)
+					ChannelEnabled(this, new ChannelEventArgs(channel));
+				return true;
+			}
+			return false;
+		}
+
 		public bool DisableChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
