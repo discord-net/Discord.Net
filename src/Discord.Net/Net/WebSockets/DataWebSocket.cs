@@ -7,8 +7,21 @@ using System.Threading.Tasks;
 namespace Discord.Net.WebSockets
 {
     internal partial class DataWebSocket : WebSocket
-    {
-		private int _lastSeq;
+	{
+		public enum OpCodes : byte
+		{
+			Dispatch = 0,
+			Heartbeat = 1,
+			Identify = 2,
+			StatusUpdate = 3,
+			VoiceStateUpdate = 4,
+			VoiceServerPing = 5,
+			Resume = 6,
+			Redirect = 7,
+			RequestGuildMembers = 8
+		}
+
+        private int _lastSeq;
 
 		public string SessionId => _sessionId;
 		private string _sessionId;
@@ -74,10 +87,11 @@ namespace Discord.Net.WebSockets
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
 				_lastSeq = msg.Sequence.Value;
-			
-			switch (msg.Operation)
+
+			var opCode = (OpCodes)msg.Operation;
+            switch (opCode)
 			{
-				case 0:
+				case OpCodes.Dispatch:
 					{
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
@@ -96,7 +110,7 @@ namespace Discord.Net.WebSockets
 							EndConnect();
 					}
 					break;
-				case 7: //Redirect
+				case OpCodes.Redirect:
 					{
 						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_client.DataSocketSerializer);
 						if (payload.Url != null)
@@ -110,7 +124,7 @@ namespace Discord.Net.WebSockets
 					break;
 				default:
 					if (_logLevel >= LogMessageSeverity.Warning)
-						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {msg.Operation}");
+						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
 					break;
 			}
 		}

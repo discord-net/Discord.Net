@@ -17,6 +17,16 @@ namespace Discord.Net.WebSockets
 {
 	internal partial class VoiceWebSocket : WebSocket
 	{
+		public enum OpCodes : byte
+		{
+			Identify = 0,
+			SelectProtocol = 1,
+			Ready = 2,
+			Heartbeat = 3,
+			SessionDescription = 4,
+			Speaking = 5
+		}
+
 		private const int MaxOpusSize = 4000;
         private const string EncryptedMode = "xsalsa20_poly1305";
 		private const string UnencryptedMode = "plain";
@@ -437,9 +447,10 @@ namespace Discord.Net.WebSockets
 		{
 			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
-			switch (msg.Operation)
+			var opCode = (OpCodes)msg.Operation;
+            switch (opCode)
 			{
-				case 2: //READY
+				case OpCodes.Ready:
 					{
 						if (_state != (int)WebSocketState.Connected)
 						{
@@ -476,7 +487,7 @@ namespace Discord.Net.WebSockets
 						}
 					}
 					break;
-				case 3: //PONG
+				case OpCodes.Heartbeat:
 					{
 						long time = EpochTime.GetMilliseconds();
 						var payload = (long)msg.Payload;
@@ -484,7 +495,7 @@ namespace Discord.Net.WebSockets
 						//TODO: Use this to estimate latency
 					}
 					break;
-				case 4: //SESSION_DESCRIPTION
+				case OpCodes.SessionDescription:
 					{
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_client.VoiceSocketSerializer);
 						_secretKey = payload.SecretKey;
@@ -492,7 +503,7 @@ namespace Discord.Net.WebSockets
 						EndConnect();
 					}
 					break;
-				case 5:
+				case OpCodes.Speaking:
 					{
 						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>(_client.VoiceSocketSerializer);
 						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
@@ -500,7 +511,7 @@ namespace Discord.Net.WebSockets
 					break;
 				default:
 					if (_logLevel >= LogMessageSeverity.Warning)
-						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {msg.Operation}");
+						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
 					break;
 			}
 		}
