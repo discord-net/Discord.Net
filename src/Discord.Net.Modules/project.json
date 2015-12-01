@@ -1,4 +1,4 @@
-﻿{
+{
 	"version": "0.8.1-beta2",
 	"description": "A Discord.Net extension adding basic plugin support.",
 	"authors": [ "RogueException" ],
@@ -12,14 +12,14 @@
 	"compilationOptions": {
 		"warningsAsErrors": true
 	},
-
 	"dependencies": {
 		"Discord.Net": "0.8.1-beta2",
 		"Discord.Net.Commands": "0.8.1-beta2"
 	},
-
-	"frameworks": {
-		"net45": { },
-		"dotnet5.4": { }
-	}
+  "frameworks": {
+    "net45": { },
+    "dotnet5.4": { }
+  },
+  "configurations": {
+  }
 }

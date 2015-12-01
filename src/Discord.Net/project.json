@@ -18,15 +18,15 @@
     "allowUnsafe": true
   },
 	"configurations": {
-		"TestResponses": {
-			"compilationOptions": {
-				"define": [
-					"DEBUG",
-					"TRACE",
-					"TEST_RESPONSES"
-				]
-			}
-		}
+    "TestResponses": {
+      "compilationOptions": {
+        "define": [
+          "DEBUG",
+          "TRACE",
+          "TEST_RESPONSES"
+        ]
+      }
+    }
 	},
 
 	"dependencies": {
