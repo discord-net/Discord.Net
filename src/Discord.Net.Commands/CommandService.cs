@@ -49,7 +49,7 @@ namespace Discord.Commands
 					.Parameter("command", ParameterType.Multiple)
                     .Hide()
                     .Description("Returns information about commands.")
-                    .Do((Func<CommandEventArgs, Task>)(async e =>
+                    .Do(async e =>
                     {
 						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await client.CreatePMChannel(e.User);
 						if (e.Args.Length > 0) //Show command help
@@ -62,7 +62,7 @@ namespace Discord.Commands
 						}
                         else //Show general help							
 							await ShowGeneralHelp(e.User, e.Channel, replyChannel);
-                    }));
+                    });
             }
 
             client.MessageReceived += async (s, e) =>
@@ -209,7 +209,7 @@ namespace Discord.Commands
 			IEnumerable<Command> cmds = map.Commands;
 			bool isFirstCmd = true;
 			string error;
-			if (cmds != null)
+			if (cmds.Any())
 			{
 				foreach (var cmd in cmds)
 				{
@@ -233,7 +233,7 @@ namespace Discord.Commands
 			}
 
 			bool isFirstSubCmd = true;
-			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel, out error) && !x.IsVisible))
+			foreach (var subCmd in map.SubGroups.Where(x => x.CanRun(user, channel, out error) && x.IsVisible))
 			{
 				if (isFirstSubCmd)
 				{
@@ -289,8 +289,8 @@ namespace Discord.Commands
 						break;
 				}
 			}
-			output.Append('`');
-			output.AppendLine($": {command.Description ?? "No description set for this command."}");
+			output.AppendLine("`");
+			output.AppendLine($"{command.Description ?? "No description."}");
 
 			if (command.Aliases.Any())
 				output.AppendLine($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');

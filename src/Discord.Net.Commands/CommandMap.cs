@@ -114,24 +114,24 @@ namespace Discord.Commands
 
 		public bool CanRun(User user, Channel channel, out string error)
 		{
+			error = null;
 			if (_commands.Count > 0)
 			{
 				foreach (var cmd in _commands)
 				{
-					if (!cmd.CanRun(user, channel, out error))
-						return false;
+					if (cmd.CanRun(user, channel, out error))
+						return true;
 				}
 			}
 			if (_items.Count > 0)
 			{
 				foreach (var item in _items)
 				{
-					if (!item.Value.CanRun(user, channel, out error))
-						return false;
+					if (item.Value.CanRun(user, channel, out error))
+						return true;
 				}
 			}
-			error = null;
-			return true;
+			return false;
 		}
 	}
 }
