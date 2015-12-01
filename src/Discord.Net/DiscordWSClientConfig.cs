@@ -35,10 +35,10 @@ namespace Discord
 		private int? _voiceBitrate = null;
 
 		//Experimental Features
-		/// <summary> (Experimental) Enables the voice websocket and UDP client and specifies how it will be used. Any option other than Disabled requires the opus .dll or .so be in the local lib/ folder. </summary>
+		/// <summary> (Experimental) Enables the voice websocket and UDP client and specifies how it will be used. Any option other than Disabled requires the opus .dll or .so be in the local or system folder. </summary>
 		public DiscordVoiceMode VoiceMode { get { return _voiceMode; } set { SetValue(ref _voiceMode, value); } }
 		private DiscordVoiceMode _voiceMode = DiscordVoiceMode.Disabled;
-		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local lib/ folder. </summary>
+		/// <summary> (Experimental) Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local or system folder. </summary>
 		public bool EnableVoiceEncryption { get { return _enableVoiceEncryption; } set { SetValue(ref _enableVoiceEncryption, value); } }
 		private bool _enableVoiceEncryption = true;
 		/// <summary> (Experimental) Instructs Discord to not send send information about offline users, for servers with more than 50 users. </summary>
