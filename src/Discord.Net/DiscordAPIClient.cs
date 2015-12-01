@@ -13,6 +13,8 @@ namespace Discord
 	/// <summary> A lightweight wrapper around the Discord API. </summary>
 	public class DiscordAPIClient
 	{
+		public static readonly string Version = DiscordClient.Version;
+
 		private readonly DiscordAPIClientConfig _config;
 
 		internal RestClient RestClient => _rest;
