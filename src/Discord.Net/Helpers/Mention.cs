@@ -72,7 +72,7 @@ namespace Discord
 			if (source == null) throw new ArgumentNullException(nameof(source));
 			if (text == null) throw new ArgumentNullException(nameof(text));
 
-			return Resolve(source.Server, text);
+			return Resolve(source?.Server, text);
         }
 
 		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
