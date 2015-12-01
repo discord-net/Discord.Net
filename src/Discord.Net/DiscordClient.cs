@@ -287,7 +287,7 @@ namespace Discord
 				singletonT = singleton as T;
 
 			if (singletonT == null && required)
-				throw new InvalidOperationException($"This operation requires {nameof(T)} to be added to {nameof(DiscordClient)}.");
+				throw new InvalidOperationException($"This operation requires {typeof(T).Name} to be added to {nameof(DiscordClient)}.");
 			return singletonT;
 		}
 		public T AddService<T>(T obj)
