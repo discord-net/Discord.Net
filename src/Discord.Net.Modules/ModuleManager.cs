@@ -132,6 +132,7 @@ namespace Discord.Modules
 		public void EnableServers(IEnumerable<Server> servers)
 		{
 			if (servers == null) throw new ArgumentNullException(nameof(servers));
+			if (servers.Contains(null)) throw new ArgumentException("Collection cannot contain null.", nameof(servers));
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
@@ -194,6 +195,7 @@ namespace Discord.Modules
 		public void EnableChannels(IEnumerable<Channel> channels)
 		{
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
+			if (channels.Contains(null)) throw new ArgumentException("Collection cannot contain null.", nameof(channels));
 			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
 			lock (this)
