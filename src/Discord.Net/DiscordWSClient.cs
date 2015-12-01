@@ -289,9 +289,9 @@ namespace Discord
 		{
 			try
 			{
-				asyncAction().Wait();
+				asyncAction().GetAwaiter().GetResult(); //Avoids creating AggregateExceptions
 			}
-			catch (AggregateException ex) when (ex.InnerException is TaskCanceledException) { }
+			catch (TaskCanceledException) { }
 			_disconnectedEvent.WaitOne();
 		}
 		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
