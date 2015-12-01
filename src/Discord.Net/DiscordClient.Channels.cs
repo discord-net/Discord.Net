@@ -66,7 +66,7 @@ namespace Discord
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
-		public IEnumerable<Channel> PrivateChannels => _channels.PrivateChannels;
+		public IEnumerable<Channel> PrivateChannels { get { CheckReady(); return _channels.PrivateChannels; } }
 		internal Channels Channels => _channels;
 		private readonly Channels _channels;
 

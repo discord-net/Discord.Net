@@ -56,7 +56,7 @@ namespace Discord
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
-		public IEnumerable<Server> AllServers => _servers;
+		public IEnumerable<Server> AllServers { get { CheckReady(); return _servers; } }
 		internal Servers Servers => _servers;
 		private readonly Servers _servers;
 

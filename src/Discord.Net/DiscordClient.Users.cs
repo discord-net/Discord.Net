@@ -134,10 +134,10 @@ namespace Discord
 		private User _privateUser;
 
 		/// <summary> Returns information about the currently logged-in account. </summary>
-		public GlobalUser CurrentUser => _privateUser.Global;
+		public GlobalUser CurrentUser { get { CheckReady(); return _privateUser.Global; } }
 
 		/// <summary> Returns a collection of all unique users this client can currently see. </summary>
-		public IEnumerable<GlobalUser> AllUsers => _globalUsers;
+		public IEnumerable<GlobalUser> AllUsers { get { CheckReady(); return _globalUsers; } }
 		internal GlobalUsers GlobalUsers => _globalUsers;
 		private readonly GlobalUsers _globalUsers;
 
@@ -146,6 +146,9 @@ namespace Discord
 
 		public GlobalUser GetUser(long userId)
 		{
+			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
+			CheckReady();
+
 			return _globalUsers[userId];
 		}
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
