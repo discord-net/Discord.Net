@@ -111,7 +111,6 @@ namespace Discord
 
 			try { await _api.LeaveServer(server.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-			//return _servers.TryRemove(server.Id);
 		}
 
 		public async Task<IEnumerable<Region>> GetVoiceRegions()

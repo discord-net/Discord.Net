@@ -23,8 +23,6 @@ namespace Discord
 				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
 		}
 
-		internal static string GetAvatarUrl(long userId, string avatarId) => avatarId != null ? Endpoints.UserAvatar(userId, avatarId) : null;
-
 		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
 		internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
 		/// <summary> Returns the name of this user on this server. </summary>
@@ -34,7 +32,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
+		public string AvatarUrl => AvatarId != null ? Endpoints.UserAvatar(Id, AvatarId) : null;
 		/// <summary> Returns the datetime that this user joined this server. </summary>
 		public DateTime JoinedAt { get; private set; }
 
@@ -161,12 +159,12 @@ namespace Discord
 
 		internal void Update(UserReference model)
 		{
-			if (model.Avatar != null)
-				AvatarId = model.Avatar;
-			if (model.Discriminator != null)
-				Discriminator = model.Discriminator.Value;
 			if (model.Username != null)
 				Name = model.Username;
+			if (model.Discriminator != null)
+				Discriminator = model.Discriminator.Value;
+			if (model.Avatar != null)
+				AvatarId = model.Avatar;
 		}
 		internal void Update(MemberInfo model)
 		{

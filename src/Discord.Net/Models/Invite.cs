@@ -42,7 +42,7 @@ namespace Discord
 			/// <summary> Returns the unique identifier for this user's avatar. </summary>
 			public string AvatarId { get; }
 			/// <summary> Returns the full path to this user's avatar. </summary>
-			public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
+			public string AvatarUrl => AvatarId != null ? Endpoints.UserAvatar(Id, AvatarId) : null;
 
 			internal InviterInfo(long id, string name, int discriminator, string avatarId)
 			{

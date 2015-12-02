@@ -4,6 +4,7 @@
 	{
 		public const string BaseStatusApi = "https://status.discordapp.com/api/v2/";
 		public const string BaseApi = "https://discordapp.com/api/";
+		public const string BaseCdn = "https://cdn.discordapp.com/";
 
 		public const string Gateway = "gateway";
 
@@ -31,6 +32,7 @@
 		public static string ServerPrune(long serverId, int days) => $"guilds/{serverId}/prune?days={days}";
 		public static string ServerRoles(long serverId) => $"guilds/{serverId}/roles";
 		public static string ServerRole(long serverId, long roleId) => $"guilds/{serverId}/roles/{roleId}";
+		public static string ServerIcon(long serverId, string iconId) => BaseCdn + $"icons/{serverId}/{iconId}.jpg";
 
 		public const string Invites = "invite";
 		public static string Invite(long inviteId) => $"invite/{inviteId}";
@@ -39,9 +41,9 @@
 		public static string InviteUrl(string inviteIdOrXkcd) => $"https://discord.gg/{inviteIdOrXkcd}";
 
 		public const string Users = "users";
-		public static string UserAvatar(long userId, string avatarId) => BaseApi + $"users/{userId}/avatars/{avatarId}.jpg";
-        public static string UserChannels(long userId) => $"users/{userId}/channels";
 		public static string UserMe => $"users/@me";
+        public static string UserChannels(long userId) => $"users/{userId}/channels";
+		public static string UserAvatar(long serverId, string avatarId) => BaseCdn + $"avatars/{serverId}/{avatarId}.jpg";
 
 		public const string Voice = "voice";
 		public const string VoiceRegions = "voice/regions";

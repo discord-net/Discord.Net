@@ -33,6 +33,10 @@ namespace Discord
 		public DateTime JoinedAt { get; private set; }
 		/// <summary> Returns the region for this server (see Regions). </summary>
 		public string Region { get; private set; }
+		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
+		public string IconId { get; private set; }
+		/// <summary> Returns the URL to this user's current avatar. </summary>
+		public string IconUrl => IconId != null ? Endpoints.ServerIcon(Id, IconId) : null;
 
 		/// <summary> Returns true if the current user created this server. </summary>
 		public bool IsOwner => _client.CurrentUserId == _owner.Id;
@@ -154,6 +158,8 @@ namespace Discord
 				_owner.Id = model.OwnerId.Value;
 			if (model.Region != null)
 				Region = model.Region;
+			if (model.Icon != null)
+				IconId = model.Icon;
 
 			if (model.Roles != null)
 			{
