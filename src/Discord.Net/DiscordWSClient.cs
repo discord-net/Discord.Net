@@ -1,5 +1,4 @@
-﻿using Discord.Net;
-using Discord.Net.WebSockets;
+﻿using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
