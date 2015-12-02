@@ -281,16 +281,22 @@ namespace Discord
 			_dataSocket.SendGetUsers(server.Id);
 		}
 
-		public Task EditProfile(string currentPassword = "",
+		public async Task EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
 			Stream avatar = null, ImageType avatarType = ImageType.Png)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 			CheckReady();
 
-			return _api.EditProfile(currentPassword: currentPassword, 
+			await _api.EditProfile(currentPassword: currentPassword, 
 				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
 				avatar: avatar, avatarType: avatarType);
+
+			if (password != null)
+			{
+				var loginResponse = await _api.Login(_privateUser.Global.Email, password);
+				_api.Token = loginResponse.Token;
+			}
 		}
 
 		public Task SetStatus(UserStatus status)
