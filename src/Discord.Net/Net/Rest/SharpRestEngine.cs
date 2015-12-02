@@ -2,6 +2,7 @@
 using Discord.API;
 using RestSharp;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,10 +45,10 @@ namespace Discord.Net.Rest
 			request.AddParameter("application/json", json, ParameterType.RequestBody);
 			return Send(request, cancelToken);
 		}
-		public Task<string> SendFile(string method, string path, string filePath, CancellationToken cancelToken)
+		public Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, Method.POST);
-            request.AddFile("file", filePath);
+            request.AddFile("file", x => stream.CopyTo(x), filename);
             return Send(request, cancelToken);
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)

@@ -2,6 +2,7 @@
 using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -198,12 +199,13 @@ namespace Discord
 			var request = new SendMessageRequest { Content = message, Mentions = mentionedUserIds ?? new long[0], Nonce = nonce, IsTTS = isTTS ? true : false };
 			return _rest.Post<SendMessageResponse>(Endpoints.ChannelMessages(channelId), request);
 		}
-		public Task<SendMessageResponse> SendFile(long channelId, string filePath)
+		public Task<SendMessageResponse> SendFile(long channelId, string filename, Stream stream)
 		{
 			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+			if (filename == null) throw new ArgumentNullException(nameof(filename));
+			if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-			return _rest.PostFile<SendMessageResponse>(Endpoints.ChannelMessages(channelId), filePath);
+			return _rest.PostFile<SendMessageResponse>(Endpoints.ChannelMessages(channelId), filename, stream);
 		}
 		public Task DeleteMessage(long messageId, long channelId)
 		{
@@ -301,38 +303,39 @@ namespace Discord
 
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(long serverId, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
+		public Task<EditServerResponse> EditServer(long serverId, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
 		{
 			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 
-			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(iconType, icon) };
+			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(icon, iconType) };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
 		}
 
 		//User
-		public Task<EditUserResponse> EditUser(string currentPassword = "",
+		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
-			ImageType avatarType = ImageType.Png, byte[] avatar = null)
+			Stream avatar = null, ImageType avatarType = ImageType.Png)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 			
-			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = Base64Picture(avatarType, avatar) };
+			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = Base64Picture(avatar, avatarType) };
 			return _rest.Patch<EditUserResponse>(Endpoints.UserMe, request);
 		}
 
 		//Voice
 		public Task<GetRegionsResponse> GetVoiceRegions()
 			=> _rest.Get<GetRegionsResponse>(Endpoints.VoiceRegions);
-		/*public Task<GetIceResponse> GetVoiceIce()
-			=> _rest.Get<GetIceResponse>(Endpoints.VoiceIce);*/
 
-		private string Base64Picture(ImageType type, byte[] data)
+		private string Base64Picture(Stream stream, ImageType type)
 		{
 			if (type == ImageType.None)
 				return "";
-			else if (data != null)
+			else if (stream != null)
 			{
-				string base64 = Convert.ToBase64String(data);
+				byte[] bytes = new byte[stream.Length - stream.Position];
+				stream.Read(bytes, 0, bytes.Length);
+
+				string base64 = Convert.ToBase64String(bytes);
 				string imageType = type == ImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
 				return $"data:{imageType},{base64}";
 			}

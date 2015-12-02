@@ -170,8 +170,18 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
 			CheckReady();
+			
+			return _api.SendFile(channel.Id, Path.GetFileName(filePath), File.OpenRead(filePath));
+		}
+		/// <summary> Sends a file to the provided channel. </summary>
+		public Task SendFile(Channel channel, string filename, Stream stream)
+		{
+			if (channel == null) throw new ArgumentNullException(nameof(channel));
+			if (filename == null) throw new ArgumentNullException(nameof(filename));
+			if (stream == null) throw new ArgumentNullException(nameof(stream));
+			CheckReady();
 
-			return _api.SendFile(channel.Id, filePath);
+			return _api.SendFile(channel.Id, filename, stream);
 		}
 
 		/// <summary> Edits the provided message, changing only non-null attributes. </summary>

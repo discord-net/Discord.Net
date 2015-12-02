@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -65,15 +66,15 @@ namespace Discord.Net.Rest
 		internal Task Put(string path) 
 			=> Send("PUT", path);
 
-		internal Task<ResponseT> PostFile<ResponseT>(string path, string filePath) where ResponseT : class 
-			=> SendFile<ResponseT>("POST", path, filePath);
-		internal Task PostFile(string path, string filePath) 
-			=> SendFile("POST", path, filePath);
+		internal Task<ResponseT> PostFile<ResponseT>(string path, string filename, Stream stream) where ResponseT : class 
+			=> SendFile<ResponseT>("POST", path, filename, stream);
+		internal Task PostFile(string path, string filename, Stream stream) 
+			=> SendFile("POST", path, filename, stream);
 
-		internal Task<ResponseT> PutFile<ResponseT>(string path, string filePath) where ResponseT : class 
-			=> SendFile<ResponseT>("PUT", path, filePath);
-		internal Task PutFile(string path, string filePath) 
-			=> SendFile("PUT", path, filePath);
+		internal Task<ResponseT> PutFile<ResponseT>(string path, string filename, Stream stream) where ResponseT : class 
+			=> SendFile<ResponseT>("PUT", path, filename, stream);
+		internal Task PutFile(string path, string filename, Stream stream) 
+			=> SendFile("PUT", path, filename, stream);
 
 		private async Task<ResponseT> Send<ResponseT>(string method, string path, object content = null)
 			where ResponseT : class
@@ -117,22 +118,22 @@ namespace Discord.Net.Rest
 			return responseJson;
 		}
 
-		private async Task<ResponseT> SendFile<ResponseT>(string method, string path, string filePath)
+		private async Task<ResponseT> SendFile<ResponseT>(string method, string path, string filename, Stream stream)
 			where ResponseT : class
 		{
-			string responseJson = await SendFile(method, path, filePath, true).ConfigureAwait(false);
+			string responseJson = await SendFile(method, path, filename, stream, true).ConfigureAwait(false);
 			return DeserializeResponse<ResponseT>(responseJson);
 		}
-		private Task SendFile(string method, string path, string filePath)
-			=> SendFile(method, path, filePath, false);
-		private async Task<string> SendFile(string method, string path, string filePath, bool hasResponse)
+		private Task SendFile(string method, string path, string filename, Stream stream)
+			=> SendFile(method, path, filename, stream, false);
+		private async Task<string> SendFile(string method, string path, string filename, Stream stream, bool hasResponse)
 		{
 			Stopwatch stopwatch = null;
 
 			if (_config.LogLevel >= LogMessageSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
-			string responseJson = await _engine.SendFile(method, path, filePath, _cancelToken).ConfigureAwait(false);
+			string responseJson = await _engine.SendFile(method, path, filename, stream, _cancelToken).ConfigureAwait(false);
 
 #if TEST_RESPONSES
 			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
@@ -143,7 +144,7 @@ namespace Discord.Net.Rest
 			{
 				stopwatch.Stop();
 				if (_config.LogLevel >= LogMessageSeverity.Debug)
-					RaiseOnRequest(method, path, filePath, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
+					RaiseOnRequest(method, path, filename, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 				else
                     RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 			}

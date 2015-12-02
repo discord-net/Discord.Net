@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -282,14 +283,14 @@ namespace Discord
 
 		public Task EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
-			ImageType avatarType = ImageType.Png, byte[] avatar = null)
+			Stream avatar = null, ImageType avatarType = ImageType.Png)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 			CheckReady();
 
-			return _api.EditUser(currentPassword: currentPassword, 
+			return _api.EditProfile(currentPassword: currentPassword, 
 				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
-				avatarType: avatarType, avatar: avatar);
+				avatar: avatar, avatarType: avatarType);
 		}
 
 		public Task SetStatus(UserStatus status)

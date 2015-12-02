@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -93,12 +94,12 @@ namespace Discord
 		}
 		
 		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public async Task EditServer(Server server, string name = null, string region = null, ImageType iconType = ImageType.Png, byte[] icon = null)
+		public async Task EditServer(Server server, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region, iconType: iconType, icon: icon).ConfigureAwait(false);
+			var response = await _api.EditServer(server.Id, name: name ?? server.Name, region: region, icon: icon, iconType: iconType).ConfigureAwait(false);
 			server.Update(response);
 		}
 		

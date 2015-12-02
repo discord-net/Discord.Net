@@ -45,7 +45,6 @@
 
 		public const string Voice = "voice";
 		public const string VoiceRegions = "voice/regions";
-		//public const string VoiceIce = "voice/ice";
 
 		public const string StatusActiveMaintenance = "scheduled-maintenances/active.json";
 		public const string StatusUpcomingMaintenance = "scheduled-maintenances/upcoming.json";
