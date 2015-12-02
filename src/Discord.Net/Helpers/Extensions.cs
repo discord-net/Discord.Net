@@ -1,35 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    internal static class Extensions
+	public enum EditMode : byte
 	{
-		public static async Task Timeout(this Task self, int milliseconds)
+		Set,
+		Add,
+		Remove
+	}
+
+	internal static class Extensions
+	{
+		public static async Task Timeout(this Task task, int milliseconds)
 		{
 			Task timeoutTask = Task.Delay(milliseconds);
-			Task finishedTask = await Task.WhenAny(self, timeoutTask).ConfigureAwait(false);
+			Task finishedTask = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
 			if (finishedTask == timeoutTask)
 				throw new TimeoutException();
 			else
-				await self.ConfigureAwait(false);
+				await task.ConfigureAwait(false);
 		}
-		public static async Task<T> Timeout<T>(this Task<T> self, int milliseconds)
+		public static async Task<T> Timeout<T>(this Task<T> task, int milliseconds)
 		{
 			Task timeoutTask = Task.Delay(milliseconds);
-			Task finishedTask = await Task.WhenAny(self, timeoutTask).ConfigureAwait(false);
+			Task finishedTask = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
 			if (finishedTask == timeoutTask)
 				throw new TimeoutException();
 			else
-				return await self.ConfigureAwait(false);
+				return await task.ConfigureAwait(false);
 		}
-		public static async Task Timeout(this Task self, int milliseconds, CancellationTokenSource timeoutToken)
+		public static async Task Timeout(this Task task, int milliseconds, CancellationTokenSource timeoutToken)
 		{
 			try
 			{
 				timeoutToken.CancelAfter(milliseconds);
-				await self.ConfigureAwait(false);
+				await task.ConfigureAwait(false);
 			}
 			catch (OperationCanceledException)
 			{
@@ -38,12 +47,12 @@ namespace Discord
 				throw;
 			}
 		}
-		public static async Task<T> Timeout<T>(this Task<T> self, int milliseconds, CancellationTokenSource timeoutToken)
+		public static async Task<T> Timeout<T>(this Task<T> task, int milliseconds, CancellationTokenSource timeoutToken)
 		{
 			try
 			{
 				timeoutToken.CancelAfter(milliseconds);
-				return await self.ConfigureAwait(false);
+				return await task.ConfigureAwait(false);
 			}
 			catch (OperationCanceledException)
 			{
@@ -64,5 +73,20 @@ namespace Discord
 			try { await Task.Delay(-1, token).ConfigureAwait(false); }
 			catch (OperationCanceledException) { } //Expected
 		}
-	}
+
+		public static IEnumerable<T>  Modify<T>(this IEnumerable<T> original, IEnumerable<T> modified, EditMode mode)
+		{
+			if (original == null) return null;
+			switch (mode)
+			{
+				case EditMode.Set:
+				default:
+					return modified;
+				case EditMode.Add:
+					return original.Concat(modified);
+				case EditMode.Remove:
+					return original.Except(modified);
+			}
+        }
+    }
 }

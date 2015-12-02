@@ -218,16 +218,22 @@ namespace Discord
 			return query;
 		}
 
-		public Task EditUser(User user, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null)
+		public Task EditUser(User user, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null, EditMode rolesMode = EditMode.Set)
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to edit users in a private channel");
 			CheckReady();
 
+			//Modify the roles collection and filter out the everyone role
+			IEnumerable<long> roleIds = roles == null ? null : user.Roles
+				.Modify(roles, rolesMode)
+				.Where(x => !x.IsEveryone)
+				.Select(x => x.Id);
+
 			var serverId = user.Server.Id;
             return _api.EditUser(serverId, user.Id, 
 				mute: mute, deaf: deaf, 
-				roleIds: roles.Select(x => x.Id).Where(x  => x != serverId));
+				roleIds: roleIds);
 		}
 
 		public Task KickUser(User user)
