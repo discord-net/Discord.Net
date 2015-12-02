@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord.Tests
 {
+	//TODO: Tests are massively incomplete and out of date, needing a full rewrite
+
 	[TestClass]
 	public class Tests
 	{
