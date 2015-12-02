@@ -48,8 +48,14 @@ namespace Discord.Net.Rest
 		public Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, Method.POST);
-            request.AddFile("file", x => stream.CopyTo(x), filename);
-            return Send(request, cancelToken);
+			request.AddHeader("content-length", (stream.Length - stream.Position).ToString());
+
+			byte[] bytes = new byte[stream.Length - stream.Position];
+			stream.Read(bytes, 0, bytes.Length);
+			request.AddFileBytes("file", bytes, filename);
+			//request.AddFile("file", x => stream.CopyTo(x), filename); (Broken in latest ver)
+
+			return Send(request, cancelToken);
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)
 		{
