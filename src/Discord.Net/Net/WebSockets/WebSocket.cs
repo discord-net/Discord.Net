@@ -204,7 +204,7 @@ namespace Discord.Net.WebSockets
 		protected virtual Task ProcessMessage(string json)
 		{
 			if (_logLevel >= LogMessageSeverity.Debug)
-				RaiseLogMessage(LogMessageSeverity.Debug, $"In: {json}");
+				RaiseOnLog(LogMessageSeverity.Debug, $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}
 		protected abstract object GetKeepAlive();
@@ -213,7 +213,7 @@ namespace Discord.Net.WebSockets
 		{
 			string json = JsonConvert.SerializeObject(message);
 			if (_logLevel >= LogMessageSeverity.Debug)
-				RaiseLogMessage(LogMessageSeverity.Debug, $"Out: " + json);
+				RaiseOnLog(LogMessageSeverity.Debug, $"Out: " + json);
 			_engine.QueueMessage(json);
 		}
 

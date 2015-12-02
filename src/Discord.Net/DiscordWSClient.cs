@@ -68,7 +68,7 @@ namespace Discord
 			_dataSocketSerializer.Error += (s, e) =>
 			{
 				e.ErrorContext.Handled = true;
-				RaiseLogMessage(LogMessageSeverity.Error, LogMessageSource.DataWebSocket, "Serialization Failed", e.ErrorContext.Error);
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.DataWebSocket, "Serialization Failed", e.ErrorContext.Error);
 			};
 #endif
 
@@ -81,7 +81,7 @@ namespace Discord
 			_voiceSocketSerializer.Error += (s, e) =>
 			{
 				e.ErrorContext.Handled = true;
-				RaiseLogMessage(LogMessageSeverity.Error, LogMessageSource.VoiceWebSocket, "Serialization Failed", e.ErrorContext.Error);
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.VoiceWebSocket, "Serialization Failed", e.ErrorContext.Error);
 			};
 #endif
 
@@ -105,16 +105,16 @@ namespace Discord
 			;
 			socket.Disconnected += async (s, e) =>
 			{
-				await RaiseDisconnected(e);
+				RaiseDisconnected(e);
 				if (e.WasUnexpected)
 					await socket.Reconnect(_token).ConfigureAwait(false);
 			};
 			
-			socket.LogMessage += (s, e) => RaiseLogMessage(e.Severity, LogMessageSource.DataWebSocket, e.Message, e.Exception);
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.DataWebSocket, e.Message, e.Exception);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				socket.Connected += (s, e) => RaiseLogMessage(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
-				socket.Disconnected += (s, e) => RaiseLogMessage(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
+				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Connected");
+				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.DataWebSocket, "Disconnected");
 			}
 
 			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
@@ -123,19 +123,19 @@ namespace Discord
 		internal virtual VoiceWebSocket CreateVoiceSocket()
 		{
 			var socket = new VoiceWebSocket(this);
-			socket.Connected += (s, e) => RaiseVoiceConnected(socket.CurrentServerId.Value);
+			socket.Connected += (s, e) => RaiseVoiceConnected();
 			socket.Disconnected += async (s, e) =>
 			{
-				await RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);				
+				RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);				
 				if (e.WasUnexpected)
 					await socket.Reconnect().ConfigureAwait(false);
 			};
 
-			socket.LogMessage += (s, e) => RaiseLogMessage(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
+			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
 			if (_config.LogLevel >= LogMessageSeverity.Info)
 			{
-				socket.Connected += (s, e) => RaiseLogMessage(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
-				socket.Disconnected += (s, e) => RaiseLogMessage(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
+				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
+				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
 			}
 
 			return socket;
@@ -314,15 +314,14 @@ namespace Discord
 			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
 				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
-		internal async Task RaiseEvent<T>(AsyncEvent<T> eventHandler, T eventArgs)
-			where T : EventArgs
+		protected void RaiseEvent(string name, Action action)
 		{
-			try { await eventHandler.Invoke(this, eventArgs); }
+			try { action(); }
 			catch (Exception ex)
 			{
 				var ex2 = ex.GetBaseException();
-				await RaiseLogMessage(LogMessageSeverity.Error, LogMessageSource.Client,
-					$"{eventHandler.Name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}", ex);
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client,
+					$"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}", ex);
 			}
 		}
 
@@ -351,7 +350,7 @@ namespace Discord
 			}
 			catch (Exception ex)
 			{
-				await RaiseLogMessage(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
+				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
 			}
 		}
     }

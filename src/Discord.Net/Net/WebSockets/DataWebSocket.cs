@@ -72,7 +72,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						RaiseLogMessage(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
+						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -117,14 +117,14 @@ namespace Discord.Net.WebSockets
 						{
 							Host = payload.Url;
 							if (_logLevel >= LogMessageSeverity.Info)
-								RaiseLogMessage(LogMessageSeverity.Info, "Redirected to " + payload.Url);
+								RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
 							await Redirect(payload.Url).ConfigureAwait(false);
 						}
 					}
 					break;
 				default:
 					if (_logLevel >= LogMessageSeverity.Warning)
-						RaiseLogMessage(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
+						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
 					break;
 			}
 		}
