@@ -18,7 +18,7 @@ namespace Discord.Net.WebSockets
 		}
 
 		public event EventHandler<LogMessageEventArgs> LogMessage;
-		internal void RaiseOnLog(LogMessageSeverity severity, string message, Exception exception = null)
+		internal void RaiseLogMessage(LogMessageSeverity severity, string message, Exception exception = null)
 		{
 			if (LogMessage != null)
 				LogMessage(this, new LogMessageEventArgs(severity, LogMessageSource.Unknown, message, exception));

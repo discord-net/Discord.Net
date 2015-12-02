@@ -45,6 +45,16 @@ namespace Discord
 			Channel = channel;
 		}
 	}
+	public class UserIsTypingEventArgs : UserChannelEventArgs
+	{
+		public bool IsTyping { get; }
+
+		public UserIsTypingEventArgs(User user, Channel channel, bool isTyping)
+			: base(user, channel)
+		{
+			IsTyping = isTyping;
+		}
+	}
 	public class UserIsSpeakingEventArgs : UserChannelEventArgs
 	{
 		public bool IsSpeaking { get; }
@@ -69,66 +79,55 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<UserEventArgs> UserJoined;
-		private void RaiseUserJoined(User user)
-		{
-			if (UserJoined != null)
-				RaiseEvent(nameof(UserJoined), () => UserJoined(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserEventArgs> UserLeft;
-		private void RaiseUserLeft(User user)
-		{
-			if (UserLeft != null)
-				RaiseEvent(nameof(UserLeft), () => UserLeft(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserEventArgs> UserUpdated;
-		private void RaiseUserUpdated(User user)
-		{
-			if (UserUpdated != null)
-				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserEventArgs> UserPresenceUpdated;
-		private void RaiseUserPresenceUpdated(User user)
-		{
-			if (UserPresenceUpdated != null)
-				RaiseEvent(nameof(UserPresenceUpdated), () => UserPresenceUpdated(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
-		private void RaiseUserVoiceStateUpdated(User user)
-		{
-			if (UserVoiceStateUpdated != null)
-				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
-		}
-		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
-		private void RaiseUserIsTyping(User user, Channel channel)
-		{
-			if (UserIsTypingUpdated != null)
-				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
-		}
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
-		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
-		{
-			if (UserIsSpeakingUpdated != null)
-				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
-		}
-		public event EventHandler ProfileUpdated;
-		private void RaiseProfileUpdated()
-		{
-			if (ProfileUpdated != null)
-				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
-		}
-		public event EventHandler<BanEventArgs> UserBanned;
-		private void RaiseUserBanned(long userId, Server server)
-		{
-			if (UserBanned != null)
-				RaiseEvent(nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
-		}
-		public event EventHandler<BanEventArgs> UserUnbanned;
-		private void RaiseUserUnbanned(long userId, Server server)
-		{
-			if (UserUnbanned != null)
-				RaiseEvent(nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
-		}
+		public event AsyncEventHandler<UserEventArgs> UserJoined { add { _userJoined.Add(value); } remove { _userJoined.Remove(value); } }
+		private readonly AsyncEvent<UserEventArgs> _userJoined = new AsyncEvent<UserEventArgs>(nameof(UserJoined));
+		private Task RaiseUserJoined(User user)
+			=> RaiseEvent(_userJoined, new UserEventArgs(user));
+
+		public event AsyncEventHandler<UserEventArgs> UserLeft { add { _userLeft.Add(value); } remove { _userLeft.Remove(value); } }
+		private readonly AsyncEvent<UserEventArgs> _userLeft = new AsyncEvent<UserEventArgs>(nameof(UserLeft));
+		private Task RaiseUserLeft(User user)
+			=> RaiseEvent(_userLeft, new UserEventArgs(user));
+
+		public event AsyncEventHandler<UserEventArgs> UserUpdated { add { _userUpdated.Add(value); } remove { _userUpdated.Remove(value); } }
+		private readonly AsyncEvent<UserEventArgs> _userUpdated = new AsyncEvent<UserEventArgs>(nameof(UserUpdated));
+		private Task RaiseUserUpdated(User user)
+			=> RaiseEvent(_userUpdated, new UserEventArgs(user));
+
+		public event AsyncEventHandler<UserEventArgs> UserPresenceUpdated { add { _userPresenceUpdated.Add(value); } remove { _userPresenceUpdated.Remove(value); } }
+		private readonly AsyncEvent<UserEventArgs> _userPresenceUpdated = new AsyncEvent<UserEventArgs>(nameof(UserPresenceUpdated));
+		private Task RaiseUserPresenceUpdated(User user)
+			=> RaiseEvent(_userPresenceUpdated, new UserEventArgs(user));
+
+		public event AsyncEventHandler<UserEventArgs> UserVoiceStateUpdated { add { _userVoiceStateUpdated.Add(value); } remove { _userVoiceStateUpdated.Remove(value); } }
+		private readonly AsyncEvent<UserEventArgs> _userVoiceStateUpdated = new AsyncEvent<UserEventArgs>(nameof(UserVoiceStateUpdated));
+		private Task RaiseUserVoiceStateUpdated(User user)
+			=> RaiseEvent(_userVoiceStateUpdated, new UserEventArgs(user));
+
+		public event AsyncEventHandler<UserIsTypingEventArgs> UserIsTypingUpdated { add { _userIsTypingUpdated.Add(value); } remove { _userIsTypingUpdated.Remove(value); } }
+		private readonly AsyncEvent<UserIsTypingEventArgs> _userIsTypingUpdated = new AsyncEvent<UserIsTypingEventArgs>(nameof(UserIsTypingUpdated));
+		private Task RaiseUserIsTypingUpdated(User user, Channel channel, bool isTyping)
+			=> RaiseEvent(_userIsTypingUpdated, new UserIsTypingEventArgs(user, channel, isTyping));
+
+		public event AsyncEventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated { add { _userIsSpeakingUpdated.Add(value); } remove { _userIsSpeakingUpdated.Remove(value); } }
+		private readonly AsyncEvent<UserIsSpeakingEventArgs> _userIsSpeakingUpdated = new AsyncEvent<UserIsSpeakingEventArgs>(nameof(UserIsSpeakingUpdated));
+		private Task RaiseUserIsSpeakingUpdated(User user, Channel channel, bool isSpeaking)
+			=> RaiseEvent(_userIsSpeakingUpdated, new UserIsSpeakingEventArgs(user, channel, isSpeaking));
+
+		public event AsyncEventHandler<EventArgs> ProfileUpdated { add { _profileUpdated.Add(value); } remove { _profileUpdated.Remove(value); } }
+		private readonly AsyncEvent<EventArgs> _profileUpdated = new AsyncEvent<EventArgs>(nameof(ProfileUpdated));
+		private Task RaiseProfileUpdated()
+			=> RaiseEvent(_profileUpdated, EventArgs.Empty);
+
+		public event AsyncEventHandler<BanEventArgs> UserBanned { add { _userBanned.Add(value); } remove { _userBanned.Remove(value); } }
+		private readonly AsyncEvent<BanEventArgs> _userBanned = new AsyncEvent<BanEventArgs>(nameof(UserBanned));
+		private Task RaiseUserBanned(long userId, Server server)
+			=> RaiseEvent(_userBanned, new BanEventArgs(userId, server));
+
+		public event AsyncEventHandler<BanEventArgs> UserUnbanned { add { _userUnbanned.Add(value); } remove { _userUnbanned.Remove(value); } }
+		private readonly AsyncEvent<BanEventArgs> _userUnbanned = new AsyncEvent<BanEventArgs>(nameof(UserUnbanned));
+		private Task RaiseUserUnbanned(long userId, Server server)
+			=> RaiseEvent(_userUnbanned, new BanEventArgs(userId, server));
 
 		/// <summary> Returns the current logged-in user in a private channel. </summary>
 		internal User PrivateUser => _privateUser;

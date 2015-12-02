@@ -7,7 +7,11 @@ namespace Discord
 		public static Task CompletedTask { get; }
 		static TaskHelper()
 		{
+#if DOTNET5_4
+			CompletedTask = Task.CompletedTask;
+#else
 			CompletedTask = Task.Delay(0);
+#endif
 		}
 	}
 }

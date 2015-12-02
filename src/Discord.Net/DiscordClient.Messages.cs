@@ -50,36 +50,30 @@ namespace Discord
 	{
 		public const int MaxMessageSize = 2000;
 
-		public event EventHandler<MessageEventArgs> MessageReceived;
-		private void RaiseMessageReceived(Message msg)
-		{
-			if (MessageReceived != null)
-				RaiseEvent(nameof(MessageReceived), () => MessageReceived(this, new MessageEventArgs(msg)));
-		}
-		public event EventHandler<MessageEventArgs> MessageSent;
-		private void RaiseMessageSent(Message msg)
-		{
-			if (MessageSent != null)
-				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
-		}
-		public event EventHandler<MessageEventArgs> MessageDeleted;
-		private void RaiseMessageDeleted(Message msg)
-		{
-			if (MessageDeleted != null)
-				RaiseEvent(nameof(MessageDeleted), () => MessageDeleted(this, new MessageEventArgs(msg)));
-		}
-		public event EventHandler<MessageEventArgs> MessageUpdated;
-		private void RaiseMessageUpdated(Message msg)
-		{
-			if (MessageUpdated != null)
-				RaiseEvent(nameof(MessageUpdated), () => MessageUpdated(this, new MessageEventArgs(msg)));
-		}
-		public event EventHandler<MessageEventArgs> MessageReadRemotely;
-		private void RaiseMessageReadRemotely(Message msg)
-		{
-			if (MessageReadRemotely != null)
-				RaiseEvent(nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
-		}
+		public event AsyncEventHandler<MessageEventArgs> MessageReceived { add { _messageReceived.Add(value); } remove { _messageReceived.Remove(value); } }
+		private readonly AsyncEvent<MessageEventArgs> _messageReceived = new AsyncEvent<MessageEventArgs>(nameof(MessageReceived));
+		private Task RaiseMessageReceived(Message msg)
+			=> RaiseEvent(_messageReceived, new MessageEventArgs(msg));
+
+		public event AsyncEventHandler<MessageEventArgs> MessageSent { add { _messageSent.Add(value); } remove { _messageSent.Remove(value); } }
+		private readonly AsyncEvent<MessageEventArgs> _messageSent = new AsyncEvent<MessageEventArgs>(nameof(MessageSent));
+		private Task RaiseMessageSent(Message msg)
+			=> RaiseEvent(_messageSent, new MessageEventArgs(msg));
+
+		public event AsyncEventHandler<MessageEventArgs> MessageDeleted { add { _messageDeleted.Add(value); } remove { _messageDeleted.Remove(value); } }
+		private readonly AsyncEvent<MessageEventArgs> _messageDeleted = new AsyncEvent<MessageEventArgs>(nameof(MessageDeleted));
+		private Task RaiseMessageDeleted(Message msg)
+			=> RaiseEvent(_messageDeleted, new MessageEventArgs(msg));
+
+		public event AsyncEventHandler<MessageEventArgs> MessageUpdated { add { _messageUpdated.Add(value); } remove { _messageUpdated.Remove(value); } }
+		private readonly AsyncEvent<MessageEventArgs> _messageUpdated = new AsyncEvent<MessageEventArgs>(nameof(MessageUpdated));
+		private Task RaiseMessageUpdated(Message msg)
+			=> RaiseEvent(_messageUpdated, new MessageEventArgs(msg));
+
+		public event AsyncEventHandler<MessageEventArgs> MessageReadRemotely { add { _messageReadRemotely.Add(value); } remove { _messageReadRemotely.Remove(value); } }
+		private readonly AsyncEvent<MessageEventArgs> _messageReadRemotely = new AsyncEvent<MessageEventArgs>(nameof(MessageReadRemotely));
+		private Task RaiseMessageReadRemotely(Message msg)
+			=> RaiseEvent(_messageReadRemotely, new MessageEventArgs(msg));
 		
 		internal Messages Messages => _messages;
 		private readonly Messages _messages;
@@ -158,7 +152,7 @@ namespace Discord
 				var model = await _api.SendMessage(channel.Id, text, mentionedUsers.Select(x => x.Id), null, isTextToSpeech).ConfigureAwait(false);
 				msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
 				msg.Update(model);
-				RaiseMessageSent(msg);
+				await RaiseMessageSent(msg);
 			}
 			return msg;
 		}
@@ -331,7 +325,7 @@ namespace Discord
                         }
 						else
 							msg.State = MessageState.Failed;
-						RaiseMessageSent(msg);
+						await RaiseMessageSent(msg);
 					}
 					await Task.Delay(interval).ConfigureAwait(false);
 				}

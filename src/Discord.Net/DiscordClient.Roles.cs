@@ -25,24 +25,20 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<RoleEventArgs> RoleCreated;
-		private void RaiseRoleCreated(Role role)
-		{
-			if (RoleCreated != null)
-				RaiseEvent(nameof(RoleCreated), () => RoleCreated(this, new RoleEventArgs(role)));
-		}
-		public event EventHandler<RoleEventArgs> RoleUpdated;
-		private void RaiseRoleDeleted(Role role)
-		{
-			if (RoleDeleted != null)
-				RaiseEvent(nameof(RoleDeleted), () => RoleDeleted(this, new RoleEventArgs(role)));
-		}
-		public event EventHandler<RoleEventArgs> RoleDeleted;
-		private void RaiseRoleUpdated(Role role)
-		{
-			if (RoleUpdated != null)
-				RaiseEvent(nameof(RoleUpdated), () => RoleUpdated(this, new RoleEventArgs(role)));
-		}
+		public event AsyncEventHandler<RoleEventArgs> RoleCreated { add { _roleCreated.Add(value); } remove { _roleCreated.Remove(value); } }
+		private readonly AsyncEvent<RoleEventArgs> _roleCreated = new AsyncEvent<RoleEventArgs>(nameof(RoleCreated));
+		private Task RaiseRoleCreated(Role role)
+			=> RaiseEvent(_roleCreated, new RoleEventArgs(role));
+
+		public event AsyncEventHandler<RoleEventArgs> RoleUpdated { add { _roleUpdated.Add(value); } remove { _roleUpdated.Remove(value); } }
+		private readonly AsyncEvent<RoleEventArgs> _roleUpdated = new AsyncEvent<RoleEventArgs>(nameof(RoleUpdated));
+		private Task RaiseRoleUpdated(Role role)
+			=> RaiseEvent(_roleUpdated, new RoleEventArgs(role));
+
+		public event AsyncEventHandler<RoleEventArgs> RoleDeleted { add { _roleDeleted.Add(value); } remove { _roleDeleted.Remove(value); } }
+		private readonly AsyncEvent<RoleEventArgs> _roleDeleted = new AsyncEvent<RoleEventArgs>(nameof(RoleDeleted));
+		private Task RaiseRoleDeleted(Role role)
+			=> RaiseEvent(_roleDeleted, new RoleEventArgs(role));
 		
 		internal Roles Roles => _roles;
 		private readonly Roles _roles;

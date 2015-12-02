@@ -25,36 +25,31 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<ServerEventArgs> JoinedServer;
-		private void RaiseJoinedServer(Server server)
-		{
-			if (JoinedServer != null)
-				RaiseEvent(nameof(JoinedServer), () => JoinedServer(this, new ServerEventArgs(server)));
-		}
-		public event EventHandler<ServerEventArgs> LeftServer;
-		private void RaiseLeftServer(Server server)
-		{
-			if (LeftServer != null)
-				RaiseEvent(nameof(LeftServer), () => LeftServer(this, new ServerEventArgs(server)));
-		}
-		public event EventHandler<ServerEventArgs> ServerUpdated;
-		private void RaiseServerUpdated(Server server)
-		{
-			if (ServerUpdated != null)
-				RaiseEvent(nameof(ServerUpdated), () => ServerUpdated(this, new ServerEventArgs(server)));
-		}
-		public event EventHandler<ServerEventArgs> ServerUnavailable;
-		private void RaiseServerUnavailable(Server server)
-		{
-			if (ServerUnavailable != null)
-				RaiseEvent(nameof(ServerUnavailable), () => ServerUnavailable(this, new ServerEventArgs(server)));
-		}
-		public event EventHandler<ServerEventArgs> ServerAvailable;
-		private void RaiseServerAvailable(Server server)
-		{
-			if (ServerAvailable != null)
-				RaiseEvent(nameof(ServerAvailable), () => ServerAvailable(this, new ServerEventArgs(server)));
-		}
+		public event AsyncEventHandler<ServerEventArgs> JoinedServer { add { _joinedServer.Add(value); } remove { _joinedServer.Remove(value); } }
+		private readonly AsyncEvent<ServerEventArgs> _joinedServer = new AsyncEvent<ServerEventArgs>(nameof(JoinedServer));
+		private Task RaiseJoinedServer(Server server)
+			=> RaiseEvent(_joinedServer, new ServerEventArgs(server));
+
+		public event AsyncEventHandler<ServerEventArgs> LeftServer { add { _leftServer.Add(value); } remove { _leftServer.Remove(value); } }
+		private readonly AsyncEvent<ServerEventArgs> _leftServer = new AsyncEvent<ServerEventArgs>(nameof(LeftServer));
+		private Task RaiseLeftServer(Server server)
+			=> RaiseEvent(_leftServer, new ServerEventArgs(server));
+
+		public event AsyncEventHandler<ServerEventArgs> ServerUpdated { add { _serverUpdated.Add(value); } remove { _serverUpdated.Remove(value); } }
+		private readonly AsyncEvent<ServerEventArgs> _serverUpdated = new AsyncEvent<ServerEventArgs>(nameof(ServerUpdated));
+		private Task RaiseServerUpdated(Server server)
+			=> RaiseEvent(_serverUpdated, new ServerEventArgs(server));
+
+		public event AsyncEventHandler<ServerEventArgs> ServerAvailable { add { _serverAvailable.Add(value); } remove { _serverAvailable.Remove(value); } }
+		private readonly AsyncEvent<ServerEventArgs> _serverAvailable = new AsyncEvent<ServerEventArgs>(nameof(ServerAvailable));
+		private Task RaiseServerAvailable(Server server)
+			=> RaiseEvent(_serverAvailable, new ServerEventArgs(server));
+
+		public event AsyncEventHandler<ServerEventArgs> ServerUnavailable { add { _serverUnavailable.Add(value); } remove { _serverUnavailable.Remove(value); } }
+		private readonly AsyncEvent<ServerEventArgs> _serverUnavailable = new AsyncEvent<ServerEventArgs>(nameof(ServerUnavailable));
+		private Task RaiseServerUnavailable(Server server)
+			=> RaiseEvent(_serverUnavailable, new ServerEventArgs(server));
+
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
 		public IEnumerable<Server> AllServers { get { CheckReady(); return _servers; } }

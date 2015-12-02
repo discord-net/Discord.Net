@@ -43,7 +43,8 @@ namespace Discord
 			client.LogMessage += (s, e) =>
 			{
 				if (e.Source != LogMessageSource.DataWebSocket)
-					RaiseOnLog(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}", e.Exception);
+					return RaiseLogMessage(e.Severity, e.Source, $"(#{client.Config.VoiceClientId}) {e.Message}", e.Exception);
+				return TaskHelper.CompletedTask;
 			};
 			await client.Connect(_gateway, _token).ConfigureAwait(false);
 			return client;

@@ -51,7 +51,7 @@ namespace Discord.Net.WebSockets
 			};
 			_webSocket.OnError += async (s, e) =>
 			{
-				_parent.RaiseOnLog(LogMessageSeverity.Error, e.Exception?.GetBaseException()?.Message ?? e.Message);
+				_parent.RaiseLogMessage(LogMessageSeverity.Error, e.Exception?.GetBaseException()?.Message ?? e.Message);
 				await _parent.DisconnectInternal(e.Exception, skipAwait: true).ConfigureAwait(false);
 			};
 			_webSocket.OnClose += async (s, e) =>

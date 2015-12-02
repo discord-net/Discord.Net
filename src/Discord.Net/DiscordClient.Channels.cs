@@ -46,24 +46,20 @@ namespace Discord
 
 	public partial class DiscordClient
 	{
-		public event EventHandler<ChannelEventArgs> ChannelCreated;
-		private void RaiseChannelCreated(Channel channel)
-		{
-			if (ChannelCreated != null)
-				RaiseEvent(nameof(ChannelCreated), () => ChannelCreated(this, new ChannelEventArgs(channel)));
-		}
-		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
-		private void RaiseChannelDestroyed(Channel channel)
-		{
-			if (ChannelDestroyed != null)
-				RaiseEvent(nameof(ChannelDestroyed), () => ChannelDestroyed(this, new ChannelEventArgs(channel)));
-		}
-		public event EventHandler<ChannelEventArgs> ChannelUpdated;
-		private void RaiseChannelUpdated(Channel channel)
-		{
-			if (ChannelUpdated != null)
-				RaiseEvent(nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
-		}
+		public event AsyncEventHandler<ChannelEventArgs> ChannelCreated { add { _channelCreated.Add(value); } remove { _channelCreated.Remove(value); } }
+		private readonly AsyncEvent<ChannelEventArgs> _channelCreated = new AsyncEvent<ChannelEventArgs>(nameof(ChannelCreated));
+		private Task RaiseChannelCreated(Channel channel)
+			=> RaiseEvent(_channelCreated, new ChannelEventArgs(channel));
+
+		public event AsyncEventHandler<ChannelEventArgs> ChannelDestroyed { add { _channelDestroyed.Add(value); } remove { _channelDestroyed.Remove(value); } }
+		private readonly AsyncEvent<ChannelEventArgs> _channelDestroyed = new AsyncEvent<ChannelEventArgs>(nameof(ChannelDestroyed));
+		private Task RaiseChannelDestroyed(Channel channel)
+			=> RaiseEvent(_channelDestroyed, new ChannelEventArgs(channel));
+
+		public event AsyncEventHandler<ChannelEventArgs> ChannelUpdated { add { _channelUpdated.Add(value); } remove { _channelUpdated.Remove(value); } }
+		private readonly AsyncEvent<ChannelEventArgs> _channelUpdated = new AsyncEvent<ChannelEventArgs>(nameof(ChannelUpdated));
+		private Task RaiseChannelUpdated(Channel channel)
+			=> RaiseEvent(_channelUpdated, new ChannelEventArgs(channel));
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>
 		public IEnumerable<Channel> PrivateChannels { get { CheckReady(); return _channels.PrivateChannels; } }

@@ -107,7 +107,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
+						RaiseLogMessage(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -282,7 +282,7 @@ namespace Discord.Net.WebSockets
 								}
 
 								/*if (_logLevel >= LogMessageSeverity.Debug)
-									RaiseOnLog(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");*/
+									RaiseLogMessage(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");*/
 
 								long userId;
 								if (_ssrcMapping.TryGetValue(ssrc, out userId))
@@ -404,7 +404,7 @@ namespace Discord.Net.WebSockets
 							}
 							catch (SocketException ex)
 							{
-								RaiseOnLog(LogMessageSeverity.Error, "Failed to send UDP packet.", ex);
+								RaiseLogMessage(LogMessageSeverity.Error, "Failed to send UDP packet.", ex);
 							}
 							hasFrame = false;
 						}
@@ -511,7 +511,7 @@ namespace Discord.Net.WebSockets
 					break;
 				default:
 					if (_logLevel >= LogMessageSeverity.Warning)
-						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
+						RaiseLogMessage(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
 					break;
 			}
 		}

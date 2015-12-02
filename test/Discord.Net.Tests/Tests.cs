@@ -9,7 +9,7 @@ namespace Discord.Tests
 {
 	//TODO: Tests are massively incomplete and out of date, needing a full rewrite
 
-	[TestClass]
+	/*[TestClass]
 	public class Tests
 	{
 		private const int EventTimeout = 5000; //Max time in milliseconds to wait for an event response from our test actions
@@ -167,5 +167,5 @@ namespace Discord.Tests
 		{
 			Task.WaitAll(tasks.Where(x => x != null).SelectMany(x => x).ToArray());
 		}
-	}
+	}*/
 }
