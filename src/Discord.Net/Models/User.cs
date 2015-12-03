@@ -41,7 +41,6 @@ namespace Discord
 		public bool IsServerMuted { get; private set; }
 		public bool IsServerDeafened { get; private set; }
 		public bool IsServerSuppressed { get; private set; }
-		public bool IsSpeaking { get; internal set; }
 		public bool IsPrivate => _server.Id == null;
 
 		public string SessionId { get; private set; }
@@ -116,6 +115,9 @@ namespace Discord
 				}
 			}
 		}
+
+		/// <summary> Returns the string used to mention this user. </summary>
+		public string Mention => $"<@{Id}>";
 
 		internal User(DiscordClient client, long id, long? serverId)
 			: base(client, id)

@@ -8,7 +8,6 @@ namespace Discord
 {
 	public sealed class GlobalUser : CachedObject<long>
 	{
-
 		/// <summary> Returns the email for this user. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
 		public string Email { get; private set; }
@@ -38,6 +37,9 @@ namespace Discord
 		[JsonProperty]
 		private IEnumerable<long> ServerIds => _users.Select(x => x.Key);
 		private readonly ConcurrentDictionary<long, User> _users;
+
+		/// <summary> Returns the string used to mention this user. </summary>
+		public string Mention => $"<@{Id}>";
 
 		internal GlobalUser(DiscordClient client, long id)
 			: base(client, id)

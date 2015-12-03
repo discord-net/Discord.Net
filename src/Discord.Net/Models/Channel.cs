@@ -91,6 +91,9 @@ namespace Discord
 		private PermissionOverwrite[] _permissionOverwrites;
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites { get { return _permissionOverwrites; } internal set { _permissionOverwrites = value.ToArray(); } }
 
+		/// <summary> Returns the string used to mention this channel. </summary>
+		public string Mention => $"<#{Id}>";
+
 		internal Channel(DiscordClient client, long id, long? serverId, long? recipientId)
 			: base(client, id)
 		{

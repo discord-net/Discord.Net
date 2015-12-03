@@ -1,12 +1,13 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord
 {
 	public sealed class Role : CachedObject<long>
-	{		
+	{
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
 		/// <summary> If true, this role is displayed isolated from other users. </summary>
@@ -37,6 +38,9 @@ namespace Discord
 		[JsonProperty]
 		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
 		//TODO: Add local members cache
+
+		/// <summary> Returns the string used to mention this role. </summary>
+		public string Mention { get { if (IsEveryone) return "@everyone"; else throw new InvalidOperationException("Discord currently only supports referencing the everyone role"); } }
 
 		internal Role(DiscordClient client, long id, long serverId)
 			: base(client, id)
