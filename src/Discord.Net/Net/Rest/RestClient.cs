@@ -91,7 +91,7 @@ namespace Discord.Net.Rest
 			if (content != null)
 				requestJson = JsonConvert.SerializeObject(content);
 
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
@@ -101,10 +101,10 @@ namespace Discord.Net.Rest
 				throw new Exception("API check failed: Response is not empty.");
 #endif
 
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (content != null && _config.LogLevel >= LogMessageSeverity.Debug)
+				if (content != null && _config.LogLevel >= LogSeverity.Debug)
 				{
 					if (path.StartsWith(Endpoints.Auth))
                         RaiseOnRequest(method, path, "[Hidden]", stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
@@ -130,7 +130,7 @@ namespace Discord.Net.Rest
 		{
 			Stopwatch stopwatch = null;
 
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await _engine.SendFile(method, path, filename, stream, _cancelToken).ConfigureAwait(false);
@@ -140,10 +140,10 @@ namespace Discord.Net.Rest
 				throw new Exception("API check failed: Response is not empty.");
 #endif
 
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
+			if (_config.LogLevel >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (_config.LogLevel >= LogMessageSeverity.Debug)
+				if (_config.LogLevel >= LogSeverity.Debug)
 					RaiseOnRequest(method, path, filename, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 				else
                     RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);

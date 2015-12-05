@@ -4,7 +4,7 @@ namespace Discord
 {
 	public sealed class TimeoutException : OperationCanceledException
 	{
-		internal TimeoutException()
+		public TimeoutException()
 			: base("An operation has timed out.")
 		{
 		}

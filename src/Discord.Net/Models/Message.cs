@@ -94,7 +94,7 @@ namespace Discord
 		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
 		public bool IsMentioningMe { get; private set; }
 		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUserId == _user.Id;
+		public bool IsAuthor => _client.CurrentUser.Id == _user.Id;
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>

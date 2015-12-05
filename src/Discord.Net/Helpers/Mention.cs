@@ -6,8 +6,8 @@ namespace Discord
 {
     public static class Mention
 	{
-		private static readonly Regex _userRegex = new Regex(@"<@([0-9]+?)>", RegexOptions.Compiled);
-		private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+?)>", RegexOptions.Compiled);
+		private static readonly Regex _userRegex = new Regex(@"<@([0-9]+)>", RegexOptions.Compiled);
+		private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
 		private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
 		
 		/// <summary> Returns the string used to create a user mention. </summary>

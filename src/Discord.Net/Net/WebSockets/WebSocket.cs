@@ -21,8 +21,7 @@ namespace Discord.Net.WebSockets
 	public abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
-		protected readonly DiscordWSClient _client;
-		protected readonly LogMessageSeverity _logLevel;
+		protected readonly DiscordClient _client;
 		protected readonly ManualResetEventSlim _connectedEvent;
 
 		protected ExceptionDispatchInfo _disconnectReason;
@@ -38,24 +37,48 @@ namespace Discord.Net.WebSockets
 		private CancellationTokenSource _cancelTokenSource;
 		protected CancellationToken _cancelToken;
 
-		public string Host { get; set; }
+		internal JsonSerializer Serializer => _serializer;
+		protected JsonSerializer _serializer;
+
+		public Logger Logger => _logger;
+		protected readonly Logger _logger;
+
+		public string Host { get { return _host; } set { _host = value; } }
+		private string _host;
 
 		public WebSocketState State => (WebSocketState)_state;
 		protected int _state;
 
-		public WebSocket(DiscordWSClient client)
+		public event EventHandler Connected;
+		private void RaiseConnected()
+		{
+			if (_logger.Level >= LogSeverity.Info)
+				_logger.Log(LogSeverity.Info, "Connected");
+			if (Connected != null)
+				Connected(this, EventArgs.Empty);
+		}
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
+		private void RaiseDisconnected(bool wasUnexpected, Exception error)
+		{
+			if (_logger.Level >= LogSeverity.Info)
+				_logger.Log(LogSeverity.Info, "Disconnected");
+			if (Disconnected != null)
+				Disconnected(this, new DisconnectedEventArgs(wasUnexpected, error));
+		}
+
+		public WebSocket(DiscordClient client, Logger logger)
 		{
 			_client = client;
-			_logLevel = client.Config.LogLevel;
+			_logger = logger;
 
 			_loginTimeout = client.Config.ConnectionTimeout;
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
 #if !DOTNET5_4
-			_engine = new WebSocketSharpEngine(this, client.Config);
+			_engine = new WebSocketSharpEngine(this, client.Config, _logger);
 #else
-			//_engine = new BuiltInWebSocketEngine(this, client.Config);
+			//_engine = new BuiltInWebSocketEngine(this, client.Config, _logger);
 #endif
 			_engine.BinaryMessage += (s, e) =>
 			{
@@ -73,6 +96,19 @@ namespace Discord.Net.WebSockets
 			{
 				/*await*/ ProcessMessage(e.Message).Wait();
 			};
+
+			_serializer = new JsonSerializer();
+			_serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+#if TEST_RESPONSES
+			_serializer.CheckAdditionalContent = true;
+			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
+#else
+			_serializer.Error += (s, e) =>
+			{
+				e.ErrorContext.Handled = true;
+				_logger.Log(LogSeverity.Error, "Serialization Failed", e.ErrorContext.Error);
+			};
+#endif
 		}
 
 		protected async Task BeginConnect()
@@ -87,25 +123,6 @@ namespace Discord.Net.WebSockets
 				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
 
 				_state = (int)WebSocketState.Connecting;
-			}
-			catch (Exception ex)
-			{
-				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
-				throw;
-			}
-		}
-
-		protected virtual async Task Start()
-		{
-            try
-			{
-				if (_state != (int)WebSocketState.Connecting)
-					throw new InvalidOperationException("Socket is in the wrong state.");
-
-				_lastHeartbeat = DateTime.UtcNow;
-				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
-
-				_runTask = RunTasks();
 			}
 			catch (Exception ex)
 			{
@@ -145,7 +162,7 @@ namespace Discord.Net.WebSockets
 
 				_cancelTokenSource.Cancel();
 				if (_disconnectState == WebSocketState.Connecting) //_runTask was never made
-					await Cleanup().ConfigureAwait(false);
+					await Stop().ConfigureAwait(false);
 			}
 
 			if (!skipAwait)
@@ -153,6 +170,25 @@ namespace Discord.Net.WebSockets
 				Task task = _runTask;
 				if (_runTask != null)
 					await task.ConfigureAwait(false);
+			}
+		}
+
+		protected virtual async Task Start()
+		{
+            try
+			{
+				if (_state != (int)WebSocketState.Connecting)
+					throw new InvalidOperationException("Socket is in the wrong state.");
+
+				_lastHeartbeat = DateTime.UtcNow;
+				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
+
+				_runTask = RunTasks();
+			}
+			catch (Exception ex)
+			{
+				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
+				throw;
 			}
 		}
 
@@ -174,7 +210,7 @@ namespace Discord.Net.WebSockets
 			catch { }
 
 			//Start cleanup
-			await Cleanup().ConfigureAwait(false);
+			await Stop().ConfigureAwait(false);
 		}
 		protected virtual IEnumerable<Task> GetTasks()
 		{
@@ -182,7 +218,8 @@ namespace Discord.Net.WebSockets
 			return _engine.GetTasks(cancelToken)
 				.Concat(new Task[] { HeartbeatAsync(cancelToken) });
 		}
-		protected virtual async Task Cleanup()
+
+		protected virtual async Task Stop()
 		{
 			var disconnectState = _disconnectState;
 			_disconnectState = WebSocketState.Disconnected;
@@ -203,8 +240,8 @@ namespace Discord.Net.WebSockets
 
 		protected virtual Task ProcessMessage(string json)
 		{
-			if (_logLevel >= LogMessageSeverity.Debug)
-				RaiseOnLog(LogMessageSeverity.Debug, $"In: {json}");
+			if (_logger.Level >= LogSeverity.Debug)
+				_logger.Log(LogSeverity.Debug, $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}
 		protected abstract object GetKeepAlive();
@@ -212,8 +249,8 @@ namespace Discord.Net.WebSockets
 		protected void QueueMessage(object message)
 		{
 			string json = JsonConvert.SerializeObject(message);
-			if (_logLevel >= LogMessageSeverity.Debug)
-				RaiseOnLog(LogMessageSeverity.Debug, $"Out: " + json);
+			if (_logger.Level >= LogSeverity.Debug)
+				_logger.Log(LogSeverity.Debug, $"Out: " + json);
 			_engine.QueueMessage(json);
 		}
 

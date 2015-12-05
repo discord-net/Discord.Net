@@ -29,31 +29,31 @@ namespace Discord
 		private void RaiseJoinedServer(Server server)
 		{
 			if (JoinedServer != null)
-				RaiseEvent(nameof(JoinedServer), () => JoinedServer(this, new ServerEventArgs(server)));
+				EventHelper.Raise(_logger, nameof(JoinedServer), () => JoinedServer(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> LeftServer;
 		private void RaiseLeftServer(Server server)
 		{
 			if (LeftServer != null)
-				RaiseEvent(nameof(LeftServer), () => LeftServer(this, new ServerEventArgs(server)));
+				EventHelper.Raise(_logger, nameof(LeftServer), () => LeftServer(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerUpdated;
 		private void RaiseServerUpdated(Server server)
 		{
 			if (ServerUpdated != null)
-				RaiseEvent(nameof(ServerUpdated), () => ServerUpdated(this, new ServerEventArgs(server)));
+				EventHelper.Raise(_logger, nameof(ServerUpdated), () => ServerUpdated(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerUnavailable;
 		private void RaiseServerUnavailable(Server server)
 		{
 			if (ServerUnavailable != null)
-				RaiseEvent(nameof(ServerUnavailable), () => ServerUnavailable(this, new ServerEventArgs(server)));
+				EventHelper.Raise(_logger, nameof(ServerUnavailable), () => ServerUnavailable(this, new ServerEventArgs(server)));
 		}
 		public event EventHandler<ServerEventArgs> ServerAvailable;
 		private void RaiseServerAvailable(Server server)
 		{
 			if (ServerAvailable != null)
-				RaiseEvent(nameof(ServerAvailable), () => ServerAvailable(this, new ServerEventArgs(server)));
+				EventHelper.Raise(_logger, nameof(ServerAvailable), () => ServerAvailable(this, new ServerEventArgs(server)));
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>

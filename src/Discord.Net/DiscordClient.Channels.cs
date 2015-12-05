@@ -50,19 +50,19 @@ namespace Discord
 		private void RaiseChannelCreated(Channel channel)
 		{
 			if (ChannelCreated != null)
-				RaiseEvent(nameof(ChannelCreated), () => ChannelCreated(this, new ChannelEventArgs(channel)));
+				EventHelper.Raise(_logger, nameof(ChannelCreated), () => ChannelCreated(this, new ChannelEventArgs(channel)));
 		}
 		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
 		private void RaiseChannelDestroyed(Channel channel)
 		{
 			if (ChannelDestroyed != null)
-				RaiseEvent(nameof(ChannelDestroyed), () => ChannelDestroyed(this, new ChannelEventArgs(channel)));
+				EventHelper.Raise(_logger, nameof(ChannelDestroyed), () => ChannelDestroyed(this, new ChannelEventArgs(channel)));
 		}
 		public event EventHandler<ChannelEventArgs> ChannelUpdated;
 		private void RaiseChannelUpdated(Channel channel)
 		{
 			if (ChannelUpdated != null)
-				RaiseEvent(nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
+				EventHelper.Raise(_logger, nameof(ChannelUpdated), () => ChannelUpdated(this, new ChannelEventArgs(channel)));
 		}
 
 		/// <summary> Returns a collection of all servers this client is a member of. </summary>

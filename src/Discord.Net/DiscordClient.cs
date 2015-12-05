@@ -6,153 +6,279 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-	/// <summary> Provides a connection to the DiscordApp service. </summary>
-	public sealed partial class DiscordClient : DiscordWSClient
+	public enum DiscordClientState : byte
 	{
-		public static readonly string Version = typeof(DiscordClientConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3);
+		Disconnected,
+		Connecting,
+		Connected,
+		Disconnecting
+	}
 
-		private readonly DiscordAPIClient _api;
+	public class DisconnectedEventArgs : EventArgs
+	{
+		public readonly bool WasUnexpected;
+		public readonly Exception Error;
+
+		public DisconnectedEventArgs(bool wasUnexpected, Exception error)
+		{
+			WasUnexpected = wasUnexpected;
+			Error = error;
+		}
+	}
+	public sealed class LogMessageEventArgs : EventArgs
+	{
+		public LogSeverity Severity { get; }
+		public string Source { get; }
+		public string Message { get; }
+		public Exception Exception { get; }
+
+		public LogMessageEventArgs(LogSeverity severity, string source, string msg, Exception exception)
+		{
+			Severity = severity;
+			Source = source;
+			Message = msg;
+			Exception = exception;
+		}
+	}
+
+	/// <summary> Provides a connection to the DiscordApp service. </summary>
+	public partial class DiscordClient
+	{
+		public static readonly string Version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
+
+		private readonly ManualResetEvent _disconnectedEvent;
+		private readonly ManualResetEventSlim _connectedEvent;
 		private readonly Random _rand;
 		private readonly JsonSerializer _messageImporter;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly Dictionary<Type, object> _singletons;
+		private readonly LogService _log;
+		private readonly object _cacheLock;
+		private Logger _logger, _restLogger, _cacheLogger;
 		private bool _sentInitialLog;
+		private long? _userId;
 		private UserStatus _status;
 		private int? _gameId;
+		private Task _runTask;
+		private ExceptionDispatchInfo _disconnectReason;
+		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public new DiscordClientConfig Config => _config as DiscordClientConfig;
+		public DiscordClientConfig Config => _config;
+		private readonly DiscordClientConfig _config;
+		
+		/// <summary> Returns the current connection state of this client. </summary>
+		public DiscordClientState State => (DiscordClientState)_state;
+		private int _state;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
-		public DiscordAPIClient API => _api;
-		
+		public DiscordAPIClient APIClient => _api;
+		private readonly DiscordAPIClient _api;
+
+		/// <summary> Returns the internal websocket object. </summary>
+		public DataWebSocket WebSocket => _webSocket;
+		private readonly DataWebSocket _webSocket;
+
+		public string GatewayUrl => _gateway;
+		private string _gateway;
+
+		public string Token => _token;
+		private string _token;
+
+		/// <summary> Returns a cancellation token that triggers when the client is manually disconnected. </summary>
+		public CancellationToken CancelToken => _cancelToken;
+		private CancellationTokenSource _cancelTokenSource;
+		private CancellationToken _cancelToken;
+
+		public event EventHandler Connected;
+		private void RaiseConnected()
+		{
+			if (Connected != null)
+				EventHelper.Raise(_logger, nameof(Connected), () => Connected(this, EventArgs.Empty));
+		}
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
+		private void RaiseDisconnected(DisconnectedEventArgs e)
+		{
+			if (Disconnected != null)
+				EventHelper.Raise(_logger, nameof(Disconnected), () => Disconnected(this, e));
+		}
+
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
 		public DiscordClient(DiscordClientConfig config = null)
-			: base(config ?? new DiscordClientConfig())
 		{
+			_config = config ?? new DiscordClientConfig();
+			_config.Lock();
+
 			_rand = new Random();
+			_state = (int)DiscordClientState.Disconnected;
+			_status = UserStatus.Online;
+
+			//Services
+			_singletons = new Dictionary<Type, object>();
+			_log = AddService(new LogService());
+			CreateMainLogger();
+
+			//Async
+			_cancelToken = new CancellationToken(true);
+			_disconnectedEvent = new ManualResetEvent(true);
+			_connectedEvent = new ManualResetEventSlim(false);
+			
+			//Cache
+			_cacheLock = new object();
+			_channels = new Channels(this, _cacheLock);
+			_users = new Users(this, _cacheLock);
+			_messages = new Messages(this, _cacheLock, Config.MessageCacheLength > 0);
+			_roles = new Roles(this, _cacheLock);
+			_servers = new Servers(this, _cacheLock);
+			_globalUsers = new GlobalUsers(this, _cacheLock);
+			CreateCacheLogger();
+
+			//Networking
+			_webSocket = CreateWebSocket();
 			_api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
-
-			object cacheLock = new object();
-			_channels = new Channels(this, cacheLock);
-			_users = new Users(this, cacheLock);
-			_messages = new Messages(this, cacheLock, Config.MessageCacheLength > 0);
-			_roles = new Roles(this, cacheLock);
-			_servers = new Servers(this, cacheLock);
-			_globalUsers = new GlobalUsers(this, cacheLock);
-			_singletons = new Dictionary<Type, object>();
-
-			_status = UserStatus.Online;
-
 			this.Connected += async (s, e) =>
 			{
 				_api.CancelToken = _cancelToken;
 				await SendStatus().ConfigureAwait(false);
 			};
-			
-			if (_config.LogLevel >= LogMessageSeverity.Info)
-			{
-				JoinedServer += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Created: {e.Server?.Name ?? "[Private]"}");
-				LeftServer += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
-				ServerUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Updated: {e.Server?.Name ?? "[Private]"}");
-				ServerAvailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Available: {e.Server?.Name ?? "[Private]"}");
-				ServerUnavailable += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
-				ChannelCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				MessageReceived += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				RoleCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleDeleted += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				UserBanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
-				UserUnbanned += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
-				UserJoined += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserLeft += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserVoiceStateUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				ProfileUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.Client,
-					"Profile Updated");
-			}
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-			{
-				UserIsTypingUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client,
-					$"User Updated (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
-				MessageReadRemotely += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageSent += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				UserPresenceUpdated += (s, e) => RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, 
-					$"User Updated (Presence): {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
-				
-				_api.RestClient.OnRequest += (s, e) =>
-				{
-                    if (e.Payload != null)
-						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Rest, $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
-					else
-						RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Rest, $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
-				};
-			}
-			if (_config.LogLevel >= LogMessageSeverity.Debug)
-			{
-                _channels.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Channels");
-				_users.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
-				_messages.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemRemapped += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
-				_messages.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Messages");
-				_roles.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Roles");
-				_servers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created Server {e.Item.Id}");
-				_servers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed Server {e.Item.Id}");
-				_servers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Servers");
-				_globalUsers.ItemCreated += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Created User {e.Item.Id}");
-				_globalUsers.ItemDestroyed += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Destroyed User {e.Item.Id}");
-				_globalUsers.Cleared += (s, e) => RaiseOnLog(LogMessageSeverity.Debug, LogMessageSource.Cache, $"Cleared Users");
-			}
+			CreateRestLogger();
 
-			if (Config.UseMessageQueue)
-				_pendingMessages = new ConcurrentQueue<Message>();
-			
+			//Import/Export
 			_messageImporter = new JsonSerializer();
 			_messageImporter.ContractResolver = new Message.ImportResolver();
-        }
+		}
+
+		private void CreateMainLogger()
+		{
+			_logger = _log.CreateLogger("Client");
+			if (_logger.Level >= LogSeverity.Info)
+			{
+				JoinedServer += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Server Created: {e.Server?.Name ?? "[Private]"}");
+				LeftServer += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
+				ServerUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Server Updated: {e.Server?.Name ?? "[Private]"}");
+				ServerAvailable += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Server Available: {e.Server?.Name ?? "[Private]"}");
+				ServerUnavailable += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
+				ChannelCreated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				ChannelDestroyed += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				ChannelUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				MessageReceived += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageDeleted += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				RoleCreated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				RoleUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				RoleDeleted += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				UserBanned += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
+				UserUnbanned += (s, e) => _logger.Log(LogSeverity.Info,
+					$"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+				UserJoined += (s, e) => _logger.Log(LogSeverity.Info,
+					$"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserLeft += (s, e) => _logger.Log(LogSeverity.Info,
+					$"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserVoiceStateUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				ProfileUpdated += (s, e) => _logger.Log(LogSeverity.Info,
+					"Profile Updated");
+			}
+			if (_log.Level >= LogSeverity.Verbose)
+			{
+				UserIsTypingUpdated += (s, e) => _logger.Log(LogSeverity.Verbose,
+					$"User Updated (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
+				MessageReadRemotely += (s, e) => _logger.Log(LogSeverity.Verbose,
+					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageSent += (s, e) => _logger.Log(LogSeverity.Verbose,
+					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				UserPresenceUpdated += (s, e) => _logger.Log(LogSeverity.Verbose,
+					$"User Updated (Presence): {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
+			}
+		}
+		private void CreateRestLogger()
+		{
+			_restLogger = _log.CreateLogger("Rest");
+			if (_log.Level >= LogSeverity.Verbose)
+			{
+				_api.RestClient.OnRequest += (s, e) =>
+				{
+					if (e.Payload != null)
+						_restLogger.Log(LogSeverity.Verbose, $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
+					else
+						_restLogger.Log(LogSeverity.Verbose, $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
+				};
+			}
+		}
+		private void CreateCacheLogger()
+		{
+			_cacheLogger = _log.CreateLogger("Cache");
+			if (_log.Level >= LogSeverity.Debug)
+			{
+				_channels.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_channels.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_channels.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Channels");
+				_users.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_users.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_users.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Users");
+				_messages.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemRemapped += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
+				_messages.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Messages");
+				_roles.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_roles.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_roles.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Roles");
+				_servers.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created Server {e.Item.Id}");
+				_servers.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed Server {e.Item.Id}");
+				_servers.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Servers");
+				_globalUsers.ItemCreated += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Created User {e.Item.Id}");
+				_globalUsers.ItemDestroyed += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Destroyed User {e.Item.Id}");
+				_globalUsers.Cleared += (s, e) => _cacheLogger.Log(LogSeverity.Debug, $"Cleared Users");
+			}
+		}
+
+		private DataWebSocket CreateWebSocket()
+		{
+			var socket = new DataWebSocket(this, _log.CreateLogger("WebSocket"));
+			socket.Connected += (s, e) =>
+			{
+				if (_state == (int)DiscordClientState.Connecting)
+					CompleteConnect();
+			};
+			socket.Disconnected += async (s, e) =>
+			{
+				RaiseDisconnected(e);
+				if (e.WasUnexpected)
+					await socket.Reconnect(_token).ConfigureAwait(false);
+			};
+
+			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
+			return socket;
+		}
 
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
-		public new async Task<string> Connect(string email, string password)
+		public async Task<string> Connect(string email, string password)
 		{
 			if (!_sentInitialLog)
 				SendInitialLog();
@@ -167,13 +293,13 @@ namespace Discord
 					.Timeout(_config.APITimeout)
 					.ConfigureAwait(false);
 				token = response.Token;
-				if (_config.LogLevel >= LogMessageSeverity.Verbose)
-					RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, "Login successful, got token.");
+				if (_config.LogLevel >= LogSeverity.Verbose)
+					_logger.Log(LogSeverity.Verbose, "Login successful, got token.");
+
+				await Connect(token);
+				return token;
 			}
 			catch (TaskCanceledException) { throw new TimeoutException(); }
-
-			await Connect(token).ConfigureAwait(false);
-			return token;
 		}
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
@@ -185,22 +311,133 @@ namespace Discord
 				await Disconnect().ConfigureAwait(false);
 
 			_api.Token = token;
-			string gateway = (await _api.Gateway()
-					.Timeout(_config.APITimeout)
-					.ConfigureAwait(false)
-				).Url;
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Websocket endpoint: {gateway}");
+			var gatewayResponse = await _api.Gateway().Timeout(_config.APITimeout).ConfigureAwait(false);
+			string gateway = gatewayResponse.Url;
+			if (_config.LogLevel >= LogSeverity.Verbose)
+				_logger.Log(LogSeverity.Verbose, $"Websocket endpoint: {gateway}");
 
-			await base.Connect(gateway, token)
-				.Timeout(_config.ConnectionTimeout)
-				.ConfigureAwait(false);
+			try
+			{
+				_state = (int)DiscordClientState.Connecting;
+				_disconnectedEvent.Reset();
+
+				_gateway = gateway;
+				_token = token;
+
+				_cancelTokenSource = new CancellationTokenSource();
+				_cancelToken = _cancelTokenSource.Token;
+
+				_webSocket.Host = gateway;
+				_webSocket.ParentCancelToken = _cancelToken;
+				await _webSocket.Login(token).ConfigureAwait(false);
+
+				_runTask = RunTasks();
+
+				try
+				{
+					//Cancel if either Disconnect is called, data socket errors or timeout is reached
+					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _webSocket.CancelToken).Token;
+					_connectedEvent.Wait(cancelToken);
+				}
+				catch (OperationCanceledException)
+				{
+					_webSocket.ThrowError(); //Throws data socket's internal error if any occured
+					throw;
+				}
+
+				//_state = (int)DiscordClientState.Connected;
+			}
+			catch
+			{
+				await Disconnect().ConfigureAwait(false);
+				throw;
+			}
+		}
+		private void CompleteConnect()
+		{
+			_state = (int)DiscordClientState.Connected;
+			_connectedEvent.Set();
+			RaiseConnected();
 		}
 
-		protected override async Task Cleanup()
+		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
+		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
+		private async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
 		{
-			await base.Cleanup().ConfigureAwait(false);
+			int oldState;
+			bool hasWriterLock;
 
+			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
+			oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connecting);
+			if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
+			hasWriterLock = oldState == (int)DiscordClientState.Connecting; //Caused state change
+			if (!hasWriterLock)
+			{
+				oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connected);
+				if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
+				hasWriterLock = oldState == (int)DiscordClientState.Connected; //Caused state change
+			}
+
+			if (hasWriterLock)
+			{
+				_wasDisconnectUnexpected = isUnexpected;
+				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
+
+				_cancelTokenSource.Cancel();
+				/*if (_disconnectState == DiscordClientState.Connecting) //_runTask was never made
+					await Cleanup().ConfigureAwait(false);*/
+			}
+
+			if (!skipAwait)
+			{
+				Task task = _runTask;
+				if (_runTask != null)
+					await task.ConfigureAwait(false);
+			}
+		}
+
+		private async Task RunTasks()
+		{
+			List<Task> tasks = new List<Task>();
+			tasks.Add(_cancelToken.Wait());
+			if (Config.UseMessageQueue)
+				tasks.Add(MessageQueueLoop());
+
+			Task[] tasksArray = tasks.ToArray();
+			Task firstTask = Task.WhenAny(tasksArray);
+			Task allTasks = Task.WhenAll(tasksArray);
+
+			//Wait until the first task ends/errors and capture the error
+			try { await firstTask.ConfigureAwait(false); }
+			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
+
+			//Ensure all other tasks are signaled to end.
+			await DisconnectInternal(skipAwait: true).ConfigureAwait(false);
+
+			//Wait for the remaining tasks to complete
+			try { await allTasks.ConfigureAwait(false); }
+			catch { }
+
+			//Start cleanup
+			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
+			_wasDisconnectUnexpected = false;
+
+			await _webSocket.Disconnect().ConfigureAwait(false);
+
+			_userId = null;
+			_gateway = null;
+			_token = null;
+
+			if (!wasDisconnectUnexpected)
+			{
+				_state = (int)DiscordClientState.Disconnected;
+				_disconnectedEvent.Set();
+			}
+			_connectedEvent.Reset();
+			_runTask = null;
+		}
+		private async Task Stop()
+		{
 			if (Config.UseMessageQueue)
 			{
 				Message ignored;
@@ -247,16 +484,8 @@ namespace Discord
 		public T GetService<T>(bool required = true)
 			where T : class, IService
 			=> GetSingleton<T>(required);
-
-		protected override IEnumerable<Task> GetTasks()
-		{
-			if (Config.UseMessageQueue)
-				return base.GetTasks().Concat(new Task[] { MessageQueueLoop() });
-			else
-				return base.GetTasks();
-		}
 		
-		protected override async Task OnReceivedEvent(WebSocketEventEventArgs e)
+		private async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
 			{
@@ -265,8 +494,7 @@ namespace Discord
 					//Global
 					case "READY": //Resync 
 						{
-							base.OnReceivedEvent(e).Wait(); //This cannot be an await, or we'll get later messages before we're ready
-							var data = e.Payload.ToObject<ReadyEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<ReadyEvent>(_webSocket.Serializer);
 							_privateUser = _users.GetOrAdd(data.User.Id, null);
 							_privateUser.Update(data.User);
 							_privateUser.Global.Update(data.User);
@@ -291,7 +519,7 @@ namespace Discord
 					//Servers
 					case "GUILD_CREATE":
 						{
-							var data = e.Payload.ToObject<GuildCreateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<GuildCreateEvent>(_webSocket.Serializer);
 							if (data.Unavailable != true)
 							{
 								var server = _servers.GetOrAdd(data.Id);
@@ -305,7 +533,7 @@ namespace Discord
 						break;
 					case "GUILD_UPDATE":
 						{
-							var data = e.Payload.ToObject<GuildUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<GuildUpdateEvent>(_webSocket.Serializer);
 							var server = _servers[data.Id];
 							if (server != null)
 							{
@@ -316,7 +544,7 @@ namespace Discord
 						break;
 					case "GUILD_DELETE":
 						{
-							var data = e.Payload.ToObject<GuildDeleteEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<GuildDeleteEvent>(_webSocket.Serializer);
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
 							{
@@ -331,7 +559,7 @@ namespace Discord
 					//Channels
 					case "CHANNEL_CREATE":
 						{
-							var data = e.Payload.ToObject<ChannelCreateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<ChannelCreateEvent>(_webSocket.Serializer);
 							Channel channel;
 							if (data.IsPrivate)
 							{
@@ -347,7 +575,7 @@ namespace Discord
 						break;
 					case "CHANNEL_UPDATE":
 						{
-							var data = e.Payload.ToObject<ChannelUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<ChannelUpdateEvent>(_webSocket.Serializer);
 							var channel = _channels[data.Id];
 							if (channel != null)
 							{
@@ -358,7 +586,7 @@ namespace Discord
 						break;
 					case "CHANNEL_DELETE":
 						{
-							var data = e.Payload.ToObject<ChannelDeleteEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<ChannelDeleteEvent>(_webSocket.Serializer);
 							var channel = _channels.TryRemove(data.Id);
 							if (channel != null)
 								RaiseChannelDestroyed(channel);
@@ -368,7 +596,7 @@ namespace Discord
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Payload.ToObject<MemberAddEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MemberAddEvent>(_webSocket.Serializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							user.Update(data);
 							if (Config.TrackActivity)
@@ -378,7 +606,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MemberUpdateEvent>(_webSocket.Serializer);
 							var user = _users[data.User.Id, data.GuildId];
 							if (user != null)
 							{
@@ -389,7 +617,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Payload.ToObject<MemberRemoveEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MemberRemoveEvent>(_webSocket.Serializer);
 							var user = _users.TryRemove(data.UserId, data.GuildId);
 							if (user != null)
 								RaiseUserLeft(user);
@@ -397,7 +625,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBERS_CHUNK":
 						{
-							var data = e.Payload.ToObject<MembersChunkEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MembersChunkEvent>(_webSocket.Serializer);
 							foreach (var memberData in data.Members)
 							{
 								var user = _users.GetOrAdd(memberData.User.Id, memberData.GuildId);
@@ -410,7 +638,7 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Payload.ToObject<RoleCreateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<RoleCreateEvent>(_webSocket.Serializer);
 							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
 							role.Update(data.Data);
 							var server = _servers[data.GuildId];
@@ -421,7 +649,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Payload.ToObject<RoleUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<RoleUpdateEvent>(_webSocket.Serializer);
 							var role = _roles[data.Data.Id];
 							if (role != null)
 							{
@@ -432,7 +660,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Payload.ToObject<RoleDeleteEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<RoleDeleteEvent>(_webSocket.Serializer);
 							var role = _roles.TryRemove(data.RoleId);
 							if (role != null)
 							{
@@ -447,7 +675,7 @@ namespace Discord
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Payload.ToObject<BanAddEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<BanAddEvent>(_webSocket.Serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
@@ -459,7 +687,7 @@ namespace Discord
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Payload.ToObject<BanRemoveEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<BanRemoveEvent>(_webSocket.Serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
@@ -473,7 +701,7 @@ namespace Discord
 					//Messages
 					case "MESSAGE_CREATE":
 						{
-							var data = e.Payload.ToObject<MessageCreateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MessageCreateEvent>(_webSocket.Serializer);
 							Message msg = null;
 
 							bool isAuthor = data.Author.Id == _userId;
@@ -500,7 +728,7 @@ namespace Discord
 						break;
 					case "MESSAGE_UPDATE":
 						{
-							var data = e.Payload.ToObject<MessageUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MessageUpdateEvent>(_webSocket.Serializer);
 							var msg = _messages[data.Id];
 							if (msg != null)
 							{
@@ -511,7 +739,7 @@ namespace Discord
 						break;
 					case "MESSAGE_DELETE":
 						{
-							var data = e.Payload.ToObject<MessageDeleteEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MessageDeleteEvent>(_webSocket.Serializer);
 							var msg = _messages.TryRemove(data.Id);
 							if (msg != null)
 								RaiseMessageDeleted(msg);
@@ -519,7 +747,7 @@ namespace Discord
 						break;
 					case "MESSAGE_ACK":
 						{
-							var data = e.Payload.ToObject<MessageAckEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MessageAckEvent>(_webSocket.Serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
 								RaiseMessageReadRemotely(msg);
@@ -529,7 +757,7 @@ namespace Discord
 					//Statuses
 					case "PRESENCE_UPDATE":
 						{
-							var data = e.Payload.ToObject<PresenceUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<PresenceUpdateEvent>(_webSocket.Serializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							if (user != null)
 							{
@@ -540,7 +768,7 @@ namespace Discord
 						break;
 					case "TYPING_START":
 						{
-							var data = e.Payload.ToObject<TypingStartEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<TypingStartEvent>(_webSocket.Serializer);
 							var channel = _channels[data.ChannelId];
 							if (channel != null)
 							{
@@ -566,7 +794,7 @@ namespace Discord
 					//Voice
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_webSocket.Serializer);
 							var user = _users[data.UserId, data.GuildId];
 							if (user != null)
 							{
@@ -585,7 +813,7 @@ namespace Discord
 					//Settings
 					case "USER_UPDATE":
 						{
-							var data = e.Payload.ToObject<UserUpdateEvent>(_dataSocketSerializer);
+							var data = e.Payload.ToObject<UserUpdateEvent>(_webSocket.Serializer);
 							var user = _globalUsers[data.Id];
 							if (user != null)
 							{
@@ -598,35 +826,61 @@ namespace Discord
 					//Ignored
 					case "USER_SETTINGS_UPDATE":
 					case "GUILD_INTEGRATIONS_UPDATE":
-                        break;
-
-					//Internal (handled in DataWebSocket)
-					case "RESUMED":
-						break;
-
-					//Pass to DiscordWSClient
 					case "VOICE_SERVER_UPDATE":
-						await base.OnReceivedEvent(e).ConfigureAwait(false);
+						break;
+						
+					case "RESUMED": //Handled in DataWebSocket
 						break;
 
 					//Others
 					default:
-						RaiseOnLog(LogMessageSeverity.Warning, LogMessageSource.DataWebSocket, $"Unknown message type: {e.Type}");
+						_webSocket.Logger.Log(LogSeverity.Warning, $"Unknown message type: {e.Type}");
 						break;
 				}
 			}
 			catch (Exception ex)
 			{
-				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
+				_logger.Log(LogSeverity.Error, $"Error handling {e.Type} event", ex);
 			}
 		}
 
 		private void SendInitialLog()
 		{
-			if (_config.LogLevel >= LogMessageSeverity.Verbose)
-				RaiseOnLog(LogMessageSeverity.Verbose, LogMessageSource.Client, $"Config: {JsonConvert.SerializeObject(_config)}");
+			if (_config.LogLevel >= LogSeverity.Verbose)
+				_logger.Log(LogSeverity.Verbose, $"Config: {JsonConvert.SerializeObject(_config)}");
 			_sentInitialLog = true;
         }
+
+
+		//Helpers
+		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+		public void Run(Func<Task> asyncAction)
+		{
+			try
+			{
+				asyncAction().GetAwaiter().GetResult(); //Avoids creating AggregateExceptions
+			}
+			catch (TaskCanceledException) { }
+			_disconnectedEvent.WaitOne();
+		}
+		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+		public void Run()
+		{
+			_disconnectedEvent.WaitOne();
+		}
+
+		private void CheckReady()
+		{
+			switch (_state)
+			{
+				case (int)DiscordClientState.Disconnecting:
+					throw new InvalidOperationException("The client is disconnecting.");
+				case (int)DiscordClientState.Disconnected:
+					throw new InvalidOperationException("The client is not connected to Discord");
+				case (int)DiscordClientState.Connecting:
+					throw new InvalidOperationException("The client is connecting.");
+			}
+		}
 		
 		public void GetCacheStats(out int serverCount, out int channelCount, out int userCount, out int uniqueUserCount, out int messageCount, out int roleCount)
 		{

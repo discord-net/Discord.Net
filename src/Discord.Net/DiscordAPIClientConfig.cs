@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Net;
-using System.Reflection;
 
 namespace Discord
 {
+	public enum LogSeverity : byte
+	{
+		Error = 1,
+		Warning = 2,
+		Info = 3,
+		Verbose = 4,
+		Debug = 5
+	}
+
 	public class DiscordAPIClientConfig
 	{
-		internal static readonly string UserAgent = $"Discord.Net/{DiscordClient.Version} (https://github.com/RogueException/Discord.Net)";
-
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
-		public LogMessageSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
-		private LogMessageSeverity _logLevel = LogMessageSeverity.Info;
+		public LogSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
+		private LogSeverity _logLevel = LogSeverity.Info;
 		
 		/// <summary> Max time (in milliseconds) to wait for an API request to complete. </summary>
 		public int APITimeout { get { return _apiTimeout; } set { SetValue(ref _apiTimeout, value); } }
@@ -22,6 +28,9 @@ namespace Discord
 		/// <summary> The credentials to use for this proxy. </summary>
 		public NetworkCredential ProxyCredentials { get { return _proxyCredentials; } set { SetValue(ref _proxyCredentials, value); } }
 		private NetworkCredential _proxyCredentials = null;
+
+		//Internals
+		internal static readonly string UserAgent = $"Discord.Net/{DiscordClient.Version} (https://github.com/RogueException/Discord.Net)";
 
 		//Lock
 		protected bool _isLocked;

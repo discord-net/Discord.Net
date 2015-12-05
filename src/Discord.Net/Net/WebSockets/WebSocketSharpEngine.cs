@@ -10,7 +10,8 @@ namespace Discord.Net.WebSockets
 {
 	internal class WebSocketSharpEngine : IWebSocketEngine
 	{
-		private readonly DiscordWSClientConfig _config;
+		private readonly DiscordClientConfig _config;
+		private readonly Logger _logger;
 		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly WebSocket _parent;
 		private WSSharpWebSocket _webSocket;
@@ -28,10 +29,11 @@ namespace Discord.Net.WebSockets
 				TextMessage(this, new WebSocketTextMessageEventArgs(msg));
 		}
 
-		internal WebSocketSharpEngine(WebSocket parent, DiscordWSClientConfig config)
+		internal WebSocketSharpEngine(WebSocket parent, DiscordClientConfig config, Logger logger)
 		{
 			_parent = parent;
 			_config = config;
+			_logger = logger;
 			_sendQueue = new ConcurrentQueue<string>();
 		}
 
@@ -51,7 +53,7 @@ namespace Discord.Net.WebSockets
 			};
 			_webSocket.OnError += async (s, e) =>
 			{
-				_parent.RaiseOnLog(LogMessageSeverity.Error, e.Exception?.GetBaseException()?.Message ?? e.Message);
+				_logger.Log(LogSeverity.Error, "WebSocket Error", e.Exception);
 				await _parent.DisconnectInternal(e.Exception, skipAwait: true).ConfigureAwait(false);
 			};
 			_webSocket.OnClose += async (s, e) =>
@@ -61,7 +63,7 @@ namespace Discord.Net.WebSockets
 				Exception ex = new Exception($"Got Close Message ({code}): {reason}");
 				await _parent.DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false);
 			};
-			_webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console
+			_webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console directly
             _webSocket.Connect();
 			return TaskHelper.CompletedTask;
 		}

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Converters
 {
-    internal class LongStringConverter : JsonConverter
+	public class LongStringConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType)
 		{
@@ -19,7 +19,7 @@ namespace Discord.API.Converters
 		}
 	}
 
-	internal class NullableLongStringConverter : JsonConverter
+	public class NullableLongStringConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType)
 		{

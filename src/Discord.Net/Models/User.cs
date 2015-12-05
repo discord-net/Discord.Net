@@ -131,13 +131,13 @@ namespace Discord
 				x =>
 				{
 					x.AddMember(this);
-					if (Id == _client.CurrentUserId)
+					if (Id == _client.CurrentUser.Id)
 						x.CurrentUser = this;
                 }, 
 				x =>
 				{
 					x.RemoveMember(this);
-					if (Id == _client.CurrentUserId)
+					if (Id == _client.CurrentUser.Id)
 						x.CurrentUser = null;
 				});
 			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);

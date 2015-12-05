@@ -54,31 +54,31 @@ namespace Discord
 		private void RaiseMessageReceived(Message msg)
 		{
 			if (MessageReceived != null)
-				RaiseEvent(nameof(MessageReceived), () => MessageReceived(this, new MessageEventArgs(msg)));
+				EventHelper.Raise(_logger, nameof(MessageReceived), () => MessageReceived(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageSent;
 		private void RaiseMessageSent(Message msg)
 		{
 			if (MessageSent != null)
-				RaiseEvent(nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
+				EventHelper.Raise(_logger, nameof(MessageSent), () => MessageSent(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageDeleted;
 		private void RaiseMessageDeleted(Message msg)
 		{
 			if (MessageDeleted != null)
-				RaiseEvent(nameof(MessageDeleted), () => MessageDeleted(this, new MessageEventArgs(msg)));
+				EventHelper.Raise(_logger, nameof(MessageDeleted), () => MessageDeleted(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageUpdated;
 		private void RaiseMessageUpdated(Message msg)
 		{
 			if (MessageUpdated != null)
-				RaiseEvent(nameof(MessageUpdated), () => MessageUpdated(this, new MessageEventArgs(msg)));
+				EventHelper.Raise(_logger, nameof(MessageUpdated), () => MessageUpdated(this, new MessageEventArgs(msg)));
 		}
 		public event EventHandler<MessageEventArgs> MessageReadRemotely;
 		private void RaiseMessageReadRemotely(Message msg)
 		{
 			if (MessageReadRemotely != null)
-				RaiseEvent(nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
+				EventHelper.Raise(_logger, nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
 		}
 		
 		internal Messages Messages => _messages;

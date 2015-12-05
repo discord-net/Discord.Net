@@ -26,8 +26,8 @@ namespace Discord.Net.WebSockets
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public DataWebSocket(DiscordWSClient client)
-			: base(client)
+		public DataWebSocket(DiscordClient client, Logger logger)
+			: base(client, logger)
 		{
 		}
 
@@ -72,7 +72,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						RaiseOnLog(LogMessageSeverity.Error, $"Reconnect failed: {ex.GetBaseException().Message}");
+						_logger.Log(LogSeverity.Error, $"Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -96,13 +96,13 @@ namespace Discord.Net.WebSockets
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
 						{
-							var payload = token.ToObject<ReadyEvent>(_client.DataSocketSerializer);
+							var payload = token.ToObject<ReadyEvent>(_serializer);
 							_sessionId = payload.SessionId;
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
 						else if (msg.Type == "RESUMED")
 						{
-							var payload = token.ToObject<ResumedEvent>(_client.DataSocketSerializer);
+							var payload = token.ToObject<ResumedEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
 						RaiseReceivedEvent(msg.Type, token);
@@ -112,19 +112,19 @@ namespace Discord.Net.WebSockets
 					break;
 				case OpCodes.Redirect:
 					{
-						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_client.DataSocketSerializer);
+						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_serializer);
 						if (payload.Url != null)
 						{
 							Host = payload.Url;
-							if (_logLevel >= LogMessageSeverity.Info)
-								RaiseOnLog(LogMessageSeverity.Info, "Redirected to " + payload.Url);
+							if (_logger.Level >= LogSeverity.Info)
+								_logger.Log(LogSeverity.Info, "Redirected to " + payload.Url);
 							await Redirect(payload.Url).ConfigureAwait(false);
 						}
 					}
 					break;
 				default:
-					if (_logLevel >= LogMessageSeverity.Warning)
-						RaiseOnLog(LogMessageSeverity.Warning, $"Unknown Opcode: {opCode}");
+					if (_logger.Level >= LogSeverity.Warning)
+						_logger.Log(LogSeverity.Warning, $"Unknown Opcode: {opCode}");
 					break;
 			}
 		}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Converters
 {
-	internal class EnumerableLongStringConverter : JsonConverter
+	public class EnumerableLongStringConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType)
 		{

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public static class TaskExtensions
+    internal static class TaskExtensions
 	{
 		public static async Task Timeout(this Task task, int milliseconds)
 		{

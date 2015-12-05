@@ -39,7 +39,7 @@ namespace Discord
 		public string IconUrl => IconId != null ? Endpoints.ServerIcon(Id, IconId) : null;
 
 		/// <summary> Returns true if the current user created this server. </summary>
-		public bool IsOwner => _client.CurrentUserId == _owner.Id;
+		public bool IsOwner => _client.CurrentUser.Id == _owner.Id;
 
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]

@@ -11,6 +11,9 @@ namespace Discord.API
 	//Common
 	public class WebSocketMessage
 	{
+		public WebSocketMessage() { }
+		public WebSocketMessage(int op) { Operation = op; }
+
 		[JsonProperty("op")]
 		public int Operation;
 		[JsonProperty("d")]
@@ -20,12 +23,12 @@ namespace Discord.API
 		[JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
 		public int? Sequence;
 	}
-	internal abstract class WebSocketMessage<T> : WebSocketMessage
+	public abstract class WebSocketMessage<T> : WebSocketMessage
 		where T : new()
 	{
 		public WebSocketMessage() { Payload = new T(); }
-		public WebSocketMessage(int op) { Operation = op; Payload = new T(); }
-		public WebSocketMessage(int op, T payload) { Operation = op; Payload = payload; }
+		public WebSocketMessage(int op) : base(op) { Payload = new T(); }
+		public WebSocketMessage(int op, T payload) : base(op) { Payload = payload; }
 
 		[JsonIgnore]
 		public new T Payload

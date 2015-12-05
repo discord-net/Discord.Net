@@ -73,63 +73,63 @@ namespace Discord
 		private void RaiseUserJoined(User user)
 		{
 			if (UserJoined != null)
-				RaiseEvent(nameof(UserJoined), () => UserJoined(this, new UserEventArgs(user)));
+				EventHelper.Raise(_logger, nameof(UserJoined), () => UserJoined(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserLeft;
 		private void RaiseUserLeft(User user)
 		{
 			if (UserLeft != null)
-				RaiseEvent(nameof(UserLeft), () => UserLeft(this, new UserEventArgs(user)));
+				EventHelper.Raise(_logger, nameof(UserLeft), () => UserLeft(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserUpdated;
 		private void RaiseUserUpdated(User user)
 		{
 			if (UserUpdated != null)
-				RaiseEvent(nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
+				EventHelper.Raise(_logger, nameof(UserUpdated), () => UserUpdated(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserPresenceUpdated;
 		private void RaiseUserPresenceUpdated(User user)
 		{
 			if (UserPresenceUpdated != null)
-				RaiseEvent(nameof(UserPresenceUpdated), () => UserPresenceUpdated(this, new UserEventArgs(user)));
+				EventHelper.Raise(_logger, nameof(UserPresenceUpdated), () => UserPresenceUpdated(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
 		private void RaiseUserVoiceStateUpdated(User user)
 		{
 			if (UserVoiceStateUpdated != null)
-				RaiseEvent(nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
+				EventHelper.Raise(_logger, nameof(UserVoiceStateUpdated), () => UserVoiceStateUpdated(this, new UserEventArgs(user)));
 		}
 		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
 		private void RaiseUserIsTyping(User user, Channel channel)
 		{
 			if (UserIsTypingUpdated != null)
-				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
+				EventHelper.Raise(_logger, nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
 		}
 		public event EventHandler ProfileUpdated;
 		private void RaiseProfileUpdated()
 		{
 			if (ProfileUpdated != null)
-				RaiseEvent(nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
+				EventHelper.Raise(_logger, nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
 		}
 		public event EventHandler<BanEventArgs> UserBanned;
 		private void RaiseUserBanned(long userId, Server server)
 		{
 			if (UserBanned != null)
-				RaiseEvent(nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
+				EventHelper.Raise(_logger, nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
 		}
 		public event EventHandler<BanEventArgs> UserUnbanned;
 		private void RaiseUserUnbanned(long userId, Server server)
 		{
 			if (UserUnbanned != null)
-				RaiseEvent(nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
+				EventHelper.Raise(_logger, nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
 		}
 
-		/// <summary> Returns the current logged-in user in a private channel. </summary>
+		/// <summary> Returns the current logged-in user used in private channels. </summary>
 		internal User PrivateUser => _privateUser;
 		private User _privateUser;
 
 		/// <summary> Returns information about the currently logged-in account. </summary>
-		public GlobalUser CurrentUser { get { CheckReady(); return _privateUser.Global; } }
+		public GlobalUser CurrentUser => _privateUser?.Global;
 
 		/// <summary> Returns a collection of all unique users this client can currently see. </summary>
 		public IEnumerable<GlobalUser> AllUsers { get { CheckReady(); return _globalUsers; } }
@@ -272,7 +272,7 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
-			_dataSocket.SendRequestUsers(server.Id);
+			_webSocket.SendRequestUsers(server.Id);
 		}
 
 		public async Task EditProfile(string currentPassword = "",
@@ -312,7 +312,7 @@ namespace Discord
 		}
 		private Task SendStatus()
 		{
-			_dataSocket.SendStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
+			_webSocket.SendStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
 			return TaskHelper.CompletedTask;
 		}
 	}

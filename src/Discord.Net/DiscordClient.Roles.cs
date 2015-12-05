@@ -29,19 +29,19 @@ namespace Discord
 		private void RaiseRoleCreated(Role role)
 		{
 			if (RoleCreated != null)
-				RaiseEvent(nameof(RoleCreated), () => RoleCreated(this, new RoleEventArgs(role)));
+				EventHelper.Raise(_logger, nameof(RoleCreated), () => RoleCreated(this, new RoleEventArgs(role)));
 		}
 		public event EventHandler<RoleEventArgs> RoleUpdated;
 		private void RaiseRoleDeleted(Role role)
 		{
 			if (RoleDeleted != null)
-				RaiseEvent(nameof(RoleDeleted), () => RoleDeleted(this, new RoleEventArgs(role)));
+				EventHelper.Raise(_logger, nameof(RoleDeleted), () => RoleDeleted(this, new RoleEventArgs(role)));
 		}
 		public event EventHandler<RoleEventArgs> RoleDeleted;
 		private void RaiseRoleUpdated(Role role)
 		{
 			if (RoleUpdated != null)
-				RaiseEvent(nameof(RoleUpdated), () => RoleUpdated(this, new RoleEventArgs(role)));
+				EventHelper.Raise(_logger, nameof(RoleUpdated), () => RoleUpdated(this, new RoleEventArgs(role)));
 		}
 		
 		internal Roles Roles => _roles;
