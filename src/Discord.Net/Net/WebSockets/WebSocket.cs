@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-	internal enum WebSocketState : byte
+	public enum WebSocketState : byte
 	{
 		Disconnected,
 		Connecting,
@@ -18,7 +18,7 @@ namespace Discord.Net.WebSockets
 		Disconnecting
 	}
 
-	internal abstract partial class WebSocket
+	public abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
 		protected readonly DiscordWSClient _client;

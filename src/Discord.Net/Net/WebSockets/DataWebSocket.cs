@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    internal partial class DataWebSocket : WebSocket
+    public partial class DataWebSocket : WebSocket
 	{
-		public enum OpCodes : byte
+		internal enum OpCodes : byte
 		{
 			Dispatch = 0,
 			Heartbeat = 1,
@@ -155,7 +155,7 @@ namespace Discord.Net.WebSockets
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}
-		public void SendGetUsers(long serverId, string query = "", int limit = 0)
+		public void SendRequestUsers(long serverId, string query = "", int limit = 0)
 		{
 			var getOfflineUsers = new GetUsersCommand();
 			getOfflineUsers.Payload.ServerId = serverId;

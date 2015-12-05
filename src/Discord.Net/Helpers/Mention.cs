@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Discord
@@ -10,17 +9,21 @@ namespace Discord
 		private static readonly Regex _userRegex = new Regex(@"<@([0-9]+?)>", RegexOptions.Compiled);
 		private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+?)>", RegexOptions.Compiled);
 		private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
-
+		
 		/// <summary> Returns the string used to create a user mention. </summary>
+		[Obsolete("Use User.Mention instead")]
 		public static string User(User user)
 			=> $"<@{user.Id}>";
 		/// <summary> Returns the string used to create a user mention. </summary>
+		[Obsolete("Use GlobalUser.Mention instead")]
 		public static string User(GlobalUser user)
 			=> $"<@{user.Id}>";
 		/// <summary> Returns the string used to create a channel mention. </summary>
+		[Obsolete("Use Channel.Mention instead")]
 		public static string Channel(Channel channel)
 			=> $"<#{channel.Id}>";
 		/// <summary> Returns the string used to create a mention to everyone in a channel. </summary>
+		[Obsolete("Use Role.Mention instead")]
 		public static string Everyone()
 			=> $"@everyone";
 
@@ -72,7 +75,7 @@ namespace Discord
 			if (source == null) throw new ArgumentNullException(nameof(source));
 			if (text == null) throw new ArgumentNullException(nameof(text));
 
-			return Resolve(source?.Server, text);
+			return Resolve(source.Server, text);
         }
 
 		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
@@ -80,12 +83,12 @@ namespace Discord
 		{
 			if (text == null) throw new ArgumentNullException(nameof(text));
 
-			var client = server.Client;
-            text = Mention.CleanUserMentions(client, server, text);
+			var client = server?.Client;
+            text = CleanUserMentions(client, server, text);
 			if (server != null)
 			{
-				text = Mention.CleanChannelMentions(client, server, text);
-				//text = Mention.CleanRoleMentions(_client, User, channel, text);
+				text = CleanChannelMentions(client, server, text);
+				//text = CleanRoleMentions(_client, User, channel, text);
 			}
 			return text;
 		}

@@ -105,12 +105,6 @@ namespace Discord
 			if (UserIsTypingUpdated != null)
 				RaiseEvent(nameof(UserIsTypingUpdated), () => UserIsTypingUpdated(this, new UserChannelEventArgs(user, channel)));
 		}
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
-		private void RaiseUserIsSpeaking(User user, Channel channel, bool isSpeaking)
-		{
-			if (UserIsSpeakingUpdated != null)
-				RaiseEvent(nameof(UserIsSpeakingUpdated), () => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, channel, isSpeaking)));
-		}
 		public event EventHandler ProfileUpdated;
 		private void RaiseProfileUpdated()
 		{
@@ -278,7 +272,7 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
-			_dataSocket.SendGetUsers(server.Id);
+			_dataSocket.SendRequestUsers(server.Id);
 		}
 
 		public async Task EditProfile(string currentPassword = "",

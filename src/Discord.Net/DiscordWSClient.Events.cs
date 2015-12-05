@@ -26,20 +26,10 @@ namespace Discord
 		public readonly bool WasUnexpected;
 		public readonly Exception Error;
 
-		internal DisconnectedEventArgs(bool wasUnexpected, Exception error) 
+		public DisconnectedEventArgs(bool wasUnexpected, Exception error) 
 		{ 
 			WasUnexpected = wasUnexpected; 
 			Error = error; 
-		}
-	}
-	public class VoiceDisconnectedEventArgs : DisconnectedEventArgs
-	{
-		public readonly long ServerId;
-
-		internal VoiceDisconnectedEventArgs(long serverId, DisconnectedEventArgs e)
-			: base(e.WasUnexpected, e.Error)
-		{
-			ServerId = serverId;
 		}
 	}
 	public sealed class LogMessageEventArgs : EventArgs
@@ -49,7 +39,7 @@ namespace Discord
 		public string Message { get; }
 		public Exception Exception { get; }
 
-		internal LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg, Exception exception)
+		public LogMessageEventArgs(LogMessageSeverity severity, LogMessageSource source, string msg, Exception exception)
 		{ 
 			Severity = severity; 
 			Source = source; 
@@ -66,7 +56,7 @@ namespace Discord
 		public int Offset { get; }
 		public int Count { get; }
 
-		internal VoicePacketEventArgs(long userId, long channelId, byte[] buffer, int offset, int count)
+		public VoicePacketEventArgs(long userId, long channelId, byte[] buffer, int offset, int count)
 		{
 			UserId = userId;
 			Buffer = buffer;
@@ -90,30 +80,10 @@ namespace Discord
 				RaiseEvent(nameof(Disconnected), () => Disconnected(this, e));
 		}
 		public event EventHandler<LogMessageEventArgs> LogMessage;
-		internal void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message, Exception exception = null)
+		protected void RaiseOnLog(LogMessageSeverity severity, LogMessageSource source, string message, Exception exception = null)
 		{
 			if (LogMessage != null)
 				RaiseEvent(nameof(LogMessage), () => LogMessage(this, new LogMessageEventArgs(severity, source, message, exception)));
-		}
-
-		public event EventHandler VoiceConnected;
-		private void RaiseVoiceConnected()
-		{
-			if (VoiceConnected != null)
-				RaiseEvent(nameof(VoiceConnected), () => VoiceConnected(this, EventArgs.Empty));
-		}
-		public event EventHandler<VoiceDisconnectedEventArgs> VoiceDisconnected;
-		private void RaiseVoiceDisconnected(long serverId, DisconnectedEventArgs e)
-		{
-			if (VoiceDisconnected != null)
-				RaiseEvent(nameof(VoiceDisconnected), () => VoiceDisconnected(this, new VoiceDisconnectedEventArgs(serverId, e)));
-		}
-
-		public event EventHandler<VoicePacketEventArgs> OnVoicePacket;
-		internal void RaiseOnVoicePacket(VoicePacketEventArgs e)
-		{
-			if (OnVoicePacket != null)
-				OnVoicePacket(this, e);
 		}
 	}
 }

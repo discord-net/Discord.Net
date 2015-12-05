@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-	internal class WebSocketBinaryMessageEventArgs : EventArgs
+	public class WebSocketBinaryMessageEventArgs : EventArgs
 	{
 		public readonly byte[] Data;
 		public WebSocketBinaryMessageEventArgs(byte[] data) { Data = data; }
 	}
-	internal class WebSocketTextMessageEventArgs : EventArgs
+	public class WebSocketTextMessageEventArgs : EventArgs
 	{
 		public readonly string Message;
 		public WebSocketTextMessageEventArgs(string msg) { Message = msg; }
 	}
 
-	internal interface IWebSocketEngine
+	public interface IWebSocketEngine
 	{
 		event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage;
 		event EventHandler<WebSocketTextMessageEventArgs> TextMessage;

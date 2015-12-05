@@ -19,10 +19,8 @@ namespace Discord
 		private readonly Random _rand;
 		private readonly JsonSerializer _messageImporter;
 		private readonly ConcurrentQueue<Message> _pendingMessages;
-		private readonly ConcurrentDictionary<long, DiscordWSClient> _voiceClients;
 		private readonly Dictionary<Type, object> _singletons;
 		private bool _sentInitialLog;
-		private uint _nextVoiceClientId;
 		private UserStatus _status;
 		private int? _gameId;
 
@@ -40,8 +38,6 @@ namespace Discord
 			_api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
-			if (Config.EnableVoiceMultiserver)
-				_voiceClients = new ConcurrentDictionary<long, DiscordWSClient>();
 
 			object cacheLock = new object();
 			_channels = new Channels(this, cacheLock);
@@ -58,22 +54,6 @@ namespace Discord
 			{
 				_api.CancelToken = _cancelToken;
 				await SendStatus().ConfigureAwait(false);
-			};
-
-			VoiceDisconnected += (s, e) =>
-			{
-				var server = _servers[e.ServerId];
-				if (server != null)
-				{
-					foreach (var member in server.Members)
-					{
-						if (member.IsSpeaking)
-						{
-							member.IsSpeaking = false;
-							RaiseUserIsSpeaking(member, _channels[_voiceSocket.CurrentChannelId], false);
-						}
-					}
-				}
 			};
 			
 			if (_config.LogLevel >= LogMessageSeverity.Info)
@@ -169,27 +149,6 @@ namespace Discord
 			_messageImporter = new JsonSerializer();
 			_messageImporter.ContractResolver = new Message.ImportResolver();
         }
-		internal override VoiceWebSocket CreateVoiceSocket()
-		{
-			var socket = base.CreateVoiceSocket();
-			socket.IsSpeaking += (s, e) =>
-			{
-				if (_voiceSocket.State == WebSocketState.Connected)
-				{
-					var user = _users[e.UserId, socket.CurrentServerId];
-					bool value = e.IsSpeaking;
-					if (user.IsSpeaking != value)
-					{
-						user.IsSpeaking = value;
-						var channel = _channels[_voiceSocket.CurrentChannelId];
-						RaiseUserIsSpeaking(user, channel, value);
-						if (Config.TrackActivity)
-							user.UpdateActivity();
-					}
-				}
-			};
-			return socket;
-		}
 
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
@@ -241,18 +200,6 @@ namespace Discord
 		protected override async Task Cleanup()
 		{
 			await base.Cleanup().ConfigureAwait(false);
-
-			if (_config.VoiceMode != DiscordVoiceMode.Disabled)
-			{
-				if (Config.EnableVoiceMultiserver)
-				{
-					var tasks = _voiceClients
-						.Select(x => x.Value.Disconnect())
-						.ToArray();
-					_voiceClients.Clear();
-					await Task.WhenAll(tasks).ConfigureAwait(false);
-				}
-			}
 
 			if (Config.UseMessageQueue)
 			{
@@ -309,7 +256,7 @@ namespace Discord
 				return base.GetTasks();
 		}
 		
-		internal override async Task OnReceivedEvent(WebSocketEventEventArgs e)
+		protected override async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
 			{
@@ -623,12 +570,12 @@ namespace Discord
 							var user = _users[data.UserId, data.GuildId];
 							if (user != null)
 							{
-								var voiceChannel = user.VoiceChannel;
+								/*var voiceChannel = user.VoiceChannel;
                                 if (voiceChannel != null && data.ChannelId != voiceChannel.Id && user.IsSpeaking)
 								{
 									user.IsSpeaking = false;
 									RaiseUserIsSpeaking(user, _channels[voiceChannel.Id], false);
-								}
+								}*/
 								user.Update(data);
 								RaiseUserVoiceStateUpdated(user);
 							}

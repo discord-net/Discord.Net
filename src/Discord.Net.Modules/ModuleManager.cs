@@ -35,7 +35,6 @@ namespace Discord.Modules
 		public event EventHandler<UserEventArgs> UserPresenceUpdated;
 		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
 		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
 
 		public event EventHandler<MessageEventArgs> MessageReceived;
 		public event EventHandler<MessageEventArgs> MessageSent;
@@ -77,9 +76,7 @@ namespace Discord.Modules
 			if (_allowAll || _useServerWhitelist) //Server-only events
 			{
 				client.ChannelCreated += (s, e) => { if (ChannelCreated != null && HasServer(e.Server)) ChannelCreated(s, e); };
-
 				client.UserVoiceStateUpdated += (s, e) => { if (UserVoiceStateUpdated != null && HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
-				client.UserIsSpeakingUpdated += (s, e) => { if (UserIsSpeakingUpdated != null && HasServer(e.Server)) UserIsSpeakingUpdated(s, e); };
 			}
 
 			client.ChannelDestroyed += (s, e) => { if (ChannelDestroyed != null && HasChannel(e.Channel)) ChannelDestroyed(s, e); };
@@ -103,7 +100,7 @@ namespace Discord.Modules
 			client.UserJoined += (s, e) => { if (UserJoined != null && HasIndirectServer(e.Server)) UserJoined(s, e); };
 			client.UserLeft += (s, e) => { if (UserLeft != null && HasIndirectServer(e.Server)) UserLeft(s, e); };
 			client.UserUpdated += (s, e) => { if (UserUpdated != null && HasIndirectServer(e.Server)) UserUpdated(s, e); };
-			client.UserIsTypingUpdated += (s, e) => { if (UserIsSpeakingUpdated != null && HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
+			client.UserIsTypingUpdated += (s, e) => { if (UserIsTypingUpdated != null && HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
 			//TODO: We aren't getting events from UserPresence if AllowPrivate is enabled, but the server we know that user through isn't on the whitelist
 			client.UserPresenceUpdated += (s, e) => { if (UserPresenceUpdated != null && HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
 			client.UserBanned += (s, e) => { if (UserBanned != null && HasIndirectServer(e.Server)) UserBanned(s, e); };

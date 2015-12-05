@@ -24,10 +24,9 @@ namespace Discord
 		protected readonly ManualResetEvent _disconnectedEvent;
 		protected readonly ManualResetEventSlim _connectedEvent;
 		protected ExceptionDispatchInfo _disconnectReason;
-		internal readonly DataWebSocket _dataSocket;
-		internal readonly VoiceWebSocket _voiceSocket;
+		protected readonly DataWebSocket _dataSocket;
 		protected string _gateway, _token;
-		protected long? _userId, _voiceServerId;
+		protected long? _userId;
 		private Task _runTask;
 		private bool _wasDisconnectUnexpected;
 
@@ -86,13 +85,6 @@ namespace Discord
 #endif
 
 			_dataSocket = CreateDataSocket();
-			if (_config.EnableVoice)
-				_voiceSocket = CreateVoiceSocket();
-		}
-		internal DiscordWSClient(DiscordWSClientConfig config = null, long? voiceServerId = null)
-			: this(config)
-		{
-			_voiceServerId = voiceServerId;
 		}
 
 		internal virtual DataWebSocket CreateDataSocket()
@@ -120,26 +112,6 @@ namespace Discord
 			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
 			return socket;
 		}
-		internal virtual VoiceWebSocket CreateVoiceSocket()
-		{
-			var socket = new VoiceWebSocket(this);
-			socket.Connected += (s, e) => RaiseVoiceConnected();
-			socket.Disconnected += async (s, e) =>
-			{
-				RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);				
-				if (e.WasUnexpected)
-					await socket.Reconnect().ConfigureAwait(false);
-			};
-
-			socket.LogMessage += (s, e) => RaiseOnLog(e.Severity, LogMessageSource.VoiceWebSocket, e.Message, e.Exception);
-			if (_config.LogLevel >= LogMessageSeverity.Info)
-			{
-				socket.Connected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Connected");
-				socket.Disconnected += (s, e) => RaiseOnLog(LogMessageSeverity.Info, LogMessageSource.VoiceWebSocket, "Disconnected");
-			}
-
-			return socket;
-		}
 
 		//Connection
 		public async Task<string> Connect(string gateway, string token)
@@ -160,8 +132,6 @@ namespace Discord
 
 				_dataSocket.Host = gateway;
 				_dataSocket.ParentCancelToken = _cancelToken;
-				if (_config.EnableVoice)
-					_voiceSocket.ParentCancelToken = _cancelToken;
 				await _dataSocket.Login(token).ConfigureAwait(false);				
 
 				_runTask = RunTasks();
@@ -268,13 +238,6 @@ namespace Discord
 
         protected virtual async Task Cleanup()
 		{
-			if (_config.EnableVoice)
-			{
-				var voiceServerId = _voiceSocket.CurrentServerId;
-                if (voiceServerId != null)
-					_dataSocket.SendLeaveVoice(voiceServerId.Value);
-				await _voiceSocket.Disconnect().ConfigureAwait(false);
-			}
 			await _dataSocket.Disconnect().ConfigureAwait(false);
 
 			_userId = null;
@@ -310,9 +273,6 @@ namespace Discord
 				case (int)DiscordClientState.Connecting:
 					throw new InvalidOperationException("The client is connecting.");
 			}
-			
-			if (checkVoice && _config.VoiceMode == DiscordVoiceMode.Disabled)
-				throw new InvalidOperationException("Voice is not enabled for this client.");
 		}
 		protected void RaiseEvent(string name, Action action)
 		{
@@ -325,7 +285,7 @@ namespace Discord
 			}
 		}
 
-		internal virtual async Task OnReceivedEvent(WebSocketEventEventArgs e)
+		protected virtual Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
 			{
@@ -334,24 +294,13 @@ namespace Discord
 					case "READY":
 						_userId = IdConvert.ToLong(e.Payload["user"].Value<string>("id"));
 						break;
-					case "VOICE_SERVER_UPDATE":
-						{
-							long guildId = IdConvert.ToLong(e.Payload.Value<string>("guild_id"));
-
-							if (_config.EnableVoice && guildId == _voiceSocket.CurrentServerId)
-							{
-								string token = e.Payload.Value<string>("token");
-								_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-								await _voiceSocket.Login(_userId.Value, _dataSocket.SessionId, token, _cancelToken).ConfigureAwait(false);
-							}
-						}
-						break;
 				}
 			}
 			catch (Exception ex)
 			{
 				RaiseOnLog(LogMessageSeverity.Error, LogMessageSource.Client, $"Error handling {e.Type} event: {ex.GetBaseException().Message}");
 			}
+			return TaskHelper.CompletedTask;
 		}
     }
 }

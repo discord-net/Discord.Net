@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.Net.WebSockets
 {
-	internal sealed class WebSocketEventEventArgs : EventArgs
+	public sealed class WebSocketEventEventArgs : EventArgs
 	{
 		public readonly string Type;
 		public readonly JToken Payload;
@@ -14,7 +14,7 @@ namespace Discord.Net.WebSockets
 		}
 	}
 
-	internal partial class DataWebSocket
+	public partial class DataWebSocket
 	{
 		internal event EventHandler<WebSocketEventEventArgs> ReceivedEvent;
 		private void RaiseReceivedEvent(string type, JToken payload)

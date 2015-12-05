@@ -18,7 +18,5 @@
   "frameworks": {
     "net45": { },
     "dotnet5.4": { }
-  },
-  "configurations": {
   }
 }

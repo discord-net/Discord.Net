@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using WSSharpNWebSocket = WebSocketSharp.WebSocket;
+using WSSharpWebSocket = WebSocketSharp.WebSocket;
 
 namespace Discord.Net.WebSockets
 {
@@ -13,7 +13,7 @@ namespace Discord.Net.WebSockets
 		private readonly DiscordWSClientConfig _config;
 		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly WebSocket _parent;
-		private WSSharpNWebSocket _webSocket;
+		private WSSharpWebSocket _webSocket;
 
 		public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage;
 		public event EventHandler<WebSocketTextMessageEventArgs> TextMessage;
@@ -37,7 +37,7 @@ namespace Discord.Net.WebSockets
 
 		public Task Connect(string host, CancellationToken cancelToken)
 		{
-			_webSocket = new WSSharpNWebSocket(host);
+			_webSocket = new WSSharpWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
 			_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;	

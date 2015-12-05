@@ -1,32 +1,30 @@
 {
-  "version": "0.8.1-beta2",
-  "description": "An unofficial .Net API wrapper for the Discord client.",
-  "authors": [
-    "RogueException"
-  ],
+	"version": "0.8.1-beta2",
+	"description": "An unofficial .Net API wrapper for the Discord client.",
+	"authors": [
+		"RogueException"
+	],
 	"tags": [
 		"discord",
 		"discordapp"
 	],
-  "projectUrl": "https://github.com/RogueException/Discord.Net",
-  "licenseUrl": "http://opensource.org/licenses/MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/RogueException/Discord.Net"
-  },
-  "compilationOptions": {
-    "allowUnsafe": true
-  },
+	"projectUrl": "https://github.com/RogueException/Discord.Net",
+	"licenseUrl": "http://opensource.org/licenses/MIT",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/RogueException/Discord.Net"
+	},
+
 	"configurations": {
-    "TestResponses": {
-      "compilationOptions": {
-        "define": [
-          "DEBUG",
-          "TRACE",
-          "TEST_RESPONSES"
-        ]
-      }
-    }
+		"TestResponses": {
+			"compilationOptions": {
+				"define": [
+					"DEBUG",
+					"TRACE",
+					"TEST_RESPONSES"
+				]
+			}
+		}
 	},
 
 	"dependencies": {
