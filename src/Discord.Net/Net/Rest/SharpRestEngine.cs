@@ -3,7 +3,6 @@ using Discord.API;
 using RestSharp;
 using System;
 using System.IO;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,22 +10,22 @@ namespace Discord.Net.Rest
 {
     internal sealed class RestSharpEngine : IRestEngine
 	{
-		private readonly DiscordAPIClientConfig _config;
+		private readonly DiscordConfig _config;
 		private readonly RestSharp.RestClient _client;
 
-        public RestSharpEngine(DiscordAPIClientConfig config)
+        public RestSharpEngine(DiscordConfig config)
 		{
 			_config = config;
 			_client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
 				PreAuthenticate = false,
-				ReadWriteTimeout = _config.APITimeout,
-				UserAgent = DiscordAPIClientConfig.UserAgent
+				ReadWriteTimeout = _config.RestTimeout,
+				UserAgent = config.UserAgent
 			};
-			if (_config.ProxyUrl != null)
+			/*if (_config.ProxyUrl != null)
 				_client.Proxy = new WebProxy(_config.ProxyUrl, true, new string[0], _config.ProxyCredentials);
-			else
-				_client.Proxy = null;
+			else*/
+			_client.Proxy = null;
             _client.RemoveDefaultParameter("Accept");
             _client.AddDefaultHeader("accept", "*/*");
 			_client.AddDefaultHeader("accept-encoding", "gzip,deflate");

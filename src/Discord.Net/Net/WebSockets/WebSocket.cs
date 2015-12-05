@@ -21,14 +21,14 @@ namespace Discord.Net.WebSockets
 	public abstract partial class WebSocket
 	{
 		protected readonly IWebSocketEngine _engine;
-		protected readonly DiscordClient _client;
+		protected readonly DiscordConfig _config;
 		protected readonly ManualResetEventSlim _connectedEvent;
 
 		protected ExceptionDispatchInfo _disconnectReason;
 		protected bool _wasDisconnectUnexpected;
 		protected WebSocketState _disconnectState;
 
-		protected int _loginTimeout, _heartbeatInterval;
+		protected int _heartbeatInterval;
 		private DateTime _lastHeartbeat;
 		private Task _runTask;
 
@@ -66,19 +66,18 @@ namespace Discord.Net.WebSockets
 				Disconnected(this, new DisconnectedEventArgs(wasUnexpected, error));
 		}
 
-		public WebSocket(DiscordClient client, Logger logger)
+		public WebSocket(DiscordConfig config, Logger logger)
 		{
-			_client = client;
+			_config = config;
 			_logger = logger;
-
-			_loginTimeout = client.Config.ConnectionTimeout;
+			
 			_cancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
 
 #if !DOTNET5_4
-			_engine = new WebSocketSharpEngine(this, client.Config, _logger);
+			_engine = new WebSocketSharpEngine(this, _config, _logger);
 #else
-			//_engine = new BuiltInWebSocketEngine(this, client.Config, _logger);
+			//_engine = new BuiltInWebSocketEngine(this, _config, _logger);
 #endif
 			_engine.BinaryMessage += (s, e) =>
 			{

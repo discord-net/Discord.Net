@@ -45,16 +45,6 @@ namespace Discord
 			Channel = channel;
 		}
 	}
-	public class UserIsSpeakingEventArgs : UserChannelEventArgs
-	{
-		public bool IsSpeaking { get; }
-
-		public UserIsSpeakingEventArgs(User user, Channel channel, bool isSpeaking)
-			: base(user, channel)
-		{
-			IsSpeaking = isSpeaking;
-		}
-	}
 	public class BanEventArgs : EventArgs
 	{
 		public long UserId { get; }

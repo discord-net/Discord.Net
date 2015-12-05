@@ -10,7 +10,7 @@ namespace Discord.Net.WebSockets
 {
 	internal class WebSocketSharpEngine : IWebSocketEngine
 	{
-		private readonly DiscordClientConfig _config;
+		private readonly DiscordConfig _config;
 		private readonly Logger _logger;
 		private readonly ConcurrentQueue<string> _sendQueue;
 		private readonly WebSocket _parent;
@@ -29,7 +29,7 @@ namespace Discord.Net.WebSockets
 				TextMessage(this, new WebSocketTextMessageEventArgs(msg));
 		}
 
-		internal WebSocketSharpEngine(WebSocket parent, DiscordClientConfig config, Logger logger)
+		internal WebSocketSharpEngine(WebSocket parent, DiscordConfig config, Logger logger)
 		{
 			_parent = parent;
 			_config = config;
@@ -42,8 +42,9 @@ namespace Discord.Net.WebSockets
 			_webSocket = new WSSharpWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-			_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;	
-			_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
+			_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;
+			_webSocket.SetProxy(null, null, null); //Disable
+			//_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
 			_webSocket.OnMessage += (s, e) =>
 			{
 				if (e.IsBinary)

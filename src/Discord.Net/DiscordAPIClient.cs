@@ -16,14 +16,14 @@ namespace Discord
 	{
 		public static readonly string Version = DiscordClient.Version;
 
-		private readonly DiscordAPIClientConfig _config;
+		private readonly DiscordConfig _config;
 
 		internal RestClient RestClient => _rest;
 		private readonly RestClient _rest;
 
-		public DiscordAPIClient(DiscordAPIClientConfig config = null)
+		public DiscordAPIClient(DiscordConfig config = null)
 		{
-			_config = config ?? new DiscordAPIClientConfig();
+			_config = config ?? new DiscordConfig();
             _rest = new RestClient(_config);
         }
 

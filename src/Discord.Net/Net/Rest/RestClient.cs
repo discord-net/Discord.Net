@@ -10,11 +10,11 @@ namespace Discord.Net.Rest
 {
 	internal sealed partial class RestClient
 	{
-		private readonly DiscordAPIClientConfig _config;
+		private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
 		private CancellationToken _cancelToken;
 
-		public RestClient(DiscordAPIClientConfig config)
+		public RestClient(DiscordConfig config)
 		{
 			_config = config;
 #if !DOTNET5_4

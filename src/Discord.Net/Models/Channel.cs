@@ -124,7 +124,7 @@ namespace Discord
 			}
 
 			//Local Cache
-			if (client.Config.MessageCacheLength > 0)
+			if (client.Config.MessageCacheSize > 0)
 				_messages = new ConcurrentDictionary<long, Message>();
 		}
 		internal override bool LoadReferences()
@@ -174,7 +174,7 @@ namespace Discord
 		internal void AddMessage(Message message)
 		{
 			//Race conditions are okay here - it just means the queue will occasionally go higher than the requested cache size, and fixed later.
-			var cacheLength = _client.Config.MessageCacheLength;
+			var cacheLength = _client.Config.MessageCacheSize;
 			if (cacheLength > 0)
 			{
 				var oldestIds = _messages.Where(x => x.Value.Timestamp < message.Timestamp).Select(x => x.Key).OrderBy(x => x).Take(_messages.Count - cacheLength);

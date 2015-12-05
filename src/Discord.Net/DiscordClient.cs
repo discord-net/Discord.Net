@@ -70,8 +70,8 @@ namespace Discord
 		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
-		public DiscordClientConfig Config => _config;
-		private readonly DiscordClientConfig _config;
+		public DiscordConfig Config => _config;
+		private readonly DiscordConfig _config;
 		
 		/// <summary> Returns the current connection state of this client. </summary>
 		public DiscordClientState State => (DiscordClientState)_state;
@@ -110,9 +110,9 @@ namespace Discord
 		}
 
 		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
-		public DiscordClient(DiscordClientConfig config = null)
+		public DiscordClient(DiscordConfig config = null)
 		{
-			_config = config ?? new DiscordClientConfig();
+			_config = config ?? new DiscordConfig();
 			_config.Lock();
 
 			_rand = new Random();
@@ -133,7 +133,7 @@ namespace Discord
 			_cacheLock = new object();
 			_channels = new Channels(this, _cacheLock);
 			_users = new Users(this, _cacheLock);
-			_messages = new Messages(this, _cacheLock, Config.MessageCacheLength > 0);
+			_messages = new Messages(this, _cacheLock, Config.MessageCacheSize > 0);
 			_roles = new Roles(this, _cacheLock);
 			_servers = new Servers(this, _cacheLock);
 			_globalUsers = new GlobalUsers(this, _cacheLock);
@@ -259,7 +259,8 @@ namespace Discord
 
 		private DataWebSocket CreateWebSocket()
 		{
-			var socket = new DataWebSocket(this, _log.CreateLogger("WebSocket"));
+			var socket = new DataWebSocket(_config, _log.CreateLogger("WebSocket"));
+			var settings = new JsonSerializerSettings();
 			socket.Connected += (s, e) =>
 			{
 				if (_state == (int)DiscordClientState.Connecting)
@@ -290,7 +291,6 @@ namespace Discord
 			try
 			{
 				var response = await _api.Login(email, password)
-					.Timeout(_config.APITimeout)
 					.ConfigureAwait(false);
 				token = response.Token;
 				if (_config.LogLevel >= LogSeverity.Verbose)
@@ -311,7 +311,7 @@ namespace Discord
 				await Disconnect().ConfigureAwait(false);
 
 			_api.Token = token;
-			var gatewayResponse = await _api.Gateway().Timeout(_config.APITimeout).ConfigureAwait(false);
+			var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
 			string gateway = gatewayResponse.Url;
 			if (_config.LogLevel >= LogSeverity.Verbose)
 				_logger.Log(LogSeverity.Verbose, $"Websocket endpoint: {gateway}");
@@ -400,7 +400,7 @@ namespace Discord
 		{
 			List<Task> tasks = new List<Task>();
 			tasks.Add(_cancelToken.Wait());
-			if (Config.UseMessageQueue)
+			if (_config.UseMessageQueue)
 				tasks.Add(MessageQueueLoop());
 
 			Task[] tasksArray = tasks.ToArray();

@@ -26,8 +26,8 @@ namespace Discord.Net.WebSockets
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public DataWebSocket(DiscordClient client, Logger logger)
-			: base(client, logger)
+		public DataWebSocket(DiscordConfig config, Logger logger)
+			: base(config, logger)
 		{
 		}
 
@@ -39,7 +39,7 @@ namespace Discord.Net.WebSockets
 			LoginCommand msg = new LoginCommand();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
-			if (_client.Config.UseLargeThreshold)
+			if (_config.UseLargeThreshold)
 				msg.Payload.LargeThreshold = 100;
 			msg.Payload.Compress = true;
 			QueueMessage(msg);
@@ -61,7 +61,7 @@ namespace Discord.Net.WebSockets
 			try
 			{
 				var cancelToken = ParentCancelToken.Value;
-				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				await Task.Delay(_config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{
 					try
@@ -74,7 +74,7 @@ namespace Discord.Net.WebSockets
 					{
 						_logger.Log(LogSeverity.Error, $"Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+						await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
 				}
 			}
