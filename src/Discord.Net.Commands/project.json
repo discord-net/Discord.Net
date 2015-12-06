@@ -9,7 +9,7 @@
 		"type": "git",
 		"url": "git://github.com/RogueException/Discord.Net"
 	},
-	"compile": [ "**/*.cs", "../Discord.Net/Helpers/Shared/*.cs" ],
+	"compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
 
 	"compilationOptions": {
 		"warningsAsErrors": true

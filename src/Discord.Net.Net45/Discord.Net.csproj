@@ -137,9 +137,6 @@
     <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
       <Link>DiscordAPIClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordAPIClientConfig.cs">
-      <Link>DiscordAPIClientConfig.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.Channels.cs">
       <Link>DiscordClient.Channels.cs</Link>
     </Compile>
@@ -164,17 +161,8 @@
     <Compile Include="..\Discord.Net\DiscordClient.Users.cs">
       <Link>DiscordClient.Users.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\DiscordClientConfig.cs">
-      <Link>DiscordClientConfig.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWSClient.cs">
-      <Link>DiscordWSClient.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWSClient.Events.cs">
-      <Link>DiscordWSClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordWSClientConfig.cs">
-      <Link>DiscordWSClientConfig.cs</Link>
+    <Compile Include="..\Discord.Net\DiscordConfig.cs">
+      <Link>DiscordConfig.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\AsyncCollection.cs">
       <Link>Helpers\AsyncCollection.cs</Link>
@@ -185,17 +173,11 @@
     <Compile Include="..\Discord.Net\Helpers\CachedObject.cs">
       <Link>Helpers\CachedObject.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\EpochTime.cs">
-      <Link>Helpers\EpochTime.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\Extensions.cs">
-      <Link>Helpers\Extensions.cs</Link>
+    <Compile Include="..\Discord.Net\Helpers\CollectionExtensions.cs">
+      <Link>Helpers\CollectionExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Format.cs">
       <Link>Helpers\Format.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Helpers\IdConvert.cs">
-      <Link>Helpers\IdConvert.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Mention.cs">
       <Link>Helpers\Mention.cs</Link>
@@ -203,14 +185,17 @@
     <Compile Include="..\Discord.Net\Helpers\Reference.cs">
       <Link>Helpers\Reference.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Helpers\TaskHelper.cs">
-      <Link>Helpers\TaskHelper.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\HttpException.cs">
       <Link>HttpException.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\IService.cs">
       <Link>IService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\LogExtensions.cs">
+      <Link>LogExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\LogService.cs">
+      <Link>LogService.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
@@ -266,9 +251,6 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.cs">
       <Link>Net\WebSockets\WebSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.Events.cs">
-      <Link>Net\WebSockets\WebSocket.Events.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
       <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
     </Compile>
@@ -278,20 +260,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Discord.Net\lib\libopus.so">
-      <Link>lib\libopus.so</Link>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Discord.Net\lib\libsodium.dll">
-      <Link>lib\libsodium.dll</Link>
-    </Content>
-    <Content Include="..\Discord.Net\lib\opus.dll">
-      <Link>lib\opus.dll</Link>
-    </Content>
-  </ItemGroup>
   <ItemGroup />
+  <Import Project="..\Discord.Net.Shared\Discord.Net.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>6</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,11 +33,19 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>6</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\DiscordBot\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Discord.Net.Audio\API\Voice.cs">
+      <Link>API\Voice.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Audio\AudioExtensions.cs">
       <Link>AudioExtensions.cs</Link>
     </Compile>
@@ -46,11 +55,14 @@
     <Compile Include="..\Discord.Net.Audio\AudioServiceConfig.cs">
       <Link>AudioServiceConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\DiscordVoiceClient.cs">
-      <Link>DiscordVoiceClient.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\DiscordAudioClient.cs">
+      <Link>DiscordAudioClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\IDiscordVoiceClient.cs">
-      <Link>IDiscordVoiceClient.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Net\VoiceWebSocket.cs">
+      <Link>Net\VoiceWebSocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\Net\VoiceWebSocket.Events.cs">
+      <Link>Net\VoiceWebSocket.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Opus.cs">
       <Link>Opus.cs</Link>
@@ -67,12 +79,6 @@
     <Compile Include="..\Discord.Net.Audio\VoiceBuffer.cs">
       <Link>VoiceBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\VoiceWebSocket.cs">
-      <Link>VoiceWebSocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net.Audio\VoiceWebSocket.Events.cs">
-      <Link>VoiceWebSocket.Events.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +91,20 @@
       <Name>Discord.Net</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Discord.Net.Audio\libsodium.dll">
+      <Link>libsodium.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Discord.Net.Audio\opus.dll">
+      <Link>opus.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="..\Discord.Net.Shared\Discord.Net.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
