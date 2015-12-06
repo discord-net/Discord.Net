@@ -274,7 +274,7 @@ namespace Discord.Net.WebSockets
 			});
 		}
 
-		internal void ThrowError()
+		protected internal void ThrowError()
 		{
 			if (_wasDisconnectUnexpected)
 			{

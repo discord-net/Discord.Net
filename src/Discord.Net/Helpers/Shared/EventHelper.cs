@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public static class EventHelper
+    internal static class EventHelper
 	{
 		public static void Raise(Logger logger, string name, Action action)
 		{
