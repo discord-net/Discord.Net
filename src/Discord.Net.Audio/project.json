@@ -1,0 +1,27 @@
+{
+	"version": "0.9.0-alpha1",
+	"description": "A Discord.Net extension adding voice support.",
+	"authors": [ "RogueException" ],
+	"tags": [ "discord", "discordapp" ],
+	"projectUrl": "https://github.com/RogueException/Discord.Net",
+	"licenseUrl": "http://opensource.org/licenses/MIT",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/RogueException/Discord.Net"
+	},
+	"compile": [ "**/*.cs", "../Discord.Net/Helpers/Shared/*.cs" ],
+	"contentFiles": [ "libsodium.dll", "opus.dll" ],
+
+	"compilationOptions": {
+		"warningsAsErrors": true,
+		"allowUnsafe": true
+	},
+
+	"dependencies": {
+		"Discord.Net": "0.9.0-alpha1"
+	},
+	"frameworks": {
+		"net45": { },
+		"dotnet5.4": { }
+	}
+}

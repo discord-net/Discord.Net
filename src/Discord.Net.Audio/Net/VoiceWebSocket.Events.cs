@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Audio;
+using System;
 
 namespace Discord.Net.WebSockets
 {
@@ -13,16 +14,16 @@ namespace Discord.Net.WebSockets
 		}
 	}
 
-	internal partial class VoiceWebSocket
+	public partial class VoiceWebSocket
 	{
-		public event EventHandler<IsTalkingEventArgs> IsSpeaking;
+		internal event EventHandler<IsTalkingEventArgs> IsSpeaking;
 		private void RaiseIsSpeaking(long userId, bool isSpeaking)
 		{
 			if (IsSpeaking != null)
 				IsSpeaking(this, new IsTalkingEventArgs(userId, isSpeaking));
 		}
 
-		public event EventHandler<VoicePacketEventArgs> OnPacket;
+		internal event EventHandler<VoicePacketEventArgs> OnPacket;
 		internal void RaiseOnPacket(long userId, long channelId, byte[] buffer, int offset, int count)
 		{
 			if (OnPacket != null)

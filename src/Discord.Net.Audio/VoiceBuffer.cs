@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Discord.Audio
 {
-    internal class VoiceBuffer : IDiscordVoiceBuffer
+    internal class VoiceBuffer
 	{
 		private readonly int _frameSize, _frameCount, _bufferSize;
 		private readonly byte[] _buffer;
