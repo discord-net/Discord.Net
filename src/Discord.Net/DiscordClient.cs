@@ -200,14 +200,14 @@ namespace Discord
 				UserUpdated += (s, e) => _logger.Log(LogSeverity.Info,
 					$"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				UserVoiceStateUpdated += (s, e) => _logger.Log(LogSeverity.Info,
-					$"User Updated (Voice State): {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+					$"User Updated (Voice): {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
 				ProfileUpdated += (s, e) => _logger.Log(LogSeverity.Info,
 					"Profile Updated");
 			}
 			if (_log.Level >= LogSeverity.Verbose)
 			{
 				UserIsTypingUpdated += (s, e) => _logger.Log(LogSeverity.Verbose,
-					$"User Updated (Is Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
+					$"User Updated (Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
 				MessageReadRemotely += (s, e) => _logger.Log(LogSeverity.Verbose,
 					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageSent += (s, e) => _logger.Log(LogSeverity.Verbose,
