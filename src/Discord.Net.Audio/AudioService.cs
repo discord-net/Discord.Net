@@ -119,7 +119,7 @@ namespace Discord.Audio
 			};
 		}
 
-		public DiscordAudioClient GetVoiceClient(Server server)
+		public DiscordAudioClient GetClient(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
@@ -137,7 +137,7 @@ namespace Discord.Audio
 			else
 				return null;
 		}
-		private Task<DiscordAudioClient> CreateVoiceClient(Server server)
+		private Task<DiscordAudioClient> CreateClient(Server server)
 		{
 			if (!Config.EnableMultiserver)
 			{
@@ -170,17 +170,17 @@ namespace Discord.Audio
 			return Task.FromResult(client);
 		}
 
-		public async Task<DiscordAudioClient> JoinVoiceServer(Channel channel)
+		public async Task<DiscordAudioClient> Join(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			//CheckReady(true);
 
-			var client = await CreateVoiceClient(channel.Server).ConfigureAwait(false);
+			var client = await CreateClient(channel.Server).ConfigureAwait(false);
 			await client.Join(channel).ConfigureAwait(false);
 			return client;
 		}
-
-		public async Task LeaveVoiceServer(Server server)
+		
+		public async Task Leave(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			//CheckReady(true);
