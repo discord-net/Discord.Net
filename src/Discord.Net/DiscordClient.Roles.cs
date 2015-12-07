@@ -1,3 +1,4 @@
+using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -140,7 +141,7 @@ namespace Discord
 			CheckReady();
 
 			try { await _api.DeleteRole(role.Server.Id, role.Id); }
-			catch (HttpException ex) when(ex.StatusCode == HttpStatusCode.NotFound) { }
+			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 	}
 
 		public Task ReorderRoles(Server server, IEnumerable<Role> roles, int startPos = 0)

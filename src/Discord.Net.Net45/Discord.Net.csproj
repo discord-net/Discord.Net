@@ -176,18 +176,6 @@
     <Compile Include="..\Discord.Net\Helpers\Reference.cs">
       <Link>Helpers\Reference.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\HttpException.cs">
-      <Link>HttpException.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\IService.cs">
-      <Link>IService.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\LogExtensions.cs">
-      <Link>LogExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\LogService.cs">
-      <Link>LogService.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>
     </Compile>
@@ -218,6 +206,9 @@
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\HttpException.cs">
+      <Link>Net\HttpException.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\IRestEngine.cs">
       <Link>Net\Rest\IRestEngine.cs</Link>
     </Compile>
@@ -229,6 +220,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\SharpRestEngine.cs">
       <Link>Net\Rest\SharpRestEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\TimeoutException.cs">
+      <Link>Net\TimeoutException.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\GatewayWebSocket.cs">
       <Link>Net\WebSockets\GatewayWebSocket.cs</Link>
@@ -245,8 +239,14 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
       <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\TimeoutException.cs">
-      <Link>TimeoutException.cs</Link>
+    <Compile Include="..\Discord.Net\Services\IService.cs">
+      <Link>Services\IService.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Services\LogExtensions.cs">
+      <Link>Services\LogExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Services\LogService.cs">
+      <Link>Services\LogService.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

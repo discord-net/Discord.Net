@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord
+namespace Discord.Net
 {
 	public sealed class TimeoutException : OperationCanceledException
 	{
