@@ -54,7 +54,7 @@ namespace Discord
 
 		public void Log(LogSeverity severity, string message, Exception exception = null)
 		{
-			if (severity >= _service.Level)
+			if (severity <= _service.Level)
 				_service.RaiseLogMessage(new LogMessageEventArgs(severity, _source, message, exception));
 		}
 	}
