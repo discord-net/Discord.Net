@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8D7989F0-66CE-4DBB-8230-D8C811E9B1D7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{EA68EBE2-51C8-4440-9EF7-D633C90A5D35}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "netplatform", "netplatform", "{EA68EBE2-51C8-4440-9EF7-D633C90A5D35}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net", "src\Discord.Net\Discord.Net.xproj", "{ACFB060B-EC8A-4926-B293-04C01E17EE23}"
 EndProject
@@ -30,7 +30,20 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Modules", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Modules", "src\Discord.Net.Modules.Net45\Discord.Net.Modules.csproj", "{3091164F-66AE-4543-A63D-167C1116241D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Audio", "src\Discord.Net.Audio.Net5\Discord.Net.Audio.csproj", "{7BFEF748-B934-4621-9B11-6302E3A9F6B3}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Audio", "src\Discord.Net.Audio\Discord.Net.Audio.xproj", "{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Discord.Net.Shared", "src\Discord.Net.Shared\Discord.Net.Shared.shproj", "{2875DEB5-F248-4105-8EA2-5141E3DE8025}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Discord.Net.Shared\Discord.Net.Shared.projitems*{2875deb5-f248-4105-8ea2-5141e3de8025}*SharedItemsImports = 13
+		src\Discord.Net.Shared\Discord.Net.Shared.projitems*{7bfef748-b934-4621-9b11-6302e3a9f6b3}*SharedItemsImports = 4
+		src\Discord.Net.Shared\Discord.Net.Shared.projitems*{1b5603b4-6f8f-4289-b945-7baae523d740}*SharedItemsImports = 4
+		src\Discord.Net.Shared\Discord.Net.Shared.projitems*{3091164f-66ae-4543-a63d-167c1116241d}*SharedItemsImports = 4
+		src\Discord.Net.Shared\Discord.Net.Shared.projitems*{8d71a857-879a-4a10-859e-5ff824ed6688}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		FullDebug|Any CPU = FullDebug|Any CPU
@@ -79,6 +92,18 @@ Global
 		{3091164F-66AE-4543-A63D-167C1116241D}.FullDebug|Any CPU.Build.0 = Debug|Any CPU
 		{3091164F-66AE-4543-A63D-167C1116241D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3091164F-66AE-4543-A63D-167C1116241D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.FullDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.FullDebug|Any CPU.Build.0 = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.FullDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.FullDebug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +118,8 @@ Global
 		{1B5603B4-6F8F-4289-B945-7BAAE523D740} = {DF03D4E8-38F6-4FE1-BC52-E38124BE8AFD}
 		{01584E8A-78DA-486F-9EF9-A894E435841B} = {EA68EBE2-51C8-4440-9EF7-D633C90A5D35}
 		{3091164F-66AE-4543-A63D-167C1116241D} = {DF03D4E8-38F6-4FE1-BC52-E38124BE8AFD}
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3} = {DF03D4E8-38F6-4FE1-BC52-E38124BE8AFD}
+		{DFF7AFE3-CA77-4109-BADE-B4B49A4F6648} = {EA68EBE2-51C8-4440-9EF7-D633C90A5D35}
+		{2875DEB5-F248-4105-8EA2-5141E3DE8025} = {DF03D4E8-38F6-4FE1-BC52-E38124BE8AFD}
 	EndGlobalSection
 EndGlobal
