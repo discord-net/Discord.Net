@@ -82,8 +82,8 @@ namespace Discord
 		private readonly DiscordAPIClient _api;
 
 		/// <summary> Returns the internal websocket object. </summary>
-		public DataWebSocket WebSocket => _webSocket;
-		private readonly DataWebSocket _webSocket;
+		public GatewayWebSocket WebSocket => _webSocket;
+		private readonly GatewayWebSocket _webSocket;
 
 		public string GatewayUrl => _gateway;
 		private string _gateway;
@@ -257,9 +257,9 @@ namespace Discord
 			}
 		}
 
-		private DataWebSocket CreateWebSocket()
+		private GatewayWebSocket CreateWebSocket()
 		{
-			var socket = new DataWebSocket(_config, _log.CreateLogger("WebSocket"));
+			var socket = new GatewayWebSocket(_config, _log.CreateLogger("WebSocket"));
 			var settings = new JsonSerializerSettings();
 			socket.Connected += (s, e) =>
 			{

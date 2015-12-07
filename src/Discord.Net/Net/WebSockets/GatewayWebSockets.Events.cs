@@ -14,7 +14,7 @@ namespace Discord.Net.WebSockets
 		}
 	}
 
-	public partial class DataWebSocket
+	public partial class GatewayWebSocket
 	{
 		public event EventHandler<WebSocketEventEventArgs> ReceivedEvent;
 		private void RaiseReceivedEvent(string type, JToken payload)

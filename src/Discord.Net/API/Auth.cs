@@ -12,7 +12,7 @@ namespace Discord.API
 		[JsonProperty("url")]
 		public string Url;
 	}
-
+	
 	//Login
 	public sealed class LoginRequest
 	{

@@ -149,9 +149,9 @@ namespace Discord.Audio
 			{
 				int id = unchecked(++_nextClientId);
 				var logger = Client.Log().CreateLogger($"Voice #{id}");
-				DataWebSocket dataSocket = null;
+				GatewayWebSocket dataSocket = null;
 				var voiceSocket = new VoiceWebSocket(Client.Config, _config, logger);
-				var voiceClient = new DiscordAudioClient(this, id, logger, dataSocket, voiceSocket);
+				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket, voiceSocket);
 				voiceClient.SetServerId(server.Id);
 
 				voiceSocket.OnPacket += (s, e) =>
@@ -166,7 +166,7 @@ namespace Discord.Audio
 
 				return voiceClient;
 			});
-			//await client.Connect(dataSocket.Host, _client.Token).ConfigureAwait(false);
+			//await client.Connect(gatewaySocket.Host, _client.Token).ConfigureAwait(false);
 			return Task.FromResult(client);
 		}
 

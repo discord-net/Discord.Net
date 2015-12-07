@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public partial class DataWebSocket : WebSocket
+    public partial class GatewayWebSocket : WebSocket
 	{
 		internal enum OpCodes : byte
 		{
@@ -26,7 +26,7 @@ namespace Discord.Net.WebSockets
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public DataWebSocket(DiscordConfig config, Logger logger)
+		public GatewayWebSocket(DiscordConfig config, Logger logger)
 			: base(config, logger)
 		{
 		}

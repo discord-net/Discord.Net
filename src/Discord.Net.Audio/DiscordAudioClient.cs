@@ -10,19 +10,19 @@ namespace Discord.Audio
 		public int Id => _id;
 
 		private readonly AudioService _service;
-		private readonly DataWebSocket _dataSocket;
+		private readonly GatewayWebSocket _gatewaySocket;
 		private readonly VoiceWebSocket _voiceSocket;
 		private readonly Logger _logger;
 
 		public long? ServerId => _voiceSocket.ServerId;
 		public long? ChannelId => _voiceSocket.ChannelId;
 
-		public DiscordAudioClient(AudioService service, int id, Logger logger, DataWebSocket dataSocket, VoiceWebSocket voiceSocket)
+		public DiscordAudioClient(AudioService service, int id, Logger logger, GatewayWebSocket gatewaySocket, VoiceWebSocket voiceSocket)
 		{
 			_service = service;
 			_id = id;
 			_logger = logger;
-			_dataSocket = dataSocket;
+			_gatewaySocket = gatewaySocket;
 			_voiceSocket = voiceSocket;
 
 			/*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
@@ -30,7 +30,7 @@ namespace Discord.Audio
 			{
 				_voiceSocket.CurrentServerId;
 				if (voiceServerId != null)
-					_dataSocket.SendLeaveVoice(voiceServerId.Value);
+					_gatewaySocket.SendLeaveVoice(voiceServerId.Value);
 				await _voiceSocket.Disconnect().ConfigureAwait(false);
 				RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);
 				if (e.WasUnexpected)
@@ -59,7 +59,7 @@ namespace Discord.Audio
 				_voiceSocket.ParentCancelToken = _cancelToken;
 			};*/
 
-			_dataSocket.ReceivedEvent += async (s, e) =>
+			_gatewaySocket.ReceivedEvent += async (s, e) =>
 			{
 				try
 				{
@@ -74,7 +74,7 @@ namespace Discord.Audio
 									var client = _service.Client;
 									string token = e.Payload.Value<string>("token");
 									_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-									await _voiceSocket.Login(client.CurrentUser.Id, _dataSocket.SessionId, token, client.CancelToken).ConfigureAwait(false);
+									await _voiceSocket.Login(client.CurrentUser.Id, _gatewaySocket.SessionId, token, client.CancelToken).ConfigureAwait(false);
 								}
 							}
 							break;
@@ -82,7 +82,7 @@ namespace Discord.Audio
 				}
 				catch (Exception ex)
 				{
-					_dataSocket.Logger.Log(LogSeverity.Error, $"Error handling {e.Type} event", ex);
+					_gatewaySocket.Logger.Log(LogSeverity.Error, $"Error handling {e.Type} event", ex);
 				}
 			};
 		}
@@ -106,7 +106,7 @@ namespace Discord.Audio
 
 			await _voiceSocket.Disconnect().ConfigureAwait(false);
 			_voiceSocket.ChannelId = channel.Id;
-			_dataSocket.SendJoinVoice(channel.Server.Id, channel.Id);
+			_gatewaySocket.SendJoinVoice(channel.Server.Id, channel.Id);
 			await _voiceSocket.WaitForConnection(_service.Config.ConnectionTimeout).ConfigureAwait(false);
 		}
 
