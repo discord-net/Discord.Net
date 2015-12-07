@@ -2,12 +2,26 @@
 #pragma warning disable CS0649
 #pragma warning disable CS0169
 
+using Discord.API.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Discord.API
 {
+	public enum GatewayOpCodes : byte
+	{
+		Dispatch = 0,
+		Heartbeat = 1,
+		Identify = 2,
+		StatusUpdate = 3,
+		VoiceStateUpdate = 4,
+		//VoiceServerPing = 5, (Unused?)
+		Resume = 6,
+		Redirect = 7,
+		RequestGuildMembers = 8
+	}
+
 	//Common
 	public class WebSocketMessage
 	{
@@ -44,13 +58,13 @@ namespace Discord.API
 	}
 
 	//Commands
-	internal sealed class KeepAliveCommand : WebSocketMessage<long>
+	internal sealed class HeartbeatCommand : WebSocketMessage<long>
 	{
-		public KeepAliveCommand() : base(1, EpochTime.GetMilliseconds()) { }
+		public HeartbeatCommand() : base((int)GatewayOpCodes.Heartbeat, EpochTime.GetMilliseconds()) { }
 	}
-	internal sealed class LoginCommand : WebSocketMessage<LoginCommand.Data>
+	internal sealed class IdentifyCommand : WebSocketMessage<IdentifyCommand.Data>
 	{
-		public LoginCommand() : base(2) { }
+		public IdentifyCommand() : base((int)GatewayOpCodes.Identify) { }
 		public class Data
 		{
 			[JsonProperty("token")]
@@ -65,9 +79,43 @@ namespace Discord.API
 			public bool? Compress;
         }
 	}
+
+	internal sealed class StatusUpdateCommand : WebSocketMessage<StatusUpdateCommand.Data>
+	{
+		public StatusUpdateCommand() : base((int)GatewayOpCodes.StatusUpdate) { }
+		public class Data
+		{
+			[JsonProperty("idle_since")]
+			public long? IdleSince;
+			[JsonProperty("game_id")]
+			public int? GameId;
+		}
+	}
+
+
+	//Commands
+	internal sealed class JoinVoiceCommand : WebSocketMessage<JoinVoiceCommand.Data>
+	{
+		public JoinVoiceCommand() : base((int)GatewayOpCodes.VoiceStateUpdate) { }
+		public class Data
+		{
+			[JsonProperty("guild_id")]
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ServerId;
+			[JsonProperty("channel_id")]
+			[JsonConverter(typeof(LongStringConverter))]
+			public long ChannelId;
+			[JsonProperty("self_mute")]
+			public string SelfMute;
+			[JsonProperty("self_deaf")]
+			public string SelfDeaf;
+		}
+	}
+
+	//Events
 	internal sealed class ResumeCommand : WebSocketMessage<ResumeCommand.Data>
 	{
-		public ResumeCommand() : base(6) { }
+		public ResumeCommand() : base((int)GatewayOpCodes.Resume) { }
 		public class Data
 		{
 			[JsonProperty("session_id")]
@@ -105,15 +153,15 @@ namespace Discord.API
 		[JsonProperty("heartbeat_interval")]
 		public int HeartbeatInterval;
 	}
-	internal sealed class ResumedEvent
-	{
-		[JsonProperty("heartbeat_interval")]
-		public int HeartbeatInterval;
-	}
 
 	internal sealed class RedirectEvent
 	{
 		[JsonProperty("url")]
 		public string Url;
+	}
+	internal sealed class ResumeEvent
+	{
+		[JsonProperty("heartbeat_interval")]
+		public int HeartbeatInterval;
 	}
 }

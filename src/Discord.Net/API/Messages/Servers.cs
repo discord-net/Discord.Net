@@ -5,6 +5,7 @@
 using Discord.API.Converters;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -85,6 +86,21 @@ namespace Discord.API
 	//Delete
 	public sealed class DeleteServerResponse : GuildInfo { }
 
+	//GetRegions
+	public class GetRegionsResponse : List<GetRegionsResponse.RegionData>
+	{
+		public sealed class RegionData
+		{
+			[JsonProperty("sample_hostname")]
+			public string Hostname;
+			[JsonProperty("sample_port")]
+			public int Port;
+			[JsonProperty("id")]
+			public string Id;
+			[JsonProperty("name")]
+			public string Name;
+		}
+	}
 	//Events
 	internal sealed class GuildCreateEvent : ExtendedGuildInfo { }
 	internal sealed class GuildUpdateEvent : GuildInfo { }

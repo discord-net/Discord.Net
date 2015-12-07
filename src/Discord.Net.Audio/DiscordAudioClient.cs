@@ -59,7 +59,7 @@ namespace Discord.Audio
 				_voiceSocket.ParentCancelToken = _cancelToken;
 			};*/
 
-			_gatewaySocket.ReceivedEvent += async (s, e) =>
+			_gatewaySocket.ReceivedDispatch += async (s, e) =>
 			{
 				try
 				{

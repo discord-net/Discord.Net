@@ -68,15 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net\API\Auth.cs">
-      <Link>API\Auth.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Bans.cs">
-      <Link>API\Bans.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\API\Channels.cs">
-      <Link>API\Channels.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\API\Converters\LongCollectionConverter.cs">
       <Link>API\Converters\LongCollectionConverter.cs</Link>
     </Compile>
@@ -101,38 +92,38 @@
     <Compile Include="..\Discord.Net\API\Enums\UserStatus.cs">
       <Link>API\Enums\UserStatus.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Invites.cs">
-      <Link>API\Invites.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Auth.cs">
+      <Link>API\Messages\Auth.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Maintenance.cs">
-      <Link>API\Maintenance.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Channels.cs">
+      <Link>API\Messages\Channels.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Members.cs">
-      <Link>API\Members.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\GatewaySocket.cs">
+      <Link>API\Messages\GatewaySocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Messages.cs">
-      <Link>API\Messages.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Invites.cs">
+      <Link>API\Messages\Invites.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Permissions.cs">
-      <Link>API\Permissions.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Maintenance.cs">
+      <Link>API\Messages\Maintenance.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Presence.cs">
-      <Link>API\Presence.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Members.cs">
+      <Link>API\Messages\Members.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Roles.cs">
-      <Link>API\Roles.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Messages.cs">
+      <Link>API\Messages\Messages.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Servers.cs">
-      <Link>API\Servers.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Permissions.cs">
+      <Link>API\Messages\Permissions.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Users.cs">
-      <Link>API\Users.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Roles.cs">
+      <Link>API\Messages\Roles.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Voice.cs">
-      <Link>API\Voice.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Servers.cs">
+      <Link>API\Messages\Servers.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\WebSockets.cs">
-      <Link>API\WebSockets.cs</Link>
+    <Compile Include="..\Discord.Net\API\Messages\Users.cs">
+      <Link>API\Messages\Users.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordAPIClient.cs">
       <Link>DiscordAPIClient.cs</Link>
@@ -239,11 +230,11 @@
     <Compile Include="..\Discord.Net\Net\Rest\SharpRestEngine.cs">
       <Link>Net\Rest\SharpRestEngine.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSocket.cs">
-      <Link>Net\WebSockets\DataWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\GatewayWebSocket.cs">
+      <Link>Net\WebSockets\GatewayWebSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\DataWebSockets.Events.cs">
-      <Link>Net\WebSockets\DataWebSockets.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\GatewayWebSockets.Events.cs">
+      <Link>Net\WebSockets\GatewayWebSockets.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\IWebSocketEngine.cs">
       <Link>Net\WebSockets\IWebSocketEngine.cs</Link>

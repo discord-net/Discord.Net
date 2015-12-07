@@ -527,9 +527,9 @@ namespace Discord.Net.WebSockets
 			QueueMessage(isTalking);
 		}
 
-		protected override object GetKeepAlive()
+		public override void SendHeartbeat()
 		{
-			return new VoiceKeepAliveCommand();
+			QueueMessage(new VoiceKeepAliveCommand());
 		}
 
 		public void WaitForQueue()

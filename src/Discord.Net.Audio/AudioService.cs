@@ -149,7 +149,7 @@ namespace Discord.Audio
 			{
 				int id = unchecked(++_nextClientId);
 				var logger = Client.Log().CreateLogger($"Voice #{id}");
-				GatewayWebSocket dataSocket = null;
+				GatewayWebSocket gatewaySocket = null;
 				var voiceSocket = new VoiceWebSocket(Client.Config, _config, logger);
 				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket, voiceSocket);
 				voiceClient.SetServerId(server.Id);

@@ -8,19 +8,6 @@ namespace Discord.Net.WebSockets
 {
     public partial class GatewayWebSocket : WebSocket
 	{
-		internal enum OpCodes : byte
-		{
-			Dispatch = 0,
-			Heartbeat = 1,
-			Identify = 2,
-			StatusUpdate = 3,
-			VoiceStateUpdate = 4,
-			VoiceServerPing = 5,
-			Resume = 6,
-			Redirect = 7,
-			RequestGuildMembers = 8
-		}
-
         private int _lastSeq;
 
 		public string SessionId => _sessionId;
@@ -35,14 +22,8 @@ namespace Discord.Net.WebSockets
 		{
 			await BeginConnect().ConfigureAwait(false);
 			await Start().ConfigureAwait(false);
-			
-			LoginCommand msg = new LoginCommand();
-			msg.Payload.Token = token;
-			msg.Payload.Properties["$device"] = "Discord.Net";
-			if (_config.UseLargeThreshold)
-				msg.Payload.LargeThreshold = 100;
-			msg.Payload.Compress = true;
-			QueueMessage(msg);
+
+			SendIdentify(token);
         }
 		private async Task Redirect(string server)
 		{
@@ -51,10 +32,7 @@ namespace Discord.Net.WebSockets
 			await BeginConnect().ConfigureAwait(false);
 			await Start().ConfigureAwait(false);
 
-			var resumeMsg = new ResumeCommand();
-			resumeMsg.Payload.SessionId = _sessionId;
-			resumeMsg.Payload.Sequence = _lastSeq;
-			QueueMessage(resumeMsg);
+			SendResume();
 		}
 		public async Task Reconnect(string token)
 		{
@@ -88,10 +66,10 @@ namespace Discord.Net.WebSockets
 			if (msg.Sequence.HasValue)
 				_lastSeq = msg.Sequence.Value;
 
-			var opCode = (OpCodes)msg.Operation;
+			var opCode = (GatewayOpCodes)msg.Operation;
             switch (opCode)
 			{
-				case OpCodes.Dispatch:
+				case GatewayOpCodes.Dispatch:
 					{
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
@@ -102,15 +80,15 @@ namespace Discord.Net.WebSockets
 						}
 						else if (msg.Type == "RESUMED")
 						{
-							var payload = token.ToObject<ResumedEvent>(_serializer);
+							var payload = token.ToObject<ResumeEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
-						RaiseReceivedEvent(msg.Type, token);
+						RaiseReceivedDispatch(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
 							EndConnect();
 					}
 					break;
-				case OpCodes.Redirect:
+				case GatewayOpCodes.Redirect:
 					{
 						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_serializer);
 						if (payload.Url != null)
@@ -129,14 +107,33 @@ namespace Discord.Net.WebSockets
 			}
 		}
 
-		protected override object GetKeepAlive()
+		public void SendIdentify(string token)
 		{
-			return new KeepAliveCommand();
+			IdentifyCommand msg = new IdentifyCommand();
+			msg.Payload.Token = token;
+			msg.Payload.Properties["$device"] = "Discord.Net";
+			if (_config.UseLargeThreshold)
+				msg.Payload.LargeThreshold = 100;
+			msg.Payload.Compress = true;
+			QueueMessage(msg);
 		}
 
-		public void SendStatus(long? idleSince, int? gameId)
+		public void SendResume()
 		{
-			var updateStatus = new UpdateStatusCommand();
+			var resumeMsg = new ResumeCommand();
+			resumeMsg.Payload.SessionId = _sessionId;
+			resumeMsg.Payload.Sequence = _lastSeq;
+			QueueMessage(resumeMsg);
+		}
+
+		public override void SendHeartbeat()
+		{
+			QueueMessage(new HeartbeatCommand());
+		}
+
+		public void SendStatusUpdate(long? idleSince, int? gameId)
+		{
+			var updateStatus = new StatusUpdateCommand();
 			updateStatus.Payload.IdleSince = idleSince;
 			updateStatus.Payload.GameId = gameId;
             QueueMessage(updateStatus);
@@ -155,6 +152,7 @@ namespace Discord.Net.WebSockets
 			leaveVoice.Payload.ServerId = serverId;
 			QueueMessage(leaveVoice);
 		}
+
 		public void SendRequestUsers(long serverId, string query = "", int limit = 0)
 		{
 			var getOfflineUsers = new GetUsersCommand();

@@ -46,6 +46,18 @@ namespace Discord.API
 
 	//Events
 	internal sealed class UserUpdateEvent : UserInfo { }
+	internal sealed class PresenceUpdateEvent : PresenceInfo { }
+	internal sealed class TypingStartEvent
+	{
+		[JsonProperty("user_id")]
+		[JsonConverter(typeof(LongStringConverter))]
+		public long UserId;
+		[JsonProperty("channel_id")]
+		[JsonConverter(typeof(LongStringConverter))]
+		public long ChannelId;
+		[JsonProperty("timestamp")]
+		public int Timestamp;
+	}
 	internal sealed class BanAddEvent : MemberReference { }
 	internal sealed class BanRemoveEvent : MemberReference { }
 }

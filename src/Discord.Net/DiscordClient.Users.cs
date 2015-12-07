@@ -302,7 +302,7 @@ namespace Discord
 		}
 		private Task SendStatus()
 		{
-			_webSocket.SendStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
+			_webSocket.SendStatusUpdate(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
 			return TaskHelper.CompletedTask;
 		}
 	}

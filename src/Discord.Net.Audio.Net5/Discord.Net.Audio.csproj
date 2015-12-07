@@ -43,8 +43,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net.Audio\API\Voice.cs">
-      <Link>API\Voice.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\API\Messages\GatewaySocket.cs">
+      <Link>API\Messages\GatewaySocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\API\Messages\VoiceSocket.cs">
+      <Link>API\Messages\VoiceSocket.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\AudioExtensions.cs">
       <Link>AudioExtensions.cs</Link>
@@ -58,11 +61,11 @@
     <Compile Include="..\Discord.Net.Audio\DiscordAudioClient.cs">
       <Link>DiscordAudioClient.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\Net\VoiceWebSocket.cs">
-      <Link>Net\VoiceWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Net\WebSockets\VoiceWebSocket.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\Net\VoiceWebSocket.Events.cs">
-      <Link>Net\VoiceWebSocket.Events.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Net\WebSockets\VoiceWebSocket.Events.cs">
+      <Link>Net\WebSockets\VoiceWebSocket.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Opus.cs">
       <Link>Opus.cs</Link>

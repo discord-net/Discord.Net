@@ -243,7 +243,6 @@ namespace Discord.Net.WebSockets
 				_logger.Log(LogSeverity.Debug, $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}
-		protected abstract object GetKeepAlive();
 		
 		protected void QueueMessage(object message)
 		{
@@ -255,7 +254,7 @@ namespace Discord.Net.WebSockets
 
 		private Task HeartbeatAsync(CancellationToken cancelToken)
 		{
-			return Task.Run(async () =>
+			return Task.Run((Func<Task>)(async () =>
 			{
 				try
 				{
@@ -263,7 +262,7 @@ namespace Discord.Net.WebSockets
 					{
 						if (_state == (int)WebSocketState.Connected)
 						{
-							QueueMessage(GetKeepAlive());
+							SendHeartbeat();
 							await Task.Delay(_heartbeatInterval, cancelToken).ConfigureAwait(false);
 						}
 						else
@@ -271,7 +270,7 @@ namespace Discord.Net.WebSockets
 					}
 				}
 				catch (OperationCanceledException) { }
-			});
+			}));
 		}
 
 		protected internal void ThrowError()
@@ -283,5 +282,7 @@ namespace Discord.Net.WebSockets
 				reason.Throw();
 			}
 		}
+
+		public abstract void SendHeartbeat();
 	}
 }

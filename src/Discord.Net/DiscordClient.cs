@@ -273,7 +273,7 @@ namespace Discord
 					await socket.Reconnect(_token).ConfigureAwait(false);
 			};
 
-			socket.ReceivedEvent += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
+			socket.ReceivedDispatch += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
 			return socket;
 		}
 
