@@ -154,22 +154,22 @@ namespace Discord
 			if (discriminator <= 0) throw new ArgumentOutOfRangeException(nameof(discriminator));
 			CheckReady();
 
-			return FindUsers(server, username, discriminator, true).FirstOrDefault();
+			return FindUsers(server.Members, server.Id, username, discriminator, true).FirstOrDefault();
 		}
 
 		/// <summary> Returns all users with the specified server and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive.</remarks>
-		public IEnumerable<User> FindUsers(Server server, string name, short? discriminator = null, bool exactMatch = false)
+		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive if exactMatch is false.</remarks>
+		public IEnumerable<User> FindUsers(Server server, string name, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			return FindUsers(server.Members, server.Id, name, discriminator, exactMatch);
+			return FindUsers(server.Members, server.Id, name, exactMatch: exactMatch);
 		}
 		/// <summary> Returns all users with the specified channel and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive.</remarks>
-		public IEnumerable<User> FindUsers(Channel channel, string name, short? discriminator = null, bool exactMatch = false)
+		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive if exactMatch is false.</remarks>
+		public IEnumerable<User> FindUsers(Channel channel, string name, bool exactMatch = false)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (name == null) throw new ArgumentNullException(nameof(name));
@@ -180,16 +180,16 @@ namespace Discord
 
 		private IEnumerable<User> FindUsers(IEnumerable<User> users, long? serverId, string name, short? discriminator = null, bool exactMatch = false)
 		{
-			var query = users.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+			var query = users.Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
 
 			if (!exactMatch && name.Length >= 2)
 			{
 				if (name[0] == '<' && name[1] == '@' && name[name.Length - 1] == '>') //Parse mention
 				{
 					long id = IdConvert.ToLong(name.Substring(2, name.Length - 3));
-					var channel = _users[id, serverId];
-					if (channel != null)
-						query = query.Concat(new User[] { channel });
+					var user = _users[id, serverId];
+					if (user != null)
+						query = query.Concat(new User[] { user });
 				}
 				else if (name[0] == '@') //If we somehow get text starting with @ but isn't a mention
 				{
