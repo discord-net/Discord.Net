@@ -17,16 +17,6 @@ namespace Discord.Net.WebSockets
 {
 	public partial class VoiceWebSocket : WebSocket
 	{
-		public enum OpCodes : byte
-		{
-			Identify = 0,
-			SelectProtocol = 1,
-			Ready = 2,
-			Heartbeat = 3,
-			SessionDescription = 4,
-			Speaking = 5
-		}
-
 		private const int MaxOpusSize = 4000;
         private const string EncryptedMode = "xsalsa20_poly1305";
 		private const string UnencryptedMode = "plain";
@@ -114,12 +104,7 @@ namespace Discord.Net.WebSockets
 		{			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 
-			VoiceLoginCommand msg = new VoiceLoginCommand();
-			msg.Payload.ServerId = _serverId.Value;
-			msg.Payload.SessionId = _sessionId;
-			msg.Payload.Token = _token;
-			msg.Payload.UserId = _userId.Value;
-			QueueMessage(msg);
+			SendIdentify();
 
 			List<Task> tasks = new List<Task>();
 			if ((_audioConfig.Mode & AudioMode.Outgoing) != 0)
@@ -224,15 +209,10 @@ namespace Discord.Net.WebSockets
 								if (packetLength != 70)
 									return;
 
-								int port = packet[68] | packet[69] << 8;
 								string ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
+								int port = packet[68] | packet[69] << 8;
 
-								var login2 = new VoiceLogin2Command();
-								login2.Payload.Protocol = "udp";
-								login2.Payload.SocketData.Address = ip;
-								login2.Payload.SocketData.Mode = _encryptionMode;
-								login2.Payload.SocketData.Port = port;
-								QueueMessage(login2);
+								SendSelectProtocol(ip, port);
 								if ((_audioConfig.Mode & AudioMode.Incoming) == 0)
 									return;
 							}
@@ -441,10 +421,10 @@ namespace Discord.Net.WebSockets
 		{
 			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
-			var opCode = (OpCodes)msg.Operation;
+			var opCode = (VoiceOpCodes)msg.Operation;
             switch (opCode)
 			{
-				case OpCodes.Ready:
+				case VoiceOpCodes.Ready:
 					{
 						if (_state != (int)WebSocketState.Connected)
 						{
@@ -481,7 +461,7 @@ namespace Discord.Net.WebSockets
 						}
 					}
 					break;
-				case OpCodes.Heartbeat:
+				case VoiceOpCodes.Heartbeat:
 					{
 						long time = EpochTime.GetMilliseconds();
 						var payload = (long)msg.Payload;
@@ -489,7 +469,7 @@ namespace Discord.Net.WebSockets
 						//TODO: Use this to estimate latency
 					}
 					break;
-				case OpCodes.SessionDescription:
+				case VoiceOpCodes.SessionDescription:
 					{
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_serializer);
 						_secretKey = payload.SecretKey;
@@ -497,7 +477,7 @@ namespace Discord.Net.WebSockets
 						EndConnect();
 					}
 					break;
-				case OpCodes.Speaking:
+				case VoiceOpCodes.Speaking:
 					{
 						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>(_serializer);
 						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
@@ -519,19 +499,6 @@ namespace Discord.Net.WebSockets
 			_sendBuffer.Clear(_cancelToken);
 		}
 
-		private void SendIsTalking(bool value)
-		{
-			var isTalking = new IsTalkingCommand();
-			isTalking.Payload.IsSpeaking = value;
-			isTalking.Payload.Delay = 0;
-			QueueMessage(isTalking);
-		}
-
-		public override void SendHeartbeat()
-		{
-			QueueMessage(new VoiceKeepAliveCommand());
-		}
-
 		public void WaitForQueue()
 		{
 			_sendBuffer.Wait(_cancelToken);
@@ -550,6 +517,39 @@ namespace Discord.Net.WebSockets
 					ThrowError();
 				}
 			});
+		}
+
+		public void SendIdentify()
+		{
+			var msg = new IdentifyCommand();
+			msg.Payload.ServerId = _serverId.Value;
+			msg.Payload.SessionId = _sessionId;
+			msg.Payload.Token = _token;
+			msg.Payload.UserId = _userId.Value;
+			QueueMessage(msg);
+		}
+
+		public void SendSelectProtocol(string externalIp, int externalPort)
+		{
+			var msg = new SelectProtocolCommand();
+			msg.Payload.Protocol = "udp";
+			msg.Payload.SocketData.Address = externalIp;
+			msg.Payload.SocketData.Mode = _encryptionMode;
+			msg.Payload.SocketData.Port = externalPort;
+			QueueMessage(msg);
+		}
+
+		public void SendIsTalking(bool value)
+		{
+			var isTalking = new SpeakingCommand();
+			isTalking.Payload.IsSpeaking = value;
+			isTalking.Payload.Delay = 0;
+			QueueMessage(isTalking);
+		}
+
+		public override void SendHeartbeat()
+		{
+			QueueMessage(new HeartbeatCommand());
 		}
 	}
 }

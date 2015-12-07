@@ -11,14 +11,23 @@ namespace Discord.API
 {
 	public enum GatewayOpCodes : byte
 	{
+		/// <summary> Client <-- Server - Used to send most events. </summary>
 		Dispatch = 0,
+		/// <summary> Client <-> Server - Used to keep the connection alive and measure latency. </summary>
 		Heartbeat = 1,
+		/// <summary> Client --> Server - Used to associate a connection with a token and specify configuration. </summary>
 		Identify = 2,
+		/// <summary> Client --> Server - Used to update client's status and current game id. </summary>
 		StatusUpdate = 3,
+		/// <summary> Client --> Server - Used to join a particular voice channel. </summary>
 		VoiceStateUpdate = 4,
-		//VoiceServerPing = 5, (Unused?)
+		/// <summary> Client --> Server - Used to ensure the server's voice server is alive. Only send this if voice connection fails or suddenly drops. </summary>
+		VoiceServerPing = 5,
+		/// <summary> Client --> Server - Used to resume a connection after a redirect occurs. </summary>
 		Resume = 6,
+		/// <summary> Client <-- Server - Used to notify a client that they must reconnect to another gateway. </summary>
 		Redirect = 7,
+		/// <summary> Client --> Server - Used to request all members that were withheld by large_threshold </summary>
 		RequestGuildMembers = 8
 	}
 
@@ -92,8 +101,6 @@ namespace Discord.API
 		}
 	}
 
-
-	//Commands
 	internal sealed class JoinVoiceCommand : WebSocketMessage<JoinVoiceCommand.Data>
 	{
 		public JoinVoiceCommand() : base((int)GatewayOpCodes.VoiceStateUpdate) { }
@@ -112,7 +119,6 @@ namespace Discord.API
 		}
 	}
 
-	//Events
 	internal sealed class ResumeCommand : WebSocketMessage<ResumeCommand.Data>
 	{
 		public ResumeCommand() : base((int)GatewayOpCodes.Resume) { }

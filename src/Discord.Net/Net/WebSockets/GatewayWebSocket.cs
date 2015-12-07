@@ -109,7 +109,7 @@ namespace Discord.Net.WebSockets
 
 		public void SendIdentify(string token)
 		{
-			IdentifyCommand msg = new IdentifyCommand();
+			var msg = new IdentifyCommand();
 			msg.Payload.Token = token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
 			if (_config.UseLargeThreshold)
@@ -120,10 +120,10 @@ namespace Discord.Net.WebSockets
 
 		public void SendResume()
 		{
-			var resumeMsg = new ResumeCommand();
-			resumeMsg.Payload.SessionId = _sessionId;
-			resumeMsg.Payload.Sequence = _lastSeq;
-			QueueMessage(resumeMsg);
+			var msg = new ResumeCommand();
+			msg.Payload.SessionId = _sessionId;
+			msg.Payload.Sequence = _lastSeq;
+			QueueMessage(msg);
 		}
 
 		public override void SendHeartbeat()
@@ -133,31 +133,31 @@ namespace Discord.Net.WebSockets
 
 		public void SendStatusUpdate(long? idleSince, int? gameId)
 		{
-			var updateStatus = new StatusUpdateCommand();
-			updateStatus.Payload.IdleSince = idleSince;
-			updateStatus.Payload.GameId = gameId;
-            QueueMessage(updateStatus);
+			var msg = new StatusUpdateCommand();
+			msg.Payload.IdleSince = idleSince;
+			msg.Payload.GameId = gameId;
+            QueueMessage(msg);
 		}
 
 		public void SendJoinVoice(long serverId, long channelId)
 		{
-			var joinVoice = new JoinVoiceCommand();
-			joinVoice.Payload.ServerId = serverId;
-			joinVoice.Payload.ChannelId = channelId;
-			QueueMessage(joinVoice);
+			var msg = new JoinVoiceCommand();
+			msg.Payload.ServerId = serverId;
+			msg.Payload.ChannelId = channelId;
+			QueueMessage(msg);
 		}
 		public void SendLeaveVoice(long serverId)
 		{
-			var leaveVoice = new JoinVoiceCommand();
-			leaveVoice.Payload.ServerId = serverId;
-			QueueMessage(leaveVoice);
+			var msg = new JoinVoiceCommand();
+			msg.Payload.ServerId = serverId;
+			QueueMessage(msg);
 		}
 
 		public void SendRequestUsers(long serverId, string query = "", int limit = 0)
 		{
-			var getOfflineUsers = new GetUsersCommand();
-			getOfflineUsers.Payload.ServerId = serverId;
-			QueueMessage(getOfflineUsers);
+			var msg = new GetUsersCommand();
+			msg.Payload.ServerId = serverId;
+			QueueMessage(msg);
 		}
 	}
 }

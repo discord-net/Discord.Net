@@ -7,10 +7,26 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-	//Commands
-	internal sealed class VoiceLoginCommand : WebSocketMessage<VoiceLoginCommand.Data>
+	public enum VoiceOpCodes : byte
 	{
-		public VoiceLoginCommand() : base(0) { }
+		/// <summary> Client --> Server - Used to associate a connection with a token. </summary>
+		Identify = 0,
+		/// <summary> Client --> Server - Used to specify configuration. </summary>
+		SelectProtocol = 1,
+		/// <summary> Client <-- Server - Used to notify that the voice connection was successful and informs the client of available protocols. </summary>
+		Ready = 2,
+		/// <summary> Client <-> Server - Used to keep the connection alive and measure latency. </summary>
+		Heartbeat = 3,
+		/// <summary> Client <-- Server - Used to provide an encryption key to the client. </summary>
+		SessionDescription = 4,
+		/// <summary> Client <-> Server - Used to inform that a certain user is speaking. </summary>
+		Speaking = 5
+	}
+
+	//Commands
+	internal sealed class IdentifyCommand : WebSocketMessage<IdentifyCommand.Data>
+	{
+		public IdentifyCommand() : base((int)VoiceOpCodes.Identify) { }
 		public class Data
 		{
 			[JsonProperty("server_id")]
@@ -25,9 +41,9 @@ namespace Discord.API
 			public string Token;
 		}
 	}
-	internal sealed class VoiceLogin2Command : WebSocketMessage<VoiceLogin2Command.Data>
+	internal sealed class SelectProtocolCommand : WebSocketMessage<SelectProtocolCommand.Data>
 	{
-		public VoiceLogin2Command() : base(1) { }
+		public SelectProtocolCommand() : base((int)VoiceOpCodes.SelectProtocol) { }
 		public class Data
 		{
 			public class SocketInfo
@@ -45,13 +61,13 @@ namespace Discord.API
 			public SocketInfo SocketData = new SocketInfo();
 		}
 	}
-	internal sealed class VoiceKeepAliveCommand : WebSocketMessage<long>
+	internal sealed class HeartbeatCommand : WebSocketMessage<long>
 	{
-		public VoiceKeepAliveCommand() : base(3, EpochTime.GetMilliseconds()) { }
+		public HeartbeatCommand() : base((int)VoiceOpCodes.Heartbeat, EpochTime.GetMilliseconds()) { }
 	}
-	internal sealed class IsTalkingCommand : WebSocketMessage<IsTalkingCommand.Data>
+	internal sealed class SpeakingCommand : WebSocketMessage<SpeakingCommand.Data>
 	{
-		public IsTalkingCommand() : base(5) { }
+		public SpeakingCommand() : base((int)VoiceOpCodes.Speaking) { }
 		public class Data
 		{
 			[JsonProperty("delay")]
