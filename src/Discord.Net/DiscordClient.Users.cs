@@ -147,7 +147,6 @@ namespace Discord
 			return _users[userId, server.Id];
 		}
 		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive. </remarks>
 		public User GetUser(Server server, string username, short discriminator)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
@@ -159,7 +158,7 @@ namespace Discord
 		}
 
 		/// <summary> Returns all users with the specified server and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive.</remarks>
 		public IEnumerable<User> FindUsers(Server server, string name, short? discriminator = null, bool exactMatch = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
@@ -169,7 +168,7 @@ namespace Discord
 			return FindUsers(server.Members, server.Id, name, discriminator, exactMatch);
 		}
 		/// <summary> Returns all users with the specified channel and name, along with their server-specific data. </summary>
-		/// <remarks> Name formats supported: Name and @Name. Search is case-insensitive.</remarks>
+		/// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive.</remarks>
 		public IEnumerable<User> FindUsers(Channel channel, string name, short? discriminator = null, bool exactMatch = false)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
