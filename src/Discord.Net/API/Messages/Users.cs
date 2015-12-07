@@ -33,13 +33,13 @@ namespace Discord.API
 	{
 		[JsonProperty("password")]
 		public string CurrentPassword;
-		[JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("email")]
 		public string Email;
 		[JsonProperty("new_password")]
 		public string Password;
-		[JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("username")]
 		public string Username;
-		[JsonProperty("avatar", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("avatar")]
 		public string Avatar;
 	}
 	public sealed class EditUserResponse : UserInfo { }

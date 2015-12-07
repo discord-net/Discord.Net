@@ -814,10 +814,12 @@ namespace Discord
 					case "USER_UPDATE":
 						{
 							var data = e.Payload.ToObject<UserUpdateEvent>(_webSocket.Serializer);
-							var user = _globalUsers[data.Id];
-							if (user != null)
+							var globalUser = _globalUsers[data.Id];
+							if (globalUser != null)
 							{
-								user.Update(data);
+								globalUser.Update(data);
+								foreach (var user in globalUser.Memberships)
+									user.Update(data);
 								RaiseProfileUpdated();
 							}
 						}

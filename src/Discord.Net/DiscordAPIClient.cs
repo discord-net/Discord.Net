@@ -303,22 +303,24 @@ namespace Discord
 
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(long serverId, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
+		public Task<EditServerResponse> EditServer(long serverId, string name = null, string region = null, 
+			Stream icon = null, ImageType iconType = ImageType.Png, string existingIcon = null)
 		{
 			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 
-			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(icon, iconType) };
+			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(icon, iconType, existingIcon) };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
 		}
 
 		//User
 		public Task<EditUserResponse> EditProfile(string currentPassword = "",
 			string username = null, string email = null, string password = null,
-			Stream avatar = null, ImageType avatarType = ImageType.Png)
+			Stream avatar = null, ImageType avatarType = ImageType.Png, string existingAvatar = null)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 			
-			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username, Email = email, Password = password, Avatar = Base64Picture(avatar, avatarType) };
+			var request = new EditUserRequest { CurrentPassword = currentPassword, Username = username,
+				Email = email, Password = password, Avatar = Base64Picture(avatar, avatarType, existingAvatar) };
 			return _rest.Patch<EditUserResponse>(Endpoints.UserMe, request);
 		}
 
@@ -326,10 +328,10 @@ namespace Discord
 		public Task<GetRegionsResponse> GetVoiceRegions()
 			=> _rest.Get<GetRegionsResponse>(Endpoints.VoiceRegions);
 
-		private string Base64Picture(Stream stream, ImageType type)
+		private string Base64Picture(Stream stream, ImageType type, string existingId)
 		{
 			if (type == ImageType.None)
-				return "";
+				return null;
 			else if (stream != null)
 			{
 				byte[] bytes = new byte[stream.Length - stream.Position];
@@ -339,7 +341,7 @@ namespace Discord
 				string imageType = type == ImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
 				return $"data:{imageType},{base64}";
 			}
-			return null;
+			return existingId;
 		}
 	}
 }

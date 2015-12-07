@@ -275,7 +275,7 @@ namespace Discord
 
 			await _api.EditProfile(currentPassword: currentPassword, 
 				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
-				avatar: avatar, avatarType: avatarType);
+				avatar: avatar, avatarType: avatarType, existingAvatar: _privateUser?.AvatarId);
 
 			if (password != null)
 			{
