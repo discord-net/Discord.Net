@@ -91,7 +91,6 @@ namespace Discord
 		}
 
 		/// <summary> Returns true if the logged-in user was mentioned. </summary>
-		/// <remarks> This is not set to true if the user was mentioned with @everyone (see IsMentioningEverone). </remarks>
 		public bool IsMentioningMe { get; private set; }
 		/// <summary> Returns true if the current user created this message. </summary>
 		public bool IsAuthor => _client.CurrentUser.Id == _user.Id;
