@@ -40,7 +40,7 @@ namespace Discord
 		//TODO: Add local members cache
 
 		/// <summary> Returns the string used to mention this role. </summary>
-		public string Mention { get { if (IsEveryone) return "@everyone"; else throw new InvalidOperationException("Discord currently only supports referencing the everyone role"); } }
+		public string Mention { get { if (IsEveryone) return "@everyone"; else throw new InvalidOperationException("Discord currently only supports mentioning the everyone role"); } }
 
 		internal Role(DiscordClient client, long id, long serverId)
 			: base(client, id)
