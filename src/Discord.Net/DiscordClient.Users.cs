@@ -175,7 +175,7 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			return FindUsers(channel.Members, channel.IsPrivate ? (long?)null : channel.Server.Id, name, null, exactMatch);
+			return FindUsers(channel.Members, channel.IsPrivate ? (long?)null : channel.Server.Id, name, exactMatch: exactMatch);
         }
 
 		private IEnumerable<User> FindUsers(IEnumerable<User> users, long? serverId, string name, short? discriminator = null, bool exactMatch = false)
