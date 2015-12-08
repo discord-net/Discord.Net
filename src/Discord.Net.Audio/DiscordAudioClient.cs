@@ -74,7 +74,7 @@ namespace Discord.Audio
 									var client = _service.Client;
 									string token = e.Payload.Value<string>("token");
 									_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-									await _voiceSocket.Login(client.CurrentUser.Id, _gatewaySocket.SessionId, token, client.CancelToken).ConfigureAwait(false);
+									await _voiceSocket.Connect(client.CurrentUser.Id, _gatewaySocket.SessionId, token/*, client.CancelToken*/).ConfigureAwait(false);
 								}
 							}
 							break;

@@ -55,14 +55,14 @@ namespace Discord.Net.WebSockets
 			_webSocket.OnError += async (s, e) =>
 			{
 				_logger.Log(LogSeverity.Error, "WebSocket Error", e.Exception);
-				await _parent.DisconnectInternal(e.Exception, skipAwait: true).ConfigureAwait(false);
+				await _parent.SignalDisconnect(e.Exception, isUnexpected: true).ConfigureAwait(false);
 			};
 			_webSocket.OnClose += async (s, e) =>
 			{
 				string code = e.WasClean ? e.Code.ToString() : "Unexpected";
 				string reason = e.Reason != "" ? e.Reason : "No Reason";
-				Exception ex = new Exception($"Got Close Message ({code}): {reason}");
-				await _parent.DisconnectInternal(ex, skipAwait: true).ConfigureAwait(false);
+				var ex = new Exception($"Got Close Message ({code}): {reason}");
+				await _parent.SignalDisconnect(ex, isUnexpected: true).ConfigureAwait(false);
 			};
 			_webSocket.Log.Output = (e, m) => { }; //Dont let websocket-sharp print to console directly
             _webSocket.Connect();

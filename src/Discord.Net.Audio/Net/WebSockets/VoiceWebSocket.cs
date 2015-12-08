@@ -58,20 +58,13 @@ namespace Discord.Net.WebSockets
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_audioConfig.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 		
-		public async Task Login(long userId, string sessionId, string token, CancellationToken cancelToken)
-		{
-			if ((WebSocketState)_state == WebSocketState.Connected)
-			{
-				//Adjust the host and tell the system to reconnect
-				await DisconnectInternal(new Exception("Server transfer occurred."), isUnexpected: false).ConfigureAwait(false);
-				return;
-			}
-			
+		public async Task Connect(long userId, string sessionId, string token)
+		{			
 			_userId = userId;
 			_sessionId = sessionId;
 			_token = token;
-			
-			await Start().ConfigureAwait(false);
+
+			await BeginConnect().ConfigureAwait(false);
 		}
 		public async Task Reconnect()
 		{
@@ -83,9 +76,7 @@ namespace Discord.Net.WebSockets
 				{
 					try
 					{
-						//This check is needed in case we start a reconnect before the initial login completes
-						if (_state != (int)WebSocketState.Disconnected) 
-							await Start().ConfigureAwait(false);
+						await Connect(_userId.Value, _sessionId, _token).ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -99,12 +90,14 @@ namespace Discord.Net.WebSockets
 			}
 			catch (OperationCanceledException) { }
 		}
+		public Task Disconnect()
+		{
+			return SignalDisconnect(wait: true);
+		}
 
-		protected override IEnumerable<Task> GetTasks()
+		protected override async Task Run()
 		{			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
-
-			SendIdentify();
 
 			List<Task> tasks = new List<Task>();
 			if ((_audioConfig.Mode & AudioMode.Outgoing) != 0)
@@ -112,35 +105,24 @@ namespace Discord.Net.WebSockets
 				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
 				_sendThread.IsBackground = true;
                 _sendThread.Start();
-			}
-			
-			//This thread is required to establish a connection even if we're outgoing only
+			}			
 			if ((_audioConfig.Mode & AudioMode.Incoming) != 0)
 			{
 				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
 				_receiveThread.IsBackground = true;
 				_receiveThread.Start();
 			}
-			else //Dont make an OS thread if we only want to capture one packet...
-				tasks.Add(Task.Run(() => ReceiveVoiceAsync(_cancelToken)));
+			
+			SendIdentify();
 
 #if !DOTNET5_4
 			tasks.Add(WatcherAsync());
 #endif
-			if (tasks.Count > 0)
-			{
-				// We need to combine tasks into one because receiveThread is 
-				// supposed to exit early if it's an outgoing-only client
-				// and we dont want the main thread to think we errored
-				var task = Task.WhenAll(tasks);
-				tasks.Clear();
-				tasks.Add(task);
-			}
-			tasks.AddRange(base.GetTasks());
-			
-			return new Task[] { Task.WhenAll(tasks.ToArray()) };
+			await RunTasks(tasks.ToArray());
+
+			await Cleanup();
 		}
-		protected override Task Stop()
+		protected override Task Cleanup()
 		{
 			if (_sendThread != null)
 				_sendThread.Join();
@@ -165,7 +147,7 @@ namespace Discord.Net.WebSockets
 			}
 			_udp = null;
 
-			return base.Stop();
+			return base.Cleanup();
 		}
 		
 		private void ReceiveVoiceAsync(CancellationToken cancelToken)
@@ -474,7 +456,7 @@ namespace Discord.Net.WebSockets
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_serializer);
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
-						EndConnect();
+						await EndConnect();
 					}
 					break;
 				case VoiceOpCodes.Speaking:

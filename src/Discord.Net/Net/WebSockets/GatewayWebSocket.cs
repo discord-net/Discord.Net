@@ -8,7 +8,11 @@ namespace Discord.Net.WebSockets
 {
     public partial class GatewayWebSocket : WebSocket
 	{
-        private int _lastSeq;
+		public int LastSequence => _lastSeq;
+		private int _lastSeq;
+
+		public string Token => _token;
+		private string _token;
 
 		public string SessionId => _sessionId;
 		private string _sessionId;
@@ -16,25 +20,25 @@ namespace Discord.Net.WebSockets
 		public GatewayWebSocket(DiscordConfig config, Logger logger)
 			: base(config, logger)
 		{
+			Disconnected += async (s, e) =>
+			{
+				if (e.WasUnexpected)
+					await Reconnect().ConfigureAwait(false);
+			};
 		}
 
-        public async Task Login(string token)
+        public async Task Connect(string token)
 		{
+			_token = token;
 			await BeginConnect().ConfigureAwait(false);
-			await Start().ConfigureAwait(false);
-
 			SendIdentify(token);
         }
 		private async Task Redirect(string server)
 		{
-			await DisconnectInternal(isUnexpected: false).ConfigureAwait(false);
-
 			await BeginConnect().ConfigureAwait(false);
-			await Start().ConfigureAwait(false);
-
 			SendResume();
 		}
-		public async Task Reconnect(string token)
+		private async Task Reconnect()
 		{
 			try
 			{
@@ -44,7 +48,7 @@ namespace Discord.Net.WebSockets
 				{
 					try
 					{
-						await Login(token).ConfigureAwait(false);
+						await Connect(_token).ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -57,6 +61,15 @@ namespace Discord.Net.WebSockets
 				}
 			}
 			catch (OperationCanceledException) { }
+		}
+		public Task Disconnect()
+		{
+			return SignalDisconnect(wait: true);
+		}
+
+		protected override async Task Run()
+		{
+			await RunTasks();
 		}
 
 		protected override async Task ProcessMessage(string json)
@@ -85,7 +98,7 @@ namespace Discord.Net.WebSockets
 						}
 						RaiseReceivedDispatch(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
-							EndConnect();
+							await EndConnect(); //Complete the connect
 					}
 					break;
 				case GatewayOpCodes.Redirect:

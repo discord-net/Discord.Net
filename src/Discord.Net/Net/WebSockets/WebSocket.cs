@@ -114,38 +114,50 @@ namespace Discord.Net.WebSockets
 		{
 			try
 			{
-				await Disconnect().ConfigureAwait(false);
+				await SignalDisconnect(wait: true).ConfigureAwait(false);
+				_state = (int)WebSocketState.Connecting;
 
 				if (ParentCancelToken == null)
 					throw new InvalidOperationException("Parent cancel token was never set.");
 				_cancelTokenSource = new CancellationTokenSource();
 				_cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
 
-				_state = (int)WebSocketState.Connecting;
+				if (_state != (int)WebSocketState.Connecting)
+					throw new InvalidOperationException("Socket is in the wrong state.");
+
+				_lastHeartbeat = DateTime.UtcNow;
+				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
+
+				_runTask = Run();
 			}
 			catch (Exception ex)
 			{
-				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
+				await SignalDisconnect(ex, isUnexpected: false).ConfigureAwait(false);
 				throw;
 			}
 		}
-		protected void EndConnect()
+		protected async Task EndConnect()
 		{
-			_state = (int)WebSocketState.Connected;
-			_connectedEvent.Set();
-			RaiseConnected();
-        }
+			try
+			{
+				_state = (int)WebSocketState.Connected;
 
-		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		protected internal async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
+				_connectedEvent.Set();
+				RaiseConnected();
+			}
+			catch (Exception ex)
+			{
+				await SignalDisconnect(ex, isUnexpected: false).ConfigureAwait(false);
+				throw;
+			}
+		}
+		
+		protected internal async Task SignalDisconnect(Exception ex = null, bool isUnexpected = false, bool wait = false)
 		{
-			int oldState;
-			bool hasWriterLock;
-
 			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
-			oldState = Interlocked.CompareExchange(ref _state, (int)WebSocketState.Disconnecting, (int)WebSocketState.Connecting);
+			int oldState = Interlocked.CompareExchange(ref _state, (int)WebSocketState.Disconnecting, (int)WebSocketState.Connecting);
 			if (oldState == (int)WebSocketState.Disconnected) return; //Already disconnected
-			hasWriterLock = oldState == (int)WebSocketState.Connecting; //Caused state change
+			bool hasWriterLock = oldState == (int)WebSocketState.Connecting; //Caused state change
 			if (!hasWriterLock)
 			{
 				oldState = Interlocked.CompareExchange(ref _state, (int)WebSocketState.Disconnecting, (int)WebSocketState.Connected);
@@ -155,70 +167,55 @@ namespace Discord.Net.WebSockets
 
 			if (hasWriterLock)
 			{
-				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectState = (WebSocketState)oldState;
-				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
-
+				CaptureError(ex ?? new Exception("Disconnect was requested."), isUnexpected);
 				_cancelTokenSource.Cancel();
 				if (_disconnectState == WebSocketState.Connecting) //_runTask was never made
-					await Stop().ConfigureAwait(false);
+					await Cleanup().ConfigureAwait(false);
 			}
 
-			if (!skipAwait)
+			if (!wait)
 			{
 				Task task = _runTask;
 				if (_runTask != null)
 					await task.ConfigureAwait(false);
 			}
 		}
-
-		protected virtual async Task Start()
+		private void CaptureError(Exception ex, bool isUnexpected)
 		{
-            try
-			{
-				if (_state != (int)WebSocketState.Connecting)
-					throw new InvalidOperationException("Socket is in the wrong state.");
-
-				_lastHeartbeat = DateTime.UtcNow;
-				await _engine.Connect(Host, _cancelToken).ConfigureAwait(false);
-
-				_runTask = RunTasks();
-			}
-			catch (Exception ex)
-			{
-				await DisconnectInternal(ex, isUnexpected: false).ConfigureAwait(false);
-				throw;
-			}
+			_disconnectReason = ExceptionDispatchInfo.Capture(ex);
+			_wasDisconnectUnexpected = isUnexpected;
 		}
 
-		protected virtual async Task RunTasks()
+		protected abstract Task Run();
+		protected async Task RunTasks(params Task[] tasks)
 		{
-			Task[] tasks = GetTasks().ToArray();
+			//Get all async tasks
+			tasks = tasks
+				.Concat(_engine.GetTasks(_cancelToken))
+				.Concat(new Task[] { HeartbeatAsync(_cancelToken) })
+				.ToArray();
+
+			//Create group tasks
 			Task firstTask = Task.WhenAny(tasks);
 			Task allTasks = Task.WhenAll(tasks);
 
 			//Wait until the first task ends/errors and capture the error
-            try {  await firstTask.ConfigureAwait(false); }
-			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
+			Exception ex = null;
+			try { await firstTask.ConfigureAwait(false); }
+			catch (Exception ex2) { ex = ex2; }
 
 			//Ensure all other tasks are signaled to end.
-			await DisconnectInternal(skipAwait: true).ConfigureAwait(false);
+			await SignalDisconnect(ex, ex != null, true).ConfigureAwait(false);
 
 			//Wait for the remaining tasks to complete
 			try { await allTasks.ConfigureAwait(false); }
 			catch { }
 
 			//Start cleanup
-			await Stop().ConfigureAwait(false);
-		}
-		protected virtual IEnumerable<Task> GetTasks()
-		{
-			var cancelToken = _cancelToken;
-			return _engine.GetTasks(cancelToken)
-				.Concat(new Task[] { HeartbeatAsync(cancelToken) });
+			await Cleanup().ConfigureAwait(false);
 		}
 
-		protected virtual async Task Stop()
+		protected virtual async Task Cleanup()
 		{
 			var disconnectState = _disconnectState;
 			_disconnectState = WebSocketState.Disconnected;
@@ -254,7 +251,7 @@ namespace Discord.Net.WebSockets
 
 		private Task HeartbeatAsync(CancellationToken cancelToken)
 		{
-			return Task.Run((Func<Task>)(async () =>
+			return Task.Run(async () =>
 			{
 				try
 				{
@@ -270,7 +267,7 @@ namespace Discord.Net.WebSockets
 					}
 				}
 				catch (OperationCanceledException) { }
-			}));
+			});
 		}
 
 		protected internal void ThrowError()

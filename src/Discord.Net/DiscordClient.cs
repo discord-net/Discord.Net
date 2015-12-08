@@ -266,11 +266,9 @@ namespace Discord
 				if (_state == (int)DiscordClientState.Connecting)
 					CompleteConnect();
 			};
-			socket.Disconnected += async (s, e) =>
+			socket.Disconnected += (s, e) =>
 			{
 				RaiseDisconnected(e);
-				if (e.WasUnexpected)
-					await socket.Reconnect(_token).ConfigureAwait(false);
 			};
 
 			socket.ReceivedDispatch += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
@@ -329,7 +327,7 @@ namespace Discord
 
 				_webSocket.Host = gateway;
 				_webSocket.ParentCancelToken = _cancelToken;
-				await _webSocket.Login(token).ConfigureAwait(false);
+				await _webSocket.Connect(token).ConfigureAwait(false);
 
 				_runTask = RunTasks();
 
@@ -422,7 +420,7 @@ namespace Discord
 			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
 			_wasDisconnectUnexpected = false;
 
-			await _webSocket.Disconnect().ConfigureAwait(false);
+			await _webSocket.SignalDisconnect().ConfigureAwait(false);
 
 			_userId = null;
 			_gateway = null;
