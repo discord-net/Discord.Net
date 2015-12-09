@@ -50,7 +50,7 @@ namespace Discord
 
 		/// <summary> Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
 		public bool UseMessageQueue { get { return _useMessageQueue; } set { SetValue(ref _useMessageQueue, value); } }
-		private bool _useMessageQueue = false;
+		private bool _useMessageQueue = true;
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the message queue is empty before checking again. </summary>
 		public int MessageQueueInterval { get { return _messageQueueInterval; } set { SetValue(ref _messageQueueInterval, value); } }
 		private int _messageQueueInterval = 100;
