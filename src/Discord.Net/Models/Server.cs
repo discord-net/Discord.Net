@@ -38,14 +38,11 @@ namespace Discord
 		/// <summary> Returns the URL to this user's current avatar. </summary>
 		public string IconUrl => IconId != null ? Endpoints.ServerIcon(Id, IconId) : null;
 
-		/// <summary> Returns true if the current user created this server. </summary>
-		public bool IsOwner => _client.CurrentUser.Id == _owner.Id;
-
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
 		public User Owner => _owner.Value;
 		[JsonProperty]
-		private long? OwnerId => _owner.Id;
+		internal long? OwnerId => _owner.Id;
 		private Reference<User> _owner;
 
 		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
@@ -110,6 +107,7 @@ namespace Discord
 		internal override bool LoadReferences()
 		{
 			_afkChannel.Load();
+            _owner.Load();
 			return true;
         }
 		internal override void UnloadReferences()
@@ -185,7 +183,7 @@ namespace Discord
 			}
 			
 			var usersCache = _client.Users;
-			foreach (var subModel in model.Members)
+            foreach (var subModel in model.Members)
 			{
 				var user = usersCache.GetOrAdd(subModel.User.Id, Id);
 				user.Update(subModel);
@@ -279,10 +277,9 @@ namespace Discord
 		}
         private void UpdatePermissions(User user, ServerPermissions permissions)
 		{
-			uint oldPermissions = permissions.RawValue;
 			uint newPermissions = 0;
 
-			if (Owner == user)
+			if (user.IsOwner)
 				newPermissions = ServerPermissions.All.RawValue;
 			else
 			{
@@ -294,7 +291,7 @@ namespace Discord
 			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
 				newPermissions = ServerPermissions.All.RawValue;
 
-			if (newPermissions != oldPermissions)
+			if (newPermissions != permissions.RawValue)
 			{
 				permissions.SetRawValueInternal(newPermissions);
 				foreach (var channel in _channels)

@@ -68,12 +68,30 @@ namespace Discord
 		{
 			get
 			{
-				if (Type == ChannelType.Text)
-					return _members.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
-				else if (Type == ChannelType.Voice)
-					return _members.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
-				else
-					return Enumerable.Empty<User>();
+                if (IsPrivate)
+                    return _members.Values.Select(x => x.User);
+                if (_client.Config.UsePermissionsCache)
+                {
+                    if (Type == ChannelType.Text)
+                        return _members.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
+                    else if (Type == ChannelType.Voice)
+                        return _members.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
+                }
+                else
+                {
+                    if (Type == ChannelType.Text)
+                    {
+                        ChannelPermissions perms = new ChannelPermissions();
+                        return Server.Members.Where(x =>
+                        {
+                            UpdatePermissions(x, perms);
+                            return perms.ReadMessages == true;
+                        });
+                    }
+                    else if (Type == ChannelType.Voice)
+                        return Server.Members.Where(x => x.VoiceChannel == this);
+                }
+				return Enumerable.Empty<User>();
             }
 		}
 		[JsonProperty]
@@ -115,13 +133,13 @@ namespace Discord
 						x.Global.PrivateChannel = null;
                 });
 			_permissionOverwrites = new PermissionOverwrite[0];
-			_members = new ConcurrentDictionary<long, ChannelMember>();
+            _members = new ConcurrentDictionary<long, ChannelMember>();
 
-			if (recipientId != null)
-			{
-				AddMember(client.PrivateUser);
-				AddMember(Recipient);
-			}
+            if (recipientId != null)
+            {
+                AddMember(client.PrivateUser);
+                AddMember(Recipient);
+            }
 
 			//Local Cache
 			if (client.Config.MessageCacheSize > 0)
@@ -190,40 +208,61 @@ namespace Discord
 		internal void RemoveMessage(Message message) => _messages.TryRemove(message.Id, out message);
 		
 		internal void AddMember(User user)
-		{
-			var member = new ChannelMember(user);
+        {
+            if (!_client.Config.UsePermissionsCache)
+                return;
+
+            var member = new ChannelMember(user);
             if (_members.TryAdd(user.Id, member))
 				UpdatePermissions(user, member.Permissions);
         }
 		internal void RemoveMember(User user)
-		{
-			ChannelMember ignored;
+        {
+            if (!_client.Config.UsePermissionsCache)
+                return;
+
+            ChannelMember ignored;
 			_members.TryRemove(user.Id, out ignored);
 		}
 
-		internal ChannelPermissions GetPermissions(User user)
-		{
-			ChannelMember member;
-			if (_members.TryGetValue(user.Id, out member))
-				return member.Permissions;
-			else
-				return null;
+        internal ChannelPermissions GetPermissions(User user)
+        {
+            if (_client.Config.UsePermissionsCache)
+            {
+                ChannelMember member;
+                if (_members.TryGetValue(user.Id, out member))
+                    return member.Permissions;
+                else
+                    return null;
+            }
+            else
+            {
+                ChannelPermissions perms = new ChannelPermissions();
+                UpdatePermissions(user, perms);
+                return perms;
+            }
 		}
 		internal void UpdatePermissions()
-		{
-			foreach (var pair in _members)
-			{
-				ChannelMember member = pair.Value;
-				UpdatePermissions(member.User, member.Permissions);
-			}
+        {
+            if (!_client.Config.UsePermissionsCache)
+                return;
+
+            foreach (var pair in _members)
+            {
+                ChannelMember member = pair.Value;
+                UpdatePermissions(member.User, member.Permissions);
+            }
 		}
-		internal void UpdatePermissions(User user)
-		{
-			ChannelMember member;
-			if (_members.TryGetValue(user.Id, out member))
-				UpdatePermissions(member.User, member.Permissions);
+        internal void UpdatePermissions(User user)
+        {
+            if (!_client.Config.UsePermissionsCache)
+                return;
+
+            ChannelMember member;
+            if (_members.TryGetValue(user.Id, out member))
+                UpdatePermissions(member.User, member.Permissions);
         }
-        private void UpdatePermissions(User user, ChannelPermissions permissions)
+        internal void UpdatePermissions(User user, ChannelPermissions permissions)
 		{
 			uint newPermissions = 0;
 			var server = Server;
@@ -236,7 +275,7 @@ namespace Discord
 				//Start with this user's server permissions
 				newPermissions = server.GetPermissions(user).RawValue;
 
-				if (IsPrivate || server.Owner == user)
+				if (IsPrivate || user.IsOwner)
 					newPermissions = mask; //Owners always have all permissions
 				else
 				{
@@ -263,7 +302,8 @@ namespace Discord
 			else
 				newPermissions = mask; //Private messages always have all permissions
 
-			permissions.SetRawValueInternal(newPermissions);
+            if (newPermissions != permissions.RawValue)
+                permissions.SetRawValueInternal(newPermissions);
 		}
 
 		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;

@@ -83,8 +83,11 @@ namespace Discord
 		/// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
 		public int MessageCacheSize { get { return _messageCacheSize; } set { SetValue(ref _messageCacheSize, value); } }
 		private int _messageCacheSize = 100;
-		/// <summary> Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
-		public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
+        /// <summary> Gets or sets whether the permissions cache should be used. This makes operations such as User.GetPermissions(Channel), User.ServerPermissions and Channel.Members </summary>
+        public bool UsePermissionsCache { get { return _usePermissionsCache; } set { SetValue(ref _usePermissionsCache, value); } }
+        private bool _usePermissionsCache = true;
+        /// <summary> Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
+        public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
 		private bool _trackActivity = true;
 	}
 }
