@@ -3,6 +3,7 @@ using Discord.API;
 using RestSharp;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,15 +64,29 @@ namespace Discord.Net.Rest
 			{
 				var response = await _client.ExecuteTaskAsync(request, cancelToken).ConfigureAwait(false);
 				int statusCode = (int)response.StatusCode;
-				if (statusCode == 0) //Internal Error
-				{
-					if (response.ErrorException.HResult == -2146233079 && retryCount++ < 5) //The request was aborted: Could not create SSL/TLS secure channel.
-						continue; //Seems to work if we immediately retry
-					throw response.ErrorException;
-				}
-				if (statusCode < 200 || statusCode >= 300) //2xx = Success
+                if (statusCode == 0) //Internal Error
+                {
+                    //The request was aborted: Could not create SSL/TLS secure channel.
+                    if (response.ErrorException.HResult == -2146233079 && retryCount++ < 5)
+                        continue; //Retrying seems to fix this somehow?
+                    throw response.ErrorException;
+                }
+                else if (statusCode == 429) //Rate limit
+                {
+                    var retryAfter = response.Headers
+                        .FirstOrDefault(x => x.Name.Equals("Retry-After", StringComparison.OrdinalIgnoreCase));
+                    int milliseconds;
+                    if (retryAfter != null)
+                    {
+                        await Task.Delay((int)retryAfter.Value);
+                        continue;
+                    }
+                    throw new HttpException(response.StatusCode);
+                }
+				else if (statusCode < 200 || statusCode >= 300) //2xx = Success
 					throw new HttpException(response.StatusCode);
-				return response.Content;
+                else
+				    return response.Content;
 			}
 		}
 
