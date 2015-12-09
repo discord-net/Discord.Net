@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -82,8 +81,8 @@ namespace Discord
 		private readonly DiscordAPIClient _api;
 
 		/// <summary> Returns the internal websocket object. </summary>
-		public GatewayWebSocket WebSocket => _webSocket;
-		private readonly GatewayWebSocket _webSocket;
+		public GatewaySocket WebSocket => _webSocket;
+		private readonly GatewaySocket _webSocket;
 
 		public string GatewayUrl => _gateway;
 		private string _gateway;
@@ -140,11 +139,24 @@ namespace Discord
 			CreateCacheLogger();
 
 			//Networking
-			_webSocket = CreateWebSocket();
-			_api = new DiscordAPIClient(_config);
+			_webSocket = new GatewaySocket(_config, _log.CreateLogger("WebSocket"));
+            var settings = new JsonSerializerSettings();
+            _webSocket.Connected += (s, e) =>
+            {
+                if (_state == (int)DiscordClientState.Connecting)
+                    EndConnect();
+            };
+            _webSocket.Disconnected += (s, e) =>
+            {
+                RaiseDisconnected(e);
+            };
+
+            _webSocket.ReceivedDispatch += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
+
+            _api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<Message>();
-			this.Connected += async (s, e) =>
+			Connected += async (s, e) =>
 			{
 				_api.CancelToken = _cancelToken;
 				await SendStatus().ConfigureAwait(false);
@@ -257,24 +269,6 @@ namespace Discord
 			}
 		}
 
-		private GatewayWebSocket CreateWebSocket()
-		{
-			var socket = new GatewayWebSocket(_config, _log.CreateLogger("WebSocket"));
-			var settings = new JsonSerializerSettings();
-			socket.Connected += (s, e) =>
-			{
-				if (_state == (int)DiscordClientState.Connecting)
-					CompleteConnect();
-			};
-			socket.Disconnected += (s, e) =>
-			{
-				RaiseDisconnected(e);
-			};
-
-			socket.ReceivedDispatch += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
-			return socket;
-		}
-
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
@@ -285,73 +279,73 @@ namespace Discord
 			if (State != DiscordClientState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
 			
-			string token;
-			try
-			{
-				var response = await _api.Login(email, password)
-					.ConfigureAwait(false);
-				token = response.Token;
-				if (_config.LogLevel >= LogSeverity.Verbose)
-					_logger.Log(LogSeverity.Verbose, "Login successful, got token.");
+			var response = await _api.Login(email, password)
+				.ConfigureAwait(false);
+            _token = response.Token;
+            _api.Token = response.Token;
+            if (_config.LogLevel >= LogSeverity.Verbose)
+				_logger.Log(LogSeverity.Verbose, "Login successful, got token.");
 
-				await Connect(token);
-				return token;
-			}
-			catch (TaskCanceledException) { throw new TimeoutException(); }
-		}
+            await BeginConnect();
+            return response.Token;
+        }
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
-		{
-			if (!_sentInitialLog)
-				SendInitialLog();
+        {
+            if (!_sentInitialLog)
+                SendInitialLog();
 
-			if (State != (int)DiscordClientState.Disconnected)
-				await Disconnect().ConfigureAwait(false);
+            if (State != (int)DiscordClientState.Disconnected)
+                await Disconnect().ConfigureAwait(false);
 
-			_api.Token = token;
-			var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
-			string gateway = gatewayResponse.Url;
-			if (_config.LogLevel >= LogSeverity.Verbose)
-				_logger.Log(LogSeverity.Verbose, $"Websocket endpoint: {gateway}");
+            _token = token;
+            _api.Token = token;
+            await BeginConnect();
+        }
 
-			try
-			{
-				_state = (int)DiscordClientState.Connecting;
-				_disconnectedEvent.Reset();
+        private async Task BeginConnect()
+        {
+            try
+            {
+                _state = (int)DiscordClientState.Connecting;
 
-				_gateway = gateway;
-				_token = token;
+                var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
+                string gateway = gatewayResponse.Url;
+                if (_config.LogLevel >= LogSeverity.Verbose)
+                    _logger.Log(LogSeverity.Verbose, $"Websocket endpoint: {gateway}");
 
-				_cancelTokenSource = new CancellationTokenSource();
-				_cancelToken = _cancelTokenSource.Token;
+                _disconnectedEvent.Reset();
 
-				_webSocket.Host = gateway;
-				_webSocket.ParentCancelToken = _cancelToken;
-				await _webSocket.Connect(token).ConfigureAwait(false);
+                _gateway = gateway;
 
-				_runTask = RunTasks();
+                _cancelTokenSource = new CancellationTokenSource();
+                _cancelToken = _cancelTokenSource.Token;
 
-				try
-				{
-					//Cancel if either Disconnect is called, data socket errors or timeout is reached
-					var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _webSocket.CancelToken).Token;
-					_connectedEvent.Wait(cancelToken);
-				}
-				catch (OperationCanceledException)
-				{
-					_webSocket.ThrowError(); //Throws data socket's internal error if any occured
-					throw;
-				}
+                _webSocket.Host = gateway;
+                _webSocket.ParentCancelToken = _cancelToken;
+                await _webSocket.Connect(_token).ConfigureAwait(false);
 
-				//_state = (int)DiscordClientState.Connected;
-			}
-			catch
-			{
-				await Disconnect().ConfigureAwait(false);
-				throw;
-			}
-		}
-		private void CompleteConnect()
+                _runTask = RunTasks();
+
+                try
+                {
+                    //Cancel if either Disconnect is called, data socket errors or timeout is reached
+                    var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _webSocket.CancelToken).Token;
+                    _connectedEvent.Wait(cancelToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    _webSocket.ThrowError(); //Throws data socket's internal error if any occured
+                    throw;
+                }
+            }
+            catch
+            {
+                await Disconnect().ConfigureAwait(false);
+                throw;
+            }
+        }
+		private void EndConnect()
 		{
 			_state = (int)DiscordClientState.Connected;
 			_connectedEvent.Set();
@@ -359,8 +353,8 @@ namespace Discord
 		}
 
 		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-		public Task Disconnect() => DisconnectInternal(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		private async Task DisconnectInternal(Exception ex = null, bool isUnexpected = true, bool skipAwait = false)
+		public Task Disconnect() => SignalDisconnect(new Exception("Disconnect was requested by user."), isUnexpected: false);
+		private async Task SignalDisconnect(Exception ex = null, bool isUnexpected = true, bool wait = false)
 		{
 			int oldState;
 			bool hasWriterLock;
@@ -386,7 +380,7 @@ namespace Discord
 					await Cleanup().ConfigureAwait(false);*/
 			}
 
-			if (!skipAwait)
+			if (wait)
 			{
 				Task task = _runTask;
 				if (_runTask != null)
@@ -407,10 +401,10 @@ namespace Discord
 
 			//Wait until the first task ends/errors and capture the error
 			try { await firstTask.ConfigureAwait(false); }
-			catch (Exception ex) { await DisconnectInternal(ex: ex, skipAwait: true).ConfigureAwait(false); }
+			catch (Exception ex) { await SignalDisconnect(ex: ex, wait: true).ConfigureAwait(false); }
 
 			//Ensure all other tasks are signaled to end.
-			await DisconnectInternal(skipAwait: true).ConfigureAwait(false);
+			await SignalDisconnect(wait: true).ConfigureAwait(false);
 
 			//Wait for the remaining tasks to complete
 			try { await allTasks.ConfigureAwait(false); }
@@ -453,35 +447,6 @@ namespace Discord
 
 			_privateUser = null;
 		}
-
-		public T AddSingleton<T>(T obj)
-			where T : class
-		{
-			_singletons.Add(typeof(T), obj);
-			return obj;
-		}
-        public T GetSingleton<T>(bool required = true)
-			where T : class
-		{
-			object singleton;
-			T singletonT = null;
-			if (_singletons.TryGetValue(typeof(T), out singleton))
-				singletonT = singleton as T;
-
-			if (singletonT == null && required)
-				throw new InvalidOperationException($"This operation requires {typeof(T).Name} to be added to {nameof(DiscordClient)}.");
-			return singletonT;
-		}
-		public T AddService<T>(T obj)
-			where T : class, IService
-		{
-			AddSingleton(obj);
-			obj.Install(this);
-			return obj;
-		}
-		public T GetService<T>(bool required = true)
-			where T : class, IService
-			=> GetSingleton<T>(required);
 		
 		private async Task OnReceivedEvent(WebSocketEventEventArgs e)
 		{
@@ -851,45 +816,99 @@ namespace Discord
 			_sentInitialLog = true;
         }
 
+        #region Async Wrapper
+        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+        public void Run(Func<Task> asyncAction)
+        {
+            try
+            {
+                asyncAction().GetAwaiter().GetResult(); //Avoids creating AggregateExceptions
+            }
+            catch (TaskCanceledException) { }
+            _disconnectedEvent.WaitOne();
+        }
+        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+        public void Run()
+        {
+            _disconnectedEvent.WaitOne();
+        }
+        #endregion
 
-		//Helpers
-		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-		public void Run(Func<Task> asyncAction)
-		{
-			try
-			{
-				asyncAction().GetAwaiter().GetResult(); //Avoids creating AggregateExceptions
-			}
-			catch (TaskCanceledException) { }
-			_disconnectedEvent.WaitOne();
-		}
-		/// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-		public void Run()
-		{
-			_disconnectedEvent.WaitOne();
-		}
+        #region Services
+        public T AddSingleton<T>(T obj)
+            where T : class
+        {
+            _singletons.Add(typeof(T), obj);
+            return obj;
+        }
+        public T GetSingleton<T>(bool required = true)
+            where T : class
+        {
+            object singleton;
+            T singletonT = null;
+            if (_singletons.TryGetValue(typeof(T), out singleton))
+                singletonT = singleton as T;
 
-		private void CheckReady()
-		{
-			switch (_state)
-			{
-				case (int)DiscordClientState.Disconnecting:
-					throw new InvalidOperationException("The client is disconnecting.");
-				case (int)DiscordClientState.Disconnected:
-					throw new InvalidOperationException("The client is not connected to Discord");
-				case (int)DiscordClientState.Connecting:
-					throw new InvalidOperationException("The client is connecting.");
-			}
-		}
-		
-		public void GetCacheStats(out int serverCount, out int channelCount, out int userCount, out int uniqueUserCount, out int messageCount, out int roleCount)
-		{
-			serverCount = _servers.Count;
-			channelCount = _channels.Count;
-			userCount = _users.Count;
-			uniqueUserCount = _globalUsers.Count;
-			messageCount = _messages.Count;
-			roleCount = _roles.Count;
-		}
-	}
+            if (singletonT == null && required)
+                throw new InvalidOperationException($"This operation requires {typeof(T).Name} to be added to {nameof(DiscordClient)}.");
+            return singletonT;
+        }
+        public T AddService<T>(T obj)
+            where T : class, IService
+        {
+            AddSingleton(obj);
+            obj.Install(this);
+            return obj;
+        }
+        public T GetService<T>(bool required = true)
+            where T : class, IService
+            => GetSingleton<T>(required);
+        #endregion
+
+        #region IDisposable
+        private bool _isDisposed = false;
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!_isDisposed)
+            {
+                if (isDisposing)
+                {
+                    _disconnectedEvent.Dispose();
+                    _connectedEvent.Dispose();
+                }
+                _isDisposed = true;
+            }
+        }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
+
+        //Helpers
+        private void CheckReady()
+        {
+            switch (_state)
+            {
+                case (int)DiscordClientState.Disconnecting:
+                    throw new InvalidOperationException("The client is disconnecting.");
+                case (int)DiscordClientState.Disconnected:
+                    throw new InvalidOperationException("The client is not connected to Discord");
+                case (int)DiscordClientState.Connecting:
+                    throw new InvalidOperationException("The client is connecting.");
+            }
+        }
+
+        public void GetCacheStats(out int serverCount, out int channelCount, out int userCount, out int uniqueUserCount, out int messageCount, out int roleCount)
+        {
+            serverCount = _servers.Count;
+            channelCount = _channels.Count;
+            userCount = _users.Count;
+            uniqueUserCount = _globalUsers.Count;
+            messageCount = _messages.Count;
+            roleCount = _roles.Count;
+        }
+    }
 }

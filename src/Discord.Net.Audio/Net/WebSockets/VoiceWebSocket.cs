@@ -1,5 +1,7 @@
 ﻿using Discord.API;
 using Discord.Audio;
+using Discord.Audio.Opus;
+using Discord.Audio.Sodium;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -54,7 +56,7 @@ namespace Discord.Net.WebSockets
 			_targetAudioBufferLength = _audioConfig.BufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
 			_ssrcMapping = new ConcurrentDictionary<uint, long>();
-			_encoder = new OpusEncoder(48000, 1, 20, _audioConfig.Bitrate, Opus.Application.Audio);
+			_encoder = new OpusEncoder(48000, _audioConfig.Channels, 20, _audioConfig.Bitrate, OpusApplication.Audio);
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_audioConfig.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 		
@@ -223,7 +225,7 @@ namespace Discord.Net.WebSockets
 										return;
 
 									Buffer.BlockCopy(packet, 0, nonce, 0, 12);
-									int ret = Sodium.Decrypt(packet, 12, packetLength - 12, decodingBuffer, nonce, _secretKey);
+									int ret = SecretBox.Decrypt(packet, 12, packetLength - 12, decodingBuffer, nonce, _secretKey);
 									if (ret != 0)
 										continue;
 									result = decodingBuffer;
@@ -294,7 +296,7 @@ namespace Discord.Net.WebSockets
 				if (_isEncrypted)
 				{
 					Buffer.BlockCopy(pingPacket, 0, nonce, 0, 8);
-					int ret = Sodium.Encrypt(pingPacket, 8, encodedFrame, 0, nonce, _secretKey);
+					int ret = SecretBox.Encrypt(pingPacket, 8, encodedFrame, 0, nonce, _secretKey);
 					if (ret != 0)
 						throw new InvalidOperationException("Failed to encrypt ping packet");
 					pingPacket = new byte[pingPacket.Length + 16];
@@ -333,7 +335,7 @@ namespace Discord.Net.WebSockets
 						if (_isEncrypted)
 						{
 							Buffer.BlockCopy(voicePacket, 2, nonce, 2, 6); //Update nonce
-							int ret = Sodium.Encrypt(encodedFrame, encodedLength, voicePacket, 12, nonce, _secretKey);
+							int ret = SecretBox.Encrypt(encodedFrame, encodedLength, voicePacket, 12, nonce, _secretKey);
 							if (ret != 0)
 								continue;
 							rtpPacketLength = encodedLength + 12 + 16;

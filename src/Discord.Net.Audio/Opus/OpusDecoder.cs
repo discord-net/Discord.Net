@@ -1,11 +1,26 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using System.Security;
 
-namespace Discord.Audio
+namespace Discord.Audio.Opus
 {
 	/// <summary> Opus codec wrapper. </summary>
 	internal class OpusDecoder : IDisposable
-	{
-		private readonly IntPtr _ptr;
+    {
+#if NET45
+        [SuppressUnmanagedCodeSecurity]
+#endif
+        private unsafe static class UnsafeNativeMethods
+        {
+            [DllImport("opus", EntryPoint = "opus_decoder_create", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr CreateDecoder(int Fs, int channels, out OpusError error);
+            [DllImport("opus", EntryPoint = "opus_decoder_destroy", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void DestroyDecoder(IntPtr decoder);
+            [DllImport("opus", EntryPoint = "opus_decode", CallingConvention = CallingConvention.Cdecl)]
+            public static extern int Decode(IntPtr st, byte* data, int len, byte[] pcm, int frame_size, int decode_fec);
+        }
+
+        private readonly IntPtr _ptr;
 
 		/// <summary> Gets the bit rate of the encoder. </summary>
 		public const int BitRate = 16;
@@ -22,7 +37,7 @@ namespace Discord.Audio
 		/// <summary> Gets the bytes per frame. </summary>
 		public int FrameSize { get; private set; }
 
-		/// <summary> Creates a new Opus encoder. </summary>
+		/// <summary> Creates a new Opus decoder. </summary>
 		/// <param name="samplingRate">Sampling rate of the input signal (Hz). Supported Values:  8000, 12000, 16000, 24000, or 48000.</param>
 		/// <param name="channels">Number of channels (1 or 2) in input signal.</param>
 		/// <param name="frameLength">Length, in milliseconds, that each frame takes. Supported Values: 2.5, 5, 10, 20, 40, 60</param>
@@ -44,45 +59,32 @@ namespace Discord.Audio
 			SamplesPerFrame = samplingRate / 1000 * FrameLength;
 			FrameSize = SamplesPerFrame * SampleSize;
 
-			Opus.Error error;
-			_ptr = Opus.CreateDecoder(samplingRate, channels,  out error);
-			if (error != Opus.Error.OK)
+			OpusError error;
+			_ptr = UnsafeNativeMethods.CreateDecoder(samplingRate, channels,  out error);
+			if (error != OpusError.OK)
 				throw new InvalidOperationException($"Error occured while creating decoder: {error}");
-
-			SetForwardErrorCorrection(true);
 		}
 
-		/// <summary> Produces Opus encoded audio from PCM samples. </summary>
-		/// <param name="input">PCM samples to encode.</param>
-		/// <param name="inputOffset">Offset of the frame in pcmSamples.</param>
-		/// <param name="output">Buffer to store the encoded frame.</param>
-		/// <returns>Length of the frame contained in outputBuffer.</returns>
-		public unsafe int DecodeFrame(byte[] input, int inputOffset, byte[] output)
+        /// <summary> Produces PCM samples from Opus-encoded audio. </summary>
+        /// <param name="input">PCM samples to decode.</param>
+        /// <param name="inputOffset">Offset of the frame in input.</param>
+        /// <param name="output">Buffer to store the decoded frame.</param>
+        /// <returns>Length of the frame contained in output.</returns>
+        public unsafe int DecodeFrame(byte[] input, int inputOffset, byte[] output)
 		{
 			if (disposed)
 				throw new ObjectDisposedException(nameof(OpusDecoder));
 			
 			int result = 0;
 			fixed (byte* inPtr = input)
-				result = Opus.Encode(_ptr, inPtr + inputOffset, SamplesPerFrame, output, output.Length);
+				result = UnsafeNativeMethods.Decode(_ptr, inPtr + inputOffset, SamplesPerFrame, output, output.Length, 0);
 
 			if (result < 0)
-				throw new Exception("Decoding failed: " + ((Opus.Error)result).ToString());
+				throw new Exception("Decoding failed: " + ((OpusError)result).ToString());
 			return result;
 		}
 
-		/// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
-		public void SetForwardErrorCorrection(bool value)
-		{
-			if (disposed)
-				throw new ObjectDisposedException(nameof(OpusDecoder));
-
-			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetInbandFECRequest, value ? 1 : 0);
-			if (result < 0)
-				throw new Exception("Decoder error: " + ((Opus.Error)result).ToString());
-		}
-
-		#region IDisposable
+#region IDisposable
 		private bool disposed;
 		public void Dispose()
 		{
@@ -92,7 +94,7 @@ namespace Discord.Audio
 			GC.SuppressFinalize(this);
 
 			if (_ptr != IntPtr.Zero)
-				Opus.DestroyEncoder(_ptr);
+				UnsafeNativeMethods.DestroyDecoder(_ptr);
 
 			disposed = true;
 		}
@@ -100,6 +102,6 @@ namespace Discord.Audio
 		{
 			Dispose();
 		}
-		#endregion
+#endregion
 	}
 }

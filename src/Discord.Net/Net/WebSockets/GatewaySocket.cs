@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public partial class GatewayWebSocket : WebSocket
+    public partial class GatewaySocket : WebSocket
 	{
 		public int LastSequence => _lastSeq;
 		private int _lastSeq;
@@ -17,7 +17,7 @@ namespace Discord.Net.WebSockets
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public GatewayWebSocket(DiscordConfig config, Logger logger)
+		public GatewaySocket(DiscordConfig config, Logger logger)
 			: base(config, logger)
 		{
 			Disconnected += async (s, e) =>
@@ -28,14 +28,18 @@ namespace Discord.Net.WebSockets
 		}
 
         public async Task Connect(string token)
-		{
-			_token = token;
+        {
+            await SignalDisconnect(wait: true).ConfigureAwait(false);
+
+            _token = token;
 			await BeginConnect().ConfigureAwait(false);
 			SendIdentify(token);
         }
 		private async Task Redirect(string server)
-		{
-			await BeginConnect().ConfigureAwait(false);
+        {
+            await SignalDisconnect(wait: true).ConfigureAwait(false);
+
+            await BeginConnect().ConfigureAwait(false);
 			SendResume();
 		}
 		private async Task Reconnect()
@@ -47,8 +51,8 @@ namespace Discord.Net.WebSockets
 				while (!cancelToken.IsCancellationRequested)
 				{
 					try
-					{
-						await Connect(_token).ConfigureAwait(false);
+                    {
+                        await Connect(_token).ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }

@@ -224,11 +224,11 @@
     <Compile Include="..\Discord.Net\Net\TimeoutException.cs">
       <Link>Net\TimeoutException.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\GatewayWebSocket.cs">
-      <Link>Net\WebSockets\GatewayWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\GatewaySocket.cs">
+      <Link>Net\WebSockets\GatewaySocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\GatewayWebSockets.Events.cs">
-      <Link>Net\WebSockets\GatewayWebSockets.Events.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\GatewaySocket.Events.cs">
+      <Link>Net\WebSockets\GatewaySocket.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\IWebSocketEngine.cs">
       <Link>Net\WebSockets\IWebSocketEngine.cs</Link>

@@ -145,27 +145,27 @@ namespace Discord.Audio
 				return Task.FromResult(_defaultClient);
 			}
 
-			var client = _voiceClients.GetOrAdd(server.Id, _ =>
+			var client = _voiceClients.GetOrAdd(server.Id, (Func<long, DiscordAudioClient>)(_ =>
 			{
 				int id = unchecked(++_nextClientId);
 				var logger = Client.Log().CreateLogger($"Voice #{id}");
-				GatewayWebSocket gatewaySocket = null;
+                Net.WebSockets.GatewaySocket gatewaySocket = null;
 				var voiceSocket = new VoiceWebSocket(Client.Config, _config, logger);
-				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket, voiceSocket);
+				var voiceClient = new DiscordAudioClient((AudioService)(this), (int)id, (Logger)logger, (Net.WebSockets.GatewaySocket)gatewaySocket, (VoiceWebSocket)voiceSocket);
 				voiceClient.SetServerId(server.Id);
 
 				voiceSocket.OnPacket += (s, e) =>
 				{
-					RaiseOnPacket(e);
+                    RaiseOnPacket(e);
 				};
 				voiceSocket.IsSpeaking += (s, e) =>
 				{
 					var user = Client.GetUser(server, e.UserId);
-					RaiseUserIsSpeakingUpdated(user, e.IsSpeaking);
+                    RaiseUserIsSpeakingUpdated(user, e.IsSpeaking);
 				};
 
 				return voiceClient;
-			});
+			}));
 			//await client.Connect(gatewaySocket.Host, _client.Token).ConfigureAwait(false);
 			return Task.FromResult(client);
 		}

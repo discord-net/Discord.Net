@@ -37,8 +37,12 @@ namespace Discord.Audio
 		public int? Bitrate { get { return _bitrate; } set { SetValue(ref _bitrate, value); } }
 		private int? _bitrate = null;
 
-		//Lock
-		protected bool _isLocked;
+        /// <summary> Gets or sets the number of channels (1 or 2) used for outgoing audio. </summary>
+        public int Channels { get { return _channels; } set { SetValue(ref _channels, value); } }
+        private int _channels = 1;
+
+        //Lock
+        protected bool _isLocked;
 		internal void Lock() { _isLocked = true; }
 		protected void SetValue<T>(ref T storage, T value)
 		{

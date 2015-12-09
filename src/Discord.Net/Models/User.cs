@@ -42,6 +42,7 @@ namespace Discord
 		public bool IsServerDeafened { get; private set; }
 		public bool IsServerSuppressed { get; private set; }
 		public bool IsPrivate => _server.Id == null;
+        public bool IsOwner => _server.Value.OwnerId == Id;
 
 		public string SessionId { get; private set; }
 		public string Token { get; private set; }
@@ -101,9 +102,23 @@ namespace Discord
 			{
 				if (_server.Id != null)
 				{
-					return Server.Channels
-						.Where(x => (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
-						(x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
+                    if (_client.Config.UsePermissionsCache)
+                    {
+                        return Server.Channels
+                            .Where(x => (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
+                            (x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
+                    }
+                    else
+                    {
+                        ChannelPermissions perms = new ChannelPermissions();
+                        return Server.Channels
+                            .Where(x =>
+                            {
+                                x.UpdatePermissions(this, perms);
+                                return (x.Type == ChannelType.Text && perms.ReadMessages) ||
+                                        (x.Type == ChannelType.Voice && perms.Connect);
+                            });
+                    }
 				}
 				else
 				{

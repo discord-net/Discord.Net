@@ -2,7 +2,7 @@
 
 namespace Discord.Commands
 {
-	public class CommandEventArgs
+	public class CommandEventArgs : EventArgs
 	{
 		private readonly string[] _args;
 

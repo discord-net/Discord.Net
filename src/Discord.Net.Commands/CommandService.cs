@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
 	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
-	public partial class CommandService : IService
+	public sealed partial class CommandService : IService
     {
 		private const string DefaultPermissionError = "You do not have permission to access this command.";
 

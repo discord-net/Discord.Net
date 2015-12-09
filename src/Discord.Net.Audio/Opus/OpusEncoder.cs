@@ -1,11 +1,28 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using System.Security;
 
-namespace Discord.Audio
+namespace Discord.Audio.Opus
 {
 	/// <summary> Opus codec wrapper. </summary>
 	internal class OpusEncoder : IDisposable
-	{
-		private readonly IntPtr _ptr;
+    {
+#if NET45
+        [SuppressUnmanagedCodeSecurity]
+#endif
+        private unsafe static class UnsafeNativeMethods
+        {
+            [DllImport("opus", EntryPoint = "opus_encoder_create", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr CreateEncoder(int Fs, int channels, int application, out OpusError error);
+            [DllImport("opus", EntryPoint = "opus_encoder_destroy", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void DestroyEncoder(IntPtr encoder);
+            [DllImport("opus", EntryPoint = "opus_encode", CallingConvention = CallingConvention.Cdecl)]
+            public static extern int Encode(IntPtr st, byte* pcm, int frame_size, byte[] data, int max_data_bytes);
+            [DllImport("opus", EntryPoint = "opus_encoder_ctl", CallingConvention = CallingConvention.Cdecl)]
+            public static extern int EncoderCtl(IntPtr st, OpusCtl request, int value);
+        }
+
+        private readonly IntPtr _ptr;
 
 		/// <summary> Gets the bit rate of the encoder. </summary>
 		public const int BitsPerSample = 16;
@@ -24,7 +41,7 @@ namespace Discord.Audio
 		/// <summary> Gets the bit rate in kbit/s. </summary>
 		public int? BitRate { get; private set; }
 		/// <summary> Gets the coding mode of the encoder. </summary>
-		public Opus.Application Application { get; private set; }
+		public OpusApplication Application { get; private set; }
 
 		/// <summary> Creates a new Opus encoder. </summary>
 		/// <param name="samplingRate">Sampling rate of the input signal (Hz). Supported Values:  8000, 12000, 16000, 24000, or 48000.</param>
@@ -33,7 +50,7 @@ namespace Discord.Audio
 		/// <param name="bitrate">Bitrate (kbit/s) used for this encoder. Supported Values: 1-512. Null will use the recommended bitrate. </param>
 		/// <param name="application">Coding mode.</param>
 		/// <returns>A new <c>OpusEncoder</c></returns>
-		public OpusEncoder(int samplingRate, int channels, int frameLength, int? bitrate, Opus.Application application)
+		public OpusEncoder(int samplingRate, int channels, int frameLength, int? bitrate, OpusApplication application)
 		{
 			if (samplingRate != 8000 && samplingRate != 12000 &&
 				samplingRate != 16000 && samplingRate != 24000 &&
@@ -53,9 +70,9 @@ namespace Discord.Audio
 			FrameSize = SamplesPerFrame * SampleSize;
 			BitRate = bitrate;
 
-			Opus.Error error;
-			_ptr = Opus.CreateEncoder(samplingRate, channels, (int)application, out error);
-			if (error != Opus.Error.OK)
+			OpusError error;
+			_ptr = UnsafeNativeMethods.CreateEncoder(samplingRate, channels, (int)application, out error);
+			if (error != OpusError.OK)
 				throw new InvalidOperationException($"Error occured while creating encoder: {error}");
 
 			SetForwardErrorCorrection(true);
@@ -75,10 +92,10 @@ namespace Discord.Audio
 			
 			int result = 0;
 			fixed (byte* inPtr = input)
-				result = Opus.Encode(_ptr, inPtr + inputOffset, SamplesPerFrame, output, output.Length);
+				result = UnsafeNativeMethods.Encode(_ptr, inPtr + inputOffset, SamplesPerFrame, output, output.Length);
 
 			if (result < 0)
-				throw new Exception("Encoding failed: " + ((Opus.Error)result).ToString());
+				throw new Exception("Encoding failed: " + ((OpusError)result).ToString());
 			return result;
 		}
 
@@ -88,9 +105,9 @@ namespace Discord.Audio
 			if (disposed)
 				throw new ObjectDisposedException(nameof(OpusEncoder));
 
-			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetInbandFECRequest, value ? 1 : 0);
+			var result = UnsafeNativeMethods.EncoderCtl(_ptr, OpusCtl.SetInbandFECRequest, value ? 1 : 0);
 			if (result < 0)
-				throw new Exception("Encoder error: " + ((Opus.Error)result).ToString());
+				throw new Exception("Encoder error: " + ((OpusError)result).ToString());
 		}
 
 		/// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
@@ -99,9 +116,9 @@ namespace Discord.Audio
 			if (disposed)
 				throw new ObjectDisposedException(nameof(OpusEncoder));
 
-			var result = Opus.EncoderCtl(_ptr, Opus.Ctl.SetBitrateRequest, value * 1000);
+			var result = UnsafeNativeMethods.EncoderCtl(_ptr, OpusCtl.SetBitrateRequest, value * 1000);
 			if (result < 0)
-				throw new Exception("Encoder error: " + ((Opus.Error)result).ToString());
+				throw new Exception("Encoder error: " + ((OpusError)result).ToString());
 		}
 
 		#region IDisposable
@@ -114,7 +131,7 @@ namespace Discord.Audio
 			GC.SuppressFinalize(this);
 
 			if (_ptr != IntPtr.Zero)
-				Opus.DestroyEncoder(_ptr);
+				UnsafeNativeMethods.DestroyEncoder(_ptr);
 
 			disposed = true;
 		}

@@ -67,17 +67,20 @@
     <Compile Include="..\Discord.Net.Audio\Net\WebSockets\VoiceWebSocket.Events.cs">
       <Link>Net\WebSockets\VoiceWebSocket.Events.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\Opus.cs">
-      <Link>Opus.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Opus\Enums.cs">
+      <Link>Opus\Enums.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\OpusDecoder.cs">
-      <Link>OpusDecoder.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Opus\OpusDecoder.cs">
+      <Link>Opus\OpusDecoder.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\OpusEncoder.cs">
-      <Link>OpusEncoder.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Opus\OpusEncoder.cs">
+      <Link>Opus\OpusEncoder.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Sodium.cs">
       <Link>Sodium.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\Sodium\SecretBox.cs">
+      <Link>Sodium\SecretBox.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\VoiceBuffer.cs">
       <Link>VoiceBuffer.cs</Link>

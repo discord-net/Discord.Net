@@ -114,7 +114,6 @@ namespace Discord.Net.WebSockets
 		{
 			try
 			{
-				await SignalDisconnect(wait: true).ConfigureAwait(false);
 				_state = (int)WebSocketState.Connecting;
 
 				if (ParentCancelToken == null)
@@ -173,7 +172,7 @@ namespace Discord.Net.WebSockets
 					await Cleanup().ConfigureAwait(false);
 			}
 
-			if (!wait)
+			if (wait)
 			{
 				Task task = _runTask;
 				if (_runTask != null)

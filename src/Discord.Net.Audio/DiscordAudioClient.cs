@@ -10,14 +10,14 @@ namespace Discord.Audio
 		public int Id => _id;
 
 		private readonly AudioService _service;
-		private readonly GatewayWebSocket _gatewaySocket;
+		private readonly GatewaySocket _gatewaySocket;
 		private readonly VoiceWebSocket _voiceSocket;
 		private readonly Logger _logger;
 
 		public long? ServerId => _voiceSocket.ServerId;
 		public long? ChannelId => _voiceSocket.ChannelId;
 
-		public DiscordAudioClient(AudioService service, int id, Logger logger, GatewayWebSocket gatewaySocket, VoiceWebSocket voiceSocket)
+		public DiscordAudioClient(AudioService service, int id, Logger logger, GatewaySocket gatewaySocket, VoiceWebSocket voiceSocket)
 		{
 			_service = service;
 			_id = id;
