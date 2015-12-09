@@ -283,8 +283,7 @@ namespace Discord
 				newPermissions = ServerPermissions.All.RawValue;
 			else
 			{
-				var roles = user.Roles;
-				foreach (var serverRole in roles)
+				foreach (var serverRole in user.Roles)
 					newPermissions |= serverRole.Permissions.RawValue;
 			}
 
