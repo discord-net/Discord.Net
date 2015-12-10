@@ -85,6 +85,7 @@ namespace Discord.API
 		[JsonProperty("deaf", NullValueHandling = NullValueHandling.Ignore)]
 		public bool? Deaf;
         [JsonProperty("channel_id", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(NullableLongStringConverter))]
         public long? ChannelId;
         [JsonProperty("roles", NullValueHandling = NullValueHandling.Ignore)]
 		[JsonConverter(typeof(EnumerableLongStringConverter))]
