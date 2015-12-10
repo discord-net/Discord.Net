@@ -75,7 +75,7 @@ namespace Discord.Net.WebSockets
 			_connectedEvent = new ManualResetEventSlim(false);
 
 #if !DOTNET5_4
-			_engine = new WebSocketSharpEngine(this, _config, _logger);
+			_engine = new WS4NetEngine(this, _config, _logger);
 #else
 			//_engine = new BuiltInWebSocketEngine(this, _config, _logger);
 #endif

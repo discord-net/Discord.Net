@@ -62,8 +62,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="websocket-sharp, Version=1.0.2.59610, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
-      <HintPath>..\..\..\DiscordBot\packages\WebSocketSharp.1.0.3-rc10\lib\websocket-sharp.dll</HintPath>
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\DiscordBot\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -238,6 +238,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
       <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WS4NetEngine.cs">
+      <Link>Net\WebSockets\WS4NetEngine.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Services\IService.cs">
       <Link>Services\IService.cs</Link>

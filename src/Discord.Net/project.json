@@ -35,10 +35,10 @@
 
 	"frameworks": {
 		"net45": {
-			"dependencies": {
-				"WebSocketSharp": "1.0.3-rc10",
-				"RestSharp": "105.2.3"
-			}
+      "dependencies": {
+        "WebSocket4Net": "0.14.1",
+        "RestSharp": "105.2.3"
+      }
 		},
 		"dotnet5.4": {
       "dependencies": {

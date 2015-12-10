@@ -1,4 +1,4 @@
-﻿#if !DOTNET5_4
+﻿/*#if !DOTNET5_4
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace Discord.Net.WebSockets
 			_webSocket = new WSSharpWebSocket(host);
 			_webSocket.EmitOnPing = false;
 			_webSocket.EnableRedirection = true;
-			_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;
+			//_webSocket.Compression = WebSocketSharp.CompressionMethod.Deflate;
 			_webSocket.SetProxy(null, null, null); //Disable
 			//_webSocket.SetProxy(_config.ProxyUrl, _config.ProxyCredentials?.UserName, _config.ProxyCredentials?.Password);
 			_webSocket.OnMessage += (s, e) =>
@@ -115,4 +115,4 @@ namespace Discord.Net.WebSockets
 		}
 	}
 }
-#endif
+#endif*/
