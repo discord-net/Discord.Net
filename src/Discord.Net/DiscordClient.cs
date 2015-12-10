@@ -217,8 +217,8 @@ namespace Discord
 			{
 				UserIsTypingUpdated += (s, e) => _logger.Log(LogSeverity.Verbose,
 					$"User Updated (Typing): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
-				MessageReadRemotely += (s, e) => _logger.Log(LogSeverity.Verbose,
-					$"Read Message (Remotely): {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageAcknowledged += (s, e) => _logger.Log(LogSeverity.Verbose,
+					$"Ack'd Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				MessageSent += (s, e) => _logger.Log(LogSeverity.Verbose,
 					$"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
 				UserPresenceUpdated += (s, e) => _logger.Log(LogSeverity.Verbose,
@@ -729,7 +729,7 @@ namespace Discord
 							var data = e.Payload.ToObject<MessageAckEvent>(_webSocket.Serializer);
 							var msg = GetMessage(data.MessageId);
 							if (msg != null)
-								RaiseMessageReadRemotely(msg);
+								RaiseMessageAcknowledged(msg);
 						}
 						break;
 

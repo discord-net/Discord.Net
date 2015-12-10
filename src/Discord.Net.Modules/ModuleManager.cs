@@ -86,7 +86,7 @@ namespace Discord.Modules
 			client.MessageSent += (s, e) => { if (MessageSent != null && HasChannel(e.Channel)) MessageSent(s, e); };
 			client.MessageDeleted += (s, e) => { if (MessageDeleted != null && HasChannel(e.Channel)) MessageDeleted(s, e); };
 			client.MessageUpdated += (s, e) => { if (MessageUpdated != null && HasChannel(e.Channel)) MessageUpdated(s, e); };
-			client.MessageReadRemotely += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
+			client.MessageAcknowledged += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
 
 			client.RoleCreated += (s, e) => { if (RoleCreated != null && HasIndirectServer(e.Server)) RoleCreated(s, e); };
 			client.RoleUpdated += (s, e) => { if (RoleUpdated != null && HasIndirectServer(e.Server)) RoleUpdated(s, e); };

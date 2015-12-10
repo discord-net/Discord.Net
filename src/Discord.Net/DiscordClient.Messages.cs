@@ -88,11 +88,11 @@ namespace Discord
 			if (MessageUpdated != null)
 				EventHelper.Raise(_logger, nameof(MessageUpdated), () => MessageUpdated(this, new MessageEventArgs(msg)));
 		}
-		public event EventHandler<MessageEventArgs> MessageReadRemotely;
-		private void RaiseMessageReadRemotely(Message msg)
+		public event EventHandler<MessageEventArgs> MessageAcknowledged;
+		private void RaiseMessageAcknowledged(Message msg)
 		{
-			if (MessageReadRemotely != null)
-				EventHelper.Raise(_logger, nameof(MessageReadRemotely), () => MessageReadRemotely(this, new MessageEventArgs(msg)));
+			if (MessageAcknowledged != null)
+				EventHelper.Raise(_logger, nameof(MessageAcknowledged), () => MessageAcknowledged(this, new MessageEventArgs(msg)));
 		}
 		
 		internal Messages Messages => _messages;
