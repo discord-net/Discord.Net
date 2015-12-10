@@ -353,22 +353,31 @@ namespace Discord
 				{
 					while (_pendingMessages.TryDequeue(out queuedMessage))
 					{
-						SendMessageResponse response = null;
                         var msg = queuedMessage.Message;
                         try
                         {
-                            response = await _api.SendMessage(
+                            if (msg.Id < 0)
+                            {
+                                await _api.SendMessage(
+                                        msg.Channel.Id,
+                                        queuedMessage.Text,
+                                        queuedMessage.MentionedUsers,
+                                        IdConvert.ToString(msg.Id), //Nonce
+                                        msg.IsTTS)
+                                    .ConfigureAwait(false);
+                                RaiseMessageSent(msg);
+                            }
+                            else
+                            {
+                                await _api.EditMessage(
+                                    msg.Id,
                                     msg.Channel.Id,
                                     queuedMessage.Text,
-                                    queuedMessage.MentionedUsers,
-                                    IdConvert.ToString(msg.Id), //Nonce
-                                    msg.IsTTS)
-                                .ConfigureAwait(false);
+                                    queuedMessage.MentionedUsers);
+                            }
                         }
                         catch (WebException) { break; }
-                        catch (HttpException) { msg.State = MessageState.Failed; }
-                        
-						RaiseMessageSent(msg);
+                        catch (HttpException) { msg.State = MessageState.Failed; }                        
                     }
                     await Task.Delay(interval).ConfigureAwait(false);
 				}
