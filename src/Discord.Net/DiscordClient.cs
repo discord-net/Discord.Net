@@ -53,9 +53,6 @@ namespace Discord
 
 		private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
-		private readonly Random _rand;
-		private readonly JsonSerializer _messageImporter;
-		private readonly ConcurrentQueue<Message> _pendingMessages;
 		private readonly Dictionary<Type, object> _singletons;
 		private readonly LogService _log;
 		private readonly object _cacheLock;
@@ -114,7 +111,7 @@ namespace Discord
 			_config = config ?? new DiscordConfig();
 			_config.Lock();
 
-			_rand = new Random();
+			_nonceRand = new Random();
 			_state = (int)DiscordClientState.Disconnected;
 			_status = UserStatus.Online;
 
@@ -155,7 +152,7 @@ namespace Discord
 
             _api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
-				_pendingMessages = new ConcurrentQueue<Message>();
+				_pendingMessages = new ConcurrentQueue<MessageQueueItem>();
 			Connected += async (s, e) =>
 			{
 				_api.CancelToken = _cancelToken;
@@ -393,7 +390,7 @@ namespace Discord
 			List<Task> tasks = new List<Task>();
 			tasks.Add(_cancelToken.Wait());
 			if (_config.UseMessageQueue)
-				tasks.Add(MessageQueueLoop());
+				tasks.Add(MessageQueueAsync());
 
 			Task[] tasksArray = tasks.ToArray();
 			Task firstTask = Task.WhenAny(tasksArray);
@@ -432,7 +429,7 @@ namespace Discord
 		{
 			if (Config.UseMessageQueue)
 			{
-				Message ignored;
+				MessageQueueItem ignored;
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
 
@@ -668,9 +665,19 @@ namespace Discord
 							Message msg = null;
 
 							bool isAuthor = data.Author.Id == _userId;
+                            int nonce = 0;
 
-							if (msg == null)
-								msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+                            if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
+                            {
+                                if (data.Nonce != null && int.TryParse(data.Nonce, out nonce))
+                                    msg = _messages[nonce];
+                            }
+                            if (msg == null)
+                            {
+                                msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
+                                nonce = 0;
+                            }
+
 							msg.Update(data);
 							if (Config.TrackActivity)
 							{
@@ -683,7 +690,15 @@ namespace Discord
 								}
 							}
 
-							RaiseMessageReceived(msg);
+                            //Remapped queued message
+                            if (nonce != 0)
+                            {
+                                msg = _messages.Remap(nonce, data.Id);
+                                msg.Id = data.Id;
+                            }
+
+                            msg.State = MessageState.Normal;
+                            RaiseMessageReceived(msg);
 
 							if (Config.AckMessages && !isAuthor)
 								await _api.AckMessage(data.Id, data.ChannelId).ConfigureAwait(false);
@@ -694,9 +709,10 @@ namespace Discord
 							var data = e.Payload.ToObject<MessageUpdateEvent>(_webSocket.Serializer);
 							var msg = _messages[data.Id];
 							if (msg != null)
-							{
-								msg.Update(data);
-								RaiseMessageUpdated(msg);
+                            {
+                                msg.Update(data);
+                                msg.State = MessageState.Normal;
+                                RaiseMessageUpdated(msg);
 							}
 						}
 						break;

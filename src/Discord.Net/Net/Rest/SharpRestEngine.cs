@@ -75,7 +75,6 @@ namespace Discord.Net.Rest
                 {
                     var retryAfter = response.Headers
                         .FirstOrDefault(x => x.Name.Equals("Retry-After", StringComparison.OrdinalIgnoreCase));
-                    int milliseconds;
                     if (retryAfter != null)
                     {
                         await Task.Delay((int)retryAfter.Value);
