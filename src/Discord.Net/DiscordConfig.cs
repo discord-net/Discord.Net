@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Discord
 {
@@ -38,14 +39,38 @@ namespace Discord
 		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
 		public LogSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
 		private LogSeverity _logLevel = LogSeverity.Info;
-		/// <summary> User Agent string to use when connecting to Discord. </summary>
-		public string UserAgent { get { return _userAgent; } set { SetValue(ref _userAgent, value); } }
-		private string _userAgent = $"Discord.Net/{DiscordClient.Version} (https://github.com/RogueException/Discord.Net)";
 
-		//Rest
+		/// <summary> Name of your application. </summary>
+		public string AppName { get { return _appName; } set { SetValue(ref _appName, value); UpdateUserAgent(); } }
+        private string _appName = null;
+        /// <summary> Version of your application. </summary>
+        public string AppVersion { get { return _appVersion; } set { SetValue(ref _appVersion, value); UpdateUserAgent(); } }
+        private string _appVersion = null;
 
-		/// <summary> Max time (in milliseconds) to wait for an API request to complete. </summary>
-		public int RestTimeout { get { return _restTimeout; } set { SetValue(ref _restTimeout, value); } }
+        /// <summary> User Agent string to use when connecting to Discord. </summary>
+        public string UserAgent { get { return _userAgent; } }
+        private string _userAgent;
+        private void UpdateUserAgent()
+        {
+            StringBuilder builder = new StringBuilder();
+            if (!string.IsNullOrEmpty(_appName))
+            {
+                builder.Append(_appName);
+                if (!string.IsNullOrEmpty(_appVersion))
+                {
+                    builder.Append('/');
+                    builder.Append(_appVersion);
+                }
+                builder.Append(' ');
+            }
+            builder.Append($"DiscordBot (https://github.com/RogueException/Discord.Net, v{DiscordClient.Version})");
+            _userAgent = builder.ToString();
+        }
+
+        //Rest
+
+        /// <summary> Max time (in milliseconds) to wait for an API request to complete. </summary>
+        public int RestTimeout { get { return _restTimeout; } set { SetValue(ref _restTimeout, value); } }
 		private int _restTimeout = 10000;
 
 		/// <summary> Enables or disables the internal message queue. This will allow SendMessage to return immediately and handle messages internally. Messages will set the IsQueued and HasFailed properties to show their progress. </summary>
@@ -89,5 +114,10 @@ namespace Discord
         /// <summary> Maintains the LastActivity property for users, showing when they last made an action (sent message, joined server, typed, etc). </summary>
         public bool TrackActivity { get { return _trackActivity; } set { SetValue(ref _trackActivity, value); } }
 		private bool _trackActivity = true;
+
+        public DiscordConfig()
+        {
+            UpdateUserAgent();
+        }
 	}
 }
