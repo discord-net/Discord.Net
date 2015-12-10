@@ -66,8 +66,8 @@ namespace Discord
 		public async Task<Invite> CreateInvite(Channel channel, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
-			if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
+			if (maxAge < 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
+			if (maxUses < 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 			CheckReady();
 
 			var response = await _api.CreateInvite(channel.Id, maxAge: maxAge, maxUses: maxUses, 
