@@ -58,7 +58,6 @@ namespace Discord
 		private readonly object _cacheLock;
 		private Logger _logger, _restLogger, _cacheLogger;
 		private bool _sentInitialLog;
-		private long? _userId;
 		private UserStatus _status;
 		private int? _gameId;
 		private Task _runTask;
@@ -413,7 +412,7 @@ namespace Discord
 
 			await _webSocket.SignalDisconnect().ConfigureAwait(false);
 
-			_userId = null;
+			_privateUser = null;
 			_gateway = null;
 			_token = null;
 
@@ -664,7 +663,7 @@ namespace Discord
 							var data = e.Payload.ToObject<MessageCreateEvent>(_webSocket.Serializer);
 							Message msg = null;
 
-							bool isAuthor = data.Author.Id == _userId;
+							bool isAuthor = data.Author.Id == _privateUser.Id;
                             int nonce = 0;
 
                             if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)

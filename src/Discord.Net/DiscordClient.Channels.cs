@@ -136,7 +136,7 @@ namespace Discord
 				channel = user.Global.PrivateChannel;
 			if (channel == null)
 			{
-				var response = await _api.CreatePMChannel(_userId.Value, user.Id).ConfigureAwait(false);
+				var response = await _api.CreatePMChannel(_privateUser.Id, user.Id).ConfigureAwait(false);
 				var recipient = _users.GetOrAdd(response.Recipient.Id, null);
 				recipient.Update(response.Recipient);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient.Id);

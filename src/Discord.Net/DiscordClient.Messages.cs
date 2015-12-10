@@ -195,13 +195,13 @@ namespace Discord
             if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
-				msg = _messages.GetOrAdd(nonce, channel.Id, _userId.Value);
+				msg = _messages.GetOrAdd(nonce, channel.Id, _privateUser.Id);
                 var currentUser = msg.User;
                 msg.Update(new MessageInfo
                 {
                     Content = text,
                     Timestamp = DateTime.UtcNow,
-                    Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _userId.Value, Username = currentUser.Name },
+                    Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _privateUser.Id, Username = currentUser.Name },
                     ChannelId = channel.Id,
                     Nonce = IdConvert.ToString(nonce),
 					IsTextToSpeech = isTextToSpeech
