@@ -150,12 +150,12 @@ namespace Discord
 		}
 
 		//Users
-		public Task EditUser(long serverId, long userId, bool? mute = null, bool? deaf = null, IEnumerable<long> roleIds = null)
+		public Task EditUser(long serverId, long userId, bool? mute = null, bool? deaf = null, long? voiceChannelId = null, IEnumerable<long> roleIds = null)
 		{
 			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
-			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, Roles = roleIds };
+			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, ChannelId = voiceChannelId, Roles = roleIds };
 			return _rest.Patch(Endpoints.ServerMember(serverId, userId), request);
 		}
 		public Task KickUser(long serverId, long userId)

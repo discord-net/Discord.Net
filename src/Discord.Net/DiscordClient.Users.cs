@@ -203,7 +203,7 @@ namespace Discord
 			return query;
 		}
 
-		public Task EditUser(User user, bool? mute = null, bool? deaf = null, IEnumerable<Role> roles = null, EditMode rolesMode = EditMode.Set)
+		public Task EditUser(User user, bool? mute = null, bool? deaf = null, Channel voiceChannel = null, IEnumerable<Role> roles = null, EditMode rolesMode = EditMode.Set)
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to edit users in a private channel");
@@ -217,8 +217,9 @@ namespace Discord
 
 			var serverId = user.Server.Id;
             return _api.EditUser(serverId, user.Id, 
-				mute: mute, deaf: deaf, 
-				roleIds: roleIds);
+				mute: mute, deaf: deaf,
+                voiceChannelId: voiceChannel?.Id,
+                roleIds: roleIds);
 		}
 
 		public Task KickUser(User user)
