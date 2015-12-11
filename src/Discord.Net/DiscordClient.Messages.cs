@@ -308,6 +308,15 @@ namespace Discord
 			}
 			return new Message[0];
 		}
+
+        /// <summary> Marks a given message as read. </summary>
+        public void AckMessage(Message message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
+            if (!message.IsAuthor)
+                _api.AckMessage(message.Id, message.Channel.Id);
+        }
 		
 		/// <summary> Deserializes messages from JSON format and imports them into the message cache.</summary>
 		public IEnumerable<Message> ImportMessages(Channel channel, string json)
