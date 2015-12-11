@@ -177,7 +177,7 @@ namespace Discord.Net.WebSockets
 
                         if (packetLength > 0 && endpoint.Equals(_endpoint))
 						{
-							if (_state != (int)ConnectionState.Connected)
+							if (_state != ConnectionState.Connected)
 							{
 								if (packetLength != 70)
 									return;
@@ -247,7 +247,7 @@ namespace Discord.Net.WebSockets
 		{
 			try
 			{
-				while (!cancelToken.IsCancellationRequested && _state != (int)ConnectionState.Connected)
+				while (!cancelToken.IsCancellationRequested && _state != ConnectionState.Connected)
 					Thread.Sleep(1);
 
 				if (cancelToken.IsCancellationRequested)
@@ -399,7 +399,7 @@ namespace Discord.Net.WebSockets
 			{
 				case VoiceOpCodes.Ready:
 					{
-						if (_state != (int)ConnectionState.Connected)
+						if (_state != ConnectionState.Connected)
 						{
 							var payload = (msg.Payload as JToken).ToObject<VoiceReadyEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
@@ -488,7 +488,7 @@ namespace Discord.Net.WebSockets
 				}
 				catch (OperationCanceledException)
 				{
-					ThrowError();
+					_taskManager.ThrowException();
 				}
 			});
 		}

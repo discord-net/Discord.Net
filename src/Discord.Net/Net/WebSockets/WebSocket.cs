@@ -34,8 +34,8 @@ namespace Discord.Net.WebSockets
 		public string Host { get { return _host; } set { _host = value; } }
 		private string _host;
 
-		public ConnectionState State => (ConnectionState)_state;
-		protected int _state;
+		public ConnectionState State => _state;
+		protected ConnectionState _state;
 
 		public event EventHandler Connected;
 		private void RaiseConnected()
@@ -104,8 +104,9 @@ namespace Discord.Net.WebSockets
                 _lock.WaitOne();
                 try
                 {
-                    await _taskManager.Stop().ConfigureAwait(false);                    
-                    _state = (int)ConnectionState.Connecting;
+                    await _taskManager.Stop().ConfigureAwait(false);
+                    _taskManager.ClearException();
+                    _state = ConnectionState.Connecting;
                     
                     _cancelTokenSource = new CancellationTokenSource();
                     _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
@@ -122,13 +123,14 @@ namespace Discord.Net.WebSockets
 			catch (Exception ex)
 			{
                 _taskManager.SignalError(ex, true);
+                throw;
 			}
 		}
 		protected void EndConnect()
 		{
 			try
             {
-                _state = (int)ConnectionState.Connected;
+                _state = ConnectionState.Connected;
 
 				_connectedEvent.Set();
 				RaiseConnected();
@@ -142,17 +144,17 @@ namespace Discord.Net.WebSockets
 		protected abstract Task Run();
 		protected virtual async Task Cleanup()
 		{
-			await _engine.Disconnect().ConfigureAwait(false);
+            var oldState = _state;
+            _state = ConnectionState.Disconnecting;
+
+            await _engine.Disconnect().ConfigureAwait(false);
 			_cancelTokenSource = null;
-			var oldState = _state;
 			_connectedEvent.Reset();
 
-            if (oldState == (int)ConnectionState.Connected)
-            {
-                _state = (int)ConnectionState.Disconnected;
+            if (oldState == ConnectionState.Connected)
                 RaiseDisconnected(_taskManager.WasUnexpected, _taskManager.Exception);
-            }
-		}
+            _state = ConnectionState.Disconnected;
+        }
 
 		protected virtual Task ProcessMessage(string json)
 		{
@@ -176,23 +178,18 @@ namespace Discord.Net.WebSockets
 				{
 					while (!cancelToken.IsCancellationRequested)
 					{
-						if (_state == (int)ConnectionState.Connected)
+						if (_state == ConnectionState.Connected)
 						{
 							SendHeartbeat();
 							await Task.Delay(_heartbeatInterval, cancelToken).ConfigureAwait(false);
 						}
 						else
-							await Task.Delay(100, cancelToken).ConfigureAwait(false);
+							await Task.Delay(1000, cancelToken).ConfigureAwait(false);
 					}
 				}
 				catch (OperationCanceledException) { }
 			});
         }
         public abstract void SendHeartbeat();
-
-        protected internal void ThrowError()
-		{
-            _taskManager.Throw();
-		}
 	}
 }

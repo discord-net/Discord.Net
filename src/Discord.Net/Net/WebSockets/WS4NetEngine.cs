@@ -57,6 +57,7 @@ namespace Discord.Net.WebSockets
             _waitUntilConnect.Reset();
             _webSocket.Open();
             _waitUntilConnect.Wait(cancelToken);
+            _parent.TaskManager.ThrowException(); //In case our connection failed
             return TaskHelper.CompletedTask;
         }
 

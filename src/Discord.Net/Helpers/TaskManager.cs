@@ -16,8 +16,8 @@ namespace Discord
         private CancellationTokenSource _cancelSource;
         private Task _task;
 
-        public bool WasUnexpected => _wasUnexpected;
-        private bool _wasUnexpected;
+        public bool WasUnexpected => _wasStopUnexpected;
+        private bool _wasStopUnexpected;
 
         public Exception Exception => _stopReason.SourceException;
         private ExceptionDispatchInfo _stopReason;
@@ -53,7 +53,7 @@ namespace Discord
                         continue; //Another thread sneaked in and started this manager before we got a lock, loop and try again
 
                     _stopReason = null;
-                    _wasUnexpected = false;
+                    _wasStopUnexpected = false;
 
                     Task[] tasksArray = tasks.ToArray();
                     Task<Task> anyTask = Task.WhenAny(tasksArray);
@@ -74,8 +74,10 @@ namespace Discord
                         await allTasks.ConfigureAwait(false);
 
                         //Run the cleanup function within our lock
-                        await _stopAction().ConfigureAwait(false);
+                        if (_stopAction != null)
+                            await _stopAction().ConfigureAwait(false);
                         _task = null;
+                        _cancelSource = null;
                     });
                     return;
                 }
@@ -89,7 +91,8 @@ namespace Discord
                 if (_task == null) return; //Are we running?
                 if (_cancelSource.IsCancellationRequested) return;
 
-                _cancelSource.Cancel();
+                if (_cancelSource != null)
+                    _cancelSource.Cancel();
             }
         }
         public Task Stop()
@@ -102,7 +105,8 @@ namespace Discord
                 if (task == null) return TaskHelper.CompletedTask; //Are we running?
                 if (_cancelSource.IsCancellationRequested) return task;
 
-                _cancelSource.Cancel();
+                if (_cancelSource != null)
+                    _cancelSource.Cancel();
             }
             return task;
         }
@@ -111,11 +115,12 @@ namespace Discord
         {
             lock (_lock)
             {
-                if (_task == null) return; //Are we running?
+                if (_stopReason != null) return;
 
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
-                _wasUnexpected = isUnexpected;
-                _cancelSource.Cancel();
+                _wasStopUnexpected = isUnexpected;
+                if (_cancelSource != null)
+                    _cancelSource.Cancel();
             }
         }
         public Task Error(Exception ex, bool isUnexpected = true)
@@ -123,25 +128,35 @@ namespace Discord
             Task task;
             lock (_lock)
             {
+                if (_stopReason != null) return TaskHelper.CompletedTask;
+
                 //Cache the task so we still have something to await if Cleanup is run really quickly
-                task = _task;
-                if (task == null) return TaskHelper.CompletedTask; //Are we running?
+                task = _task ?? TaskHelper.CompletedTask;
                 if (_cancelSource.IsCancellationRequested) return task;
 
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
-                _wasUnexpected = isUnexpected;
-                _cancelSource.Cancel();
+                _wasStopUnexpected = isUnexpected;
+                if (_cancelSource != null)
+                    _cancelSource.Cancel();
             }
             return task;
         }
 
         /// <summary> Throws an exception if one was captured. </summary>
-        public void Throw()
+        public void ThrowException()
         {
             lock (_lock)
             {
                 if  (_stopReason != null)
                     _stopReason.Throw();
+            }
+        }
+        public void ClearException()
+        {
+            lock (_lock)
+            {
+                _stopReason = null;
+                _wasStopUnexpected = false;
             }
         }
     }

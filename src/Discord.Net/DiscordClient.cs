@@ -68,8 +68,8 @@ namespace Discord
 		private readonly DiscordConfig _config;
 		
 		/// <summary> Returns the current connection state of this client. </summary>
-		public ConnectionState State => (ConnectionState)_state;
-		private int _state;
+		public ConnectionState State => _state;
+		private ConnectionState _state;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
 		public DiscordAPIClient APIClient => _api;
@@ -145,7 +145,7 @@ namespace Discord
             var settings = new JsonSerializerSettings();
             _webSocket.Connected += (s, e) =>
             {
-                if (_state == (int)ConnectionState.Connecting)
+                if (_state == ConnectionState.Connecting)
                     EndConnect();
             };
             _webSocket.Disconnected += (s, e) =>
@@ -277,7 +277,7 @@ namespace Discord
             if (!_sentInitialLog)
                 SendInitialLog();
 
-            if (State != (int)ConnectionState.Disconnected)
+            if (State != ConnectionState.Disconnected)
                 await Disconnect().ConfigureAwait(false);
 
             _token = token;
@@ -293,7 +293,8 @@ namespace Discord
                 try
                 {
                     await _taskManager.Stop().ConfigureAwait(false);
-                    _state = (int)ConnectionState.Connecting;
+                    _taskManager.ClearException();
+                    _state = ConnectionState.Connecting;
 
                     var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
                     string gateway = gatewayResponse.Url;
@@ -326,7 +327,7 @@ namespace Discord
                     }
                     catch (OperationCanceledException)
                     {
-                        _webSocket.ThrowError(); //Throws data socket's internal error if any occured
+                        _webSocket.TaskManager.ThrowException(); //Throws data socket's internal error if any occured
                         throw;
                     }
                 }
@@ -335,15 +336,15 @@ namespace Discord
                     _lock.Release();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                await Disconnect().ConfigureAwait(false);
+                _taskManager.SignalError(ex, true);
                 throw;
             }
         }
 		private void EndConnect()
 		{
-			_state = (int)ConnectionState.Connected;
+			_state = ConnectionState.Connected;
 			_connectedEvent.Set();
 			RaiseConnected();
 		}
@@ -352,8 +353,9 @@ namespace Discord
         public Task Disconnect() => _taskManager.Stop();
         
 		private async Task Cleanup()
-		{
-			if (Config.UseMessageQueue)
+        {
+            _state = ConnectionState.Disconnecting;
+            if (Config.UseMessageQueue)
 			{
 				MessageQueueItem ignored;
 				while (_pendingMessages.TryDequeue(out ignored)) { }
@@ -373,8 +375,8 @@ namespace Discord
             _token = null;
             
             _state = (int)ConnectionState.Disconnected;
-            _disconnectedEvent.Set();
             _connectedEvent.Reset();
+            _disconnectedEvent.Set();
         }
 		
 		private void OnReceivedEvent(WebSocketEventEventArgs e)
@@ -822,11 +824,11 @@ namespace Discord
         {
             switch (_state)
             {
-                case (int)ConnectionState.Disconnecting:
+                case ConnectionState.Disconnecting:
                     throw new InvalidOperationException("The client is disconnecting.");
-                case (int)ConnectionState.Disconnected:
+                case ConnectionState.Disconnected:
                     throw new InvalidOperationException("The client is not connected to Discord");
-                case (int)ConnectionState.Connecting:
+                case ConnectionState.Connecting:
                     throw new InvalidOperationException("The client is connecting.");
             }
         }
