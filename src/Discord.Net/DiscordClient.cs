@@ -673,9 +673,6 @@ namespace Discord
 
                             msg.State = MessageState.Normal;
                             RaiseMessageReceived(msg);
-
-							if (Config.AckMessages && !isAuthor)
-								await _api.AckMessage(data.Id, data.ChannelId).ConfigureAwait(false);
 						}
 						break;
 					case "MESSAGE_UPDATE":
