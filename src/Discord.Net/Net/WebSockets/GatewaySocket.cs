@@ -112,7 +112,7 @@ namespace Discord.Net.WebSockets
 						{
 							Host = payload.Url;
 							if (_logger.Level >= LogSeverity.Info)
-								_logger.Log(LogSeverity.Info, "Redirected to " + payload.Url);
+								_logger.Info("Redirected to " + payload.Url);
 							await Redirect(payload.Url).ConfigureAwait(false);
 						}
 					}

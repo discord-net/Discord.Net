@@ -10,7 +10,7 @@ namespace Discord
 			catch (Exception ex)
 			{
 				var ex2 = ex.GetBaseException();
-				logger.Log(LogSeverity.Error, $"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}", ex);
+				logger.Error($"{name}'s handler raised {ex2.GetType().Name}: ${ex2.Message}", ex);
 			}
 		}
 	}

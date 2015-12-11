@@ -56,6 +56,16 @@ namespace Discord
 		{
 			if (severity <= _service.Level)
 				_service.RaiseLogMessage(new LogMessageEventArgs(severity, _source, message, exception));
-		}
-	}
+        }
+        public void Error(string message, Exception exception = null)
+            => Log(LogSeverity.Error, message, exception);
+        public void Warning(string message, Exception exception = null)
+            => Log(LogSeverity.Warning, message, exception);
+        public void Info(string message, Exception exception = null)
+            => Log(LogSeverity.Info, message, exception);
+        public void Verbose(string message, Exception exception = null)
+            => Log(LogSeverity.Verbose, message, exception);
+        public void Debug(string message, Exception exception = null)
+            => Log(LogSeverity.Debug, message, exception);
+    }
 }

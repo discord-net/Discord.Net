@@ -84,7 +84,7 @@ namespace Discord.Net.WebSockets
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						_logger.Log(LogSeverity.Error, "Reconnect failed", ex);
+						_logger.Error("Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -362,7 +362,7 @@ namespace Discord.Net.WebSockets
 							}
 							catch (SocketException ex)
 							{
-								_logger.Log(LogSeverity.Error, "Failed to send UDP packet.", ex);
+								_logger.Error("Failed to send UDP packet.", ex);
 							}
 							hasFrame = false;
 						}
@@ -469,7 +469,7 @@ namespace Discord.Net.WebSockets
 					break;
 				default:
 					if (_logger.Level >= LogSeverity.Warning)
-						_logger.Log(LogSeverity.Warning, $"Unknown Opcode: {opCode}");
+						_logger.Warning($"Unknown Opcode: {opCode}");
 					break;
 			}
 		}

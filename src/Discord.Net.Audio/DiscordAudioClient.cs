@@ -82,7 +82,7 @@ namespace Discord.Audio
 				}
 				catch (Exception ex)
 				{
-					_gatewaySocket.Logger.Log(LogSeverity.Error, $"Error handling {e.Type} event", ex);
+					_gatewaySocket.Logger.Error($"Error handling {e.Type} event", ex);
 				}
 			};
 		}

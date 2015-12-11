@@ -53,7 +53,7 @@ namespace Discord.Net.WebSockets
 		private void RaiseConnected()
 		{
 			if (_logger.Level >= LogSeverity.Info)
-				_logger.Log(LogSeverity.Info, "Connected");
+				_logger.Info( "Connected");
 			if (Connected != null)
 				Connected(this, EventArgs.Empty);
 		}
@@ -61,7 +61,7 @@ namespace Discord.Net.WebSockets
 		private void RaiseDisconnected(bool wasUnexpected, Exception error)
 		{
 			if (_logger.Level >= LogSeverity.Info)
-				_logger.Log(LogSeverity.Info, "Disconnected");
+				_logger.Info( "Disconnected");
 			if (Disconnected != null)
 				Disconnected(this, new DisconnectedEventArgs(wasUnexpected, error));
 		}
@@ -165,8 +165,10 @@ namespace Discord.Net.WebSockets
 			}
 
 			if (hasWriterLock)
-			{
-				CaptureError(ex ?? new Exception("Disconnect was requested."), isUnexpected);
+            {
+                if (ex != null)
+                    _logger.Log(LogSeverity.Error, "Error", ex);
+                CaptureError(ex ?? new Exception("Disconnect was requested."), isUnexpected);
 				_cancelTokenSource.Cancel();
 				if (_disconnectState == WebSocketState.Connecting) //_runTask was never made
 					await Cleanup().ConfigureAwait(false);
@@ -236,7 +238,7 @@ namespace Discord.Net.WebSockets
 		protected virtual Task ProcessMessage(string json)
 		{
 			if (_logger.Level >= LogSeverity.Debug)
-				_logger.Log(LogSeverity.Debug, $"In: {json}");
+				_logger.Debug( $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}
 		
@@ -244,7 +246,7 @@ namespace Discord.Net.WebSockets
 		{
 			string json = JsonConvert.SerializeObject(message);
 			if (_logger.Level >= LogSeverity.Debug)
-				_logger.Log(LogSeverity.Debug, $"Out: " + json);
+				_logger.Debug( $"Out: " + json);
 			_engine.QueueMessage(json);
 		}
 

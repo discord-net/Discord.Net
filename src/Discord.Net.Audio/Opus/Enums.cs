@@ -1,8 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Security;
-
-namespace Discord.Audio.Opus
+﻿namespace Discord.Audio.Opus
 {
     internal enum OpusCtl : int
     {

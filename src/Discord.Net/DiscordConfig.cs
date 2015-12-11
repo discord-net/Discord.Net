@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace Discord
@@ -48,6 +49,7 @@ namespace Discord
         private string _appVersion = null;
 
         /// <summary> User Agent string to use when connecting to Discord. </summary>
+        [JsonIgnore]
         public string UserAgent { get { return _userAgent; } }
         private string _userAgent;
         private void UpdateUserAgent()
