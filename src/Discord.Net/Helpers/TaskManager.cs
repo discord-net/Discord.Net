@@ -47,7 +47,7 @@ namespace Discord
 
                 lock (_lock)
                 {
-                    _cancelSource = new CancellationTokenSource();
+                    _cancelSource = cancelSource;
 
                     if (_task != null)
                         continue; //Another thread sneaked in and started this manager before we got a lock, loop and try again
@@ -66,7 +66,7 @@ namespace Discord
 
                         //Signal the rest of the tasks to stop
                         if (firstTask.Exception != null)
-                            SignalError(firstTask.Exception.GetBaseException(), true);
+                            SignalError(firstTask.Exception, true);
                         else
                             SignalStop();
 
@@ -113,9 +113,9 @@ namespace Discord
             {
                 if (_task == null) return; //Are we running?
 
-                _cancelSource.Cancel();
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
                 _wasUnexpected = isUnexpected;
+                _cancelSource.Cancel();
             }
         }
         public Task Error(Exception ex, bool isUnexpected = true)
@@ -128,9 +128,9 @@ namespace Discord
                 if (task == null) return TaskHelper.CompletedTask; //Are we running?
                 if (_cancelSource.IsCancellationRequested) return task;
 
-                _cancelSource.Cancel();
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
                 _wasUnexpected = isUnexpected;
+                _cancelSource.Cancel();
             }
             return task;
         }
