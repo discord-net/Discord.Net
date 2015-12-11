@@ -140,7 +140,7 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			try { await _api.DeleteRole(role.Server.Id, role.Id); }
+			try { await _api.DeleteRole(role.Server.Id, role.Id).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 	}
 

@@ -1,4 +1,5 @@
-﻿using Discord.Net.WebSockets;
+﻿using Discord.API;
+using Discord.Net.WebSockets;
 using System;
 using System.Threading.Tasks;
 
@@ -10,22 +11,29 @@ namespace Discord.Audio
 		public int Id => _id;
 
 		private readonly AudioService _service;
-		private readonly GatewaySocket _gatewaySocket;
-		private readonly VoiceWebSocket _voiceSocket;
 		private readonly Logger _logger;
 
-		public long? ServerId => _voiceSocket.ServerId;
-		public long? ChannelId => _voiceSocket.ChannelId;
+        public GatewaySocket GatewaySocket => _gatewaySocket;
+        private readonly GatewaySocket _gatewaySocket;
 
-		public DiscordAudioClient(AudioService service, int id, Logger logger, GatewaySocket gatewaySocket, VoiceWebSocket voiceSocket)
+        public VoiceWebSocket VoiceSocket => _voiceSocket;
+        private readonly VoiceWebSocket _voiceSocket;
+
+        public string Token => _token;
+        private string _token;
+
+        public long? ServerId => _voiceSocket.ServerId;
+        public long? ChannelId => _voiceSocket.ChannelId;
+
+        public DiscordAudioClient(AudioService service, int id, Logger logger, GatewaySocket gatewaySocket)
 		{
 			_service = service;
 			_id = id;
 			_logger = logger;
 			_gatewaySocket = gatewaySocket;
-			_voiceSocket = voiceSocket;
+			_voiceSocket = new VoiceWebSocket(service.Client, this, logger);
 
-			/*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
+            /*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
 			_voiceSocket.Disconnected += async (s, e) =>
 			{
 				_voiceSocket.CurrentServerId;
@@ -37,7 +45,7 @@ namespace Discord.Audio
 					await socket.Reconnect().ConfigureAwait(false);
 			};*/
 
-			/*_voiceSocket.IsSpeaking += (s, e) =>
+            /*_voiceSocket.IsSpeaking += (s, e) =>
 			{
 				if (_voiceSocket.State == WebSocketState.Connected)
 				{
@@ -54,27 +62,28 @@ namespace Discord.Audio
 				}
 			};*/
 
-			/*this.Connected += (s, e) =>
+            /*this.Connected += (s, e) =>
 			{
 				_voiceSocket.ParentCancelToken = _cancelToken;
 			};*/
 
-			_gatewaySocket.ReceivedDispatch += async (s, e) =>
+            _gatewaySocket.ReceivedDispatch += async (s, e) =>
 			{
 				try
 				{
 					switch (e.Type)
 					{
 						case "VOICE_SERVER_UPDATE":
-							{
-								long serverId = IdConvert.ToLong(e.Payload.Value<string>("guild_id"));
+                            {
+                                var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_gatewaySocket.Serializer);
+                                long serverId = data.ServerId;
 
 								if (serverId == ServerId)
 								{
 									var client = _service.Client;
-									string token = e.Payload.Value<string>("token");
+									_token = data.Token;
 									_voiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-									await _voiceSocket.Connect(client.CurrentUser.Id, _gatewaySocket.SessionId, token/*, client.CancelToken*/).ConfigureAwait(false);
+									await _voiceSocket.Connect().ConfigureAwait(false);
 								}
 							}
 							break;

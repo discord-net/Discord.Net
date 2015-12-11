@@ -26,7 +26,8 @@ namespace Discord.Net.WebSockets
 		//private readonly Random _rand;
 		private readonly int _targetAudioBufferLength;
 		private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
-		private readonly AudioServiceConfig _audioConfig;
+		private readonly DiscordAudioClient _audioClient;
+        private readonly AudioServiceConfig _config;
 		private OpusEncoder _encoder;
 		private uint _ssrc;
 		private ConcurrentDictionary<uint, long> _ssrcMapping;
@@ -37,8 +38,8 @@ namespace Discord.Net.WebSockets
 		private bool _isEncrypted;
 		private byte[] _secretKey, _encodingBuffer;
 		private ushort _sequence;
-		private long? _serverId, _channelId, _userId;
-		private string _sessionId, _token, _encryptionMode;
+		private long? _serverId, _channelId;
+		private string _encryptionMode;
 		private int _ping;
 		
 		private Thread _sendThread, _receiveThread;
@@ -48,24 +49,21 @@ namespace Discord.Net.WebSockets
 		public int Ping => _ping;
 		internal VoiceBuffer OutputBuffer => _sendBuffer;
 
-		public VoiceWebSocket(DiscordConfig config, AudioServiceConfig audioConfig, Logger logger)
-			: base(config, logger)
+		public VoiceWebSocket(DiscordClient client, DiscordAudioClient audioClient, Logger logger)
+			: base(client, logger)
 		{
-			_audioConfig = audioConfig;
-			_decoders = new ConcurrentDictionary<uint, OpusDecoder>();
-			_targetAudioBufferLength = _audioConfig.BufferLength / 20; //20 ms frames
+            _audioClient = audioClient;
+            _config = client.Audio().Config;
+            _decoders = new ConcurrentDictionary<uint, OpusDecoder>();
+			_targetAudioBufferLength = _config.BufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
 			_ssrcMapping = new ConcurrentDictionary<uint, long>();
-			_encoder = new OpusEncoder(48000, _audioConfig.Channels, 20, _audioConfig.Bitrate, OpusApplication.Audio);
-			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_audioConfig.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
+			_encoder = new OpusEncoder(48000, _config.Channels, 20, _config.Bitrate, OpusApplication.Audio);
+			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_config.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 		
-		public async Task Connect(long userId, string sessionId, string token)
-		{			
-			_userId = userId;
-			_sessionId = sessionId;
-			_token = token;
-
+		public async Task Connect()
+		{
 			await BeginConnect().ConfigureAwait(false);
 		}
 		public async Task Reconnect()
@@ -73,12 +71,12 @@ namespace Discord.Net.WebSockets
 			try
 			{
 				var cancelToken = ParentCancelToken.Value;
-                await Task.Delay(_config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+                await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{
 					try
 					{
-						await Connect(_userId.Value, _sessionId, _token).ConfigureAwait(false);
+						await Connect().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -86,29 +84,26 @@ namespace Discord.Net.WebSockets
 					{
 						_logger.Error("Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
 				}
 			}
 			catch (OperationCanceledException) { }
 		}
-		public Task Disconnect()
-		{
-			return SignalDisconnect(wait: true);
-		}
+        public Task Disconnect() => _taskManager.Stop();
 
 		protected override async Task Run()
 		{			
 			_udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 
 			List<Task> tasks = new List<Task>();
-			if ((_audioConfig.Mode & AudioMode.Outgoing) != 0)
+			if ((_config.Mode & AudioMode.Outgoing) != 0)
 			{
 				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(_cancelToken)));
 				_sendThread.IsBackground = true;
                 _sendThread.Start();
 			}			
-			if ((_audioConfig.Mode & AudioMode.Incoming) != 0)
+			if ((_config.Mode & AudioMode.Incoming) != 0)
 			{
 				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(_cancelToken)));
 				_receiveThread.IsBackground = true;
@@ -120,9 +115,9 @@ namespace Discord.Net.WebSockets
 #if !DOTNET5_4
 			tasks.Add(WatcherAsync());
 #endif
-			await RunTasks(tasks.ToArray());
-
-			await Cleanup();
+            tasks.AddRange(_engine.GetTasks(_cancelToken));
+            tasks.Add(HeartbeatAsync(_cancelToken));
+            await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
 		}
 		protected override Task Cleanup()
 		{
@@ -141,12 +136,6 @@ namespace Discord.Net.WebSockets
             }
 
 			ClearPCMFrames();
-			if (!_wasDisconnectUnexpected)
-			{
-				_userId = null;
-				_sessionId = null;
-				_token = null;
-			}
 			_udp = null;
 
 			return base.Cleanup();
@@ -161,7 +150,7 @@ namespace Discord.Net.WebSockets
 				int packetLength, resultOffset, resultLength;
 				IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 0);
 
-				if ((_audioConfig.Mode & AudioMode.Incoming) != 0)
+				if ((_config.Mode & AudioMode.Incoming) != 0)
 				{
 					decodingBuffer = new byte[MaxOpusSize];
 					nonce = new byte[24];
@@ -188,7 +177,7 @@ namespace Discord.Net.WebSockets
 
                         if (packetLength > 0 && endpoint.Equals(_endpoint))
 						{
-							if (_state != (int)WebSocketState.Connected)
+							if (_state != (int)ConnectionState.Connected)
 							{
 								if (packetLength != 70)
 									return;
@@ -197,8 +186,8 @@ namespace Discord.Net.WebSockets
 								int port = packet[68] | packet[69] << 8;
 
 								SendSelectProtocol(ip, port);
-								if ((_audioConfig.Mode & AudioMode.Incoming) == 0)
-									return;
+								if ((_config.Mode & AudioMode.Incoming) == 0)
+									return; //We dont need this thread anymore
 							}
 							else
 							{
@@ -258,7 +247,7 @@ namespace Discord.Net.WebSockets
 		{
 			try
 			{
-				while (!cancelToken.IsCancellationRequested && _state != (int)WebSocketState.Connected)
+				while (!cancelToken.IsCancellationRequested && _state != (int)ConnectionState.Connected)
 					Thread.Sleep(1);
 
 				if (cancelToken.IsCancellationRequested)
@@ -410,14 +399,15 @@ namespace Discord.Net.WebSockets
 			{
 				case VoiceOpCodes.Ready:
 					{
-						if (_state != (int)WebSocketState.Connected)
+						if (_state != (int)ConnectionState.Connected)
 						{
 							var payload = (msg.Payload as JToken).ToObject<VoiceReadyEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
-							_endpoint = new IPEndPoint((await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault(), payload.Port);
+                            var address = (await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault();
+                            _endpoint = new IPEndPoint(address, payload.Port);
 							
-							if (_audioConfig.EnableEncryption)
+							if (_config.EnableEncryption)
 							{
 								if (payload.Modes.Contains(EncryptedMode))
 								{
@@ -458,7 +448,7 @@ namespace Discord.Net.WebSockets
 						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_serializer);
 						_secretKey = payload.SecretKey;
 						SendIsTalking(true);
-						await EndConnect();
+						EndConnect();
 					}
 					break;
 				case VoiceOpCodes.Speaking:
@@ -507,9 +497,9 @@ namespace Discord.Net.WebSockets
 		{
 			var msg = new IdentifyCommand();
 			msg.Payload.ServerId = _serverId.Value;
-			msg.Payload.SessionId = _sessionId;
-			msg.Payload.Token = _token;
-			msg.Payload.UserId = _userId.Value;
+			msg.Payload.SessionId = _client.SessionId;
+			msg.Payload.Token = _audioClient.Token;
+			msg.Payload.UserId = _client.UserId.Value;
 			QueueMessage(msg);
 		}
 

@@ -254,7 +254,7 @@ namespace Discord
 			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
 			CheckReady();
 
-			var response = await _api.PruneUsers(server.Id, days, simulate);
+			var response = await _api.PruneUsers(server.Id, days, simulate).ConfigureAwait(false);
 			return response.Pruned ?? 0;
 		}
 
@@ -275,11 +275,11 @@ namespace Discord
 
 			await _api.EditProfile(currentPassword: currentPassword, 
 				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
-				avatar: avatar, avatarType: avatarType, existingAvatar: _privateUser?.AvatarId);
+				avatar: avatar, avatarType: avatarType, existingAvatar: _privateUser?.AvatarId).ConfigureAwait(false);
 
 			if (password != null)
 			{
-				var loginResponse = await _api.Login(_privateUser.Global.Email, password);
+				var loginResponse = await _api.Login(_privateUser.Global.Email, password).ConfigureAwait(false);
 				_api.Token = loginResponse.Token;
 			}
 		}

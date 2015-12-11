@@ -23,7 +23,7 @@ namespace Discord
 		public static string Channel(Channel channel)
 			=> $"<#{channel.Id}>";
 		/// <summary> Returns the string used to create a mention to everyone in a channel. </summary>
-		[Obsolete("Use Role.Mention instead")]
+		[Obsolete("Use Server.EveryoneRole.Mention instead")]
 		public static string Everyone()
 			=> $"@everyone";
 

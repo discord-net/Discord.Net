@@ -36,7 +36,7 @@ namespace Discord.API
 		[JsonProperty("joined_at")]
 		public DateTime? JoinedAt;
 		[JsonProperty("roles")]
-		[JsonConverter(typeof(LongArrayStringConverter))]
+		[JsonConverter(typeof(LongStringArrayConverter))]
 		public long[] Roles;
 	}
 	public class ExtendedMemberInfo : MemberInfo
@@ -53,7 +53,7 @@ namespace Discord.API
 		[JsonProperty("status")]
 		public string Status;
 		[JsonProperty("roles")] //TODO: Might be temporary
-		[JsonConverter(typeof(LongArrayStringConverter))]
+		[JsonConverter(typeof(LongStringArrayConverter))]
 		public long[] Roles;
 	}
 	public class VoiceMemberInfo : MemberReference
@@ -88,7 +88,7 @@ namespace Discord.API
         [JsonConverter(typeof(NullableLongStringConverter))]
         public long? ChannelId;
         [JsonProperty("roles", NullValueHandling = NullValueHandling.Ignore)]
-		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		[JsonConverter(typeof(LongStringEnumerableConverter))]
 		public IEnumerable<long> Roles;
 	}
 

@@ -95,8 +95,7 @@ namespace Discord.Audio
 			else
 			{
 				var logger = Client.Log().CreateLogger("Voice");
-				var voiceSocket = new VoiceWebSocket(Client.Config, _config, logger);
-				_defaultClient = new DiscordAudioClient(this, 0, logger, _client.WebSocket, voiceSocket);
+				_defaultClient = new DiscordAudioClient(this, 0, logger, _client.WebSocket);
 			}
 			_talkingUsers = new ConcurrentDictionary<User, bool>();
 
@@ -145,27 +144,26 @@ namespace Discord.Audio
 				return Task.FromResult(_defaultClient);
 			}
 
-			var client = _voiceClients.GetOrAdd(server.Id, (Func<long, DiscordAudioClient>)(_ =>
+			var client = _voiceClients.GetOrAdd(server.Id, _ =>
 			{
 				int id = unchecked(++_nextClientId);
 				var logger = Client.Log().CreateLogger($"Voice #{id}");
-                Net.WebSockets.GatewaySocket gatewaySocket = null;
-				var voiceSocket = new VoiceWebSocket(Client.Config, _config, logger);
-				var voiceClient = new DiscordAudioClient((AudioService)(this), (int)id, (Logger)logger, (Net.WebSockets.GatewaySocket)gatewaySocket, (VoiceWebSocket)voiceSocket);
+                GatewaySocket gatewaySocket = null;
+				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket);
 				voiceClient.SetServerId(server.Id);
 
-				voiceSocket.OnPacket += (s, e) =>
+                voiceClient.VoiceSocket.OnPacket += (s, e) =>
 				{
                     RaiseOnPacket(e);
 				};
-				voiceSocket.IsSpeaking += (s, e) =>
+                voiceClient.VoiceSocket.IsSpeaking += (s, e) =>
 				{
 					var user = Client.GetUser(server, e.UserId);
                     RaiseUserIsSpeakingUpdated(user, e.IsSpeaking);
 				};
 
 				return voiceClient;
-			}));
+			});
 			//await client.Connect(gatewaySocket.Host, _client.Token).ConfigureAwait(false);
 			return Task.FromResult(client);
 		}

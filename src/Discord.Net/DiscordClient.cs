@@ -11,15 +11,15 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public enum DiscordClientState : byte
-	{
-		Disconnected,
-		Connecting,
-		Connected,
-		Disconnecting
-	}
+    public enum ConnectionState : byte
+    {
+        Disconnected,
+        Connecting,
+        Connected,
+        Disconnecting
+    }
 
-	public class DisconnectedEventArgs : EventArgs
+    public class DisconnectedEventArgs : EventArgs
 	{
 		public readonly bool WasUnexpected;
 		public readonly Exception Error;
@@ -51,25 +51,24 @@ namespace Discord
 	{
 		public static readonly string Version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
 
-		private readonly ManualResetEvent _disconnectedEvent;
+        private readonly LogService _log;
+        private readonly Logger _logger, _restLogger, _cacheLogger;
+        private readonly Dictionary<Type, object> _singletons;
+        private readonly object _cacheLock;
+        private readonly Semaphore _lock;
+        private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
-		private readonly Dictionary<Type, object> _singletons;
-		private readonly LogService _log;
-		private readonly object _cacheLock;
-		private Logger _logger, _restLogger, _cacheLogger;
+        private readonly TaskManager _taskManager;
 		private bool _sentInitialLog;
 		private UserStatus _status;
 		private int? _gameId;
-		private Task _runTask;
-		private ExceptionDispatchInfo _disconnectReason;
-		private bool _wasDisconnectUnexpected;
 
 		/// <summary> Returns the configuration object used to make this client. Note that this object cannot be edited directly - to change the configuration of this client, use the DiscordClient(DiscordClientConfig config) constructor. </summary>
 		public DiscordConfig Config => _config;
 		private readonly DiscordConfig _config;
 		
 		/// <summary> Returns the current connection state of this client. </summary>
-		public DiscordClientState State => (DiscordClientState)_state;
+		public ConnectionState State => (ConnectionState)_state;
 		private int _state;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
@@ -82,12 +81,17 @@ namespace Discord
 
 		public string GatewayUrl => _gateway;
 		private string _gateway;
-
+        
 		public string Token => _token;
 		private string _token;
 
-		/// <summary> Returns a cancellation token that triggers when the client is manually disconnected. </summary>
-		public CancellationToken CancelToken => _cancelToken;
+        public string SessionId => _sessionId;
+        private string _sessionId;
+
+        public long? UserId => _privateUser?.Id;
+
+        /// <summary> Returns a cancellation token that triggers when the client is manually disconnected. </summary>
+        public CancellationToken CancelToken => _cancelToken;
 		private CancellationTokenSource _cancelTokenSource;
 		private CancellationToken _cancelToken;
 
@@ -111,35 +115,37 @@ namespace Discord
 			_config.Lock();
 
 			_nonceRand = new Random();
-			_state = (int)DiscordClientState.Disconnected;
+			_state = (int)ConnectionState.Disconnected;
 			_status = UserStatus.Online;
 
 			//Services
 			_singletons = new Dictionary<Type, object>();
 			_log = AddService(new LogService());
-			CreateMainLogger();
+            _logger = CreateMainLogger();
 
-			//Async
+            //Async
+            _lock = new Semaphore(1, 1);
+            _taskManager = new TaskManager(Cleanup);
 			_cancelToken = new CancellationToken(true);
 			_disconnectedEvent = new ManualResetEvent(true);
 			_connectedEvent = new ManualResetEventSlim(false);
-			
-			//Cache
-			_cacheLock = new object();
+
+            //Cache
+            _cacheLock = new object();
 			_channels = new Channels(this, _cacheLock);
 			_users = new Users(this, _cacheLock);
 			_messages = new Messages(this, _cacheLock, Config.MessageCacheSize > 0);
 			_roles = new Roles(this, _cacheLock);
 			_servers = new Servers(this, _cacheLock);
 			_globalUsers = new GlobalUsers(this, _cacheLock);
-			CreateCacheLogger();
+            _cacheLogger = CreateCacheLogger();
 
-			//Networking
-			_webSocket = new GatewaySocket(_config, _log.CreateLogger("WebSocket"));
+            //Networking
+            _webSocket = new GatewaySocket(this, _log.CreateLogger("WebSocket"));
             var settings = new JsonSerializerSettings();
             _webSocket.Connected += (s, e) =>
             {
-                if (_state == (int)DiscordClientState.Connecting)
+                if (_state == (int)ConnectionState.Connecting)
                     EndConnect();
             };
             _webSocket.Disconnected += (s, e) =>
@@ -157,88 +163,94 @@ namespace Discord
 				_api.CancelToken = _cancelToken;
 				await SendStatus().ConfigureAwait(false);
 			};
-			CreateRestLogger();
+            _restLogger = CreateRestLogger();
 
 			//Import/Export
 			_messageImporter = new JsonSerializer();
 			_messageImporter.ContractResolver = new Message.ImportResolver();
 		}
 
-		private void CreateMainLogger()
-		{
-			_logger = _log.CreateLogger("Client");
-			if (_logger.Level >= LogSeverity.Info)
-			{
-				JoinedServer += (s, e) => _logger.Info($"Server Created: {e.Server?.Name ?? "[Private]"}");
-				LeftServer += (s, e) => _logger.Info($"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
-				ServerUpdated += (s, e) => _logger.Info($"Server Updated: {e.Server?.Name ?? "[Private]"}");
-				ServerAvailable += (s, e) => _logger.Info($"Server Available: {e.Server?.Name ?? "[Private]"}");
-				ServerUnavailable += (s, e) => _logger.Info($"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
-				ChannelCreated += (s, e) => _logger.Info($"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelDestroyed += (s, e) => _logger.Info($"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelUpdated += (s, e) => _logger.Info($"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				MessageReceived += (s, e) => _logger.Info($"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageDeleted += (s, e) => _logger.Info($"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageUpdated += (s, e) => _logger.Info($"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				RoleCreated += (s, e) => _logger.Info($"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleUpdated += (s, e) => _logger.Info($"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleDeleted += (s, e) => _logger.Info($"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				UserBanned += (s, e) => _logger.Info($"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
-				UserUnbanned += (s, e) => _logger.Info($"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
-				UserJoined += (s, e) => _logger.Info($"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserLeft += (s, e) => _logger.Info($"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserUpdated += (s, e) => _logger.Info($"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserVoiceStateUpdated += (s, e) => _logger.Info($"Voice Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				ProfileUpdated += (s, e) => _logger.Info("Profile Updated");
+		private Logger CreateMainLogger()
+        {
+            Logger logger = null;
+            if (_log.Level >= LogSeverity.Info)
+            {
+                logger = _log.CreateLogger("Client");
+                JoinedServer += (s, e) => logger.Info($"Server Created: {e.Server?.Name ?? "[Private]"}");
+				LeftServer += (s, e) => logger.Info($"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
+				ServerUpdated += (s, e) => logger.Info($"Server Updated: {e.Server?.Name ?? "[Private]"}");
+				ServerAvailable += (s, e) => logger.Info($"Server Available: {e.Server?.Name ?? "[Private]"}");
+				ServerUnavailable += (s, e) => logger.Info($"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
+				ChannelCreated += (s, e) => logger.Info($"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				ChannelDestroyed += (s, e) => logger.Info($"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				ChannelUpdated += (s, e) => logger.Info($"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+				MessageReceived += (s, e) => logger.Info($"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageDeleted += (s, e) => logger.Info($"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageUpdated += (s, e) => logger.Info($"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				RoleCreated += (s, e) => logger.Info($"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				RoleUpdated += (s, e) => logger.Info($"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				RoleDeleted += (s, e) => logger.Info($"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+				UserBanned += (s, e) => logger.Info($"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
+				UserUnbanned += (s, e) => logger.Info($"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+				UserJoined += (s, e) => logger.Info($"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserLeft += (s, e) => logger.Info($"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserUpdated += (s, e) => logger.Info($"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				UserVoiceStateUpdated += (s, e) => logger.Info($"Voice Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+				ProfileUpdated += (s, e) => logger.Info("Profile Updated");
 			}
 			if (_log.Level >= LogSeverity.Verbose)
 			{
-				UserIsTypingUpdated += (s, e) => _logger.Verbose($"Is Typing: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
-				MessageAcknowledged += (s, e) => _logger.Verbose($"Ack Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageSent += (s, e) => _logger.Verbose($"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				UserPresenceUpdated += (s, e) => _logger.Verbose($"Presence Updated: {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
+				UserIsTypingUpdated += (s, e) => logger.Verbose($"Is Typing: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
+				MessageAcknowledged += (s, e) => logger.Verbose($"Ack Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				MessageSent += (s, e) => logger.Verbose($"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+				UserPresenceUpdated += (s, e) => logger.Verbose($"Presence Updated: {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
 			}
+            return logger;
 		}
-		private void CreateRestLogger()
-		{
-			_restLogger = _log.CreateLogger("Rest");
-			if (_log.Level >= LogSeverity.Verbose)
-			{
-				_api.RestClient.OnRequest += (s, e) =>
+		private Logger CreateRestLogger()
+        {
+            Logger logger = null;
+            if (_log.Level >= LogSeverity.Verbose)
+            {
+                logger = _log.CreateLogger("Rest");
+                _api.RestClient.OnRequest += (s, e) =>
 				{
 					if (e.Payload != null)
-						_restLogger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
+                        logger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
 					else
-						_restLogger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
+                        logger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
 				};
-			}
-		}
-		private void CreateCacheLogger()
-		{
-			_cacheLogger = _log.CreateLogger("Cache");
-			if (_log.Level >= LogSeverity.Debug)
-			{
-				_channels.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Channels");
-				_users.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Users");
-				_messages.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemRemapped += (s, e) => _cacheLogger.Debug( $"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
-				_messages.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Messages");
-				_roles.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Roles");
-				_servers.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created Server {e.Item.Id}");
-				_servers.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed Server {e.Item.Id}");
-				_servers.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Servers");
-				_globalUsers.ItemCreated += (s, e) => _cacheLogger.Debug( $"Created User {e.Item.Id}");
-				_globalUsers.ItemDestroyed += (s, e) => _cacheLogger.Debug( $"Destroyed User {e.Item.Id}");
-				_globalUsers.Cleared += (s, e) => _cacheLogger.Debug( $"Cleared Users");
-			}
-		}
+            }
+            return logger;
+        }
+		private Logger CreateCacheLogger()
+        {
+            Logger logger = null;
+            if (_log.Level >= LogSeverity.Debug)
+            {
+                logger = _log.CreateLogger("Cache");
+                _channels.ItemCreated += (s, e) => logger.Debug( $"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_channels.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_channels.Cleared += (s, e) => logger.Debug( $"Cleared Channels");
+				_users.ItemCreated += (s, e) => logger.Debug( $"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_users.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_users.Cleared += (s, e) => logger.Debug( $"Cleared Users");
+				_messages.ItemCreated += (s, e) => logger.Debug( $"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+				_messages.ItemRemapped += (s, e) => logger.Debug( $"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
+				_messages.Cleared += (s, e) => logger.Debug( $"Cleared Messages");
+				_roles.ItemCreated += (s, e) => logger.Debug( $"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_roles.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+				_roles.Cleared += (s, e) => logger.Debug( $"Cleared Roles");
+				_servers.ItemCreated += (s, e) => logger.Debug( $"Created Server {e.Item.Id}");
+				_servers.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Server {e.Item.Id}");
+				_servers.Cleared += (s, e) => logger.Debug( $"Cleared Servers");
+				_globalUsers.ItemCreated += (s, e) => logger.Debug( $"Created User {e.Item.Id}");
+				_globalUsers.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed User {e.Item.Id}");
+				_globalUsers.Cleared += (s, e) => logger.Debug( $"Cleared Users");
+            }
+            return logger;
+        }
 
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
 		/// <returns> Returns a token for future connections. </returns>
@@ -247,17 +259,16 @@ namespace Discord
 			if (!_sentInitialLog)
 				SendInitialLog();
 
-			if (State != DiscordClientState.Disconnected)
+			if (State != ConnectionState.Disconnected)
 				await Disconnect().ConfigureAwait(false);
 			
-			var response = await _api.Login(email, password)
-				.ConfigureAwait(false);
+			var response = await _api.Login(email, password).ConfigureAwait(false);
             _token = response.Token;
             _api.Token = response.Token;
             if (_config.LogLevel >= LogSeverity.Verbose)
 				_logger.Verbose( "Login successful, got token.");
 
-            await BeginConnect();
+            await BeginConnect().ConfigureAwait(false);
             return response.Token;
         }
 		/// <summary> Connects to the Discord server with the provided token. </summary>
@@ -266,48 +277,62 @@ namespace Discord
             if (!_sentInitialLog)
                 SendInitialLog();
 
-            if (State != (int)DiscordClientState.Disconnected)
+            if (State != (int)ConnectionState.Disconnected)
                 await Disconnect().ConfigureAwait(false);
 
             _token = token;
             _api.Token = token;
-            await BeginConnect();
+            await BeginConnect().ConfigureAwait(false);
         }
 
         private async Task BeginConnect()
         {
             try
             {
-                _state = (int)DiscordClientState.Connecting;
-
-                var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
-                string gateway = gatewayResponse.Url;
-                if (_config.LogLevel >= LogSeverity.Verbose)
-                    _logger.Verbose( $"Websocket endpoint: {gateway}");
-
-                _disconnectedEvent.Reset();
-
-                _gateway = gateway;
-
-                _cancelTokenSource = new CancellationTokenSource();
-                _cancelToken = _cancelTokenSource.Token;
-
-                _webSocket.Host = gateway;
-                _webSocket.ParentCancelToken = _cancelToken;
-                await _webSocket.Connect(_token).ConfigureAwait(false);
-
-                _runTask = RunTasks();
-
+                _lock.WaitOne();
                 try
                 {
-                    //Cancel if either Disconnect is called, data socket errors or timeout is reached
-                    var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _webSocket.CancelToken).Token;
-                    _connectedEvent.Wait(cancelToken);
+                    await _taskManager.Stop().ConfigureAwait(false);
+                    _state = (int)ConnectionState.Connecting;
+
+                    var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
+                    string gateway = gatewayResponse.Url;
+                    if (_config.LogLevel >= LogSeverity.Verbose)
+                        _logger.Verbose( $"Websocket endpoint: {gateway}");
+
+                    _disconnectedEvent.Reset();
+
+                    _gateway = gateway;
+
+                    _cancelTokenSource = new CancellationTokenSource();
+                    _cancelToken = _cancelTokenSource.Token;
+
+                    _webSocket.Host = gateway;
+                    _webSocket.ParentCancelToken = _cancelToken;
+                    await _webSocket.Connect().ConfigureAwait(false);
+
+                    List<Task> tasks = new List<Task>();
+                    tasks.Add(_cancelToken.Wait());
+                    if (_config.UseMessageQueue)
+                        tasks.Add(MessageQueueAsync());
+
+                    await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
+
+                    try
+                    {
+                        //Cancel if either Disconnect is called, data socket errors or timeout is reached
+                        var cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, _webSocket.CancelToken).Token;
+                        _connectedEvent.Wait(cancelToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _webSocket.ThrowError(); //Throws data socket's internal error if any occured
+                        throw;
+                    }
                 }
-                catch (OperationCanceledException)
+                finally
                 {
-                    _webSocket.ThrowError(); //Throws data socket's internal error if any occured
-                    throw;
+                    _lock.Release();
                 }
             }
             catch
@@ -318,88 +343,15 @@ namespace Discord
         }
 		private void EndConnect()
 		{
-			_state = (int)DiscordClientState.Connected;
+			_state = (int)ConnectionState.Connected;
 			_connectedEvent.Set();
 			RaiseConnected();
 		}
 
-		/// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-		public Task Disconnect() => SignalDisconnect(new Exception("Disconnect was requested by user."), isUnexpected: false);
-		private async Task SignalDisconnect(Exception ex = null, bool isUnexpected = true, bool wait = false)
-		{
-			int oldState;
-			bool hasWriterLock;
-
-			//If in either connecting or connected state, get a lock by being the first to switch to disconnecting
-			oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connecting);
-			if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
-			hasWriterLock = oldState == (int)DiscordClientState.Connecting; //Caused state change
-			if (!hasWriterLock)
-			{
-				oldState = Interlocked.CompareExchange(ref _state, (int)DiscordClientState.Disconnecting, (int)DiscordClientState.Connected);
-				if (oldState == (int)DiscordClientState.Disconnected) return; //Already disconnected
-				hasWriterLock = oldState == (int)DiscordClientState.Connected; //Caused state change
-			}
-
-			if (hasWriterLock)
-			{
-				_wasDisconnectUnexpected = isUnexpected;
-				_disconnectReason = ex != null ? ExceptionDispatchInfo.Capture(ex) : null;
-
-				_cancelTokenSource.Cancel();
-				/*if (_disconnectState == DiscordClientState.Connecting) //_runTask was never made
-					await Cleanup().ConfigureAwait(false);*/
-			}
-
-			if (wait)
-			{
-				Task task = _runTask;
-				if (_runTask != null)
-					await task.ConfigureAwait(false);
-			}
-		}
-
-		private async Task RunTasks()
-		{
-			List<Task> tasks = new List<Task>();
-			tasks.Add(_cancelToken.Wait());
-			if (_config.UseMessageQueue)
-				tasks.Add(MessageQueueAsync());
-
-			Task[] tasksArray = tasks.ToArray();
-			Task firstTask = Task.WhenAny(tasksArray);
-			Task allTasks = Task.WhenAll(tasksArray);
-
-			//Wait until the first task ends/errors and capture the error
-			try { await firstTask.ConfigureAwait(false); }
-			catch (Exception ex) { await SignalDisconnect(ex: ex, wait: true).ConfigureAwait(false); }
-
-			//Ensure all other tasks are signaled to end.
-			await SignalDisconnect(wait: true).ConfigureAwait(false);
-
-			//Wait for the remaining tasks to complete
-			try { await allTasks.ConfigureAwait(false); }
-			catch { }
-
-			//Start cleanup
-			var wasDisconnectUnexpected = _wasDisconnectUnexpected;
-			_wasDisconnectUnexpected = false;
-
-			await _webSocket.SignalDisconnect().ConfigureAwait(false);
-
-			_privateUser = null;
-			_gateway = null;
-			_token = null;
-
-			if (!wasDisconnectUnexpected)
-			{
-				_state = (int)DiscordClientState.Disconnected;
-				_disconnectedEvent.Set();
-			}
-			_connectedEvent.Reset();
-			_runTask = null;
-		}
-		private async Task Stop()
+        /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
+        public Task Disconnect() => _taskManager.Stop();
+        
+		private async Task Cleanup()
 		{
 			if (Config.UseMessageQueue)
 			{
@@ -417,7 +369,13 @@ namespace Discord
 			_globalUsers.Clear();
 
 			_privateUser = null;
-		}
+            _gateway = null;
+            _token = null;
+            
+            _state = (int)ConnectionState.Disconnected;
+            _disconnectedEvent.Set();
+            _connectedEvent.Reset();
+        }
 		
 		private void OnReceivedEvent(WebSocketEventEventArgs e)
 		{
@@ -429,7 +387,8 @@ namespace Discord
 					case "READY": //Resync 
 						{
 							var data = e.Payload.ToObject<ReadyEvent>(_webSocket.Serializer);
-							_privateUser = _users.GetOrAdd(data.User.Id, null);
+                            _sessionId = data.SessionId;
+                            _privateUser = _users.GetOrAdd(data.User.Id, null);
 							_privateUser.Update(data.User);
 							_privateUser.Global.Update(data.User);
                             foreach (var model in data.Guilds)
@@ -863,11 +822,11 @@ namespace Discord
         {
             switch (_state)
             {
-                case (int)DiscordClientState.Disconnecting:
+                case (int)ConnectionState.Disconnecting:
                     throw new InvalidOperationException("The client is disconnecting.");
-                case (int)DiscordClientState.Disconnected:
+                case (int)ConnectionState.Disconnected:
                     throw new InvalidOperationException("The client is not connected to Discord");
-                case (int)DiscordClientState.Connecting:
+                case (int)ConnectionState.Connecting:
                     throw new InvalidOperationException("The client is connecting.");
             }
         }

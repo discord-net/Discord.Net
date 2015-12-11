@@ -380,10 +380,11 @@ namespace Discord
                             else
                             {
                                 await _api.EditMessage(
-                                    msg.Id,
-                                    msg.Channel.Id,
-                                    queuedMessage.Text,
-                                    queuedMessage.MentionedUsers);
+                                        msg.Id,
+                                        msg.Channel.Id,
+                                        queuedMessage.Text,
+                                        queuedMessage.MentionedUsers)
+                                    .ConfigureAwait(false);
                             }
                         }
                         catch (WebException) { break; }

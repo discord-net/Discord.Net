@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
@@ -11,14 +12,11 @@ namespace Discord.Net.WebSockets
 		public int LastSequence => _lastSeq;
 		private int _lastSeq;
 
-		public string Token => _token;
-		private string _token;
-
 		public string SessionId => _sessionId;
 		private string _sessionId;
 
-		public GatewaySocket(DiscordConfig config, Logger logger)
-			: base(config, logger)
+		public GatewaySocket(DiscordClient client, Logger logger)
+			: base(client, logger)
 		{
 			Disconnected += async (s, e) =>
 			{
@@ -27,18 +25,13 @@ namespace Discord.Net.WebSockets
 			};
 		}
 
-        public async Task Connect(string token)
+        public async Task Connect()
         {
-            await SignalDisconnect(wait: true).ConfigureAwait(false);
-
-            _token = token;
 			await BeginConnect().ConfigureAwait(false);
-			SendIdentify(token);
+			SendIdentify();
         }
-		private async Task Redirect(string server)
+		private async Task Redirect()
         {
-            await SignalDisconnect(wait: true).ConfigureAwait(false);
-
             await BeginConnect().ConfigureAwait(false);
 			SendResume();
 		}
@@ -47,12 +40,12 @@ namespace Discord.Net.WebSockets
 			try
 			{
 				var cancelToken = ParentCancelToken.Value;
-				await Task.Delay(_config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
 				while (!cancelToken.IsCancellationRequested)
 				{
 					try
                     {
-                        await Connect(_token).ConfigureAwait(false);
+                        await Connect().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -60,21 +53,21 @@ namespace Discord.Net.WebSockets
 					{
 						_logger.Log(LogSeverity.Error, $"Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
 				}
 			}
 			catch (OperationCanceledException) { }
 		}
-		public Task Disconnect()
-		{
-			return SignalDisconnect(wait: true);
-		}
+        public Task Disconnect() => TaskManager.Stop();
 
 		protected override async Task Run()
-		{
-			await RunTasks();
-		}
+        {
+            List<Task> tasks = new List<Task>();
+            tasks.AddRange(_engine.GetTasks(_cancelToken));
+            tasks.Add(HeartbeatAsync(_cancelToken));
+            await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
+        }
 
 		protected override async Task ProcessMessage(string json)
 		{
@@ -102,7 +95,7 @@ namespace Discord.Net.WebSockets
 						}
 						RaiseReceivedDispatch(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
-							await EndConnect(); //Complete the connect
+							EndConnect(); //Complete the connect
 					}
 					break;
 				case GatewayOpCodes.Redirect:
@@ -113,7 +106,7 @@ namespace Discord.Net.WebSockets
 							Host = payload.Url;
 							if (_logger.Level >= LogSeverity.Info)
 								_logger.Info("Redirected to " + payload.Url);
-							await Redirect(payload.Url).ConfigureAwait(false);
+							await Redirect().ConfigureAwait(false);
 						}
 					}
 					break;
@@ -124,12 +117,12 @@ namespace Discord.Net.WebSockets
 			}
 		}
 
-		public void SendIdentify(string token)
+		public void SendIdentify()
 		{
 			var msg = new IdentifyCommand();
-			msg.Payload.Token = token;
+			msg.Payload.Token = _client.Token;
 			msg.Payload.Properties["$device"] = "Discord.Net";
-			if (_config.UseLargeThreshold)
+			if (_client.Config.UseLargeThreshold)
 				msg.Payload.LargeThreshold = 100;
 			msg.Payload.Compress = true;
 			QueueMessage(msg);

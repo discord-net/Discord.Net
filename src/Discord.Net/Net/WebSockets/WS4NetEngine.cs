@@ -46,7 +46,7 @@ namespace Discord.Net.WebSockets
             _webSocket = new WS4NetWebSocket(host);
             _webSocket.EnableAutoSendPing = false;
             _webSocket.NoDelay = true;
-            _webSocket.Proxy = null; //Disable
+            _webSocket.Proxy = null;
 
             _webSocket.DataReceived += OnWebSocketBinary;
             _webSocket.MessageReceived += OnWebSocketText;
@@ -81,15 +81,15 @@ namespace Discord.Net.WebSockets
             return TaskHelper.CompletedTask;
         }
 
-        private async void OnWebSocketError(object sender, ErrorEventArgs e)
+        private void OnWebSocketError(object sender, ErrorEventArgs e)
         {
-            await _parent.SignalDisconnect(e.Exception, isUnexpected: true).ConfigureAwait(false);
+            _parent.TaskManager.SignalError(e.Exception);
             _waitUntilConnect.Set();
         }
-        private async void OnWebSocketClosed(object sender, EventArgs e)
+        private void OnWebSocketClosed(object sender, EventArgs e)
         {
             var ex = new Exception($"Connection lost or close message received.");
-            await _parent.SignalDisconnect(ex, isUnexpected: false/*true*/).ConfigureAwait(false);
+            _parent.TaskManager.SignalError(ex, isUnexpected: true);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketOpened(object sender, EventArgs e)

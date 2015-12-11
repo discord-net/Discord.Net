@@ -93,7 +93,7 @@ namespace Discord.Commands
 		}
 		internal void SetRunFunc(Action<CommandEventArgs> func)
 		{
-			_runFunc = e => { func(e); return TaskHelper.CompletedTask; };
+            _runFunc = TaskHelper.ToAsync(func);
 		}
 		internal Task Run(CommandEventArgs args)
 		{

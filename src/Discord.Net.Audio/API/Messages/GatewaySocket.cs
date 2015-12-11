@@ -5,7 +5,7 @@
 using Discord.API.Converters;
 using Newtonsoft.Json;
 
-namespace Discord.Audio.API
+namespace Discord.API
 {
 	internal sealed class VoiceServerUpdateEvent
 	{

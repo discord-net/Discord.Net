@@ -68,8 +68,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net\API\Converters\LongCollectionConverter.cs">
-      <Link>API\Converters\LongCollectionConverter.cs</Link>
+    <Compile Include="..\Discord.Net\API\Converters\LongStringCollectionConverter.cs">
+      <Link>API\Converters\LongStringCollectionConverter.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Converters\LongStringConverter.cs">
       <Link>API\Converters\LongStringConverter.cs</Link>
@@ -77,11 +77,11 @@
     <Compile Include="..\Discord.Net\API\Endpoints.cs">
       <Link>API\Endpoints.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Enums\AvatarImageType.cs">
-      <Link>API\Enums\AvatarImageType.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\API\Enums\ChannelType.cs">
       <Link>API\Enums\ChannelType.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Enums\ImageType.cs">
+      <Link>API\Enums\ImageType.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Enums\PermissionTarget.cs">
       <Link>API\Enums\PermissionTarget.cs</Link>
@@ -175,6 +175,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Helpers\Reference.cs">
       <Link>Helpers\Reference.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Helpers\TaskManager.cs">
+      <Link>Helpers\TaskManager.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Channel.cs">
       <Link>Models\Channel.cs</Link>

@@ -108,7 +108,7 @@ namespace Discord.API
 		[JsonProperty("content")]
 		public string Content;
 		[JsonProperty("mentions")]
-		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		[JsonConverter(typeof(LongStringEnumerableConverter))]
 		public IEnumerable<long> Mentions;
 		[JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
 		public string Nonce;
@@ -123,7 +123,7 @@ namespace Discord.API
 		[JsonProperty("content", NullValueHandling = NullValueHandling.Ignore)]
 		public string Content;
 		[JsonProperty("mentions", NullValueHandling = NullValueHandling.Ignore)]
-		[JsonConverter(typeof(EnumerableLongStringConverter))]
+		[JsonConverter(typeof(LongStringEnumerableConverter))]
 		public IEnumerable<long> Mentions;
 	}
 	public sealed class EditMessageResponse : MessageInfo { }

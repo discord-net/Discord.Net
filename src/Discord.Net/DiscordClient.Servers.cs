@@ -118,7 +118,8 @@ namespace Discord
 		{
 			CheckReady();
 
-			return (await _api.GetVoiceRegions()).Select(x => new Region { Id = x.Id, Name = x.Name, Hostname = x.Hostname, Port = x.Port });
+            var regions = await _api.GetVoiceRegions().ConfigureAwait(false);
+            return regions.Select(x => new Region { Id = x.Id, Name = x.Name, Hostname = x.Hostname, Port = x.Port });
 		}
 	}
 }
