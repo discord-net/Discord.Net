@@ -147,7 +147,7 @@ namespace Discord
                 RaiseDisconnected(e);
             };
 
-            _webSocket.ReceivedDispatch += async (s, e) => await OnReceivedEvent(e).ConfigureAwait(false);
+            _webSocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
 
             _api = new DiscordAPIClient(_config);
 			if (Config.UseMessageQueue)
@@ -419,7 +419,7 @@ namespace Discord
 			_privateUser = null;
 		}
 		
-		private async Task OnReceivedEvent(WebSocketEventEventArgs e)
+		private void OnReceivedEvent(WebSocketEventEventArgs e)
 		{
 			try
 			{
@@ -533,8 +533,7 @@ namespace Discord
 							var data = e.Payload.ToObject<MemberAddEvent>(_webSocket.Serializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							user.Update(data);
-							if (Config.TrackActivity)
-								user.UpdateActivity();
+							user.UpdateActivity();
 							RaiseUserJoined(user);
 						}
 						break;
@@ -653,16 +652,9 @@ namespace Discord
                             }
 
 							msg.Update(data);
-							if (Config.TrackActivity)
-							{
-								var channel = msg.Channel;
-								if (channel?.IsPrivate == false)
-								{
-									var user = msg.User;
-									if (user != null)
-										user.UpdateActivity(data.Timestamp);
-								}
-							}
+							var user = msg.User;
+                            if (user != null)
+                                user.UpdateActivity();// data.Timestamp);
 
                             //Remapped queued message
                             if (nonce != 0)
@@ -726,18 +718,10 @@ namespace Discord
 								if (user != null)
 								{
 									if (channel != null)
-										RaiseUserIsTyping(user, channel);
-								}
-
-								if (Config.TrackActivity)
-								{
-									if (!channel.IsPrivate)
-									{
-										if (user != null)
-											user.UpdateActivity();
-									}
-								}
-							}
+										RaiseUserIsTyping(user, channel);                                
+									user.UpdateActivity();
+                                }
+                            }
 						}
 						break;
 

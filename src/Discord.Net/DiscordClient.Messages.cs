@@ -275,9 +275,7 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
 			CheckReady();
-
-			bool trackActivity = Config.TrackActivity;
-
+            
 			if (count == 0) return new Message[0];
 			if (channel != null && channel.Type == ChannelType.Text)
 			{
@@ -290,12 +288,9 @@ namespace Discord
 						if (useCache)
 						{
 							msg = _messages.GetOrAdd(x.Id, x.ChannelId, x.Author.Id);
-							if (trackActivity)
-							{
-								var user = msg.User;
-								if (user != null)
-									user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
-							}
+							var user = msg.User;
+							if (user != null)
+								user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
 						}
 						else
 							msg = /*_messages[x.Id] ??*/ new Message(this, x.Id, x.ChannelId, x.Author.Id);
@@ -338,6 +333,12 @@ namespace Discord
 				})
 				.ToDictionary(x => x.Id);
 			_messages.Import(dic);
+            foreach (var msg in dic.Values)
+            {
+                var user = msg.User;
+                if (user != null)
+                    user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
+            }
 			return dic.Values;
 		}
 
