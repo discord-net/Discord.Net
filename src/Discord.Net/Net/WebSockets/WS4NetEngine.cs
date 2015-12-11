@@ -1,9 +1,11 @@
 ﻿#if !DOTNET5_4
+using SuperSocket.ClientEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSocket4Net;
 using WS4NetWebSocket = WebSocket4Net.WebSocket;
 
 namespace Discord.Net.WebSockets
@@ -46,32 +48,11 @@ namespace Discord.Net.WebSockets
             _webSocket.NoDelay = true;
             _webSocket.Proxy = null; //Disable
 
-            _webSocket.DataReceived += (s, e) =>
-            {
-                RaiseBinaryMessage(e.Data);
-            };
-            _webSocket.MessageReceived += (s, e) =>
-            {
-                RaiseTextMessage(e.Message);
-            };
-            _webSocket.Error += async (s, e) =>
-            {
-                _logger.Log(LogSeverity.Error, "WebSocket Error", e.Exception);
-                await _parent.SignalDisconnect(e.Exception, isUnexpected: true).ConfigureAwait(false);
-                _waitUntilConnect.Set();
-            };
-            _webSocket.Closed += async (s, e) =>
-            {
-                /*string code = e.WasClean ? e.Code.ToString() : "Unexpected";
-                string reason = e.Reason != "" ? e.Reason : "No Reason";*/
-                var ex = new Exception($"Got Close Message");// ({code}): {reason}");
-                await _parent.SignalDisconnect(ex, isUnexpected: false/*true*/).ConfigureAwait(false);
-                _waitUntilConnect.Set();
-            };
-            _webSocket.Opened += (s, e) =>
-            {
-                _waitUntilConnect.Set();
-            };
+            _webSocket.DataReceived += OnWebSocketBinary;
+            _webSocket.MessageReceived += OnWebSocketText;
+            _webSocket.Error += OnWebSocketError;
+            _webSocket.Closed += OnWebSocketClosed;
+            _webSocket.Opened += OnWebSocketOpened;
 
             _waitUntilConnect.Reset();
             _webSocket.Open();
@@ -87,9 +68,41 @@ namespace Discord.Net.WebSockets
             var socket = _webSocket;
             _webSocket = null;
             if (socket != null)
+            {
+                //We dont want a slow disconnect to mess up the next connection, so lets just unregister events
+                socket.DataReceived -= OnWebSocketBinary;
+                socket.MessageReceived -= OnWebSocketText;
+                socket.Error -= OnWebSocketError;
+                socket.Closed -= OnWebSocketClosed;
+                socket.Opened -= OnWebSocketOpened;
                 socket.Close();
+            }
 
             return TaskHelper.CompletedTask;
+        }
+
+        private async void OnWebSocketError(object sender, ErrorEventArgs e)
+        {
+            await _parent.SignalDisconnect(e.Exception, isUnexpected: true).ConfigureAwait(false);
+            _waitUntilConnect.Set();
+        }
+        private async void OnWebSocketClosed(object sender, EventArgs e)
+        {
+            var ex = new Exception($"Connection lost or close message received.");
+            await _parent.SignalDisconnect(ex, isUnexpected: false/*true*/).ConfigureAwait(false);
+            _waitUntilConnect.Set();
+        }
+        private void OnWebSocketOpened(object sender, EventArgs e)
+        {
+            _waitUntilConnect.Set();
+        }
+        private void OnWebSocketText(object sender, MessageReceivedEventArgs e)
+        {
+            RaiseTextMessage(e.Message);
+        }
+        private void OnWebSocketBinary(object sender, DataReceivedEventArgs e)
+        {
+            RaiseBinaryMessage(e.Data);
         }
 
         public IEnumerable<Task> GetTasks(CancellationToken cancelToken)
