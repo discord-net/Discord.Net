@@ -158,10 +158,13 @@ namespace Discord
 			_recipient.Unload();
 			
 			var globalMessages = _client.Messages;
-			var messages = _messages;
-			foreach (var message in messages)
-				globalMessages.TryRemove(message.Key);
-			_messages.Clear();
+            if (_client.Config.MessageCacheSize > 0)
+            {
+                var messages = _messages;
+                foreach (var message in messages)
+                    globalMessages.TryRemove(message.Key);
+                messages.Clear();
+            }
         }
 
 		internal void Update(ChannelReference model)
@@ -205,7 +208,11 @@ namespace Discord
 				_messages.TryAdd(message.Id, message);
 			}
 		}
-		internal void RemoveMessage(Message message) => _messages.TryRemove(message.Id, out message);
+        internal void RemoveMessage(Message message)
+        {
+            if (_client.Config.MessageCacheSize > 0)
+                _messages.TryRemove(message.Id, out message);
+        }
 		
 		internal void AddMember(User user)
         {
