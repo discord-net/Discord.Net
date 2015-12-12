@@ -418,14 +418,10 @@ namespace Discord
 							{
 								var server = _servers.GetOrAdd(data.Id);
 								server.Update(data);
-                                if (data.Unavailable == false)
-                                    RaiseServerAvailable(server);
-                                else
-                                {
+                                if (data.Unavailable != false)
                                     RaiseJoinedServer(server);
-                                    RaiseServerAvailable(server);
-                                }
-							}
+                                RaiseServerAvailable(server);
+                            }
 						}
 						break;
 					case "GUILD_UPDATE":
@@ -445,13 +441,9 @@ namespace Discord
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
 							{
-                                if (data.Unavailable == true)
-                                    RaiseServerUnavailable(server);
-                                else
-                                {
-                                    RaiseServerUnavailable(server);
+                                RaiseServerUnavailable(server);
+                                if (data.Unavailable != true)
                                     RaiseLeftServer(server);
-                                }
 							}
 						}
 						break;
