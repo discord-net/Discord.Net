@@ -102,7 +102,8 @@ namespace Discord
 			_members = new ConcurrentDictionary<long, ServerMember>();
 
 			//Local Cache
-			_bans = new ConcurrentDictionary<long, bool>();
+			_bans = new ConcurrentDictionary<long, bool>();            
+            EveryoneRole = _client.Roles.GetOrAdd(id, id);
         }
 		internal override bool LoadReferences()
 		{
@@ -254,11 +255,7 @@ namespace Discord
 		}
 		internal void RemoveRole(Role role)
 		{
-			if (_roles.TryRemove(role.Id, out role))
-			{
-				if (role.Id == Id)
-					EveryoneRole = null;
-			}
+            _roles.TryRemove(role.Id, out role);
 		}
 
 		internal ServerPermissions GetPermissions(User user)
