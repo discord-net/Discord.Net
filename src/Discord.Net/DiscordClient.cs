@@ -512,7 +512,7 @@ namespace Discord
 					case "GUILD_MEMBER_REMOVE":
 						{
 							var data = e.Payload.ToObject<MemberRemoveEvent>(_webSocket.Serializer);
-							var user = _users.TryRemove(data.UserId, data.GuildId);
+							var user = _users.TryRemove(data.User.Id, data.GuildId);
 							if (user != null)
 								RaiseUserLeft(user);
 						}

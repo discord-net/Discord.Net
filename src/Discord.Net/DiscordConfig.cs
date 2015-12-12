@@ -98,7 +98,6 @@ namespace Discord
 		public int WebSocketInterval { get { return _webSocketInterval; } set { SetValue(ref _webSocketInterval, value); } }
 		private int _webSocketInterval = 100;
 
-
         //Performance
 
         /// <summary> Instructs Discord to not send send information about offline users, for servers with more than 50 users. </summary>

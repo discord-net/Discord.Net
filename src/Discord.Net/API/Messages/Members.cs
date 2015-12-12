@@ -14,14 +14,15 @@ namespace Discord.API
 	{
 		[JsonProperty("user_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long UserId;
+		public long UserId; //Used in bans
+
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
 		public long GuildId;
-
-		[JsonProperty("user")]
+        
 		private UserReference _user;
-		public UserReference User
+        [JsonProperty("user")]
+        public UserReference User
 		{
 			get { return _user; }
 			set
