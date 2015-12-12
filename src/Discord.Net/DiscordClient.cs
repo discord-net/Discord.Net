@@ -418,10 +418,13 @@ namespace Discord
 							{
 								var server = _servers.GetOrAdd(data.Id);
 								server.Update(data);
-								if (data.Unavailable == false)
-									RaiseServerAvailable(server);
-								else
-									RaiseJoinedServer(server);
+                                if (data.Unavailable == false)
+                                    RaiseServerAvailable(server);
+                                else
+                                {
+                                    RaiseJoinedServer(server);
+                                    RaiseServerAvailable(server);
+                                }
 							}
 						}
 						break;
@@ -442,10 +445,13 @@ namespace Discord
 							var server = _servers.TryRemove(data.Id);
 							if (server != null)
 							{
-								if (data.Unavailable == true)
-									RaiseServerUnavailable(server);
-								else
-									RaiseLeftServer(server);
+                                if (data.Unavailable == true)
+                                    RaiseServerUnavailable(server);
+                                else
+                                {
+                                    RaiseServerUnavailable(server);
+                                    RaiseLeftServer(server);
+                                }
 							}
 						}
 						break;
