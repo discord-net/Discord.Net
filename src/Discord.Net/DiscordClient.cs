@@ -172,10 +172,9 @@ namespace Discord
 
 		private Logger CreateMainLogger()
         {
-            Logger logger = null;
+            Logger logger = _log.CreateLogger("Client");
             if (_log.Level >= LogSeverity.Info)
             {
-                logger = _log.CreateLogger("Client");
                 JoinedServer += (s, e) => logger.Info($"Server Created: {e.Server?.Name ?? "[Private]"}");
 				LeftServer += (s, e) => logger.Info($"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
 				ServerUpdated += (s, e) => logger.Info($"Server Updated: {e.Server?.Name ?? "[Private]"}");
