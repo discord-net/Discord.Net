@@ -16,7 +16,7 @@ namespace Discord
 		Failed
 	}
 
-	public sealed class Message : CachedObject<long>
+	public sealed class Message : CachedObject<ulong>
 	{
 		internal class ImportResolver : DefaultContractResolver
 		{
