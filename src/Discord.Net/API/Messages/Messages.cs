@@ -14,13 +14,13 @@ namespace Discord.API
 	{
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("channel_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long ChannelId;
+		public ulong ChannelId;
 		[JsonProperty("message_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long MessageId { get { return Id; } set { Id = value; } }
+		public ulong MessageId { get { return Id; } set { Id = value; } }
 	}
 	public class MessageInfo : MessageReference
 	{
@@ -109,7 +109,7 @@ namespace Discord.API
 		public string Content;
 		[JsonProperty("mentions")]
 		[JsonConverter(typeof(LongStringEnumerableConverter))]
-		public IEnumerable<long> Mentions;
+		public IEnumerable<ulong> Mentions;
 		[JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
 		public string Nonce;
 		[JsonProperty("tts", NullValueHandling = NullValueHandling.Ignore)]
@@ -124,7 +124,7 @@ namespace Discord.API
 		public string Content;
 		[JsonProperty("mentions", NullValueHandling = NullValueHandling.Ignore)]
 		[JsonConverter(typeof(LongStringEnumerableConverter))]
-		public IEnumerable<long> Mentions;
+		public IEnumerable<ulong> Mentions;
 	}
 	public sealed class EditMessageResponse : MessageInfo { }
 
@@ -139,7 +139,7 @@ namespace Discord.API
 		{
 			[JsonProperty("guild_id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long ServerId;
+			public ulong ServerId;
 			[JsonProperty("query")]
 			public string Query;
 			[JsonProperty("limit")]

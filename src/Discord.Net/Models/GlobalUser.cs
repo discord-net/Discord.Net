@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class GlobalUser : CachedObject<long>
+	public sealed class GlobalUser : CachedObject<ulong>
 	{
 		/// <summary> Returns the email for this user. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
@@ -28,23 +28,23 @@ namespace Discord
             }
 		}
 		[JsonProperty]
-		private long? PrivateChannelId => _privateChannel?.Id;
+		private ulong? PrivateChannelId => _privateChannel?.Id;
         private Channel _privateChannel;
 
 		/// <summary> Returns a collection of all server-specific data for every server this user is a member of. </summary>
 		[JsonIgnore]
 		public IEnumerable<User> Memberships => _users.Select(x => x.Value);
 		[JsonProperty]
-		private IEnumerable<long> ServerIds => _users.Select(x => x.Key);
-		private readonly ConcurrentDictionary<long, User> _users;
+		private IEnumerable<ulong> ServerIds => _users.Select(x => x.Key);
+		private readonly ConcurrentDictionary<ulong, User> _users;
 
 		/// <summary> Returns the string used to mention this user. </summary>
 		public string Mention => $"<@{Id}>";
 
-		internal GlobalUser(DiscordClient client, long id)
+		internal GlobalUser(DiscordClient client, ulong id)
 			: base(client, id)
 		{
-			_users = new ConcurrentDictionary<long, User>();
+			_users = new ConcurrentDictionary<ulong, User>();
 		}
 		internal override bool LoadReferences() { return true; }
 		internal override void UnloadReferences()

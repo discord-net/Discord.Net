@@ -3,16 +3,16 @@ using Discord.API;
 
 namespace Discord
 {
-	public sealed class Invite : CachedObject<string>
+	public sealed class Invite
 	{
 		public sealed class ServerInfo
 		{
 			/// <summary> Returns the unique identifier of this server. </summary>
-			public long Id { get; }
+			public ulong Id { get; }
 			/// <summary> Returns the name of this server. </summary>
 			public string Name { get; }
 
-			internal ServerInfo(long id, string name)
+			internal ServerInfo(ulong id, string name)
 			{
 				Id = id;
 				Name = name;
@@ -21,11 +21,11 @@ namespace Discord
 		public sealed class ChannelInfo
 		{
 			/// <summary> Returns the unique identifier of this channel. </summary>
-			public long Id { get; }
+			public ulong Id { get; }
 			/// <summary> Returns the name of this channel. </summary>
 			public string Name { get; }
 
-			internal ChannelInfo(long id, string name)
+			internal ChannelInfo(ulong id, string name)
 			{
 				Id = id;
 				Name = name;
@@ -34,17 +34,17 @@ namespace Discord
 		public sealed class InviterInfo
 		{
 			/// <summary> Returns the unique identifier for this user. </summary>
-			public long Id { get; }
+			public ulong Id { get; }
 			/// <summary> Returns the name of this user. </summary>
 			public string Name { get; }
 			/// <summary> Returns the by-name unique identifier for this user. </summary>
-			public int Discriminator { get; }
+			public ushort Discriminator { get; }
 			/// <summary> Returns the unique identifier for this user's avatar. </summary>
 			public string AvatarId { get; }
 			/// <summary> Returns the full path to this user's avatar. </summary>
 			public string AvatarUrl => AvatarId != null ? Endpoints.UserAvatar(Id, AvatarId) : null;
 
-			internal InviterInfo(long id, string name, int discriminator, string avatarId)
+			internal InviterInfo(ulong id, string name, ushort discriminator, string avatarId)
 			{
 				Id = id;
 				Name = name;
@@ -59,9 +59,10 @@ namespace Discord
 		public ChannelInfo Channel { get; private set; }
 		/// <summary> Returns information about the user that created this invite. </summary>
 		public InviterInfo Inviter { get; private set; }
-
-		/// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
-		public string XkcdCode { get; }
+        
+        public string Id { get; }
+        /// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
+        public string XkcdCode { get; }
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
 		public int MaxAge { get; private set; }
 		/// <summary> The amount  of times this invite has been used. </summary>
@@ -77,13 +78,10 @@ namespace Discord
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
 		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id.ToString());
 
-		internal Invite(DiscordClient client, string code, string xkcdPass)
-			: base(client, code)
+		internal Invite(string code, string xkcdPass)
 		{
 			XkcdCode = xkcdPass;
 		}
-		internal override bool LoadReferences() { return true; }
-		internal override void UnloadReferences() { }
 
 		internal void Update(InviteReference model)
 		{

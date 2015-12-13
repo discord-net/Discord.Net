@@ -118,7 +118,7 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<User> MentionedUsers { get; internal set; }
 		[JsonProperty]
-		private IEnumerable<long> MentionedUserIds
+		private IEnumerable<ulong> MentionedUserIds
 		{
 			get { return MentionedUsers?.Select(x => x.Id); }
 			set { MentionedUsers = value.Select(x => _client.GetUser(Server, x)).Where(x => x != null); }
@@ -128,7 +128,7 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
 		[JsonProperty]
-		private IEnumerable<long> MentionedChannelIds
+		private IEnumerable<ulong> MentionedChannelIds
 		{
 			get { return MentionedChannels?.Select(x => x.Id); }
 			set { MentionedChannels = value.Select(x => _client.GetChannel(x)).Where(x => x != null); }
@@ -138,7 +138,7 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
 		[JsonProperty]
-		private IEnumerable<long> MentionedRoleIds
+		private IEnumerable<ulong> MentionedRoleIds
 		{
 			get { return MentionedRoles?.Select(x => x.Id); }
 			set { MentionedRoles = value.Select(x => _client.GetRole(x)).Where(x => x != null); }
@@ -152,17 +152,17 @@ namespace Discord
 		[JsonIgnore]
 		public Channel Channel => _channel.Value;
 		[JsonProperty]
-		private long? ChannelId => _channel.Id;
+		private ulong? ChannelId => _channel.Id;
 		private readonly Reference<Channel> _channel;
 
 		/// <summary> Returns the author of this message. </summary>
 		[JsonIgnore]
 		public User User => _user.Value;
 		[JsonProperty]
-		private long? UserId => _user.Id;
+		private ulong? UserId => _user.Id;
 		private readonly Reference<User> _user;
 
-		internal Message(DiscordClient client, long id, long channelId, long userId)
+		internal Message(DiscordClient client, ulong id, ulong channelId, ulong userId)
 			: base(client, id)
 		{
 			_channel = new Reference<Channel>(channelId,

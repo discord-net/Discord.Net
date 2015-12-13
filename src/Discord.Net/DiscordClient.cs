@@ -92,7 +92,7 @@ namespace Discord
         public string SessionId => _sessionId;
         private string _sessionId;
 
-        public long? UserId => _privateUser?.Id;
+        public ulong? UserId => _currentUser?.Id;
 
         /// <summary> Returns a cancellation token that triggers when the client is manually disconnected. </summary>
         public CancellationToken CancelToken => _cancelToken;
@@ -408,7 +408,7 @@ namespace Discord
 			_servers.Clear();
 			_globalUsers.Clear();
 
-			_privateUser = null;
+			_currentUser = null;
             _gateway = null;
             _token = null;
             
@@ -429,8 +429,9 @@ namespace Discord
 							var data = e.Payload.ToObject<ReadyEvent>(_webSocket.Serializer);
                             _sessionId = data.SessionId;
                             _privateUser = _users.GetOrAdd(data.User.Id, null);
-							_privateUser.Update(data.User);
-							_privateUser.Global.Update(data.User);
+                            _privateUser.Update(data.User);
+                            _currentUser = _privateUser.Global;
+                            _currentUser.Update(data.User);
                             foreach (var model in data.Guilds)
 							{
 								if (model.Unavailable != true)
@@ -634,18 +635,18 @@ namespace Discord
 							var data = e.Payload.ToObject<MessageCreateEvent>(_webSocket.Serializer);
 							Message msg = null;
 
-							bool isAuthor = data.Author.Id == _privateUser.Id;
-                            int nonce = 0;
+							bool isAuthor = data.Author.Id == _currentUser.Id;
+                            //ulong nonce = 0;
 
-                            if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
+                            /*if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
                             {
-                                if (data.Nonce != null && int.TryParse(data.Nonce, out nonce))
+                                if (data.Nonce != null && ulong.TryParse(data.Nonce, out nonce))
                                     msg = _messages[nonce];
-                            }
+                            }*/
                             if (msg == null)
                             {
                                 msg = _messages.GetOrAdd(data.Id, data.ChannelId, data.Author.Id);
-                                nonce = 0;
+                                //nonce = 0;
                             }
 
 							msg.Update(data);
@@ -654,11 +655,12 @@ namespace Discord
                                 user.UpdateActivity();// data.Timestamp);
 
                             //Remapped queued message
-                            if (nonce != 0)
+                            /*if (nonce != 0)
                             {
                                 msg = _messages.Remap(nonce, data.Id);
                                 msg.Id = data.Id;
-                            }
+                                RaiseMessageSent(msg);
+                            }*/
 
                             msg.State = MessageState.Normal;
                             RaiseMessageReceived(msg);

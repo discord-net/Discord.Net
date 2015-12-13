@@ -8,11 +8,11 @@ namespace Discord.API.Converters
 	{
 		public override bool CanConvert(Type objectType)
 		{
-			return objectType == typeof(IEnumerable<long>);
+			return objectType == typeof(IEnumerable<ulong>);
 		}
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			List<long> result = new List<long>();
+			List<ulong> result = new List<ulong>();
 			if (reader.TokenType == JsonToken.StartArray)
 			{
 				reader.Read();
@@ -31,7 +31,7 @@ namespace Discord.API.Converters
 			else
 			{
 				writer.WriteStartArray();
-				foreach (var v in (IEnumerable<long>)value)
+				foreach (var v in (IEnumerable<ulong>)value)
 					writer.WriteValue(IdConvert.ToString(v));
 				writer.WriteEndArray();
 			}
@@ -42,11 +42,11 @@ namespace Discord.API.Converters
 	{
 		public override bool CanConvert(Type objectType)
 		{
-			return objectType == typeof(IEnumerable<long[]>);
+			return objectType == typeof(IEnumerable<ulong[]>);
 		}
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			List<long> result = new List<long>();
+			var result = new List<ulong>();
 			if (reader.TokenType == JsonToken.StartArray)
 			{
 				reader.Read();
@@ -65,7 +65,7 @@ namespace Discord.API.Converters
 			else
 			{
 				writer.WriteStartArray();
-				var a = (long[])value;
+				var a = (ulong[])value;
 				for (int i = 0; i < a.Length; i++)
 					writer.WriteValue(IdConvert.ToString(a[i]));
 				writer.WriteEndArray();

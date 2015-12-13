@@ -149,21 +149,21 @@ namespace Discord.Net.WebSockets
             QueueMessage(msg);
 		}
 
-		public void SendJoinVoice(long serverId, long channelId)
+		public void SendJoinVoice(ulong serverId, ulong channelId)
 		{
 			var msg = new JoinVoiceCommand();
 			msg.Payload.ServerId = serverId;
 			msg.Payload.ChannelId = channelId;
 			QueueMessage(msg);
 		}
-		public void SendLeaveVoice(long serverId)
+		public void SendLeaveVoice(ulong serverId)
 		{
 			var msg = new JoinVoiceCommand();
 			msg.Payload.ServerId = serverId;
 			QueueMessage(msg);
 		}
 
-		public void SendRequestUsers(long serverId, string query = "", int limit = 0)
+		public void SendRequestUsers(ulong serverId, string query = "", int limit = 0)
 		{
 			var msg = new GetUsersCommand();
 			msg.Payload.ServerId = serverId;

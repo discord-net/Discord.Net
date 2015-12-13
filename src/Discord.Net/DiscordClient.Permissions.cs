@@ -63,7 +63,7 @@ namespace Discord
 
 			return SetChannelPermissions(channel, role.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
 		}
-		private Task SetChannelPermissions(Channel channel, long targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
+		private Task SetChannelPermissions(Channel channel, ulong targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
 			=> _api.SetChannelPermissions(channel.Id, targetId, targetType.Value, allow?.RawValue ?? 0, deny?.RawValue ?? 0);
 
 		public Task RemoveChannelPermissions(Channel channel, User user)
@@ -82,7 +82,7 @@ namespace Discord
 
 			return RemoveChannelPermissions(channel, role.Id, PermissionTarget.Role);
 		}
-		private async Task RemoveChannelPermissions(Channel channel, long userOrRoleId, PermissionTarget targetType)
+		private async Task RemoveChannelPermissions(Channel channel, ulong userOrRoleId, PermissionTarget targetType)
 		{
 			try
 			{

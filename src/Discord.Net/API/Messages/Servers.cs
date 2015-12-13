@@ -14,7 +14,7 @@ namespace Discord.API
 	{
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("name")]
 		public string Name;
 	}
@@ -22,12 +22,12 @@ namespace Discord.API
 	{
 		[JsonProperty("afk_channel_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? AFKChannelId;
+		public ulong? AFKChannelId;
 		[JsonProperty("afk_timeout")]
 		public int? AFKTimeout;
 		[JsonProperty("embed_channel_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? EmbedChannelId;
+		public ulong? EmbedChannelId;
 		[JsonProperty("embed_enabled")]
 		public bool EmbedEnabled;
 		[JsonProperty("icon")]
@@ -36,7 +36,7 @@ namespace Discord.API
 		public DateTime? JoinedAt;
 		[JsonProperty("owner_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? OwnerId;
+		public ulong? OwnerId;
 		[JsonProperty("region")]
 		public string Region;
 		[JsonProperty("roles")]
@@ -77,7 +77,7 @@ namespace Discord.API
 		public string Icon;
 		[JsonProperty("afk_channel_id", NullValueHandling = NullValueHandling.Ignore)]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? AFKChannelId;
+		public ulong? AFKChannelId;
 		[JsonProperty("afk_timeout", NullValueHandling = NullValueHandling.Ignore)]
 		public int AFKTimeout;
 	}

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class Messages : AsyncCollection<long, Message>
+	internal sealed class Messages : AsyncCollection<ulong, Message>
 	{
 		private bool _isEnabled;
 
@@ -22,7 +22,7 @@ namespace Discord
 			_isEnabled = isEnabled;
         }
 		
-		public Message GetOrAdd(long id, long channelId, long userId)
+		public Message GetOrAdd(ulong id, ulong channelId, ulong userId)
 		{
 			if (_isEnabled)
 				return GetOrAdd(id, () => new Message(_client, id, channelId, userId));
@@ -33,7 +33,7 @@ namespace Discord
 				return msg;
             }
 		}
-		public void Import(Dictionary<long, Message> messages)
+		public void Import(Dictionary<ulong, Message> messages)
 			=> base.Import(messages);
 	}
 
@@ -41,8 +41,8 @@ namespace Discord
     {
         public readonly Message Message;
         public readonly string Text;
-        public readonly long[] MentionedUsers;
-        public MessageQueueItem(Message msg, string text, long[] userIds)
+        public readonly ulong[] MentionedUsers;
+        public MessageQueueItem(Message msg, string text, ulong[] userIds)
         {
             Message = msg;
             Text = text;
@@ -102,7 +102,7 @@ namespace Discord
         private readonly ConcurrentQueue<MessageQueueItem> _pendingMessages;
 
         /// <summary> Returns the message with the specified id, or null if none was found. </summary>
-        public Message GetMessage(long id)
+        public Message GetMessage(ulong id)
 		{
 			if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
 			CheckReady();
@@ -195,13 +195,13 @@ namespace Discord
             if (Config.UseMessageQueue)
 			{
 				var nonce = GenerateNonce();
-				msg = _messages.GetOrAdd(nonce, channel.Id, _privateUser.Id);
+                msg = new Message(this, 0, channel.Id, _currentUser.Id); //_messages.GetOrAdd(nonce, channel.Id, _privateUser.Id);
                 var currentUser = msg.User;
                 msg.Update(new MessageInfo
                 {
                     Content = text,
                     Timestamp = DateTime.UtcNow,
-                    Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _privateUser.Id, Username = currentUser.Name },
+                    Author = new UserReference { Avatar = currentUser.AvatarId, Discriminator = currentUser.Discriminator, Id = _currentUser.Id, Username = currentUser.Name },
                     ChannelId = channel.Id,
                     Nonce = IdConvert.ToString(nonce),
 					IsTextToSpeech = isTextToSpeech
@@ -270,7 +270,7 @@ namespace Discord
 		}
 
 		/// <summary> Downloads last count messages from the server, returning all messages before or after relativeMessageId, if it's provided. </summary>
-		public async Task<Message[]> DownloadMessages(Channel channel, int count, long? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+		public async Task<Message[]> DownloadMessages(Channel channel, int count, ulong? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (count < 0) throw new ArgumentNullException(nameof(count));
@@ -322,9 +322,9 @@ namespace Discord
 				.Select(x =>
 				{
 					var msg = new Message(this, 
-						x["Id"].Value<long>(),
+						x["Id"].Value<ulong>(),
 						channel.Id,
-						x["UserId"].Value<long>());
+						x["UserId"].Value<ulong>());
 
 					var reader = x.CreateReader();
 					_messageImporter.Populate(reader, msg);
@@ -366,7 +366,7 @@ namespace Discord
                         var msg = queuedMessage.Message;
                         try
                         {
-                            if (msg.Id < 0)
+                            if (msg.Id == 0)
                             {
                                 await _api.SendMessage(
                                         msg.Channel.Id,
@@ -375,7 +375,6 @@ namespace Discord
                                         IdConvert.ToString(msg.Id), //Nonce
                                         msg.IsTTS)
                                     .ConfigureAwait(false);
-                                RaiseMessageSent(msg);
                             }
                             else
                             {
@@ -394,10 +393,10 @@ namespace Discord
 				}
 			});
 		}
-		private long GenerateNonce()
+		private ulong GenerateNonce()
 		{
 			lock (_nonceRand)
-				return -_nonceRand.Next(1, int.MaxValue - 1);
+				return (ulong)_nonceRand.Next(1, int.MaxValue);
 		}
 	}
 }

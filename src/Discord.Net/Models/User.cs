@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace Discord
 {
-	public class User : CachedObject<long>
+	public class User : CachedObject<ulong>
 	{
 		internal struct CompositeKey : IEquatable<CompositeKey>
 		{
-			public long ServerId, UserId;
-			public CompositeKey(long userId, long? serverId)
+			public ulong ServerId, UserId;
+			public CompositeKey(ulong userId, ulong? serverId)
 			{
 				ServerId = serverId ?? 0;
 				UserId = userId;
@@ -28,7 +28,7 @@ namespace Discord
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public short Discriminator { get; private set; }
+		public ushort Discriminator { get; private set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
@@ -66,20 +66,20 @@ namespace Discord
 		public Server Server => _server.Value;
         private readonly Reference<Server> _server;
 		[JsonProperty]
-		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
+		private ulong? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 
 		[JsonIgnore]
 		public Channel VoiceChannel => _voiceChannel.Value;
 		private Reference<Channel> _voiceChannel;
 		[JsonProperty]
-		private long? VoiceChannelId { get { return _voiceChannel.Id; } set { _voiceChannel.Id = value; } }
+		private ulong? VoiceChannelId { get { return _voiceChannel.Id; } set { _voiceChannel.Id = value; } }
 
 		//Collections
 		[JsonIgnore]
 		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-		private Dictionary<long, Role> _roles;
+		private Dictionary<ulong, Role> _roles;
 		[JsonProperty]
-		private IEnumerable<long> RoleIds => _roles.Select(x => x.Key);
+		private IEnumerable<ulong> RoleIds => _roles.Select(x => x.Key);
 
 		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
 		[JsonIgnore]
@@ -134,7 +134,7 @@ namespace Discord
 		/// <summary> Returns the string used to mention this user. </summary>
 		public string Mention => $"<@{Id}>";
 
-		internal User(DiscordClient client, long id, long? serverId)
+		internal User(DiscordClient client, ulong id, ulong? serverId)
 			: base(client, id)
 		{
 			_globalUser = new Reference<GlobalUser>(id, 
@@ -156,7 +156,7 @@ namespace Discord
 						x.CurrentUser = null;
 				});
 			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);
-			_roles = new Dictionary<long, Role>();
+			_roles = new Dictionary<ulong, Role>();
 
 			Status = UserStatus.Offline;
 
@@ -240,7 +240,7 @@ namespace Discord
 		}
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
-			Dictionary<long, Role> newRoles = new Dictionary<long, Role>();
+			var newRoles = new Dictionary<ulong, Role>();
 			if (roles != null)
 			{
 				foreach (var r in roles)

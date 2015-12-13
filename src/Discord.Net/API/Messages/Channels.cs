@@ -14,10 +14,10 @@ namespace Discord.API
 	{
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long GuildId;
+		public ulong GuildId;
 		[JsonProperty("name")]
 		public string Name;
 		[JsonProperty("type")]
@@ -31,7 +31,7 @@ namespace Discord.API
 			public string Type;
 			[JsonProperty("id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long Id;
+			public ulong Id;
 			[JsonProperty("deny")]
 			public uint Deny;
 			[JsonProperty("allow")]
@@ -40,7 +40,7 @@ namespace Discord.API
 
 		[JsonProperty("last_message_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? LastMessageId;
+		public ulong? LastMessageId;
 		[JsonProperty("is_private")]
 		public bool IsPrivate;
 		[JsonProperty("position")]
@@ -65,7 +65,7 @@ namespace Discord.API
 	{
 		[JsonProperty("recipient_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long RecipientId;
+		public ulong RecipientId;
 	}
 	public class CreateChannelResponse : ChannelInfo { }
 
@@ -89,7 +89,7 @@ namespace Discord.API
 		{
 			[JsonProperty("id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long Id;
+			public ulong Id;
 			[JsonProperty("position")]
 			public uint Position;
 		}

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	internal sealed class GlobalUsers : AsyncCollection<long, GlobalUser>
+	internal sealed class GlobalUsers : AsyncCollection<ulong, GlobalUser>
 	{
 		public GlobalUsers(DiscordClient client, object writerLock)
 			: base(client, writerLock) { }
 
-		public GlobalUser GetOrAdd(long id) => GetOrAdd(id, () => new GlobalUser(_client, id));
+		public GlobalUser GetOrAdd(ulong id) => GetOrAdd(id, () => new GlobalUser(_client, id));
 	}
 	internal sealed class Users : AsyncCollection<User.CompositeKey, User>
 	{
@@ -21,11 +21,11 @@ namespace Discord
 			: base(client, writerLock)
 		{ }
 
-		public User this[long userId, long? serverId]
+		public User this[ulong userId, ulong? serverId]
 			=> base[new User.CompositeKey(userId, serverId)];
-		public User GetOrAdd(long userId, long? serverId)
+		public User GetOrAdd(ulong userId, ulong? serverId)
 			=> GetOrAdd(new User.CompositeKey(userId, serverId), () => new User(_client, userId, serverId));
-		public User TryRemove(long userId, long? serverId)
+		public User TryRemove(ulong userId, ulong? serverId)
 			=> TryRemove(new User.CompositeKey(userId, serverId));
 	}
 
@@ -48,10 +48,10 @@ namespace Discord
 	}
 	public class BanEventArgs : EventArgs
 	{
-		public long UserId { get; }
+		public ulong UserId { get; }
 		public Server Server { get; }
 
-		public BanEventArgs(long userId, Server server)
+		public BanEventArgs(ulong userId, Server server)
 		{
 			UserId = userId;
 			Server = server;
@@ -103,13 +103,13 @@ namespace Discord
 				EventHelper.Raise(_logger, nameof(ProfileUpdated), () => ProfileUpdated(this, EventArgs.Empty));
 		}
 		public event EventHandler<BanEventArgs> UserBanned;
-		private void RaiseUserBanned(long userId, Server server)
+		private void RaiseUserBanned(ulong userId, Server server)
 		{
 			if (UserBanned != null)
 				EventHelper.Raise(_logger, nameof(UserBanned), () => UserBanned(this, new BanEventArgs(userId, server)));
 		}
 		public event EventHandler<BanEventArgs> UserUnbanned;
-		private void RaiseUserUnbanned(long userId, Server server)
+		private void RaiseUserUnbanned(ulong userId, Server server)
 		{
 			if (UserUnbanned != null)
 				EventHelper.Raise(_logger, nameof(UserUnbanned), () => UserUnbanned(this, new BanEventArgs(userId, server)));
@@ -119,39 +119,37 @@ namespace Discord
 		internal User PrivateUser => _privateUser;
 		private User _privateUser;
 
-		/// <summary> Returns information about the currently logged-in account. </summary>
-		public GlobalUser CurrentUser => _privateUser?.Global;
+        /// <summary> Returns information about the currently logged-in account. </summary>
+        public GlobalUser CurrentUser => _currentUser;
+        private GlobalUser _currentUser;
 
-		/// <summary> Returns a collection of all unique users this client can currently see. </summary>
-		public IEnumerable<GlobalUser> AllUsers { get { CheckReady(); return _globalUsers; } }
+        /// <summary> Returns a collection of all unique users this client can currently see. </summary>
+        public IEnumerable<GlobalUser> AllUsers { get { CheckReady(); return _globalUsers; } }
 		internal GlobalUsers GlobalUsers => _globalUsers;
 		private readonly GlobalUsers _globalUsers;
 
 		internal Users Users => _users;
 		private readonly Users _users;
 
-		public GlobalUser GetUser(long userId)
+		public GlobalUser GetUser(ulong userId)
 		{
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 			CheckReady();
 
 			return _globalUsers[userId];
 		}
 		/// <summary> Returns the user with the specified id, along with their server-specific data, or null if none was found. </summary>
-		public User GetUser(Server server, long userId)
+		public User GetUser(Server server, ulong userId)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 			CheckReady();
 
 			return _users[userId, server.Id];
 		}
 		/// <summary> Returns the user with the specified name and discriminator, along withtheir server-specific data, or null if they couldn't be found. </summary>
-		public User GetUser(Server server, string username, short discriminator)
+		public User GetUser(Server server, string username, ushort discriminator)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (username == null) throw new ArgumentNullException(nameof(username));
-			if (discriminator <= 0) throw new ArgumentOutOfRangeException(nameof(discriminator));
 			CheckReady();
 
 			return FindUsers(server.Members, server.Id, username, discriminator, true).FirstOrDefault();
@@ -175,10 +173,10 @@ namespace Discord
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			return FindUsers(channel.Members, channel.IsPrivate ? (long?)null : channel.Server.Id, name, exactMatch: exactMatch);
+			return FindUsers(channel.Members, channel.IsPrivate ? (ulong?)null : channel.Server.Id, name, exactMatch: exactMatch);
         }
 
-		private IEnumerable<User> FindUsers(IEnumerable<User> users, long? serverId, string name, short? discriminator = null, bool exactMatch = false)
+		private IEnumerable<User> FindUsers(IEnumerable<User> users, ulong? serverId, string name, ushort? discriminator = null, bool exactMatch = false)
 		{
 			var query = users.Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
 
@@ -186,7 +184,7 @@ namespace Discord
 			{
 				if (name[0] == '<' && name[1] == '@' && name[name.Length - 1] == '>') //Parse mention
 				{
-					long id = IdConvert.ToLong(name.Substring(2, name.Length - 3));
+                    ulong id = IdConvert.ToLong(name.Substring(2, name.Length - 3));
 					var user = _users[id, serverId];
 					if (user != null)
 						query = query.Concat(new User[] { user });
@@ -210,7 +208,7 @@ namespace Discord
 			CheckReady();
 
 			//Modify the roles collection and filter out the everyone role
-			IEnumerable<long> roleIds = roles == null ? null : user.Roles
+			IEnumerable<ulong> roleIds = roles == null ? null : user.Roles
 				.Modify(roles, rolesMode)
 				.Where(x => !x.IsEveryone)
 				.Select(x => x.Id);
@@ -238,7 +236,7 @@ namespace Discord
 
 			return _api.BanUser(user.Server.Id, user.Id);
 		}
-		public async Task UnbanUser(Server server, long userId)
+		public async Task UnbanUser(Server server, ulong userId)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
@@ -274,12 +272,12 @@ namespace Discord
 			CheckReady();
 
 			await _api.EditProfile(currentPassword: currentPassword, 
-				username: username ?? _privateUser?.Name,  email: email ?? _privateUser?.Global.Email, password: password,
+				username: username ?? _privateUser?.Name,  email: email ?? _currentUser?.Email, password: password,
 				avatar: avatar, avatarType: avatarType, existingAvatar: _privateUser?.AvatarId).ConfigureAwait(false);
 
 			if (password != null)
 			{
-				var loginResponse = await _api.Login(_privateUser.Global.Email, password).ConfigureAwait(false);
+				var loginResponse = await _api.Login(_currentUser.Email, password).ConfigureAwait(false);
 				_api.Token = loginResponse.Token;
 			}
 		}

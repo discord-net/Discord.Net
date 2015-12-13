@@ -30,7 +30,7 @@ namespace Discord.Net.WebSockets
         private readonly AudioServiceConfig _config;
 		private OpusEncoder _encoder;
 		private uint _ssrc;
-		private ConcurrentDictionary<uint, long> _ssrcMapping;
+		private ConcurrentDictionary<uint, ulong> _ssrcMapping;
 
 		private VoiceBuffer _sendBuffer;
 		private UdpClient _udp;
@@ -38,14 +38,14 @@ namespace Discord.Net.WebSockets
 		private bool _isEncrypted;
 		private byte[] _secretKey, _encodingBuffer;
 		private ushort _sequence;
-		private long? _serverId, _channelId;
+		private ulong? _serverId, _channelId;
 		private string _encryptionMode;
 		private int _ping;
 		
 		private Thread _sendThread, _receiveThread;
 		
-		public long? ServerId { get { return _serverId; } internal set { _serverId = value; } }
-		public long? ChannelId { get { return _channelId; } internal set { _channelId = value; } }
+		public ulong? ServerId { get { return _serverId; } internal set { _serverId = value; } }
+		public ulong? ChannelId { get { return _channelId; } internal set { _channelId = value; } }
 		public int Ping => _ping;
 		internal VoiceBuffer OutputBuffer => _sendBuffer;
 
@@ -57,7 +57,7 @@ namespace Discord.Net.WebSockets
             _decoders = new ConcurrentDictionary<uint, OpusDecoder>();
 			_targetAudioBufferLength = _config.BufferLength / 20; //20 ms frames
 			_encodingBuffer = new byte[MaxOpusSize];
-			_ssrcMapping = new ConcurrentDictionary<uint, long>();
+			_ssrcMapping = new ConcurrentDictionary<uint, ulong>();
 			_encoder = new OpusEncoder(48000, _config.Channels, 20, _config.Bitrate, OpusApplication.Audio);
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_config.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
@@ -228,10 +228,10 @@ namespace Discord.Net.WebSockets
 									resultLength = packetLength - 12;
 								}
 
-								/*if (_logLevel >= LogMessageSeverity.Debug)
+                                /*if (_logLevel >= LogMessageSeverity.Debug)
 									RaiseOnLog(LogMessageSeverity.Debug, $"Received {buffer.Length - 12} bytes.");*/
 
-								long userId;
+                                ulong userId;
 								if (_ssrcMapping.TryGetValue(ssrc, out userId))
 									RaiseOnPacket(userId, _channelId.Value, result, resultOffset, resultLength);
 							}

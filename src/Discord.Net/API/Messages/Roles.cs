@@ -14,16 +14,16 @@ namespace Discord.API
 	{
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long GuildId;
+		public ulong GuildId;
 		[JsonProperty("role_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long RoleId;
+		public ulong RoleId;
 	}
 	public class RoleInfo
 	{
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("permissions")]
 		public uint? Permissions;
 		[JsonProperty("name")]
@@ -62,7 +62,7 @@ namespace Discord.API
 		{
 			[JsonProperty("id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long Id;
+			public ulong Id;
 			[JsonProperty("position")]
 			public uint Position;
 		}
@@ -78,7 +78,7 @@ namespace Discord.API
 	{
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long GuildId;
+		public ulong GuildId;
 		[JsonProperty("role")]
 		public RoleInfo Data;
 	}
@@ -86,7 +86,7 @@ namespace Discord.API
 	{
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long GuildId;
+		public ulong GuildId;
 		[JsonProperty("role")]
 		public RoleInfo Data;
 	}

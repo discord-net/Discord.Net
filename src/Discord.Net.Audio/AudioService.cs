@@ -8,9 +8,9 @@ namespace Discord.Audio
 {
 	public class VoiceDisconnectedEventArgs : DisconnectedEventArgs
 	{
-		public readonly long ServerId;
+		public readonly ulong ServerId;
 
-		public VoiceDisconnectedEventArgs(long serverId, DisconnectedEventArgs e)
+		public VoiceDisconnectedEventArgs(ulong serverId, DisconnectedEventArgs e)
 			: base(e.WasUnexpected, e.Error)
 		{
 			ServerId = serverId;
@@ -28,13 +28,13 @@ namespace Discord.Audio
 	}
 	public class VoicePacketEventArgs : EventArgs
 	{
-		public readonly long UserId;
-		public readonly long ChannelId;
+		public readonly ulong UserId;
+		public readonly ulong ChannelId;
 		public readonly byte[] Buffer;
 		public readonly int Offset;
 		public readonly int Count;
 
-		public VoicePacketEventArgs(long userId, long channelId, byte[] buffer, int offset, int count)
+		public VoicePacketEventArgs(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
 		{
 			UserId = userId;
 			ChannelId = channelId;
@@ -47,7 +47,7 @@ namespace Discord.Audio
 	public class AudioService : IService
 	{
 		private DiscordAudioClient _defaultClient;
-		private ConcurrentDictionary<long, DiscordAudioClient> _voiceClients;
+		private ConcurrentDictionary<ulong, DiscordAudioClient> _voiceClients;
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		private int _nextClientId;
 
@@ -64,7 +64,7 @@ namespace Discord.Audio
 				Connected(this, EventArgs.Empty);
 		}
 		public event EventHandler<VoiceDisconnectedEventArgs> Disconnected;
-		private void RaiseDisconnected(long serverId, DisconnectedEventArgs e)
+		private void RaiseDisconnected(ulong serverId, DisconnectedEventArgs e)
 		{
 			if (Disconnected != null)
 				Disconnected(this, new VoiceDisconnectedEventArgs(serverId, e));
@@ -91,7 +91,7 @@ namespace Discord.Audio
 		{
 			_client = client;
 			if (Config.EnableMultiserver)
-				_voiceClients = new ConcurrentDictionary<long, DiscordAudioClient>();
+				_voiceClients = new ConcurrentDictionary<ulong, DiscordAudioClient>();
 			else
 			{
 				var logger = Client.Log().CreateLogger("Voice");

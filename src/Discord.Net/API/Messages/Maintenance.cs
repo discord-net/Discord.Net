@@ -19,7 +19,7 @@ namespace Discord.API
 		{
 			[JsonProperty("id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long Id;
+			public ulong Id;
 			[JsonProperty("name")]
 			public string Name;
 			[JsonProperty("url")]

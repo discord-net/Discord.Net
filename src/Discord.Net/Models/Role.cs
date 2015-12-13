@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Role : CachedObject<long>
+	public sealed class Role : CachedObject<ulong>
 	{
 		/// <summary> Returns the name of this role. </summary>
 		public string Name { get; private set; }
@@ -26,7 +26,7 @@ namespace Discord
 		[JsonIgnore]
 		public Server Server => _server.Value;
 		[JsonProperty]
-		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
+		private ulong? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 		private readonly Reference<Server> _server;
 
 		/// <summary> Returns true if this is the role representing all users in a server. </summary>
@@ -36,13 +36,13 @@ namespace Discord
 		[JsonIgnore]
 		public IEnumerable<User> Members => _server.Id != null ? (IsEveryone ? Server.Members : Server.Members.Where(x => x.HasRole(this))) : new User[0];
 		[JsonProperty]
-		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
+		private IEnumerable<ulong> MemberIds => Members.Select(x => x.Id);
 		//TODO: Add local members cache
 
 		/// <summary> Returns the string used to mention this role. </summary>
 		public string Mention { get { if (IsEveryone) return "@everyone"; else throw new InvalidOperationException("Discord currently only supports mentioning the everyone role"); } }
 
-		internal Role(DiscordClient client, long id, long serverId)
+		internal Role(DiscordClient client, ulong id, ulong serverId)
 			: base(client, id)
 		{
 			_server = new Reference<Server>(serverId, x => _client.Servers[x], x => x.AddRole(this), x => x.RemoveRole(this));

@@ -108,10 +108,10 @@ namespace Discord.API
         {
             [JsonProperty("guild_id")]
             [JsonConverter(typeof(LongStringConverter))]
-            public long ServerId;
+            public ulong ServerId;
             [JsonProperty("channel_id")]
             [JsonConverter(typeof(LongStringConverter))]
-            public long ChannelId;
+            public ulong ChannelId;
             [JsonProperty("self_mute")]
             public string SelfMute;
             [JsonProperty("self_deaf")]

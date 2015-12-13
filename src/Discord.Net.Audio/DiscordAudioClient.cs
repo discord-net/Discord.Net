@@ -22,8 +22,8 @@ namespace Discord.Audio
         public string Token => _token;
         private string _token;
 
-        public long? ServerId => _voiceSocket.ServerId;
-        public long? ChannelId => _voiceSocket.ChannelId;
+        public ulong? ServerId => _voiceSocket.ServerId;
+        public ulong? ChannelId => _voiceSocket.ChannelId;
 
         public DiscordAudioClient(AudioService service, int id, Logger logger, GatewaySocket gatewaySocket)
 		{
@@ -76,7 +76,7 @@ namespace Discord.Audio
 						case "VOICE_SERVER_UPDATE":
                             {
                                 var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_gatewaySocket.Serializer);
-                                long serverId = data.ServerId;
+                                var serverId = data.ServerId;
 
 								if (serverId == ServerId)
 								{
@@ -101,14 +101,14 @@ namespace Discord.Audio
 			return _voiceSocket.Disconnect();
 		}
 
-		internal void SetServerId(long serverId)
+		internal void SetServerId(ulong serverId)
 		{
 			_voiceSocket.ServerId = serverId;
 		}
 		public async Task Join(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			long? serverId = channel.Server?.Id;
+            ulong? serverId = channel.Server?.Id;
 			if (serverId != ServerId)
 				throw new InvalidOperationException("Cannot join a channel on a different server than this voice client.");
 			//CheckReady(checkVoice: true);

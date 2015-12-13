@@ -55,39 +55,30 @@ namespace Discord
 			=> _rest.Post(Endpoints.AuthLogout);
 
 		//Channels
-        public Task<CreateChannelResponse> CreateChannel(long serverId, string name, string channelType)
+        public Task<CreateChannelResponse> CreateChannel(ulong serverId, string name, string channelType)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			if (channelType == null) throw new ArgumentNullException(nameof(channelType));
 
 			var request = new CreateChannelRequest { Name = name, Type = channelType };
 			return _rest.Post<CreateChannelResponse>(Endpoints.ServerChannels(serverId), request);
 		}
-		public Task<CreateChannelResponse> CreatePMChannel(long myId, long recipientId)
+		public Task<CreateChannelResponse> CreatePMChannel(ulong myId, ulong recipientId)
 		{
-			if (myId <= 0) throw new ArgumentOutOfRangeException(nameof(myId));
-			if (recipientId <= 0) throw new ArgumentOutOfRangeException(nameof(recipientId));
-
 			var request = new CreatePMChannelRequest { RecipientId = recipientId };
 			return _rest.Post<CreateChannelResponse>(Endpoints.UserChannels(myId), request);
 		}
-		public Task<DestroyChannelResponse> DestroyChannel(long channelId)
+		public Task<DestroyChannelResponse> DestroyChannel(ulong channelId)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			return _rest.Delete<DestroyChannelResponse>(Endpoints.Channel(channelId));
 		}
-		public Task<EditChannelResponse> EditChannel(long channelId, string name = null, string topic = null)
+		public Task<EditChannelResponse> EditChannel(ulong channelId, string name = null, string topic = null)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			var request = new EditChannelRequest { Name = name, Topic = topic };
 			return _rest.Patch<EditChannelResponse>(Endpoints.Channel(channelId), request);
 		}
-		public Task ReorderChannels(long serverId, IEnumerable<long> channelIds, int startPos = 0)
+		public Task ReorderChannels(ulong serverId, IEnumerable<ulong> channelIds, int startPos = 0)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 			if (channelIds == null) throw new ArgumentNullException(nameof(channelIds));
 			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
 
@@ -96,10 +87,8 @@ namespace Discord
 			var request = new ReorderChannelsRequest(channels);
 			return _rest.Patch(Endpoints.ServerChannels(serverId), request);
 		}
-		public Task<GetMessagesResponse> GetMessages(long channelId, int count, long? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before)
+		public Task<GetMessagesResponse> GetMessages(ulong channelId, int count, ulong? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			if (relativeMessageId != null)
 				return _rest.Get<GetMessagesResponse>(Endpoints.ChannelMessages(channelId, count, relativeMessageId.Value, relativeDir == RelativeDirection.Before ? "before" : "after"));
 			else
@@ -117,10 +106,8 @@ namespace Discord
 		}
 
 		//Invites
-		public Task<CreateInviteResponse> CreateInvite(long channelId, int maxAge, int maxUses, bool tempMembership, bool hasXkcd)
+		public Task<CreateInviteResponse> CreateInvite(ulong channelId, int maxAge, int maxUses, bool tempMembership, bool hasXkcd)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			var request = new CreateInviteRequest { MaxAge = maxAge, MaxUses = maxUses, IsTemporary = tempMembership, WithXkcdPass = hasXkcd };
 			return _rest.Post<CreateInviteResponse>(Endpoints.ChannelInvites(channelId), request);
 		}
@@ -130,10 +117,8 @@ namespace Discord
 
 			return _rest.Get<GetInviteResponse>(Endpoints.Invite(inviteIdOrXkcd));
 		}
-		public Task<GetInvitesResponse> GetInvites(long serverId)
+		public Task<GetInvitesResponse> GetInvites(ulong serverId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-
 			return _rest.Get<GetInvitesResponse>(Endpoints.ServerInvites(serverId));
 		}
 		public Task<AcceptInviteResponse> AcceptInvite(string inviteId)
@@ -150,40 +135,25 @@ namespace Discord
 		}
 
 		//Users
-		public Task EditUser(long serverId, long userId, bool? mute = null, bool? deaf = null, long? voiceChannelId = null, IEnumerable<long> roleIds = null)
+		public Task EditUser(ulong serverId, ulong userId, bool? mute = null, bool? deaf = null, ulong? voiceChannelId = null, IEnumerable<ulong> roleIds = null)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
-
 			var request = new EditMemberRequest { Mute = mute, Deaf = deaf, ChannelId = voiceChannelId, Roles = roleIds };
 			return _rest.Patch(Endpoints.ServerMember(serverId, userId), request);
 		}
-		public Task KickUser(long serverId, long userId)
+		public Task KickUser(ulong serverId, ulong userId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
-
 			return _rest.Delete(Endpoints.ServerMember(serverId, userId));
 		}
-		public Task BanUser(long serverId, long userId)
+		public Task BanUser(ulong serverId, ulong userId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
-
 			return _rest.Put(Endpoints.ServerBan(serverId, userId));
 		}
-		public Task UnbanUser(long serverId, long userId)
+		public Task UnbanUser(ulong serverId, ulong userId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
-
 			return _rest.Delete(Endpoints.ServerBan(serverId, userId));
 		}
-		public Task<PruneUsersResponse> PruneUsers(long serverId, int days, bool simulate)
-		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
-			
+		public Task<PruneUsersResponse> PruneUsers(ulong serverId, int days, bool simulate)
+		{			
             if (simulate)
 				return _rest.Get<PruneUsersResponse>(Endpoints.ServerPrune(serverId, days));
 			else
@@ -191,94 +161,67 @@ namespace Discord
         }
 
 		//Messages
-		public Task<SendMessageResponse> SendMessage(long channelId, string message, IEnumerable<long> mentionedUserIds = null, string nonce = null, bool isTTS = false)
+		public Task<SendMessageResponse> SendMessage(ulong channelId, string message, IEnumerable<ulong> mentionedUserIds = null, string nonce = null, bool isTTS = false)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
 			if (message == null) throw new ArgumentNullException(nameof(message));
 
-			var request = new SendMessageRequest { Content = message, Mentions = mentionedUserIds ?? new long[0], Nonce = nonce, IsTTS = isTTS ? true : false };
+			var request = new SendMessageRequest { Content = message, Mentions = mentionedUserIds ?? new ulong[0], Nonce = nonce, IsTTS = isTTS ? true : false };
 			return _rest.Post<SendMessageResponse>(Endpoints.ChannelMessages(channelId), request);
 		}
-		public Task<SendMessageResponse> SendFile(long channelId, string filename, Stream stream)
+		public Task<SendMessageResponse> SendFile(ulong channelId, string filename, Stream stream)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
 			if (filename == null) throw new ArgumentNullException(nameof(filename));
 			if (stream == null) throw new ArgumentNullException(nameof(stream));
 
 			return _rest.PostFile<SendMessageResponse>(Endpoints.ChannelMessages(channelId), filename, stream);
 		}
-		public Task DeleteMessage(long messageId, long channelId)
+		public Task DeleteMessage(ulong messageId, ulong channelId)
 		{
-			if (messageId <= 0) throw new ArgumentOutOfRangeException(nameof(messageId));
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			return _rest.Delete(Endpoints.ChannelMessage(channelId, messageId));
 		}
-		public Task<EditMessageResponse> EditMessage(long messageId, long channelId, string message = null, IEnumerable<long> mentionedUserIds = null)
+		public Task<EditMessageResponse> EditMessage(ulong messageId, ulong channelId, string message = null, IEnumerable<ulong> mentionedUserIds = null)
 		{
-			if (messageId <= 0) throw new ArgumentOutOfRangeException(nameof(messageId));
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			var request = new EditMessageRequest { Content = message, Mentions = mentionedUserIds };
 			return _rest.Patch<EditMessageResponse>(Endpoints.ChannelMessage(channelId, messageId), request);
 		}
-		public Task AckMessage(long messageId, long channelId)
+		public Task AckMessage(ulong messageId, ulong channelId)
 		{
-			if (messageId <= 0) throw new ArgumentOutOfRangeException(nameof(messageId));
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			return _rest.Post(Endpoints.ChannelMessageAck(channelId, messageId));
 		}
-        public Task SendIsTyping(long channelId)
+        public Task SendIsTyping(ulong channelId)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-
 			return _rest.Post(Endpoints.ChannelTyping(channelId));
 		}
 
 		//Permissions
-		public Task SetChannelPermissions(long channelId, long userOrRoleId, string idType, uint allow = 0, uint deny = 0)
+		public Task SetChannelPermissions(ulong channelId, ulong userOrRoleId, string idType, uint allow = 0, uint deny = 0)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-			if (userOrRoleId <= 0) throw new ArgumentOutOfRangeException(nameof(userOrRoleId));
 			if (idType == null) throw new ArgumentNullException(nameof(idType));
 
 			var request = new SetChannelPermissionsRequest { Id = userOrRoleId, Type = idType, Allow = allow, Deny = deny };
 			return _rest.Put(Endpoints.ChannelPermission(channelId, userOrRoleId), request);
 		}
-		public Task DeleteChannelPermissions(long channelId, long userOrRoleId)
+		public Task DeleteChannelPermissions(ulong channelId, ulong userOrRoleId)
 		{
-			if (channelId <= 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-			if (userOrRoleId <= 0) throw new ArgumentOutOfRangeException(nameof(userOrRoleId));
-
 			return _rest.Delete(Endpoints.ChannelPermission(channelId, userOrRoleId), null);
 		}
 
 		//Roles
-		public Task<RoleInfo> CreateRole(long serverId)
-		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			
+		public Task<RoleInfo> CreateRole(ulong serverId)
+		{			
 			return _rest.Post<RoleInfo>(Endpoints.ServerRoles(serverId));
 		}
-		public Task DeleteRole(long serverId, long roleId)
+		public Task DeleteRole(ulong serverId, ulong roleId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (roleId <= 0) throw new ArgumentOutOfRangeException(nameof(roleId));
-
 			return _rest.Delete(Endpoints.ServerRole(serverId, roleId));
 		}
-		public Task<RoleInfo> EditRole(long serverId, long roleId, string name = null, uint? permissions = null, uint? color = null, bool? hoist = null)
+		public Task<RoleInfo> EditRole(ulong serverId, ulong roleId, string name = null, uint? permissions = null, uint? color = null, bool? hoist = null)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-			if (roleId <= 0) throw new ArgumentOutOfRangeException(nameof(roleId));
-
 			var request = new EditRoleRequest { Name = name, Permissions = permissions, Hoist = hoist, Color = color };
 			return _rest.Patch<RoleInfo>(Endpoints.ServerRole(serverId, roleId), request);
 		}
-		public Task ReorderRoles(long serverId, IEnumerable<long> roleIds, int startPos = 0)
+		public Task ReorderRoles(ulong serverId, IEnumerable<ulong> roleIds, int startPos = 0)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
 			if (roleIds == null) throw new ArgumentNullException(nameof(roleIds));
 			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
 
@@ -297,17 +240,13 @@ namespace Discord
 			var request = new CreateServerRequest { Name = name, Region = region };
 			return _rest.Post<CreateServerResponse>(Endpoints.Servers, request);
 		}
-		public Task LeaveServer(long serverId)
+		public Task LeaveServer(ulong serverId)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(long serverId, string name = null, string region = null, 
+		public Task<EditServerResponse> EditServer(ulong serverId, string name = null, string region = null, 
 			Stream icon = null, ImageType iconType = ImageType.Png, string existingIcon = null)
 		{
-			if (serverId <= 0) throw new ArgumentOutOfRangeException(nameof(serverId));
-
 			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(icon, iconType, existingIcon) };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
 		}

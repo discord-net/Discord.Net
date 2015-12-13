@@ -3,12 +3,12 @@
 namespace Discord
 {
     internal class Reference<T>
-		where T : CachedObject<long>
+		where T : CachedObject<ulong>
 	{
 		private Action<T> _onCache, _onUncache;
-		private Func<long, T> _getItem;
-        private long? _id;
-		public long? Id
+		private Func<ulong, T> _getItem;
+        private ulong? _id;
+		public ulong? Id
 		{
 			get { return _id; }
 			set
@@ -56,9 +56,9 @@ namespace Discord
 			}
 		}
 
-		public Reference(Func<long, T> onUpdate, Action<T> onCache = null, Action<T> onUncache = null)
+		public Reference(Func<ulong, T> onUpdate, Action<T> onCache = null, Action<T> onUncache = null)
 			: this(null, onUpdate, onCache, onUncache) { }
-		public Reference(long? id, Func<long, T> getItem, Action<T> onCache = null, Action<T> onUncache = null)
+		public Reference(ulong? id, Func<ulong, T> getItem, Action<T> onCache = null, Action<T> onUncache = null)
 		{
 			_id = id;
 			_getItem = getItem;

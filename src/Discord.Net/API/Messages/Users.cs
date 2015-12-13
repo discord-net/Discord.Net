@@ -14,9 +14,9 @@ namespace Discord.API
 		public string Username;
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("discriminator")]
-		public short? Discriminator;
+		public ushort? Discriminator;
 		[JsonProperty("avatar")]
 		public string Avatar;
 	}
@@ -51,10 +51,10 @@ namespace Discord.API
 	{
 		[JsonProperty("user_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long UserId;
+		public ulong UserId;
 		[JsonProperty("channel_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long ChannelId;
+		public ulong ChannelId;
 		[JsonProperty("timestamp")]
 		public int Timestamp;
 	}

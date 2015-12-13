@@ -7,7 +7,7 @@ namespace Discord.API.Converters
 	{
 		public override bool CanConvert(Type objectType)
 		{
-			return objectType == typeof(long);
+			return objectType == typeof(ulong);
 		}
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
@@ -15,7 +15,7 @@ namespace Discord.API.Converters
 		}
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			writer.WriteValue(IdConvert.ToString((long)value));
+			writer.WriteValue(IdConvert.ToString((ulong)value));
 		}
 	}
 
@@ -23,7 +23,7 @@ namespace Discord.API.Converters
 	{
 		public override bool CanConvert(Type objectType)
 		{
-			return objectType == typeof(long?);
+			return objectType == typeof(ulong?);
 		}
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
@@ -31,7 +31,7 @@ namespace Discord.API.Converters
 		}
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			writer.WriteValue(IdConvert.ToString((long?)value));
+			writer.WriteValue(IdConvert.ToString((ulong?)value));
 		}
 	}
 }

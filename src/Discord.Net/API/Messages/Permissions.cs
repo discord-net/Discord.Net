@@ -12,7 +12,7 @@ namespace Discord.API
 	{
 		[JsonProperty("id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long Id;
+		public ulong Id;
 		[JsonProperty("type")]
 		public string Type;
 		[JsonProperty("allow")]

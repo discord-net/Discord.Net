@@ -14,11 +14,11 @@ namespace Discord.API
 	{
 		[JsonProperty("user_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long UserId; //Used in bans
+		public ulong UserId; //Used in bans
 
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long GuildId;
+		public ulong GuildId;
         
 		private UserReference _user;
         [JsonProperty("user")]
@@ -38,7 +38,7 @@ namespace Discord.API
 		public DateTime? JoinedAt;
 		[JsonProperty("roles")]
 		[JsonConverter(typeof(LongStringArrayConverter))]
-		public long[] Roles;
+		public ulong[] Roles;
 	}
 	public class ExtendedMemberInfo : MemberInfo
 	{
@@ -55,13 +55,13 @@ namespace Discord.API
 		public string Status;
 		[JsonProperty("roles")] //TODO: Might be temporary
 		[JsonConverter(typeof(LongStringArrayConverter))]
-		public long[] Roles;
+		public ulong[] Roles;
 	}
 	public class VoiceMemberInfo : MemberReference
 	{
 		[JsonProperty("channel_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
-		public long? ChannelId;
+		public ulong? ChannelId;
 		[JsonProperty("session_id")]
 		public string SessionId;
 		[JsonProperty("token")]
@@ -87,10 +87,10 @@ namespace Discord.API
 		public bool? Deaf;
         [JsonProperty("channel_id", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(NullableLongStringConverter))]
-        public long? ChannelId;
+        public ulong? ChannelId;
         [JsonProperty("roles", NullValueHandling = NullValueHandling.Ignore)]
 		[JsonConverter(typeof(LongStringEnumerableConverter))]
-		public IEnumerable<long> Roles;
+		public IEnumerable<ulong> Roles;
 	}
 
 	public class PruneUsersResponse

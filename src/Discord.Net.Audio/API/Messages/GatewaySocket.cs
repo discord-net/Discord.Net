@@ -11,7 +11,7 @@ namespace Discord.API
 	{
 		[JsonProperty("guild_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long ServerId;
+		public ulong ServerId;
 		[JsonProperty("endpoint")]
 		public string Endpoint;
 		[JsonProperty("token")]

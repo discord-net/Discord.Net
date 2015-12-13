@@ -31,10 +31,10 @@ namespace Discord.API
 		{
 			[JsonProperty("server_id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long ServerId;
+			public ulong ServerId;
 			[JsonProperty("user_id")]
 			[JsonConverter(typeof(LongStringConverter))]
-			public long UserId;
+			public ulong UserId;
 			[JsonProperty("session_id")]
 			public string SessionId;
 			[JsonProperty("token")]
@@ -102,7 +102,7 @@ namespace Discord.API
 	{
 		[JsonProperty("user_id")]
 		[JsonConverter(typeof(LongStringConverter))]
-		public long UserId;
+		public ulong UserId;
 		[JsonProperty("ssrc")]
 		public uint SSRC;
 		[JsonProperty("speaking")]

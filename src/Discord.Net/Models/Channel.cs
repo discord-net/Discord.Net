@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-	public sealed class Channel : CachedObject<long>
+	public sealed class Channel : CachedObject<ulong>
 	{
 		private struct ChannelMember
 		{
@@ -24,10 +24,10 @@ namespace Discord
 		public sealed class PermissionOverwrite
 		{
 			public PermissionTarget TargetType { get; }
-			public long TargetId { get; }
+			public ulong TargetId { get; }
 			public DualChannelPermissions Permissions { get; }
 
-			internal PermissionOverwrite(PermissionTarget targetType, long targetId, uint allow, uint deny)
+			internal PermissionOverwrite(PermissionTarget targetType, ulong targetId, uint allow, uint deny)
 			{
 				TargetType = targetType;
 				TargetId = targetId;
@@ -51,14 +51,14 @@ namespace Discord
 		[JsonIgnore]
 		public Server Server => _server.Value;
 		[JsonProperty]
-		private long? ServerId { get { return _server.Id; } set { _server.Id = value; } }
+		private ulong? ServerId { get { return _server.Id; } set { _server.Id = value; } }
 		private readonly Reference<Server> _server;
 
 		/// For private chats, returns the target user, otherwise null.
 		[JsonIgnore]
 		public User Recipient => _recipient.Value;
 		[JsonProperty]
-		private long? RecipientId { get { return _recipient.Id; } set { _recipient.Id = value; } }
+		private ulong? RecipientId { get { return _recipient.Id; } set { _recipient.Id = value; } }
 		private readonly Reference<User> _recipient;
 
 		//Collections
@@ -95,15 +95,15 @@ namespace Discord
             }
 		}
 		[JsonProperty]
-		private IEnumerable<long> MemberIds => Members.Select(x => x.Id);
-		private ConcurrentDictionary<long, ChannelMember> _members;
+		private IEnumerable<ulong> MemberIds => Members.Select(x => x.Id);
+		private ConcurrentDictionary<ulong, ChannelMember> _members;
 
 		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
 		[JsonIgnore]
 		public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
 		[JsonProperty]
-		private IEnumerable<long> MessageIds => Messages.Select(x => x.Id);
-		private readonly ConcurrentDictionary<long, Message> _messages;
+		private IEnumerable<ulong> MessageIds => Messages.Select(x => x.Id);
+		private readonly ConcurrentDictionary<ulong, Message> _messages;
 
 		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
 		private PermissionOverwrite[] _permissionOverwrites;
@@ -112,7 +112,7 @@ namespace Discord
 		/// <summary> Returns the string used to mention this channel. </summary>
 		public string Mention => $"<#{Id}>";
 
-		internal Channel(DiscordClient client, long id, long? serverId, long? recipientId)
+		internal Channel(DiscordClient client, ulong id, ulong? serverId, ulong? recipientId)
 			: base(client, id)
 		{
 			_server = new Reference<Server>(serverId, 
@@ -133,7 +133,7 @@ namespace Discord
 						x.Global.PrivateChannel = null;
                 });
 			_permissionOverwrites = new PermissionOverwrite[0];
-            _members = new ConcurrentDictionary<long, ChannelMember>();
+            _members = new ConcurrentDictionary<ulong, ChannelMember>();
 
             if (recipientId != null)
             {
@@ -143,7 +143,7 @@ namespace Discord
 
 			//Local Cache
 			if (client.Config.MessageCacheSize > 0)
-				_messages = new ConcurrentDictionary<long, Message>();
+				_messages = new ConcurrentDictionary<ulong, Message>();
 		}
 		internal override bool LoadReferences()
 		{
