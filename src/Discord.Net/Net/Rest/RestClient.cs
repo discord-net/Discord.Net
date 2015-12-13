@@ -14,17 +14,17 @@ namespace Discord.Net.Rest
 		private readonly IRestEngine _engine;
 		private CancellationToken _cancelToken;
 
-		public RestClient(DiscordConfig config)
+		public RestClient(DiscordConfig config, Logger logger)
 		{
 			_config = config;
 #if !DOTNET5_4
-			_engine = new RestSharpEngine(config);
+			_engine = new RestSharpEngine(config, logger);
 #else
-			//_engine = new BuiltInRestEngine(config);
+			//_engine = new BuiltInRestEngine(config, logger);
 #endif
-		}
+        }
 
-		public void SetToken(string token) => _engine.SetToken(token);
+        public void SetToken(string token) => _engine.SetToken(token);
 
 		//DELETE
 		internal Task<ResponseT> Delete<ResponseT>(string path, object data) where ResponseT : class  

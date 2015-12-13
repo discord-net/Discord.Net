@@ -11,13 +11,19 @@ namespace Discord.Net.Rest
 {
     internal sealed class RestSharpEngine : IRestEngine
 	{
-		private readonly DiscordConfig _config;
+        private readonly DiscordConfig _config;
 		private readonly RestSharp.RestClient _client;
+        private readonly Logger _logger;
 
-        public RestSharpEngine(DiscordConfig config)
+        private readonly object _rateLimitLock;
+        private DateTime _rateLimitTime;
+
+        public RestSharpEngine(DiscordConfig config, Logger logger)
 		{
 			_config = config;
-			_client = new RestSharp.RestClient(Endpoints.BaseApi)
+            _logger = logger;
+            _rateLimitLock = new object();
+            _client = new RestSharp.RestClient(Endpoints.BaseApi)
 			{
 				PreAuthenticate = false,
 				ReadWriteTimeout = _config.RestTimeout,
@@ -58,8 +64,8 @@ namespace Discord.Net.Rest
 			return Send(request, cancelToken);
 		}
 		private async Task<string> Send(RestRequest request, CancellationToken cancelToken)
-		{
-			int retryCount = 0;
+        {
+            int retryCount = 0;
 			while (true)
 			{
 				var response = await _client.ExecuteTaskAsync(request, cancelToken).ConfigureAwait(false);
@@ -78,7 +84,22 @@ namespace Discord.Net.Rest
                     int milliseconds;
                     if (retryAfter != null && int.TryParse((string)retryAfter.Value, out milliseconds))
                     {
-                        await Task.Delay(milliseconds).ConfigureAwait(false);
+                        if (_logger != null)
+                        {
+                            var now = DateTime.UtcNow;
+                            if (now >= _rateLimitTime)
+                            {
+                                lock (_rateLimitLock)
+                                {
+                                    if (now >= _rateLimitTime)
+                                    {
+                                        _rateLimitTime = now.AddMilliseconds(milliseconds);
+                                        _logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
+                                    }
+                                }
+                            }
+                        }
+                        await Task.Delay(milliseconds, cancelToken).ConfigureAwait(false);
                         continue;
                     }
                     throw new HttpException(response.StatusCode);

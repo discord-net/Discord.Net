@@ -21,10 +21,10 @@ namespace Discord
 		internal RestClient RestClient => _rest;
 		private readonly RestClient _rest;
 
-		public DiscordAPIClient(DiscordConfig config = null)
+		public DiscordAPIClient(DiscordConfig config = null, Logger logger = null)
 		{
 			_config = config ?? new DiscordConfig();
-            _rest = new RestClient(_config);
+            _rest = new RestClient(_config, logger);
         }
 
 		private string _token;
