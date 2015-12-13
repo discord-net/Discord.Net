@@ -47,27 +47,10 @@ namespace Discord
         /// <summary> Version of your application. </summary>
         public string AppVersion { get { return _appVersion; } set { SetValue(ref _appVersion, value); UpdateUserAgent(); } }
         private string _appVersion = null;
-
         /// <summary> User Agent string to use when connecting to Discord. </summary>
         [JsonIgnore]
         public string UserAgent { get { return _userAgent; } }
         private string _userAgent;
-        private void UpdateUserAgent()
-        {
-            StringBuilder builder = new StringBuilder();
-            if (!string.IsNullOrEmpty(_appName))
-            {
-                builder.Append(_appName);
-                if (!string.IsNullOrEmpty(_appVersion))
-                {
-                    builder.Append('/');
-                    builder.Append(_appVersion);
-                }
-                builder.Append(' ');
-            }
-            builder.Append($"DiscordBot (https://github.com/RogueException/Discord.Net, v{DiscordClient.Version})");
-            _userAgent = builder.ToString();
-        }
 
         //Rest
 
@@ -100,6 +83,9 @@ namespace Discord
 
         //Performance
 
+        /// <summary> Cache an encrypted login token to temp dir after success login. </summary>
+        public bool CacheToken { get { return _cacheToken; } set { SetValue(ref _cacheToken, value); } }
+        private bool _cacheToken = true;
         /// <summary> Instructs Discord to not send send information about offline users, for servers with more than 50 users. </summary>
         public bool UseLargeThreshold { get { return _useLargeThreshold; } set { SetValue(ref _useLargeThreshold, value); } }
         private bool _useLargeThreshold = false;
@@ -114,5 +100,22 @@ namespace Discord
         {
             UpdateUserAgent();
         }
-	}
+        
+        private void UpdateUserAgent()
+        {
+            StringBuilder builder = new StringBuilder();
+            if (!string.IsNullOrEmpty(_appName))
+            {
+                builder.Append(_appName);
+                if (!string.IsNullOrEmpty(_appVersion))
+                {
+                    builder.Append('/');
+                    builder.Append(_appVersion);
+                }
+                builder.Append(' ');
+            }
+            builder.Append($"DiscordBot (https://github.com/RogueException/Discord.Net, v{DiscordClient.Version})");
+            _userAgent = builder.ToString();
+        }
+    }
 }

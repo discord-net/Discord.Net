@@ -1,11 +1,15 @@
 ﻿using Discord.API;
+using Discord.Net;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -255,59 +259,43 @@ namespace Discord
 		/// <returns> Returns a token for future connections. </returns>
 		public async Task<string> Connect(string email, string password)
 		{
-			if (!_sentInitialLog)
-				SendInitialLog();
+            if (email == null) throw new ArgumentNullException(email);
+            if (password == null) throw new ArgumentNullException(password);
 
-			if (State != ConnectionState.Disconnected)
-				await Disconnect().ConfigureAwait(false);
-			
-			var response = await _api.Login(email, password).ConfigureAwait(false);
-            _token = response.Token;
-            _api.Token = response.Token;
-            if (_config.LogLevel >= LogSeverity.Verbose)
-				_logger.Verbose( "Login successful, got token.");
-
-            await BeginConnect().ConfigureAwait(false);
-            return response.Token;
+            await BeginConnect(email, password, null).ConfigureAwait(false);
+            return _token;
         }
 		/// <summary> Connects to the Discord server with the provided token. </summary>
 		public async Task Connect(string token)
         {
-            if (!_sentInitialLog)
-                SendInitialLog();
+            if (token == null) throw new ArgumentNullException(token);
 
-            if (State != ConnectionState.Disconnected)
-                await Disconnect().ConfigureAwait(false);
-
-            _token = token;
-            _api.Token = token;
-            await BeginConnect().ConfigureAwait(false);
+            await BeginConnect(null, null, token).ConfigureAwait(false);
         }
 
-        private async Task BeginConnect()
+        private async Task BeginConnect(string email, string password, string token = null)
         {
             try
             {
                 _lock.WaitOne();
                 try
                 {
+                    if (!_sentInitialLog)
+                        SendInitialLog();
+
+                    if (State != ConnectionState.Disconnected)
+                        await Disconnect().ConfigureAwait(false);
                     await _taskManager.Stop().ConfigureAwait(false);
                     _taskManager.ClearException();
                     _state = ConnectionState.Connecting;
-
-                    var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
-                    string gateway = gatewayResponse.Url;
-                    if (_config.LogLevel >= LogSeverity.Verbose)
-                        _logger.Verbose( $"Websocket endpoint: {gateway}");
-
                     _disconnectedEvent.Reset();
-
-                    _gateway = gateway;
 
                     _cancelTokenSource = new CancellationTokenSource();
                     _cancelToken = _cancelTokenSource.Token;
 
-                    _webSocket.Host = gateway;
+                    await Login(email, password, token);
+
+                    _webSocket.Host = _gateway;
                     _webSocket.ParentCancelToken = _cancelToken;
                     await _webSocket.Connect().ConfigureAwait(false);
 
@@ -341,7 +329,58 @@ namespace Discord
                 throw;
             }
         }
-		private void EndConnect()
+        private async Task Login(string email, string password, string token)
+        {
+            bool useCache = _config.CacheToken;
+            while (true)
+            {
+                //Get Token
+                if (token == null)
+                {
+                    if (useCache)
+                    {
+                        Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
+                            new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
+                        byte[] key = deriveBytes.GetBytes(16);
+
+                        string tokenPath = GetTokenCachePath(email);
+                        token = LoadToken(tokenPath, key);
+                        if (token == null)
+                        {
+                            var response = await _api.Login(email, password).ConfigureAwait(false);
+                            token = response.Token;
+                            SaveToken(tokenPath, key, token);
+                            useCache = false;
+                        }
+                    }
+                    else
+                    {
+                        var response = await _api.Login(email, password).ConfigureAwait(false);
+                        token = response.Token;
+                    }
+                }
+                _token = token;
+                _api.Token = token;
+
+                //Get gateway and check token
+                try
+                {
+                    var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
+                    var gateway = gatewayResponse.Url;
+                    _gateway = gateway;
+                    if (_config.LogLevel >= LogSeverity.Verbose)
+                        _logger.Verbose($"Login successful, gateway: {gateway}");
+                }
+                catch (HttpException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized && useCache)
+                {
+                    useCache = false; //Cached token is bad, retry without cache
+                    token = null;
+                    continue;
+                }
+                break;
+            }
+        }
+        private void EndConnect()
 		{
 			_state = ConnectionState.Connected;
 			_connectedEvent.Set();
@@ -838,6 +877,72 @@ namespace Discord
             uniqueUserCount = _globalUsers.Count;
             messageCount = _messages.Count;
             roleCount = _roles.Count;
+        }
+
+        private string GetTokenCachePath(string email)
+        {
+            using (var md5 = MD5.Create())
+            {
+                byte[] data = md5.ComputeHash(Encoding.UTF8.GetBytes(email.ToLowerInvariant()));
+                StringBuilder filenameBuilder = new StringBuilder();
+                for (int i = 0; i < data.Length; i++)
+                    filenameBuilder.Append(data[i].ToString("x2"));
+                return Path.Combine(Path.GetTempPath(), _config.AppName ?? "Discord.Net", filenameBuilder.ToString());
+            }
+        }
+        private string LoadToken(string path, byte[] key)
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    using (var fileStream = File.Open(path, FileMode.Open))
+                    using (var aes = Aes.Create())
+                    {
+                        byte[] iv = new byte[aes.BlockSize / 8];
+                        fileStream.Read(iv, 0, iv.Length);
+                        aes.IV = iv;
+                        aes.Key = key;
+                        using (var cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                        {
+                            byte[] tokenBuffer = new byte[64];
+                            int length = cryptoStream.Read(tokenBuffer, 0, tokenBuffer.Length);
+                            return Encoding.UTF8.GetString(tokenBuffer, 0, length);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warning("Failed to load cached token. Wrong/changed password?", ex);
+                }
+            }
+            return null;
+        }
+        private void SaveToken(string path, byte[] key, string token)
+        {
+            byte[] tokenBytes = Encoding.UTF8.GetBytes(token);
+            try
+            {
+                string parentDir = Path.GetDirectoryName(path);
+                if (!Directory.Exists(parentDir))
+                    Directory.CreateDirectory(parentDir);
+
+                using (var fileStream = File.Open(path, FileMode.Create))
+                using (var aes = Aes.Create())
+                {
+                    aes.GenerateIV();
+                    aes.Key = key;
+                    using (var cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        fileStream.Write(aes.IV, 0, aes.IV.Length);
+                        cryptoStream.Write(tokenBytes, 0, tokenBytes.Length);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning("Failed to cache token", ex);
+            }
         }
     }
 }
