@@ -281,6 +281,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7230);
-		public override string ToString() => Name ?? IdConvert.ToString(Id);
+		public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : IdConvert.ToString(Id);
 	}
 }
