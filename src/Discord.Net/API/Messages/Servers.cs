@@ -69,16 +69,16 @@ namespace Discord.API
 	//Edit
 	internal sealed class EditServerRequest
 	{
-		[JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("name")]
 		public string Name;
-		[JsonProperty("region", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("region")]
 		public string Region;
-		[JsonProperty("icon", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("icon")]
 		public string Icon;
-		[JsonProperty("afk_channel_id", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("afk_channel_id")]
 		[JsonConverter(typeof(NullableLongStringConverter))]
 		public ulong? AFKChannelId;
-		[JsonProperty("afk_timeout", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("afk_timeout")]
 		public int AFKTimeout;
 	}
 	public sealed class EditServerResponse : GuildInfo { }

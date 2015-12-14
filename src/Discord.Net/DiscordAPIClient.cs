@@ -244,17 +244,24 @@ namespace Discord
 		{
 			return _rest.Delete<DeleteServerResponse>(Endpoints.Server(serverId));
 		}
-		public Task<EditServerResponse> EditServer(ulong serverId, string name = null, string region = null, 
-			Stream icon = null, ImageType iconType = ImageType.Png, string existingIcon = null)
+		public Task<EditServerResponse> EditServer(ulong serverId, string name, string region,
+			Stream icon, ImageType iconType, string existingIcon,
+            ulong? afkChannelId, int afkTimeout)
 		{
-			var request = new EditServerRequest { Name = name, Region = region, Icon = Base64Picture(icon, iconType, existingIcon) };
+			var request = new EditServerRequest {
+                Name = name,
+                Region = region,
+                Icon = Base64Picture(icon, iconType, existingIcon),
+                AFKChannelId = afkChannelId,
+                AFKTimeout = afkTimeout
+            };
 			return _rest.Patch<EditServerResponse>(Endpoints.Server(serverId), request);
 		}
 
 		//User
-		public Task<EditUserResponse> EditProfile(string currentPassword = "",
-			string username = null, string email = null, string password = null,
-			Stream avatar = null, ImageType avatarType = ImageType.Png, string existingAvatar = null)
+		public Task<EditUserResponse> EditProfile(string currentPassword,
+			string username, string email, string password,
+			Stream avatar, ImageType avatarType, string existingAvatar)
 		{
 			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
 			
