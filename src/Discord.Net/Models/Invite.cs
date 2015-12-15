@@ -80,6 +80,7 @@ namespace Discord
 
 		internal Invite(string code, string xkcdPass)
 		{
+            Id = code;
 			XkcdCode = xkcdPass;
 		}
 
