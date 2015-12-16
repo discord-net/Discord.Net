@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class DeleteRoleRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/roles/{RoleId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/roles/{RoleId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

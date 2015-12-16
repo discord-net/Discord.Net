@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class UpdateRoleRequest : IRestRequest<Role>
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/roles/{RoleId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/roles/{RoleId}";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

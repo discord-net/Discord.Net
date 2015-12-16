@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class CreatePrivateChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/users/@me/channels";
+        string IRestRequest.Endpoint => $"users/@me/channels";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

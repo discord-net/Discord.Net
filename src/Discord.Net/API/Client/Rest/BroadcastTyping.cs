@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class BroadcastTypingRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/typing";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/typing";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

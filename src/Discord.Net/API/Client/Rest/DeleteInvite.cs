@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class DeleteInviteRequest : IRestRequest<Invite>
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/invite/{InviteCode}";
+        string IRestRequest.Endpoint => $"invite/{InviteCode}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

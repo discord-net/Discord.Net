@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class AddGuildBanRequest : IRestRequest
     {
         string IRestRequest.Method => "PUT";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/bans/{UserId}?delete-message-days={PruneDays}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/bans/{UserId}?delete-message-days={PruneDays}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

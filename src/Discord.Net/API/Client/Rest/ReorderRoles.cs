@@ -8,7 +8,7 @@ namespace Discord.API.Client.Rest
     public sealed class ReorderRolesRequest : IRestRequest<Role[]>
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/roles";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/roles";
         object IRestRequest.Payload
         {
             get

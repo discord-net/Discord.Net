@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class KickMemberRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/members/{UserId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/members/{UserId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

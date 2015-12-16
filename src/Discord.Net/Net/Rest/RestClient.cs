@@ -13,13 +13,13 @@ namespace Discord.Net.Rest
 		private readonly IRestEngine _engine;
 		private CancellationToken _cancelToken;
 
-		public RestClient(DiscordConfig config, Logger logger)
+		public RestClient(DiscordConfig config, Logger logger, string baseUrl)
 		{
 			_config = config;
 #if !DOTNET5_4
-			_engine = new RestSharpEngine(config, logger, DiscordConfig.ClientAPIUrl);
+			_engine = new RestSharpEngine(config, logger, baseUrl);
 #else
-			//_engine = new BuiltInRestEngine(config, logger);
+			//_engine = new BuiltInRestEngine(config, logger, baseUrl);
 #endif
         }
 

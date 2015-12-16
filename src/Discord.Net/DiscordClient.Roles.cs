@@ -87,7 +87,7 @@ namespace Discord
 			CheckReady();
 
             var request1 = new CreateRoleRequest(server.Id);
-            var response1 = await _rest.Send(request1).ConfigureAwait(false);
+            var response1 = await _clientRest.Send(request1).ConfigureAwait(false);
 			var role = _roles.GetOrAdd(response1.Id, server.Id);
 			role.Update(response1);
             
@@ -98,7 +98,7 @@ namespace Discord
                 Color = (color ?? Color.Default).RawValue,
                 IsHoisted = isHoisted
             };
-            var response2 = await _rest.Send(request2).ConfigureAwait(false);
+            var response2 = await _clientRest.Send(request2).ConfigureAwait(false);
             role.Update(response2);
 
             return role;
@@ -117,7 +117,7 @@ namespace Discord
                 IsHoisted = isHoisted ?? role.IsHoisted
             };
 
-            var response = await _rest.Send(request1).ConfigureAwait(false);
+            var response = await _clientRest.Send(request1).ConfigureAwait(false);
 
             if (position != null)
             {
@@ -146,7 +146,7 @@ namespace Discord
                     RoleIds = roles.Skip(minPos).Select(x => x.Id).ToArray(),
                     StartPos = minPos
                 };
-                await _rest.Send(request2).ConfigureAwait(false);
+                await _clientRest.Send(request2).ConfigureAwait(false);
 			}
 		}
 
@@ -155,7 +155,7 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			try { await _rest.Send(new DeleteRoleRequest(role.Server.Id, role.Id)).ConfigureAwait(false); }
+			try { await _clientRest.Send(new DeleteRoleRequest(role.Server.Id, role.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 	}
 
@@ -166,7 +166,7 @@ namespace Discord
 			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
 			CheckReady();
 
-			return _rest.Send(new ReorderRolesRequest(server.Id)
+			return _clientRest.Send(new ReorderRolesRequest(server.Id)
             {
                 RoleIds = roles.Select(x => x.Id).ToArray(),
                 StartPos = startPos

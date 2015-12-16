@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class AckMessageRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/messages/{MessageId}/ack";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/messages/{MessageId}/ack";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

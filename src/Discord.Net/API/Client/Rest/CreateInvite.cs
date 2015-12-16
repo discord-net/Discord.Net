@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class CreateInviteRequest : IRestRequest<Invite>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/invites";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/invites";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

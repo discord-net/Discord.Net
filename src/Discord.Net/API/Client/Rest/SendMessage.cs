@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class SendMessageRequest : IRestRequest<Message>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/messages";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/messages";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

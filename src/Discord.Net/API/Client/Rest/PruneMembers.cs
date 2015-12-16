@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class PruneMembersRequest : IRestRequest<PruneMembersResponse>
     {
         string IRestRequest.Method => IsSimulation ? "GET" : "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/prune?days={Days}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/prune?days={Days}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

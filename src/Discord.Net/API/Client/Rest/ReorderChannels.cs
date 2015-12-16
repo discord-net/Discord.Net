@@ -8,7 +8,7 @@ namespace Discord.API.Client.Rest
     public sealed class ReorderChannelsRequest : IRestRequest
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/channels";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/channels";
         object IRestRequest.Payload
         {
             get

@@ -218,7 +218,7 @@ namespace Discord
                 VoiceChannelId = voiceChannel?.Id,
                 RoleIds = roleIds.ToArray()
             };
-            return _rest.Send(request);
+            return _clientRest.Send(request);
 		}
 
 		public Task KickUser(User user)
@@ -228,7 +228,7 @@ namespace Discord
 			CheckReady();
 
             var request = new KickMemberRequest(user.Server.Id, user.Id);
-            return _rest.Send(request);
+            return _clientRest.Send(request);
 		}
 		public Task BanUser(User user, int pruneDays = 0)
 		{
@@ -238,7 +238,7 @@ namespace Discord
 
             var request = new AddGuildBanRequest(user.Server.Id, user.Id);
             request.PruneDays = pruneDays;
-            return _rest.Send(request);
+            return _clientRest.Send(request);
 		}
 		public async Task UnbanUser(Server server, ulong userId)
 		{
@@ -246,7 +246,7 @@ namespace Discord
 			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 			CheckReady();
 
-			try { await _rest.Send(new RemoveGuildBanRequest(server.Id, userId)).ConfigureAwait(false); }
+			try { await _clientRest.Send(new RemoveGuildBanRequest(server.Id, userId)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
@@ -261,7 +261,7 @@ namespace Discord
                 Days = days,
                 IsSimulation = simulate
             };
-            var response = await _rest.Send(request).ConfigureAwait(false);
+            var response = await _clientRest.Send(request).ConfigureAwait(false);
 			return response.Pruned;
 		}
 
@@ -289,7 +289,7 @@ namespace Discord
                 AvatarBase64 = Base64Image(avatarType, avatar, _privateUser?.AvatarId)
             };
 
-            await _rest.Send(request).ConfigureAwait(false);
+            await _clientRest.Send(request).ConfigureAwait(false);
 
 			if (password != null)
 			{
@@ -298,8 +298,8 @@ namespace Discord
                     Email = _currentUser.Email,
                     Password = password
                 };
-                var loginResponse = await _rest.Send(loginRequest).ConfigureAwait(false);
-				_rest.SetToken(loginResponse.Token);
+                var loginResponse = await _clientRest.Send(loginRequest).ConfigureAwait(false);
+				_clientRest.SetToken(loginResponse.Token);
 			}
 		}
 

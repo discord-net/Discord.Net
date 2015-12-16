@@ -6,10 +6,10 @@ namespace Discord.API.Client.GatewaySocket
     public sealed class TypingStartEvent
     {
         [JsonProperty("user_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong UserId { get; }
+        public ulong UserId { get; set; }
         [JsonProperty("channel_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong ChannelId { get; }
+        public ulong ChannelId { get; set; }
         [JsonProperty("timestamp")]
-        public int Timestamp { get; }
+        public int Timestamp { get; set; }
     }
 }

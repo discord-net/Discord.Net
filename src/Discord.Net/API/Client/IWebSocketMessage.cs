@@ -11,13 +11,13 @@ namespace Discord.API.Client
     public class WebSocketMessage
     {
         [JsonProperty("op")]
-        public int Operation { get; }
-        [JsonProperty("d")]
-        public object Payload { get; }
+        public int Operation { get; set; }
         [JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
-        public string Type { get; }
+        public string Type { get; set; }
         [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
-        public int? Sequence { get; }
+        public int? Sequence { get; set; }
+        [JsonProperty("d")]
+        public object Payload { get; set; }
 
         public WebSocketMessage() { }
         public WebSocketMessage(IWebSocketMessage msg)

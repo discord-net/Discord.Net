@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class LogoutRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/auth/logout";
+        string IRestRequest.Endpoint => $"auth/logout";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
     }

@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class RemoveGuildBanRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/bans/{UserId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/bans/{UserId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

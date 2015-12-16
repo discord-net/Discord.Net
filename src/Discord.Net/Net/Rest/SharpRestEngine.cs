@@ -1,5 +1,4 @@
 ﻿#if !DOTNET5_4
-using Discord.API;
 using RestSharp;
 using System;
 using System.IO;

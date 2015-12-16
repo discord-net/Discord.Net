@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class DeleteChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

@@ -6,7 +6,7 @@ namespace Discord.API.Status.Rest
     public sealed class GetActiveIncidentsRequest : IRestRequest<Incident>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"{DiscordConfig.StatusAPIUrl}/scheduled-maintenances/active.json";
+        string IRestRequest.Endpoint => $"scheduled-maintenances/active.json";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
     }

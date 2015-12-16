@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class UpdateGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class CreateChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/channels";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/channels";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

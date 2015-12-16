@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class GetWidgetRequest : IRestRequest<GetWidgetResponse>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/servers/{GuildId}/widget.json";
+        string IRestRequest.Endpoint => $"servers/{GuildId}/widget.json";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

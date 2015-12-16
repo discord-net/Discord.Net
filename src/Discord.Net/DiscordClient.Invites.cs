@@ -24,7 +24,7 @@ namespace Discord
 			if (index >= 0)
 				inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
 
-			var response = await _rest.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
+			var response = await _clientRest.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
 			var invite = new Invite(response.Code, response.XkcdPass);
 			invite.Update(response);
             return invite;
@@ -36,7 +36,7 @@ namespace Discord
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			var response = await _rest.Send(new GetInvitesRequest(server.Id)).ConfigureAwait(false);
+			var response = await _clientRest.Send(new GetInvitesRequest(server.Id)).ConfigureAwait(false);
 			return response.Select(x =>
 			{
 				var invite = new Invite(x.Code, x.XkcdPass);
@@ -77,7 +77,7 @@ namespace Discord
                 WithXkcdPass = withXkcd
             };
 
-            var response = await _rest.Send(request).ConfigureAwait(false);
+            var response = await _clientRest.Send(request).ConfigureAwait(false);
 			var invite = new Invite(response.Code, response.XkcdPass);
 			return invite;
 		}
@@ -88,7 +88,7 @@ namespace Discord
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
 			CheckReady();
 
-			try { await _rest.Send(new DeleteInviteRequest(invite.Code)).ConfigureAwait(false); }
+			try { await _clientRest.Send(new DeleteInviteRequest(invite.Code)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 		
@@ -98,7 +98,7 @@ namespace Discord
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
 			CheckReady();
 
-			return _rest.Send(new AcceptInviteRequest(invite.Code));
+			return _clientRest.Send(new AcceptInviteRequest(invite.Code));
 		}
 	}
 }

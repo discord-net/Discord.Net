@@ -3,8 +3,13 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Client
 {
-    public class MemberVoiceState : MemberReference
+    public class MemberVoiceState
     {
+        [JsonProperty("guild_id"), JsonConverter(typeof(LongStringConverter))]
+        public ulong GuildId { get; set; }
+        [JsonProperty("user_id"), JsonConverter(typeof(LongStringConverter))]
+        public ulong UserId { get; set; }
+
         [JsonProperty("channel_id"), JsonConverter(typeof(NullableLongStringConverter))]
         public ulong? ChannelId { get; set; }
         [JsonProperty("session_id")]

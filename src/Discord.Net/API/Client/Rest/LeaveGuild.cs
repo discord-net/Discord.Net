@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class LeaveGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "DELETE";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

@@ -94,7 +94,7 @@ namespace Discord
                 Region = region.Id,
                 IconBase64 = Base64Image(iconType, icon, null)
             };
-            var response = await _rest.Send(request).ConfigureAwait(false);
+            var response = await _clientRest.Send(request).ConfigureAwait(false);
 
 			var server = _servers.GetOrAdd(response.Id);
 			server.Update(response);
@@ -115,7 +115,7 @@ namespace Discord
                 AFKChannelId = server.AFKChannel?.Id,
                 AFKTimeout = server.AFKTimeout
             };
-            var response = await _rest.Send(request).ConfigureAwait(false);
+            var response = await _clientRest.Send(request).ConfigureAwait(false);
 			server.Update(response);
 		}
 		
@@ -125,7 +125,7 @@ namespace Discord
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			try { await _rest.Send(new LeaveGuildRequest(server.Id)).ConfigureAwait(false); }
+			try { await _clientRest.Send(new LeaveGuildRequest(server.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
@@ -133,7 +133,7 @@ namespace Discord
 		{
 			CheckReady();
 
-            var regions = await _rest.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false);
+            var regions = await _clientRest.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false);
             return regions.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port));
 		}
 	}

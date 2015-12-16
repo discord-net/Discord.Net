@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class CreateGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds";
+        string IRestRequest.Endpoint => $"guilds";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

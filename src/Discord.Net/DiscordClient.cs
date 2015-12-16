@@ -54,7 +54,7 @@ namespace Discord
 	public partial class DiscordClient
 	{
         private readonly LogService _log;
-        private readonly Logger _logger, _restLogger, _cacheLogger;
+        private readonly Logger _logger, _restLogger, _cacheLogger, _webSocketLogger;
         private readonly Dictionary<Type, object> _singletons;
         private readonly object _cacheLock;
         private readonly Semaphore _lock;
@@ -73,8 +73,9 @@ namespace Discord
 		private ConnectionState _state;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
-		public RestClient Rest => _rest;
-		private readonly RestClient _rest;
+		public RestClient ClientAPI => _clientRest;
+        public RestClient StatusAPI => _statusRest;
+        private readonly RestClient _clientRest, _statusRest;
 
 		/// <summary> Returns the internal websocket object. </summary>
 		public GatewaySocket WebSocket => _webSocket;
@@ -122,7 +123,10 @@ namespace Discord
 			//Services
 			_singletons = new Dictionary<Type, object>();
 			_log = AddService(new LogService());
-            _logger = CreateMainLogger();
+            _logger = _log.CreateLogger("Client");
+            _cacheLogger = _log.CreateLogger("Cache");
+            _restLogger = _log.CreateLogger("Rest");
+            _webSocketLogger = _log.CreateLogger("WebSocket");
 
             //Async
             _lock = new Semaphore(1, 1);
@@ -133,20 +137,17 @@ namespace Discord
 
             //Cache
             _cacheLock = new object();
-			_channels = new Channels(this, _cacheLock);
-			_users = new Users(this, _cacheLock);
-			_messages = new Messages(this, _cacheLock, Config.MessageCacheSize > 0);
-			_roles = new Roles(this, _cacheLock);
-			_servers = new Servers(this, _cacheLock);
-			_globalUsers = new GlobalUsers(this, _cacheLock);
-            _cacheLogger = CreateCacheLogger();
+            _channels = new Channels(this, _cacheLock);
+            _users = new Users(this, _cacheLock);
+            _messages = new Messages(this, _cacheLock, Config.MessageCacheSize > 0);
+            _roles = new Roles(this, _cacheLock);
+            _servers = new Servers(this, _cacheLock);
+            _globalUsers = new GlobalUsers(this, _cacheLock);
 
             //Networking
-            _restLogger = CreateRestLogger();
-            _rest = new RestClient(_config, _restLogger);
-
-            var webSocketLogger = _log.CreateLogger("WebSocket");
-            _webSocket = new GatewaySocket(this, webSocketLogger);
+            _clientRest = new RestClient(_config, _restLogger, DiscordConfig.ClientAPIUrl);
+            _statusRest = new RestClient(_config, _restLogger, DiscordConfig.StatusAPIUrl);
+            _webSocket = new GatewaySocket(this, _webSocketLogger);
             _webSocket.Connected += (s, e) =>
             {
                 if (_state == ConnectionState.Connecting)
@@ -162,94 +163,80 @@ namespace Discord
 				_pendingMessages = new ConcurrentQueue<MessageQueueItem>();
 			Connected += async (s, e) =>
 			{
-				_rest.SetCancelToken(_cancelToken);
+				_clientRest.SetCancelToken(_cancelToken);
 				await SendStatus().ConfigureAwait(false);
 			};
 
 			//Import/Export
 			_messageImporter = new JsonSerializer();
 			_messageImporter.ContractResolver = new Message.ImportResolver();
-		}
 
-		private Logger CreateMainLogger()
-        {
-            Logger logger = _log.CreateLogger("Client");
+            //Logging
             if (_log.Level >= LogSeverity.Info)
             {
-                JoinedServer += (s, e) => logger.Info($"Server Created: {e.Server?.Name ?? "[Private]"}");
-				LeftServer += (s, e) => logger.Info($"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
-				ServerUpdated += (s, e) => logger.Info($"Server Updated: {e.Server?.Name ?? "[Private]"}");
-				ServerAvailable += (s, e) => logger.Info($"Server Available: {e.Server?.Name ?? "[Private]"}");
-				ServerUnavailable += (s, e) => logger.Info($"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
-				ChannelCreated += (s, e) => logger.Info($"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelDestroyed += (s, e) => logger.Info($"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				ChannelUpdated += (s, e) => logger.Info($"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
-				MessageReceived += (s, e) => logger.Info($"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageDeleted += (s, e) => logger.Info($"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageUpdated += (s, e) => logger.Info($"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				RoleCreated += (s, e) => logger.Info($"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleUpdated += (s, e) => logger.Info($"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				RoleDeleted += (s, e) => logger.Info($"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
-				UserBanned += (s, e) => logger.Info($"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
-				UserUnbanned += (s, e) => logger.Info($"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
-				UserJoined += (s, e) => logger.Info($"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserLeft += (s, e) => logger.Info($"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserUpdated += (s, e) => logger.Info($"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				UserVoiceStateUpdated += (s, e) => logger.Info($"Voice Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
-				ProfileUpdated += (s, e) => logger.Info("Profile Updated");
-			}
-			if (_log.Level >= LogSeverity.Verbose)
-			{
-				UserIsTypingUpdated += (s, e) => logger.Verbose($"Is Typing: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
-				MessageAcknowledged += (s, e) => logger.Verbose($"Ack Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				MessageSent += (s, e) => logger.Verbose($"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
-				UserPresenceUpdated += (s, e) => logger.Verbose($"Presence Updated: {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
-			}
-            return logger;
-		}
-		private Logger CreateRestLogger()
-        {
-            Logger logger = null;
+                JoinedServer += (s, e) => _logger.Info($"Server Created: {e.Server?.Name ?? "[Private]"}");
+                LeftServer += (s, e) => _logger.Info($"Server Destroyed: {e.Server?.Name ?? "[Private]"}");
+                ServerUpdated += (s, e) => _logger.Info($"Server Updated: {e.Server?.Name ?? "[Private]"}");
+                ServerAvailable += (s, e) => _logger.Info($"Server Available: {e.Server?.Name ?? "[Private]"}");
+                ServerUnavailable += (s, e) => _logger.Info($"Server Unavailable: {e.Server?.Name ?? "[Private]"}");
+                ChannelCreated += (s, e) => _logger.Info($"Channel Created: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+                ChannelDestroyed += (s, e) => _logger.Info($"Channel Destroyed: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+                ChannelUpdated += (s, e) => _logger.Info($"Channel Updated: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}");
+                MessageReceived += (s, e) => _logger.Info($"Message Received: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+                MessageDeleted += (s, e) => _logger.Info($"Message Deleted: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+                MessageUpdated += (s, e) => _logger.Info($"Message Update: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+                RoleCreated += (s, e) => _logger.Info($"Role Created: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+                RoleUpdated += (s, e) => _logger.Info($"Role Updated: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+                RoleDeleted += (s, e) => _logger.Info($"Role Deleted: {e.Server?.Name ?? "[Private]"}/{e.Role?.Name}");
+                UserBanned += (s, e) => _logger.Info($"Banned User: {e.Server?.Name ?? "[Private]" }/{e.UserId}");
+                UserUnbanned += (s, e) => _logger.Info($"Unbanned User: {e.Server?.Name ?? "[Private]"}/{e.UserId}");
+                UserJoined += (s, e) => _logger.Info($"User Joined: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+                UserLeft += (s, e) => _logger.Info($"User Left: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+                UserUpdated += (s, e) => _logger.Info($"User Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+                UserVoiceStateUpdated += (s, e) => _logger.Info($"Voice Updated: {e.Server?.Name ?? "[Private]"}/{e.User.Name}");
+                ProfileUpdated += (s, e) => _logger.Info("Profile Updated");
+            }
             if (_log.Level >= LogSeverity.Verbose)
             {
-                logger = _log.CreateLogger("Rest");
-                _rest.OnRequest += (s, e) =>
-				{
-					if (e.Payload != null)
-                        logger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
-					else
-                        logger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
-				};
+                UserIsTypingUpdated += (s, e) => _logger.Verbose($"Is Typing: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.User?.Name}");
+                MessageAcknowledged += (s, e) => _logger.Verbose($"Ack Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+                MessageSent += (s, e) => _logger.Verbose($"Sent Message: {e.Server?.Name ?? "[Private]"}/{e.Channel?.Name}/{e.Message?.Id}");
+                UserPresenceUpdated += (s, e) => _logger.Verbose($"Presence Updated: {e.Server?.Name ?? "[Private]"}/{e.User?.Name}");
             }
-            return logger;
-        }
-		private Logger CreateCacheLogger()
-        {
-            Logger logger = null;
+            
+            if (_log.Level >= LogSeverity.Verbose)
+            {
+                _clientRest.OnRequest += (s, e) =>
+                {
+                    if (e.Payload != null)
+                        _restLogger.Verbose($"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
+                    else
+                        _restLogger.Verbose($"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms");
+                };
+            }
+            
             if (_log.Level >= LogSeverity.Debug)
             {
-                logger = _log.CreateLogger("Cache");
-                _channels.ItemCreated += (s, e) => logger.Debug( $"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_channels.Cleared += (s, e) => logger.Debug( $"Cleared Channels");
-				_users.ItemCreated += (s, e) => logger.Debug( $"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_users.Cleared += (s, e) => logger.Debug( $"Cleared Users");
-				_messages.ItemCreated += (s, e) => logger.Debug( $"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
-				_messages.ItemRemapped += (s, e) => logger.Debug( $"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
-				_messages.Cleared += (s, e) => logger.Debug( $"Cleared Messages");
-				_roles.ItemCreated += (s, e) => logger.Debug( $"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
-				_roles.Cleared += (s, e) => logger.Debug( $"Cleared Roles");
-				_servers.ItemCreated += (s, e) => logger.Debug( $"Created Server {e.Item.Id}");
-				_servers.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed Server {e.Item.Id}");
-				_servers.Cleared += (s, e) => logger.Debug( $"Cleared Servers");
-				_globalUsers.ItemCreated += (s, e) => logger.Debug( $"Created User {e.Item.Id}");
-				_globalUsers.ItemDestroyed += (s, e) => logger.Debug( $"Destroyed User {e.Item.Id}");
-				_globalUsers.Cleared += (s, e) => logger.Debug( $"Cleared Users");
+                _channels.ItemCreated += (s, e) => _cacheLogger.Debug($"Created Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _channels.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed Channel {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _channels.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Channels");
+                _users.ItemCreated += (s, e) => _cacheLogger.Debug($"Created User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _users.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed User {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _users.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Users");
+                _messages.ItemCreated += (s, e) => _cacheLogger.Debug($"Created Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+                _messages.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/{e.Item.Id}");
+                _messages.ItemRemapped += (s, e) => _cacheLogger.Debug($"Remapped Message {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Channel.Id}/[{e.OldId} -> {e.NewId}]");
+                _messages.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Messages");
+                _roles.ItemCreated += (s, e) => _cacheLogger.Debug($"Created Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _roles.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed Role {IdConvert.ToString(e.Item.Server?.Id) ?? "[Private]"}/{e.Item.Id}");
+                _roles.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Roles");
+                _servers.ItemCreated += (s, e) => _cacheLogger.Debug($"Created Server {e.Item.Id}");
+                _servers.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed Server {e.Item.Id}");
+                _servers.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Servers");
+                _globalUsers.ItemCreated += (s, e) => _cacheLogger.Debug($"Created User {e.Item.Id}");
+                _globalUsers.ItemDestroyed += (s, e) => _cacheLogger.Debug($"Destroyed User {e.Item.Id}");
+                _globalUsers.Cleared += (s, e) => _cacheLogger.Debug($"Cleared Users");
             }
-            return logger;
         }
 
 		/// <summary> Connects to the Discord server with the provided email and password. </summary>
@@ -342,7 +329,7 @@ namespace Discord
                         if (token == null)
                         {
                             var request = new LoginRequest() { Email = email, Password = password };
-                            var response = await _rest.Send(request).ConfigureAwait(false);
+                            var response = await _clientRest.Send(request).ConfigureAwait(false);
                             token = response.Token;
                             SaveToken(tokenPath, key, token);
                             useCache = false;
@@ -351,17 +338,17 @@ namespace Discord
                     else
                     {
                         var request = new LoginRequest() { Email = email, Password = password };
-                        var response = await _rest.Send(request).ConfigureAwait(false);
+                        var response = await _clientRest.Send(request).ConfigureAwait(false);
                         token = response.Token;
                     }
                 }
                 _token = token;
-                _rest.SetToken(token);
+                _clientRest.SetToken(token);
 
                 //Get gateway and check token
                 try
                 {
-                    var gatewayResponse = await _rest.Send(new GatewayRequest()).ConfigureAwait(false);
+                    var gatewayResponse = await _clientRest.Send(new GatewayRequest()).ConfigureAwait(false);
                     var gateway = gatewayResponse.Url;
                     _gateway = gateway;
                     if (_config.LogLevel >= LogSeverity.Verbose)
@@ -395,7 +382,7 @@ namespace Discord
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
 
-			await _rest.Send(new LogoutRequest()).ConfigureAwait(false);
+			await _clientRest.Send(new LogoutRequest()).ConfigureAwait(false);
 
 			_channels.Clear();
 			_users.Clear();
@@ -722,7 +709,7 @@ namespace Discord
 					case "VOICE_STATE_UPDATE":
 						{
 							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_webSocket.Serializer);
-							var user = _users[data.User.Id, data.GuildId];
+							var user = _users[data.UserId, data.GuildId];
 							if (user != null)
 							{
 								/*var voiceChannel = user.VoiceChannel;

@@ -15,7 +15,7 @@ namespace Discord.API.Client.Rest
                 this.AddQueryParam(query, "limit", Limit.ToString());
                 if (RelativeDir != null)
                     this.AddQueryParam(query, RelativeDir, RelativeId.Value.ToString());
-                return $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/messages{query}";
+                return $"channels/{ChannelId}/messages{query}";
             }
         }
         object IRestRequest.Payload => null;

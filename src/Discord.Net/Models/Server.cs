@@ -192,7 +192,7 @@ namespace Discord
 			}
 			foreach (var subModel in model.VoiceStates)
 			{
-				var user = usersCache[subModel.User.Id, Id];
+				var user = usersCache[subModel.UserId, Id];
 				if (user != null)
 					user.Update(subModel);
 			}

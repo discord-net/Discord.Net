@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class CreateRoleRequest : IRestRequest<Role>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/roles";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/roles";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

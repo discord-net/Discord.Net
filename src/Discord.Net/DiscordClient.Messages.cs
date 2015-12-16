@@ -164,7 +164,7 @@ namespace Discord
                 Filename = filename,
                 Stream = stream
             };
-            var model = await _rest.Send(request).ConfigureAwait(false);
+            var model = await _clientRest.Send(request).ConfigureAwait(false);
 
             var msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
             msg.Update(model);
@@ -229,7 +229,7 @@ namespace Discord
                     Nonce = null,
                     IsTTS = isTextToSpeech
                 };
-                var model = await _rest.Send(request).ConfigureAwait(false);
+                var model = await _clientRest.Send(request).ConfigureAwait(false);
                 msg = _messages.GetOrAdd(model.Id, channel.Id, model.Author.Id);
                 msg.Update(model);
                 RaiseMessageSent(msg);
@@ -262,7 +262,7 @@ namespace Discord
                     Content = text,
                     MentionedUserIds = mentionedUsers.Select(x => x.Id).ToArray()
                 };
-                await _rest.Send(request).ConfigureAwait(false);
+                await _clientRest.Send(request).ConfigureAwait(false);
             }
 		}
 
@@ -273,7 +273,7 @@ namespace Discord
 			CheckReady();
 
             var request = new DeleteMessageRequest(message.Id, message.Channel.Id);
-            try { await _rest.Send(request).ConfigureAwait(false); }
+            try { await _clientRest.Send(request).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 		public async Task DeleteMessages(IEnumerable<Message> messages)
@@ -284,7 +284,7 @@ namespace Discord
 			foreach (var message in messages)
 			{
                 var request = new DeleteMessageRequest(message.Id, message.Channel.Id);
-                try { await _rest.Send(request).ConfigureAwait(false); }
+                try { await _clientRest.Send(request).ConfigureAwait(false); }
 				catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 			}
 		}
@@ -307,7 +307,7 @@ namespace Discord
                         RelativeDir = relativeDir == RelativeDirection.Before ? "before" : "after",
                         RelativeId = relativeMessageId
                     };
-                    var msgs = await _rest.Send(request).ConfigureAwait(false);
+                    var msgs = await _clientRest.Send(request).ConfigureAwait(false);
                     return msgs.Select(x =>
 					{
 						Message msg = null;
@@ -336,7 +336,7 @@ namespace Discord
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             if (!message.IsAuthor)
-                _rest.Send(new AckMessageRequest(message.Id, message.Channel.Id));
+                _clientRest.Send(new AckMessageRequest(message.Id, message.Channel.Id));
         }
 		
 		/// <summary> Deserializes messages from JSON format and imports them into the message cache.</summary>
@@ -401,7 +401,7 @@ namespace Discord
                                     Nonce = IdConvert.ToString(msg.Id), //Nonce
                                     IsTTS = msg.IsTTS
                                 };
-                                await _rest.Send(request).ConfigureAwait(false);
+                                await _clientRest.Send(request).ConfigureAwait(false);
                             }
                             else
                             {
@@ -410,7 +410,7 @@ namespace Discord
                                     Content = queuedMessage.Text,
                                     MentionedUserIds = queuedMessage.MentionedUsers
                                 };
-                                await _rest.Send(request).ConfigureAwait(false);
+                                await _clientRest.Send(request).ConfigureAwait(false);
                             }
                         }
                         catch (WebException) { break; }

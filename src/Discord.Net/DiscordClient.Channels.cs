@@ -120,7 +120,7 @@ namespace Discord
 			CheckReady();
 
             var request = new CreateChannelRequest(server.Id) { Name = name, Type = type.Value };
-            var response = await _rest.Send(request).ConfigureAwait(false);
+            var response = await _clientRest.Send(request).ConfigureAwait(false);
 
 			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 			channel.Update(response);
@@ -139,7 +139,7 @@ namespace Discord
             if (channel == null)
             {
                 var request = new CreatePrivateChannelRequest() { RecipientId = user.Id };
-                var response = await _rest.Send(request).ConfigureAwait(false);
+                var response = await _clientRest.Send(request).ConfigureAwait(false);
 
 				var recipient = _users.GetOrAdd(response.Recipient.Id, null);
 				recipient.Update(response.Recipient);
@@ -163,7 +163,7 @@ namespace Discord
                     Topic = topic ?? channel.Topic,
                     Position = channel.Position
                 };
-                await _rest.Send(request).ConfigureAwait(false);
+                await _clientRest.Send(request).ConfigureAwait(false);
             }
 
 			if (position != null)
@@ -207,7 +207,7 @@ namespace Discord
                 ChannelIds = channels.Select(x => x.Id).ToArray(),
                 StartPos = after != null ? after.Position + 1 : channels.Min(x => x.Position)
             };
-            return _rest.Send(request);
+            return _clientRest.Send(request);
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
@@ -216,7 +216,7 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
-			try { await _rest.Send(new DeleteChannelRequest(channel.Id)).ConfigureAwait(false); }
+			try { await _clientRest.Send(new DeleteChannelRequest(channel.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 	}

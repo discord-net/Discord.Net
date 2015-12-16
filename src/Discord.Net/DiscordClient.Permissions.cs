@@ -73,7 +73,7 @@ namespace Discord
                 Allow = allow?.RawValue ?? 0,
                 Deny = deny?.RawValue ?? 0
             };
-            return _rest.Send(request);
+            return _clientRest.Send(request);
         }
 
 		public Task RemoveChannelPermissions(Channel channel, User user)
@@ -97,7 +97,7 @@ namespace Discord
 			try
 			{
 				var perms = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != userOrRoleId).FirstOrDefault();
-				await _rest.Send(new RemoveChannelPermissionsRequest(channel.Id, userOrRoleId)).ConfigureAwait(false);
+				await _clientRest.Send(new RemoveChannelPermissionsRequest(channel.Id, userOrRoleId)).ConfigureAwait(false);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}

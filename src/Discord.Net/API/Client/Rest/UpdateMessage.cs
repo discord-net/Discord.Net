@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class UpdateMessageRequest : IRestRequest<Message>
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/channels/{ChannelId}/messages/{MessageId}";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/messages/{MessageId}";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 

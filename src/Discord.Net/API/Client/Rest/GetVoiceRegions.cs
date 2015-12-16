@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class GetVoiceRegionsRequest : IRestRequest<GetVoiceRegionsResponse[]>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/voice/regions";
+        string IRestRequest.Endpoint => $"voice/regions";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
     }

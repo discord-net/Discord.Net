@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class AcceptInviteRequest : IRestRequest<InviteReference>
     {
         string IRestRequest.Method => "POST";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/invite/{InviteId}";
+        string IRestRequest.Endpoint => $"invite/{InviteId}";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

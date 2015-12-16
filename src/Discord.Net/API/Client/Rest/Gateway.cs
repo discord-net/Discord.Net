@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class GatewayRequest : IRestRequest<GatewayResponse>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/gateway";
+        string IRestRequest.Endpoint => $"gateway";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
     }

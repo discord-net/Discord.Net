@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class GetInvitesRequest : IRestRequest<InviteReference[]>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/guilds/{GuildId}/invites";
+        string IRestRequest.Endpoint => $"guilds/{GuildId}/invites";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 

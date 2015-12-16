@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public sealed class UpdateProfileRequest : IRestRequest<User>
     {
         string IRestRequest.Method => "PATCH";
-        string IRestRequest.Endpoint => $"{DiscordConfig.ClientAPIUrl}/users/@me";
+        string IRestRequest.Endpoint => $"users/@me";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
