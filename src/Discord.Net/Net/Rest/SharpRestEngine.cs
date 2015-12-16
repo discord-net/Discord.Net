@@ -18,12 +18,12 @@ namespace Discord.Net.Rest
         private readonly object _rateLimitLock;
         private DateTime _rateLimitTime;
 
-        public RestSharpEngine(DiscordConfig config, Logger logger)
+        public RestSharpEngine(DiscordConfig config, Logger logger, string baseUrl)
 		{
 			_config = config;
             _logger = logger;
             _rateLimitLock = new object();
-            _client = new RestSharp.RestClient(Endpoints.BaseApi)
+            _client = new RestSharp.RestClient(baseUrl)
 			{
 				PreAuthenticate = false,
 				ReadWriteTimeout = _config.RestTimeout,

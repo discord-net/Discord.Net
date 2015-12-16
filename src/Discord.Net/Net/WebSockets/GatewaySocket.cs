@@ -1,4 +1,5 @@
-﻿using Discord.API;
+﻿using Discord.API.Client;
+using Discord.API.Client.GatewaySocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -76,10 +77,10 @@ namespace Discord.Net.WebSockets
 			if (msg.Sequence.HasValue)
 				_lastSeq = msg.Sequence.Value;
 
-			var opCode = (GatewayOpCodes)msg.Operation;
+			var opCode = (OpCodes)msg.Operation;
             switch (opCode)
 			{
-				case GatewayOpCodes.Dispatch:
+				case OpCodes.Dispatch:
 					{
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
@@ -90,7 +91,7 @@ namespace Discord.Net.WebSockets
 						}
 						else if (msg.Type == "RESUMED")
 						{
-							var payload = token.ToObject<ResumeEvent>(_serializer);
+							var payload = token.ToObject<ResumedEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
 						RaiseReceivedDispatch(msg.Type, token);
@@ -98,7 +99,7 @@ namespace Discord.Net.WebSockets
 							EndConnect(); //Complete the connect
 					}
 					break;
-				case GatewayOpCodes.Redirect:
+				case OpCodes.Redirect:
 					{
 						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_serializer);
 						if (payload.Url != null)
@@ -117,57 +118,32 @@ namespace Discord.Net.WebSockets
 			}
 		}
 
-		public void SendIdentify()
-		{
-			var msg = new IdentifyCommand();
-			msg.Payload.Token = _client.Token;
-			msg.Payload.Properties["$device"] = "Discord.Net";
-			if (_client.Config.UseLargeThreshold)
-				msg.Payload.LargeThreshold = 100;
-			msg.Payload.Compress = true;
+        public void SendIdentify()
+        {
+            var props = new Dictionary<string, string>
+            {
+                ["$device"] = "Discord.Net"
+            };
+            var msg = new IdentifyCommand()
+            {
+                Version = 3,
+                Token = _client.Token,
+                Properties = props, 
+                LargeThreshold = _client.Config.UseLargeThreshold ? 100 : (int?)null,
+                UseCompression = true
+            };
 			QueueMessage(msg);
 		}
 
-		public void SendResume()
-		{
-			var msg = new ResumeCommand();
-			msg.Payload.SessionId = _sessionId;
-			msg.Payload.Sequence = _lastSeq;
-			QueueMessage(msg);
-		}
-
-		public override void SendHeartbeat()
-		{
-			QueueMessage(new HeartbeatCommand());
-		}
-
-		public void SendStatusUpdate(long? idleSince, int? gameId)
-		{
-			var msg = new StatusUpdateCommand();
-			msg.Payload.IdleSince = idleSince;
-			msg.Payload.GameId = gameId;
-            QueueMessage(msg);
-		}
-
-		public void SendJoinVoice(ulong serverId, ulong channelId)
-		{
-			var msg = new JoinVoiceCommand();
-			msg.Payload.ServerId = serverId;
-			msg.Payload.ChannelId = channelId;
-			QueueMessage(msg);
-		}
-		public void SendLeaveVoice(ulong serverId)
-		{
-			var msg = new JoinVoiceCommand();
-			msg.Payload.ServerId = serverId;
-			QueueMessage(msg);
-		}
-
-		public void SendRequestUsers(ulong serverId, string query = "", int limit = 0)
-		{
-			var msg = new GetUsersCommand();
-			msg.Payload.ServerId = serverId;
-			QueueMessage(msg);
-		}
+        public void SendResume()
+            => QueueMessage(new ResumeCommand { SessionId = _sessionId, Sequence = _lastSeq });
+		public override void SendHeartbeat() 
+            => QueueMessage(new HeartbeatCommand());
+		public void SendUpdateStatus(long? idleSince, int? gameId) 
+            => QueueMessage(new UpdateStatusCommand { IdleSince = idleSince, GameId = gameId });
+		public void SendUpdateVoice(ulong serverId, ulong channelId, bool isSelfMuted, bool isSelfDeafened)
+            => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
+		public void SendRequestMembers(ulong serverId, string query, int limit)
+            => QueueMessage(new RequestMembersCommand { GuildId = serverId, Query = query, Limit = limit });
 	}
 }

@@ -1,8 +1,9 @@
-﻿using Discord.API;
+﻿using Discord.API.Client;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
@@ -21,22 +22,25 @@ namespace Discord
 				=> UserId == other.UserId && ServerId == other.ServerId;
 			public override int GetHashCode()
 				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
-		}
+        }
 
-		/// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
-		internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
+        public static string GetAvatarUrl(ulong userId, string avatarId) => avatarId != null ? $"{DiscordConfig.CDNUrl}/avatars/{userId}/{avatarId}.jpg" : null;
+
+        /// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
+        internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
 		/// <summary> Returns the name of this user on this server. </summary>
 		public string Name { get; private set; }
 		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
 		public ushort Discriminator { get; private set; }
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string AvatarId { get; private set; }
-		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string AvatarUrl => AvatarId != null ? Endpoints.UserAvatar(Id, AvatarId) : null;
-		/// <summary> Returns the datetime that this user joined this server. </summary>
-		public DateTime JoinedAt { get; private set; }
+        /// <summary> Returns the URL to this user's current avatar. </summary>
+        public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
+        /// <summary> Returns the datetime that this user joined this server. </summary>
+        public DateTime JoinedAt { get; private set; }
 
-		public bool IsSelfMuted { get; private set; }
+
+        public bool IsSelfMuted { get; private set; }
 		public bool IsSelfDeafened { get; private set; }
 		public bool IsServerMuted { get; private set; }
 		public bool IsServerDeafened { get; private set; }
@@ -183,7 +187,7 @@ namespace Discord
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
 		}
-		internal void Update(MemberInfo model)
+		internal void Update(APIMember model)
 		{
 			if (model.User != null)
 				Update(model.User);
@@ -193,16 +197,16 @@ namespace Discord
 			if (model.Roles != null)
 				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
         }
-		internal void Update(ExtendedMemberInfo model)
+		internal void Update(ExtendedGuild.ExtendedMemberInfo model)
 		{
-			Update(model as API.MemberInfo);
+			Update(model as APIMember);
 
 			if (model.IsServerDeafened != null)
 				IsServerDeafened = model.IsServerDeafened.Value;
 			if (model.IsServerMuted != null)
 				IsServerMuted = model.IsServerMuted.Value;
 		}
-		internal void Update(PresenceInfo model)
+		internal void Update(MemberPresence model)
 		{
 			if (model.User != null)
 				Update(model.User as UserReference);
@@ -218,7 +222,7 @@ namespace Discord
 			
 			GameId = model.GameId; //Allows null
 		}
-		internal void Update(VoiceMemberInfo model)
+		internal void Update(MemberVoiceState model)
 		{
 			if (model.IsServerDeafened != null)
 				IsServerDeafened = model.IsServerDeafened.Value;

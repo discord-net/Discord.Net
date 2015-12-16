@@ -1,3 +1,4 @@
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
@@ -80,33 +81,41 @@ namespace Discord
 			return _servers.Where(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 		}
 
-		/// <summary> Creates a new server with the provided name and region (see Regions). </summary>
-		public async Task<Server> CreateServer(string name, Region region)
-		{
-			if (name == null) throw new ArgumentNullException(nameof(name));
-			if (region == null) throw new ArgumentNullException(nameof(region));
-			CheckReady();
+        /// <summary> Creates a new server with the provided name and region (see Regions). </summary>
+        public async Task<Server> CreateServer(string name, Region region, ImageType iconType = ImageType.None, Stream icon = null)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (region == null) throw new ArgumentNullException(nameof(region));
+            CheckReady();
 
-			var response = await _api.CreateServer(name, region.Id).ConfigureAwait(false);
+            var request = new CreateGuildRequest()
+            {
+                Name = name,
+                Region = region.Id,
+                IconBase64 = Base64Image(iconType, icon, null)
+            };
+            var response = await _rest.Send(request).ConfigureAwait(false);
+
 			var server = _servers.GetOrAdd(response.Id);
 			server.Update(response);
 			return server;
 		}
-		
-		/// <summary> Edits the provided server, changing only non-null attributes. </summary>
-		public async Task EditServer(Server server, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
-		{
-			if (server == null) throw new ArgumentNullException(nameof(server));
-			CheckReady();
 
-			var response = await _api.EditServer(
-                server.Id, name: name ?? server.Name, 
-                region: region ?? server.Region,
-                icon: icon, 
-                iconType: iconType,
-                existingIcon: server.IconId,
-                afkChannelId: server.AFKChannel?.Id,
-                afkTimeout: server.AFKTimeout).ConfigureAwait(false);
+        /// <summary> Edits the provided server, changing only non-null attributes. </summary>
+        public async Task EditServer(Server server, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
+        {
+            if (server == null) throw new ArgumentNullException(nameof(server));
+            CheckReady();
+
+            var request = new UpdateGuildRequest(server.Id)
+            {
+                Name = name ?? server.Name,
+                Region = region ?? server.Region,
+                IconBase64 = Base64Image(iconType, icon, server.IconId),
+                AFKChannelId = server.AFKChannel?.Id,
+                AFKTimeout = server.AFKTimeout
+            };
+            var response = await _rest.Send(request).ConfigureAwait(false);
 			server.Update(response);
 		}
 		
@@ -116,7 +125,7 @@ namespace Discord
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			try { await _api.LeaveServer(server.Id).ConfigureAwait(false); }
+			try { await _rest.Send(new LeaveGuildRequest(server.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
@@ -124,8 +133,8 @@ namespace Discord
 		{
 			CheckReady();
 
-            var regions = await _api.GetVoiceRegions().ConfigureAwait(false);
-            return regions.Select(x => new Region { Id = x.Id, Name = x.Name, Hostname = x.Hostname, Port = x.Port });
+            var regions = await _rest.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false);
+            return regions.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port));
 		}
 	}
 }

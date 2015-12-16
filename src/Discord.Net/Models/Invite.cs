@@ -1,5 +1,6 @@
-﻿using System;
-using Discord.API;
+﻿using Discord.API.Client;
+using System;
+using APIInvite = Discord.API.Client.Invite;
 
 namespace Discord
 {
@@ -42,7 +43,7 @@ namespace Discord
 			/// <summary> Returns the unique identifier for this user's avatar. </summary>
 			public string AvatarId { get; }
 			/// <summary> Returns the full path to this user's avatar. </summary>
-			public string AvatarUrl => AvatarId != null ? Endpoints.UserAvatar(Id, AvatarId) : null;
+			public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
 
 			internal InviterInfo(ulong id, string name, ushort discriminator, string avatarId)
 			{
@@ -57,10 +58,8 @@ namespace Discord
 		public ServerInfo Server { get; private set; }
 		/// <summary> Returns information about the channel this invite is attached to. </summary>
 		public ChannelInfo Channel { get; private set; }
-		/// <summary> Returns information about the user that created this invite. </summary>
-		public InviterInfo Inviter { get; private set; }
         
-        public string Id { get; }
+        public string Code { get; }
         /// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
         public string XkcdCode { get; }
 		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
@@ -76,11 +75,11 @@ namespace Discord
 		public DateTime CreatedAt { get; private set; }
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
-		public string Url => API.Endpoints.InviteUrl(XkcdCode ?? Id.ToString());
+		public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
-		internal Invite(string code, string xkcdPass)
+        internal Invite(string code, string xkcdPass)
 		{
-            Id = code;
+            Code = code;
 			XkcdCode = xkcdPass;
 		}
 
@@ -90,10 +89,8 @@ namespace Discord
 				Server = new ServerInfo(model.Guild.Id, model.Guild.Name);
 			if (model.Channel != null)
 				Channel = new ChannelInfo(model.Channel.Id, model.Channel.Name);
-			if (model.Inviter != null)
-				Inviter = new InviterInfo(model.Inviter.Id, model.Inviter.Username, model.Inviter.Discriminator.Value, model.Inviter.Avatar);
         }
-        internal void Update(InviteInfo model)
+        internal void Update(APIInvite model)
 		{
 			Update(model as InviteReference);
 
@@ -111,8 +108,8 @@ namespace Discord
 				CreatedAt = model.CreatedAt.Value;
 		}
 
-		public override bool Equals(object obj) => obj is Invite && (obj as Invite).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 9980);
-		public override string ToString() => XkcdCode ?? Id;
+		public override bool Equals(object obj) => obj is Invite && (obj as Invite).Code == Code;
+		public override int GetHashCode() => unchecked(Code.GetHashCode() + 9980);
+		public override string ToString() => XkcdCode ?? Code;
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API.Client;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -162,9 +163,9 @@ namespace Discord.Net.WebSockets
 				_logger.Debug( $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}		
-		protected void QueueMessage(object message)
+		protected void QueueMessage(IWebSocketMessage message)
 		{
-			string json = JsonConvert.SerializeObject(message);
+			string json = JsonConvert.SerializeObject(new WebSocketMessage(message));
 			if (_logger.Level >= LogSeverity.Debug)
 				_logger.Debug( $"Out: " + json);
 			_engine.QueueMessage(json);

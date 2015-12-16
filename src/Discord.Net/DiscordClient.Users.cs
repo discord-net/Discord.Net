@@ -1,4 +1,5 @@
-﻿using Discord.Net;
+﻿using Discord.API.Client.Rest;
+using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -201,23 +202,23 @@ namespace Discord
 			return query;
 		}
 
-		public Task EditUser(User user, bool? mute = null, bool? deaf = null, Channel voiceChannel = null, IEnumerable<Role> roles = null, EditMode rolesMode = EditMode.Set)
-		{
-			if (user == null) throw new ArgumentNullException(nameof(user));
-			if (user.IsPrivate) throw new InvalidOperationException("Unable to edit users in a private channel");
-			CheckReady();
+        public Task EditUser(User user, bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (user.IsPrivate) throw new InvalidOperationException("Unable to edit users in a private channel");
+            CheckReady();
 
-			//Modify the roles collection and filter out the everyone role
-			IEnumerable<ulong> roleIds = roles == null ? null : user.Roles
-				.Modify(roles, rolesMode)
-				.Where(x => !x.IsEveryone)
-				.Select(x => x.Id);
+            //Modify the roles collection and filter out the everyone role
+            var roleIds = roles == null ? null : user.Roles.Where(x => !x.IsEveryone) .Select(x => x.Id);
 
-			var serverId = user.Server.Id;
-            return _api.EditUser(serverId, user.Id, 
-				mute: mute, deaf: deaf,
-                voiceChannelId: voiceChannel?.Id,
-                roleIds: roleIds);
+            var request = new UpdateMemberRequest(user.Server.Id, user.Id)
+            {
+                IsMuted = isMuted ?? user.IsServerMuted,
+                IsDeafened = isDeafened ?? user.IsServerDeafened,
+                VoiceChannelId = voiceChannel?.Id,
+                RoleIds = roleIds.ToArray()
+            };
+            return _rest.Send(request);
 		}
 
 		public Task KickUser(User user)
@@ -226,15 +227,18 @@ namespace Discord
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to kick users from a private channel");
 			CheckReady();
 
-			return _api.KickUser(user.Server.Id, user.Id);
+            var request = new KickMemberRequest(user.Server.Id, user.Id);
+            return _rest.Send(request);
 		}
-		public Task BanUser(User user)
+		public Task BanUser(User user, int pruneDays = 0)
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (user.IsPrivate) throw new InvalidOperationException("Unable to ban users from a private channel");
 			CheckReady();
 
-			return _api.BanUser(user.Server.Id, user.Id);
+            var request = new AddGuildBanRequest(user.Server.Id, user.Id);
+            request.PruneDays = pruneDays;
+            return _rest.Send(request);
 		}
 		public async Task UnbanUser(Server server, ulong userId)
 		{
@@ -242,7 +246,7 @@ namespace Discord
 			if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 			CheckReady();
 
-			try { await _api.UnbanUser(server.Id, userId).ConfigureAwait(false); }
+			try { await _rest.Send(new RemoveGuildBanRequest(server.Id, userId)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 
@@ -252,8 +256,13 @@ namespace Discord
 			if (days <= 0) throw new ArgumentOutOfRangeException(nameof(days));
 			CheckReady();
 
-			var response = await _api.PruneUsers(server.Id, days, simulate).ConfigureAwait(false);
-			return response.Pruned ?? 0;
+            var request = new PruneMembersRequest(server.Id)
+            {
+                Days = days,
+                IsSimulation = simulate
+            };
+            var response = await _rest.Send(request).ConfigureAwait(false);
+			return response.Pruned;
 		}
 
 		/// <summary>When Config.UseLargeThreshold is enabled, running this command will request the Discord server to provide you with all offline users for a particular server.</summary>
@@ -261,24 +270,36 @@ namespace Discord
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
-			_webSocket.SendRequestUsers(server.Id);
+			_webSocket.SendRequestMembers(server.Id, "", 0);
 		}
 
-		public async Task EditProfile(string currentPassword = "",
-			string username = null, string email = null, string password = null,
-			Stream avatar = null, ImageType avatarType = ImageType.Png)
-		{
-			if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
-			CheckReady();
+        public async Task EditProfile(string currentPassword = "",
+            string username = null, string email = null, string password = null,
+            Stream avatar = null, ImageType avatarType = ImageType.Png)
+        {
+            if (currentPassword == null) throw new ArgumentNullException(nameof(currentPassword));
+            CheckReady();
 
-			await _api.EditProfile(currentPassword: currentPassword, 
-				username: username ?? _privateUser?.Name,  email: email ?? _currentUser?.Email, password: password,
-				avatar: avatar, avatarType: avatarType, existingAvatar: _privateUser?.AvatarId).ConfigureAwait(false);
+            var request = new UpdateProfileRequest()
+            {
+                CurrentPassword = currentPassword,
+                Email = email ?? _currentUser?.Email,
+                Password = password,
+                Username = username ?? _privateUser?.Name,
+                AvatarBase64 = Base64Image(avatarType, avatar, _privateUser?.AvatarId)
+            };
+
+            await _rest.Send(request).ConfigureAwait(false);
 
 			if (password != null)
 			{
-				var loginResponse = await _api.Login(_currentUser.Email, password).ConfigureAwait(false);
-				_api.Token = loginResponse.Token;
+                var loginRequest = new LoginRequest()
+                {
+                    Email = _currentUser.Email,
+                    Password = password
+                };
+                var loginResponse = await _rest.Send(loginRequest).ConfigureAwait(false);
+				_rest.SetToken(loginResponse.Token);
 			}
 		}
 
@@ -301,7 +322,7 @@ namespace Discord
 		}
 		private Task SendStatus()
 		{
-			_webSocket.SendStatusUpdate(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
+			_webSocket.SendUpdateStatus(_status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, _gameId);
 			return TaskHelper.CompletedTask;
 		}
     }

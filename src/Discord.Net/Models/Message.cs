@@ -1,11 +1,10 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MemberInfo = System.Reflection.MemberInfo;
+using APIMessage = Discord.API.Client.Message;
 
 namespace Discord
 {
@@ -193,7 +192,7 @@ namespace Discord
 			_user.Unload();
 		}
 
-		internal void Update(MessageInfo model)
+		internal void Update(APIMessage model)
 		{
 			var channel = Channel;
 			var server = channel.Server;

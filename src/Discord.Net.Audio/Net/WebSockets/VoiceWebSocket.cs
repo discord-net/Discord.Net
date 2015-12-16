@@ -1,4 +1,6 @@
 ﻿using Discord.API;
+using Discord.API.Client;
+using Discord.API.Client.VoiceSocket;
 using Discord.Audio;
 using Discord.Audio.Opus;
 using Discord.Audio.Sodium;
@@ -394,14 +396,14 @@ namespace Discord.Net.WebSockets
 		{
 			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
-			var opCode = (VoiceOpCodes)msg.Operation;
+			var opCode = (OpCodes)msg.Operation;
             switch (opCode)
 			{
-				case VoiceOpCodes.Ready:
+				case OpCodes.Ready:
 					{
 						if (_state != ConnectionState.Connected)
 						{
-							var payload = (msg.Payload as JToken).ToObject<VoiceReadyEvent>(_serializer);
+							var payload = (msg.Payload as JToken).ToObject<ReadyEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 							_ssrc = payload.SSRC;
                             var address = (await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault();
@@ -435,7 +437,7 @@ namespace Discord.Net.WebSockets
 						}
 					}
 					break;
-				case VoiceOpCodes.Heartbeat:
+				case OpCodes.Heartbeat:
 					{
 						long time = EpochTime.GetMilliseconds();
 						var payload = (long)msg.Payload;
@@ -443,17 +445,17 @@ namespace Discord.Net.WebSockets
 						//TODO: Use this to estimate latency
 					}
 					break;
-				case VoiceOpCodes.SessionDescription:
+				case OpCodes.SessionDescription:
 					{
-						var payload = (msg.Payload as JToken).ToObject<JoinServerEvent>(_serializer);
+						var payload = (msg.Payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
 						_secretKey = payload.SecretKey;
-						SendIsTalking(true);
+						SendSetSpeaking(true);
 						EndConnect();
 					}
 					break;
-				case VoiceOpCodes.Speaking:
+				case OpCodes.Speaking:
 					{
-						var payload = (msg.Payload as JToken).ToObject<IsTalkingEvent>(_serializer);
+						var payload = (msg.Payload as JToken).ToObject<SpeakingEvent>(_serializer);
 						RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
 					}
 					break;
@@ -493,37 +495,14 @@ namespace Discord.Net.WebSockets
 			});
 		}
 
-		public void SendIdentify()
-		{
-			var msg = new IdentifyCommand();
-			msg.Payload.ServerId = _serverId.Value;
-			msg.Payload.SessionId = _client.SessionId;
-			msg.Payload.Token = _audioClient.Token;
-			msg.Payload.UserId = _client.UserId.Value;
-			QueueMessage(msg);
-		}
+        public override void SendHeartbeat()
+            => QueueMessage(new HeartbeatCommand());
+        public void SendIdentify()
+            => QueueMessage(new IdentifyCommand { GuildId = _serverId.Value, UserId = _client.UserId.Value, SessionId = _client.SessionId, Token = _audioClient.Token });
+        public void SendSelectProtocol(string externalAddress, int externalPort)
+            => QueueMessage(new SelectProtocolCommand { Protocol = "udp", ExternalAddress = externalAddress, ExternalPort = externalPort, EncryptionMode = _encryptionMode });
+        public void SendSetSpeaking(bool value)
+            => QueueMessage(new SetSpeakingCommand { IsSpeaking = value, Delay = 0 });
 
-		public void SendSelectProtocol(string externalIp, int externalPort)
-		{
-			var msg = new SelectProtocolCommand();
-			msg.Payload.Protocol = "udp";
-			msg.Payload.SocketData.Address = externalIp;
-			msg.Payload.SocketData.Mode = _encryptionMode;
-			msg.Payload.SocketData.Port = externalPort;
-			QueueMessage(msg);
-		}
-
-		public void SendIsTalking(bool value)
-		{
-			var isTalking = new SpeakingCommand();
-			isTalking.Payload.IsSpeaking = value;
-			isTalking.Payload.Delay = 0;
-			QueueMessage(isTalking);
-		}
-
-		public override void SendHeartbeat()
-		{
-			QueueMessage(new HeartbeatCommand());
-		}
 	}
 }

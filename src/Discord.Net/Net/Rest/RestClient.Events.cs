@@ -2,7 +2,7 @@
 
 namespace Discord.Net.Rest
 {
-    internal sealed partial class RestClient
+    public sealed partial class RestClient
 	{
 		public class RequestEventArgs : EventArgs
 		{

@@ -2,13 +2,12 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-	internal sealed partial class RestClient
+	public sealed partial class RestClient
 	{
 		private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
@@ -18,95 +17,69 @@ namespace Discord.Net.Rest
 		{
 			_config = config;
 #if !DOTNET5_4
-			_engine = new RestSharpEngine(config, logger);
+			_engine = new RestSharpEngine(config, logger, DiscordConfig.ClientAPIUrl);
 #else
 			//_engine = new BuiltInRestEngine(config, logger);
 #endif
         }
 
         public void SetToken(string token) => _engine.SetToken(token);
+        public void SetCancelToken(CancellationToken token) => _cancelToken = token;
 
-		//DELETE
-		internal Task<ResponseT> Delete<ResponseT>(string path, object data) where ResponseT : class  
-			=> Send<ResponseT>("DELETE", path, data);
-		internal Task<ResponseT> Delete<ResponseT>(string path) where ResponseT : class  
-			=> Send<ResponseT>("DELETE", path);
-		internal Task Delete(string path, object data) 
-			=> Send("DELETE", path, data);
-		internal Task Delete(string path) 
-			=> Send("DELETE", path);
-
-		//GET
-		internal Task<ResponseT> Get<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>("GET", path);
-		internal Task Get(string path) 
-			=> Send("GET", path);
-
-		//PATCH
-		internal Task<ResponseT> Patch<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>("PATCH", path, data);
-		internal Task Patch(string path, object data) 
-			=> Send("PATCH", path, data);
-		
-		internal Task<ResponseT> Post<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>("POST", path, data);
-		internal Task<ResponseT> Post<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>("POST", path);
-		internal Task Post(string path, object data) 
-			=> Send("POST", path, data);
-		internal Task Post(string path) 
-			=> Send("POST", path);
-		
-		internal Task<ResponseT> Put<ResponseT>(string path, object data) where ResponseT : class 
-			=> Send<ResponseT>("PUT", path, data);
-		internal Task<ResponseT> Put<ResponseT>(string path) where ResponseT : class 
-			=> Send<ResponseT>("PUT", path);
-		internal Task Put(string path, object data) 
-			=> Send("PUT", path, data);
-		internal Task Put(string path) 
-			=> Send("PUT", path);
-
-		internal Task<ResponseT> PostFile<ResponseT>(string path, string filename, Stream stream) where ResponseT : class 
-			=> SendFile<ResponseT>("POST", path, filename, stream);
-		internal Task PostFile(string path, string filename, Stream stream) 
-			=> SendFile("POST", path, filename, stream);
-
-		internal Task<ResponseT> PutFile<ResponseT>(string path, string filename, Stream stream) where ResponseT : class 
-			=> SendFile<ResponseT>("PUT", path, filename, stream);
-		internal Task PutFile(string path, string filename, Stream stream) 
-			=> SendFile("PUT", path, filename, stream);
-
-		private async Task<ResponseT> Send<ResponseT>(string method, string path, object content = null)
+        public async Task<ResponseT> Send<ResponseT>(IRestRequest<ResponseT> request)
 			where ResponseT : class
 		{
-			string responseJson = await Send(method, path, content, true).ConfigureAwait(false);
-			return DeserializeResponse<ResponseT>(responseJson);
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            
+            string responseJson = await Send(request, true).ConfigureAwait(false);
+            return DeserializeResponse<ResponseT>(responseJson);
 		}
-		private Task Send(string method, string path, object content = null)
-			=> Send(method, path, content, false);
-		private async Task<string> Send(string method, string path, object content, bool hasResponse)
-		{
-			Stopwatch stopwatch = null;
-			string requestJson = null;
-			if (content != null)
-				requestJson = JsonConvert.SerializeObject(content);
+        public Task Send(IRestRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            
+            return Send(request, false);
+        }
 
-			if (_config.LogLevel >= LogSeverity.Verbose)
+        public async Task<ResponseT> Send<ResponseT>(IRestFileRequest<ResponseT> request)
+            where ResponseT : class
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            string requestJson = JsonConvert.SerializeObject(request.Payload);
+            string responseJson = await SendFile(request, true).ConfigureAwait(false);
+            return DeserializeResponse<ResponseT>(responseJson);
+        }
+        public Task Send(IRestFileRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            
+            return SendFile(request, false);
+        }
+
+        private async Task<string> Send(IRestRequest request, bool hasResponse)
+        {
+            var method = request.Method;
+            var path = request.Endpoint;
+            object payload = request.Payload;
+            var isPrivate = request.IsPrivate;
+
+            string requestJson = null;
+            if (payload != null)
+				requestJson = JsonConvert.SerializeObject(payload);
+
+            Stopwatch stopwatch = null;
+            if (_config.LogLevel >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
-			
-			string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
 
-#if TEST_RESPONSES
-			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
-				throw new Exception("API check failed: Response is not empty.");
-#endif
+            string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
 
 			if (_config.LogLevel >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (content != null && _config.LogLevel >= LogSeverity.Debug)
+				if (payload != null && _config.LogLevel >= LogSeverity.Debug)
 				{
-					if (path.StartsWith(Endpoints.Auth))
+					if (isPrivate)
                         RaiseOnRequest(method, path, "[Hidden]", stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 					else
 						RaiseOnRequest(method, path, requestJson, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
@@ -117,33 +90,25 @@ namespace Discord.Net.Rest
 
 			return responseJson;
 		}
+        
+		private async Task<string> SendFile(IRestFileRequest request, bool hasResponse)
+		{
+            var method = request.Method;
+            var path = request.Endpoint;
+            var filename = request.Filename;
+            var stream = request.Stream;
+            var isPrivate = request.IsPrivate;
 
-		private async Task<ResponseT> SendFile<ResponseT>(string method, string path, string filename, Stream stream)
-			where ResponseT : class
-		{
-			string responseJson = await SendFile(method, path, filename, stream, true).ConfigureAwait(false);
-			return DeserializeResponse<ResponseT>(responseJson);
-		}
-		private Task SendFile(string method, string path, string filename, Stream stream)
-			=> SendFile(method, path, filename, stream, false);
-		private async Task<string> SendFile(string method, string path, string filename, Stream stream, bool hasResponse)
-		{
 			Stopwatch stopwatch = null;
-
 			if (_config.LogLevel >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
 			string responseJson = await _engine.SendFile(method, path, filename, stream, _cancelToken).ConfigureAwait(false);
 
-#if TEST_RESPONSES
-			if (!hasResponse && !string.IsNullOrEmpty(responseJson))
-				throw new Exception("API check failed: Response is not empty.");
-#endif
-
 			if (_config.LogLevel >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (_config.LogLevel >= LogSeverity.Debug)
+				if (_config.LogLevel >= LogSeverity.Debug && !isPrivate)
 					RaiseOnRequest(method, path, filename, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
 				else
                     RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
@@ -169,7 +134,5 @@ namespace Discord.Net.Rest
 			return JsonConvert.DeserializeObject<T>(json);
 #endif
 		}
-
-		internal void SetCancelToken(CancellationToken token) => _cancelToken = token;
 	}
 }

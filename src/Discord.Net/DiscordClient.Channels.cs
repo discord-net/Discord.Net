@@ -1,3 +1,4 @@
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Collections.Concurrent;
@@ -118,7 +119,9 @@ namespace Discord
 			if (type == null) throw new ArgumentNullException(nameof(type));
 			CheckReady();
 
-			var response = await _api.CreateChannel(server.Id, name, type.Value).ConfigureAwait(false);
+            var request = new CreateChannelRequest(server.Id) { Name = name, Type = type.Value };
+            var response = await _rest.Send(request).ConfigureAwait(false);
+
 			var channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient?.Id);
 			channel.Update(response);
 			return channel;
@@ -133,9 +136,11 @@ namespace Discord
 			Channel channel = null;
 			if (user != null)
 				channel = user.Global.PrivateChannel;
-			if (channel == null)
-			{
-				var response = await _api.CreatePMChannel(_currentUser.Id, user.Id).ConfigureAwait(false);
+            if (channel == null)
+            {
+                var request = new CreatePrivateChannelRequest() { RecipientId = user.Id };
+                var response = await _rest.Send(request).ConfigureAwait(false);
+
 				var recipient = _users.GetOrAdd(response.Recipient.Id, null);
 				recipient.Update(response.Recipient);
 				channel = _channels.GetOrAdd(response.Id, response.GuildId, response.Recipient.Id);
@@ -150,8 +155,16 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
-			if (name != null || topic != null)
-				await _api.EditChannel(channel.Id, name: name, topic: topic).ConfigureAwait(false);
+            if (name != null || topic != null)
+            {
+                var request = new UpdateChannelRequest(channel.Id)
+                {
+                    Name = name ?? channel.Name,
+                    Topic = topic ?? channel.Topic,
+                    Position = channel.Position
+                };
+                await _rest.Send(request).ConfigureAwait(false);
+            }
 
 			if (position != null)
 			{
@@ -189,7 +202,12 @@ namespace Discord
 			if (channels == null) throw new ArgumentNullException(nameof(channels));
 			CheckReady();
 
-			return _api.ReorderChannels(server.Id, channels.Select(x => x.Id), after?.Position ?? 0);
+            var request = new ReorderChannelsRequest(server.Id)
+            {
+                ChannelIds = channels.Select(x => x.Id).ToArray(),
+                StartPos = after != null ? after.Position + 1 : channels.Min(x => x.Position)
+            };
+            return _rest.Send(request);
 		}
 		
 		/// <summary> Destroys the provided channel. </summary>
@@ -198,7 +216,7 @@ namespace Discord
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			CheckReady();
 
-			try { await _api.DestroyChannel(channel.Id).ConfigureAwait(false); }
+			try { await _rest.Send(new DeleteChannelRequest(channel.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 	}

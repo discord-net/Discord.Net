@@ -1,8 +1,8 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using APIRole = Discord.API.Client.Role;
 
 namespace Discord
 {
@@ -60,7 +60,7 @@ namespace Discord
 			_server.Unload();
         }
 
-		internal void Update(RoleInfo model)
+		internal void Update(APIRole model)
 		{
 			if (model.Name != null)
 				Name = model.Name;

@@ -1,3 +1,4 @@
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Linq;
@@ -63,8 +64,17 @@ namespace Discord
 
 			return SetChannelPermissions(channel, role.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
 		}
-		private Task SetChannelPermissions(Channel channel, ulong targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
-			=> _api.SetChannelPermissions(channel.Id, targetId, targetType.Value, allow?.RawValue ?? 0, deny?.RawValue ?? 0);
+        private Task SetChannelPermissions(Channel channel, ulong targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        {
+            var request = new AddChannelPermissionsRequest(channel.Id)
+            {
+                TargetId = targetId,
+                TargetType = targetType.Value,
+                Allow = allow?.RawValue ?? 0,
+                Deny = deny?.RawValue ?? 0
+            };
+            return _rest.Send(request);
+        }
 
 		public Task RemoveChannelPermissions(Channel channel, User user)
 		{
@@ -87,7 +97,7 @@ namespace Discord
 			try
 			{
 				var perms = channel.PermissionOverwrites.Where(x => x.TargetType != targetType || x.TargetId != userOrRoleId).FirstOrDefault();
-				await _api.DeleteChannelPermissions(channel.Id, userOrRoleId).ConfigureAwait(false);
+				await _rest.Send(new RemoveChannelPermissionsRequest(channel.Id, userOrRoleId)).ConfigureAwait(false);
 			}
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}

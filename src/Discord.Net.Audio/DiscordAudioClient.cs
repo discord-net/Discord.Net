@@ -1,4 +1,5 @@
 ﻿using Discord.API;
+using Discord.API.Client.GatewaySocket;
 using Discord.Net.WebSockets;
 using System;
 using System.Threading.Tasks;
@@ -76,7 +77,7 @@ namespace Discord.Audio
 						case "VOICE_SERVER_UPDATE":
                             {
                                 var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_gatewaySocket.Serializer);
-                                var serverId = data.ServerId;
+                                var serverId = data.GuildId;
 
 								if (serverId == ServerId)
 								{
@@ -96,10 +97,6 @@ namespace Discord.Audio
 			};
 		}
 		
-		public Task Disconnect()
-		{
-			return _voiceSocket.Disconnect();
-		}
 
 		internal void SetServerId(ulong serverId)
 		{
@@ -115,14 +112,17 @@ namespace Discord.Audio
 
 			await _voiceSocket.Disconnect().ConfigureAwait(false);
 			_voiceSocket.ChannelId = channel.Id;
-			_gatewaySocket.SendJoinVoice(channel.Server.Id, channel.Id);
+			_gatewaySocket.SendUpdateVoice(channel.Server.Id, channel.Id,
+                (_service.Config.Mode | AudioMode.Outgoing) == 0, 
+                (_service.Config.Mode | AudioMode.Incoming) == 0);
 			await _voiceSocket.WaitForConnection(_service.Config.ConnectionTimeout).ConfigureAwait(false);
-		}
+        }
+        public Task Disconnect() => _voiceSocket.Disconnect();
 
-		/// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
-		/// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
-		/// <param name="count">Number of bytes in this frame. </param>
-		public void Send(byte[] data, int count)
+        /// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
+        /// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
+        /// <param name="count">Number of bytes in this frame. </param>
+        public void Send(byte[] data, int count)
 		{
 			if (data == null) throw new ArgumentException(nameof(data));
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));

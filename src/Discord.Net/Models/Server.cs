@@ -1,9 +1,10 @@
-﻿using Discord.API;
+﻿using Discord.API.Client;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using APIGuild = Discord.API.Client.Guild;
 
 namespace Discord
 {
@@ -36,7 +37,7 @@ namespace Discord
 		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
 		public string IconId { get; private set; }
 		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string IconUrl => IconId != null ? Endpoints.ServerIcon(Id, IconId) : null;
+		public string IconUrl => IconId != null ? $"{DiscordConfig.CDNUrl}/icons/{Id}/{IconId}.jpg" : null;
 
 		/// <summary> Returns the user that first created this server. </summary>
 		[JsonIgnore]
@@ -144,7 +145,7 @@ namespace Discord
 				Name = model.Name;
 		}
 
-        internal void Update(GuildInfo model)
+        internal void Update(Guild model)
 		{
 			Update(model as GuildReference);
 
@@ -172,9 +173,9 @@ namespace Discord
 			
 			_afkChannel.Id = model.AFKChannelId; //Can be null
 		}
-		internal void Update(ExtendedGuildInfo model)
+		internal void Update(ExtendedGuild model)
 		{
-			Update(model as GuildInfo);
+			Update(model as APIGuild);
 			
 			var channels = _client.Channels;
 			foreach (var subModel in model.Channels)
@@ -191,7 +192,7 @@ namespace Discord
 			}
 			foreach (var subModel in model.VoiceStates)
 			{
-				var user = usersCache[subModel.UserId, Id];
+				var user = usersCache[subModel.User.Id, Id];
 				if (user != null)
 					user.Update(subModel);
 			}

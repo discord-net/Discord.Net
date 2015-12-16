@@ -1,8 +1,8 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using APIUser = Discord.API.Client.User;
 
 namespace Discord
 {
@@ -52,7 +52,7 @@ namespace Discord
 			//Don't need to clean _users - they're considered owned by server
 		}
 		
-		internal void Update(UserInfo model)
+		internal void Update(APIUser model)
 		{
 			if (model.Email != null)
 				Email = model.Email;

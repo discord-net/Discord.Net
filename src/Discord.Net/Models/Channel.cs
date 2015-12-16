@@ -1,8 +1,9 @@
-﻿using Discord.API;
+﻿using Discord.API.Client;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using APIChannel = Discord.API.Client.Channel;
 
 namespace Discord
 {
@@ -174,12 +175,12 @@ namespace Discord
 			if (model.Type != null)
 				Type = model.Type;
 		}
-		internal void Update(ChannelInfo model)
+		internal void Update(APIChannel model)
 		{
 			Update(model as ChannelReference);
 			
 			if (model.Position != null)
-				Position = model.Position.Value;
+				Position = model.Position;
 			if (model.Topic != null)
 				Topic = model.Topic;
 

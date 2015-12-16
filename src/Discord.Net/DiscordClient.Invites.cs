@@ -1,3 +1,4 @@
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Discord
 			if (index >= 0)
 				inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
 
-			var response = await _api.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
+			var response = await _rest.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
 			var invite = new Invite(response.Code, response.XkcdPass);
 			invite.Update(response);
             return invite;
@@ -35,7 +36,7 @@ namespace Discord
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			CheckReady();
 
-			var response = await _api.GetInvites(server.Id).ConfigureAwait(false);
+			var response = await _rest.Send(new GetInvitesRequest(server.Id)).ConfigureAwait(false);
 			return response.Select(x =>
 			{
 				var invite = new Invite(x.Code, x.XkcdPass);
@@ -61,15 +62,22 @@ namespace Discord
 		/// <param name="tempMembership"> If true, a user accepting this invite will be kicked from the server after closing their client. </param>
 		/// <param name="hasXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to 0. </param>
 		/// <param name="maxUses"> The max amount  of times this invite may be used. Set to 0 to have unlimited uses. </param>
-		public async Task<Invite> CreateInvite(Channel channel, int maxAge = 1800, int maxUses = 0, bool tempMembership = false, bool hasXkcd = false)
+		public async Task<Invite> CreateInvite(Channel channel, int maxAge = 1800, int maxUses = 0, bool isTemporary = false, bool withXkcd = false)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			if (maxAge < 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
 			if (maxUses < 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
 			CheckReady();
 
-			var response = await _api.CreateInvite(channel.Id, maxAge: maxAge, maxUses: maxUses, 
-				tempMembership: tempMembership, hasXkcd: hasXkcd).ConfigureAwait(false);
+            var request = new CreateInviteRequest(channel.Id)
+            {
+                MaxAge = maxAge,
+                MaxUses = maxUses,
+                IsTemporary = isTemporary,
+                WithXkcdPass = withXkcd
+            };
+
+            var response = await _rest.Send(request).ConfigureAwait(false);
 			var invite = new Invite(response.Code, response.XkcdPass);
 			return invite;
 		}
@@ -80,7 +88,7 @@ namespace Discord
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
 			CheckReady();
 
-			try { await _api.DeleteInvite(invite.Id).ConfigureAwait(false); }
+			try { await _rest.Send(new DeleteInviteRequest(invite.Code)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 		}
 		
@@ -90,7 +98,7 @@ namespace Discord
 			if (invite == null) throw new ArgumentNullException(nameof(invite));
 			CheckReady();
 
-			return _api.AcceptInvite(invite.Id);
+			return _rest.Send(new AcceptInviteRequest(invite.Code));
 		}
 	}
 }

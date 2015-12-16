@@ -1,3 +1,5 @@
+using Discord.API;
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Collections.Generic;
@@ -76,61 +78,75 @@ namespace Discord
 					string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 			//}
 		}
-		
-		/// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
-		public async Task<Role> CreateRole(Server server, string name)
+
+        /// <summary> Note: due to current API limitations, the created role cannot be returned. </summary>
+        public async Task<Role> CreateRole(Server server, string name, ServerPermissions permissions = null, Color color = null, bool isHoisted = false)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (name == null) throw new ArgumentNullException(nameof(name));
 			CheckReady();
 
-			var response1 = await _api.CreateRole(server.Id).ConfigureAwait(false);
+            var request1 = new CreateRoleRequest(server.Id);
+            var response1 = await _rest.Send(request1).ConfigureAwait(false);
 			var role = _roles.GetOrAdd(response1.Id, server.Id);
 			role.Update(response1);
+            
+            var request2 = new UpdateRoleRequest(role.Server.Id, role.Id)
+            {
+                Name = name,
+                Permissions = (permissions ?? role.Permissions).RawValue,
+                Color = (color ?? Color.Default).RawValue,
+                IsHoisted = isHoisted
+            };
+            var response2 = await _rest.Send(request2).ConfigureAwait(false);
+            role.Update(response2);
 
-			//TODO: We shouldnt have to send permissions here, should be fixed on Discord's end soon
-			var response2 = await _api.EditRole(role.Server.Id, role.Id,
-				name: name,
-				permissions: role.Permissions.RawValue).ConfigureAwait(false);
-			role.Update(response2);
-
-			return role;
+            return role;
 		}
-		
-		public async Task EditRole(Role role, string name = null, ServerPermissions permissions = null, Color color = null, bool? hoist = null, int? position = null)
-		{
-			if (role == null) throw new ArgumentNullException(nameof(role));
-			CheckReady();
 
-			//TODO: check this null workaround later, should be fixed on Discord's end soon
-			var response = await _api.EditRole(role.Server.Id, role.Id, 
-				name: name ?? role.Name,
-				permissions: (permissions ?? role.Permissions).RawValue, 
-				color: (color ?? role.Color).RawValue, 
-				hoist: hoist ?? role.IsHoisted).ConfigureAwait(false);
+        public async Task EditRole(Role role, string name = null, ServerPermissions permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            CheckReady();
+            
+            var request1 = new UpdateRoleRequest(role.Server.Id, role.Id)
+            {
+                Name = name ?? role.Name,
+                Permissions = (permissions ?? role.Permissions).RawValue,
+                Color = (color ?? role.Color).RawValue,
+                IsHoisted = isHoisted ?? role.IsHoisted
+            };
 
-			if (position != null)
-			{
-				int oldPos = role.Position;
-				int newPos = position.Value;
-				int minPos;
-				Role[] roles = role.Server.Roles.OrderBy(x => x.Position).ToArray();
+            var response = await _rest.Send(request1).ConfigureAwait(false);
 
-				if (oldPos < newPos) //Moving Down
-				{
-					minPos = oldPos;
-					for (int i = oldPos; i < newPos; i++)
-						roles[i] = roles[i + 1];
-					roles[newPos] = role;
-				}
-				else //(oldPos > newPos) Moving Up
-				{
-					minPos = newPos;
-					for (int i = oldPos; i > newPos; i--)
-						roles[i] = roles[i - 1];
-					roles[newPos] = role;
-				}
-				await _api.ReorderRoles(role.Server.Id, roles.Skip(minPos).Select(x => x.Id), minPos).ConfigureAwait(false);
+            if (position != null)
+            {
+                int oldPos = role.Position;
+                int newPos = position.Value;
+                int minPos;
+                Role[] roles = role.Server.Roles.OrderBy(x => x.Position).ToArray();
+
+                if (oldPos < newPos) //Moving Down
+                {
+                    minPos = oldPos;
+                    for (int i = oldPos; i < newPos; i++)
+                        roles[i] = roles[i + 1];
+                    roles[newPos] = role;
+                }
+                else //(oldPos > newPos) Moving Up
+                {
+                    minPos = newPos;
+                    for (int i = oldPos; i > newPos; i--)
+                        roles[i] = roles[i - 1];
+                    roles[newPos] = role;
+                }
+
+                var request2 = new ReorderRolesRequest(role.Server.Id)
+                {
+                    RoleIds = roles.Skip(minPos).Select(x => x.Id).ToArray(),
+                    StartPos = minPos
+                };
+                await _rest.Send(request2).ConfigureAwait(false);
 			}
 		}
 
@@ -139,7 +155,7 @@ namespace Discord
 			if (role == null) throw new ArgumentNullException(nameof(role));
 			CheckReady();
 
-			try { await _api.DeleteRole(role.Server.Id, role.Id).ConfigureAwait(false); }
+			try { await _rest.Send(new DeleteRoleRequest(role.Server.Id, role.Id)).ConfigureAwait(false); }
 			catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
 	}
 
@@ -150,7 +166,11 @@ namespace Discord
 			if (startPos < 0) throw new ArgumentOutOfRangeException(nameof(startPos), "startPos must be a positive integer.");
 			CheckReady();
 
-			return _api.ReorderRoles(server.Id, roles.Select(x => x.Id), startPos);
+			return _rest.Send(new ReorderRolesRequest(server.Id)
+            {
+                RoleIds = roles.Select(x => x.Id).ToArray(),
+                StartPos = startPos
+            });
 		}
 	}
 }
