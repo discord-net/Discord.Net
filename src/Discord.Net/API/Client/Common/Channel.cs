@@ -19,7 +19,7 @@ namespace Discord.API.Client
         }
 
         [JsonProperty("last_message_id"), JsonConverter(typeof(NullableLongStringConverter))]
-        public ulong LastMessageId { get; set; }
+        public ulong? LastMessageId { get; set; }
         [JsonProperty("is_private")]
         public bool IsPrivate { get; set; }
         [JsonProperty("position")]
