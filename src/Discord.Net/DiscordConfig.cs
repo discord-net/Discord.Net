@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Reflection;
 using System.Text;
 
 namespace Discord
@@ -35,18 +36,28 @@ namespace Discord
 	
 	public class DiscordConfig : BaseConfig<DiscordConfig>
 	{
-		//Global
+        public static string LibName => "Discord.Net";
+        public static string LibVersion => typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
+        public static string LibUrl => "https://github.com/RogueException/Discord.Net";
 
-		/// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
-		public LogSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
-		private LogSeverity _logLevel = LogSeverity.Info;
+        public static string ClientAPIUrl => "https://discordapp.com/api/";
+        public static string StatusAPIUrl => "https://status.discordapp.com/api/v2/";
+        public static string CDNUrl => "https://cdn.discordapp.com/";
+        public static string InviteUrl => "https://discord.gg/";
 
-		/// <summary> Name of your application. </summary>
-		public string AppName { get { return _appName; } set { SetValue(ref _appName, value); UpdateUserAgent(); } }
+        //Global
+
+        /// <summary> Name of your application. </summary>
+        public string AppName { get { return _appName; } set { SetValue(ref _appName, value); UpdateUserAgent(); } }
         private string _appName = null;
         /// <summary> Version of your application. </summary>
         public string AppVersion { get { return _appVersion; } set { SetValue(ref _appVersion, value); UpdateUserAgent(); } }
         private string _appVersion = null;
+
+        /// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
+        public LogSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
+        private LogSeverity _logLevel = LogSeverity.Info;
+
         /// <summary> User Agent string to use when connecting to Discord. </summary>
         [JsonIgnore]
         public string UserAgent { get { return _userAgent; } }
@@ -114,7 +125,7 @@ namespace Discord
                 }
                 builder.Append(' ');
             }
-            builder.Append($"DiscordBot (https://github.com/RogueException/Discord.Net, v{DiscordClient.Version})");
+            builder.Append($"DiscordBot ({LibUrl}, v{LibVersion})");
             _userAgent = builder.ToString();
         }
     }

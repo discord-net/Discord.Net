@@ -106,13 +106,7 @@ namespace Discord.Net.WebSockets
             RaiseBinaryMessage(e.Data);
         }
 
-        public IEnumerable<Task> GetTasks(CancellationToken cancelToken)
-        {
-            return new Task[]
-            {
-                SendAsync(cancelToken)
-            };
-        }
+        public IEnumerable<Task> GetTasks(CancellationToken cancelToken) => new Task[] { SendAsync(cancelToken) };
 
         private Task SendAsync(CancellationToken cancelToken)
         {

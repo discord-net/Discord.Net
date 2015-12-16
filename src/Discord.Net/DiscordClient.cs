@@ -1,13 +1,13 @@
-﻿using Discord.API;
+﻿using Discord.API.Client.GatewaySocket;
+using Discord.API.Client.Rest;
 using Discord.Net;
+using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -53,8 +53,6 @@ namespace Discord
 	/// <summary> Provides a connection to the DiscordApp service. </summary>
 	public partial class DiscordClient
 	{
-		public static readonly string Version = typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
-
         private readonly LogService _log;
         private readonly Logger _logger, _restLogger, _cacheLogger;
         private readonly Dictionary<Type, object> _singletons;
@@ -63,7 +61,6 @@ namespace Discord
         private readonly ManualResetEvent _disconnectedEvent;
 		private readonly ManualResetEventSlim _connectedEvent;
         private readonly TaskManager _taskManager;
-		private bool _sentInitialLog;
 		private UserStatus _status;
 		private int? _gameId;
 
@@ -76,8 +73,8 @@ namespace Discord
 		private ConnectionState _state;
 
 		/// <summary> Gives direct access to the underlying DiscordAPIClient. This can be used to modify objects not in cache. </summary>
-		public DiscordAPIClient APIClient => _api;
-		private readonly DiscordAPIClient _api;
+		public RestClient Rest => _rest;
+		private readonly RestClient _rest;
 
 		/// <summary> Returns the internal websocket object. </summary>
 		public GatewaySocket WebSocket => _webSocket;
@@ -145,8 +142,11 @@ namespace Discord
             _cacheLogger = CreateCacheLogger();
 
             //Networking
-            _webSocket = new GatewaySocket(this, _log.CreateLogger("WebSocket"));
-            var settings = new JsonSerializerSettings();
+            _restLogger = CreateRestLogger();
+            _rest = new RestClient(_config, _restLogger);
+
+            var webSocketLogger = _log.CreateLogger("WebSocket");
+            _webSocket = new GatewaySocket(this, webSocketLogger);
             _webSocket.Connected += (s, e) =>
             {
                 if (_state == ConnectionState.Connecting)
@@ -156,18 +156,15 @@ namespace Discord
             {
                 RaiseDisconnected(e);
             };
-
             _webSocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
-
-            _api = new DiscordAPIClient(_config);
+            
 			if (Config.UseMessageQueue)
 				_pendingMessages = new ConcurrentQueue<MessageQueueItem>();
 			Connected += async (s, e) =>
 			{
-				_api.CancelToken = _cancelToken;
+				_rest.SetCancelToken(_cancelToken);
 				await SendStatus().ConfigureAwait(false);
 			};
-            _restLogger = CreateRestLogger();
 
 			//Import/Export
 			_messageImporter = new JsonSerializer();
@@ -216,7 +213,7 @@ namespace Discord
             if (_log.Level >= LogSeverity.Verbose)
             {
                 logger = _log.CreateLogger("Rest");
-                _api.RestClient.OnRequest += (s, e) =>
+                _rest.OnRequest += (s, e) =>
 				{
 					if (e.Payload != null)
                         logger.Verbose( $"{e.Method} {e.Path}: {Math.Round(e.ElapsedMilliseconds, 2)} ms ({e.Payload})");
@@ -280,9 +277,6 @@ namespace Discord
                 _lock.WaitOne();
                 try
                 {
-                    if (!_sentInitialLog)
-                        SendInitialLog();
-
                     if (State != ConnectionState.Disconnected)
                         await Disconnect().ConfigureAwait(false);
                     await _taskManager.Stop().ConfigureAwait(false);
@@ -347,7 +341,8 @@ namespace Discord
                         token = LoadToken(tokenPath, key);
                         if (token == null)
                         {
-                            var response = await _api.Login(email, password).ConfigureAwait(false);
+                            var request = new LoginRequest() { Email = email, Password = password };
+                            var response = await _rest.Send(request).ConfigureAwait(false);
                             token = response.Token;
                             SaveToken(tokenPath, key, token);
                             useCache = false;
@@ -355,17 +350,18 @@ namespace Discord
                     }
                     else
                     {
-                        var response = await _api.Login(email, password).ConfigureAwait(false);
+                        var request = new LoginRequest() { Email = email, Password = password };
+                        var response = await _rest.Send(request).ConfigureAwait(false);
                         token = response.Token;
                     }
                 }
                 _token = token;
-                _api.Token = token;
+                _rest.SetToken(token);
 
                 //Get gateway and check token
                 try
                 {
-                    var gatewayResponse = await _api.Gateway().ConfigureAwait(false);
+                    var gatewayResponse = await _rest.Send(new GatewayRequest()).ConfigureAwait(false);
                     var gateway = gatewayResponse.Url;
                     _gateway = gateway;
                     if (_config.LogLevel >= LogSeverity.Verbose)
@@ -399,7 +395,7 @@ namespace Discord
 				while (_pendingMessages.TryDequeue(out ignored)) { }
 			}
 
-			await _api.Logout().ConfigureAwait(false);
+			await _rest.Send(new LogoutRequest()).ConfigureAwait(false);
 
 			_channels.Clear();
 			_users.Clear();
@@ -528,7 +524,7 @@ namespace Discord
 					//Members
 					case "GUILD_MEMBER_ADD":
 						{
-							var data = e.Payload.ToObject<MemberAddEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildMemberAddEvent>(_webSocket.Serializer);
 							var user = _users.GetOrAdd(data.User.Id, data.GuildId);
 							user.Update(data);
 							user.UpdateActivity();
@@ -537,7 +533,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberUpdateEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildMemberUpdateEvent>(_webSocket.Serializer);
 							var user = _users[data.User.Id, data.GuildId];
 							if (user != null)
 							{
@@ -548,7 +544,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBER_REMOVE":
 						{
-							var data = e.Payload.ToObject<MemberRemoveEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildMemberRemoveEvent>(_webSocket.Serializer);
 							var user = _users.TryRemove(data.User.Id, data.GuildId);
 							if (user != null)
 								RaiseUserLeft(user);
@@ -556,7 +552,7 @@ namespace Discord
 						break;
 					case "GUILD_MEMBERS_CHUNK":
 						{
-							var data = e.Payload.ToObject<MembersChunkEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildMembersChunkEvent>(_webSocket.Serializer);
 							foreach (var memberData in data.Members)
 							{
 								var user = _users.GetOrAdd(memberData.User.Id, memberData.GuildId);
@@ -569,7 +565,7 @@ namespace Discord
 					//Roles
 					case "GUILD_ROLE_CREATE":
 						{
-							var data = e.Payload.ToObject<RoleCreateEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildRoleCreateEvent>(_webSocket.Serializer);
 							var role = _roles.GetOrAdd(data.Data.Id, data.GuildId);
 							role.Update(data.Data);
 							var server = _servers[data.GuildId];
@@ -580,7 +576,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_UPDATE":
 						{
-							var data = e.Payload.ToObject<RoleUpdateEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildRoleUpdateEvent>(_webSocket.Serializer);
 							var role = _roles[data.Data.Id];
 							if (role != null)
 							{
@@ -591,7 +587,7 @@ namespace Discord
 						break;
 					case "GUILD_ROLE_DELETE":
 						{
-							var data = e.Payload.ToObject<RoleDeleteEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildRoleDeleteEvent>(_webSocket.Serializer);
 							var role = _roles.TryRemove(data.RoleId);
 							if (role != null)
 							{
@@ -606,25 +602,23 @@ namespace Discord
 					//Bans
 					case "GUILD_BAN_ADD":
 						{
-							var data = e.Payload.ToObject<BanAddEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildBanAddEvent>(_webSocket.Serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
-								var id = data.User?.Id ?? data.UserId;
-                                server.AddBan(id);
-								RaiseUserBanned(id, server);
+                                server.AddBan(data.UserId);
+								RaiseUserBanned(data.UserId, server);
 							}
 						}
 						break;
 					case "GUILD_BAN_REMOVE":
 						{
-							var data = e.Payload.ToObject<BanRemoveEvent>(_webSocket.Serializer);
+							var data = e.Payload.ToObject<GuildBanRemoveEvent>(_webSocket.Serializer);
 							var server = _servers[data.GuildId];
 							if (server != null)
 							{
-								var id = data.User?.Id ?? data.UserId;
-								if (server.RemoveBan(id))
-									RaiseUserUnbanned(id, server);
+								if (server.RemoveBan(data.UserId))
+									RaiseUserUnbanned(data.UserId, server);
 							}
 						}
 						break;
@@ -689,7 +683,7 @@ namespace Discord
 					case "MESSAGE_ACK":
 						{
 							var data = e.Payload.ToObject<MessageAckEvent>(_webSocket.Serializer);
-							var msg = GetMessage(data.MessageId);
+							var msg = _messages[data.MessageId];
 							if (msg != null)
 								RaiseMessageAcknowledged(msg);
 						}
@@ -727,8 +721,8 @@ namespace Discord
 					//Voice
 					case "VOICE_STATE_UPDATE":
 						{
-							var data = e.Payload.ToObject<MemberVoiceStateUpdateEvent>(_webSocket.Serializer);
-							var user = _users[data.UserId, data.GuildId];
+							var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_webSocket.Serializer);
+							var user = _users[data.User.Id, data.GuildId];
 							if (user != null)
 							{
 								/*var voiceChannel = user.VoiceChannel;
@@ -778,13 +772,6 @@ namespace Discord
 				_logger.Log(LogSeverity.Error, $"Error handling {e.Type} event", ex);
 			}
 		}
-
-		private void SendInitialLog()
-		{
-			if (_config.LogLevel >= LogSeverity.Verbose)
-				_logger.Verbose( $"Config: {JsonConvert.SerializeObject(_config)}");
-			_sentInitialLog = true;
-        }
 
         #region Async Wrapper
         /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
@@ -945,6 +932,22 @@ namespace Discord
             {
                 _logger.Warning("Failed to cache token", ex);
             }
+        }
+
+        private static string Base64Image(ImageType type, Stream stream, string existingId)
+        {
+            if (type == ImageType.None)
+                return null;
+            else if (stream != null)
+            {
+                byte[] bytes = new byte[stream.Length - stream.Position];
+                stream.Read(bytes, 0, bytes.Length);
+
+                string base64 = Convert.ToBase64String(bytes);
+                string imageType = type == ImageType.Jpeg ? "image/jpeg;base64" : "image/png;base64";
+                return $"data:{imageType},{base64}";
+            }
+            return existingId;
         }
     }
 }
