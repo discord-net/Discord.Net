@@ -59,7 +59,7 @@ namespace Discord
 		public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
 		public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
 		public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
-        public static ChannelPermissions All(string channelType, bool isPrivate)
+        public static ChannelPermissions All(ChannelType channelType, bool isPrivate)
 		{
 			if (isPrivate) return PrivateOnly;
 			else if (channelType == ChannelType.Text) return TextOnly;
