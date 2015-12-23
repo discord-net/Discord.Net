@@ -253,17 +253,19 @@ namespace Discord.Legacy
             return user.Kick();
         }
         [Obsolete("Use Server.Ban")]
-        public static Task BanUser(this DiscordClient client, Server server, User user, int pruneDays = 0)
+        public static Task BanUser(this DiscordClient client, User user, int pruneDays = 0)
         {
-            if (server == null) throw new ArgumentNullException(nameof(server));
             if (user == null) throw new ArgumentNullException(nameof(user));
+            var server = user.Server;
+            if (server == null) throw new ArgumentNullException(nameof(server));
             return server.Ban(user, pruneDays);
         }
         [Obsolete("Use Server.Unban")]
-        public static Task UnbanUser(this DiscordClient client, Server server, User user)
+        public static Task UnbanUser(this DiscordClient client, User user)
         {
-            if (server == null) throw new ArgumentNullException(nameof(server));
             if (user == null) throw new ArgumentNullException(nameof(user));
+            var server = user.Server;
+            if (server == null) throw new ArgumentNullException(nameof(server));
             return server.Unban(user);
         }
         [Obsolete("Use Server.Unban")]
