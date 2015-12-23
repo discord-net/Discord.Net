@@ -66,9 +66,9 @@ namespace Discord
         /// <summary> Gets a collection of all servers this client is a member of. </summary>
         public IEnumerable<Server> Servers => _servers.Select(x => x.Value);
         // /// <summary> Gets a collection of all channels this client is a member of. </summary>
-        // public IEnumerable<Channel> Channels => _servers.Select(x => x.Value);
+        // public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
         /// <summary> Gets a collection of all private channels this client is a member of. </summary>
-        public IEnumerable<Channel> PrivateChannels => _channels.Select(x => x.Value);
+        public IEnumerable<Channel> PrivateChannels => _privateChannels.Select(x => x.Value);
         /// <summary> Gets a collection of all voice regions currently offered by Discord. </summary>
         public IEnumerable<Region> Regions => _regions.Select(x => x.Value);
         
