@@ -1,5 +1,5 @@
 {
-	"version": "0.9.0-alpha1",
+	"version": "0.9.0-alpha2",
 	"description": "An unofficial .Net API wrapper for the Discord client.",
 	"authors": [
 		"RogueException"
