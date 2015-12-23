@@ -733,7 +733,7 @@ namespace Discord
                                 }*/
 
                                 msg.State = MessageState.Normal;
-                                Logger.Info($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{msg.Id}");
+                                Logger.Info($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnMessageReceived(msg);
                             }
                         }
@@ -749,7 +749,7 @@ namespace Discord
                                 {
                                     msg.Update(data);
                                     msg.State = MessageState.Normal;
-                                    Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{msg.Id}");
+                                    Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageUpdated(msg);
                                 }
                             }
@@ -764,7 +764,7 @@ namespace Discord
                                 var msg = channel.RemoveMessage(data.Id);
                                 if (msg != null)
                                 {
-                                    Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{msg.Id}");
+                                    Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageDeleted(msg);
                                 }
                             }
@@ -779,7 +779,7 @@ namespace Discord
                                 var msg = channel.GetMessage(data.MessageId);
                                 if (msg != null)
                                 {
-                                    Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{msg.Id}");
+                                    Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageAcknowledged(msg);
                                 }
                             }
