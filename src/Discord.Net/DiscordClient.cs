@@ -171,10 +171,7 @@ namespace Discord
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
                     
-                    await Login(email, password, token).ConfigureAwait(false);
-
-                    ClientAPI.Token = token;
-                    GatewaySocket.Token = token;
+                    await Login(email, password, token).ConfigureAwait(false);                    
                     await GatewaySocket.Connect().ConfigureAwait(false);
 
                     List<Task> tasks = new List<Task>();
@@ -232,6 +229,9 @@ namespace Discord
                         token = response.Token;
                     }
                 }
+
+                ClientAPI.Token = token;
+                GatewaySocket.Token = token;
 
                 //Get gateway and check token
                 try
@@ -309,22 +309,10 @@ namespace Discord
         }
 
         #region Channels
-        private Channel AddChannel(ulong id, ulong? guildId, ulong? recipientId)
+        internal void AddChannel(Channel channel)
         {
-            Channel channel;
-            if (recipientId != null)
-            {
-                channel = _privateChannels.GetOrAdd(recipientId.Value,
-                    x => new Channel(this, x, new User(this, recipientId.Value, null)));
-            }
-            else
-            {
-                var server = GetServer(guildId.Value);
-                channel = server.AddChannel(id);
-            }
             _channels[channel.Id] = channel;
-            return channel;
-        }        
+        }
         private Channel RemoveChannel(ulong id)
         {
             Channel channel;
@@ -337,11 +325,18 @@ namespace Discord
             }
             return channel;
         }
-
-        internal Channel GetChannel(ulong id)
+        public Channel GetChannel(ulong id)
         {
             Channel channel;
             _channels.TryGetValue(id, out channel);
+            return channel;
+        }
+
+        private Channel AddPrivateChannel(ulong id, ulong recipientId)
+        {
+            Channel channel;
+            if (_privateChannels.TryGetOrAdd(recipientId, x => new Channel(this, id, new User(this, x, null)), out channel))
+                AddChannel(channel);
             return channel;
         }
         internal Channel GetPrivateChannel(ulong recipientId)
@@ -350,7 +345,6 @@ namespace Discord
             _privateChannels.TryGetValue(recipientId, out channel);
             return channel;
         }
-
         internal async Task<Channel> CreatePrivateChannel(User user)
         {
             var channel = GetPrivateChannel(user.Id);
@@ -358,8 +352,8 @@ namespace Discord
 
             var request = new CreatePrivateChannelRequest() { RecipientId = user.Id };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
-            
-            channel = AddChannel(response.Id, null, response.Recipient.Id);
+
+            channel = AddPrivateChannel(response.Id, user.Id);
             channel.Update(response);
             return channel;
         }
@@ -453,6 +447,7 @@ namespace Discord
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
+                            CurrentUser = new Profile(this, data.User.Id);
                             CurrentUser.Update(data.User);
                             foreach (var model in data.Guilds)
                             {
@@ -464,7 +459,7 @@ namespace Discord
                             }
                             foreach (var model in data.PrivateChannels)
                             {
-                                var channel = AddChannel(model.Id, null, model.Recipient.Id);
+                                var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
                         }
@@ -523,10 +518,22 @@ namespace Discord
                     case "CHANNEL_CREATE":
                         {
                             var data = e.Payload.ToObject<ChannelCreateEvent>(_serializer);
-                            Channel channel = AddChannel(data.Id, data.GuildId, data.Recipient.Id);
-                            channel.Update(data);
-                            Logger.Info($"Channel Created: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                            OnChannelCreated(channel);
+
+                            Channel channel = null;
+                            if (data.GuildId != null)
+                            {
+                                var server = GetServer(data.GuildId.Value);
+                                if (server != null)
+                                    channel = server.AddChannel(data.Id);
+                            }
+                            else
+                                channel = AddPrivateChannel(data.Id, data.Recipient.Id);
+                            if (channel != null)
+                            {
+                                channel.Update(data);
+                                Logger.Info($"Channel Created: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                OnChannelCreated(channel);
+                            }
                         }
                         break;
                     case "CHANNEL_UPDATE":

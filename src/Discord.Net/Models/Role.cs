@@ -52,6 +52,7 @@ namespace Discord
 		{
             Id = id;
             Server = server;
+
 			Permissions = new ServerPermissions(0);
 			Permissions.Lock();
 			Color = new Color(0);

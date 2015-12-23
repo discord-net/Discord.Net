@@ -11,20 +11,21 @@ namespace Discord
         internal DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this user. </summary>
-        public ulong Id { get; private set; }
+        public ulong Id { get; }
+
 		/// <summary> Gets the email for this user. </summary>
 		public string Email { get; private set; }
 		/// <summary> Gets if the email for this user has been verified. </summary>
 		public bool? IsVerified { get; private set; }
 
-        internal Profile(DiscordClient client)
+        internal Profile(DiscordClient client, ulong id)
         {
             Client = client;
+            Id = id;
         }
 
         internal void Update(APIUser model)
         {
-            Id = model.Id;
             Email = model.Email;
             IsVerified = model.IsVerified;
         }

@@ -7,8 +7,8 @@ namespace Discord.API.Client
     {
         [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
         public ulong Id { get; set; }
-        [JsonProperty("guild_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong GuildId { get; set; }
+        [JsonProperty("guild_id"), JsonConverter(typeof(NullableLongStringConverter))]
+        public ulong? GuildId { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("type")]

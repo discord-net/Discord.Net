@@ -68,7 +68,7 @@ namespace Discord.Commands
             client.MessageReceived += async (s, e) =>
             {
                 if (_allCommands.Count == 0)  return;
-                if (e.Message.User.Id == _client.CurrentUser.Id) return;
+                if (e.Message.User == null || e.Message.User.Id == _client.CurrentUser.Id) return;
 
                 string msg = e.Message.RawText;
                 if (msg.Length == 0) return;

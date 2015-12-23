@@ -27,15 +27,22 @@ namespace Discord
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasBit(this uint value, byte bit) => ((value >> bit) & 1U) == 1;
 
-        public static bool TryGetAdd<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> d, 
+        public static bool TryGetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> d, 
             TKey key, Func<TKey, TValue> factory, out TValue result)
+            where TValue : class
         {
+            TValue newValue = null;
             while (true)
             {
                 if (d.TryGetValue(key, out result))
                     return false;
-                if (d.TryAdd(key, factory(key)))
+                if (newValue == null)
+                    newValue = factory(key);
+                if (d.TryAdd(key, newValue))
+                {
+                    result = newValue;
                     return true;
+                }
             }
         }
         

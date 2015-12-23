@@ -9,8 +9,7 @@ namespace Discord.API.Client
         {
             [JsonProperty("type")]
             public string Type { get; set; }
-            [JsonProperty("id")]
-            [JsonConverter(typeof(LongStringConverter))]
+            [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
             public ulong Id { get; set; }
             [JsonProperty("deny")]
             public uint Deny { get; set; }

@@ -201,6 +201,10 @@ namespace Discord
 
 		internal Message(ulong id, Channel channel, ulong userId)
 		{
+            Id = id;
+            Channel = channel;
+            _userId = userId;
+
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
 		}

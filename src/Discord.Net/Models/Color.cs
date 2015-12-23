@@ -28,7 +28,6 @@ namespace Discord
 		public static readonly Color LightGrey = PresetColor(0x979C9F);
 		public static readonly Color DarkerGrey = PresetColor(0x546E7A);
 
-
 		private static Color PresetColor(uint packedValue)
 		{
 			Color color = new Color(packedValue);

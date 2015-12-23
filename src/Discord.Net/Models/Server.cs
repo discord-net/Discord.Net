@@ -78,6 +78,7 @@ namespace Discord
         {
             Client = client;
             Id = id;
+
             _channels = new ConcurrentDictionary<ulong, Channel>();
             _roles = new ConcurrentDictionary<ulong, Role>();
             _users = new ConcurrentDictionary<ulong, Member>();
@@ -97,7 +98,7 @@ namespace Discord
 
             if (model.AFKTimeout != null)
                 AFKTimeout = model.AFKTimeout.Value;
-            _afkChannelId = model.AFKChannelId.Value; //Can be null
+            _afkChannelId = model.AFKChannelId; //Can be null
             if (model.JoinedAt != null)
                 JoinedAt = model.JoinedAt.Value;
             if (model.OwnerId != null)
@@ -196,7 +197,11 @@ namespace Discord
 
         #region Channels
         internal Channel AddChannel(ulong id)
-            => _channels.GetOrAdd(id, x => new Channel(Client, x, this));
+        {
+            var channel = _channels.GetOrAdd(id, x => new Channel(Client, x, this));
+            Client.AddChannel(channel);
+            return channel;
+        }
         internal Channel RemoveChannel(ulong id)
         {
             Channel channel;

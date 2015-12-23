@@ -136,9 +136,10 @@ namespace Discord
 		internal User(DiscordClient client, ulong id, Server server)
 		{
             Client = client;
+            Id = id;
             Server = server;
-			_roles = new Dictionary<ulong, Role>();
 
+			_roles = new Dictionary<ulong, Role>();
 			Status = UserStatus.Offline;
 
 			if (server == null)

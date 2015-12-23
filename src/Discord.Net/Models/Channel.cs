@@ -112,7 +112,6 @@ namespace Discord
             : this(client, id)
         {
             Recipient = recipient;
-            Name = $"@{recipient}";
             AddUser(client.PrivateUser);
             AddUser(recipient);
         }
@@ -143,7 +142,10 @@ namespace Discord
             if (model.Topic != null)
                 Topic = model.Topic;
             if (model.Recipient != null)
+            {
                 Recipient.Update(model.Recipient);
+                Name = $"@{Recipient}";
+            }
 
             if (model.PermissionOverwrites != null)
             {
@@ -263,9 +265,13 @@ namespace Discord
 
         public Message GetMessage(ulong id)
         {
-            Message result;
-            _messages.TryGetValue(id, out result);
-            return result;
+            if (Client.Config.MessageCacheSize > 0)
+            {
+                Message result;
+                _messages.TryGetValue(id, out result);
+                return result;
+            }
+            return null;
         }
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
             RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
@@ -556,6 +562,17 @@ namespace Discord
         }
         public User GetUser(ulong id)
         {
+            if (!Client.Config.UsePermissionsCache)
+            {
+                var user = Server.GetUser(id);
+                ChannelPermissions perms = new ChannelPermissions();
+                UpdatePermissions(user, perms);
+                if (perms.ReadMessages)
+                    return user;
+                else
+                    return null;
+            }
+
             Member result;
             _users.TryGetValue(id, out result);
             return result.User;
