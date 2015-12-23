@@ -564,13 +564,25 @@ namespace Discord
         {
             if (!Client.Config.UsePermissionsCache)
             {
-                var user = Server.GetUser(id);
-                ChannelPermissions perms = new ChannelPermissions();
-                UpdatePermissions(user, perms);
-                if (perms.ReadMessages)
-                    return user;
+                if (Server != null)
+                {
+                    var user = Server.GetUser(id);
+                    if (user != null)
+                    {
+                        ChannelPermissions perms = new ChannelPermissions();
+                        UpdatePermissions(user, perms);
+                        if (perms.ReadMessages)
+                            return user;
+                    }
+                }
                 else
-                    return null;
+                {
+                    if (id == Recipient.Id)
+                        return Recipient;
+                    else if (id == Client.PrivateUser.Id)
+                        return Client.PrivateUser;
+                }
+                return null;
             }
 
             Member result;
