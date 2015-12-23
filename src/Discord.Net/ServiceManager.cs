@@ -15,11 +15,12 @@ namespace Discord
             _services = new Dictionary<Type, IService>();
         }
 
-        public void Add<T>(T service)
+        public T Add<T>(T service)
             where T : class, IService
         {
             _services.Add(typeof(T), service);
             service.Install(Client);
+            return service;
         }
 
         public T Get<T>(bool isRequired = true)
