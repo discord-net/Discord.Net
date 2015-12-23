@@ -71,6 +71,8 @@ namespace Discord
         // /// <summary> Gets this user's voice token. </summary>
         // public string Token { get; private set; }
 
+        /// <summary> Gets the current private channel for this user if one exists. </summary>
+        public Channel PrivateChannel => Client.GetPrivateChannel(Id);
         /// <summary> Returns the string used to mention this user. </summary>
         public string Mention => $"<@{Id}>";
         /// <summary> Returns true if this user has marked themselves as muted. </summary>
