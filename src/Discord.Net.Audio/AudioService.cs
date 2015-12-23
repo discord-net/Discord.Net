@@ -11,7 +11,7 @@ namespace Discord.Audio
 		public readonly ulong ServerId;
 
 		public VoiceDisconnectedEventArgs(ulong serverId, DisconnectedEventArgs e)
-			: base(e.WasUnexpected, e.Error)
+			: base(e.WasUnexpected, e.Exception)
 		{
 			ServerId = serverId;
 		}
@@ -45,8 +45,8 @@ namespace Discord.Audio
 	}
 
 	public class AudioService : IService
-	{
-		private DiscordAudioClient _defaultClient;
+    {
+        private DiscordAudioClient _defaultClient;
 		private ConcurrentDictionary<ulong, DiscordAudioClient> _voiceClients;
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		private int _nextClientId;
@@ -94,8 +94,8 @@ namespace Discord.Audio
 				_voiceClients = new ConcurrentDictionary<ulong, DiscordAudioClient>();
 			else
 			{
-				var logger = Client.Log().CreateLogger("Voice");
-				_defaultClient = new DiscordAudioClient(this, 0, logger, _client.WebSocket);
+				var logger = Client.Log.CreateLogger("Voice");
+				_defaultClient = new DiscordAudioClient(this, 0, logger, _client.GatewaySocket);
 			}
 			_talkingUsers = new ConcurrentDictionary<User, bool>();
 
@@ -147,7 +147,7 @@ namespace Discord.Audio
 			var client = _voiceClients.GetOrAdd(server.Id, _ =>
 			{
 				int id = unchecked(++_nextClientId);
-				var logger = Client.Log().CreateLogger($"Voice #{id}");
+				var logger = Client.Log.CreateLogger($"Voice #{id}");
                 GatewaySocket gatewaySocket = null;
 				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket);
 				voiceClient.SetServerId(server.Id);
@@ -158,7 +158,7 @@ namespace Discord.Audio
 				};
                 voiceClient.VoiceSocket.IsSpeaking += (s, e) =>
 				{
-					var user = Client.GetUser(server, e.UserId);
+					var user = server.GetUser(e.UserId);
                     RaiseUserIsSpeakingUpdated(user, e.IsSpeaking);
 				};
 

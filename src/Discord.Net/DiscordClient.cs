@@ -56,6 +56,8 @@ namespace Discord
         internal User PrivateUser { get; private set; }
         /// <summary> Gets information about the current logged-in account. </summary>
         public Profile CurrentUser { get; private set; }
+        /// <summary> Gets the session id for the current connection. </summary>
+        public string SessionId { get; private set; }
         /// <summary> Gets the status of the current user. </summary>
         public UserStatus Status { get; private set; }
         /// <summary> Gets the game this current user is reported as playing. </summary>
@@ -448,7 +450,7 @@ namespace Discord
                     case "READY": //Resync 
                         {
                             var data = e.Payload.ToObject<ReadyEvent>(_serializer);
-                            //SessionId = data.SessionId;
+                            SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
                             CurrentUser.Update(data.User);

@@ -22,7 +22,7 @@ namespace Discord.Net.WebSockets
 		private DateTime _lastHeartbeat;
         
         /// <summary> Gets the logger used for this client. </summary>
-        internal Logger Logger { get; }
+        protected internal Logger Logger { get; }
 
         public CancellationToken CancelToken { get; private set; }
 
