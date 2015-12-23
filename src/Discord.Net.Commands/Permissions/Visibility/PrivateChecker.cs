@@ -6,7 +6,7 @@
 
 		public bool CanRun(Command command, User user, Channel channel, out string error)
 		{
-			if (!user.IsPrivate)
+			if (user.Server != null)
 			{
 				error = "This command may only be run in a private chat.";
 				return false;

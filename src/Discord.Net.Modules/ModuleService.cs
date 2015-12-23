@@ -33,7 +33,6 @@ namespace Discord.Modules
 			var manager = new ModuleManager(_client, name, type);
 			_modules.Add(module, manager);
 			module.Install(manager);
-			_client.AddSingleton(module);
         }
 
 		public ModuleManager GetManager(IModule module)

@@ -8,39 +8,39 @@ namespace Discord.Modules
 {
     public class ModuleManager
 	{
-		public event EventHandler<ServerEventArgs> ServerEnabled;
-		public event EventHandler<ServerEventArgs> ServerDisabled;
-		public event EventHandler<ChannelEventArgs> ChannelEnabled;
-		public event EventHandler<ChannelEventArgs> ChannelDisabled;
+		public event EventHandler<ServerEventArgs> ServerEnabled = delegate { };
+        public event EventHandler<ServerEventArgs> ServerDisabled = delegate { };
+        public event EventHandler<ChannelEventArgs> ChannelEnabled = delegate { };
+        public event EventHandler<ChannelEventArgs> ChannelDisabled = delegate { };
 
-		public event EventHandler<ServerEventArgs> LeftServer;
-		public event EventHandler<ServerEventArgs> ServerUpdated;
-		public event EventHandler<ServerEventArgs> ServerUnavailable;
-		public event EventHandler<ServerEventArgs> ServerAvailable;
+        public event EventHandler<ServerEventArgs> LeftServer = delegate { };
+        public event EventHandler<ServerEventArgs> ServerUpdated = delegate { };
+        public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
+        public event EventHandler<ServerEventArgs> ServerAvailable = delegate { };
 
-		public event EventHandler<BanEventArgs> UserBanned;
-		public event EventHandler<BanEventArgs> UserUnbanned;
+        public event EventHandler<BanEventArgs> UserBanned = delegate { };
+        public event EventHandler<BanEventArgs> UserUnbanned = delegate { };
 
-		public event EventHandler<ChannelEventArgs> ChannelCreated;
-		public event EventHandler<ChannelEventArgs> ChannelDestroyed;
-		public event EventHandler<ChannelEventArgs> ChannelUpdated;
+        public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
+        public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
+        public event EventHandler<ChannelEventArgs> ChannelUpdated = delegate { };
 
-		public event EventHandler<RoleEventArgs> RoleCreated;
-		public event EventHandler<RoleEventArgs> RoleUpdated;
-		public event EventHandler<RoleEventArgs> RoleDeleted;
+        public event EventHandler<RoleEventArgs> RoleCreated = delegate { };
+        public event EventHandler<RoleEventArgs> RoleUpdated = delegate { };
+        public event EventHandler<RoleEventArgs> RoleDeleted = delegate { };
 
-		public event EventHandler<UserEventArgs> UserJoined;
-		public event EventHandler<UserEventArgs> UserLeft;
-		public event EventHandler<UserEventArgs> UserUpdated;
-		public event EventHandler<UserEventArgs> UserPresenceUpdated;
-		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
-		public event EventHandler<ChannelEventArgs> UserIsTypingUpdated;
+        public event EventHandler<UserEventArgs> UserJoined = delegate { };
+        public event EventHandler<UserEventArgs> UserLeft = delegate { };
+        public event EventHandler<UserEventArgs> UserUpdated = delegate { };
+        public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
+        public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
+        public event EventHandler<ChannelUserEventArgs> UserIsTypingUpdated = delegate { };
 
-		public event EventHandler<MessageEventArgs> MessageReceived;
-		public event EventHandler<MessageEventArgs> MessageSent;
-		public event EventHandler<MessageEventArgs> MessageDeleted;
-		public event EventHandler<MessageEventArgs> MessageUpdated;
-		public event EventHandler<MessageEventArgs> MessageReadRemotely;
+        public event EventHandler<MessageEventArgs> MessageReceived = delegate { };
+        public event EventHandler<MessageEventArgs> MessageSent = delegate { };
+        public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
+        public event EventHandler<MessageEventArgs> MessageUpdated = delegate { };
+        public event EventHandler<MessageEventArgs> MessageReadRemotely = delegate { };
 
 		private readonly DiscordClient _client;
 		private readonly string _name, _id;
@@ -75,36 +75,36 @@ namespace Discord.Modules
 
 			if (_allowAll || _useServerWhitelist) //Server-only events
 			{
-				client.ChannelCreated += (s, e) => { if (ChannelCreated != null && HasServer(e.Server)) ChannelCreated(s, e); };
-				client.UserVoiceStateUpdated += (s, e) => { if (UserVoiceStateUpdated != null && HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
+				client.ChannelCreated += (s, e) => { if (HasServer(e.Server)) ChannelCreated(s, e); };
+				client.UserVoiceStateUpdated += (s, e) => { if (HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
 			}
 
-			client.ChannelDestroyed += (s, e) => { if (ChannelDestroyed != null && HasChannel(e.Channel)) ChannelDestroyed(s, e); };
-			client.ChannelUpdated += (s, e) => { if (ChannelUpdated != null && HasChannel(e.Channel)) ChannelUpdated(s, e); };
+			client.ChannelDestroyed += (s, e) => { if (HasChannel(e.Channel)) ChannelDestroyed(s, e); };
+			client.ChannelUpdated += (s, e) => { if (HasChannel(e.Channel)) ChannelUpdated(s, e); };
 
-			client.MessageReceived += (s, e) => { if (MessageReceived != null && HasChannel(e.Channel)) MessageReceived(s, e); };
-			client.MessageSent += (s, e) => { if (MessageSent != null && HasChannel(e.Channel)) MessageSent(s, e); };
-			client.MessageDeleted += (s, e) => { if (MessageDeleted != null && HasChannel(e.Channel)) MessageDeleted(s, e); };
-			client.MessageUpdated += (s, e) => { if (MessageUpdated != null && HasChannel(e.Channel)) MessageUpdated(s, e); };
-			client.MessageAcknowledged += (s, e) => { if (MessageReadRemotely != null && HasChannel(e.Channel)) MessageReadRemotely(s, e); };
+			client.MessageReceived += (s, e) => { if (HasChannel(e.Channel)) MessageReceived(s, e); };
+			client.MessageSent += (s, e) => { if (HasChannel(e.Channel)) MessageSent(s, e); };
+			client.MessageDeleted += (s, e) => { if (HasChannel(e.Channel)) MessageDeleted(s, e); };
+			client.MessageUpdated += (s, e) => { if (HasChannel(e.Channel)) MessageUpdated(s, e); };
+			client.MessageAcknowledged += (s, e) => { if (HasChannel(e.Channel)) MessageReadRemotely(s, e); };
 
-			client.RoleCreated += (s, e) => { if (RoleCreated != null && HasIndirectServer(e.Server)) RoleCreated(s, e); };
-			client.RoleUpdated += (s, e) => { if (RoleUpdated != null && HasIndirectServer(e.Server)) RoleUpdated(s, e); };
-			client.RoleDeleted += (s, e) => { if (RoleDeleted != null && HasIndirectServer(e.Server)) RoleDeleted(s, e); };
+			client.RoleCreated += (s, e) => { if (HasIndirectServer(e.Server)) RoleCreated(s, e); };
+			client.RoleUpdated += (s, e) => { if (HasIndirectServer(e.Server)) RoleUpdated(s, e); };
+			client.RoleDeleted += (s, e) => { if (HasIndirectServer(e.Server)) RoleDeleted(s, e); };
 
-			client.LeftServer += (s, e) => { if (LeftServer != null && HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
-			client.ServerUpdated += (s, e) => { if (ServerUpdated != null && HasIndirectServer(e.Server)) ServerUpdated(s, e); };
-			client.ServerUnavailable += (s, e) => { if (ServerUnavailable != null && HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
-			client.ServerAvailable += (s, e) => { if (ServerAvailable != null && HasIndirectServer(e.Server)) ServerAvailable(s, e); };
+			client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
+			client.ServerUpdated += (s, e) => { if (HasIndirectServer(e.Server)) ServerUpdated(s, e); };
+			client.ServerUnavailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
+			client.ServerAvailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerAvailable(s, e); };
 
-			client.UserJoined += (s, e) => { if (UserJoined != null && HasIndirectServer(e.Server)) UserJoined(s, e); };
-			client.UserLeft += (s, e) => { if (UserLeft != null && HasIndirectServer(e.Server)) UserLeft(s, e); };
-			client.UserUpdated += (s, e) => { if (UserUpdated != null && HasIndirectServer(e.Server)) UserUpdated(s, e); };
-			client.UserIsTypingUpdated += (s, e) => { if (UserIsTypingUpdated != null && HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
+			client.UserJoined += (s, e) => { if (HasIndirectServer(e.Server)) UserJoined(s, e); };
+			client.UserLeft += (s, e) => { if (HasIndirectServer(e.Server)) UserLeft(s, e); };
+			client.UserUpdated += (s, e) => { if (HasIndirectServer(e.Server)) UserUpdated(s, e); };
+			client.UserIsTypingUpdated += (s, e) => { if (HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
 			//TODO: We aren't getting events from UserPresence if AllowPrivate is enabled, but the server we know that user through isn't on the whitelist
-			client.UserPresenceUpdated += (s, e) => { if (UserPresenceUpdated != null && HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
-			client.UserBanned += (s, e) => { if (UserBanned != null && HasIndirectServer(e.Server)) UserBanned(s, e); };
-			client.UserUnbanned += (s, e) => { if (UserUnbanned != null && HasIndirectServer(e.Server)) UserUnbanned(s, e); };
+			client.UserPresenceUpdated += (s, e) => { if (HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
+			client.UserBanned += (s, e) => { if (HasIndirectServer(e.Server)) UserBanned(s, e); };
+			client.UserUnbanned += (s, e) => { if (HasIndirectServer(e.Server)) UserUnbanned(s, e); };
 		}
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
