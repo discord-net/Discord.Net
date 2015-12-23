@@ -127,9 +127,15 @@ namespace Discord
 			_rawValue = rawValue;
 		}
 
-		internal bool GetBit(PermissionsBits pos) => BitHelper.GetBit(_rawValue, (int)pos);
-		internal void SetBit(PermissionsBits pos, bool value) { CheckLock(); SetBitInternal((byte)pos, value); }
-		internal void SetBitInternal(int pos, bool value) => BitHelper.SetBit(ref _rawValue, pos, value);
+        internal bool GetBit(PermissionsBits bit) => _rawValue.HasBit((byte)bit);
+		internal void SetBit(PermissionsBits bit, bool value) { CheckLock(); SetBitInternal((byte)bit, value); }
+        internal void SetBitInternal(int pos, bool value)
+        {
+            if (value)
+                _rawValue |= (1U << pos);
+            else
+                _rawValue &= ~(1U << pos);
+        }
 
 		internal void Lock() => _isLocked = true;
 		protected void CheckLock()
@@ -140,7 +146,7 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is Permissions && (obj as Permissions)._rawValue == _rawValue;
 		public override int GetHashCode() => unchecked(_rawValue.GetHashCode() + 393);
-	}
+    }
 
 	public sealed class DualChannelPermissions
 	{

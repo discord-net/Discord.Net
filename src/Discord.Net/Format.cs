@@ -10,11 +10,11 @@ namespace Discord
 		static Format()
 		{
 			_patterns = new string[] { "__", "_", "**", "*", "~~", "```", "`"};
-			_builder = new StringBuilder(DiscordClient.MaxMessageSize);
+			_builder = new StringBuilder(DiscordConfig.MaxMessageSize);
         }
 
 		/// <summary> Removes all special formatting characters from the provided text. </summary>
-		private static string Escape(string text)
+		public static string Escape(string text)
 		{
 			lock (_builder)
 			{
@@ -84,10 +84,7 @@ namespace Discord
 			}
 			return -1;
 		}
-
-		/// <summary> Returns a markdown-formatted string with no formatting, optionally escaping the contents. </summary>
-		public static string Normal(string text, bool escape = true)
-			=> escape ? Escape(text) : text;
+        
 		/// <summary> Returns a markdown-formatted string with bold formatting, optionally escaping the contents. </summary>
 		public static string Bold(string text, bool escape = true)
 			=> escape ? $"**{Escape(text)}**" : $"**{text}**";
@@ -108,21 +105,6 @@ namespace Discord
 				return $"```{language ?? ""}\n{text}\n```";
 			else
 				return $"`{text}`";
-		}
-
-		/// <summary> Returns a markdown-formatted string with multiple formatting, optionally escaping the contents. </summary>
-		public static string Multiple(string text, bool escape = true, 
-			bool bold = false, bool italics = false, bool underline = false, bool strikeout = false, 
-			bool code = false, string codeLanguage = null)
-		{
-			string result = text;
-			if (escape) result = Escape(result);
-			if (bold) result = Bold(result, false);
-			if (italics) result = Italics(result, false);
-			if (underline) result = Underline(result, false);
-			if (strikeout) result = Strikeout(result, false);
-			if (code) result = Code(result, codeLanguage);
-            return result;
 		}
 	}
 }

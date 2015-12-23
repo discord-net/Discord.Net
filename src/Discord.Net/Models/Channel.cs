@@ -1,5 +1,5 @@
 ﻿using Discord.API.Client;
-using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,238 +7,278 @@ using APIChannel = Discord.API.Client.Channel;
 
 namespace Discord
 {
-	public sealed class Channel : CachedObject<ulong>
-	{
-		private struct ChannelMember
-		{
-			public readonly User User;
-			public readonly ChannelPermissions Permissions;
+    public sealed class Channel
+    {
+        private struct Member
+        {
+            public readonly User User;
+            public readonly ChannelPermissions Permissions;
+            public Member(User user)
+            {
+                User = user;
+                Permissions = new ChannelPermissions();
+                Permissions.Lock();
+            }
+        }
 
-			public ChannelMember(User user)
-			{
-				User = user;
-				Permissions = new ChannelPermissions();
-				Permissions.Lock();
-			}
-		}
+        public sealed class PermissionOverwrite
+        {
+            public PermissionTarget TargetType { get; }
+            public ulong TargetId { get; }
+            public DualChannelPermissions Permissions { get; }
+            internal PermissionOverwrite(PermissionTarget targetType, ulong targetId, uint allow, uint deny)
+            {
+                TargetType = targetType;
+                TargetId = targetId;
+                Permissions = new DualChannelPermissions(allow, deny);
+                Permissions.Lock();
+            }
+        }
+        
+        private readonly ConcurrentDictionary<ulong, Member> _users;
+        private readonly ConcurrentDictionary<ulong, Message> _messages;
+        private Dictionary<ulong, PermissionOverwrite> _permissionOverwrites;
 
-		public sealed class PermissionOverwrite
-		{
-			public PermissionTarget TargetType { get; }
-			public ulong TargetId { get; }
-			public DualChannelPermissions Permissions { get; }
+        /// <summary> Gets the client that generated this channel object. </summary>
+        internal DiscordClient Client { get; }
+        /// <summary> Gets the unique identifier for this channel. </summary>
+        public ulong Id { get; }
+        /// <summary> Gets the server owning this channel, if this is a public chat. </summary>
+        public Server Server { get; }
+        /// <summary> Gets the target user, if this is a private chat. </summary>
+        public User Recipient { get; }
 
-			internal PermissionOverwrite(PermissionTarget targetType, ulong targetId, uint allow, uint deny)
-			{
-				TargetType = targetType;
-				TargetId = targetId;
-				Permissions = new DualChannelPermissions(allow, deny);
-				Permissions.Lock();
-			}
-		}
+        /// <summary> Gets the name of this channel. </summary>
+        public string Name { get; private set; }
+        /// <summary> Gets the topic of this channel. </summary>
+        public string Topic { get; private set; }
+        /// <summary> Gets the position of this channel relative to other channels in this server. </summary>
+        public int Position { get; private set; }
+        /// <summary> Gets the type of this channel (see ChannelTypes). </summary>
+        public string Type { get; private set; }
 
-		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get; private set; }
-		/// <summary> Returns the topic associated with this channel. </summary>
-		public string Topic { get; private set; }
-		/// <summary> Returns the position of this channel in the channel list for this server. </summary>
-		public int Position { get; private set; }
-		/// <summary> Returns false is this is a public chat and true if this is a private chat with another user (see Recipient). </summary>
-		public bool IsPrivate => _recipient.Id != null;
-		/// <summary> Returns the type of this channel (see ChannelTypes). </summary>
-		public string Type { get; private set; }
+        /// <summary> Gets true if this is a private chat with another user. </summary>
+        public bool IsPrivate => Recipient != null;
+        /// <summary> Gets the string used to mention this channel. </summary>
+        public string Mention => $"<#{Id}>";
+        /// <summary> Gets a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
+        public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
+        /// <summary> Gets a collection of all custom permissions used for this channel. </summary>
+		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites.Select(x => x.Value);
 
-		/// <summary> Returns the server containing this channel. </summary>
-		[JsonIgnore]
-		public Server Server => _server.Value;
-		[JsonProperty]
-		private ulong? ServerId { get { return _server.Id; } set { _server.Id = value; } }
-		private readonly Reference<Server> _server;
-
-		/// For private chats, returns the target user, otherwise null.
-		[JsonIgnore]
-		public User Recipient => _recipient.Value;
-		[JsonProperty]
-		private ulong? RecipientId { get { return _recipient.Id; } set { _recipient.Id = value; } }
-		private readonly Reference<User> _recipient;
-
-		//Collections
-		/// <summary> Returns a collection of all users with read access to this channel. </summary>
-		[JsonIgnore]
-		public IEnumerable<User> Members
-		{
-			get
-			{
+        /// <summary> Gets a collection of all users with read access to this channel. </summary>
+        public IEnumerable<User> Users
+        {
+            get
+            {
                 if (IsPrivate)
-                    return _members.Values.Select(x => x.User);
-                if (_client.Config.UsePermissionsCache)
+                    return _users.Values.Select(x => x.User);
+                if (Client.Config.UsePermissionsCache)
                 {
                     if (Type == ChannelType.Text)
-                        return _members.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
+                        return _users.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
                     else if (Type == ChannelType.Voice)
-                        return _members.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
+                        return _users.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
                 }
                 else
                 {
                     if (Type == ChannelType.Text)
                     {
                         ChannelPermissions perms = new ChannelPermissions();
-                        return Server.Members.Where(x =>
+                        return Server.Users.Where(x =>
                         {
                             UpdatePermissions(x, perms);
                             return perms.ReadMessages == true;
                         });
                     }
                     else if (Type == ChannelType.Voice)
-                        return Server.Members.Where(x => x.VoiceChannel == this);
+                        return Server.Users.Where(x => x.VoiceChannel == this);
                 }
-				return Enumerable.Empty<User>();
-            }
-		}
-		[JsonProperty]
-		private IEnumerable<ulong> MemberIds => Members.Select(x => x.Id);
-		private ConcurrentDictionary<ulong, ChannelMember> _members;
-
-		/// <summary> Returns a collection of all messages the client has seen posted in this channel. This collection does not guarantee any ordering. </summary>
-		[JsonIgnore]
-		public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
-		[JsonProperty]
-		private IEnumerable<ulong> MessageIds => Messages.Select(x => x.Id);
-		private readonly ConcurrentDictionary<ulong, Message> _messages;
-
-		/// <summary> Returns a collection of all custom permissions used for this channel. </summary>
-		private PermissionOverwrite[] _permissionOverwrites;
-		public IEnumerable<PermissionOverwrite> PermissionOverwrites { get { return _permissionOverwrites; } internal set { _permissionOverwrites = value.ToArray(); } }
-
-		/// <summary> Returns the string used to mention this channel. </summary>
-		public string Mention => $"<#{Id}>";
-
-		internal Channel(DiscordClient client, ulong id, ulong? serverId, ulong? recipientId)
-			: base(client, id)
-		{
-			_server = new Reference<Server>(serverId, 
-				x => _client.Servers[x], 
-				x => x.AddChannel(this), 
-				x => x.RemoveChannel(this));
-			_recipient = new Reference<User>(recipientId, 
-				x => _client.Users.GetOrAdd(x, _server.Id),
-				x =>
-				{
-                    Name = $"@{x}";
-                    if (_server.Id == null)
-						x.Global.PrivateChannel = this;
-				},
-				x =>
-				{
-					if (_server.Id == null)
-						x.Global.PrivateChannel = null;
-                });
-			_permissionOverwrites = new PermissionOverwrite[0];
-            _members = new ConcurrentDictionary<ulong, ChannelMember>();
-
-            if (recipientId != null)
-            {
-                AddMember(client.PrivateUser);
-                AddMember(Recipient);
-            }
-
-			//Local Cache
-			if (client.Config.MessageCacheSize > 0)
-				_messages = new ConcurrentDictionary<ulong, Message>();
-		}
-		internal override bool LoadReferences()
-		{
-			if (IsPrivate)
-				return _recipient.Load();
-			else
-				return _server.Load();
-		}
-		internal override void UnloadReferences()
-		{
-			_server.Unload();
-			_recipient.Unload();
-			
-			var globalMessages = _client.Messages;
-            if (_client.Config.MessageCacheSize > 0)
-            {
-                var messages = _messages;
-                foreach (var message in messages)
-                    globalMessages.TryRemove(message.Key);
-                messages.Clear();
+                return Enumerable.Empty<User>();
             }
         }
 
-		internal void Update(ChannelReference model)
-		{
-			if (!IsPrivate && model.Name != null)
-				Name = model.Name;
-			if (model.Type != null)
-				Type = model.Type;
-		}
-		internal void Update(APIChannel model)
-		{
-			Update(model as ChannelReference);
-			
-			if (model.Position != null)
-				Position = model.Position;
-			if (model.Topic != null)
-				Topic = model.Topic;
-
-			if (model.PermissionOverwrites != null)
-			{
-				_permissionOverwrites = model.PermissionOverwrites
-					.Select(x => new PermissionOverwrite(PermissionTarget.FromString(x.Type), x.Id, x.Allow, x.Deny))
-					.ToArray();
-				UpdatePermissions();
-            }
-		}
-
-		internal void AddMessage(Message message)
-		{
-			//Race conditions are okay here - it just means the queue will occasionally go higher than the requested cache size, and fixed later.
-			var cacheLength = _client.Config.MessageCacheSize;
-			if (cacheLength > 0)
-			{
-				var oldestIds = _messages.Where(x => x.Value.Timestamp < message.Timestamp).Select(x => x.Key).OrderBy(x => x).Take(_messages.Count - cacheLength);
-				foreach (var id in oldestIds)
-				{
-					Message removed;
-					if (_messages.TryRemove(id, out removed))
-						_client.Messages.TryRemove(id);
-				}
-				_messages.TryAdd(message.Id, message);
-			}
-		}
-        internal void RemoveMessage(Message message)
+        internal Channel(DiscordClient client, ulong id, Server server)
+            : this(client, id)
         {
-            if (_client.Config.MessageCacheSize > 0)
-                _messages.TryRemove(message.Id, out message);
+            Server = server;
         }
-		
-		internal void AddMember(User user)
+        internal Channel(DiscordClient client, ulong id, User recipient)
+            : this(client, id)
         {
-            if (!_client.Config.UsePermissionsCache)
+            Recipient = recipient;
+            Name = $"@{recipient}";
+            AddUser(client.PrivateUser);
+            AddUser(recipient);
+        }
+        private Channel(DiscordClient client, ulong id)
+        {
+            Client = client;
+            Id = id;
+
+            _permissionOverwrites = new Dictionary<ulong, PermissionOverwrite>();
+            _users = new ConcurrentDictionary<ulong, Member>();
+            if (client.Config.MessageCacheSize > 0)
+                _messages = new ConcurrentDictionary<ulong, Message>();
+        }
+
+        internal void Update(ChannelReference model)
+        {
+            if (!IsPrivate && model.Name != null)
+                Name = model.Name;
+            if (model.Type != null)
+                Type = model.Type;
+        }
+        internal void Update(APIChannel model)
+        {
+            Update(model as ChannelReference);
+
+            if (model.Position != null)
+                Position = model.Position.Value;
+            if (model.Topic != null)
+                Topic = model.Topic;
+            if (model.Recipient != null)
+                Recipient.Update(model.Recipient);
+
+            if (model.PermissionOverwrites != null)
+            {
+                _permissionOverwrites = model.PermissionOverwrites
+                    .Select(x => new PermissionOverwrite(PermissionTarget.FromString(x.Type), x.Id, x.Allow, x.Deny))
+                    .ToDictionary(x => x.TargetId);
+                UpdatePermissions();
+            }
+        }
+
+        //Members
+        internal void AddUser(User user)
+        {
+            if (!Client.Config.UsePermissionsCache)
                 return;
 
-            var member = new ChannelMember(user);
-            if (_members.TryAdd(user.Id, member))
-				UpdatePermissions(user, member.Permissions);
+            var member = new Member(user);
+            if (_users.TryAdd(user.Id, member))
+                UpdatePermissions(user, member.Permissions);
         }
-		internal void RemoveMember(User user)
+        internal void RemoveUser(ulong id)
         {
-            if (!_client.Config.UsePermissionsCache)
+            if (!Client.Config.UsePermissionsCache)
                 return;
 
-            ChannelMember ignored;
-			_members.TryRemove(user.Id, out ignored);
-		}
+            Member ignored;
+            _users.TryRemove(id, out ignored);
+        }
+        public User GetUser(ulong id)
+        {
+            Member result;
+            _users.TryGetValue(id, out result);
+            return result.User;
+        }
 
+        //Messages
+        internal Message AddMessage(ulong id, ulong userId, DateTime timestamp)
+        {
+            Message message = new Message(id, this, userId);
+            var cacheLength = Client.Config.MessageCacheSize;
+            if (cacheLength > 0)
+            {
+                var oldestIds = _messages
+                    .Where(x => x.Value.Timestamp < timestamp)
+                    .Select(x => x.Key).OrderBy(x => x)
+                    .Take(_messages.Count - cacheLength);
+                Message removed;
+                foreach (var removeId in oldestIds)
+                    _messages.TryRemove(removeId, out removed);
+                return _messages.GetOrAdd(message.Id, message);
+            }
+            return message;
+        }
+        internal Message RemoveMessage(ulong id)
+        {
+            if (Client.Config.MessageCacheSize > 0)
+            {
+                Message msg;
+                _messages.TryRemove(id, out msg);
+                return msg;
+            }
+            return null;
+        }
+        public Message GetMessage(ulong id)
+        {
+            Message result;
+            _messages.TryGetValue(id, out result);
+            return result;
+        }
+
+        //Permissions
+        internal void UpdatePermissions()
+        {
+            if (!Client.Config.UsePermissionsCache)
+                return;
+
+            foreach (var pair in _users)
+            {
+                Member member = pair.Value;
+                UpdatePermissions(member.User, member.Permissions);
+            }
+        }
+        internal void UpdatePermissions(User user)
+        {
+            if (!Client.Config.UsePermissionsCache)
+                return;
+
+            Member member;
+            if (_users.TryGetValue(user.Id, out member))
+                UpdatePermissions(member.User, member.Permissions);
+        }
+        internal void UpdatePermissions(User user, ChannelPermissions permissions)
+        {
+            uint newPermissions = 0;
+            var server = Server;
+
+            //Load the mask of all permissions supported by this channel type
+            var mask = ChannelPermissions.All(this).RawValue;
+
+            if (server != null)
+            {
+                //Start with this user's server permissions
+                newPermissions = server.GetPermissions(user).RawValue;
+
+                if (IsPrivate || user == Server.Owner)
+                    newPermissions = mask; //Owners always have all permissions
+                else
+                {
+                    var channelOverwrites = PermissionOverwrites;
+
+                    var roles = user.Roles;
+                    foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+                        newPermissions &= ~denyRole.Permissions.Deny.RawValue;
+                    foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+                        newPermissions |= allowRole.Permissions.Allow.RawValue;
+                    foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
+                        newPermissions &= ~denyUser.Permissions.Deny.RawValue;
+                    foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
+                        newPermissions |= allowUser.Permissions.Allow.RawValue;
+
+                    if (newPermissions.HasBit((byte)PermissionsBits.ManageRolesOrPermissions))
+                        newPermissions = mask; //ManageRolesOrPermissions gives all permisions
+                    else if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionsBits.ReadMessages))
+                        newPermissions = 0; //No read permission on a text channel removes all other permissions
+                    else
+                        newPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from serverPerms, for example)
+                }
+            }
+            else
+                newPermissions = mask; //Private messages always have all permissions
+
+            if (newPermissions != permissions.RawValue)
+                permissions.SetRawValueInternal(newPermissions);
+        }
         internal ChannelPermissions GetPermissions(User user)
         {
-            if (_client.Config.UsePermissionsCache)
+            if (Client.Config.UsePermissionsCache)
             {
-                ChannelMember member;
-                if (_members.TryGetValue(user.Id, out member))
+                Member member;
+                if (_users.TryGetValue(user.Id, out member))
                     return member.Permissions;
                 else
                     return null;
@@ -249,73 +289,10 @@ namespace Discord
                 UpdatePermissions(user, perms);
                 return perms;
             }
-		}
-		internal void UpdatePermissions()
-        {
-            if (!_client.Config.UsePermissionsCache)
-                return;
-
-            foreach (var pair in _members)
-            {
-                ChannelMember member = pair.Value;
-                UpdatePermissions(member.User, member.Permissions);
-            }
-		}
-        internal void UpdatePermissions(User user)
-        {
-            if (!_client.Config.UsePermissionsCache)
-                return;
-
-            ChannelMember member;
-            if (_members.TryGetValue(user.Id, out member))
-                UpdatePermissions(member.User, member.Permissions);
         }
-        internal void UpdatePermissions(User user, ChannelPermissions permissions)
-		{
-			uint newPermissions = 0;
-			var server = Server;
 
-			//Load the mask of all permissions supported by this channel type
-			var mask = ChannelPermissions.All(this).RawValue;
-
-			if (server != null)
-			{
-				//Start with this user's server permissions
-				newPermissions = server.GetPermissions(user).RawValue;
-
-				if (IsPrivate || user.IsOwner)
-					newPermissions = mask; //Owners always have all permissions
-				else
-				{
-					var channelOverwrites = PermissionOverwrites;
-
-					var roles = user.Roles;
-					foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-						newPermissions &= ~denyRole.Permissions.Deny.RawValue;
-					foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-						newPermissions |= allowRole.Permissions.Allow.RawValue;
-					foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
-						newPermissions &= ~denyUser.Permissions.Deny.RawValue;
-					foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
-						newPermissions |= allowUser.Permissions.Allow.RawValue;
-
-					if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
-						newPermissions = mask; //ManageRolesOrPermissions gives all permisions
-					else if (Type == ChannelType.Text && !BitHelper.GetBit(newPermissions, (int)PermissionsBits.ReadMessages))
-						newPermissions = 0; //No read permission on a text channel removes all other permissions
-					else
-						newPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from serverPerms, for example)
-				}
-			}
-			else
-				newPermissions = mask; //Private messages always have all permissions
-
-            if (newPermissions != permissions.RawValue)
-                permissions.SetRawValueInternal(newPermissions);
-		}
-
-		public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 5658);
-		public override string ToString() => Name ?? IdConvert.ToString(Id);
-	}
+        public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
+        public override int GetHashCode() => unchecked(Id.GetHashCode() + 5658);
+        public override string ToString() => Name ?? Id.ToIdString();
+    }
 }

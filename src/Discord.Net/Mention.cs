@@ -14,10 +14,6 @@ namespace Discord
 		[Obsolete("Use User.Mention instead")]
 		public static string User(User user)
 			=> $"<@{user.Id}>";
-		/// <summary> Returns the string used to create a user mention. </summary>
-		[Obsolete("Use GlobalUser.Mention instead")]
-		public static string User(GlobalUser user)
-			=> $"<@{user.Id}>";
 		/// <summary> Returns the string used to create a channel mention. </summary>
 		[Obsolete("Use Channel.Mention instead")]
 		public static string Channel(Channel channel)
@@ -27,12 +23,12 @@ namespace Discord
 		public static string Everyone()
 			=> $"@everyone";
 
-		internal static string CleanUserMentions(DiscordClient client, Server server, string text, List<User> users = null)
+		internal static string CleanUserMentions(DiscordClient client, Channel channel, string text, List<User> users = null)
 		{
 			return _userRegex.Replace(text, new MatchEvaluator(e =>
 			{
-                var id = IdConvert.ToLong(e.Value.Substring(2, e.Value.Length - 3));
-				var user = client.Users[id, server?.Id];
+                var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
+				var user = channel.GetUser(id);
 				if (user != null)
 				{
 					if (users != null)
@@ -43,54 +39,57 @@ namespace Discord
 					return '@' + e.Value;
 			}));
 		}
-		internal static string CleanChannelMentions(DiscordClient client, Server server, string text, List<Channel> channels = null)
+		internal static string CleanChannelMentions(DiscordClient client, Channel channel, string text, List<Channel> channels = null)
 		{
+            var server = channel.Server;
+            if (server == null) return text;
+
 			return _channelRegex.Replace(text, new MatchEvaluator(e =>
 			{
-				var id = IdConvert.ToLong(e.Value.Substring(2, e.Value.Length - 3));
-				var channel = client.Channels[id];
-				if (channel != null && channel.Server.Id == server.Id)
+				var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
+				var mentionedChannel = server.GetChannel(id);
+				if (mentionedChannel != null && mentionedChannel.Server.Id == server.Id)
 				{
 					if (channels != null)
-						channels.Add(channel);
-					return '#' + channel.Name;
+						channels.Add(mentionedChannel);
+					return '#' + mentionedChannel.Name;
 				}
 				else //Channel not found
 					return '#' + e.Value;
 			}));
 		}
-		/*internal static string CleanRoleMentions(DiscordClient client, User user, Channel channel, string text, List<Role> roles = null)
+        /*internal static string CleanRoleMentions(DiscordClient client, User user, Channel channel, string text, List<Role> roles = null)
 		{
+            var server = channel.Server;
+            if (server == null) return text;
+
 			return _roleRegex.Replace(text, new MatchEvaluator(e =>
 			{
 				if (roles != null && user.GetPermissions(channel).MentionEveryone)
-					roles.Add(channel.Server.EveryoneRole);
+					roles.Add(server.EveryoneRole);
 				return e.Value;
 			}));
 		}*/
 
-		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
-		public static string Resolve(Message source, string text)
+        /// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
+        public static string Resolve(Message source, string text)
 		{
 			if (source == null) throw new ArgumentNullException(nameof(source));
 			if (text == null) throw new ArgumentNullException(nameof(text));
 
-			return Resolve(source.Server, text);
+			return Resolve(source.Channel, text);
         }
 
 		/// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
-		public static string Resolve(Server server, string text)
+		public static string Resolve(Channel channel, string text)
 		{
 			if (text == null) throw new ArgumentNullException(nameof(text));
 
-			var client = server?.Client;
-            text = CleanUserMentions(client, server, text);
-			if (server != null)
-			{
-				text = CleanChannelMentions(client, server, text);
-				//text = CleanRoleMentions(_client, User, channel, text);
-			}
-			return text;
+			var client = channel.Client;
+            text = CleanUserMentions(client, channel, text);
+			text = CleanChannelMentions(client, channel, text);
+            //text = CleanRoleMentions(_client, channel, text);
+            return text;
 		}
     }
 }

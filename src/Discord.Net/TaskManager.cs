@@ -146,10 +146,7 @@ namespace Discord
         public void ThrowException()
         {
             lock (_lock)
-            {
-                if  (_stopReason != null)
-                    _stopReason.Throw();
-            }
+                _stopReason?.Throw();
         }
         public void ClearException()
         {

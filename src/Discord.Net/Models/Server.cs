@@ -1,283 +1,229 @@
 ﻿using Discord.API.Client;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using APIGuild = Discord.API.Client.Guild;
 
 namespace Discord
 {
-	public sealed class Server : CachedObject<ulong>
-	{
-		private struct ServerMember
-		{
-			public readonly User User;
-			public readonly ServerPermissions Permissions;
-
-			public ServerMember(User user)
-			{
-				User = user;
-				Permissions = new ServerPermissions();
-				Permissions.Lock();
-			}
-		}
-		
-		/// <summary> Returns the name of this channel. </summary>
-		public string Name { get; private set; }
-		/// <summary> Returns the current logged-in user's data for this server. </summary>
-		public User CurrentUser { get; internal set; }
-
-		/// <summary> Returns the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel (see AFKChannel). </summary>
-		public int AFKTimeout { get; private set; }
-		/// <summary> Returns the date and time your joined this server. </summary>
-		public DateTime JoinedAt { get; private set; }
-		/// <summary> Returns the region for this server (see Regions). </summary>
-		public string Region { get; private set; }
-		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
-		public string IconId { get; private set; }
-		/// <summary> Returns the URL to this user's current avatar. </summary>
-		public string IconUrl => IconId != null ? $"{DiscordConfig.CDNUrl}/icons/{Id}/{IconId}.jpg" : null;
-
-		/// <summary> Returns the user that first created this server. </summary>
-		[JsonIgnore]
-		public User Owner => _owner.Value;
-		[JsonProperty]
-		internal ulong? OwnerId => _owner.Id;
-		private Reference<User> _owner;
-
-		/// <summary> Returns the AFK voice channel for this server (see AFKTimeout). </summary>
-		[JsonIgnore]
-		public Channel AFKChannel => _afkChannel.Value;
-		[JsonProperty]
-		private ulong? AFKChannelId => _afkChannel.Id;
-        private Reference<Channel> _afkChannel;
-
-		/// <summary> Returns the default channel for this server. </summary>
-		[JsonIgnore]
-		public Channel DefaultChannel { get; private set; }
-
-		/// <summary> Returns a collection of the ids of all users banned on this server. </summary>
-		public IEnumerable<ulong> BannedUserIds => _bans.Select(x => x.Key);
-		private ConcurrentDictionary<ulong, bool> _bans;
-		
-		/// <summary> Returns a collection of all channels within this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
-		/// <summary> Returns a collection of all text channels within this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Channel> TextChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Text);
-		/// <summary> Returns a collection of all voice channels within this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
-		[JsonProperty]
-		private IEnumerable<ulong> ChannelIds => Channels.Select(x => x.Id);
-		private ConcurrentDictionary<ulong, Channel> _channels;
-
-		/// <summary> Returns a collection of all users within this server with their server-specific data. </summary>
-		[JsonIgnore]
-		public IEnumerable<User> Members => _members.Select(x => x.Value.User);
-		[JsonProperty]
-		private IEnumerable<ulong> MemberIds => Members.Select(x => x.Id);
-		private ConcurrentDictionary<ulong, ServerMember> _members;
-
-		/// <summary> Return the the role representing all users in a server. </summary>
-		[JsonIgnore]
-		public Role EveryoneRole { get; private set; }
-		/// <summary> Returns a collection of all roles within this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-		[JsonProperty]
-		private IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
-		private ConcurrentDictionary<ulong, Role> _roles;
-
-		internal Server(DiscordClient client, ulong id)
-			: base(client, id)
-		{
-			_owner = new Reference<User>(x => _client.Users[x, Id]);
-			_afkChannel = new Reference<Channel>(x => _client.Channels[x]);
-
-			//Global Cache
-			_channels = new ConcurrentDictionary<ulong, Channel>();
-			_roles = new ConcurrentDictionary<ulong, Role>();
-			_members = new ConcurrentDictionary<ulong, ServerMember>();
-
-			//Local Cache
-			_bans = new ConcurrentDictionary<ulong, bool>();            
-            EveryoneRole = _client.Roles.GetOrAdd(id, id);
-        }
-		internal override bool LoadReferences()
-		{
-			_afkChannel.Load();
-            _owner.Load();
-			return true;
-        }
-		internal override void UnloadReferences()
-		{
-			//Global Cache
-			var globalChannels = _client.Channels;
-			var channels = _channels;
-			foreach (var channel in channels)
-				globalChannels.TryRemove(channel.Key);
-			channels.Clear();
-
-			var globalUsers = _client.Users;
-			var members = _members;
-			foreach (var member in members)
-				globalUsers.TryRemove(member.Key, Id);
-			members.Clear();
-
-			var globalRoles = _client.Roles;
-			var roles = _roles;
-			foreach (var role in roles)
-				globalRoles.TryRemove(role.Key);
-			roles.Clear();
-
-			//Local Cache
-			_bans.Clear();
-
-			_afkChannel.Unload();
-        }
-
-		internal void Update(GuildReference model)
-		{
-			if (model.Name != null)
-				Name = model.Name;
-		}
-
-        internal void Update(Guild model)
-		{
-			Update(model as GuildReference);
-
-			if (model.AFKTimeout != null)
-				AFKTimeout = model.AFKTimeout.Value;
-			if (model.AFKChannelId != null)
-			if (model.JoinedAt != null)
-				JoinedAt = model.JoinedAt.Value;
-			if (model.OwnerId != null)
-				_owner.Id = model.OwnerId.Value;
-			if (model.Region != null)
-				Region = model.Region;
-			if (model.Icon != null)
-				IconId = model.Icon;
-
-			if (model.Roles != null)
-			{
-				var roleCache = _client.Roles;
-				foreach (var x in model.Roles)
-				{
-					var role = roleCache.GetOrAdd(x.Id, Id);
-					role.Update(x);
-                }
+    /// <summary> Represents a Discord server (also known as a guild). </summary>
+	public sealed class Server
+    {
+        private struct Member
+        {
+            public readonly User User;
+            public readonly ServerPermissions Permissions;
+            public Member(User user)
+            {
+                User = user;
+                Permissions = new ServerPermissions();
+                Permissions.Lock();
             }
-			
-			_afkChannel.Id = model.AFKChannelId; //Can be null
-		}
-		internal void Update(ExtendedGuild model)
-		{
-			Update(model as APIGuild);
-			
-			var channels = _client.Channels;
-			foreach (var subModel in model.Channels)
-			{
-				var channel = channels.GetOrAdd(subModel.Id, Id);
-				channel.Update(subModel);
-			}
-			
-			var usersCache = _client.Users;
-            foreach (var subModel in model.Members)
-			{
-				var user = usersCache.GetOrAdd(subModel.User.Id, Id);
-				user.Update(subModel);
-			}
-			foreach (var subModel in model.VoiceStates)
-			{
-				var user = usersCache[subModel.UserId, Id];
-				if (user != null)
-					user.Update(subModel);
-			}
-			foreach (var subModel in model.Presences)
-			{
-				var user = usersCache[subModel.User.Id, Id];
-				if (user != null)
-					user.Update(subModel);
-			}
-		}
-
-		internal void AddBan(ulong banId)
-		{
-			_bans.TryAdd(banId, true);
-		}
-		internal bool RemoveBan(ulong banId)
-		{
-			bool ignored;
-			return _bans.TryRemove(banId, out ignored);
-		}
-
-		internal void AddChannel(Channel channel)
-		{
-			if (_channels.TryAdd(channel.Id, channel))
-			{
-				if (channel.Id == Id)
-					DefaultChannel = channel;
-			}
-		}
-		internal void RemoveChannel(Channel channel)
-		{
-			_channels.TryRemove(channel.Id, out channel);
-		}
-
-		internal void AddMember(User user)
-		{
-			if (_members.TryAdd(user.Id, new ServerMember(user)))
-			{
-				foreach (var channel in Channels)
-					channel.AddMember(user);
-			}
         }
-		internal void RemoveMember(User user)
-		{
-			ServerMember ignored;
-			if (_members.TryRemove(user.Id, out ignored))
+
+        private readonly ConcurrentDictionary<ulong, Role> _roles;
+        private readonly ConcurrentDictionary<ulong, Member> _users;
+        private readonly ConcurrentDictionary<ulong, Channel> _channels;
+        private readonly ConcurrentDictionary<ulong, bool> _bans;
+        private ulong _ownerId;
+        private ulong? _afkChannelId;
+
+        /// <summary> Gets the client that generated this server object. </summary>
+        internal DiscordClient Client { get; }
+        /// <summary> Gets the unique identifier for this server. </summary>
+        public ulong Id { get; }
+        /// <summary> Gets the default channel for this server. </summary>
+        public Channel DefaultChannel { get; }
+        /// <summary> Gets the the role representing all users in a server. </summary>
+        public Role EveryoneRole { get; }
+
+        /// <summary> Gets the name of this server. </summary>
+        public string Name { get; private set; }
+
+        /// <summary> Gets the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK channel, if one is set. </summary>
+        public int AFKTimeout { get; private set; }
+        /// <summary> Gets the date and time you joined this server. </summary>
+        public DateTime JoinedAt { get; private set; }
+        /// <summary> Gets the voice region for this server. </summary>
+        public Region Region { get; private set; }
+        /// <summary> Gets the unique identifier for this user's current avatar. </summary>
+        public string IconId { get; private set; }
+        /// <summary> Gets the URL to this user's current avatar. </summary>
+        public string IconUrl => GetIconUrl(Id, IconId);
+        internal static string GetIconUrl(ulong serverId, string iconId) 
+            => iconId != null ? $"{DiscordConfig.CDNUrl}/icons/{serverId}/{iconId}.jpg" : null;
+
+        /// <summary> Gets the user that created this server. </summary>
+        public User Owner => GetUser(_ownerId);
+        /// <summary> Gets the AFK voice channel for this server. </summary>
+        public Channel AFKChannel => _afkChannelId != null ? GetChannel(_afkChannelId.Value) : null;
+        /// <summary> Gets the current user in this server. </summary>
+        public User CurrentUser => GetUser(Client.CurrentUser.Id);
+
+        /// <summary> Gets a collection of the ids of all users banned on this server. </summary>
+        public IEnumerable<ulong> BannedUserIds => _bans.Select(x => x.Key);
+        /// <summary> Gets a collection of all channels within this server. </summary>
+        public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
+        /// <summary> Gets a collection of all users within this server with their server-specific data. </summary>
+        public IEnumerable<User> Users => _users.Select(x => x.Value.User);
+        /// <summary> Gets a collection of all roles within this server. </summary>
+        public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
+
+        internal Server(DiscordClient client, ulong id)
+        {
+            Client = client;
+            Id = id;
+            _channels = new ConcurrentDictionary<ulong, Channel>();
+            _roles = new ConcurrentDictionary<ulong, Role>();
+            _users = new ConcurrentDictionary<ulong, Member>();
+            _bans = new ConcurrentDictionary<ulong, bool>();
+            DefaultChannel = AddChannel(id);
+            EveryoneRole = AddRole(id);
+        }
+
+        internal void Update(GuildReference model)
+        {
+            if (model.Name != null)
+                Name = model.Name;
+        }
+        internal void Update(Guild model)
+        {
+            Update(model as GuildReference);
+
+            if (model.AFKTimeout != null)
+                AFKTimeout = model.AFKTimeout.Value;
+            _afkChannelId = model.AFKChannelId.Value; //Can be null
+            if (model.JoinedAt != null)
+                JoinedAt = model.JoinedAt.Value;
+            if (model.OwnerId != null)
+                _ownerId = model.OwnerId.Value;
+            if (model.Region != null)
+                Region = Client.GetRegion(model.Region);
+            if (model.Icon != null)
+                IconId = model.Icon;
+
+            if (model.Roles != null)
+            {
+                foreach (var x in model.Roles)
+                    AddRole(x.Id).Update(x);
+            }
+        }
+        internal void Update(ExtendedGuild model)
+        {
+            Update(model as Guild);
+
+            if (model.Channels != null)
+            {
+                foreach (var subModel in model.Channels)
+                    AddChannel(subModel.Id).Update(subModel);
+            }
+            if (model.Members != null)
+            {
+                foreach (var subModel in model.Members)
+                    AddMember(subModel.User.Id).Update(subModel);
+            }
+            if (model.VoiceStates != null)
+            {
+                foreach (var subModel in model.VoiceStates)
+                    GetUser(subModel.UserId)?.Update(subModel);
+            }
+            if (model.Presences != null)
+            {
+                foreach (var subModel in model.Presences)
+                    GetUser(subModel.User.Id)?.Update(subModel);
+            }
+        }
+
+        //Bans
+        internal void AddBan(ulong banId)
+            => _bans.TryAdd(banId, true);
+        internal bool RemoveBan(ulong banId)
+        {
+            bool ignored;
+            return _bans.TryRemove(banId, out ignored);
+        }
+
+        //Channels
+        internal Channel AddChannel(ulong id)
+            => _channels.GetOrAdd(id, x => new Channel(Client, x, this));
+        internal Channel RemoveChannel(ulong id)
+        {
+            Channel channel;
+            _channels.TryRemove(id, out channel);
+            return channel;
+        }
+        public Channel GetChannel(ulong id)
+        {
+            Channel result;
+            _channels.TryGetValue(id, out result);
+            return result;
+        }
+
+        //Members
+        internal User AddMember(ulong id)
+        {
+            User newUser = null;
+            var user = _users.GetOrAdd(id, x => new Member(new User(id, this)));
+			if (user.User == newUser)
 			{
 				foreach (var channel in Channels)
-					channel.RemoveMember(user);
+					channel.AddUser(newUser);
 			}
-		}
-		internal void HasMember(User user) => _members.ContainsKey(user.Id);
-
-		internal void AddRole(Role role)
+            return user.User;
+        }
+		internal User RemoveMember(ulong id)
 		{
-			if (_roles.TryAdd(role.Id, role))
+            Member member;
+			if (_users.TryRemove(id, out member))
 			{
-				if (role.Id == Id)
-					EveryoneRole = role;
+				foreach (var channel in Channels)
+					channel.RemoveUser(id);
 			}
-		}
-		internal void RemoveRole(Role role)
-		{
-            _roles.TryRemove(role.Id, out role);
-		}
+            return member.User;
+        }
+        public User GetUser(ulong id)
+        {
+            Member result;
+            _users.TryGetValue(id, out result);
+            return result.User;
+        }
 
-		internal ServerPermissions GetPermissions(User user)
+        //Roles
+        internal Role AddRole(ulong id)
+            => _roles.GetOrAdd(id, x => new Role(x, this));
+        internal Role RemoveRole(ulong id)
+        {
+            Role role;
+            _roles.TryRemove(id, out role);
+            return role;
+        }
+        public Role GetRole(ulong id)
+        {
+            Role result;
+            _roles.TryGetValue(id, out result);
+            return result;
+        }
+
+        //Permissions
+        internal ServerPermissions GetPermissions(User user)
 		{
-			ServerMember member;
-			if (_members.TryGetValue(user.Id, out member))
+			Member member;
+			if (_users.TryGetValue(user.Id, out member))
 				return member.Permissions;
 			else
 				return null;
 		}
 		internal void UpdatePermissions(User user)
 		{
-			ServerMember member;
-			if (_members.TryGetValue(user.Id, out member))
+            Member member;
+			if (_users.TryGetValue(user.Id, out member))
 				UpdatePermissions(member.User, member.Permissions);
 		}
         private void UpdatePermissions(User user, ServerPermissions permissions)
 		{
 			uint newPermissions = 0;
 
-			if (user.IsOwner)
+			if (user.Id == _ownerId)
 				newPermissions = ServerPermissions.All.RawValue;
 			else
 			{
@@ -285,7 +231,7 @@ namespace Discord
 					newPermissions |= serverRole.Permissions.RawValue;
 			}
 
-			if (BitHelper.GetBit(newPermissions, (int)PermissionsBits.ManageRolesOrPermissions))
+			if (newPermissions.HasBit((byte)PermissionsBits.ManageRolesOrPermissions))
 				newPermissions = ServerPermissions.All.RawValue;
 
 			if (newPermissions != permissions.RawValue)
@@ -298,6 +244,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is Server && (obj as Server).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 5175);
-		public override string ToString() => Name ?? IdConvert.ToString(Id);
+		public override string ToString() => Name ?? Id.ToIdString();
 	}
 }

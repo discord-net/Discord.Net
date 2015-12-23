@@ -12,15 +12,13 @@ namespace Discord.Net.Rest
 	{
         private readonly DiscordConfig _config;
 		private readonly RestSharp.RestClient _client;
-        private readonly Logger _logger;
 
         private readonly object _rateLimitLock;
         private DateTime _rateLimitTime;
 
-        public RestSharpEngine(DiscordConfig config, Logger logger, string baseUrl)
+        public RestSharpEngine(DiscordConfig config, string baseUrl)
 		{
 			_config = config;
-            _logger = logger;
             _rateLimitLock = new object();
             _client = new RestSharp.RestClient(baseUrl)
 			{
@@ -28,9 +26,6 @@ namespace Discord.Net.Rest
 				ReadWriteTimeout = _config.RestTimeout,
 				UserAgent = config.UserAgent
             };
-			/*if (_config.ProxyUrl != null)
-				_client.Proxy = new WebProxy(_config.ProxyUrl, true, new string[0], _config.ProxyCredentials);
-			else*/
 			_client.Proxy = null;
             _client.RemoveDefaultParameter("Accept");
             _client.AddDefaultHeader("accept", "*/*");
@@ -83,21 +78,18 @@ namespace Discord.Net.Rest
                     int milliseconds;
                     if (retryAfter != null && int.TryParse((string)retryAfter.Value, out milliseconds))
                     {
-                        if (_logger != null)
+                        /*var now = DateTime.UtcNow;
+                        if (now >= _rateLimitTime)
                         {
-                            var now = DateTime.UtcNow;
-                            if (now >= _rateLimitTime)
+                            lock (_rateLimitLock)
                             {
-                                lock (_rateLimitLock)
+                                if (now >= _rateLimitTime)
                                 {
-                                    if (now >= _rateLimitTime)
-                                    {
-                                        _rateLimitTime = now.AddMilliseconds(milliseconds);
-                                        _logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
-                                    }
+                                    _rateLimitTime = now.AddMilliseconds(milliseconds);
+                                    _logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
                                 }
                             }
-                        }
+                        }*/
                         await Task.Delay(milliseconds, cancelToken).ConfigureAwait(false);
                         continue;
                     }

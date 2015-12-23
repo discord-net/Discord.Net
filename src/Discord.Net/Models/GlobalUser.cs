@@ -6,7 +6,7 @@ using APIUser = Discord.API.Client.User;
 
 namespace Discord
 {
-	public sealed class GlobalUser : CachedObject<ulong>
+	/*public sealed class GlobalUser : CachedObject<ulong>
 	{
 		/// <summary> Returns the email for this user. Note: this field is only ever populated for the current logged in user. </summary>
 		[JsonIgnore]
@@ -75,5 +75,5 @@ namespace Discord
 		public override bool Equals(object obj) => obj is GlobalUser && (obj as GlobalUser).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7891);
 		public override string ToString() => IdConvert.ToString(Id);
-	}
+	}*/
 }

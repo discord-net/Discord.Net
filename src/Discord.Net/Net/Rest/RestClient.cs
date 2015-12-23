@@ -1,4 +1,5 @@
 ﻿using Discord.API;
+using Discord.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -7,24 +8,52 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-	public sealed partial class RestClient
+    public class RequestEventArgs : EventArgs
+    {
+        public string Method { get; }
+        public string Path { get; }
+        public string Payload { get; }
+        public double ElapsedMilliseconds { get; }
+        public RequestEventArgs(string method, string path, string payload, double milliseconds)
+        {
+            Method = method;
+            Path = path;
+            Payload = payload;
+            ElapsedMilliseconds = milliseconds;
+        }
+    }
+
+    public sealed partial class RestClient
 	{
 		private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
-		private CancellationToken _cancelToken;
+        private string _token;
 
-		public RestClient(DiscordConfig config, Logger logger, string baseUrl)
-		{
-			_config = config;
-#if !DOTNET5_4
-			_engine = new RestSharpEngine(config, logger, baseUrl);
-#else
-			//_engine = new BuiltInRestEngine(config, logger, baseUrl);
-#endif
+        internal Logger Logger { get; }
+
+        public CancellationToken CancelToken { get; set; }
+
+        public string Token
+        {
+            get { return _token; }
+            set
+            {
+                _token = value;
+                _engine.SetToken(value);
+            }
         }
 
-        public void SetToken(string token) => _engine.SetToken(token);
-        public void SetCancelToken(CancellationToken token) => _cancelToken = token;
+        public RestClient(DiscordConfig config, string baseUrl, Logger logger)
+		{
+			_config = config;
+            Logger = logger;
+
+#if !DOTNET5_4
+			_engine = new RestSharpEngine(config, baseUrl);
+#else
+			//_engine = new BuiltInRestEngine(config, baseUrl);
+#endif
+        }
 
         public async Task<ResponseT> Send<ResponseT>(IRestRequest<ResponseT> request)
 			where ResponseT : class
@@ -69,24 +98,26 @@ namespace Discord.Net.Rest
 				requestJson = JsonConvert.SerializeObject(payload);
 
             Stopwatch stopwatch = null;
-            if (_config.LogLevel >= LogSeverity.Verbose)
+            if (Logger.Level >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 
-            string responseJson = await _engine.Send(method, path, requestJson, _cancelToken).ConfigureAwait(false);
+            string responseJson = await _engine.Send(method, path, requestJson, CancelToken).ConfigureAwait(false);
 
-			if (_config.LogLevel >= LogSeverity.Verbose)
+			if (Logger.Level >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (payload != null && _config.LogLevel >= LogSeverity.Debug)
+                double milliseconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2);
+
+                string log = $"{method} {path}: {milliseconds} ms";
+                if (payload != null && _config.LogLevel >= LogSeverity.Debug)
 				{
 					if (isPrivate)
-                        RaiseOnRequest(method, path, "[Hidden]", stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
-					else
-						RaiseOnRequest(method, path, requestJson, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
+                        log += $" [Hidden]";
+                    else
+                        log += $" {requestJson}";
 				}
-				else
-					RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
-			}
+                Logger.Verbose(log);
+            }
 
 			return responseJson;
 		}
@@ -100,19 +131,21 @@ namespace Discord.Net.Rest
             var isPrivate = request.IsPrivate;
 
 			Stopwatch stopwatch = null;
-			if (_config.LogLevel >= LogSeverity.Verbose)
+			if (Logger.Level >= LogSeverity.Verbose)
 				stopwatch = Stopwatch.StartNew();
 			
-			string responseJson = await _engine.SendFile(method, path, filename, stream, _cancelToken).ConfigureAwait(false);
+			string responseJson = await _engine.SendFile(method, path, filename, stream, CancelToken).ConfigureAwait(false);
 
-			if (_config.LogLevel >= LogSeverity.Verbose)
+			if (Logger.Level >= LogSeverity.Verbose)
 			{
 				stopwatch.Stop();
-				if (_config.LogLevel >= LogSeverity.Debug && !isPrivate)
-					RaiseOnRequest(method, path, filename, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
-				else
-                    RaiseOnRequest(method, path, null, stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond);
-			}
+                double milliseconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2);
+
+                string log = $"{method} {path}: {milliseconds} ms";
+                if (_config.LogLevel >= LogSeverity.Debug && !isPrivate)
+                    log += $" {filename}";
+                Logger.Verbose(log);
+            }
 
 			return responseJson;
 		}

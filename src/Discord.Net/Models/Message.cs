@@ -15,9 +15,9 @@ namespace Discord
 		Failed
 	}
 
-	public sealed class Message : CachedObject<ulong>
+	public sealed class Message
 	{
-		internal class ImportResolver : DefaultContractResolver
+		/*internal class ImportResolver : DefaultContractResolver
 		{
 			protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
 			{
@@ -31,7 +31,7 @@ namespace Discord
 				}
 				return property;
 			}
-		}
+		}*/
 
 		public sealed class Attachment : File
 		{
@@ -89,17 +89,24 @@ namespace Discord
 			internal File() { }
 		}
 
-		/// <summary> Returns true if the logged-in user was mentioned. </summary>
-		public bool IsMentioningMe { get; private set; }
-		/// <summary> Returns true if the current user created this message. </summary>
-		public bool IsAuthor => _client.CurrentUser.Id == _user.Id;
+        private static readonly Attachment[] _initialAttachments = new Attachment[0];
+        private static readonly Embed[] _initialEmbeds = new Embed[0];
+
+        private readonly ulong _userId;
+
+        /// <summary> Returns the unique identifier for this message. </summary>
+        public ulong Id { get; }
+        /// <summary> Returns the channel this message was sent to. </summary>
+        public Channel Channel { get; }
+
+        /// <summary> Returns true if the logged-in user was mentioned. </summary>
+        public bool IsMentioningMe { get; private set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
 		public MessageState State { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server. </summary>
 		public string RawText { get; private set; }
-		[JsonIgnore]
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		public string Text { get; internal set; } 
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
@@ -108,88 +115,25 @@ namespace Discord
 		public DateTime? EditedTimestamp { get; private set; }
 		/// <summary> Returns the attachments included in this message. </summary>
 		public Attachment[] Attachments { get; private set; }
-		private static readonly Attachment[] _initialAttachments = new Attachment[0];
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; private set; }
-		private static readonly Embed[] _initialEmbeds = new Embed[0];
 		
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
-		[JsonIgnore]
 		public IEnumerable<User> MentionedUsers { get; internal set; }
-		[JsonProperty]
-		private IEnumerable<ulong> MentionedUserIds
-		{
-			get { return MentionedUsers?.Select(x => x.Id); }
-			set { MentionedUsers = value.Select(x => _client.GetUser(Server, x)).Where(x => x != null); }
-		}
-
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
-		[JsonIgnore]
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
-		[JsonProperty]
-		private IEnumerable<ulong> MentionedChannelIds
-		{
-			get { return MentionedChannels?.Select(x => x.Id); }
-			set { MentionedChannels = value.Select(x => _client.GetChannel(x)).Where(x => x != null); }
-		}
-
 		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
-		[JsonIgnore]
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
-		[JsonProperty]
-		private IEnumerable<ulong> MentionedRoleIds
-		{
-			get { return MentionedRoles?.Select(x => x.Id); }
-			set { MentionedRoles = value.Select(x => _client.GetRole(x)).Where(x => x != null); }
-		}
 
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
-		[JsonIgnore]
-		public Server Server => _channel.Value.Server;
+		public Server Server => Channel.Server;
+        /// <summary> Returns the author of this message. </summary>
+        public User User => Channel.GetUser(_userId);
 
-		/// <summary> Returns the channel this message was sent to. </summary>
-		[JsonIgnore]
-		public Channel Channel => _channel.Value;
-		[JsonProperty]
-		private ulong? ChannelId => _channel.Id;
-		private readonly Reference<Channel> _channel;
-
-		/// <summary> Returns the author of this message. </summary>
-		[JsonIgnore]
-		public User User => _user.Value;
-		[JsonProperty]
-		private ulong? UserId => _user.Id;
-		private readonly Reference<User> _user;
-
-		internal Message(DiscordClient client, ulong id, ulong channelId, ulong userId)
-			: base(client, id)
+		internal Message(ulong id, Channel channel, ulong userId)
 		{
-			_channel = new Reference<Channel>(channelId,
-				x => _client.Channels[x],
-				x => x.AddMessage(this),
-				x => x.RemoveMessage(this));
-			_user = new Reference<User>(userId,
-				x =>
-				{
-					var channel = Channel;
-					if (channel == null) return null;
-
-					if (!channel.IsPrivate)
-						return _client.Users[x, channel.Server.Id];
-					else
-						return _client.Users[x, null];
-				});
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;
-		}
-		internal override bool LoadReferences()
-		{
-			return _channel.Load() && _user.Load();
-		}
-		internal override void UnloadReferences()
-		{
-			_channel.Unload();
-			_user.Unload();
 		}
 
 		internal void Update(APIMessage model)
@@ -247,7 +191,7 @@ namespace Discord
 			if (model.Mentions != null)
 			{
 				MentionedUsers = model.Mentions
-					.Select(x => _client.Users[x.Id, Channel.Server?.Id])
+					.Select(x => Channel.GetUser(x.Id))
 					.Where(x => x != null)
 					.ToArray();
 			}
@@ -266,10 +210,10 @@ namespace Discord
 				//var mentionedUsers = new List<User>();
 				var mentionedChannels = new List<Channel>();
 				//var mentionedRoles = new List<Role>();
-				text = Mention.CleanUserMentions(_client, server, text/*, mentionedUsers*/);
+				text = Mention.CleanUserMentions(Channel.Client, channel, text/*, mentionedUsers*/);
 				if (server != null)
 				{
-					text = Mention.CleanChannelMentions(_client, server, text, mentionedChannels);
+					text = Mention.CleanChannelMentions(Channel.Client, channel, text, mentionedChannels);
 					//text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
 				}
 				Text = text;
@@ -287,7 +231,7 @@ namespace Discord
 			}
 			else
 			{
-				var me = _client.PrivateUser;
+				var me = Channel.Client.PrivateUser;
 				IsMentioningMe = MentionedUsers?.Contains(me) ?? false;
             }
         }

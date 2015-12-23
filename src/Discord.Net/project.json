@@ -29,12 +29,11 @@
 	},
 
   "dependencies": {
-    "Newtonsoft.Json": "7.0.1",
-    "StyleCop.Analyzers": "1.0.0-rc2"
+    "Newtonsoft.Json": "7.0.1"
   },
 
 	"frameworks": {
-		"net45": {
+		"net46": {
       "dependencies": {
         "WebSocket4Net": "0.14.1",
         "RestSharp": "105.2.3"

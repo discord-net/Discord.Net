@@ -1,5 +1,6 @@
 ﻿using Discord.API.Client;
 using Discord.API.Client.GatewaySocket;
+using Discord.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,14 +11,13 @@ namespace Discord.Net.WebSockets
 {
     public partial class GatewaySocket : WebSocket
 	{
-		public int LastSequence => _lastSeq;
-		private int _lastSeq;
-
-		public string SessionId => _sessionId;
+        private int _lastSequence;
 		private string _sessionId;
 
-		public GatewaySocket(DiscordClient client, Logger logger)
-			: base(client, logger)
+        public string Token { get; private set; }
+
+		public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
+			: base(client, serializer, logger)
 		{
 			Disconnected += async (s, e) =>
 			{
@@ -26,10 +26,11 @@ namespace Discord.Net.WebSockets
 			};
 		}
 
-        public async Task Connect()
+        public async Task Connect(string token)
         {
-			await BeginConnect().ConfigureAwait(false);
-			SendIdentify();
+            Token = token;
+            await BeginConnect().ConfigureAwait(false);
+			SendIdentify(token);
         }
 		private async Task Redirect()
         {
@@ -46,13 +47,13 @@ namespace Discord.Net.WebSockets
 				{
 					try
                     {
-                        await Connect().ConfigureAwait(false);
+                        await Connect(Token).ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
 					catch (Exception ex)
 					{
-						_logger.Log(LogSeverity.Error, $"Reconnect failed", ex);
+						Logger.Error("Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
 						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
@@ -60,13 +61,13 @@ namespace Discord.Net.WebSockets
 			}
 			catch (OperationCanceledException) { }
 		}
-        public Task Disconnect() => TaskManager.Stop();
+        public Task Disconnect() => _taskManager.Stop();
 
 		protected override async Task Run()
         {
             List<Task> tasks = new List<Task>();
-            tasks.AddRange(_engine.GetTasks(_cancelToken));
-            tasks.Add(HeartbeatAsync(_cancelToken));
+            tasks.AddRange(_engine.GetTasks(CancelToken));
+            tasks.Add(HeartbeatAsync(CancelToken));
             await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
         }
 
@@ -75,7 +76,7 @@ namespace Discord.Net.WebSockets
 			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
-				_lastSeq = msg.Sequence.Value;
+				_lastSequence = msg.Sequence.Value;
 
 			var opCode = (OpCodes)msg.Operation;
             switch (opCode)
@@ -105,20 +106,18 @@ namespace Discord.Net.WebSockets
 						if (payload.Url != null)
 						{
 							Host = payload.Url;
-							if (_logger.Level >= LogSeverity.Info)
-								_logger.Info("Redirected to " + payload.Url);
+							Logger.Info("Redirected to " + payload.Url);
 							await Redirect().ConfigureAwait(false);
 						}
 					}
 					break;
 				default:
-					if (_logger.Level >= LogSeverity.Warning)
-						_logger.Log(LogSeverity.Warning, $"Unknown Opcode: {opCode}");
+                    Logger.Warning($"Unknown Opcode: {opCode}");
 					break;
 			}
 		}
 
-        public void SendIdentify()
+        public void SendIdentify(string token)
         {
             var props = new Dictionary<string, string>
             {
@@ -127,7 +126,7 @@ namespace Discord.Net.WebSockets
             var msg = new IdentifyCommand()
             {
                 Version = 3,
-                Token = _client.Token,
+                Token = token,
                 Properties = props, 
                 LargeThreshold = _client.Config.UseLargeThreshold ? 100 : (int?)null,
                 UseCompression = true
@@ -136,7 +135,7 @@ namespace Discord.Net.WebSockets
 		}
 
         public void SendResume()
-            => QueueMessage(new ResumeCommand { SessionId = _sessionId, Sequence = _lastSeq });
+            => QueueMessage(new ResumeCommand { SessionId = _sessionId, Sequence = _lastSequence });
 		public override void SendHeartbeat() 
             => QueueMessage(new HeartbeatCommand());
 		public void SendUpdateStatus(long? idleSince, int? gameId) 

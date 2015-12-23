@@ -14,7 +14,7 @@ namespace Discord.API.Client.Rest
                 StringBuilder query = new StringBuilder();
                 this.AddQueryParam(query, "limit", Limit.ToString());
                 if (RelativeDir != null)
-                    this.AddQueryParam(query, RelativeDir, RelativeId.Value.ToString());
+                    this.AddQueryParam(query, RelativeDir, RelativeId.ToString());
                 return $"channels/{ChannelId}/messages{query}";
             }
         }
@@ -25,7 +25,7 @@ namespace Discord.API.Client.Rest
 
         public int Limit { get; set; } = 100;
         public string RelativeDir { get; set; } = null;
-        public ulong? RelativeId { get; set; } = 0;
+        public ulong RelativeId { get; set; } = 0;
 
         public GetMessagesRequest(ulong channelId)
         {

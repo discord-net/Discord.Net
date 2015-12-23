@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Discord.Net
 {
-#if NET45
+#if NET46
     [Serializable]
 #endif
 	public class HttpException : Exception
@@ -16,7 +16,7 @@ namespace Discord.Net
 		{
 			StatusCode = statusCode;
         }
-#if NET45
+#if NET46
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
             => base.GetObjectData(info, context);
 #endif

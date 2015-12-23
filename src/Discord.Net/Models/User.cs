@@ -1,5 +1,4 @@
 ﻿using Discord.API.Client;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +6,19 @@ using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
-	public class User : CachedObject<ulong>
+	public class User
 	{
+        [Flags]
+        private enum VoiceState : byte
+        {
+            None = 0x0,
+            SelfMuted = 0x01,
+            SelfDeafened = 0x02,
+            ServerMuted = 0x04,
+            ServerDeafened = 0x08,
+            ServerSuppressed = 0x10,
+        }
+
 		internal struct CompositeKey : IEquatable<CompositeKey>
 		{
 			public ulong ServerId, UserId;
@@ -24,92 +34,71 @@ namespace Discord
 				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
         }
 
-        public static string GetAvatarUrl(ulong userId, string avatarId) => avatarId != null ? $"{DiscordConfig.CDNUrl}/avatars/{userId}/{avatarId}.jpg" : null;
+        internal static string GetAvatarUrl(ulong userId, string avatarId) => avatarId != null ? $"{DiscordConfig.CDNUrl}/avatars/{userId}/{avatarId}.jpg" : null;
 
-        /// <summary> Returns a unique identifier combining this user's id with its server's. </summary>
-        internal CompositeKey UniqueId => new CompositeKey(_server.Id ?? 0, Id);
-		/// <summary> Returns the name of this user on this server. </summary>
-		public string Name { get; private set; }
-		/// <summary> Returns a by-name unique identifier separating this user from others with the same name. </summary>
-		public ushort Discriminator { get; private set; }
-		/// <summary> Returns the unique identifier for this user's current avatar. </summary>
-		public string AvatarId { get; private set; }
-        /// <summary> Returns the URL to this user's current avatar. </summary>
-        public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
-        /// <summary> Returns the datetime that this user joined this server. </summary>
+        private VoiceState _voiceState;
+        private DateTime? _lastOnline;
+        private ulong? _voiceChannelId;
+        private Dictionary<ulong, Role> _roles;
+
+        /// <summary> Gets the client that generated this user object. </summary>
+        internal DiscordClient Client { get; }
+        /// <summary> Gets the unique identifier for this user. </summary>
+        public ulong Id { get; }
+        /// <summary> Gets the server this user is a member of. </summary>
+        public Server Server { get; }
+
+        /// <summary> Gets the name of this user. </summary>
+        public string Name { get; private set; }
+        /// <summary> Gets an id uniquely identifying from others with the same name. </summary>
+        public ushort Discriminator { get; private set; }
+        /// <summary> Gets the unique identifier for this user's current avatar. </summary>
+        public string AvatarId { get; private set; }
+        /// <summary> Gets the id for the game this user is currently playing. </summary>
+        public string GameId { get; private set; }
+        /// <summary> Gets the current status for this user. </summary>
+        public UserStatus Status { get; private set; }
+        /// <summary> Gets the datetime that this user joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
+        /// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
+        public DateTime? LastActivityAt { get; private set; }
+        // /// <summary> Gets this user's voice session id. </summary>
+        // public string SessionId { get; private set; }
+        // /// <summary> Gets this user's voice token. </summary>
+        // public string Token { get; private set; }
 
-
-        public bool IsSelfMuted { get; private set; }
-		public bool IsSelfDeafened { get; private set; }
-		public bool IsServerMuted { get; private set; }
-		public bool IsServerDeafened { get; private set; }
-		public bool IsServerSuppressed { get; private set; }
-		public bool IsPrivate => _server.Id == null;
-        public bool IsOwner => _server.Value.OwnerId == Id;
-
-		public string SessionId { get; private set; }
-		public string Token { get; private set; }
-
-		/// <summary> Returns the id for the game this user is currently playing. </summary>
-		public int? GameId { get; private set; }
-		/// <summary> Returns the current status for this user. </summary>
-		public UserStatus Status { get; private set; }
-		/// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
-		public DateTime? LastActivityAt { get; private set; }
+        /// <summary> Returns the string used to mention this user. </summary>
+        public string Mention => $"<@{Id}>";
+        /// <summary> Returns true if this user has marked themselves as muted. </summary>
+        public bool IsSelfMuted => (_voiceState & VoiceState.SelfMuted) != 0;
+        /// <summary> Returns true if this user has marked themselves as deafened. </summary>
+        public bool IsSelfDeafened => (_voiceState & VoiceState.SelfDeafened) != 0;
+        /// <summary> Returns true if the server is blocking audio from this user. </summary>
+        public bool IsServerMuted => (_voiceState & VoiceState.ServerMuted) != 0;
+        /// <summary> Returns true if the server is blocking audio to this user. </summary>
+        public bool IsServerDeafened => (_voiceState & VoiceState.ServerDeafened) != 0;
+        /// <summary> Returns true if the server is temporarily blocking audio to/from this user. </summary>
+        public bool IsServerSuppressed => (_voiceState & VoiceState.ServerSuppressed) != 0;
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
-		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline;
-		private DateTime? _lastOnline;
+		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline; 
+        /// <summary> Gets this user's  </summary>
+        public Channel VoiceChannel => _voiceChannelId != null ? Server.GetChannel(_voiceChannelId.Value) : null;
+        /// <summary> Gets the URL to this user's current avatar. </summary>
+        public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
+        /// <summary> Gets all roles that have been assigned to this user, including the everyone role. </summary>
+        public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
 
-		//References
-		[JsonIgnore]
-		public GlobalUser Global => _globalUser.Value;
-		private readonly Reference<GlobalUser> _globalUser;
-
-		[JsonIgnore]
-		public Server Server => _server.Value;
-        private readonly Reference<Server> _server;
-		[JsonProperty]
-		private ulong? ServerId { get { return _server.Id; } set { _server.Id = value; } }
-
-		[JsonIgnore]
-		public Channel VoiceChannel => _voiceChannel.Value;
-		private Reference<Channel> _voiceChannel;
-		[JsonProperty]
-		private ulong? VoiceChannelId { get { return _voiceChannel.Id; } set { _voiceChannel.Id = value; } }
-
-		//Collections
-		[JsonIgnore]
-		public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-		private Dictionary<ulong, Role> _roles;
-		[JsonProperty]
-		private IEnumerable<ulong> RoleIds => _roles.Select(x => x.Key);
-
-		/// <summary> Returns a collection of all messages this user has sent on this server that are still in cache. </summary>
-		[JsonIgnore]
-		public IEnumerable<Message> Messages
+        /// <summary> Returns a collection of all channels this user has permissions to join on this server. </summary>
+        public IEnumerable<Channel> Channels
 		{
 			get
 			{
-				if (_server.Id != null)
-					return Server.Channels.SelectMany(x => x.Messages.Where(y => y.User.Id == Id));
-				else
-					return Global.PrivateChannel.Messages.Where(x => x.User.Id == Id);
-            }
-		}
-
-		/// <summary> Returns a collection of all channels this user has permissions to join on this server. </summary>
-		[JsonIgnore]
-		public IEnumerable<Channel> Channels
-		{
-			get
-			{
-				if (_server.Id != null)
+				if (Server != null)
 				{
-                    if (_client.Config.UsePermissionsCache)
+                    if (Client.Config.UsePermissionsCache)
                     {
-                        return Server.Channels
-                            .Where(x => (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
+                        return Server.Channels.Where(x => 
+                            (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
                             (x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
                     }
                     else
@@ -120,62 +109,36 @@ namespace Discord
                             {
                                 x.UpdatePermissions(this, perms);
                                 return (x.Type == ChannelType.Text && perms.ReadMessages) ||
-                                        (x.Type == ChannelType.Voice && perms.Connect);
+                                       (x.Type == ChannelType.Voice && perms.Connect);
                             });
                     }
 				}
 				else
 				{
-					var privateChannel = Global.PrivateChannel;
-					if (privateChannel != null)
-						return new Channel[] { privateChannel };
-					else
-						return new Channel[0];
+                    if (this == Client.PrivateUser)
+                        return Client.PrivateChannels;
+                    else
+                    {
+                        var privateChannel = Client.GetPrivateChannel(Id);
+                        if (privateChannel != null)
+                            return new Channel[] { privateChannel };
+                        else
+                            return new Channel[0];
+                    }
 				}
 			}
 		}
 
-		/// <summary> Returns the string used to mention this user. </summary>
-		public string Mention => $"<@{Id}>";
 
-		internal User(DiscordClient client, ulong id, ulong? serverId)
-			: base(client, id)
+		internal User(ulong id, Server server)
 		{
-			_globalUser = new Reference<GlobalUser>(id, 
-				x => _client.GlobalUsers.GetOrAdd(x), 
-				x => x.AddUser(this), 
-				x => x.RemoveUser(this));
-			_server = new Reference<Server>(serverId, 
-				x => _client.Servers[x], 
-				x =>
-				{
-					x.AddMember(this);
-					if (Id == _client.CurrentUser.Id)
-						x.CurrentUser = this;
-                }, 
-				x =>
-				{
-					x.RemoveMember(this);
-					if (Id == _client.CurrentUser.Id)
-						x.CurrentUser = null;
-				});
-			_voiceChannel = new Reference<Channel>(x => _client.Channels[x]);
+            Server = server;
 			_roles = new Dictionary<ulong, Role>();
 
 			Status = UserStatus.Offline;
 
-			if (serverId == null)
+			if (server == null)
 				UpdateRoles(null);
-		}
-		internal override bool LoadReferences()
-		{
-			return _globalUser.Load() && 
-				(IsPrivate || _server.Load());
-		}
-		internal override void UnloadReferences()
-		{
-			_globalUser.Unload();
-			_server.Unload();
 		}
 
 		internal void Update(UserReference model)
@@ -195,24 +158,29 @@ namespace Discord
 			if (model.JoinedAt.HasValue)
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
-				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
+				UpdateRoles(model.Roles.Select(x => Server.GetRole(x)));
         }
 		internal void Update(ExtendedGuild.ExtendedMemberInfo model)
 		{
 			Update(model as APIMember);
+            
+            if (model.IsServerMuted == true)
+                _voiceState |= VoiceState.ServerMuted;
+            else if (model.IsServerMuted == false)
+                _voiceState &= ~VoiceState.ServerMuted;
 
-			if (model.IsServerDeafened != null)
-				IsServerDeafened = model.IsServerDeafened.Value;
-			if (model.IsServerMuted != null)
-				IsServerMuted = model.IsServerMuted.Value;
-		}
+            if (model.IsServerDeafened.Value == true)
+                _voiceState |= VoiceState.ServerDeafened;
+            else if (model.IsServerDeafened.Value == false)
+                _voiceState &= ~VoiceState.ServerDeafened;
+        }
 		internal void Update(MemberPresence model)
 		{
 			if (model.User != null)
 				Update(model.User as UserReference);
 
-			if (model.Roles != null)
-				UpdateRoles(model.Roles.Select(x => _client.Roles[x]));
+            if (model.Roles != null)
+                UpdateRoles(model.Roles.Select(x => Server.GetRole(x)));
 			if (model.Status != null && Status != model.Status)
 			{
 				Status = UserStatus.FromString(model.Status);
@@ -223,42 +191,55 @@ namespace Discord
 			GameId = model.GameId; //Allows null
 		}
 		internal void Update(MemberVoiceState model)
-		{
-			if (model.IsServerDeafened != null)
-				IsServerDeafened = model.IsServerDeafened.Value;
-			if (model.IsServerMuted != null)
-				IsServerMuted = model.IsServerMuted.Value;
-			if (model.SessionId != null)
+        {
+            if (model.IsSelfMuted.Value == true)
+                _voiceState |= VoiceState.SelfMuted;
+            else if (model.IsSelfMuted.Value == false)
+                _voiceState &= ~VoiceState.SelfMuted;
+            if (model.IsSelfDeafened.Value == true)
+                _voiceState |= VoiceState.SelfDeafened;
+            else if (model.IsSelfDeafened.Value == false)
+                _voiceState &= ~VoiceState.SelfDeafened;
+            if (model.IsServerMuted == true)
+                _voiceState |= VoiceState.ServerMuted;
+            else if (model.IsServerMuted == false)
+                _voiceState &= ~VoiceState.ServerMuted;
+            if (model.IsServerDeafened.Value == true)
+                _voiceState |= VoiceState.ServerDeafened;
+            else if (model.IsServerDeafened.Value == false)
+                _voiceState &= ~VoiceState.ServerDeafened;
+            if (model.IsServerSuppressed.Value == true)
+                _voiceState |= VoiceState.ServerSuppressed;
+            else if (model.IsServerSuppressed.Value == false)
+                _voiceState &= ~VoiceState.ServerSuppressed;
+            
+            /*if (model.SessionId != null)
 				SessionId = model.SessionId;
 			if (model.Token != null)
-				Token = model.Token;
+				Token = model.Token;*/			
 			
-			if (model.IsSelfDeafened != null)
-				IsSelfDeafened = model.IsSelfDeafened.Value;
-			if (model.IsSelfMuted != null)
-				IsSelfMuted = model.IsSelfMuted.Value;
-			if (model.IsServerSuppressed != null)
-				IsServerSuppressed = model.IsServerSuppressed.Value;
-			
-			_voiceChannel.Id = model.ChannelId; //Allows null
+			_voiceChannelId = model.ChannelId; //Allows null
 		}
 		private void UpdateRoles(IEnumerable<Role> roles)
 		{
 			var newRoles = new Dictionary<ulong, Role>();
 			if (roles != null)
 			{
-				foreach (var r in roles)
-					newRoles[r.Id] = r;
+                foreach (var r in roles)
+                {
+                    if (r != null)
+                        newRoles[r.Id] = r;
+                }
 			}
 
-			if (_server.Id != null)
+			if (Server != null)
 			{
 				var everyone = Server.EveryoneRole;
-				newRoles.Add(everyone.Id, everyone);
+				newRoles[everyone.Id] = everyone;
 			}
 			_roles = newRoles;
 
-			if (!IsPrivate)
+			if (Server != null)
 				Server.UpdatePermissions(this);
 		}
 
@@ -285,6 +266,6 @@ namespace Discord
 
 		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7230);
-		public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : IdConvert.ToString(Id);
+		public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
 	}
 }

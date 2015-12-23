@@ -6,7 +6,7 @@ namespace Discord.API.Client
     public class MemberReference
     {
         [JsonProperty("guild_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong GuildId { get; set; }
+        public ulong? GuildId { get; set; }
         [JsonProperty("user")]
         public UserReference User { get; set; }
     }

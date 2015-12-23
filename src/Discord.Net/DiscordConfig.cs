@@ -14,8 +14,8 @@ namespace Discord
 		Debug = 5
 	}
 
-	public abstract class BaseConfig<T>
-		where T : BaseConfig<T>
+	public abstract class Config<T>
+		where T : Config<T>
 	{
 		protected bool _isLocked;
 		protected internal void Lock() { _isLocked = true; }
@@ -34,20 +34,22 @@ namespace Discord
 		}
 	}
 	
-	public class DiscordConfig : BaseConfig<DiscordConfig>
-	{
-        public static string LibName => "Discord.Net";
-        public static string LibVersion => typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
-        public static string LibUrl => "https://github.com/RogueException/Discord.Net";
+	public class DiscordConfig : Config<DiscordConfig>
+    {
+        public const int MaxMessageSize = 2000;
 
-        public static string ClientAPIUrl => "https://discordapp.com/api/";
-        public static string StatusAPIUrl => "https://status.discordapp.com/api/v2/";
-        public static string CDNUrl => "https://cdn.discordapp.com/";
-        public static string InviteUrl => "https://discord.gg/";
+        public const string LibName = "Discord.Net";
+        public static string LibVersion => typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
+        public const string LibUrl = "https://github.com/RogueException/Discord.Net";
+
+        public const string ClientAPIUrl = "https://discordapp.com/api/";
+        public const string StatusAPIUrl = "https://status.discordapp.com/api/v2/";
+        public const string CDNUrl = "https://cdn.discordapp.com/";
+        public const string InviteUrl = "https://discord.gg/";
 
         //Global
 
-        /// <summary> Name of your application. </summary>
+        /// <summary> Name of your application. This is used both for the token cache directory and user agent. </summary>
         public string AppName { get { return _appName; } set { SetValue(ref _appName, value); UpdateUserAgent(); } }
         private string _appName = null;
         /// <summary> Version of your application. </summary>

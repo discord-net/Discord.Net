@@ -13,30 +13,22 @@ namespace Discord.Net.WebSockets
     internal class WS4NetEngine : IWebSocketEngine
     {
         private readonly DiscordConfig _config;
-        private readonly Logger _logger;
         private readonly ConcurrentQueue<string> _sendQueue;
-        private readonly WebSocket _parent;
+        private readonly TaskManager _taskManager;
         private WS4NetWebSocket _webSocket;
         private ManualResetEventSlim _waitUntilConnect;
 
-        public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage;
-        public event EventHandler<WebSocketTextMessageEventArgs> TextMessage;
-        private void RaiseBinaryMessage(byte[] data)
-        {
-            if (BinaryMessage != null)
-                BinaryMessage(this, new WebSocketBinaryMessageEventArgs(data));
-        }
-        private void RaiseTextMessage(string msg)
-        {
-            if (TextMessage != null)
-                TextMessage(this, new WebSocketTextMessageEventArgs(msg));
-        }
+        public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
+        public event EventHandler<WebSocketTextMessageEventArgs> TextMessage = delegate { };
+        private void OnBinaryMessage(byte[] data)
+            => BinaryMessage(this, new WebSocketBinaryMessageEventArgs(data));
+        private void OnTextMessage(string msg)
+            => TextMessage(this, new WebSocketTextMessageEventArgs(msg));
 
-        internal WS4NetEngine(WebSocket parent, DiscordConfig config, Logger logger)
+        internal WS4NetEngine(DiscordConfig config, TaskManager taskManager)
         {
-            _parent = parent;
             _config = config;
-            _logger = logger;
+            _taskManager = taskManager;
             _sendQueue = new ConcurrentQueue<string>();
             _waitUntilConnect = new ManualResetEventSlim();
         }
@@ -57,7 +49,7 @@ namespace Discord.Net.WebSockets
             _waitUntilConnect.Reset();
             _webSocket.Open();
             _waitUntilConnect.Wait(cancelToken);
-            _parent.TaskManager.ThrowException(); //In case our connection failed
+            _taskManager.ThrowException(); //In case our connection failed
             return TaskHelper.CompletedTask;
         }
 
@@ -84,27 +76,25 @@ namespace Discord.Net.WebSockets
 
         private void OnWebSocketError(object sender, ErrorEventArgs e)
         {
-            _parent.TaskManager.SignalError(e.Exception);
+            _taskManager.SignalError(e.Exception);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketClosed(object sender, EventArgs e)
         {
-            var ex = new Exception($"Connection lost or close message received.");
-            _parent.TaskManager.SignalError(ex, isUnexpected: true);
+            Exception ex;
+            if (e is ClosedEventArgs)
+                ex = new Exception($"Received close code {(e as ClosedEventArgs).Code}: {(e as ClosedEventArgs).Reason ?? "No reason"}");
+            else
+                ex = new Exception($"Connection lost");
+            _taskManager.SignalError(ex, isUnexpected: true);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketOpened(object sender, EventArgs e)
-        {
-            _waitUntilConnect.Set();
-        }
+            => _waitUntilConnect.Set();
         private void OnWebSocketText(object sender, MessageReceivedEventArgs e)
-        {
-            RaiseTextMessage(e.Message);
-        }
+            => OnTextMessage(e.Message);
         private void OnWebSocketBinary(object sender, DataReceivedEventArgs e)
-        {
-            RaiseBinaryMessage(e.Data);
-        }
+            => OnBinaryMessage(e.Data);
 
         public IEnumerable<Task> GetTasks(CancellationToken cancelToken) => new Task[] { SendAsync(cancelToken) };
 
@@ -128,9 +118,7 @@ namespace Discord.Net.WebSockets
         }
 
         public void QueueMessage(string message)
-        {
-            _sendQueue.Enqueue(message);
-        }
+            => _sendQueue.Enqueue(message);
     }
 }
 #endif

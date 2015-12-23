@@ -34,7 +34,7 @@ namespace Discord.Modules
 		public event EventHandler<UserEventArgs> UserUpdated;
 		public event EventHandler<UserEventArgs> UserPresenceUpdated;
 		public event EventHandler<UserEventArgs> UserVoiceStateUpdated;
-		public event EventHandler<UserChannelEventArgs> UserIsTypingUpdated;
+		public event EventHandler<ChannelEventArgs> UserIsTypingUpdated;
 
 		public event EventHandler<MessageEventArgs> MessageReceived;
 		public event EventHandler<MessageEventArgs> MessageSent;

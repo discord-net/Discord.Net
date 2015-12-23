@@ -2,7 +2,7 @@
 
 namespace Discord.Net
 {
-#if NET45
+#if NET46
     [Serializable]
 #endif
     public sealed class TimeoutException : OperationCanceledException

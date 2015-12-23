@@ -9,9 +9,9 @@ namespace Discord.API.Converters
 		public override bool CanConvert(Type objectType) 
             => objectType == typeof(ulong);
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            => IdConvert.ToLong((string)reader.Value);
+            => ((string)reader.Value).ToId();
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            => writer.WriteValue(IdConvert.ToString((ulong)value));
+            => writer.WriteValue(((ulong)value).ToIdString());
 	}
 
 	public class NullableLongStringConverter : JsonConverter
@@ -19,9 +19,9 @@ namespace Discord.API.Converters
 		public override bool CanConvert(Type objectType) 
             => objectType == typeof(ulong?);
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            => IdConvert.ToNullableLong((string)reader.Value);
+            => ((string)reader.Value).ToNullableId();
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            => writer.WriteValue(IdConvert.ToString((ulong?)value));
+            => writer.WriteValue(((ulong?)value).ToIdString());
 	}
 
 	/*public class LongStringEnumerableConverter : JsonConverter
@@ -66,7 +66,7 @@ namespace Discord.API.Converters
 				reader.Read();
 				while (reader.TokenType != JsonToken.EndArray)
 				{
-					result.Add(IdConvert.ToLong((string)reader.Value));
+					result.Add(((string)reader.Value).ToId());
 					reader.Read();
                 }
 			}
@@ -81,7 +81,7 @@ namespace Discord.API.Converters
 				writer.WriteStartArray();
 				var a = (ulong[])value;
 				for (int i = 0; i < a.Length; i++)
-					writer.WriteValue(IdConvert.ToString(a[i]));
+					writer.WriteValue(a[i].ToIdString());
 				writer.WriteEndArray();
 			}
 		}

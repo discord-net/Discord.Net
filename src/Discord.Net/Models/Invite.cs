@@ -42,6 +42,7 @@ namespace Discord
 			public ushort Discriminator { get; }
 			/// <summary> Returns the unique identifier for this user's avatar. </summary>
 			public string AvatarId { get; }
+
 			/// <summary> Returns the full path to this user's avatar. </summary>
 			public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
 
@@ -54,24 +55,26 @@ namespace Discord
 			}
 		}
 
-		/// <summary> Returns information about the server this invite is attached to. </summary>
-		public ServerInfo Server { get; private set; }
-		/// <summary> Returns information about the channel this invite is attached to. </summary>
-		public ChannelInfo Channel { get; private set; }
-        
+        /// <summary> Gets the unique code for this invite. </summary>
         public string Code { get; }
-        /// <summary> Returns, if enabled, an alternative human-readable code for URLs. </summary>
+        /// <summary> Gets, if enabled, an alternative human-readable invite code. </summary>
         public string XkcdCode { get; }
-		/// <summary> Time (in seconds) until the invite expires. Set to 0 to never expire. </summary>
-		public int MaxAge { get; private set; }
-		/// <summary> The amount  of times this invite has been used. </summary>
+
+        /// <summary> Gets information about the server this invite is attached to. </summary>
+        public ServerInfo Server { get; private set; }
+        /// <summary> Gets information about the channel this invite is attached to. </summary>
+        public ChannelInfo Channel { get; private set; }        
+		/// <summary> Gets the time (in seconds) until the invite expires. </summary>
+		public int? MaxAge { get; private set; }
+		/// <summary> Gets the amount of times this invite has been used. </summary>
 		public int Uses { get; private set; }
-		/// <summary> The max amount  of times this invite may be used. </summary>
-		public int MaxUses { get; private set; }
-		/// <summary> Returns true if this invite has been destroyed, or you are banned from that server. </summary>
+		/// <summary> Gets the max amount of times this invite may be used. </summary>
+		public int? MaxUses { get; private set; }
+		/// <summary> Returns true if this invite has expired, been destroyed, or you are banned from that server. </summary>
 		public bool IsRevoked { get; private set; }
 		/// <summary> If true, a user accepting this invite will be kicked from the server after closing their client. </summary>
 		public bool IsTemporary { get; private set; }
+        /// <summary> Gets when this invite was created. </summary>
 		public DateTime CreatedAt { get; private set; }
 
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
@@ -99,7 +102,7 @@ namespace Discord
 			if (model.IsTemporary != null)
 				IsTemporary = model.IsTemporary.Value;
 			if (model.MaxAge != null)
-				MaxAge = model.MaxAge.Value;
+				MaxAge = model.MaxAge.Value != 0 ? model.MaxAge.Value : (int?)null;
 			if (model.MaxUses != null)
 				MaxUses = model.MaxUses.Value;
 			if (model.Uses != null)
