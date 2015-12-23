@@ -101,14 +101,14 @@ namespace Discord
 				{
                     if (Client.Config.UsePermissionsCache)
                     {
-                        return Server.Channels.Where(x => 
+                        return Server.AllChannels.Where(x => 
                             (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
                             (x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
                     }
                     else
                     {
                         ChannelPermissions perms = new ChannelPermissions();
-                        return Server.Channels
+                        return Server.AllChannels
                             .Where(x =>
                             {
                                 x.UpdatePermissions(this, perms);

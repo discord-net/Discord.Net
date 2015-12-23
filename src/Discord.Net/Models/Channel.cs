@@ -59,8 +59,8 @@ namespace Discord
         public string Topic { get; private set; }
         /// <summary> Gets the position of this channel relative to other channels in this server. </summary>
         public int Position { get; private set; }
-        /// <summary> Gets the type of this channel (see ChannelTypes). </summary>
-        public string Type { get; private set; }
+        /// <summary> Gets the type of this channel). </summary>
+        public ChannelType Type { get; private set; }
 
         /// <summary> Gets true if this is a private chat with another user. </summary>
         public bool IsPrivate => Recipient != null;
@@ -172,7 +172,7 @@ namespace Discord
 
             if (position != null)
             {
-                Channel[] channels = Server.Channels.Where(x => x.Type == Type).OrderBy(x => x.Position).ToArray();
+                Channel[] channels = Server.AllChannels.Where(x => x.Type == Type).OrderBy(x => x.Position).ToArray();
                 int oldPos = Array.IndexOf(channels, this);
                 var newPosChannel = channels.Where(x => x.Position > position).FirstOrDefault();
                 int newPos = (newPosChannel != null ? Array.IndexOf(channels, newPosChannel) : channels.Length) - 1;

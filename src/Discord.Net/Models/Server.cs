@@ -68,7 +68,11 @@ namespace Discord
         /// <summary> Gets a collection of the ids of all users banned on this server. </summary>
         public IEnumerable<ulong> BannedUserIds => _bans.Select(x => x.Key);
         /// <summary> Gets a collection of all channels in this server. </summary>
-        public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
+        public IEnumerable<Channel> AllChannels => _channels.Select(x => x.Value);
+        /// <summary> Gets a collection of text channels in this server. </summary>
+        public IEnumerable<Channel> TextChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Text);
+        /// <summary> Gets a collection of voice channels in this server. </summary>
+        public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
         /// <summary> Gets a collection of all members in this server. </summary>
         public IEnumerable<User> Users => _users.Select(x => x.Value.User);
         /// <summary> Gets a collection of all roles in this server. </summary>
@@ -386,7 +390,7 @@ namespace Discord
             var user = _users.GetOrAdd(id, x => new Member(new User(Client, id, this)));
             if (user.User == newUser)
             {
-                foreach (var channel in Channels)
+                foreach (var channel in AllChannels)
                     channel.AddUser(newUser);
             }
             return user.User;
@@ -396,7 +400,7 @@ namespace Discord
             Member member;
             if (_users.TryRemove(id, out member))
             {
-                foreach (var channel in Channels)
+                foreach (var channel in AllChannels)
                     channel.RemoveUser(id);
             }
             return member.User;
