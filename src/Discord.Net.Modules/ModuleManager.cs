@@ -75,7 +75,7 @@ namespace Discord.Modules
 
 			if (_allowAll || _useServerWhitelist) //Server-only events
 			{
-				client.ChannelCreated += (s, e) => { if (HasServer(e.Server)) ChannelCreated(s, e); };
+				client.ChannelCreated += (s, e) => { if (e.Server != null && HasServer(e.Server)) ChannelCreated(s, e); };
 				client.UserVoiceStateUpdated += (s, e) => { if (HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
 			}
 
