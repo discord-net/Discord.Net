@@ -6,8 +6,8 @@ namespace Discord
 	{
 		//General
 		CreateInstantInvite = 0,
-		BanMembers = 1,
-		KickMembers = 2,
+        KickMembers = 1,
+        BanMembers = 2,
 		ManageRolesOrPermissions = 3,
 		ManageChannel = 4,
 		ManageServer = 5,

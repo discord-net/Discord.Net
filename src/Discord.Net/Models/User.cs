@@ -1,13 +1,19 @@
 ﻿using Discord.API.Client;
+using Discord.API.Client.Rest;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
 	public class User
-	{
+    {
+        internal static string GetAvatarUrl(ulong userId, string avatarId) 
+            => avatarId != null ? $"{DiscordConfig.CDNUrl}/avatars/{userId}/{avatarId}.jpg" : null;
+
         [Flags]
         private enum VoiceState : byte
         {
@@ -34,15 +40,13 @@ namespace Discord
 				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
         }
 
-        internal static string GetAvatarUrl(ulong userId, string avatarId) => avatarId != null ? $"{DiscordConfig.CDNUrl}/avatars/{userId}/{avatarId}.jpg" : null;
-
         private VoiceState _voiceState;
         private DateTime? _lastOnline;
         private ulong? _voiceChannelId;
         private Dictionary<ulong, Role> _roles;
-
-        /// <summary> Gets the client that generated this user object. </summary>
+        
         internal DiscordClient Client { get; }
+
         /// <summary> Gets the unique identifier for this user. </summary>
         public ulong Id { get; }
         /// <summary> Gets the server this user is a member of. </summary>
@@ -129,9 +133,9 @@ namespace Discord
 			}
 		}
 
-
-		internal User(ulong id, Server server)
+		internal User(DiscordClient client, ulong id, Server server)
 		{
+            Client = client;
             Server = server;
 			_roles = new Dictionary<ulong, Role>();
 
@@ -220,51 +224,109 @@ namespace Discord
 			
 			_voiceChannelId = model.ChannelId; //Allows null
 		}
-		private void UpdateRoles(IEnumerable<Role> roles)
-		{
-			var newRoles = new Dictionary<ulong, Role>();
-			if (roles != null)
-			{
-                foreach (var r in roles)
-                {
-                    if (r != null)
-                        newRoles[r.Id] = r;
-                }
-			}
-
-			if (Server != null)
-			{
-				var everyone = Server.EveryoneRole;
-				newRoles[everyone.Id] = everyone;
-			}
-			_roles = newRoles;
-
-			if (Server != null)
-				Server.UpdatePermissions(this);
-		}
 
 		internal void UpdateActivity(DateTime? activity = null)
 		{
 			if (LastActivityAt == null || activity > LastActivityAt.Value)
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
-		
-		public ServerPermissions ServerPermissions => Server.GetPermissions(this);
+
+        public Task Edit(bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null)
+        {
+            if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
+
+            //Modify the roles collection and filter out the everyone role
+            var roleIds = roles == null ? null : Roles.Where(x => !x.IsEveryone).Select(x => x.Id);
+
+            var request = new UpdateMemberRequest(Server.Id, Id)
+            {
+                IsMuted = isMuted ?? IsServerMuted,
+                IsDeafened = isDeafened ?? IsServerDeafened,
+                VoiceChannelId = voiceChannel?.Id,
+                RoleIds = roleIds.ToArray()
+            };
+            return Client.ClientAPI.Send(request);
+        }
+        
+        public Task Kick()
+        {
+            if (Server == null) throw new InvalidOperationException("Unable to kick users from a private channel");
+
+            var request = new KickMemberRequest(Server.Id, Id);
+            return Client.ClientAPI.Send(request);
+        }
+
+        #region Permissions
+        public ServerPermissions ServerPermissions => Server.GetPermissions(this);
 		public ChannelPermissions GetPermissions(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-
 			return channel.GetPermissions(this);
 		}
+        #endregion
 
-		public bool HasRole(Role role)
-		{
-			if (role == null) throw new ArgumentNullException(nameof(role));
-			
-			return _roles.ContainsKey(role.Id);
-		}
+        #region Channels
+        public Task<Channel> CreateChannel()
+            => Client.CreatePrivateChannel(this);
+        #endregion
 
-		public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
+        #region Messages
+        public async Task<Message> SendMessage(string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            var channel = await CreateChannel().ConfigureAwait(false);
+            return await channel.SendMessage(text).ConfigureAwait(false);
+        }
+        public async Task<Message> SendFile(string filePath)
+        {
+            if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+
+            var channel = await CreateChannel().ConfigureAwait(false);
+            return await channel.SendFile(filePath).ConfigureAwait(false);
+        }
+        public async Task<Message> SendFile(string filename, Stream stream)
+        {
+            if (filename == null) throw new ArgumentNullException(nameof(filename));
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            var channel = await CreateChannel().ConfigureAwait(false);
+            return await channel.SendFile(filename, stream).ConfigureAwait(false);
+        }
+        #endregion
+
+        #region Roles
+        private void UpdateRoles(IEnumerable<Role> roles)
+        {
+            var newRoles = new Dictionary<ulong, Role>();
+            if (roles != null)
+            {
+                foreach (var r in roles)
+                {
+                    if (r != null)
+                        newRoles[r.Id] = r;
+                }
+            }
+
+            if (Server != null)
+            {
+                var everyone = Server.EveryoneRole;
+                newRoles[everyone.Id] = everyone;
+            }
+            _roles = newRoles;
+
+            if (Server != null)
+                Server.UpdatePermissions(this);
+        }
+        public bool HasRole(Role role)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+
+            return _roles.ContainsKey(role.Id);
+        }
+        #endregion
+
+        public override bool Equals(object obj) => obj is User && (obj as User).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 7230);
 		public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
 	}

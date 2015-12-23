@@ -1,9 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API.Client.Rest;
+using Discord.Net;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using APIMessage = Discord.API.Client.Message;
 
 namespace Discord
@@ -16,8 +21,73 @@ namespace Discord
 	}
 
 	public sealed class Message
-	{
-		/*internal class ImportResolver : DefaultContractResolver
+    {
+        private static readonly Regex _userRegex = new Regex(@"<@([0-9]+)>", RegexOptions.Compiled);
+        private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
+        private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
+        private static readonly Attachment[] _initialAttachments = new Attachment[0];
+        private static readonly Embed[] _initialEmbeds = new Embed[0];
+
+        internal static string CleanUserMentions(Channel channel, string text, List<User> users = null)
+        {
+            return _userRegex.Replace(text, new MatchEvaluator(e =>
+            {
+                var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
+                var user = channel.GetUser(id);
+                if (user != null)
+                {
+                    if (users != null)
+                        users.Add(user);
+                    return '@' + user.Name;
+                }
+                else //User not found
+                    return '@' + e.Value;
+            }));
+        }
+        internal static string CleanChannelMentions(Channel channel, string text, List<Channel> channels = null)
+        {
+            var server = channel.Server;
+            if (server == null) return text;
+
+            return _channelRegex.Replace(text, new MatchEvaluator(e =>
+            {
+                var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
+                var mentionedChannel = server.GetChannel(id);
+                if (mentionedChannel != null && mentionedChannel.Server.Id == server.Id)
+                {
+                    if (channels != null)
+                        channels.Add(mentionedChannel);
+                    return '#' + mentionedChannel.Name;
+                }
+                else //Channel not found
+                    return '#' + e.Value;
+            }));
+        }
+        /*internal static string CleanRoleMentions(User user, Channel channel, string text, List<Role> roles = null)
+		{
+            var server = channel.Server;
+            if (server == null) return text;
+
+			return _roleRegex.Replace(text, new MatchEvaluator(e =>
+			{
+				if (roles != null && user.GetPermissions(channel).MentionEveryone)
+					roles.Add(server.EveryoneRole);
+				return e.Value;
+			}));
+		}*/
+        
+        private static string Resolve(Channel channel, string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            var client = channel.Client;
+            text = CleanUserMentions(channel, text);
+            text = CleanChannelMentions(channel, text);
+            //text = CleanRoleMentions(Channel, text);
+            return text;
+        }
+
+        /*internal class ImportResolver : DefaultContractResolver
 		{
 			protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
 			{
@@ -33,7 +103,7 @@ namespace Discord
 			}
 		}*/
 
-		public sealed class Attachment : File
+        public sealed class Attachment : File
 		{
 			/// <summary> Unique identifier for this file. </summary>
 			public string Id { get; internal set; }
@@ -89,10 +159,9 @@ namespace Discord
 			internal File() { }
 		}
 
-        private static readonly Attachment[] _initialAttachments = new Attachment[0];
-        private static readonly Embed[] _initialEmbeds = new Embed[0];
-
         private readonly ulong _userId;
+
+        internal DiscordClient Client => Channel.Client;
 
         /// <summary> Returns the unique identifier for this message. </summary>
         public ulong Id { get; }
@@ -117,7 +186,7 @@ namespace Discord
 		public Attachment[] Attachments { get; private set; }
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; private set; }
-		
+
 		/// <summary> Returns a collection of all users mentioned in this message. </summary>
 		public IEnumerable<User> MentionedUsers { get; internal set; }
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
@@ -210,11 +279,11 @@ namespace Discord
 				//var mentionedUsers = new List<User>();
 				var mentionedChannels = new List<Channel>();
 				//var mentionedRoles = new List<Role>();
-				text = Mention.CleanUserMentions(Channel.Client, channel, text/*, mentionedUsers*/);
+				text = CleanUserMentions(Channel, text/*, mentionedUsers*/);
 				if (server != null)
 				{
-					text = Mention.CleanChannelMentions(Channel.Client, channel, text, mentionedChannels);
-					//text = Mention.CleanRoleMentions(_client, User, channel, text, mentionedRoles);
+					text = CleanChannelMentions(Channel, text, mentionedChannels);
+					//text = CleanRoleMentions(_client, User, channel, text, mentionedRoles);
 				}
 				Text = text;
 
@@ -236,7 +305,54 @@ namespace Discord
             }
         }
 
-		public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
+        public async Task Edit(string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            var channel = Channel;
+            var mentionedUsers = new List<User>();
+            if (!channel.IsPrivate)
+                text = CleanUserMentions(channel, text, mentionedUsers);
+
+            if (text.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
+
+            if (Client.Config.UseMessageQueue)
+                Client.MessageQueue.QueueEdit(channel.Id, Id, text, mentionedUsers.Select(x => x.Id).ToArray());
+            else
+            {
+                var request = new UpdateMessageRequest(Channel.Id, Id)
+                {
+                    Content = text,
+                    MentionedUserIds = mentionedUsers.Select(x => x.Id).ToArray()
+                };
+                await Client.ClientAPI.Send(request).ConfigureAwait(false);
+            }
+        }
+
+        public async Task Delete()
+        {
+            var request = new DeleteMessageRequest(Channel.Id, Id);
+            try { await Client.ClientAPI.Send(request).ConfigureAwait(false); }
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+        }
+        
+        public Task Acknowledge()
+        {
+            if (_userId != Client.CurrentUser.Id)
+                return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
+            else
+                return TaskHelper.CompletedTask;
+        }
+
+        /// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
+        public string Resolve(string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            return Resolve(Channel, text);
+        }
+
+        public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 9979);
 		public override string ToString() => $"{User}: {RawText}";
 	}

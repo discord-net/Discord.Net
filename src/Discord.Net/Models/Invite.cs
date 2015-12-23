@@ -1,5 +1,9 @@
 ﻿using Discord.API.Client;
+using Discord.API.Client.Rest;
+using Discord.Net;
 using System;
+using System.Net;
+using System.Threading.Tasks;
 using APIInvite = Discord.API.Client.Invite;
 
 namespace Discord
@@ -55,6 +59,10 @@ namespace Discord
 			}
 		}
 
+        private ulong _serverId, _channelId;
+
+        internal DiscordClient Client { get; }
+
         /// <summary> Gets the unique code for this invite. </summary>
         public string Code { get; }
         /// <summary> Gets, if enabled, an alternative human-readable invite code. </summary>
@@ -63,9 +71,9 @@ namespace Discord
         /// <summary> Gets information about the server this invite is attached to. </summary>
         public ServerInfo Server { get; private set; }
         /// <summary> Gets information about the channel this invite is attached to. </summary>
-        public ChannelInfo Channel { get; private set; }        
-		/// <summary> Gets the time (in seconds) until the invite expires. </summary>
-		public int? MaxAge { get; private set; }
+        public ChannelInfo Channel { get; private set; }
+        /// <summary> Gets the time (in seconds) until the invite expires. </summary>
+        public int? MaxAge { get; private set; }
 		/// <summary> Gets the amount of times this invite has been used. </summary>
 		public int Uses { get; private set; }
 		/// <summary> Gets the max amount of times this invite may be used. </summary>
@@ -80,8 +88,9 @@ namespace Discord
 		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
 		public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
-        internal Invite(string code, string xkcdPass)
+        internal Invite(DiscordClient client, string code, string xkcdPass)
 		{
+            Client = client;
             Code = code;
 			XkcdCode = xkcdPass;
 		}
@@ -110,8 +119,16 @@ namespace Discord
 			if (model.CreatedAt != null)
 				CreatedAt = model.CreatedAt.Value;
 		}
+        
+        public async Task Delete()
+        {
+            try { await Client.ClientAPI.Send(new DeleteInviteRequest(Code)).ConfigureAwait(false); }
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+        }        
+        public Task Accept() 
+            => Client.ClientAPI.Send(new AcceptInviteRequest(Code));
 
-		public override bool Equals(object obj) => obj is Invite && (obj as Invite).Code == Code;
+        public override bool Equals(object obj) => obj is Invite && (obj as Invite).Code == Code;
 		public override int GetHashCode() => unchecked(Code.GetHashCode() + 9980);
 		public override string ToString() => XkcdCode ?? Code;
 	}

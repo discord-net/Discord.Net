@@ -14,7 +14,7 @@ namespace Discord.Net.WebSockets
         private int _lastSequence;
 		private string _sessionId;
 
-        public string Token { get; private set; }
+        public string Token { get; internal set; }
 
 		public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
 			: base(client, serializer, logger)
@@ -26,11 +26,10 @@ namespace Discord.Net.WebSockets
 			};
 		}
 
-        public async Task Connect(string token)
+        public async Task Connect()
         {
-            Token = token;
             await BeginConnect().ConfigureAwait(false);
-			SendIdentify(token);
+			SendIdentify(Token);
         }
 		private async Task Redirect()
         {
@@ -47,7 +46,7 @@ namespace Discord.Net.WebSockets
 				{
 					try
                     {
-                        await Connect(Token).ConfigureAwait(false);
+                        await Connect().ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }

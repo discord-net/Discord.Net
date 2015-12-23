@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Discord.API.Client.Rest;
+using Discord.Net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using APIRole = Discord.API.Client.Role;
 
 namespace Discord
 {
 	public sealed class Role
     {
-        private readonly DiscordClient _client;
+        internal DiscordClient Client => Server.Client;
 
         /// <summary> Gets the unique identifier for this role. </summary>
         public ulong Id { get; }
@@ -72,8 +76,57 @@ namespace Discord
 			foreach (var member in Members)
 				Server.UpdatePermissions(member);
 		}
+        
+        public async Task Edit(string name = null, ServerPermissions permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
+        {
+            var updateRequest = new UpdateRoleRequest(Server.Id, Id)
+            {
+                Name = name ?? Name,
+                Permissions = (permissions ?? Permissions).RawValue,
+                Color = (color ?? Color).RawValue,
+                IsHoisted = isHoisted ?? IsHoisted
+            };
 
-		public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
+            var updateResponse = await Client.ClientAPI.Send(updateRequest).ConfigureAwait(false);
+
+            if (position != null)
+            {
+                int oldPos = Position;
+                int newPos = position.Value;
+                int minPos;
+                Role[] roles = Server.Roles.OrderBy(x => x.Position).ToArray();
+
+                if (oldPos < newPos) //Moving Down
+                {
+                    minPos = oldPos;
+                    for (int i = oldPos; i < newPos; i++)
+                        roles[i] = roles[i + 1];
+                    roles[newPos] = this;
+                }
+                else //(oldPos > newPos) Moving Up
+                {
+                    minPos = newPos;
+                    for (int i = oldPos; i > newPos; i--)
+                        roles[i] = roles[i - 1];
+                    roles[newPos] = this;
+                }
+
+                var reorderRequest = new ReorderRolesRequest(Server.Id)
+                {
+                    RoleIds = roles.Skip(minPos).Select(x => x.Id).ToArray(),
+                    StartPos = minPos
+                };
+                await Client.ClientAPI.Send(reorderRequest).ConfigureAwait(false);
+            }
+        }
+
+        public async Task Delete()
+        {
+            try { await Client.ClientAPI.Send(new DeleteRoleRequest(Server.Id, Id)).ConfigureAwait(false); }
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+        }
+
+        public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 6653);
 		public override string ToString() => Name ?? Id.ToIdString();
 	}
