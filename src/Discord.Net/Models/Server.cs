@@ -386,12 +386,11 @@ namespace Discord
         #region Users
         internal User AddUser(ulong id)
         {
-            User newUser = null;
-            var user = _users.GetOrAdd(id, x => new Member(new User(Client, id, this)));
-            if (user.User == newUser)
+            Member user;
+            if (_users.TryGetOrAdd(id, x => new Member(new User(Client, x, this)), out user))
             {
                 foreach (var channel in AllChannels)
-                    channel.AddUser(newUser);
+                    channel.AddUser(user.User);
             }
             return user.User;
         }
