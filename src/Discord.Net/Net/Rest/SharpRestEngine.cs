@@ -1,4 +1,5 @@
 ﻿#if !DOTNET5_4
+using Discord.Logging;
 using RestSharp;
 using System;
 using System.IO;
@@ -16,7 +17,9 @@ namespace Discord.Net.Rest
         private readonly object _rateLimitLock;
         private DateTime _rateLimitTime;
 
-        public RestSharpEngine(DiscordConfig config, string baseUrl)
+        internal Logger Logger { get; }
+
+        public RestSharpEngine(DiscordConfig config, string baseUrl, Logger logger)
 		{
 			_config = config;
             _rateLimitLock = new object();
@@ -78,7 +81,7 @@ namespace Discord.Net.Rest
                     int milliseconds;
                     if (retryAfter != null && int.TryParse((string)retryAfter.Value, out milliseconds))
                     {
-                        /*var now = DateTime.UtcNow;
+                        var now = DateTime.UtcNow;
                         if (now >= _rateLimitTime)
                         {
                             lock (_rateLimitLock)
@@ -86,10 +89,10 @@ namespace Discord.Net.Rest
                                 if (now >= _rateLimitTime)
                                 {
                                     _rateLimitTime = now.AddMilliseconds(milliseconds);
-                                    _logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
+                                    Logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
                                 }
                             }
-                        }*/
+                        }
                         await Task.Delay(milliseconds, cancelToken).ConfigureAwait(false);
                         continue;
                     }
