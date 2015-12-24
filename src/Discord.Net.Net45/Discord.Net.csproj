@@ -158,6 +158,9 @@
     <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\GuildDelete.cs">
       <Link>API\Client\GatewaySocket\Events\GuildDelete.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\GuildEmojisUpdate.cs">
+      <Link>API\Client\GatewaySocket\Events\GuildEmojisUpdate.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\GuildIntegrationsUpdate.cs">
       <Link>API\Client\GatewaySocket\Events\GuildIntegrationsUpdate.cs</Link>
     </Compile>

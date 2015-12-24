@@ -445,6 +445,7 @@ namespace Discord
         }
         #endregion
 
+        #region Gateway Events
         private void OnReceivedEvent(WebSocketEventEventArgs e)
         {
             try
@@ -886,6 +887,7 @@ namespace Discord
                     case "USER_SETTINGS_UPDATE":
                     case "GUILD_INTEGRATIONS_UPDATE":
                     case "VOICE_SERVER_UPDATE":
+                    case "GUILD_EMOJIS_UPDATE":
                         break;
 
                     case "RESUMED": //Handled in DataWebSocket
@@ -902,6 +904,7 @@ namespace Discord
                 Logger.Error($"Error handling {e.Type} event", ex);
             }
         }
+        #endregion
 
         #region Async Wrapper
         /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
