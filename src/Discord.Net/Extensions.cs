@@ -29,15 +29,18 @@ namespace Discord
 
         public static bool TryGetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> d, 
             TKey key, Func<TKey, TValue> factory, out TValue result)
-            where TValue : class
         {
-            TValue newValue = null;
+            bool created = false;
+            TValue newValue = default(TValue);
             while (true)
             {
                 if (d.TryGetValue(key, out result))
                     return false;
-                if (newValue == null)
+                if (!created)
+                {
                     newValue = factory(key);
+                    created = true;
+                }
                 if (d.TryAdd(key, newValue))
                 {
                     result = newValue;

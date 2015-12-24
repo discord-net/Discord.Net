@@ -304,6 +304,17 @@ namespace Discord
         }
         private Task SendStatus()
         {
+            PrivateUser.Status = Status;
+            PrivateUser.CurrentGame = CurrentGame;
+            foreach (var server in Servers)
+            {
+                var current = server.CurrentUser;
+                if (current != null)
+                {
+                    current.Status = Status;
+                    current.CurrentGame = CurrentGame;
+                }
+            }
             GatewaySocket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
             return TaskHelper.CompletedTask;
         }

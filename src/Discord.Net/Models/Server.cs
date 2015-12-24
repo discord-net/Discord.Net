@@ -391,6 +391,11 @@ namespace Discord
             {
                 foreach (var channel in AllChannels)
                     channel.AddUser(user.User);
+                if (id == Client.CurrentUser.Id)
+                {
+                    user.User.CurrentGame = Client.CurrentGame;
+                    user.User.Status = Client.Status;
+                }
             }
             return user.User;
         }

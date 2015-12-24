@@ -59,9 +59,9 @@ namespace Discord
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId { get; private set; }
         /// <summary> Gets the name of the game this user is currently playing. </summary>
-        public string CurrentGame { get; private set; }
+        public string CurrentGame { get; internal set; }
         /// <summary> Gets the current status for this user. </summary>
-        public UserStatus Status { get; private set; }
+        public UserStatus Status { get; internal set; }
         /// <summary> Gets the datetime that this user joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
         /// <summary> Returns the time this user last sent/edited a message, started typing or sent voice data in this server. </summary>
