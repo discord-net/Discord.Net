@@ -7,7 +7,7 @@ Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or 
 - Using Discord API v3
 - Supports .Net Framework 4.5 and .Net Core 5.0
 - Server Management (Servers, Channels, Messages, Invites, Roles, Users)
-- Send/Receieve Messages (Including mentions and formatting)
+- Send/Receive Messages (Including mentions and formatting)
 - Basic Voice Support (Outgoing only)
 - Command extension library (Supports permission levels)
 
