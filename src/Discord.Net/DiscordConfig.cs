@@ -44,7 +44,7 @@ namespace Discord
 
         public const string ClientAPIUrl = "https://discordapp.com/api/";
         public const string StatusAPIUrl = "https://status.discordapp.com/api/v2/";
-        public const string CDNUrl = "https://cdn.discordapp.com/";
+        public const string CDNUrl = "https://cdn.discordapp.com";
         public const string InviteUrl = "https://discord.gg/";
 
         //Global
