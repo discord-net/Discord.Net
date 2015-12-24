@@ -39,7 +39,7 @@ namespace Discord
         public const int MaxMessageSize = 2000;
 
         public const string LibName = "Discord.Net";
-        public static string LibVersion => typeof(DiscordClient).GetTypeInfo().Assembly.GetName().Version.ToString(3);
+        public static string LibVersion => typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3);
         public const string LibUrl = "https://github.com/RogueException/Discord.Net";
 
         public const string ClientAPIUrl = "https://discordapp.com/api/";
