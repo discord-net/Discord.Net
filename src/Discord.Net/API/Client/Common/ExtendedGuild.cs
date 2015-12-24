@@ -20,7 +20,17 @@ namespace Discord.API.Client
         public MemberPresence[] Presences { get; set; }
         [JsonProperty("voice_states")]
         public MemberVoiceState[] VoiceStates { get; set; }
+        [JsonProperty("large")]
+        public bool IsLarge { get; set; }
         [JsonProperty("unavailable")]
         public bool? Unavailable { get; set; }
+
+        //Unknown
+        [JsonProperty("splash")]
+        public object Splash { get; set; }
+        [JsonProperty("features")]
+        public object Features { get; set; }
+        [JsonProperty("emojis")]
+        public object Emojis { get; set; }
     }
 }

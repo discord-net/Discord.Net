@@ -19,7 +19,7 @@ namespace Discord
         public bool WasUnexpected => _wasStopUnexpected;
         private bool _wasStopUnexpected;
 
-        public Exception Exception => _stopReason.SourceException;
+        public Exception Exception => _stopReason?.SourceException;
         private ExceptionDispatchInfo _stopReason;
 
         public TaskManager()

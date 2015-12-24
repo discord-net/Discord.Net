@@ -28,5 +28,11 @@ namespace Discord.API.Client.GatewaySocket
         public Channel[] PrivateChannels { get; set; }
         [JsonProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }
+
+        //Ignored
+        [JsonProperty("user_settings")]
+        public object UserSettings { get; set; }
+        [JsonProperty("user_guild_settings")]
+        public object UserGuildSettings { get; set; }
     }
 }
