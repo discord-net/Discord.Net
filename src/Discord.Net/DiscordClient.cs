@@ -60,8 +60,8 @@ namespace Discord
         public string SessionId { get; private set; }
         /// <summary> Gets the status of the current user. </summary>
         public UserStatus Status { get; private set; }
-        /// <summary> Gets the game this current user is reported as playing. </summary>
-        public int? CurrentGameId { get; private set; }
+        /// <summary> Gets the game the current user is displayed as playing. </summary>
+        public string CurrentGame { get; private set; }
 
         /// <summary> Gets a collection of all servers this client is a member of. </summary>
         public IEnumerable<Server> Servers => _servers.Select(x => x.Value);
@@ -297,14 +297,14 @@ namespace Discord
             Status = status;
             return SendStatus();
         }
-        public Task SetGame(int? gameId)
+        public Task SetGame(string game)
         {
-            CurrentGameId = gameId;
+            CurrentGame = game;
             return SendStatus();
         }
         private Task SendStatus()
         {
-            GatewaySocket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGameId);
+            GatewaySocket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
             return TaskHelper.CompletedTask;
         }
 

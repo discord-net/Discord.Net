@@ -59,7 +59,7 @@ namespace Discord
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId { get; private set; }
         /// <summary> Gets the id for the game this user is currently playing. </summary>
-        public string GameId { get; private set; }
+        public string GameName { get; private set; }
         /// <summary> Gets the current status for this user. </summary>
         public UserStatus Status { get; private set; }
         /// <summary> Gets the datetime that this user joined this server. </summary>
@@ -195,7 +195,7 @@ namespace Discord
 					_lastOnline = DateTime.UtcNow;
 			}
 			
-			GameId = model.GameId; //Allows null
+			GameName = model.Game?.Name; //Allows null
 		}
 		internal void Update(MemberVoiceState model)
         {

@@ -5,8 +5,13 @@ namespace Discord.API.Client
 {
     public class MemberPresence : MemberReference
     {
-        [JsonProperty("game_id")]
-        public string GameId { get; set; }
+        public sealed class GameInfo
+        {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+        }
+        [JsonProperty("game")]
+        public GameInfo Game { get; set; }
         [JsonProperty("status")]
         public string Status { get; set; }
         [JsonProperty("roles"), JsonConverter(typeof(LongStringArrayConverter))]
