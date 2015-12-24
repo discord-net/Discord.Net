@@ -58,8 +58,8 @@ namespace Discord
         public ushort Discriminator { get; private set; }
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId { get; private set; }
-        /// <summary> Gets the id for the game this user is currently playing. </summary>
-        public string GameName { get; private set; }
+        /// <summary> Gets the name of the game this user is currently playing. </summary>
+        public string CurrentGame { get; private set; }
         /// <summary> Gets the current status for this user. </summary>
         public UserStatus Status { get; private set; }
         /// <summary> Gets the datetime that this user joined this server. </summary>
@@ -195,7 +195,7 @@ namespace Discord
 					_lastOnline = DateTime.UtcNow;
 			}
 			
-			GameName = model.Game?.Name; //Allows null
+			CurrentGame = model.Game?.Name; //Allows null
 		}
 		internal void Update(MemberVoiceState model)
         {
