@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Discord.Legacy;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,12 @@ namespace Discord.Tests
 
 			//Cleanup existing servers
 			WaitMany(
-				_hostClient.AllServers.Select(x => _hostClient.LeaveServer(x)),
-				_targetBot.AllServers.Select(x => _targetBot.LeaveServer(x)),
-				_observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)));
+				_hostClient.Servers.Select(x => _hostClient.LeaveServer(x)),
+				_targetBot.Servers.Select(x => _targetBot.LeaveServer(x)),
+				_observerBot.Servers.Select(x => _observerBot.LeaveServer(x)));
 
 			//Create new server and invite the other bots to it
-			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.GetVoiceRegions().Result.First()).Result;
+			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.GetVoiceRegions().First()).Result;
 			_testServerChannel = _testServer.DefaultChannel;
 			Invite invite = _hostClient.CreateInvite(_testServer, 60, 1, false, false).Result;
 			WaitAll(
@@ -112,9 +113,9 @@ namespace Discord.Tests
 		public static void Cleanup()
 		{
 			WaitMany(
-				_hostClient.State == ConnectionState.Connected ? _hostClient.AllServers.Select(x => _hostClient.LeaveServer(x)) : null,
-				_targetBot.State == ConnectionState.Connected ? _targetBot.AllServers.Select(x => _targetBot.LeaveServer(x)) : null,
-				_observerBot.State == ConnectionState.Connected ? _observerBot.AllServers.Select(x => _observerBot.LeaveServer(x)) : null);
+				_hostClient.State == ConnectionState.Connected ? _hostClient.Servers.Select(x => _hostClient.LeaveServer(x)) : null,
+				_targetBot.State == ConnectionState.Connected ? _targetBot.Servers.Select(x => _targetBot.LeaveServer(x)) : null,
+				_observerBot.State == ConnectionState.Connected ? _observerBot.Servers.Select(x => _observerBot.LeaveServer(x)) : null);
 
 			WaitAll(
 				_hostClient.Disconnect(),
