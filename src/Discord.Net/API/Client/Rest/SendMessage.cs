@@ -15,8 +15,6 @@ namespace Discord.API.Client.Rest
 
         [JsonProperty("content")]
         public string Content { get; set; }
-        [JsonProperty("mentions"), JsonConverter(typeof(LongStringArrayConverter))]
-        public ulong[] MentionedUserIds { get; set; }
         [JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
         public string Nonce { get; set; }
         [JsonProperty("tts")]

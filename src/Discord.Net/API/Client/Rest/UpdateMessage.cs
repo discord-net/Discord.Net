@@ -16,8 +16,6 @@ namespace Discord.API.Client.Rest
 
         [JsonProperty("content")]
         public string Content { get; set; } = "";
-        [JsonProperty("mentions"), JsonConverter(typeof(LongStringArrayConverter))]
-        public ulong[] MentionedUserIds { get; set; } = new ulong[0];
 
         public UpdateMessageRequest(ulong channelId, ulong messageId)
         {

@@ -333,19 +333,16 @@ namespace Discord
         private async Task<Message> SendMessageInternal(string text, bool isTTS)
         {
             Message msg = null;
-            var mentionedUsers = new List<User>();
-            text = Message.CleanUserMentions(this, text, mentionedUsers);
             if (text.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
 
             if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueSend(Id, text, mentionedUsers.Select(x => x.Id).ToArray(), isTTS);
+                Client.MessageQueue.QueueSend(Id, text, isTTS);
             else
             {
                 var request = new SendMessageRequest(Id)
                 {
                     Content = text,
-                    MentionedUserIds = mentionedUsers.Select(x => x.Id).ToArray(),
                     Nonce = null,
                     IsTTS = isTTS
                 };

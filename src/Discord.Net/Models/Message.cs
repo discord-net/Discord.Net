@@ -314,21 +314,17 @@ namespace Discord
             if (text == null) throw new ArgumentNullException(nameof(text));
 
             var channel = Channel;
-            var mentionedUsers = new List<User>();
-            if (!channel.IsPrivate)
-                text = CleanUserMentions(channel, text, mentionedUsers);
 
             if (text.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
 
             if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueEdit(channel.Id, Id, text, mentionedUsers.Select(x => x.Id).ToArray());
+                Client.MessageQueue.QueueEdit(channel.Id, Id, text);
             else
             {
                 var request = new UpdateMessageRequest(Channel.Id, Id)
                 {
-                    Content = text,
-                    MentionedUserIds = mentionedUsers.Select(x => x.Id).ToArray()
+                    Content = text
                 };
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
             }

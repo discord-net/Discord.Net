@@ -13,15 +13,13 @@ namespace Discord.Net
         {
             public readonly ulong Id, ChannelId;
             public readonly string Text;
-            public readonly ulong[] MentionedUsers;
             public readonly bool IsTTS;
 
-            public MessageQueueItem(ulong id, ulong channelId, string text, ulong[] userIds, bool isTTS)
+            public MessageQueueItem(ulong id, ulong channelId, string text, bool isTTS)
             {
                 Id = id;
                 ChannelId = channelId;
                 Text = text;
-                MentionedUsers = userIds;
                 IsTTS = isTTS;
             }
         }
@@ -37,13 +35,13 @@ namespace Discord.Net
             _pending = new ConcurrentQueue<MessageQueueItem>();
         }
 
-        public void QueueSend(ulong channelId, string text, ulong[] userIds, bool isTTS)
+        public void QueueSend(ulong channelId, string text, bool isTTS)
         {
-            _pending.Enqueue(new MessageQueueItem(0, channelId, text, userIds, isTTS));
+            _pending.Enqueue(new MessageQueueItem(0, channelId, text, isTTS));
         }
-        public void QueueEdit(ulong channelId, ulong messageId, string text, ulong[] userIds)
+        public void QueueEdit(ulong channelId, ulong messageId, string text)
         {
-            _pending.Enqueue(new MessageQueueItem(channelId, messageId, text, userIds, false));
+            _pending.Enqueue(new MessageQueueItem(channelId, messageId, text, false));
         }
 
         internal Task Run(CancellationToken cancelToken, int interval)
@@ -64,7 +62,6 @@ namespace Discord.Net
                                 var request = new SendMessageRequest(queuedMessage.ChannelId)
                                 {
                                     Content = queuedMessage.Text,
-                                    MentionedUserIds = queuedMessage.MentionedUsers,
                                     Nonce = GenerateNonce().ToIdString(),
                                     IsTTS = queuedMessage.IsTTS
                                 };
@@ -74,8 +71,7 @@ namespace Discord.Net
                             {
                                 var request = new UpdateMessageRequest(queuedMessage.ChannelId, queuedMessage.Id)
                                 {
-                                    Content = queuedMessage.Text,
-                                    MentionedUserIds = queuedMessage.MentionedUsers
+                                    Content = queuedMessage.Text
                                 };
                                 await _client.ClientAPI.Send(request).ConfigureAwait(false);
                             }
