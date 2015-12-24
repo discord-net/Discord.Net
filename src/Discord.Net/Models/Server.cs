@@ -15,7 +15,7 @@ namespace Discord
 	public sealed class Server
     {
         internal static string GetIconUrl(ulong serverId, string iconId)
-            => iconId != null ? $"{DiscordConfig.CDNUrl}/icons/{serverId}/{iconId}.jpg" : null;
+            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{serverId}/{iconId}.jpg" : null;
 
         private struct Member
         {
