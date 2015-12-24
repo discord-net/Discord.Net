@@ -27,21 +27,21 @@ namespace Discord.Audio.Opus
 		/// <summary> Gets the bit rate of the encoder. </summary>
 		public const int BitsPerSample = 16;
 		/// <summary> Gets the input sampling rate of the encoder. </summary>
-		public int InputSamplingRate { get; private set; }
+		public int InputSamplingRate { get; }
 		/// <summary> Gets the number of channels of the encoder. </summary>
-		public int InputChannels { get; private set; }
+		public int InputChannels { get; }
 		/// <summary> Gets the milliseconds per frame. </summary>
-		public int FrameLength { get; private set; }
+		public int FrameLength { get;  }
 		/// <summary> Gets the number of samples per frame. </summary>
-		public int SamplesPerFrame { get; private set; }
+		public int SamplesPerFrame { get; }
 		/// <summary> Gets the bytes per sample. </summary>
-		public int SampleSize { get; private set; }
+		public int SampleSize { get; }
 		/// <summary> Gets the bytes per frame. </summary>
-		public int FrameSize { get; private set; }
+		public int FrameSize { get; }
 		/// <summary> Gets the bit rate in kbit/s. </summary>
-		public int? BitRate { get; private set; }
+		public int? BitRate { get; }
 		/// <summary> Gets the coding mode of the encoder. </summary>
-		public OpusApplication Application { get; private set; }
+		public OpusApplication Application { get; }
 
 		/// <summary> Creates a new Opus encoder. </summary>
 		/// <param name="samplingRate">Sampling rate of the input signal (Hz). Supported Values:  8000, 12000, 16000, 24000, or 48000.</param>
