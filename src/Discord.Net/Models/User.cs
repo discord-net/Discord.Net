@@ -199,25 +199,25 @@ namespace Discord
 		}
 		internal void Update(MemberVoiceState model)
         {
-            if (model.IsSelfMuted.Value == true)
+            if (model.IsSelfMuted == true)
                 _voiceState |= VoiceState.SelfMuted;
-            else if (model.IsSelfMuted.Value == false)
+            else if (model.IsSelfMuted == false)
                 _voiceState &= ~VoiceState.SelfMuted;
-            if (model.IsSelfDeafened.Value == true)
+            if (model.IsSelfDeafened == true)
                 _voiceState |= VoiceState.SelfDeafened;
-            else if (model.IsSelfDeafened.Value == false)
+            else if (model.IsSelfDeafened == false)
                 _voiceState &= ~VoiceState.SelfDeafened;
             if (model.IsServerMuted == true)
                 _voiceState |= VoiceState.ServerMuted;
             else if (model.IsServerMuted == false)
                 _voiceState &= ~VoiceState.ServerMuted;
-            if (model.IsServerDeafened.Value == true)
+            if (model.IsServerDeafened == true)
                 _voiceState |= VoiceState.ServerDeafened;
-            else if (model.IsServerDeafened.Value == false)
+            else if (model.IsServerDeafened == false)
                 _voiceState &= ~VoiceState.ServerDeafened;
-            if (model.IsServerSuppressed.Value == true)
+            if (model.IsServerSuppressed == true)
                 _voiceState |= VoiceState.ServerSuppressed;
-            else if (model.IsServerSuppressed.Value == false)
+            else if (model.IsServerSuppressed == false)
                 _voiceState &= ~VoiceState.ServerSuppressed;
             
             /*if (model.SessionId != null)
