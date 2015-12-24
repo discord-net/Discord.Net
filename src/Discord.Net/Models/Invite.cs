@@ -59,8 +59,6 @@ namespace Discord
 			}
 		}
 
-        private ulong _serverId, _channelId;
-
         internal DiscordClient Client { get; }
 
         /// <summary> Gets the unique code for this invite. </summary>
