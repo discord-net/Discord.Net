@@ -10,8 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)EpochTime.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EventHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IdConvert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskHelper.cs" />
   </ItemGroup>
