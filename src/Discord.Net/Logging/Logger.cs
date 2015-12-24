@@ -1,5 +1,4 @@
-﻿using Discord.Net.WebSockets;
-using System;
+﻿using System;
 
 namespace Discord.Logging
 {

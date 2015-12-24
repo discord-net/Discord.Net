@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,8 +10,9 @@
     <RootNamespace>Discord.Audio</RootNamespace>
     <AssemblyName>Discord.Net.Audio</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,12 +44,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net.Audio\API\Messages\GatewaySocket.cs">
-      <Link>API\Messages\GatewaySocket.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net.Audio\API\Messages\VoiceSocket.cs">
-      <Link>API\Messages\VoiceSocket.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net.Audio\AudioExtensions.cs">
       <Link>AudioExtensions.cs</Link>
     </Compile>
