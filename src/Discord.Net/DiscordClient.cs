@@ -1009,8 +1009,5 @@ namespace Discord
                 Logger.Warning("Failed to cache token", ex);
             }
         }
-
-        
-
     }
 }
