@@ -99,7 +99,7 @@ namespace Discord
             try { handler(this, eventArgs); }
             catch (Exception ex)
             {
-                Logger.Error($"{callerName.Substring(2)}'s handler encountered error {ex.GetType().Name}: ${ex.Message}", ex);
+                Logger.Error($"{callerName.Substring(2)}'s handler encountered an error", ex);
             }
         }
         private void OnEvent(EventHandler handler, [CallerMemberName] string callerName = null)
@@ -107,7 +107,7 @@ namespace Discord
             try { handler(this, EventArgs.Empty); }
             catch (Exception ex)
             {
-                Logger.Error($"{callerName.Substring(2)}'s handler encountered error {ex.GetType().Name}: ${ex.Message}", ex);
+                Logger.Error($"{callerName.Substring(2)}'s handler encountered an error", ex);
             }
         }
     }
