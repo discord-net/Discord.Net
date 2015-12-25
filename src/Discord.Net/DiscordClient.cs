@@ -485,13 +485,17 @@ namespace Discord
                             {
                                 var server = AddServer(data.Id);
                                 server.Update(data);
-                                if (data.Unavailable != false)
+
+                                if (Config.LogEvents)
                                 {
-                                    Logger.Info($"Server Created: {server.Name}");
-                                    OnJoinedServer(server);
+                                    if (data.Unavailable != false)
+                                        Logger.Info($"Server Created: {server.Name}");
+                                    else
+                                        Logger.Info($"Server Available: {server.Name}");
                                 }
-                                else
-                                    Logger.Info($"Server Available: {server.Name}");
+
+                                if (data.Unavailable != false)
+                                    OnJoinedServer(server);
                                 OnServerAvailable(server);
                             }
                         }
@@ -503,7 +507,8 @@ namespace Discord
                             if (server != null)
                             {
                                 server.Update(data);
-                                Logger.Info($"Server Updated: {server.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"Server Updated: {server.Name}");
                                 OnServerUpdated(server);
                             }
                         }
@@ -514,10 +519,13 @@ namespace Discord
                             Server server = RemoveServer(data.Id);
                             if (server != null)
                             {
-                                if (data.Unavailable != true)
-                                    Logger.Info($"Server Destroyed: {server.Name}");
-                                else
-                                    Logger.Info($"Server Unavailable: {server.Name}");
+                                if (Config.LogEvents)
+                                {
+                                    if (data.Unavailable != true)
+                                        Logger.Info($"Server Destroyed: {server.Name}");
+                                    else
+                                        Logger.Info($"Server Unavailable: {server.Name}");
+                                }
 
                                 OnServerUnavailable(server);
                                 if (data.Unavailable != true)
@@ -543,7 +551,8 @@ namespace Discord
                             if (channel != null)
                             {
                                 channel.Update(data);
-                                Logger.Info($"Channel Created: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"Channel Created: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnChannelCreated(channel);
                             }
                         }
@@ -555,7 +564,8 @@ namespace Discord
                             if (channel != null)
                             {
                                 channel.Update(data);
-                                Logger.Info($"Channel Updated: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"Channel Updated: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnChannelUpdated(channel);
                             }
                         }
@@ -566,7 +576,8 @@ namespace Discord
                             var channel = RemoveChannel(data.Id);
                             if (channel != null)
                             {
-                                Logger.Info($"Channel Destroyed: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"Channel Destroyed: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnChannelDestroyed(channel);
                             }
                         }
@@ -582,7 +593,8 @@ namespace Discord
                                 var user = server.AddUser(data.User.Id);
                                 user.Update(data);
                                 user.UpdateActivity();
-                                Logger.Info($"User Joined: {server.Name}/{user.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"User Joined: {server.Name}/{user.Name}");
                                 OnUserJoined(user);
                             }
                         }
@@ -597,7 +609,8 @@ namespace Discord
                                 if (user != null)
                                 {
                                     user.Update(data);
-                                    Logger.Info($"User Updated: {server.Name}/{user.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"User Updated: {server.Name}/{user.Name}");
                                     OnUserUpdated(user);
                                 }
                             }
@@ -612,7 +625,8 @@ namespace Discord
                                 var user = server.RemoveUser(data.User.Id);
                                 if (user != null)
                                 {
-                                    Logger.Info($"User Left: {server.Name}/{user.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"User Left: {server.Name}/{user.Name}");
                                     OnUserLeft(user);
                                 }
                             }
@@ -643,7 +657,8 @@ namespace Discord
                             {
                                 var role = server.AddRole(data.Data.Id);
                                 role.Update(data.Data);
-                                Logger.Info($"Role Created: {server.Name}/{role.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"Role Created: {server.Name}/{role.Name}");
                                 OnRoleUpdated(role);
                             }
                         }
@@ -658,7 +673,8 @@ namespace Discord
                                 if (role != null)
                                 {
                                     role.Update(data.Data);
-                                    Logger.Info($"Role Updated: {server.Name}/{role.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"Role Updated: {server.Name}/{role.Name}");
                                     OnRoleUpdated(role);
                                 }
                             }
@@ -673,7 +689,8 @@ namespace Discord
                                 var role = server.RemoveRole(data.RoleId);
                                 if (role != null)
                                 {
-                                    Logger.Info($"Role Deleted: {server.Name}/{role.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"Role Deleted: {server.Name}/{role.Name}");
                                     OnRoleDeleted(role);
                                 }
                             }
@@ -688,7 +705,8 @@ namespace Discord
                             if (server != null)
                             {
                                 server.AddBan(data.UserId);
-                                Logger.Info($"User Banned: {server.Name}/{data.UserId}");
+                                if (Config.LogEvents)
+                                    Logger.Info($"User Banned: {server.Name}/{data.UserId}");
                                 OnUserBanned(server, data.UserId);
                             }
                         }
@@ -701,7 +719,8 @@ namespace Discord
                             {
                                 if (server.RemoveBan(data.UserId))
                                 {
-                                    Logger.Info($"User Unbanned: {server.Name}/{data.UserId}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"User Unbanned: {server.Name}/{data.UserId}");
                                     OnUserUnbanned(server, data.UserId);
                                 }
                             }
@@ -745,7 +764,8 @@ namespace Discord
                                 }*/
 
                                 msg.State = MessageState.Normal;
-                                Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                if (Config.LogEvents)
+                                    Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnMessageReceived(msg);
                             }
                         }
@@ -761,7 +781,8 @@ namespace Discord
                                 {
                                     msg.Update(data);
                                     msg.State = MessageState.Normal;
-                                    Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageUpdated(msg);
                                 }
                             }
@@ -776,7 +797,8 @@ namespace Discord
                                 var msg = channel.RemoveMessage(data.Id);
                                 if (msg != null)
                                 {
-                                    Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageDeleted(msg);
                                 }
                             }
@@ -791,7 +813,8 @@ namespace Discord
                                 var msg = channel.GetMessage(data.MessageId);
                                 if (msg != null)
                                 {
-                                    Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    if (Config.LogEvents)
+                                        Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageAcknowledged(msg);
                                 }
                             }
@@ -877,7 +900,8 @@ namespace Discord
                                 PrivateUser.Update(data);
                                 foreach (var server in _servers)
                                     server.Value.CurrentUser.Update(data);
-                                Logger.Info("Profile Updated");
+                                if (Config.LogEvents)
+                                    Logger.Info("Profile Updated");
                                 OnProfileUpdated(CurrentUser);
                             }
                         }

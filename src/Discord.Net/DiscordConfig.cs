@@ -59,6 +59,9 @@ namespace Discord
         /// <summary> Specifies the minimum log level severity that will be sent to the LogMessage event. Warning: setting this to debug will really hurt performance but should help investigate any internal issues. </summary>
         public LogSeverity LogLevel { get { return _logLevel; } set { SetValue(ref _logLevel, value); } }
         private LogSeverity _logLevel = LogSeverity.Info;
+        /// <summary> Enables or disables the default event logger. </summary>
+        public bool LogEvents { get { return _logEvents; } set { SetValue(ref _logEvents, value); } }
+        private bool _logEvents = true;
 
         /// <summary> User Agent string to use when connecting to Discord. </summary>
         [JsonIgnore]
