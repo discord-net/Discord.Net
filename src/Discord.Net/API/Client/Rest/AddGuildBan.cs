@@ -18,7 +18,7 @@ namespace Discord.API.Client.Rest
         public AddGuildBanRequest(ulong guildId, ulong userId)
         {
             GuildId = guildId;
-            UserId = UserId;
+            UserId = userId;
         }
     }
 }
