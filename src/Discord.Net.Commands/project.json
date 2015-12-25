@@ -19,7 +19,7 @@
 		"Discord.Net": "0.9.0-alpha2"
 	},
 	"frameworks": {
-		"net46": { },
+		"net45": { },
 		"dotnet5.4": { }
 	}
 }

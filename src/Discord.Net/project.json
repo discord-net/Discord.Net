@@ -33,7 +33,7 @@
   },
 
 	"frameworks": {
-		"net46": {
+		"net45": {
       "dependencies": {
         "WebSocket4Net": "0.14.1",
         "RestSharp": "105.2.3"

@@ -10,7 +10,7 @@
     <RootNamespace>Discord</RootNamespace>
     <AssemblyName>Discord.Net</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <UseMSBuildEngine>False</UseMSBuildEngine>
