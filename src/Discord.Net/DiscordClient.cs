@@ -745,7 +745,7 @@ namespace Discord
                                 }*/
 
                                 msg.State = MessageState.Normal;
-                                Logger.Info($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnMessageReceived(msg);
                             }
                         }
@@ -818,7 +818,7 @@ namespace Discord
                             if (user != null)
                             {
                                 user.Update(data);
-                                Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
+                                //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
                                 OnUserPresenceUpdated(user);
                             }
                         }
@@ -841,7 +841,7 @@ namespace Discord
                                     user = channel.Server.GetUser(data.UserId);
                                 if (user != null)
                                 {
-                                    Logger.Verbose($"Is Typing: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{user.Name}");
+                                    //Logger.Verbose($"Is Typing: {channel.Server?.Name ?? "[Private]"}/{channel.Name}/{user.Name}");
                                     OnUserIsTypingUpdated(channel, user);
                                     user.UpdateActivity();
                                 }
@@ -860,7 +860,7 @@ namespace Discord
                                 if (user != null)
                                 {
                                     user.Update(data);
-                                    Logger.Info($"Voice Updated: {server.Name}/{user.Name}");
+                                    //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
                                     OnUserVoiceStateUpdated(user);
                                 }
                             }
