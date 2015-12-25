@@ -186,8 +186,10 @@ namespace Discord
 
         public Task Ban(User user, int pruneDays = 0)
         {
-            var request = new AddGuildBanRequest(user.Server.Id, user.Id);
-            request.PruneDays = pruneDays;
+            var request = new AddGuildBanRequest(user.Server.Id, user.Id)
+            {
+                PruneDays = pruneDays
+            };
             return Client.ClientAPI.Send(request);
         }
         public Task Unban(User user, int pruneDays = 0)

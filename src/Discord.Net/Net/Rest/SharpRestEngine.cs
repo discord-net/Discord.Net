@@ -45,7 +45,8 @@ namespace Discord.Net.Rest
 		public Task<string> Send(string method, string path, string json, CancellationToken cancelToken)
 		{
 			var request = new RestRequest(path, GetMethod(method));
-			request.AddParameter("application/json", json, ParameterType.RequestBody);
+            if (json != null)
+			    request.AddParameter("application/json", json, ParameterType.RequestBody);
 			return Send(request, cancelToken);
 		}
 		public Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken)
