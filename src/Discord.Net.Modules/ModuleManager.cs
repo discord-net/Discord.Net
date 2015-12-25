@@ -152,7 +152,7 @@ namespace Discord.Modules
 		public bool DisableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+			//if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
 			lock (this)
 			{
