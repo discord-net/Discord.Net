@@ -76,7 +76,7 @@ namespace Discord.Net.WebSockets
 
         private void OnWebSocketError(object sender, ErrorEventArgs e)
         {
-            _taskManager.SignalError(e.Exception);
+            _taskManager.SignalError(e.Exception, isUnexpected: true);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketClosed(object sender, EventArgs e)
