@@ -152,7 +152,7 @@ namespace Discord.Modules
 		public bool DisableServer(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			//if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+            if (!_useServerWhitelist) return false;
 
 			lock (this)
 			{
@@ -168,8 +168,9 @@ namespace Discord.Modules
 		public void DisableAllServers()
 		{
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
+            if (!_useServerWhitelist) return;
 
-			lock (this)
+            lock (this)
 			{
 				if (ServerDisabled != null)
 				{
@@ -223,7 +224,7 @@ namespace Discord.Modules
 		public bool DisableChannel(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+            if (!_useChannelWhitelist) return false;
 
 			lock (this)
 			{
@@ -250,7 +251,7 @@ namespace Discord.Modules
 		}
 		public void DisableAllChannels()
 		{
-			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
+            if (!_useChannelWhitelist) return;
 
 			lock (this)
 			{
