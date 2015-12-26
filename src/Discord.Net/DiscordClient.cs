@@ -409,7 +409,11 @@ namespace Discord
         private Server RemoveServer(ulong id)
         {
             Server server;
-            _servers.TryRemove(id, out server);
+            if (_servers.TryRemove(id, out server))
+            {
+                foreach (var channel in server.AllChannels)
+                    RemoveChannel(channel.Id);
+            }
             return server;
         }
 
