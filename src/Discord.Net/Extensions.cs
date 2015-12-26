@@ -48,7 +48,21 @@ namespace Discord
                 }
             }
         }
-        
+        public static bool TryGetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> d,
+            TKey key, TValue value, out TValue result)
+        {
+            while (true)
+            {
+                if (d.TryGetValue(key, out result))
+                    return false;
+                if (d.TryAdd(key, value))
+                {
+                    result = value;
+                    return true;
+                }
+            }
+        }
+
         public static IEnumerable<Channel> Find(this IEnumerable<Channel> channels, string name, ChannelType type = null, bool exactMatch = false)
         {
             //Search by name

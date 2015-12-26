@@ -346,8 +346,8 @@ namespace Discord
         private Channel AddPrivateChannel(ulong id, ulong recipientId)
         {
             Channel channel;
-            if (_privateChannels.TryGetOrAdd(recipientId, x => new Channel(this, id, new User(this, x, null)), out channel))
-                AddChannel(channel);
+            if (_channels.TryGetOrAdd(id, x => new Channel(this, x, new User(this, recipientId, null)), out channel))
+                _privateChannels[recipientId] = channel;
             return channel;
         }
         internal Channel GetPrivateChannel(ulong recipientId)

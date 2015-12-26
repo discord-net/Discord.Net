@@ -205,8 +205,8 @@ namespace Discord
         internal Channel AddChannel(ulong id)
         {
             var channel = new Channel(Client, id, this);
-            channel = _channels.GetOrAdd(id, x => channel);
             Client.AddChannel(channel);
+            channel = _channels.GetOrAdd(id, x => channel);
             return channel;
         }
         internal Channel RemoveChannel(ulong id)
@@ -389,18 +389,19 @@ namespace Discord
         #region Users
         internal User AddUser(ulong id)
         {
-            Member user;
-            if (_users.TryGetOrAdd(id, x => new Member(new User(Client, x, this)), out user))
+            Member member = new Member(new User(Client, id, this));
+            if (id == Client.CurrentUser.Id)
+            {
+                member.User.CurrentGame = Client.CurrentGame;
+                member.User.Status = Client.Status;
+            }
+            
+            if (_users.TryGetOrAdd(id, member, out member))
             {
                 foreach (var channel in AllChannels)
-                    channel.AddUser(user.User);
-                if (id == Client.CurrentUser.Id)
-                {
-                    user.User.CurrentGame = Client.CurrentGame;
-                    user.User.Status = Client.Status;
-                }
+                    channel.AddUser(member.User);
             }
-            return user.User;
+            return member.User;
         }
         internal User RemoveUser(ulong id)
         {
