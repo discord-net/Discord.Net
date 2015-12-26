@@ -91,7 +91,7 @@ namespace Discord
 		private int _reconnectDelay = 1000;
 		/// <summary> Gets or sets the time (in milliseconds) to wait after an reconnect fails before retrying. </summary>
 		public int FailedReconnectDelay { get { return _failedReconnectDelay; } set { SetValue(ref _failedReconnectDelay, value); } }
-		private int _failedReconnectDelay = 10000;
+		private int _failedReconnectDelay = 15000;
 
 		/// <summary> Gets or sets the time (in milliseconds) to wait when the websocket's message queue is empty before checking again. </summary>
 		public int WebSocketInterval { get { return _webSocketInterval; } set { SetValue(ref _webSocketInterval, value); } }
