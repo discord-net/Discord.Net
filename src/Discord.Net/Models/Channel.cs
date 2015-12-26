@@ -107,6 +107,11 @@ namespace Discord
             : this(client, id)
         {
             Server = server;
+            if (server != null)
+            {
+                foreach (var user in server.Users)
+                    AddUser(user);
+            }
         }
         internal Channel(DiscordClient client, ulong id, User recipient)
             : this(client, id)

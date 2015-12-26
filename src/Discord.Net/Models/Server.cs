@@ -204,7 +204,8 @@ namespace Discord
         #region Channels
         internal Channel AddChannel(ulong id)
         {
-            var channel = _channels.GetOrAdd(id, x => new Channel(Client, x, this));
+            var channel = new Channel(Client, id, this);
+            channel = _channels.GetOrAdd(id, x => channel);
             Client.AddChannel(channel);
             return channel;
         }
