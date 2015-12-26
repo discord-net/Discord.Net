@@ -13,8 +13,10 @@ namespace Discord.Net.WebSockets
 	{
         private int _lastSequence;
 		private string _sessionId;
+        private string _token;
+        private int _reconnects;
 
-        public string Token { get; internal set; }
+        public string Token { get { return _token; } internal set { _token = value; _sessionId = null; } }
 
 		public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
 			: base(client, serializer, logger)
@@ -29,20 +31,21 @@ namespace Discord.Net.WebSockets
         public async Task Connect()
         {
             await BeginConnect().ConfigureAwait(false);
-			SendIdentify(Token);
+            if (_sessionId == null)
+                SendIdentify(Token);
+            else
+                SendResume();
         }
-		private async Task Redirect()
-        {
-            await BeginConnect().ConfigureAwait(false);
-			SendResume();
-		}
 		private async Task Reconnect()
 		{
 			try
 			{
 				var cancelToken = ParentCancelToken.Value;
-				await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
-				while (!cancelToken.IsCancellationRequested)
+                if (_reconnects++ == 0)
+				    await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+                else
+                    await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+                while (!cancelToken.IsCancellationRequested)
 				{
 					try
                     {
@@ -69,8 +72,15 @@ namespace Discord.Net.WebSockets
             tasks.Add(HeartbeatAsync(CancelToken));
             await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
         }
+        protected override Task Cleanup()
+        {
+            var ex = _taskManager.Exception;
+            if (ex != null && (ex as WebSocketException)?.Code != 1012)
+                _sessionId = null; //Reset session unless close code 1012
+            return base.Cleanup();
+        }
 
-		protected override async Task ProcessMessage(string json)
+        protected override async Task ProcessMessage(string json)
 		{
 			await base.ProcessMessage(json).ConfigureAwait(false);
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
@@ -85,9 +95,10 @@ namespace Discord.Net.WebSockets
 						JToken token = msg.Payload as JToken;
 						if (msg.Type == "READY")
 						{
-							var payload = token.ToObject<ReadyEvent>(_serializer);
+                            _reconnects = 0;
+                            var payload = token.ToObject<ReadyEvent>(_serializer);
 							_sessionId = payload.SessionId;
-							_heartbeatInterval = payload.HeartbeatInterval;
+                            _heartbeatInterval = payload.HeartbeatInterval;
 						}
 						else if (msg.Type == "RESUMED")
 						{
@@ -106,7 +117,7 @@ namespace Discord.Net.WebSockets
 						{
 							Host = payload.Url;
 							Logger.Info("Redirected to " + payload.Url);
-							await Redirect().ConfigureAwait(false);
+							await Reconnect().ConfigureAwait(false);
 						}
 					}
 					break;

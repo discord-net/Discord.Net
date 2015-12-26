@@ -128,7 +128,7 @@ namespace Discord
 			Connected += async (s, e) =>
 			{
                 ClientAPI.CancelToken = CancelToken;
-				await SendStatus();
+				await SendStatus().ConfigureAwait(false);
 			};
 
             //Extensibility
@@ -250,7 +250,7 @@ namespace Discord
                 }
 
                 //Cache other stuff
-                var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()));
+                var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
                 _regions = regionsResponse.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port))
                     .ToDictionary(x => x.Id);
                 break;

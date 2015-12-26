@@ -213,7 +213,7 @@ namespace Discord
         #region Invites
         /// <summary> Gets all active (non-expired) invites to this server. </summary>
         public async Task<IEnumerable<Invite>> GetInvites()
-            => (await Server.GetInvites()).Where(x => x.Channel.Id == Id);
+            => (await Server.GetInvites().ConfigureAwait(false)).Where(x => x.Channel.Id == Id);
 
         /// <summary> Creates a new invite to this channel. </summary>
         /// <param name="maxAge"> Time (in seconds) until the invite expires. Set to null to never expire. </param>

@@ -83,13 +83,7 @@ namespace Discord.Net.WebSockets
         {
             Exception ex;
             if (e is ClosedEventArgs)
-            {
-                int code = (e as ClosedEventArgs).Code;
-                string reason = (e as ClosedEventArgs).Reason;
-                if (String.IsNullOrEmpty(reason))
-                    reason = "No reason";
-                ex = new Exception($"Received close code {code}: {reason}");
-            }
+                ex = new WebSocketException((e as ClosedEventArgs).Code, (e as ClosedEventArgs).Reason);
             else
                 ex = new Exception($"Connection lost");
             _taskManager.SignalError(ex, isUnexpected: true);

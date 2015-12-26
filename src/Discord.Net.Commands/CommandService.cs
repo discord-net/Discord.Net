@@ -51,14 +51,14 @@ namespace Discord.Commands
                     .Description("Returns information about commands.")
                     .Do(async e =>
                     {
-						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreateChannel();
+						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreateChannel().ConfigureAwait(false);
 						if (e.Args.Length > 0) //Show command help
 						{
 							var map = _map.GetItem(string.Join(" ", e.Args));
 							if (map != null)
-								await ShowCommandHelp(map, e.User, e.Channel, replyChannel);
+								await ShowCommandHelp(map, e.User, e.Channel, replyChannel).ConfigureAwait(false);
 							else
-								await replyChannel.SendMessage("Unable to display help: Unknown command.");
+								await replyChannel.SendMessage("Unable to display help: Unknown command.").ConfigureAwait(false);
 						}
                         else //Show general help							
 							await ShowGeneralHelp(e.User, e.Channel, replyChannel);

@@ -159,7 +159,7 @@ namespace Discord.Legacy
             if (messages == null) throw new ArgumentNullException(nameof(messages));
 
             foreach (var message in messages)
-                await message.Delete();
+                await message.Delete().ConfigureAwait(false);
         }
         
         [Obsolete("Use Channel.DownloadMessages")]

@@ -509,6 +509,9 @@
     <Compile Include="..\Discord.Net\Net\TimeoutException.cs">
       <Link>Net\TimeoutException.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSocketException.cs">
+      <Link>Net\WebSockets\WebSocketException.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\GatewaySocket.cs">
       <Link>Net\WebSockets\GatewaySocket.cs</Link>
     </Compile>

@@ -125,7 +125,7 @@ namespace Discord.Net.WebSockets
 			_cancelTokenSource = null;
 			_connectedEvent.Reset();
 
-            if (oldState == ConnectionState.Connected)
+            if (oldState == ConnectionState.Connecting || oldState == ConnectionState.Connected)
             {
                 var ex = _taskManager.Exception;
                 if (ex == null)
