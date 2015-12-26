@@ -11,7 +11,7 @@ namespace Discord.API.Client
     public class WebSocketMessage
     {
         [JsonProperty("op")]
-        public int Operation { get; set; }
+        public int? Operation { get; set; }
         [JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
         [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]

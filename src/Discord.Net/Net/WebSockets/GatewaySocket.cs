@@ -77,7 +77,7 @@ namespace Discord.Net.WebSockets
 			if (msg.Sequence.HasValue)
 				_lastSequence = msg.Sequence.Value;
 
-			var opCode = (OpCodes)msg.Operation;
+			var opCode = (OpCodes?)msg.Operation;
             switch (opCode)
 			{
 				case OpCodes.Dispatch:
@@ -111,8 +111,11 @@ namespace Discord.Net.WebSockets
 					}
 					break;
 				default:
-                    Logger.Warning($"Unknown Opcode: {opCode}");
-					break;
+                    if (opCode != null)
+                        Logger.Warning($"Unknown Opcode: {opCode}");
+                    else
+                        Logger.Warning($"Received message with no opcode");
+                    break;
 			}
 		}
 
