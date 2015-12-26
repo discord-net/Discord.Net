@@ -322,7 +322,7 @@ namespace Discord
         #region Channels
         internal void AddChannel(Channel channel)
         {
-            _channels[channel.Id] = channel;
+            _channels.GetOrAdd(channel.Id, channel);
         }
         private Channel RemoveChannel(ulong id)
         {
@@ -457,7 +457,7 @@ namespace Discord
                 switch (e.Type)
                 {
                     //Global
-                    case "READY": //Resync 
+                    case "READY":
                         {
                             var data = e.Payload.ToObject<ReadyEvent>(_serializer);
                             SessionId = data.SessionId;
@@ -639,10 +639,10 @@ namespace Discord
                     case "GUILD_MEMBERS_CHUNK":
                         {
                             var data = e.Payload.ToObject<GuildMembersChunkEvent>(_serializer);
-                            foreach (var memberData in data.Members)
+                            var server = GetServer(data.GuildId);
+                            if (server != null)
                             {
-                                var server = GetServer(memberData.GuildId.Value);
-                                if (server != null)
+                                foreach (var memberData in data.Members)
                                 {
                                     var user = server.AddUser(memberData.User.Id);
                                     user.Update(memberData);
