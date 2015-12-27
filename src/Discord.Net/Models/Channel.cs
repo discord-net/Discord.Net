@@ -270,13 +270,12 @@ namespace Discord
 
         public Message GetMessage(ulong id)
         {
-            if (Client.Config.MessageCacheSize > 0)
-            {
-                Message result;
-                _messages.TryGetValue(id, out result);
-                return result;
-            }
-            return null;
+            if (Client.Config.MessageCacheSize <= 0)
+                throw new InvalidOperationException("Unable to retrieve a message when the message cache is disabled.");
+
+            Message result;
+            _messages.TryGetValue(id, out result);
+            return result;
         }
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
             RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
