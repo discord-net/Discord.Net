@@ -377,7 +377,7 @@ namespace Discord
             return msg;
         }
 
-        public Task SendTyping()
+        public Task SendIsTyping()
             => Client.ClientAPI.Send(new BroadcastTypingRequest(Id));
         #endregion
 
