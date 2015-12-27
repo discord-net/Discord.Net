@@ -278,6 +278,9 @@
     <Compile Include="..\Discord.Net\API\Client\Rest\Gateway.cs">
       <Link>API\Client\Rest\Gateway.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Rest\GetBans.cs">
+      <Link>API\Client\Rest\GetBans.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\GetInvite.cs">
       <Link>API\Client\Rest\GetInvite.cs</Link>
     </Compile>

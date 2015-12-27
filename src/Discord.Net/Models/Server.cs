@@ -172,6 +172,17 @@ namespace Discord
         }
 
         #region Bans
+        public async Task<IEnumerable<User>> GetBans()
+        {
+            var response = await Client.ClientAPI.Send(new GetBansRequest(Id)).ConfigureAwait(false);
+            return response.Select(x =>
+            {
+                var user = new User(Client, x.Id, this);
+                user.Update(x);
+                return user;
+            });
+        }
+
         public Task Ban(User user, int pruneDays = 0)
         {
             var request = new AddGuildBanRequest(user.Server.Id, user.Id)
