@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -373,6 +374,7 @@ namespace Discord
         #region Invites
         /// <summary> Gets more info about the provided invite code. </summary>
         /// <remarks> Supported formats: inviteCode, xkcdCode, https://discord.gg/inviteCode, https://discord.gg/xkcdCode </remarks>
+        /// <returns> The invite object if found, null if not. </returns>
         public async Task<Invite> GetInvite(string inviteIdOrXkcd)
         {
             if (inviteIdOrXkcd == null) throw new ArgumentNullException(nameof(inviteIdOrXkcd));
@@ -385,10 +387,17 @@ namespace Discord
             if (index >= 0)
                 inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
 
-            var response = await ClientAPI.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
-            var invite = new Invite(this, response.Code, response.XkcdPass);
-            invite.Update(response);
-            return invite;
+            try
+            {
+                var response = await ClientAPI.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
+                var invite = new Invite(this, response.Code, response.XkcdPass);
+                invite.Update(response);
+                return invite;
+            }
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
         }
         #endregion
 
