@@ -758,7 +758,7 @@ namespace Discord
                                     }*/
                                     if (msg == null)
                                     {
-                                        msg = channel.AddMessage(data.Id, data.Author.Id, data.Timestamp.Value);
+                                        msg = channel.AddMessage(data.Id, user, data.Timestamp.Value);
                                         //nonce = 0;
                                     }
 

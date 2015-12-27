@@ -171,9 +171,11 @@ namespace Discord
         public ulong Id { get; }
         /// <summary> Returns the channel this message was sent to. </summary>
         public Channel Channel { get; }
+        /// <summary> Returns the author of this message. </summary>
+        public User User { get; }
 
-		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
-		public bool IsTTS { get; private set; }
+        /// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
+        public bool IsTTS { get; private set; }
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
 		public MessageState State { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server. </summary>
@@ -198,14 +200,12 @@ namespace Discord
         
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		public Server Server => Channel.Server;
-        /// <summary> Returns the author of this message. </summary>
-        public User User => Channel.GetUser(_userId);
 
-		internal Message(ulong id, Channel channel, ulong userId)
+		internal Message(ulong id, Channel channel, User user)
 		{
             Id = id;
             Channel = channel;
-            _userId = userId;
+            User = user;
 
 			Attachments = _initialAttachments;
 			Embeds = _initialEmbeds;

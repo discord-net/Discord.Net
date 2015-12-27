@@ -240,9 +240,9 @@ namespace Discord
         #endregion
 
         #region Messages
-        internal Message AddMessage(ulong id, ulong userId, DateTime timestamp)
+        internal Message AddMessage(ulong id, User user, DateTime timestamp)
         {
-            Message message = new Message(id, this, userId);
+            Message message = new Message(id, this, user);
             var cacheLength = Client.Config.MessageCacheSize;
             if (cacheLength > 0)
             {
@@ -298,13 +298,13 @@ namespace Discord
                     Message msg = null;
                     if (useCache)
                     {
-                        msg = AddMessage(x.Id, x.Author.Id, x.Timestamp.Value);
+                        msg = AddMessage(x.Id, GetUser(x.Author.Id), x.Timestamp.Value);
                         var user = msg.User;
                         if (user != null)
                             user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
                     }
                     else
-                        msg = new Message(x.Id, this, x.Author.Id);
+                        msg = new Message(x.Id, this, GetUser(x.Author.Id));
                     msg.Update(x);
                     return msg;
                 })
@@ -352,7 +352,7 @@ namespace Discord
                     IsTTS = isTTS
                 };
                 var model = await Client.ClientAPI.Send(request).ConfigureAwait(false);
-                msg = AddMessage(model.Id, model.Author.Id, model.Timestamp.Value);
+                msg = AddMessage(model.Id, IsPrivate ? Client.PrivateUser : Server.CurrentUser, model.Timestamp.Value);
                 msg.Update(model);
             }
             return msg;
@@ -372,7 +372,7 @@ namespace Discord
             };
             var model = await Client.ClientAPI.Send(request).ConfigureAwait(false);
 
-            var msg = AddMessage(model.Id, model.Author.Id, model.Timestamp.Value);
+            var msg = AddMessage(model.Id, IsPrivate ? Client.PrivateUser : Server.CurrentUser, model.Timestamp.Value);
             msg.Update(model);
             return msg;
         }
