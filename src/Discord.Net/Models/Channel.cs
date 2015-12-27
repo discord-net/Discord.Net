@@ -459,8 +459,7 @@ namespace Discord
                 return perms;
             }
         }
-
-        [Obsolete("Use Channel.GetPermissions")]
+        
         public DualChannelPermissions GetPermissionsRule(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -470,7 +469,6 @@ namespace Discord
                 .Select(x => x.Permissions)
                 .FirstOrDefault();
         }
-        [Obsolete("Use Channel.GetPermissions")]
         public DualChannelPermissions GetPermissionsRule(Role role)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
@@ -480,29 +478,25 @@ namespace Discord
                 .Select(x => x.Permissions)
                 .FirstOrDefault();
         }
-
-        [Obsolete("Use Channel.SetPermissions")]
+        
         public Task AddPermissionsRule(User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return AddPermissionsRule(user.Id, PermissionTarget.User, allow, deny);
         }
-        [Obsolete("Use Channel.SetPermissions")]
         public Task AddPermissionsRule(User user, DualChannelPermissions permissions = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return AddPermissionsRule(user.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
         }
-        [Obsolete("Use Channel.SetPermissions")]
         public Task AddPermissionsRule(Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
 
             return AddPermissionsRule(role.Id, PermissionTarget.Role, allow, deny);
         }
-        [Obsolete("Use Channel.SetPermissions")]
         public Task AddPermissionsRule(Role role, DualChannelPermissions permissions = null)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
@@ -520,14 +514,12 @@ namespace Discord
             };
             return Client.ClientAPI.Send(request);
         }
-
-        [Obsolete("Use Channel.RemovePermissions")]
+        
         public Task RemovePermissionsRule(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return RemovePermissionsRule(user.Id, PermissionTarget.User);
         }
-        [Obsolete("Use Channel.RemovePermissions")]
         public Task RemovePermissionsRule(Role role)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
