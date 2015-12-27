@@ -24,7 +24,7 @@ namespace Discord
         private readonly Semaphore _connectionLock;
         private readonly ManualResetEvent _disconnectedEvent;
         private readonly ManualResetEventSlim _connectedEvent;
-        private readonly TaskManager _taskManager;    
+        private readonly TaskManager _taskManager;
         private readonly ConcurrentDictionary<ulong, Server> _servers;
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private readonly ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
@@ -72,16 +72,16 @@ namespace Discord
         public IEnumerable<Channel> PrivateChannels => _privateChannels.Select(x => x.Value);
         /// <summary> Gets a collection of all voice regions currently offered by Discord. </summary>
         public IEnumerable<Region> Regions => _regions.Select(x => x.Value);
-        
-		/// <summary> Initializes a new instance of the DiscordClient class. </summary>
-		public DiscordClient(DiscordConfig config = null)
-		{
-			Config = config ?? new DiscordConfig();
+
+        /// <summary> Initializes a new instance of the DiscordClient class. </summary>
+        public DiscordClient(DiscordConfig config = null)
+        {
+            Config = config ?? new DiscordConfig();
             Config.Lock();
-            
-			State = (int)ConnectionState.Disconnected;
-			Status = UserStatus.Online;
-            
+
+            State = (int)ConnectionState.Disconnected;
+            Status = UserStatus.Online;
+
             //Logging
             Log = new LogManager(this);
             Logger = Log.CreateLogger("Discord");
@@ -89,8 +89,8 @@ namespace Discord
             //Async
             _taskManager = new TaskManager(Cleanup);
             _connectionLock = new Semaphore(1, 1);
-			_disconnectedEvent = new ManualResetEvent(true);
-			_connectedEvent = new ManualResetEventSlim(false);
+            _disconnectedEvent = new ManualResetEvent(true);
+            _connectedEvent = new ManualResetEventSlim(false);
             CancelToken = new CancellationToken(true);
 
             //Cache
@@ -102,8 +102,8 @@ namespace Discord
             _serializer = new JsonSerializer();
             _serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 #if TEST_RESPONSES
-			_serializer.CheckAdditionalContent = true;
-			_serializer.MissingMemberHandling = MissingMemberHandling.Error;
+            _serializer.CheckAdditionalContent = true;
+            _serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #else
             _serializer.Error += (s, e) =>
             {
@@ -123,14 +123,14 @@ namespace Discord
             };
             GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
-            
-			if (Config.UseMessageQueue)
-				MessageQueue = new MessageQueue(this);
-			Connected += async (s, e) =>
-			{
+
+            if (Config.UseMessageQueue)
+                MessageQueue = new MessageQueue(this);
+            Connected += async (s, e) =>
+            {
                 ClientAPI.CancelToken = CancelToken;
-				await SendStatus().ConfigureAwait(false);
-			};
+                await SendStatus().ConfigureAwait(false);
+            };
 
             //Extensibility
             Services = new ServiceManager(this);
@@ -140,18 +140,18 @@ namespace Discord
             //_messageImporter.ContractResolver = new Message.ImportResolver();
         }
 
-		/// <summary> Connects to the Discord server with the provided email and password. </summary>
-		/// <returns> Returns a token that can be optionally stored for future connections. </returns>
-		public async Task<string> Connect(string email, string password)
-		{
+        /// <summary> Connects to the Discord server with the provided email and password. </summary>
+        /// <returns> Returns a token that can be optionally stored for future connections. </returns>
+        public async Task<string> Connect(string email, string password)
+        {
             if (email == null) throw new ArgumentNullException(email);
             if (password == null) throw new ArgumentNullException(password);
 
             await BeginConnect(email, password, null).ConfigureAwait(false);
             return ClientAPI.Token;
         }
-		/// <summary> Connects to the Discord server with the provided token. </summary>
-		public async Task Connect(string token)
+        /// <summary> Connects to the Discord server with the provided token. </summary>
+        public async Task Connect(string token)
         {
             if (token == null) throw new ArgumentNullException(token);
 
@@ -171,8 +171,8 @@ namespace Discord
                     _taskManager.ClearException();
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
-                    
-                    await Login(email, password, token).ConfigureAwait(false);                    
+
+                    await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect().ConfigureAwait(false);
 
                     List<Task> tasks = new List<Task>();
@@ -258,21 +258,24 @@ namespace Discord
             }
         }
         private void EndConnect()
-		{
-			State = ConnectionState.Connected;
-			_connectedEvent.Set();
-			OnConnected();
-		}        
+        {
+            State = ConnectionState.Connected;
+            _connectedEvent.Set();
+            OnConnected();
+        }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-        public Task Disconnect() => _taskManager.Stop(true);
-		private async Task Cleanup()
+        public async Task Disconnect()
+        {
+            if (State == ConnectionState.Connected)
+			    await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
+            await _taskManager.Stop(true).ConfigureAwait(false);
+        }
+		private Task Cleanup()
         {
             State = ConnectionState.Disconnecting;
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
-
-			await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
 
             ClientAPI.Token = null;
             GatewaySocket.Token = null;
@@ -287,6 +290,7 @@ namespace Discord
             State = (int)ConnectionState.Disconnected;
             _connectedEvent.Reset();
             _disconnectedEvent.Set();
+            return TaskHelper.CompletedTask;
         }
         
         public Task SetStatus(UserStatus status)
