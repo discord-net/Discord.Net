@@ -22,8 +22,8 @@ namespace Discord
 
 	public sealed class Message
     {
-        private static readonly Regex _userRegex = new Regex(@"<@([0-9]+)>", RegexOptions.Compiled);
-        private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
+        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>", RegexOptions.Compiled);
+        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>", RegexOptions.Compiled);
         private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
@@ -32,16 +32,18 @@ namespace Discord
         {
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
-                var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
-                var user = channel.GetUser(id);
-                if (user != null)
+                ulong id;
+                if (e.Value.Substring(2, e.Value.Length - 3).TryToId(out id))
                 {
-                    if (users != null)
-                        users.Add(user);
-                    return '@' + user.Name;
-                }
-                else //User not found
-                    return '@' + e.Value;
+                    var user = channel.GetUser(id);
+                    if (user != null)
+                    {
+                        if (users != null)
+                            users.Add(user);
+                        return '@' + user.Name;
+                    }
+                }                
+                return e.Value; //User not found or parse failed
             }));
         }
         internal static string CleanChannelMentions(Channel channel, string text, List<Channel> channels = null)
@@ -51,16 +53,18 @@ namespace Discord
 
             return _channelRegex.Replace(text, new MatchEvaluator(e =>
             {
-                var id = e.Value.Substring(2, e.Value.Length - 3).ToId();
-                var mentionedChannel = server.GetChannel(id);
-                if (mentionedChannel != null && mentionedChannel.Server.Id == server.Id)
+                ulong id;
+                if (e.Value.Substring(2, e.Value.Length - 3).TryToId(out id))
                 {
-                    if (channels != null)
-                        channels.Add(mentionedChannel);
-                    return '#' + mentionedChannel.Name;
+                    var mentionedChannel = server.GetChannel(id);
+                    if (mentionedChannel != null && mentionedChannel.Server.Id == server.Id)
+                    {
+                        if (channels != null)
+                            channels.Add(mentionedChannel);
+                        return '#' + mentionedChannel.Name;
+                    }
                 }
-                else //Channel not found
-                    return '#' + e.Value;
+                return e.Value; //Channel not found or parse failed
             }));
         }
         /*internal static string CleanRoleMentions(User user, Channel channel, string text, List<Role> roles = null)
