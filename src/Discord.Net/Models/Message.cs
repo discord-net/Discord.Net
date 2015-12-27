@@ -172,8 +172,6 @@ namespace Discord
         /// <summary> Returns the channel this message was sent to. </summary>
         public Channel Channel { get; }
 
-        /// <summary> Returns true if the logged-in user was mentioned. </summary>
-        public bool IsMentioningMe { get; private set; }
 		/// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
 		public bool IsTTS { get; private set; }
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
@@ -197,7 +195,7 @@ namespace Discord
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
 		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
-
+        
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		public Server Server => Channel.Server;
         /// <summary> Returns the author of this message. </summary>
@@ -299,18 +297,6 @@ namespace Discord
 				MentionedChannels = mentionedChannels;
 				//MentionedRoles = mentionedRoles;
 			}
-
-			if (server != null)
-			{
-				var me = server.CurrentUser;
-				IsMentioningMe = (MentionedUsers?.Contains(me) ?? false) || 
-					(MentionedRoles?.Any(x => me.HasRole(x)) ?? false);
-			}
-			else
-			{
-				var me = Channel.Client.PrivateUser;
-				IsMentioningMe = MentionedUsers?.Contains(me) ?? false;
-            }
         }
 
         public async Task Edit(string text)
@@ -333,7 +319,6 @@ namespace Discord
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
             }
         }
-
         public async Task Delete()
         {
             var request = new DeleteMessageRequest(Channel.Id, Id);
@@ -347,6 +332,19 @@ namespace Discord
                 return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
             else
                 return TaskHelper.CompletedTask;
+        }
+
+        /// <summary> Returns true if the logged-in user was mentioned. </summary>
+        public bool IsMentioningMe(bool includeRoles = false)
+        {
+            User me = Server != null ? Server.CurrentUser : Channel.Client.PrivateUser;
+            if (includeRoles)
+            {
+                return (MentionedUsers?.Contains(me) ?? false) ||
+                       (MentionedRoles?.Any(x => me.HasRole(x)) ?? false);
+            }
+            else
+                return MentionedUsers?.Contains(me) ?? false;
         }
 
         /// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
