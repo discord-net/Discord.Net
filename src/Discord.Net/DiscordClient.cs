@@ -708,7 +708,6 @@ namespace Discord
                             var server = GetServer(data.GuildId);
                             if (server != null)
                             {
-                                server.AddBan(data.UserId);
                                 if (Config.LogEvents)
                                     Logger.Info($"User Banned: {server.Name}/{data.UserId}");
                                 OnUserBanned(server, data.UserId);
@@ -721,12 +720,9 @@ namespace Discord
                             var server = GetServer(data.GuildId);
                             if (server != null)
                             {
-                                if (server.RemoveBan(data.UserId))
-                                {
-                                    if (Config.LogEvents)
-                                        Logger.Info($"User Unbanned: {server.Name}/{data.UserId}");
-                                    OnUserUnbanned(server, data.UserId);
-                                }
+                                if (Config.LogEvents)
+                                    Logger.Info($"User Unbanned: {server.Name}/{data.UserId}");
+                                OnUserUnbanned(server, data.UserId);
                             }
                         }
                         break;
@@ -739,38 +735,40 @@ namespace Discord
                             Channel channel = GetChannel(data.ChannelId);
                             if (channel != null)
                             {
-                                Message msg = null;
-                                bool isAuthor = data.Author.Id == CurrentUser.Id;
-                                //ulong nonce = 0;
-
-                                /*if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
-                                {
-                                    if (data.Nonce != null && ulong.TryParse(data.Nonce, out nonce))
-                                        msg = _messages[nonce];
-                                }*/
-                                if (msg == null)
-                                {
-                                    msg = channel.AddMessage(data.Id, data.Author.Id, data.Timestamp.Value);
-                                    //nonce = 0;
-                                }
-
-                                msg.Update(data);
-                                var user = msg.User;
+                                var user = channel.GetUser(data.Author.Id);
                                 if (user != null)
-                                    user.UpdateActivity();// data.Timestamp);
-
-                                //Remapped queued message
-                                /*if (nonce != 0)
                                 {
-                                    msg = _messages.Remap(nonce, data.Id);
-                                    msg.Id = data.Id;
-                                    RaiseMessageSent(msg);
-                                }*/
+                                    Message msg = null;
+                                    bool isAuthor = data.Author.Id == CurrentUser.Id;
+                                    //ulong nonce = 0;
 
-                                msg.State = MessageState.Normal;
-                                if (Config.LogEvents)
-                                    Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                OnMessageReceived(msg);
+                                    /*if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
+                                    {
+                                        if (data.Nonce != null && ulong.TryParse(data.Nonce, out nonce))
+                                            msg = _messages[nonce];
+                                    }*/
+                                    if (msg == null)
+                                    {
+                                        msg = channel.AddMessage(data.Id, data.Author.Id, data.Timestamp.Value);
+                                        //nonce = 0;
+                                    }
+
+                                    //Remapped queued message
+                                    /*if (nonce != 0)
+                                    {
+                                        msg = _messages.Remap(nonce, data.Id);
+                                        msg.Id = data.Id;
+                                        RaiseMessageSent(msg);
+                                    }*/
+
+                                    msg.Update(data);
+                                    user.UpdateActivity();
+
+                                    msg.State = MessageState.Normal;
+                                    if (Config.LogEvents)
+                                        Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    OnMessageReceived(msg);
+                                }
                             }
                         }
                         break;

@@ -32,7 +32,6 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Role> _roles;
         private readonly ConcurrentDictionary<ulong, Member> _users;
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
-        private readonly ConcurrentDictionary<ulong, bool> _bans;
         private ulong _ownerId;
         private ulong? _afkChannelId;
         
@@ -64,9 +63,7 @@ namespace Discord
         public User CurrentUser => GetUser(Client.CurrentUser.Id);
         /// <summary> Gets the URL to this user's current avatar. </summary>
         public string IconUrl => GetIconUrl(Id, IconId);
-
-        /// <summary> Gets a collection of the ids of all users banned on this server. </summary>
-        public IEnumerable<ulong> BannedUserIds => _bans.Select(x => x.Key);
+        
         /// <summary> Gets a collection of all channels in this server. </summary>
         public IEnumerable<Channel> AllChannels => _channels.Select(x => x.Value);
         /// <summary> Gets a collection of text channels in this server. </summary>
@@ -86,7 +83,6 @@ namespace Discord
             _channels = new ConcurrentDictionary<ulong, Channel>();
             _roles = new ConcurrentDictionary<ulong, Role>();
             _users = new ConcurrentDictionary<ulong, Member>();
-            _bans = new ConcurrentDictionary<ulong, bool>();
             DefaultChannel = AddChannel(id);
             EveryoneRole = AddRole(id);
         }
@@ -176,14 +172,6 @@ namespace Discord
         }
 
         #region Bans
-        internal void AddBan(ulong banId)
-            => _bans.TryAdd(banId, true);
-        internal bool RemoveBan(ulong banId)
-        {
-            bool ignored;
-            return _bans.TryRemove(banId, out ignored);
-        }
-
         public Task Ban(User user, int pruneDays = 0)
         {
             var request = new AddGuildBanRequest(user.Server.Id, user.Id)
