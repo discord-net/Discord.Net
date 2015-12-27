@@ -239,7 +239,7 @@ namespace Discord
             if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
 
             //Modify the roles collection and filter out the everyone role
-            var roleIds = roles == null ? null : Roles.Where(x => !x.IsEveryone).Select(x => x.Id);
+            var roleIds = roles == null ? null : Roles.Where(x => !x.IsEveryone).Select(x => x.Id).Distinct();
 
             var request = new UpdateMemberRequest(Server.Id, Id)
             {
@@ -326,6 +326,15 @@ namespace Discord
             if (role == null) throw new ArgumentNullException(nameof(role));
 
             return _roles.ContainsKey(role.Id);
+        }
+
+        public Task AddRoles(params Role[] roles)
+        {
+            return Edit(roles: Roles.Concat(roles));
+        }
+        public Task RemoveRoles(params Role[] roles)
+        {
+            return Edit(roles: Roles.Except(roles));
         }
         #endregion
 
