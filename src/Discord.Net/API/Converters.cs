@@ -66,7 +66,7 @@ namespace Discord.API.Converters
 				reader.Read();
 				while (reader.TokenType != JsonToken.EndArray)
 				{
-					result.Add(((string)reader.Value).TryToId());
+					result.Add(((string)reader.Value).ToId());
 					reader.Read();
                 }
 			}
