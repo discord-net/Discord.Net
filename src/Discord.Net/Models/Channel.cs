@@ -376,6 +376,9 @@ namespace Discord
             msg.Update(model);
             return msg;
         }
+
+        public Task SendTyping()
+            => Client.ClientAPI.Send(new BroadcastTypingRequest(Id));
         #endregion
 
         #region Permissions
