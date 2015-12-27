@@ -189,7 +189,7 @@ namespace Discord
             }
             catch (Exception ex)
             {
-                _taskManager.SignalError(ex, true);
+                _taskManager.SignalError(ex);
                 throw;
             }
         }
@@ -264,7 +264,7 @@ namespace Discord
 		}        
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-        public Task Disconnect() => _taskManager.Stop();
+        public Task Disconnect() => _taskManager.Stop(true);
 		private async Task Cleanup()
         {
             State = ConnectionState.Disconnecting;

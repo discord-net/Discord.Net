@@ -76,7 +76,7 @@ namespace Discord.Net.WebSockets
 
         private void OnWebSocketError(object sender, ErrorEventArgs e)
         {
-            _taskManager.SignalError(e.Exception, isUnexpected: true);
+            _taskManager.SignalError(e.Exception);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketClosed(object sender, EventArgs e)
@@ -86,7 +86,7 @@ namespace Discord.Net.WebSockets
                 ex = new WebSocketException((e as ClosedEventArgs).Code, (e as ClosedEventArgs).Reason);
             else
                 ex = new Exception($"Connection lost");
-            _taskManager.SignalError(ex, isUnexpected: true);
+            _taskManager.SignalError(ex);
             _waitUntilConnect.Set();
         }
         private void OnWebSocketOpened(object sender, EventArgs e)

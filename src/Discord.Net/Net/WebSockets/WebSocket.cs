@@ -95,7 +95,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
 			{
-                _taskManager.SignalError(ex, true);
+                _taskManager.SignalError(ex);
                 throw;
 			}
 		}
@@ -111,7 +111,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
             {
-                _taskManager.SignalError(ex, true);
+                _taskManager.SignalError(ex);
             }
 		}
 
@@ -132,7 +132,7 @@ namespace Discord.Net.WebSockets
                     Logger.Info("Disconnected");
                 else
                     Logger.Error("Disconnected", ex);
-                OnDisconnected(_taskManager.WasUnexpected, _taskManager.Exception);
+                OnDisconnected(!_taskManager.WasStopExpected, _taskManager.Exception);
             }
             State = ConnectionState.Disconnected;
         }

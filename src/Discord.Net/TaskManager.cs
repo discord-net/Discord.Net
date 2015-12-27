@@ -16,8 +16,8 @@ namespace Discord
         private CancellationTokenSource _cancelSource;
         private Task _task;
 
-        public bool WasUnexpected => _wasStopUnexpected;
-        private bool _wasStopUnexpected;
+        public bool WasStopExpected => _wasStopExpected;
+        private bool _wasStopExpected;
 
         public Exception Exception => _stopReason?.SourceException;
         private ExceptionDispatchInfo _stopReason;
@@ -53,7 +53,7 @@ namespace Discord
                         continue; //Another thread sneaked in and started this manager before we got a lock, loop and try again
 
                     _stopReason = null;
-                    _wasStopUnexpected = false;
+                    _wasStopExpected = false;
 
                     Task[] tasksArray = tasks.ToArray();
                     Task<Task> anyTask = Task.WhenAny(tasksArray);
@@ -66,7 +66,7 @@ namespace Discord
 
                         //Signal the rest of the tasks to stop
                         if (firstTask.Exception != null)
-                            SignalError(firstTask.Exception, true);
+                            SignalError(firstTask.Exception);
                         else
                             SignalStop();
 
@@ -84,10 +84,13 @@ namespace Discord
             }
         }
 
-        public void SignalStop()
+        public void SignalStop(bool isExpected = false)
         {
             lock (_lock)
             {
+                if (isExpected)
+                    _wasStopExpected = true;
+
                 if (_task == null) return; //Are we running?
                 if (_cancelSource.IsCancellationRequested) return;
 
@@ -95,11 +98,14 @@ namespace Discord
                     _cancelSource.Cancel();
             }
         }
-        public Task Stop()
+        public Task Stop(bool isExpected = false)
         {
             Task task;
             lock (_lock)
             {
+                if (isExpected)
+                    _wasStopExpected = true;
+
                 //Cache the task so we still have something to await if Cleanup is run really quickly
                 task = _task;
                 if (task == null) return TaskHelper.CompletedTask; //Are we running?
@@ -111,19 +117,18 @@ namespace Discord
             return task;
         }
 
-        public void SignalError(Exception ex, bool isUnexpected = true)
+        public void SignalError(Exception ex)
         {
             lock (_lock)
             {
                 if (_stopReason != null) return;
 
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
-                _wasStopUnexpected = isUnexpected;
                 if (_cancelSource != null)
                     _cancelSource.Cancel();
             }
         }
-        public Task Error(Exception ex, bool isUnexpected = true)
+        public Task Error(Exception ex)
         {
             Task task;
             lock (_lock)
@@ -135,7 +140,6 @@ namespace Discord
                 if (_cancelSource.IsCancellationRequested) return task;
 
                 _stopReason = ExceptionDispatchInfo.Capture(ex);
-                _wasStopUnexpected = isUnexpected;
                 if (_cancelSource != null)
                     _cancelSource.Cancel();
             }
@@ -153,7 +157,7 @@ namespace Discord
             lock (_lock)
             {
                 _stopReason = null;
-                _wasStopUnexpected = false;
+                _wasStopExpected = false;
             }
         }
     }

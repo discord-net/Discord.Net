@@ -63,7 +63,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (OperationCanceledException) { }
 		}
-        public Task Disconnect() => _taskManager.Stop();
+        public Task Disconnect() => _taskManager.Stop(true);
 
 		protected override async Task Run()
         {
