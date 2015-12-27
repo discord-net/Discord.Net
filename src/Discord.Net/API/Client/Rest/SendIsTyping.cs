@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class BroadcastTypingRequest : IRestRequest
+    public sealed class SendIsTypingRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/typing";
@@ -12,7 +12,7 @@ namespace Discord.API.Client.Rest
 
         public ulong ChannelId { get; }
 
-        public BroadcastTypingRequest(ulong channelId)
+        public SendIsTypingRequest(ulong channelId)
         {
             ChannelId = channelId;
         }

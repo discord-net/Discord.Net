@@ -378,7 +378,7 @@ namespace Discord
         }
 
         public Task SendIsTyping()
-            => Client.ClientAPI.Send(new BroadcastTypingRequest(Id));
+            => Client.ClientAPI.Send(new SendIsTypingRequest(Id));
         #endregion
 
         #region Permissions

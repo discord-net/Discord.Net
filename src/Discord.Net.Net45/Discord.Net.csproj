@@ -245,9 +245,6 @@
     <Compile Include="..\Discord.Net\API\Client\Rest\AddGuildBan.cs">
       <Link>API\Client\Rest\AddGuildBan.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Client\Rest\BroadcastTyping.cs">
-      <Link>API\Client\Rest\BroadcastTyping.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\CreateChannel.cs">
       <Link>API\Client\Rest\CreateChannel.cs</Link>
     </Compile>
@@ -325,6 +322,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\SendFile.cs">
       <Link>API\Client\Rest\SendFile.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Rest\SendIsTyping.cs">
+      <Link>API\Client\Rest\SendIsTyping.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\SendMessage.cs">
       <Link>API\Client\Rest\SendMessage.cs</Link>
