@@ -528,6 +528,8 @@ namespace Discord
                                     Logger.Info($"Server Updated: {server.Name}");
                                 OnServerUpdated(server);
                             }
+                            else
+                                Logger.Warning("GUILD_UPDATE referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_DELETE":
@@ -548,6 +550,8 @@ namespace Discord
                                 if (data.Unavailable != true)
                                     OnLeftServer(server);
                             }
+                            else
+                                Logger.Warning("GUILD_DELETE referenced an unknown guild.");
                         }
                         break;
 
@@ -562,6 +566,8 @@ namespace Discord
                                 var server = GetServer(data.GuildId.Value);
                                 if (server != null)
                                     channel = server.AddChannel(data.Id);
+                                else
+                                    Logger.Warning("CHANNEL_CREATE referenced an unknown guild.");
                             }
                             else
                                 channel = AddPrivateChannel(data.Id, data.Recipient.Id);
@@ -585,6 +591,8 @@ namespace Discord
                                     Logger.Info($"Channel Updated: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnChannelUpdated(channel);
                             }
+                            else
+                                Logger.Warning("CHANNEL_UPDATE referenced an unknown channel.");
                         }
                         break;
                     case "CHANNEL_DELETE":
@@ -597,6 +605,8 @@ namespace Discord
                                     Logger.Info($"Channel Destroyed: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnChannelDestroyed(channel);
                             }
+                            else
+                                Logger.Warning("CHANNEL_DELETE referenced an unknown channel.");
                         }
                         break;
 
@@ -614,6 +624,8 @@ namespace Discord
                                     Logger.Info($"User Joined: {server.Name}/{user.Name}");
                                 OnUserJoined(user);
                             }
+                            else
+                                Logger.Warning("GUILD_MEMBER_ADD referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_MEMBER_UPDATE":
@@ -630,7 +642,11 @@ namespace Discord
                                         Logger.Info($"User Updated: {server.Name}/{user.Name}");
                                     OnUserUpdated(user);
                                 }
+                                else
+                                    Logger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
                             }
+                            else
+                                Logger.Warning("GUILD_MEMBER_UPDATE referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_MEMBER_REMOVE":
@@ -646,7 +662,11 @@ namespace Discord
                                         Logger.Info($"User Left: {server.Name}/{user.Name}");
                                     OnUserLeft(user);
                                 }
+                                else
+                                    Logger.Warning("GUILD_MEMBER_REMOVE referenced an unknown user.");
                             }
+                            else
+                                Logger.Warning("GUILD_MEMBER_REMOVE referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_MEMBERS_CHUNK":
@@ -662,6 +682,8 @@ namespace Discord
                                     //OnUserAdded(user);
                                 }
                             }
+                            else
+                                Logger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
                         }
                         break;
 
@@ -678,6 +700,8 @@ namespace Discord
                                     Logger.Info($"Role Created: {server.Name}/{role.Name}");
                                 OnRoleUpdated(role);
                             }
+                            else
+                                Logger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_ROLE_UPDATE":
@@ -694,7 +718,11 @@ namespace Discord
                                         Logger.Info($"Role Updated: {server.Name}/{role.Name}");
                                     OnRoleUpdated(role);
                                 }
+                                else
+                                    Logger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
                             }
+                            else
+                                Logger.Warning("GUILD_ROLE_UPDATE referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_ROLE_DELETE":
@@ -710,7 +738,11 @@ namespace Discord
                                         Logger.Info($"Role Deleted: {server.Name}/{role.Name}");
                                     OnRoleDeleted(role);
                                 }
+                                else
+                                    Logger.Warning("GUILD_ROLE_DELETE referenced an unknown role.");
                             }
+                            else
+                                Logger.Warning("GUILD_ROLE_DELETE referenced an unknown guild.");
                         }
                         break;
 
@@ -728,7 +760,11 @@ namespace Discord
                                         Logger.Info($"User Banned: {server.Name}/{user.Name}");
                                     OnUserBanned(user);
                                 }
+                                else
+                                    Logger.Warning("GUILD_BAN_ADD referenced an unknown user.");
                             }
+                            else
+                                Logger.Warning("GUILD_BAN_ADD referenced an unknown guild.");
                         }
                         break;
                     case "GUILD_BAN_REMOVE":
@@ -743,6 +779,8 @@ namespace Discord
                                     Logger.Info($"User Unbanned: {server.Name}/{user.Name}");
                                 OnUserUnbanned(user);
                             }
+                            else
+                                Logger.Warning("GUILD_BAN_REMOVE referenced an unknown guild.");
                         }
                         break;
 
@@ -789,6 +827,8 @@ namespace Discord
                                     OnMessageReceived(msg);
                                 }
                             }
+                            else
+                                Logger.Warning("MESSAGE_CREATE referenced an unknown channel.");
                         }
                         break;
                     case "MESSAGE_UPDATE":
@@ -809,6 +849,8 @@ namespace Discord
                                         OnMessageUpdated(msg);
                                     }
                                 }
+                                else
+                                    Logger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
                             }
                         }
                         break;
@@ -828,22 +870,29 @@ namespace Discord
                                         OnMessageDeleted(msg);
                                     }
                                 }
+                                else
+                                    Logger.Warning("MESSAGE_DELETE referenced an unknown channel.");
                             }
                         }
                         break;
                     case "MESSAGE_ACK":
                         {
-                            var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
+                            if (Config.MessageCacheSize > 0)
                             {
-                                var msg = channel.GetMessage(data.MessageId);
-                                if (msg != null)
+                                var data = e.Payload.ToObject<MessageAckEvent>(_serializer);
+                                var channel = GetChannel(data.ChannelId);
+                                if (channel != null)
                                 {
-                                    if (Config.LogEvents)
-                                        Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                    OnMessageAcknowledged(msg);
+                                    var msg = channel.GetMessage(data.MessageId);
+                                    if (msg != null)
+                                    {
+                                        if (Config.LogEvents)
+                                            Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                        OnMessageAcknowledged(msg);
+                                    }
                                 }
+                                else
+                                    Logger.Warning("MESSAGE_ACK referenced an unknown channel.");
                             }
                         }
                         break;
@@ -862,7 +911,13 @@ namespace Discord
                             else
                             {
                                 server = GetServer(data.GuildId.Value);
-                                user = server?.GetUser(data.User.Id);
+                                if (server == null)
+                                {
+                                    Logger.Warning("PRESENCE_UPDATE referenced an unknown server.");
+                                    break;
+                                }
+                                else
+                                    user = server.GetUser(data.User.Id);
                             }
 
                             if (user != null)
@@ -871,6 +926,8 @@ namespace Discord
                                 //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
                                 OnUserPresenceUpdated(user);
                             }
+                            else
+                                Logger.Warning("PRESENCE_UPDATE referenced an unknown channel.");
                         }
                         break;
                     case "TYPING_START":
@@ -896,6 +953,8 @@ namespace Discord
                                     user.UpdateActivity();
                                 }
                             }
+                            else
+                                Logger.Warning("TYPING_START referenced an unknown channel.");
                         }
                         break;
 
@@ -913,7 +972,11 @@ namespace Discord
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
                                     OnUserVoiceStateUpdated(user);
                                 }
+                                else
+                                    Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");
                             }
+                            else
+                                Logger.Warning("VOICE_STATE_UPDATE referenced an unknown server.");
                         }
                         break;
 
