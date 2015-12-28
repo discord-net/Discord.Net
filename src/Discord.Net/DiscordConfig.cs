@@ -52,6 +52,9 @@ namespace Discord
         /// <summary> Name of your application. This is used both for the token cache directory and user agent. </summary>
         public string AppName { get { return _appName; } set { SetValue(ref _appName, value); UpdateUserAgent(); } }
         private string _appName = null;
+        /// <summary> Url to your application. This is used in the user agent. </summary>
+        public string AppUrl { get { return _appUrl; } set { SetValue(ref _appUrl, value); UpdateUserAgent(); } }
+        private string _appUrl = null;
         /// <summary> Version of your application. </summary>
         public string AppVersion { get { return _appVersion; } set { SetValue(ref _appVersion, value); UpdateUserAgent(); } }
         private string _appVersion = null;
@@ -127,6 +130,12 @@ namespace Discord
                 {
                     builder.Append('/');
                     builder.Append(_appVersion);
+                }
+                if (!string.IsNullOrEmpty(_appUrl))
+                {
+                    builder.Append(" (");
+                    builder.Append(_appUrl);
+                    builder.Append(')');
                 }
                 builder.Append(' ');
             }
