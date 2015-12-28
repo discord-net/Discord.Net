@@ -787,7 +787,7 @@ namespace Discord
                         break;
                     case "MESSAGE_UPDATE":
                         {
-                            if (Config.MessageCacheSize <= 0)
+                            if (Config.MessageCacheSize > 0)
                             {
                                 var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
                                 var channel = GetChannel(data.ChannelId);
@@ -808,7 +808,7 @@ namespace Discord
                         break;
                     case "MESSAGE_DELETE":
                         {
-                            if (Config.MessageCacheSize <= 0)
+                            if (Config.MessageCacheSize > 0)
                             {
                                 var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
                                 var channel = GetChannel(data.ChannelId);
