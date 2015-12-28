@@ -927,7 +927,7 @@ namespace Discord
                                 OnUserPresenceUpdated(user);
                             }
                             else
-                                Logger.Warning("PRESENCE_UPDATE referenced an unknown channel.");
+                                Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");
                         }
                         break;
                     case "TYPING_START":
