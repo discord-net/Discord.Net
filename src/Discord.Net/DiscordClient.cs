@@ -271,12 +271,13 @@ namespace Discord
 			    await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
             await _taskManager.Stop(true).ConfigureAwait(false);
         }
-		private Task Cleanup()
+		private async Task Cleanup()
         {
             State = ConnectionState.Disconnecting;
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
 
+            await GatewaySocket.Disconnect();
             ClientAPI.Token = null;
             GatewaySocket.Token = null;
 
@@ -290,7 +291,6 @@ namespace Discord
             State = (int)ConnectionState.Disconnected;
             _connectedEvent.Reset();
             _disconnectedEvent.Set();
-            return TaskHelper.CompletedTask;
         }
         
         public Task SetStatus(UserStatus status)
