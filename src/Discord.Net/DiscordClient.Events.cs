@@ -24,13 +24,13 @@ namespace Discord
         public event EventHandler<ServerEventArgs> ServerAvailable = delegate { };
         public event EventHandler<ServerEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
-        public event EventHandler<BanEventArgs> UserBanned = delegate { };
+        public event EventHandler<UserEventArgs> UserBanned = delegate { };
         public event EventHandler<ChannelUserEventArgs> UserIsTypingUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
         public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserUpdated = delegate { };
-        public event EventHandler<BanEventArgs> UserUnbanned = delegate { };
+        public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
         public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
 
         private void OnConnected()
@@ -77,8 +77,8 @@ namespace Discord
         private void OnServerUnavailable(Server server)
             => OnEvent(ServerUnavailable, new ServerEventArgs(server));
 
-        private void OnUserBanned(Server server, ulong userId)
-            => OnEvent(UserBanned, new BanEventArgs(server, userId));
+        private void OnUserBanned(User user)
+            => OnEvent(UserBanned, new UserEventArgs(user));
         private void OnUserIsTypingUpdated(Channel channel, User user)
             => OnEvent(UserIsTypingUpdated, new ChannelUserEventArgs(channel, user));
         private void OnUserJoined(User user)
@@ -87,8 +87,8 @@ namespace Discord
             => OnEvent(UserLeft, new UserEventArgs(user));
         private void OnUserPresenceUpdated(User user)
             => OnEvent(UserPresenceUpdated, new UserEventArgs(user));
-        private void OnUserUnbanned(Server server, ulong userId)
-            => OnEvent(UserUnbanned, new BanEventArgs(server, userId));
+        private void OnUserUnbanned(User user)
+            => OnEvent(UserUnbanned, new UserEventArgs(user));
         private void OnUserUpdated(User user)
             => OnEvent(UserUpdated, new UserEventArgs(user));
         private void OnUserVoiceStateUpdated(User user)

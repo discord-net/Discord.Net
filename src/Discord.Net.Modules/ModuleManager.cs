@@ -17,10 +17,7 @@ namespace Discord.Modules
         public event EventHandler<ServerEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
         public event EventHandler<ServerEventArgs> ServerAvailable = delegate { };
-
-        public event EventHandler<BanEventArgs> UserBanned = delegate { };
-        public event EventHandler<BanEventArgs> UserUnbanned = delegate { };
-
+        
         public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelUpdated = delegate { };
@@ -29,11 +26,13 @@ namespace Discord.Modules
         public event EventHandler<RoleEventArgs> RoleUpdated = delegate { };
         public event EventHandler<RoleEventArgs> RoleDeleted = delegate { };
 
+        public event EventHandler<UserEventArgs> UserBanned = delegate { };
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
         public event EventHandler<UserEventArgs> UserUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
+        public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
         public event EventHandler<ChannelUserEventArgs> UserIsTypingUpdated = delegate { };
 
         public event EventHandler<MessageEventArgs> MessageReceived = delegate { };

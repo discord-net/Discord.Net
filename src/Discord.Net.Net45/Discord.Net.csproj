@@ -419,9 +419,6 @@
     <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
       <Link>Enums\UserStatus.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Events\BanEventArgs.cs">
-      <Link>Events\BanEventArgs.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Events\ChannelEventArgs.cs">
       <Link>Events\ChannelEventArgs.cs</Link>
     </Compile>

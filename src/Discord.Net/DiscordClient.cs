@@ -718,24 +718,30 @@ namespace Discord
                     case "GUILD_BAN_ADD":
                         {
                             var data = e.Payload.ToObject<GuildBanAddEvent>(_serializer);
-                            var server = GetServer(data.GuildId);
+                            var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
-                                if (Config.LogEvents)
-                                    Logger.Info($"User Banned: {server.Name}/{data.UserId}");
-                                OnUserBanned(server, data.UserId);
+                                var user = server.GetUser(data.User.Id);
+                                if (user != null)
+                                {
+                                    if (Config.LogEvents)
+                                        Logger.Info($"User Banned: {server.Name}/{user.Name}");
+                                    OnUserBanned(user);
+                                }
                             }
                         }
                         break;
                     case "GUILD_BAN_REMOVE":
                         {
                             var data = e.Payload.ToObject<GuildBanRemoveEvent>(_serializer);
-                            var server = GetServer(data.GuildId);
+                            var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
+                                var user = new User(this, data.User.Id, server);
+                                user.Update(data.User);
                                 if (Config.LogEvents)
-                                    Logger.Info($"User Unbanned: {server.Name}/{data.UserId}");
-                                OnUserUnbanned(server, data.UserId);
+                                    Logger.Info($"User Unbanned: {server.Name}/{user.Name}");
+                                OnUserUnbanned(user);
                             }
                         }
                         break;
