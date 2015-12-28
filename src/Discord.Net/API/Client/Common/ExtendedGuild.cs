@@ -26,8 +26,6 @@ namespace Discord.API.Client
         public bool? Unavailable { get; set; }
 
         //Unknown
-        [JsonProperty("splash")]
-        public object Splash { get; set; }
         [JsonProperty("features")]
         public object Features { get; set; }
         [JsonProperty("emojis")]
