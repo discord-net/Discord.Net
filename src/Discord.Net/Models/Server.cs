@@ -409,16 +409,19 @@ namespace Discord
             {
                 foreach (var channel in AllChannels)
                     channel.RemoveUser(id);
+                return member.User;
             }
-            return member.User;
+            return null;
         }
 
         /// <summary> Gets the user with the provided id and is a member of this server, or null if not found. </summary>
         public User GetUser(ulong id)
         {
             Member result;
-            _users.TryGetValue(id, out result);
-            return result.User;
+            if (_users.TryGetValue(id, out result))
+                return result.User;
+            else
+                return null;
         }
         /// <summary> Gets the user with the provided username and discriminator, that is a member of this server, or null if not found. </summary>
         public User GetUser(string name, ushort discriminator)
