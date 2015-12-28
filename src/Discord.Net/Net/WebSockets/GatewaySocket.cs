@@ -9,8 +9,19 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
+    public sealed class WebSocketEventEventArgs : EventArgs
+    {
+        public readonly string Type;
+        public readonly JToken Payload;
+        internal WebSocketEventEventArgs(string type, JToken data)
+        {
+            Type = type;
+            Payload = data;
+        }
+    }
+
     public partial class GatewaySocket : WebSocket
-	{
+    {
         private int _lastSequence;
 		private string _sessionId;
         private string _token;
@@ -18,7 +29,11 @@ namespace Discord.Net.WebSockets
 
         public string Token { get { return _token; } internal set { _token = value; _sessionId = null; } }
 
-		public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
+        public event EventHandler<WebSocketEventEventArgs> ReceivedDispatch = delegate { };
+        private void OnReceivedDispatch(string type, JToken payload)
+            => ReceivedDispatch(this, new WebSocketEventEventArgs(type, payload));
+
+        public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
 			: base(client, serializer, logger)
 		{
 			Disconnected += async (s, e) =>
@@ -63,7 +78,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (OperationCanceledException) { }
 		}
-        public Task Disconnect() => _taskManager.Stop();
+        public Task Disconnect() => _taskManager.Stop(true);
 
 		protected override async Task Run()
         {
@@ -82,7 +97,7 @@ namespace Discord.Net.WebSockets
 
         protected override async Task ProcessMessage(string json)
 		{
-			await base.ProcessMessage(json).ConfigureAwait(false);
+            base.ProcessMessage(json).Wait(); //This is just a CompletedTask, and we need to avoid asyncs in here
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
 				_lastSequence = msg.Sequence.Value;
@@ -105,7 +120,7 @@ namespace Discord.Net.WebSockets
 							var payload = token.ToObject<ResumedEvent>(_serializer);
 							_heartbeatInterval = payload.HeartbeatInterval;
 						}
-						RaiseReceivedDispatch(msg.Type, token);
+						OnReceivedDispatch(msg.Type, token);
 						if (msg.Type == "READY" || msg.Type == "RESUMED")
 							EndConnect(); //Complete the connect
 					}
