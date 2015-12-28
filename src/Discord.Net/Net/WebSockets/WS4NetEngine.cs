@@ -16,7 +16,7 @@ namespace Discord.Net.WebSockets
         private readonly ConcurrentQueue<string> _sendQueue;
         private readonly TaskManager _taskManager;
         private WebSocketClient _webSocket;
-        private ManualResetEventSlim _waitUntilConnect;
+        private ManualResetEventSlim _waitUntilConnect, _waitUntilDisconnect;
 
         public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
         public event EventHandler<WebSocketTextMessageEventArgs> TextMessage = delegate { };
@@ -31,6 +31,7 @@ namespace Discord.Net.WebSockets
             _taskManager = taskManager;
             _sendQueue = new ConcurrentQueue<string>();
             _waitUntilConnect = new ManualResetEventSlim();
+            _waitUntilDisconnect = new ManualResetEventSlim(true);
         }
 
         public Task Connect(string host, CancellationToken cancelToken)
@@ -62,13 +63,15 @@ namespace Discord.Net.WebSockets
             _webSocket = null;
             if (socket != null)
             {
-                //We dont want a slow disconnect to mess up the next connection, so lets just unregister events
+                socket.Close();
+                socket.Opened -= OnWebSocketOpened;
                 socket.DataReceived -= OnWebSocketBinary;
                 socket.MessageReceived -= OnWebSocketText;
+
+                _waitUntilDisconnect.Wait(); //We need the next two events to raise this one
                 socket.Error -= OnWebSocketError;
                 socket.Closed -= OnWebSocketClosed;
-                socket.Opened -= OnWebSocketOpened;
-                socket.Close();
+                socket.Dispose();
             }
 
             return TaskHelper.CompletedTask;
@@ -78,6 +81,7 @@ namespace Discord.Net.WebSockets
         {
             _taskManager.SignalError(e.Exception);
             _waitUntilConnect.Set();
+            _waitUntilDisconnect.Set();
         }
         private void OnWebSocketClosed(object sender, EventArgs e)
         {
@@ -85,12 +89,16 @@ namespace Discord.Net.WebSockets
             if (e is ClosedEventArgs)
                 ex = new WebSocketException((e as ClosedEventArgs).Code, (e as ClosedEventArgs).Reason);
             else
-                ex = new Exception($"Connection lost");
+                ex = new Exception("Connection lost");
             _taskManager.SignalError(ex);
             _waitUntilConnect.Set();
+            _waitUntilDisconnect.Set();
         }
         private void OnWebSocketOpened(object sender, EventArgs e)
-            => _waitUntilConnect.Set();
+        {
+            _waitUntilDisconnect.Reset();
+            _waitUntilConnect.Set();
+        }
         private void OnWebSocketText(object sender, MessageReceivedEventArgs e)
             => OnTextMessage(e.Message);
         private void OnWebSocketBinary(object sender, DataReceivedEventArgs e)

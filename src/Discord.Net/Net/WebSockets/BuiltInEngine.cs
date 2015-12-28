@@ -21,6 +21,7 @@ namespace Discord.Net.WebSockets
         private readonly DiscordConfig _config;
         private readonly ConcurrentQueue<string> _sendQueue;
         private WebSocketClient _webSocket;
+        private Task _tempTask;
 
         public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
         public event EventHandler<WebSocketTextMessageEventArgs> TextMessage = delegate { };
@@ -35,18 +36,15 @@ namespace Discord.Net.WebSockets
             _sendQueue = new ConcurrentQueue<string>();
         }
 
-        public Task Connect(string host, CancellationToken cancelToken)
+        public async Task Connect(string host, CancellationToken cancelToken)
         {
-            return Task.Run(async () =>
-            {
-                _webSocket = new WebSocketClient();
-                _webSocket.Options.Proxy = null;
-                _webSocket.Options.SetRequestHeader("User-Agent", _config.UserAgent);
-                _webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
-                await _webSocket.ConnectAsync(new Uri(host), cancelToken)//.ConfigureAwait(false);
-                    .ContinueWith(t => ReceiveAsync(cancelToken)).ConfigureAwait(false);
-                //TODO: ContinueWith is a temporary hack, may be a bug related to https://github.com/dotnet/corefx/issues/4429
-            });
+            _webSocket = new WebSocketClient();
+            _webSocket.Options.Proxy = null;
+            _webSocket.Options.SetRequestHeader("User-Agent", _config.UserAgent);
+            _webSocket.Options.KeepAliveInterval = TimeSpan.Zero;
+            _tempTask = await _webSocket.ConnectAsync(new Uri(host), cancelToken)//.ConfigureAwait(false);
+                .ContinueWith(t => ReceiveAsync(cancelToken)).ConfigureAwait(false); 
+            //TODO: ContinueWith is a temporary hack, may be a bug related to https://github.com/dotnet/corefx/issues/4429
         }
 
         public Task Disconnect()
@@ -61,7 +59,7 @@ namespace Discord.Net.WebSockets
         }
 
         public IEnumerable<Task> GetTasks(CancellationToken cancelToken) 
-            => new Task[] { /*ReceiveAsync(cancelToken),*/ SendAsync(cancelToken) };
+            => new Task[] { /*ReceiveAsync(cancelToken),*/ _tempTask, SendAsync(cancelToken) };
 
         private Task ReceiveAsync(CancellationToken cancelToken)
         {

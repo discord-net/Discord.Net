@@ -63,7 +63,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (OperationCanceledException) { }
 		}
-        public Task Disconnect() => _taskManager.Stop(true);
+        public Task Disconnect() => _taskManager.Stop();
 
 		protected override async Task Run()
         {
@@ -75,7 +75,7 @@ namespace Discord.Net.WebSockets
         protected override Task Cleanup()
         {
             var ex = _taskManager.Exception;
-            if (ex != null && (ex as WebSocketException)?.Code != 1012)
+            if (ex == null || (ex as WebSocketException)?.Code != 1012) //if (ex == null || (ex as WebSocketException)?.Code != 1012)
                 _sessionId = null; //Reset session unless close code 1012
             return base.Cleanup();
         }
