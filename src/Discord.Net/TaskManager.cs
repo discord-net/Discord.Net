@@ -70,8 +70,10 @@ namespace Discord
                         else
                             SignalStop();
 
-                        //Wait for the other tasks;
-                        await allTasks.ConfigureAwait(false);
+                        //Wait for the other tasks, and signal their errors too just in case
+                        try { await allTasks.ConfigureAwait(false); }
+                        catch (AggregateException ex) { SignalError(ex.InnerExceptions.First()); } 
+                        catch (Exception ex) { SignalError(ex); }
 
                         //Run the cleanup function within our lock
                         if (_stopAction != null)
