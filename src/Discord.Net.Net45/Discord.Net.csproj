@@ -38,7 +38,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>6</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'FullDebug|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestResponses|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\FullDebug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET45,TEST_RESPONSES</DefineConstants>
@@ -514,6 +514,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSocketException.cs">
       <Link>Net\WebSockets\WebSocketException.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\BuiltInEngine.cs">
+      <Link>Net\WebSockets\BuiltInEngine.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\GatewaySocket.cs">
       <Link>Net\WebSockets\GatewaySocket.cs</Link>

@@ -53,7 +53,7 @@ namespace Discord.Net.WebSockets
 #if !DOTNET5_4
 			_engine = new WS4NetEngine(client.Config, _taskManager);
 #else
-			//_engine = new BuiltInWebSocketEngine(this, client.Config);
+			_engine = new BuiltInEngine(client.Config);
 #endif
             _engine.BinaryMessage += (s, e) =>
             {
@@ -179,7 +179,8 @@ namespace Discord.Net.WebSockets
             {
                 //Cancel if either DiscordClient.Disconnect is called, data socket errors or timeout is reached
                 cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, CancelToken).Token;
-                _connectedEvent.Wait(cancelToken);
+                if (!_connectedEvent.Wait(_client.Config.ConnectionTimeout, cancelToken))
+                    throw new TimeoutException();
             }
             catch (OperationCanceledException)
             {

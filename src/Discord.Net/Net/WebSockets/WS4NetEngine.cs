@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocket4Net;
-using WS4NetWebSocket = WebSocket4Net.WebSocket;
+using WebSocketClient = WebSocket4Net.WebSocket;
 
 namespace Discord.Net.WebSockets
 {
@@ -15,7 +15,7 @@ namespace Discord.Net.WebSockets
         private readonly DiscordConfig _config;
         private readonly ConcurrentQueue<string> _sendQueue;
         private readonly TaskManager _taskManager;
-        private WS4NetWebSocket _webSocket;
+        private WebSocketClient _webSocket;
         private ManualResetEventSlim _waitUntilConnect;
 
         public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
@@ -35,7 +35,7 @@ namespace Discord.Net.WebSockets
 
         public Task Connect(string host, CancellationToken cancelToken)
         {
-            _webSocket = new WS4NetWebSocket(host);
+            _webSocket = new WebSocketClient(host);
             _webSocket.EnableAutoSendPing = false;
             _webSocket.NoDelay = true;
             _webSocket.Proxy = null;
@@ -96,7 +96,8 @@ namespace Discord.Net.WebSockets
         private void OnWebSocketBinary(object sender, DataReceivedEventArgs e)
             => OnBinaryMessage(e.Data);
 
-        public IEnumerable<Task> GetTasks(CancellationToken cancelToken) => new Task[] { SendAsync(cancelToken) };
+        public IEnumerable<Task> GetTasks(CancellationToken cancelToken) 
+            => new Task[] { SendAsync(cancelToken) };
 
         private Task SendAsync(CancellationToken cancelToken)
         {

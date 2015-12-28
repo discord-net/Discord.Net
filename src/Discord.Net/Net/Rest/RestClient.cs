@@ -51,7 +51,7 @@ namespace Discord.Net.Rest
 #if !DOTNET5_4
 			_engine = new RestSharpEngine(config, baseUrl, logger);
 #else
-			//_engine = new BuiltInRestEngine(config, baseUrl, logger);
+			_engine = new BuiltInEngine(config, baseUrl, logger);
 #endif
         }
 

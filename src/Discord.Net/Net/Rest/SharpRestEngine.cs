@@ -51,7 +51,7 @@ namespace Discord.Net.Rest
 		}
 		public Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken)
 		{
-			var request = new RestRequest(path, Method.POST);
+			var request = new RestRequest(path, GetMethod(method));
 			request.AddHeader("content-length", (stream.Length - stream.Position).ToString());
 
 			byte[] bytes = new byte[stream.Length - stream.Position];
@@ -79,6 +79,7 @@ namespace Discord.Net.Rest
                 {
                     var retryAfter = response.Headers
                         .FirstOrDefault(x => x.Name.Equals("Retry-After", StringComparison.OrdinalIgnoreCase));
+
                     int milliseconds;
                     if (retryAfter != null && int.TryParse((string)retryAfter.Value, out milliseconds))
                     {
