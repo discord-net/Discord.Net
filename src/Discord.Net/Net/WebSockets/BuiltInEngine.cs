@@ -14,8 +14,8 @@ namespace Discord.Net.WebSockets
 {
     internal class BuiltInEngine : IWebSocketEngine
     {
-        private const int ReceiveChunkSize = 4096;
-        private const int SendChunkSize = 4096;
+        private const int ReceiveChunkSize = 12 * 1024; //12KB
+        private const int SendChunkSize = 4 * 1024; //4KB
         private const int HR_TIMEOUT = -2147012894;
 
         private readonly DiscordConfig _config;
