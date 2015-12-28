@@ -1,4 +1,4 @@
-# Discord.Net v0.8.1-Beta2
+# Discord.Net v0.9.0-Alpha2
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
@@ -17,4 +17,4 @@ You can download Discord.Net from NuGet:
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
 ### Known Issues
-- .Net Core 5.0 is experiencing several network-related issues and support has been temporarily dropped.
+- .Net Core support is incomplete on non-Windows systems
