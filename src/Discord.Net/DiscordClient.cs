@@ -787,34 +787,40 @@ namespace Discord
                         break;
                     case "MESSAGE_UPDATE":
                         {
-                            var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
+                            if (Config.MessageCacheSize <= 0)
                             {
-                                var msg = channel.GetMessage(data.Id);
-                                if (msg != null)
+                                var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
+                                var channel = GetChannel(data.ChannelId);
+                                if (channel != null)
                                 {
-                                    msg.Update(data);
-                                    msg.State = MessageState.Normal;
-                                    if (Config.LogEvents)
-                                        Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                    OnMessageUpdated(msg);
+                                    var msg = channel.GetMessage(data.Id);
+                                    if (msg != null)
+                                    {
+                                        msg.Update(data);
+                                        msg.State = MessageState.Normal;
+                                        if (Config.LogEvents)
+                                            Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                        OnMessageUpdated(msg);
+                                    }
                                 }
                             }
                         }
                         break;
                     case "MESSAGE_DELETE":
                         {
-                            var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
+                            if (Config.MessageCacheSize <= 0)
                             {
-                                var msg = channel.RemoveMessage(data.Id);
-                                if (msg != null)
+                                var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
+                                var channel = GetChannel(data.ChannelId);
+                                if (channel != null)
                                 {
-                                    if (Config.LogEvents)
-                                        Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                    OnMessageDeleted(msg);
+                                    var msg = channel.RemoveMessage(data.Id);
+                                    if (msg != null)
+                                    {
+                                        if (Config.LogEvents)
+                                            Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                        OnMessageDeleted(msg);
+                                    }
                                 }
                             }
                         }
