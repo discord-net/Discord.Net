@@ -24,7 +24,12 @@ namespace Discord.API.Client
         public string Region { get; set; }
         [JsonProperty("roles")]
         public Role[] Roles { get; set; }
+
         [JsonProperty("splash")]
         public object Splash { get; set; }
+        [JsonProperty("features")]
+        public object Features { get; set; }
+        [JsonProperty("emojis")]
+        public object Emojis { get; set; }
     }
 }

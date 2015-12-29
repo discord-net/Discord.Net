@@ -24,11 +24,5 @@ namespace Discord.API.Client
         public bool IsLarge { get; set; }
         [JsonProperty("unavailable")]
         public bool? Unavailable { get; set; }
-
-        //Unknown
-        [JsonProperty("features")]
-        public object Features { get; set; }
-        [JsonProperty("emojis")]
-        public object Emojis { get; set; }
     }
 }
