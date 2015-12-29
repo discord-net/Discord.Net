@@ -326,7 +326,7 @@ namespace Discord
         
         public Task Acknowledge()
         {
-            if (_userId != Client.CurrentUser.Id)
+            if (User.Id != Client.CurrentUser.Id)
                 return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
             else
                 return TaskHelper.CompletedTask;
