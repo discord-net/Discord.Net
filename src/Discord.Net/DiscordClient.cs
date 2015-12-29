@@ -977,8 +977,8 @@ namespace Discord
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
                                     OnUserVoiceStateUpdated(user);
                                 }
-                                else
-                                    Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");
+                                /*else //Occurs when a user leaves a server
+                                    Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");*/
                             }
                             else
                                 Logger.Warning("VOICE_STATE_UPDATE referenced an unknown server.");
