@@ -198,6 +198,8 @@ namespace Discord
         
 		/// <summary> Returns the server containing the channel this message was sent to. </summary>
 		public Server Server => Channel.Server;
+        /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
+        public bool IsAuthor => User.Id == Client.CurrentUser?.Id;
 
 		internal Message(ulong id, Channel channel, User user)
 		{
