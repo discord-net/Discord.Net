@@ -163,8 +163,6 @@ namespace Discord
 			internal File() { }
 		}
 
-        private readonly ulong _userId;
-
         internal DiscordClient Client => Channel.Client;
 
         /// <summary> Returns the unique identifier for this message. </summary>
