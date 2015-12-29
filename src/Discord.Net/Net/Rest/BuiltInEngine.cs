@@ -13,7 +13,9 @@ using System.Globalization;
 namespace Discord.Net.Rest
 {
     internal sealed class BuiltInEngine : IRestEngine
-	{
+    {
+        private const int HR_SECURECHANNELFAILED = -2146233079;
+
         private readonly DiscordConfig _config;
 		private readonly HttpClient _client;
         private readonly string _baseUrl;
@@ -81,7 +83,7 @@ namespace Discord.Net.Rest
                 catch (WebException ex)
                 {
                     //The request was aborted: Could not create SSL/TLS secure channel.
-                    if (ex.HResult == -2146233079 && retryCount++ < 5)
+                    if (ex.HResult == HR_SECURECHANNELFAILED && retryCount++ < 5)
                         continue; //Retrying seems to fix this somehow?
                     throw;
                 }

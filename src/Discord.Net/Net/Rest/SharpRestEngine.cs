@@ -11,6 +11,8 @@ namespace Discord.Net.Rest
 {
     internal sealed class RestSharpEngine : IRestEngine
 	{
+        private const int HR_SECURECHANNELFAILED = -2146233079;
+
         private readonly DiscordConfig _config;
 		private readonly RestSharp.RestClient _client;
 
@@ -73,7 +75,7 @@ namespace Discord.Net.Rest
                 if (statusCode == 0) //Internal Error
                 {
                     //The request was aborted: Could not create SSL/TLS secure channel.
-                    if (response.ErrorException.HResult == -2146233079 && retryCount++ < 5)
+                    if (response.ErrorException.HResult == HR_SECURECHANNELFAILED && retryCount++ < 5)
                         continue; //Retrying seems to fix this somehow?
                     throw response.ErrorException;
                 }
