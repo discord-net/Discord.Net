@@ -27,6 +27,8 @@ namespace Discord.Net.Rest
 		{
 			_config = config;
             _baseUrl = baseUrl;
+            Logger = logger;
+
             _rateLimitLock = new object();
             _client = new HttpClient(new HttpClientHandler
             {

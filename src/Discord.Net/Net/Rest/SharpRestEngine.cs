@@ -22,6 +22,8 @@ namespace Discord.Net.Rest
         public RestSharpEngine(DiscordConfig config, string baseUrl, Logger logger)
 		{
 			_config = config;
+            Logger = logger;
+
             _rateLimitLock = new object();
             _client = new RestSharp.RestClient(baseUrl)
 			{
