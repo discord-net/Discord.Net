@@ -931,8 +931,8 @@ namespace Discord
                                 //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
                                 OnUserPresenceUpdated(user);
                             }
-                            else
-                                Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");
+                            /*else //Occurs when a user leaves a server
+                                Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
                         }
                         break;
                     case "TYPING_START":
