@@ -917,7 +917,12 @@ namespace Discord
                                     break;
                                 }
                                 else
-                                    user = server.GetUser(data.User.Id);
+                                {
+                                    if (Config.UseLargeThreshold)
+                                        user = server.AddUser(data.User.Id);
+                                    else
+                                        user = server.GetUser(data.User.Id);
+                                }
                             }
 
                             if (user != null)
@@ -926,9 +931,8 @@ namespace Discord
                                 //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
                                 OnUserPresenceUpdated(user);
                             }
-                            /*else
-                                Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
-                                //This happens when users leave a server
+                            else
+                                Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");
                         }
                         break;
                     case "TYPING_START":
