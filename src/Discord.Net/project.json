@@ -1,32 +1,36 @@
 {
-	"version": "0.9.0-alpha2",
-	"description": "An unofficial .Net API wrapper for the Discord client.",
-	"authors": [
-		"RogueException"
-	],
-	"tags": [
-		"discord",
-		"discordapp"
-	],
-	"projectUrl": "https://github.com/RogueException/Discord.Net",
-	"licenseUrl": "http://opensource.org/licenses/MIT",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/RogueException/Discord.Net"
-	},
-	"compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
+  "version": "0.9.0-alpha2",
+  "description": "An unofficial .Net API wrapper for the Discord client.",
+  "authors": [
+    "RogueException"
+  ],
+  "tags": [
+    "discord",
+    "discordapp"
+  ],
+  "projectUrl": "https://github.com/RogueException/Discord.Net",
+  "licenseUrl": "http://opensource.org/licenses/MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/RogueException/Discord.Net"
+  },
+  "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
+  
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
 
-	"configurations": {
-		"TestResponses": {
-			"compilationOptions": {
-				"define": [
-					"DEBUG",
-					"TRACE",
-					"TEST_RESPONSES"
-				]
-			}
-		}
-	},
+  "configurations": {
+    "TestResponses": {
+      "compilationOptions": {
+        "define": [
+          "DEBUG",
+          "TRACE",
+          "TEST_RESPONSES"
+        ]
+      }
+    }
+  },
 
   "dependencies": {
     "Newtonsoft.Json": "7.0.1"
