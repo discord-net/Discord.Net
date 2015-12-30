@@ -61,11 +61,12 @@ namespace Discord.Net
                 while (!cancelToken.IsCancellationRequested)
                 {
                     await Task.Delay(interval).ConfigureAwait(false);
+
                     int count = _pending.Count;
-                    if (count > _nextWarning)
+                    if (count >= _nextWarning)
                     {
-                        _logger.Warning($"Queue is backed up, currently at {_nextWarning} messages.");
                         _nextWarning *= 2;
+                        _logger.Warning($"Queue is backed up, currently at {count} messages.");
                     }
                     else if (count < WarningStart) //Reset once the problem is solved
                         _nextWarning = WarningStart;
