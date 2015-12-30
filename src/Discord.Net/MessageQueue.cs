@@ -33,6 +33,8 @@ namespace Discord.Net
         private readonly ConcurrentQueue<MessageQueueItem> _pending;
         private int _nextWarning;
 
+        public int Count { get; private set; }
+
         internal MessageQueue(DiscordClient client, Logger logger)
         {
             _client = client;
@@ -62,13 +64,13 @@ namespace Discord.Net
                 {
                     await Task.Delay(interval).ConfigureAwait(false);
 
-                    int count = _pending.Count;
-                    if (count >= _nextWarning)
+                    Count = _pending.Count;
+                    if (Count >= _nextWarning)
                     {
                         _nextWarning *= 2;
-                        _logger.Warning($"Queue is backed up, currently at {count} messages.");
+                        _logger.Warning($"Queue is backed up, currently at {Count} messages.");
                     }
-                    else if (count < WarningStart) //Reset once the problem is solved
+                    else if (Count < WarningStart) //Reset once the problem is solved
                         _nextWarning = WarningStart;
 
                     while (_pending.TryDequeue(out queuedMessage))
