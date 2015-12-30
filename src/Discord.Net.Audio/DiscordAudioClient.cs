@@ -1,18 +1,20 @@
-﻿using Discord.API;
-using Discord.API.Client.GatewaySocket;
+﻿using Discord.API.Client.GatewaySocket;
 using Discord.Logging;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
 	public partial class DiscordAudioClient
-	{
-        private JsonSerializer _serializer;
+    {
+        private readonly Semaphore _connectionLock;
+        private readonly JsonSerializer _serializer;
+        private CancellationTokenSource _cancelTokenSource;
 
-		internal AudioService Service { get; }
+        internal AudioService Service { get; }
         internal Logger Logger { get; }
         public int Id { get; }
         public GatewaySocket GatewaySocket { get; }
@@ -26,6 +28,9 @@ namespace Discord.Audio
 			Service = service;
 			Id = id;
 			Logger = logger;
+            GatewaySocket = gatewaySocket;
+
+            _connectionLock = new Semaphore(1, 1);
 
             _serializer = new JsonSerializer();
             _serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
@@ -35,7 +40,6 @@ namespace Discord.Audio
                 Logger.Error("Serialization Failed", e.ErrorContext.Error);
             };
 
-            GatewaySocket = gatewaySocket;
 			VoiceSocket = new VoiceWebSocket(service.Client, this, _serializer, logger);
 
             /*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
@@ -72,33 +76,7 @@ namespace Discord.Audio
 				_voiceSocket.ParentCancelToken = _cancelToken;
 			};*/
 
-            GatewaySocket.ReceivedDispatch += async (s, e) =>
-			{
-				try
-				{
-					switch (e.Type)
-					{
-						case "VOICE_SERVER_UPDATE":
-                            {
-                                var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
-                                var serverId = data.GuildId;
-
-								if (serverId == ServerId)
-								{
-									var client = Service.Client;
-									VoiceSocket.Token = data.Token;
-									VoiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-									await VoiceSocket.Connect().ConfigureAwait(false);
-								}
-							}
-							break;
-					}
-				}
-				catch (Exception ex)
-				{
-                    Logger.Error($"Error handling {e.Type} event", ex);
-				}
-			};
+            GatewaySocket.ReceivedDispatch += OnReceivedDispatch;
 		}
 		
 
@@ -106,22 +84,71 @@ namespace Discord.Audio
 		{
 			VoiceSocket.ServerId = serverId;
 		}
-		public async Task Join(Channel channel)
+		public Task Join(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             ulong? serverId = channel.Server?.Id;
 			if (serverId != ServerId)
 				throw new InvalidOperationException("Cannot join a channel on a different server than this voice client.");
-			//CheckReady(checkVoice: true);
+            //CheckReady(checkVoice: true);
 
-			await VoiceSocket.Disconnect().ConfigureAwait(false);
-			VoiceSocket.ChannelId = channel.Id;
-			GatewaySocket.SendUpdateVoice(channel.Server.Id, channel.Id,
-                (Service.Config.Mode | AudioMode.Outgoing) == 0, 
-                (Service.Config.Mode | AudioMode.Incoming) == 0);
-			await VoiceSocket.WaitForConnection(Service.Config.ConnectionTimeout).ConfigureAwait(false);
+            return Task.Run(async () =>
+            {
+                _connectionLock.WaitOne();
+                try
+                {
+                    await VoiceSocket.Disconnect().ConfigureAwait(false);
+
+                    _cancelTokenSource = new CancellationTokenSource();
+                    var cancelToken = _cancelTokenSource.Token;
+                    VoiceSocket.ParentCancelToken = cancelToken;
+
+                    VoiceSocket.ChannelId = channel.Id;
+                    GatewaySocket.SendUpdateVoice(channel.Server.Id, channel.Id,
+                        (Service.Config.Mode | AudioMode.Outgoing) == 0,
+                        (Service.Config.Mode | AudioMode.Incoming) == 0);
+
+                    VoiceSocket.WaitForConnection(cancelToken);
+                }
+                finally
+                {
+                    _connectionLock.Release();
+                }
+            });
         }
-        public Task Disconnect() => VoiceSocket.Disconnect();
+        public Task Disconnect()
+        {
+            GatewaySocket.ReceivedDispatch -= OnReceivedDispatch;
+            return VoiceSocket.Disconnect();
+        }
+
+        private async void OnReceivedDispatch(object sender, WebSocketEventEventArgs e)
+        {
+            try
+            {
+                switch (e.Type)
+                {
+                    case "VOICE_SERVER_UPDATE":
+                        {
+                            var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
+                            var serverId = data.GuildId;
+
+                            if (serverId == ServerId)
+                            {
+                                var client = Service.Client;
+                                VoiceSocket.Token = data.Token;
+                                VoiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
+                                await VoiceSocket.Connect().ConfigureAwait(false);
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error handling {e.Type} event", ex);
+            }
+        }
 
         /// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
         /// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>

@@ -126,11 +126,6 @@ namespace Discord
 
             if (Config.UseMessageQueue)
                 MessageQueue = new MessageQueue(this, Log.CreateLogger("MessageQueue"));
-            Connected += async (s, e) =>
-            {
-                ClientAPI.CancelToken = CancelToken;
-                await SendStatus().ConfigureAwait(false);
-            };
 
             //Extensibility
             Services = new ServiceManager(this);
@@ -172,6 +167,10 @@ namespace Discord
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
 
+                    _cancelTokenSource = new CancellationTokenSource();
+                    CancelToken = _cancelTokenSource.Token;
+                    GatewaySocket.ParentCancelToken = CancelToken;
+
                     await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect().ConfigureAwait(false);
 
@@ -196,10 +195,6 @@ namespace Discord
         }
         private async Task Login(string email, string password, string token)
         {
-            _cancelTokenSource = new CancellationTokenSource();
-            CancelToken = _cancelTokenSource.Token;
-            GatewaySocket.ParentCancelToken = CancelToken;
-
             bool useCache = Config.CacheToken;
             while (true)
             {
@@ -261,6 +256,9 @@ namespace Discord
         {
             State = ConnectionState.Connected;
             _connectedEvent.Set();
+
+            ClientAPI.CancelToken = CancelToken;
+            SendStatus();
             OnConnected();
         }
 
@@ -293,21 +291,19 @@ namespace Discord
             _disconnectedEvent.Set();
         }
         
-        public Task SetStatus(UserStatus status)
+        public void SetStatus(UserStatus status)
         {
             if (status == null) throw new ArgumentNullException(nameof(status));
             if (status != UserStatus.Online && status != UserStatus.Idle)
                 throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
 
             Status = status;
-            return SendStatus();
         }
-        public Task SetGame(string game)
+        public void SetGame(string game)
         {
             CurrentGame = game;
-            return SendStatus();
         }
-        private Task SendStatus()
+        private void SendStatus()
         {
             PrivateUser.Status = Status;
             PrivateUser.CurrentGame = CurrentGame;
@@ -321,7 +317,6 @@ namespace Discord
                 }
             }
             GatewaySocket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
-            return TaskHelper.CompletedTask;
         }
 
         #region Channels

@@ -63,10 +63,8 @@ namespace Discord.Net.WebSockets
 			_sendBuffer = new VoiceBuffer((int)Math.Ceiling(_config.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 		
-		public async Task Connect()
-		{
-			await BeginConnect().ConfigureAwait(false);
-		}
+		public Task Connect()
+            => BeginConnect();
 		public async Task Reconnect()
 		{
 			try
@@ -472,21 +470,6 @@ namespace Discord.Net.WebSockets
 		public void WaitForQueue()
 		{
 			_sendBuffer.Wait(CancelToken);
-		}
-		public Task WaitForConnection(int timeout)
-		{
-			return Task.Run(() =>
-			{
-				try
-				{
-					if (!_connectedEvent.Wait(timeout, CancelToken))
-						throw new TimeoutException();
-				}
-				catch (OperationCanceledException)
-				{
-					_taskManager.ThrowException();
-				}
-			});
 		}
 
         public override void SendHeartbeat()

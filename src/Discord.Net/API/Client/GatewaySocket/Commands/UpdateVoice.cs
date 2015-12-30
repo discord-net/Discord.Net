@@ -6,7 +6,7 @@ namespace Discord.API.Client.GatewaySocket
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class UpdateVoiceCommand : IWebSocketMessage
     {
-        int IWebSocketMessage.OpCode => (int)OpCodes.StatusUpdate;
+        int IWebSocketMessage.OpCode => (int)OpCodes.VoiceStateUpdate;
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 

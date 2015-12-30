@@ -173,12 +173,10 @@ namespace Discord.Net.WebSockets
         }
         public abstract void SendHeartbeat();
 
-        public void WaitForConnection(CancellationToken cancelToken)
+        public virtual void WaitForConnection(CancellationToken cancelToken)
         {
             try
             {
-                //Cancel if either DiscordClient.Disconnect is called, data socket errors or timeout is reached
-                cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, CancelToken).Token;
                 if (!_connectedEvent.Wait(_client.Config.ConnectionTimeout, cancelToken))
                     throw new TimeoutException();
             }

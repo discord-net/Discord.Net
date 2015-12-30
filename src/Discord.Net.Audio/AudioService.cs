@@ -49,7 +49,7 @@ namespace Discord.Audio
         private DiscordAudioClient _defaultClient;
 		private ConcurrentDictionary<ulong, DiscordAudioClient> _voiceClients;
 		private ConcurrentDictionary<User, bool> _talkingUsers;
-		private int _nextClientId;
+		//private int _nextClientId;
 
 		internal DiscordClient Client => _client;
 		private DiscordClient _client;
@@ -143,13 +143,14 @@ namespace Discord.Audio
 				_defaultClient.SetServerId(server.Id);
 				return Task.FromResult(_defaultClient);
 			}
+            else
+                throw new InvalidOperationException("Multiserver voice is not currently supported");
 
-			var client = _voiceClients.GetOrAdd(server.Id, _ =>
+			/*var client = _voiceClients.GetOrAdd(server.Id, _ =>
 			{
 				int id = unchecked(++_nextClientId);
 				var logger = Client.Log.CreateLogger($"Voice #{id}");
-                GatewaySocket gatewaySocket = null;
-				var voiceClient = new DiscordAudioClient(this, id, logger, gatewaySocket);
+				var voiceClient = new DiscordAudioClient(this, id, logger, Client.GatewaySocket);
 				voiceClient.SetServerId(server.Id);
 
                 voiceClient.VoiceSocket.OnPacket += (s, e) =>
@@ -165,7 +166,7 @@ namespace Discord.Audio
 				return voiceClient;
 			});
 			//await client.Connect(gatewaySocket.Host, _client.Token).ConfigureAwait(false);
-			return Task.FromResult(client);
+			return Task.FromResult(client);*/
 		}
 
 		public async Task<DiscordAudioClient> Join(Channel channel)
