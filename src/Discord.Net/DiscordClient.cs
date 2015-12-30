@@ -45,7 +45,7 @@ namespace Discord
         /// <summary> Gets the service manager used for adding extensions to this client. </summary>
         public ServiceManager Services { get; }
         /// <summary> Gets the queue used for outgoing messages, if enabled. </summary>
-        internal MessageQueue MessageQueue { get; }
+        public MessageQueue MessageQueue { get; }
         /// <summary> Gets the logger used for this client. </summary>
         internal Logger Logger { get; }
 

@@ -44,11 +44,11 @@ namespace Discord.Net
             _pending = new ConcurrentQueue<MessageQueueItem>();
         }
 
-        public void QueueSend(ulong channelId, string text, bool isTTS)
+        internal void QueueSend(ulong channelId, string text, bool isTTS)
         {
             _pending.Enqueue(new MessageQueueItem(0, channelId, text, isTTS));
         }
-        public void QueueEdit(ulong channelId, ulong messageId, string text)
+        internal void QueueEdit(ulong channelId, ulong messageId, string text)
         {
             _pending.Enqueue(new MessageQueueItem(channelId, messageId, text, false));
         }
