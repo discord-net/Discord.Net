@@ -125,7 +125,7 @@ namespace Discord
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
 
             if (Config.UseMessageQueue)
-                MessageQueue = new MessageQueue(this);
+                MessageQueue = new MessageQueue(this, Log.CreateLogger("MessageQueue"));
             Connected += async (s, e) =>
             {
                 ClientAPI.CancelToken = CancelToken;

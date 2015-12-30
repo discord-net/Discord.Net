@@ -1,4 +1,5 @@
 ﻿using Discord.API.Client.Rest;
+using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -23,14 +24,17 @@ namespace Discord.Net
                 IsTTS = isTTS;
             }
         }
-
+        
         private readonly Random _nonceRand;
         private readonly DiscordClient _client;
+        private readonly Logger _logger;
         private readonly ConcurrentQueue<MessageQueueItem> _pending;
 
-        internal MessageQueue(DiscordClient client)
+        internal MessageQueue(DiscordClient client, Logger logger)
         {
             _client = client;
+            _logger = logger;
+
             _nonceRand = new Random();
             _pending = new ConcurrentQueue<MessageQueueItem>();
         }
@@ -78,6 +82,7 @@ namespace Discord.Net
                         }
                         catch (WebException) { break; }
                         catch (HttpException) { /*msg.State = MessageState.Failed;*/ }
+                        catch (Exception ex) { _logger.Error(ex); }
                     }
                 }
             });
