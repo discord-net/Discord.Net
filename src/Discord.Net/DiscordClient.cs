@@ -298,10 +298,12 @@ namespace Discord
                 throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
 
             Status = status;
+            SendStatus();
         }
         public void SetGame(string game)
         {
             CurrentGame = game;
+            SendStatus();
         }
         private void SendStatus()
         {
