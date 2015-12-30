@@ -136,12 +136,12 @@ namespace Discord.Audio
 			else
 				return null;
 		}
-		private Task<DiscordAudioClient> CreateClient(Server server)
+		private async Task<DiscordAudioClient> CreateClient(Server server)
 		{
 			if (!Config.EnableMultiserver)
 			{
-				_defaultClient.SetServerId(server.Id);
-				return Task.FromResult(_defaultClient);
+				await _defaultClient.SetServer(server.Id);
+				return _defaultClient;
 			}
             else
                 throw new InvalidOperationException("Multiserver voice is not currently supported");
@@ -175,7 +175,7 @@ namespace Discord.Audio
 			//CheckReady(true);
 
 			var client = await CreateClient(channel.Server).ConfigureAwait(false);
-			await client.Join(channel).ConfigureAwait(false);
+			await client.JoinChannel(channel).ConfigureAwait(false);
 			return client;
 		}
 		

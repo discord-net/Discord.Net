@@ -173,7 +173,7 @@ namespace Discord.Net.WebSockets
                 IdleSince = idleSince,
                 Game = gameName != null ? new UpdateStatusCommand.GameInfo { Name = gameName } : null
             });
-		public void SendUpdateVoice(ulong serverId, ulong channelId, bool isSelfMuted, bool isSelfDeafened)
+		public void SendUpdateVoice(ulong? serverId, ulong? channelId, bool isSelfMuted, bool isSelfDeafened)
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
 		public void SendRequestMembers(ulong serverId, string query, int limit)
             => QueueMessage(new RequestMembersCommand { GuildId = serverId, Query = query, Limit = limit });

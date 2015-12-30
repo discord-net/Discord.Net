@@ -101,13 +101,15 @@ namespace Discord.Net.WebSockets
 				_sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(CancelToken)));
 				_sendThread.IsBackground = true;
                 _sendThread.Start();
-			}			
-			if ((_config.Mode & AudioMode.Incoming) != 0)
-			{
-				_receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(CancelToken)));
-                _receiveThread.IsBackground = true;
-				_receiveThread.Start();
 			}
+            /*if ((_config.Mode & AudioMode.Incoming) != 0)
+            {*/
+                _receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(CancelToken)));
+                _receiveThread.IsBackground = true;
+                _receiveThread.Start();
+            /*}
+            else
+                tasks.Add(Task.Run(() => ReceiveVoiceAsync(CancelToken)));*/
 			
 			SendIdentify();
 

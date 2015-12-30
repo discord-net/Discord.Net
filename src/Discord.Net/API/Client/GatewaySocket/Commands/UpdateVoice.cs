@@ -10,10 +10,10 @@ namespace Discord.API.Client.GatewaySocket
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        [JsonProperty("guild_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong GuildId { get; set; }
-        [JsonProperty("channel_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong ChannelId { get; set; }
+        [JsonProperty("guild_id"), JsonConverter(typeof(NullableLongStringConverter))]
+        public ulong? GuildId { get; set; }
+        [JsonProperty("channel_id"), JsonConverter(typeof(NullableLongStringConverter))]
+        public ulong? ChannelId { get; set; }
         [JsonProperty("self_mute")]
         public bool IsSelfMuted { get; set; }
         [JsonProperty("self_deaf")]
