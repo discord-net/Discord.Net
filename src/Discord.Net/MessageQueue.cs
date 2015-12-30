@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net
 {
+    /// <summary> Manages an outgoing message queue for DiscordClient. </summary>
     public class MessageQueue
     {
         private class MessageQueueItem
@@ -33,6 +34,7 @@ namespace Discord.Net
         private readonly ConcurrentQueue<MessageQueueItem> _pending;
         private int _nextWarning;
 
+        /// <summary> Gets the current number of queued message sends/edits. </summary>
         public int Count { get; private set; }
 
         internal MessageQueue(DiscordClient client, Logger logger)
@@ -104,6 +106,7 @@ namespace Discord.Net
             });
         }
 
+        /// <summary> Clears all queued message sends/edits </summary>
         public void Clear()
         {
             MessageQueueItem ignored;
