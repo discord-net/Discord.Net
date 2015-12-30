@@ -24,11 +24,14 @@ namespace Discord.Net
                 IsTTS = isTTS;
             }
         }
-        
+
+        private const int WarningStart = 30;
+
         private readonly Random _nonceRand;
         private readonly DiscordClient _client;
         private readonly Logger _logger;
         private readonly ConcurrentQueue<MessageQueueItem> _pending;
+        private int _nextWarning;
 
         internal MessageQueue(DiscordClient client, Logger logger)
         {
@@ -50,6 +53,7 @@ namespace Discord.Net
 
         internal Task Run(CancellationToken cancelToken, int interval)
         {
+            _nextWarning = WarningStart;
             return Task.Run(async () =>
             {
                 MessageQueueItem queuedMessage;
@@ -57,6 +61,15 @@ namespace Discord.Net
                 while (!cancelToken.IsCancellationRequested)
                 {
                     await Task.Delay(interval).ConfigureAwait(false);
+                    int count = _pending.Count;
+                    if (count > _nextWarning)
+                    {
+                        _logger.Warning($"Queue is backed up, currently at {_nextWarning} messages.");
+                        _nextWarning *= 2;
+                    }
+                    else if (count < WarningStart) //Reset once the problem is solved
+                        _nextWarning = WarningStart;
+
                     while (_pending.TryDequeue(out queuedMessage))
                     {
                         try
