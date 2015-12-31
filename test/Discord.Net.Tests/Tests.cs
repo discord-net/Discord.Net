@@ -36,17 +36,17 @@ namespace Discord.Tests
 
 			//Cleanup existing servers
 			WaitMany(
-				_hostClient.Servers.Select(x => _hostClient.LeaveServer(x)),
-				_targetBot.Servers.Select(x => _targetBot.LeaveServer(x)),
-				_observerBot.Servers.Select(x => _observerBot.LeaveServer(x)));
+				_hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()),
+				_targetBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()),
+				_observerBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()));
 
 			//Create new server and invite the other bots to it
-			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.GetVoiceRegions().First()).Result;
+			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First()).Result;
 			_testServerChannel = _testServer.DefaultChannel;
-			Invite invite = _hostClient.CreateInvite(_testServer, 60, 1, false, false).Result;
+			Invite invite = _testServer.CreateInvite(60, 1, false, false).Result;
 			WaitAll(
-				_targetBot.AcceptInvite(invite),
-				_observerBot.AcceptInvite(invite));
+				_targetBot.GetInvite(invite.Code).Result.Accept(),
+                _observerBot.GetInvite(invite.Code).Result.Accept());
 		}
 
 		//Channels
@@ -62,14 +62,14 @@ namespace Discord.Tests
 			string name = $"#test_{_random.Next()}";
 			AssertEvent<ChannelEventArgs>(
 				"ChannelCreated event never received",
-				async () => channel = await _hostClient.CreateChannel(_testServer, name.Substring(1), type),
+				async () => channel = await _testServer.CreateChannel(name.Substring(1), type),
 				x => _targetBot.ChannelCreated += x,
 				x => _targetBot.ChannelCreated -= x,
 				(s, e) => e.Channel.Name == name);
 
 			AssertEvent<ChannelEventArgs>(
 				"ChannelDestroyed event never received",
-				async () => await _hostClient.DeleteChannel(channel),
+				async () => await channel.Delete(),
 				x => _targetBot.ChannelDestroyed += x,
 				x => _targetBot.ChannelDestroyed -= x,
 				(s, e) => e.Channel.Name == name);
@@ -79,21 +79,21 @@ namespace Discord.Tests
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoName()
 		{
-			await _hostClient.CreateChannel(_testServer, $"", ChannelType.Text);
+			await _testServer.CreateChannel($"", ChannelType.Text);
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_NoType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString(""));
+			await _testServer.CreateChannel($"", ChannelType.FromString(""));
 		}
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task TestCreateChannel_BadType()
 		{
 			string name = $"#test_{_random.Next()}";
-			await _hostClient.CreateChannel(_testServer, $"", ChannelType.FromString("badtype"));
+			await _testServer.CreateChannel($"", ChannelType.FromString("badtype"));
 		}
 
 		//Messages
@@ -103,7 +103,7 @@ namespace Discord.Tests
 			string text = $"test_{_random.Next()}";
 			AssertEvent<MessageEventArgs>(
 				"MessageCreated event never received",
-				() => _hostClient.SendMessage(_testServerChannel, text),
+				() => _testServerChannel.SendMessage(text),
 				x => _targetBot.MessageReceived += x,
 				x => _targetBot.MessageReceived -= x,
 				(s, e) => e.Message.Text == text);
@@ -113,9 +113,9 @@ namespace Discord.Tests
 		public static void Cleanup()
 		{
 			WaitMany(
-				_hostClient.State == ConnectionState.Connected ? _hostClient.Servers.Select(x => _hostClient.LeaveServer(x)) : null,
-				_targetBot.State == ConnectionState.Connected ? _targetBot.Servers.Select(x => _targetBot.LeaveServer(x)) : null,
-				_observerBot.State == ConnectionState.Connected ? _observerBot.Servers.Select(x => _observerBot.LeaveServer(x)) : null);
+				_hostClient.State == ConnectionState.Connected ? _hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()) : null,
+				_targetBot.State == ConnectionState.Connected ? _targetBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()) : null,
+				_observerBot.State == ConnectionState.Connected ? _observerBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()) : null);
 
 			WaitAll(
 				_hostClient.Disconnect(),
