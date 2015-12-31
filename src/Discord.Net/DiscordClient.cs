@@ -358,15 +358,17 @@ namespace Discord
             _privateChannels.TryGetValue(recipientId, out channel);
             return channel;
         }
-        internal async Task<Channel> CreatePrivateChannel(User user)
+        internal Task<Channel> CreatePMChannel(User user)
+            => CreatePrivateChannel(user.Id);
+        public async Task<Channel> CreatePrivateChannel(ulong userId)
         {
-            var channel = GetPrivateChannel(user.Id);
+            var channel = GetPrivateChannel(userId);
             if (channel != null) return channel;
 
-            var request = new CreatePrivateChannelRequest() { RecipientId = user.Id };
+            var request = new CreatePrivateChannelRequest() { RecipientId = userId };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
 
-            channel = AddPrivateChannel(response.Id, user.Id);
+            channel = AddPrivateChannel(response.Id, userId);
             channel.Update(response);
             return channel;
         }

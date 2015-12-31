@@ -269,8 +269,8 @@ namespace Discord
         #endregion
 
         #region Channels
-        public Task<Channel> CreateChannel()
-            => Client.CreatePrivateChannel(this);
+        public Task<Channel> CreatePMChannel()
+            => Client.CreatePMChannel(this);
         #endregion
 
         #region Messages
@@ -278,14 +278,14 @@ namespace Discord
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            var channel = await CreateChannel().ConfigureAwait(false);
+            var channel = await CreatePMChannel().ConfigureAwait(false);
             return await channel.SendMessage(text).ConfigureAwait(false);
         }
         public async Task<Message> SendFile(string filePath)
         {
             if (filePath == null) throw new ArgumentNullException(nameof(filePath));
 
-            var channel = await CreateChannel().ConfigureAwait(false);
+            var channel = await CreatePMChannel().ConfigureAwait(false);
             return await channel.SendFile(filePath).ConfigureAwait(false);
         }
         public async Task<Message> SendFile(string filename, Stream stream)
@@ -293,7 +293,7 @@ namespace Discord
             if (filename == null) throw new ArgumentNullException(nameof(filename));
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            var channel = await CreateChannel().ConfigureAwait(false);
+            var channel = await CreatePMChannel().ConfigureAwait(false);
             return await channel.SendFile(filename, stream).ConfigureAwait(false);
         }
         #endregion

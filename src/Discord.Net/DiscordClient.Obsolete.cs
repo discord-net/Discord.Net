@@ -42,7 +42,7 @@ namespace Discord.Legacy
         public static Task<Channel> CreatePMChannel(this DiscordClient client, User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.CreateChannel();
+            return user.CreatePMChannel();
         }        
         [Obsolete("Use Channel.Edit")]
         public static Task EditChannel(this DiscordClient client, Channel channel, string name = null, string topic = null, int? position = null)

@@ -49,7 +49,7 @@ namespace Discord.Commands
                     .Description("Returns information about commands.")
                     .Do(async e =>
                     {
-						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreateChannel().ConfigureAwait(false);
+						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreatePMChannel().ConfigureAwait(false);
 						if (e.Args.Length > 0) //Show command help
 						{
 							var map = _map.GetItem(string.Join(" ", e.Args));
