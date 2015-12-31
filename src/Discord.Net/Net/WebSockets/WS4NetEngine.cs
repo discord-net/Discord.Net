@@ -36,21 +36,30 @@ namespace Discord.Net.WebSockets
 
         public Task Connect(string host, CancellationToken cancelToken)
         {
-            _webSocket = new WebSocketClient(host);
-            _webSocket.EnableAutoSendPing = false;
-            _webSocket.NoDelay = true;
-            _webSocket.Proxy = null;
+            try
+            {
+                _webSocket = new WebSocketClient(host);
+                _webSocket.EnableAutoSendPing = false;
+                _webSocket.NoDelay = true;
+                _webSocket.Proxy = null;
 
-            _webSocket.DataReceived += OnWebSocketBinary;
-            _webSocket.MessageReceived += OnWebSocketText;
-            _webSocket.Error += OnWebSocketError;
-            _webSocket.Closed += OnWebSocketClosed;
-            _webSocket.Opened += OnWebSocketOpened;
+                _webSocket.DataReceived += OnWebSocketBinary;
+                _webSocket.MessageReceived += OnWebSocketText;
+                _webSocket.Error += OnWebSocketError;
+                _webSocket.Closed += OnWebSocketClosed;
+                _webSocket.Opened += OnWebSocketOpened;
 
-            _waitUntilConnect.Reset();
-            _webSocket.Open();
-            _waitUntilConnect.Wait(cancelToken);
-            _taskManager.ThrowException(); //In case our connection failed
+                _waitUntilConnect.Reset();
+                _waitUntilDisconnect.Reset();
+                _webSocket.Open();
+                _waitUntilConnect.Wait(cancelToken);
+                _taskManager.ThrowException(); //In case our connection failed
+            }
+            catch
+            {
+                _waitUntilDisconnect.Set();
+                throw;
+            }
             return TaskHelper.CompletedTask;
         }
 
@@ -96,8 +105,8 @@ namespace Discord.Net.WebSockets
         }
         private void OnWebSocketOpened(object sender, EventArgs e)
         {
-            _waitUntilDisconnect.Reset();
             _waitUntilConnect.Set();
+            _waitUntilDisconnect.Reset();
         }
         private void OnWebSocketText(object sender, MessageReceivedEventArgs e)
             => OnTextMessage(e.Message);
