@@ -23,7 +23,7 @@ namespace Discord.Net.WebSockets
 
     public partial class GatewaySocket : WebSocket
     {
-        private int _lastSequence;
+        private uint _lastSequence;
 		private string _sessionId;
         private string _token;
         private int _reconnects;

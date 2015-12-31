@@ -12,6 +12,6 @@ namespace Discord.API.Client.GatewaySocket
         [JsonProperty("session_id")]
         public string SessionId { get; set; }
         [JsonProperty("seq")]
-        public int Sequence { get; set; }
+        public uint Sequence { get; set; }
     }
 }
