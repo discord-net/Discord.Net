@@ -57,6 +57,8 @@ namespace Discord
 
         /// <summary> Gets the user that created this server. </summary>
         public User Owner => GetUser(_ownerId);
+        /// <summary> Returns true if the current user owns this server. </summary>
+        public bool IsOwner => _ownerId == Client.CurrentUser.Id;
         /// <summary> Gets the AFK voice channel for this server. </summary>
         public Channel AFKChannel => _afkChannelId != null ? GetChannel(_afkChannelId.Value) : null;
         /// <summary> Gets the current user in this server. </summary>
