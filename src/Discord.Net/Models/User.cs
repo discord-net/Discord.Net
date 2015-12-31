@@ -87,7 +87,7 @@ namespace Discord
         public bool IsServerSuppressed => (_voiceState & VoiceState.ServerSuppressed) != 0;
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
 		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline; 
-        /// <summary> Gets this user's  </summary>
+        /// <summary> Gets this user's current voice channel. </summary>
         public Channel VoiceChannel => _voiceChannelId != null ? Server.GetChannel(_voiceChannelId.Value) : null;
         /// <summary> Gets the URL to this user's current avatar. </summary>
         public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
