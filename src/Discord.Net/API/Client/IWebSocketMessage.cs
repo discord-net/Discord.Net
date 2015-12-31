@@ -15,7 +15,7 @@ namespace Discord.API.Client
         [JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
         [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
-        public int? Sequence { get; set; }
+        public uint? Sequence { get; set; }
         [JsonProperty("d")]
         public object Payload { get; set; }
 
