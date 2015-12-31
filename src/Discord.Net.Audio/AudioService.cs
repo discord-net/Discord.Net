@@ -46,8 +46,8 @@ namespace Discord.Audio
 
 	public class AudioService : IService
     {
-        private DiscordAudioClient _defaultClient;
-		private ConcurrentDictionary<ulong, DiscordAudioClient> _voiceClients;
+        private AudioClient _defaultClient;
+		private ConcurrentDictionary<ulong, IAudioClient> _voiceClients;
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		//private int _nextClientId;
 
@@ -91,11 +91,11 @@ namespace Discord.Audio
 		{
 			_client = client;
 			if (Config.EnableMultiserver)
-				_voiceClients = new ConcurrentDictionary<ulong, DiscordAudioClient>();
+				_voiceClients = new ConcurrentDictionary<ulong, IAudioClient>();
 			else
 			{
 				var logger = Client.Log.CreateLogger("Voice");
-				_defaultClient = new DiscordAudioClient(this, 0, logger, _client.GatewaySocket);
+				_defaultClient = new SimpleAudioClient(this, 0, logger);
 			}
 			_talkingUsers = new ConcurrentDictionary<User, bool>();
 
@@ -118,34 +118,29 @@ namespace Discord.Audio
 			};
 		}
 
-		public DiscordAudioClient GetClient(Server server)
+		public IAudioClient GetClient(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
-			if (!Config.EnableMultiserver)
-			{
-				if (server.Id == _defaultClient.ServerId)
-					return _defaultClient;
-				else
-					return null;
-			}
-
-			DiscordAudioClient client;
-			if (_voiceClients.TryGetValue(server.Id, out client))
-				return client;
-			else
-				return null;
-		}
-		private async Task<DiscordAudioClient> CreateClient(Server server)
-		{
-			if (!Config.EnableMultiserver)
-			{
-				await _defaultClient.SetServer(server.Id);
-				return _defaultClient;
-			}
+            if (!Config.EnableMultiserver)
+            {
+                if (server == _defaultClient.Server)
+                    return (_defaultClient as SimpleAudioClient).CurrentClient;
+                else
+                    return null;
+            }
             else
-                throw new InvalidOperationException("Multiserver voice is not currently supported");
-
+            {
+                IAudioClient client;
+                if (_voiceClients.TryGetValue(server.Id, out client))
+                    return client;
+                else
+                    return null;
+            }
+		}
+		private Task<IAudioClient> CreateClient(Server server)
+		{
+            throw new NotImplementedException();
 			/*var client = _voiceClients.GetOrAdd(server.Id, _ =>
 			{
 				int id = unchecked(++_nextClientId);
@@ -169,30 +164,44 @@ namespace Discord.Audio
 			return Task.FromResult(client);*/
 		}
 
-		public async Task<DiscordAudioClient> Join(Channel channel)
+        //TODO: This isn't threadsafe
+        internal void RemoveClient(Server server, IAudioClient client)
+        {
+            if (Config.EnableMultiserver && server != null)
+                _voiceClients.TryRemove(server.Id, out client);
+        }
+
+		public async Task<IAudioClient> Join(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
-			//CheckReady(true);
 
-			var client = await CreateClient(channel.Server).ConfigureAwait(false);
-			await client.JoinChannel(channel).ConfigureAwait(false);
+            IAudioClient client;
+            if (!Config.EnableMultiserver)
+                client = await (_defaultClient as SimpleAudioClient).Connect(channel).ConfigureAwait(false);
+            else
+            {
+                client = await CreateClient(channel.Server).ConfigureAwait(false);
+                await client.Join(channel).ConfigureAwait(false);
+            }
 			return client;
 		}
 		
 		public async Task Leave(Server server)
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
-			//CheckReady(true);
 
-			if (Config.EnableMultiserver)
-			{
-				//client.CheckReady();
-				DiscordAudioClient client;
-				if (_voiceClients.TryRemove(server.Id, out client))
-					await client.Disconnect().ConfigureAwait(false);
-			}
-			else
-				await _defaultClient.Disconnect().ConfigureAwait(false);
+            if (Config.EnableMultiserver)
+            {
+                IAudioClient client;
+                if (_voiceClients.TryRemove(server.Id, out client))
+                    await client.Disconnect().ConfigureAwait(false);
+            }
+            else
+            {
+                IAudioClient client = GetClient(server);
+                if (client != null)
+                    await (_defaultClient as SimpleAudioClient).Leave(client as SimpleAudioClient.VirtualClient).ConfigureAwait(false);
+            }
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Discord.Net.WebSockets
         
 		private readonly int _targetAudioBufferLength;
 		private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
-		private readonly DiscordAudioClient _audioClient;
+		private readonly AudioClient _audioClient;
         private readonly AudioServiceConfig _config;
         private Thread _sendThread, _receiveThread;
         private VoiceBuffer _sendBuffer;
@@ -44,13 +44,13 @@ namespace Discord.Net.WebSockets
 		private int _ping;		
 
         public string Token { get; internal set; }
-        public ulong? ServerId { get; internal set; }
-		public ulong? ChannelId { get; internal set; }
+        public Server Server { get; internal set; }
+		public Channel Channel { get; internal set; }
 
         public int Ping => _ping;
 		internal VoiceBuffer OutputBuffer => _sendBuffer;
 
-		public VoiceWebSocket(DiscordClient client, DiscordAudioClient audioClient, JsonSerializer serializer, Logger logger)
+		internal VoiceWebSocket(DiscordClient client, AudioClient audioClient, JsonSerializer serializer, Logger logger)
 			: base(client, serializer, logger)
 		{
             _audioClient = audioClient;
@@ -65,7 +65,7 @@ namespace Discord.Net.WebSockets
 		
 		public Task Connect()
             => BeginConnect();
-		public async Task Reconnect()
+		private async Task Reconnect()
 		{
 			try
 			{
@@ -234,7 +234,7 @@ namespace Discord.Net.WebSockets
 
                                 ulong userId;
 								if (_ssrcMapping.TryGetValue(ssrc, out userId))
-									RaiseOnPacket(userId, ChannelId.Value, result, resultOffset, resultLength);
+									RaiseOnPacket(userId, Channel.Id, result, resultOffset, resultLength);
 							}
 						}
 					}
@@ -477,7 +477,7 @@ namespace Discord.Net.WebSockets
         public override void SendHeartbeat()
             => QueueMessage(new HeartbeatCommand());
         public void SendIdentify()
-            => QueueMessage(new IdentifyCommand { GuildId = ServerId.Value, UserId = _client.CurrentUser.Id,
+            => QueueMessage(new IdentifyCommand { GuildId = Server.Id, UserId = _client.CurrentUser.Id,
                 SessionId = _client.SessionId, Token = Token });
         public void SendSelectProtocol(string externalAddress, int externalPort)
             => QueueMessage(new SelectProtocolCommand { Protocol = "udp", ExternalAddress = externalAddress,

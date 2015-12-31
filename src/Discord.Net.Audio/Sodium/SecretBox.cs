@@ -3,7 +3,7 @@ using System.Security;
 
 namespace Discord.Audio.Sodium
 {
-    public unsafe static class SecretBox
+    internal unsafe static class SecretBox
     {
 #if NET45
         [SuppressUnmanagedCodeSecurity]

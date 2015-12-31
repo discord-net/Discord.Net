@@ -45,6 +45,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Discord.Net.Audio\AudioClient.cs">
+      <Link>AudioClient.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Audio\AudioExtensions.cs">
       <Link>AudioExtensions.cs</Link>
     </Compile>
@@ -54,8 +57,8 @@
     <Compile Include="..\Discord.Net.Audio\AudioServiceConfig.cs">
       <Link>AudioServiceConfig.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\DiscordAudioClient.cs">
-      <Link>DiscordAudioClient.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\IAudioClient.cs">
+      <Link>IAudioClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Net\WebSockets\VoiceWebSocket.cs">
       <Link>Net\WebSockets\VoiceWebSocket.cs</Link>
@@ -71,6 +74,9 @@
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Opus\OpusEncoder.cs">
       <Link>Opus\OpusEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\SimpleAudioClient.cs">
+      <Link>SimpleAudioClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Sodium.cs">
       <Link>Sodium.cs</Link>
