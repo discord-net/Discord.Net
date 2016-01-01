@@ -119,13 +119,13 @@ namespace Discord.Commands
 						else if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
 						{
 							int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
-							string temp = input.Substring(startPosition, length);
-							if (temp == "")
+                            if (length == 0)
 								startPosition = endPosition;
 							else
-							{
-								currentPart = ParserPart.None;
-								argList.Add(temp);
+                            {
+                                string temp = input.Substring(startPosition, length);
+                                argList.Add(temp);
+                                currentPart = ParserPart.None;
 								startPosition = endPosition;
 							}
 						} 
@@ -134,9 +134,9 @@ namespace Discord.Commands
 						if ((!isEscaped && currentChar == '\''))
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
-							currentPart = ParserPart.None;
 							argList.Add(temp);
-							startPosition = endPosition;
+                            currentPart = ParserPart.None;
+                            startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
 							return CommandErrorType.InvalidInput;
@@ -145,9 +145,9 @@ namespace Discord.Commands
 						if ((!isEscaped && currentChar == '\"'))
 						{
 							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
-							currentPart = ParserPart.None;
 							argList.Add(temp);
-							startPosition = endPosition;
+                            currentPart = ParserPart.None;
+                            startPosition = endPosition;
 						}
 						else if (endPosition >= inputLength)
 							return CommandErrorType.InvalidInput;
@@ -155,8 +155,13 @@ namespace Discord.Commands
 				}
 			}
 
-			//Too few args
-			for (int i = argList.Count; i < expectedArgs.Length; i++)
+            //Unclosed quotes
+            if (currentPart == ParserPart.QuotedParameter || 
+                currentPart == ParserPart.DoubleQuotedParameter)
+                return CommandErrorType.InvalidInput;
+
+            //Too few args
+            for (int i = argList.Count; i < expectedArgs.Length; i++)
 			{
 				var param = expectedArgs[i];
 				switch (param.Type)
