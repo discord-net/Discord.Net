@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.Legacy
 {
     public static class Mention
     {
