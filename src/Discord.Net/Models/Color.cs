@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-	public class Color
+	public sealed class Color
 	{
 		public static readonly Color Default = PresetColor(0);
 
@@ -65,8 +65,8 @@ namespace Discord
 			//Bypasses isLocked for API changes.
 			_rawValue = rawValue;
 		}
-		protected byte GetByte(int pos) => (byte)((_rawValue >> (8 * (pos - 1))) & 0xFF);
-		protected void SetByte(int pos, byte value)
+        private byte GetByte(int pos) => (byte)((_rawValue >> (8 * (pos - 1))) & 0xFF);
+		private void SetByte(int pos, byte value)
 		{
 			if (_isLocked)
 				throw new InvalidOperationException("Unable to edit cached colors directly, use Copy() to make an editable copy.");

@@ -10,18 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public sealed class WebSocketEventEventArgs : EventArgs
-    {
-        public readonly string Type;
-        public readonly JToken Payload;
-        internal WebSocketEventEventArgs(string type, JToken data)
-        {
-            Type = type;
-            Payload = data;
-        }
-    }
-
-    public partial class GatewaySocket : WebSocket
+    public sealed class GatewaySocket : WebSocket
     {
         private uint _lastSequence;
 		private string _sessionId;

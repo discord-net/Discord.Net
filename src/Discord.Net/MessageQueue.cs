@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Discord.Net
 {
     /// <summary> Manages an outgoing message queue for DiscordClient. </summary>
-    public class MessageQueue
+    public sealed class MessageQueue
     {
-        private class MessageQueueItem
+        private struct MessageQueueItem
         {
             public readonly ulong Id, ChannelId;
             public readonly string Text;

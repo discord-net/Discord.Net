@@ -12,7 +12,7 @@ using WebSocketClient = System.Net.WebSockets.ClientWebSocket;
 
 namespace Discord.Net.WebSockets
 {
-    internal class BuiltInEngine : IWebSocketEngine
+    internal sealed class BuiltInEngine : IWebSocketEngine
     {
         private const int ReceiveChunkSize = 12 * 1024; //12KB
         private const int SendChunkSize = 4 * 1024; //4KB
@@ -23,12 +23,12 @@ namespace Discord.Net.WebSockets
         private WebSocketClient _webSocket;
         private Task _tempTask;
 
-        public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
-        public event EventHandler<WebSocketTextMessageEventArgs> TextMessage = delegate { };
+        public event EventHandler<BinaryMessageEventArgs> BinaryMessage = delegate { };
+        public event EventHandler<TextMessageEventArgs> TextMessage = delegate { };
         private void OnBinaryMessage(byte[] data)
-            => BinaryMessage(this, new WebSocketBinaryMessageEventArgs(data));
+            => BinaryMessage(this, new BinaryMessageEventArgs(data));
         private void OnTextMessage(string msg)
-            => TextMessage(this, new WebSocketTextMessageEventArgs(msg));
+            => TextMessage(this, new TextMessageEventArgs(msg));
 
         internal BuiltInEngine(DiscordConfig config)
         {

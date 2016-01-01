@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public sealed class LogMessageEventArgs : EventArgs
+    public class LogMessageEventArgs : EventArgs
     {
         public LogSeverity Severity { get; }
         public string Source { get; }

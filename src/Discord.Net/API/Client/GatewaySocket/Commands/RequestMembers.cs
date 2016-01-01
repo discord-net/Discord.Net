@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.GatewaySocket
 {
     [JsonObject(MemberSerialization.OptIn)]
-    internal sealed class RequestMembersCommand : IWebSocketMessage
+    public sealed class RequestMembersCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.RequestGuildMembers;
         object IWebSocketMessage.Payload => this;

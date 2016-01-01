@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public class ChannelType : StringEnum
+	public sealed class ChannelType : StringEnum
 	{
 		/// <summary> A text-only channel. </summary>
 		public static ChannelType Text { get; } = new ChannelType("text");

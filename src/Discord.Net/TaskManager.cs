@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> Helper class used to manage several tasks and keep them in sync. If any single task errors or stops, all other tasks will also be stopped. </summary>
-    public class TaskManager
+    public sealed class TaskManager
     {
         private readonly object _lock;
         private readonly Func<Task> _stopAction;
@@ -22,7 +22,7 @@ namespace Discord
         public Exception Exception => _stopReason?.SourceException;
         private ExceptionDispatchInfo _stopReason;
 
-        public TaskManager()
+        internal TaskManager()
         {
             _lock = new object();
         }

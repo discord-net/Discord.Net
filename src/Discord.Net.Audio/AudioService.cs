@@ -1,49 +1,10 @@
-﻿using Discord.Net.WebSockets;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-	public class VoiceDisconnectedEventArgs : DisconnectedEventArgs
-	{
-		public readonly ulong ServerId;
-
-		public VoiceDisconnectedEventArgs(ulong serverId, DisconnectedEventArgs e)
-			: base(e.WasUnexpected, e.Exception)
-		{
-			ServerId = serverId;
-		}
-	}
-	public class UserIsSpeakingEventArgs : UserEventArgs
-	{
-		public readonly bool IsSpeaking;
-
-		public UserIsSpeakingEventArgs(User user, bool isSpeaking)
-			: base(user)
-		{
-			IsSpeaking = isSpeaking;
-		}
-	}
-	public class VoicePacketEventArgs : EventArgs
-	{
-		public readonly ulong UserId;
-		public readonly ulong ChannelId;
-		public readonly byte[] Buffer;
-		public readonly int Offset;
-		public readonly int Count;
-
-		public VoicePacketEventArgs(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
-		{
-			UserId = userId;
-			ChannelId = channelId;
-			Buffer = buffer;
-			Offset = offset;
-			Count = count;
-		}
-	}
-
 	public class AudioService : IService
     {
         private AudioClient _defaultClient;
@@ -51,46 +12,33 @@ namespace Discord.Audio
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		//private int _nextClientId;
 
-		internal DiscordClient Client => _client;
-		private DiscordClient _client;
+		internal DiscordClient Client { get; private set; }
+		public AudioServiceConfig Config { get; }
 
-		public AudioServiceConfig Config => _config;
-		private readonly AudioServiceConfig _config;
+        public event EventHandler Connected = delegate { };
+        public event EventHandler<VoiceDisconnectedEventArgs> Disconnected = delegate { };
+        public event EventHandler<VoicePacketEventArgs> PacketReceived = delegate { };
+        public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated = delegate { };
 
-		public event EventHandler Connected;
-		private void RaiseConnected()
-		{
-			if (Connected != null)
-				Connected(this, EventArgs.Empty);
-		}
-		public event EventHandler<VoiceDisconnectedEventArgs> Disconnected;
-		private void RaiseDisconnected(ulong serverId, DisconnectedEventArgs e)
-		{
-			if (Disconnected != null)
-				Disconnected(this, new VoiceDisconnectedEventArgs(serverId, e));
-		}
-		public event EventHandler<VoicePacketEventArgs> OnPacket;
-		internal void RaiseOnPacket(VoicePacketEventArgs e)
-		{
-			if (OnPacket != null)
-				OnPacket(this, e);
-		}
-		public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated;
-		private void RaiseUserIsSpeakingUpdated(User user, bool isSpeaking)
-		{
-			if (UserIsSpeakingUpdated != null)
-				UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, isSpeaking));
-		}
+        private void OnConnected()
+            => Connected(this, EventArgs.Empty);
+		private void OnDisconnected(ulong serverId, bool wasUnexpected, Exception ex)
+            => Disconnected(this, new VoiceDisconnectedEventArgs(serverId, wasUnexpected, ex));
+		internal void OnPacketReceived(VoicePacketEventArgs e)
+            => PacketReceived(this, e);
+		private void OnUserIsSpeakingUpdated(User user, bool isSpeaking)
+            => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, isSpeaking));
 
 		public AudioService(AudioServiceConfig config)
 		{
-			_config = config;
-			_config.Lock();
+			Config = config;
 		}
 		public void Install(DiscordClient client)
 		{
-			_client = client;
-			if (Config.EnableMultiserver)
+			Client = client;
+            Config.Lock();
+
+            if (Config.EnableMultiserver)
 				_voiceClients = new ConcurrentDictionary<ulong, IAudioClient>();
 			else
 			{
@@ -113,7 +61,7 @@ namespace Discord.Audio
 				{
 					bool ignored;
 					if (_talkingUsers.TryRemove(member.Key, out ignored))
-						RaiseUserIsSpeakingUpdated(member.Key, false);
+						OnUserIsSpeakingUpdated(member.Key, false);
 				}
 			};
 		}

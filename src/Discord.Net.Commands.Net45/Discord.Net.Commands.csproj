@@ -45,20 +45,26 @@
     <Compile Include="..\Discord.Net.Commands\CommandBuilder.cs">
       <Link>CommandBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandErrorEventArgs.cs">
+      <Link>CommandErrorEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandEventArgs.cs">
+      <Link>CommandEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandExtensions.cs">
       <Link>CommandExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandMap.cs">
       <Link>CommandMap.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Commands\CommandParameter.cs">
+      <Link>CommandParameter.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandParser.cs">
       <Link>CommandParser.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandService.cs">
       <Link>CommandService.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net.Commands\CommandService.Events.cs">
-      <Link>CommandService.Events.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandServiceConfig.cs">
       <Link>CommandServiceConfig.cs</Link>

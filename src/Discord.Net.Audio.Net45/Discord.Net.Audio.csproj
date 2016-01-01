@@ -84,8 +84,17 @@
     <Compile Include="..\Discord.Net.Audio\Sodium\SecretBox.cs">
       <Link>Sodium\SecretBox.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Audio\UserIsTalkingEventArgs.cs">
+      <Link>UserIsTalkingEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Audio\VoiceBuffer.cs">
       <Link>VoiceBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\VoiceDisconnectedEventArgs.cs">
+      <Link>VoiceDisconnectedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\VoicePacketEventArgs.cs">
+      <Link>VoicePacketEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

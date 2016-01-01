@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Discord.Legacy
+namespace Discord
 {
     public static class Mention
     {
@@ -31,19 +31,19 @@ namespace Discord.Legacy
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.FindChannels(name, type, exactMatch);
         }
-        
+
         [Obsolete("Use Server.CreateChannel")]
         public static Task<Channel> CreateChannel(this DiscordClient client, Server server, string name, ChannelType type)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.CreateChannel(name, type);
-        }        
+        }
         [Obsolete("Use User.CreateChannel")]
         public static Task<Channel> CreatePMChannel(this DiscordClient client, User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return user.CreatePMChannel();
-        }        
+        }
         [Obsolete("Use Channel.Edit")]
         public static Task EditChannel(this DiscordClient client, Channel channel, string name = null, string topic = null, int? position = null)
         {
@@ -62,15 +62,15 @@ namespace Discord.Legacy
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.ReorderChannels(channels, after);
-        }        
-        
+        }
+
         [Obsolete("Use Server.GetInvites")]
         public static Task<IEnumerable<Invite>> GetInvites(this DiscordClient client, Server server)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.GetInvites();
         }
-        
+
         [Obsolete("Use Server.CreateInvite")]
         public static Task<Invite> CreateInvite(this DiscordClient client, Server server, int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false)
         {
@@ -83,20 +83,20 @@ namespace Discord.Legacy
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.CreateInvite(maxAge, maxUses, tempMembership, withXkcd);
         }
-        
+
         [Obsolete("Use Invite.Delete")]
         public static Task DeleteInvite(this DiscordClient client, Invite invite)
         {
             if (invite == null) throw new ArgumentNullException(nameof(invite));
             return invite.Delete();
-        }        
+        }
         [Obsolete("Use Invite.Accept")]
         public static Task AcceptInvite(this DiscordClient client, Invite invite)
         {
             if (invite == null) throw new ArgumentNullException(nameof(invite));
             return invite.Accept();
         }
-        
+
         [Obsolete("Use Channel.SendMessage")]
         public static Task<Message> SendMessage(this DiscordClient client, Channel channel, string text)
         {
@@ -139,14 +139,14 @@ namespace Discord.Legacy
             if (user == null) throw new ArgumentNullException(nameof(user));
             return user.SendFile(filename, stream);
         }
-        
+
         [Obsolete("Use Message.Edit")]
         public static Task EditMessage(this DiscordClient client, Message message, string text)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             return message.Edit(text);
         }
-        
+
         [Obsolete("Use Message.Delete")]
         public static Task DeleteMessage(this DiscordClient client, Message message)
         {
@@ -161,14 +161,14 @@ namespace Discord.Legacy
             foreach (var message in messages)
                 await message.Delete().ConfigureAwait(false);
         }
-        
+
         [Obsolete("Use Channel.DownloadMessages")]
         public static Task<Message[]> DownloadMessages(this DiscordClient client, Channel channel, int limit = 100, ulong? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.DownloadMessages(limit, relativeMessageId, relativeDir, useCache);
         }
-        
+
         [Obsolete("Use Message.Acknowledge")]
         public static Task AckMessage(this DiscordClient client, Message message)
         {
@@ -212,7 +212,7 @@ namespace Discord.Legacy
 
             return JsonConvert.SerializeObject(channel.Messages);
         }*/
-        
+
         [Obsolete("Use Server.GetUser")]
         public static User GetUser(this DiscordClient client, Server server, ulong userId)
         {
@@ -225,7 +225,7 @@ namespace Discord.Legacy
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.GetUser(username, discriminator);
         }
-        
+
         [Obsolete("Use Server.FindUsers")]
         public static IEnumerable<User> FindUsers(this DiscordClient client, Server server, string name, bool exactMatch = false)
         {
@@ -287,20 +287,20 @@ namespace Discord.Legacy
             string username = null, string email = null, string password = null,
             Stream avatar = null, ImageType avatarType = ImageType.Png)
             => client.CurrentUser.Edit(currentPassword, username, email, password, avatar, avatarType);
-        
+
         [Obsolete("Use Server.GetRole")]
         public static Role GetRole(this DiscordClient client, Server server, ulong id)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.GetRole(id);
-        }        
+        }
         [Obsolete("Use Server.FindRoles")]
         public static IEnumerable<Role> FindRoles(this DiscordClient client, Server server, string name)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.FindRoles(name);
         }
-        
+
         [Obsolete("Use Server.CreateRole")]
         public static Task<Role> CreateRole(this DiscordClient client, Server server, string name, ServerPermissions permissions = null, Color color = null, bool isHoisted = false)
         {
@@ -320,21 +320,21 @@ namespace Discord.Legacy
             if (role == null) throw new ArgumentNullException(nameof(role));
             return role.Delete();
         }
-        
+
         [Obsolete("Use Server.ReorderRoles")]
         public static Task ReorderRoles(this DiscordClient client, Server server, IEnumerable<Role> roles, Role after = null)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.ReorderRoles(roles, after);
         }
-        
+
         [Obsolete("Use Server.Edit")]
         public static Task EditServer(this DiscordClient client, Server server, string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.Edit(name, region, icon, iconType);
         }
-        
+
         [Obsolete("Use Server.Leave")]
         public static Task LeaveServer(this DiscordClient client, Server server)
         {

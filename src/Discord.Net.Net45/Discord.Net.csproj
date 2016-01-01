@@ -391,14 +391,23 @@
     <Compile Include="..\Discord.Net\API\Status\Rest\Upcoming.cs">
       <Link>API\Status\Rest\Upcoming.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\ChannelEventArgs.cs">
+      <Link>ChannelEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\ChannelUserEventArgs.cs">
+      <Link>ChannelUserEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Config.cs">
+      <Link>Config.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\DisconnectedEventArgs.cs">
+      <Link>DisconnectedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.cs">
       <Link>DiscordClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.Events.cs">
       <Link>DiscordClient.Events.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\DiscordClient.Obsolete.cs">
-      <Link>DiscordClient.Obsolete.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\DiscordConfig.cs">
       <Link>DiscordConfig.cs</Link>
@@ -421,33 +430,6 @@
     <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
       <Link>Enums\UserStatus.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Events\ChannelEventArgs.cs">
-      <Link>Events\ChannelEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\ChannelUserEventArgs.cs">
-      <Link>Events\ChannelUserEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\DisconnectedEventArgs.cs">
-      <Link>Events\DisconnectedEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\LogMessageEventArgs.cs">
-      <Link>Events\LogMessageEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\MessageEventArgs.cs">
-      <Link>Events\MessageEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\ProfileEventArgs.cs">
-      <Link>Events\ProfileEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\RoleEventArgs.cs">
-      <Link>Events\RoleEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\ServerEventArgs.cs">
-      <Link>Events\ServerEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\Events\UserEventArgs.cs">
-      <Link>Events\UserEventArgs.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>
@@ -457,11 +439,20 @@
     <Compile Include="..\Discord.Net\IService.cs">
       <Link>IService.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Legacy.cs">
+      <Link>Legacy.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Logging\Logger.cs">
       <Link>Logging\Logger.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Logging\LogManager.cs">
       <Link>Logging\LogManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\LogMessageEventArgs.cs">
+      <Link>LogMessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\MessageEventArgs.cs">
+      <Link>MessageEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\MessageQueue.cs">
       <Link>MessageQueue.cs</Link>
@@ -502,6 +493,9 @@
     <Compile Include="..\Discord.Net\Net\Rest\IRestEngine.cs">
       <Link>Net\Rest\IRestEngine.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\Rest\RequestEventArgs.cs">
+      <Link>Net\Rest\RequestEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\RestClient.cs">
       <Link>Net\Rest\RestClient.cs</Link>
     </Compile>
@@ -514,6 +508,9 @@
     <Compile Include="..\Discord.Net\Net\WebSocketException.cs">
       <Link>Net\WebSockets\WebSocketException.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\WebSockets\BinaryMessageEventArgs.cs">
+      <Link>Net\WebSockets\BinaryMessageEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\BuiltInEngine.cs">
       <Link>Net\WebSockets\BuiltInEngine.cs</Link>
     </Compile>
@@ -523,29 +520,38 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\IWebSocketEngine.cs">
       <Link>Net\WebSockets\IWebSocketEngine.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.BuiltIn.cs">
-      <Link>Net\WebSockets\WebSocket.BuiltIn.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\TextMessageEventArgs.cs">
+      <Link>Net\WebSockets\TextMessageEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WebSocket.cs">
       <Link>Net\WebSockets\WebSocket.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketSharpEngine.cs">
-      <Link>Net\WebSockets\WebSocketSharpEngine.cs</Link>
+    <Compile Include="..\Discord.Net\Net\WebSockets\WebSocketEventEventArgs.cs">
+      <Link>Net\WebSockets\WebSocketEventEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\WebSockets\WS4NetEngine.cs">
       <Link>Net\WebSockets\WS4NetEngine.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Reference.cs">
-      <Link>Reference.cs</Link>
+    <Compile Include="..\Discord.Net\ProfileEventArgs.cs">
+      <Link>ProfileEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\RelativeDirection.cs">
       <Link>RelativeDirection.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\RoleEventArgs.cs">
+      <Link>RoleEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\ServerEventArgs.cs">
+      <Link>ServerEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\ServiceManager.cs">
       <Link>ServiceManager.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\UserEventArgs.cs">
+      <Link>UserEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,48 +5,24 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-	public enum ParameterType
-	{
-		/// <summary> Catches a single required parameter. </summary>
-		Required,
-		/// <summary> Catches a single optional parameter. </summary>
-		Optional,
-		/// <summary> Catches a zero or more optional parameters. </summary>
-		Multiple,
-		/// <summary> Catches all remaining text as a single optional parameter. </summary>
-		Unparsed
-	}
-	public sealed class CommandParameter
-	{
-		public string Name { get; }
-		public int Id { get; internal set; }
-		public ParameterType Type { get; }
-
-		public CommandParameter(string name, ParameterType type)
-		{
-			Name = name;
-			Type = type;
-		}
-	}
-
 	public sealed class Command
-	{
-		public string Text { get; }
+    {
+        private string[] _aliases;
+        internal CommandParameter[] _parameters;
+        private IPermissionChecker[] _checks;
+        private Func<CommandEventArgs, Task> _runFunc;
+        internal readonly Dictionary<string, CommandParameter> _parametersByName;
+
+        public string Text { get; }
 		public string Category { get; internal set; }
         public bool IsHidden { get; internal set; }
         public string Description { get; internal set; }
 
 		public IEnumerable<string> Aliases => _aliases;
-		private string[] _aliases;
-
 		public IEnumerable<CommandParameter> Parameters => _parameters;
-		internal CommandParameter[] _parameters;
-		
-		private IPermissionChecker[] _checks;
-		private Func<CommandEventArgs, Task> _runFunc;
-		internal readonly Dictionary<string, CommandParameter> _parametersByName;
+        public CommandParameter this[string name] => _parametersByName[name];
 
-		internal Command(string text)
+        internal Command(string text)
 		{
 			Text = text;
             IsHidden = false;
@@ -55,7 +31,6 @@ namespace Discord.Commands
 			_parametersByName = new Dictionary<string, CommandParameter>();
         }
 
-		public CommandParameter this[string name] => _parametersByName[name];
 
 		internal void SetAliases(string[] aliases)
 		{

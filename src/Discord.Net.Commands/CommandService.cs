@@ -6,42 +6,45 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-	/// <summary> A Discord.Net client with extensions for handling common bot operations like text commands. </summary>
-	public sealed partial class CommandService : IService
+	public partial class CommandService : IService
     {
-        private readonly CommandServiceConfig _config;
-		private readonly CommandGroupBuilder _root;
-		private DiscordClient _client;
-
-		public DiscordClient Client => _client;
-		public CommandGroupBuilder Root => _root;
+        private readonly List<Command> _allCommands;
+        private readonly Dictionary<string, CommandMap> _categories;
+        private readonly CommandMap _map; //Command map stores all commands by their input text, used for fast resolving and parsing
+        
+        public CommandServiceConfig Config { get; }
+        public CommandGroupBuilder Root { get; }
+        public DiscordClient Client { get; private set; }
 
 		//AllCommands store a flattened collection of all commands
-		public IEnumerable<Command> AllCommands => _allCommands;
-		private readonly List<Command> _allCommands;
-
-		//Command map stores all commands by their input text, used for fast resolving and parsing
-		private readonly CommandMap _map;
-
+		public IEnumerable<Command> AllCommands => _allCommands;		
 		//Groups store all commands by their module, used for more informative help
 		internal IEnumerable<CommandMap> Categories => _categories.Values;
-        private readonly Dictionary<string, CommandMap> _categories;
 
-		public CommandService(CommandServiceConfig config)
+        public event EventHandler<CommandEventArgs> Command = delegate { };
+        public event EventHandler<CommandErrorEventArgs> CommandError = delegate { };
+
+        private void OnCommand(CommandEventArgs args)
+            => Command(this, args);
+        private void OnCommandError(CommandErrorType errorType, CommandEventArgs args, Exception ex = null)
+            => CommandError(this, new CommandErrorEventArgs(errorType, args, ex));
+
+        public CommandService(CommandServiceConfig config)
 		{
-			_config = config;
+            Config = config;
+
 			_allCommands = new List<Command>();
 			_map = new CommandMap(null, "", "");
 			_categories = new Dictionary<string, CommandMap>();
-			_root = new CommandGroupBuilder(this, "", null);
+            Root = new CommandGroupBuilder(this, "", null);
 		}
 
 		void IService.Install(DiscordClient client)
 		{
-			_client = client;
-			_config.Lock();
+            Client = client;
+            Config.Lock();
 
-			if (_config.HelpMode != HelpMode.Disable)
+			if (Config.HelpMode != HelpMode.Disable)
             {
 				CreateCommand("help")
 					.Parameter("command", ParameterType.Multiple)
@@ -49,7 +52,7 @@ namespace Discord.Commands
                     .Description("Returns information about commands.")
                     .Do(async e =>
                     {
-						Channel replyChannel = _config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreatePMChannel().ConfigureAwait(false);
+						Channel replyChannel = Config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreatePMChannel().ConfigureAwait(false);
 						if (e.Args.Length > 0) //Show command help
 						{
 							var map = _map.GetItem(string.Join(" ", e.Args));
@@ -66,13 +69,13 @@ namespace Discord.Commands
             client.MessageReceived += async (s, e) =>
             {
                 if (_allCommands.Count == 0)  return;
-                if (e.Message.User == null || e.Message.User.Id == _client.CurrentUser.Id) return;
+                if (e.Message.User == null || e.Message.User.Id == Client.CurrentUser.Id) return;
 
                 string msg = e.Message.RawText;
                 if (msg.Length == 0) return;
 
 				//Check for command char if one is provided
-				var chars = _config.CommandChars;
+				var chars = Config.CommandChars;
                 if (chars.Length > 0)
                 {
 					if (!chars.Contains(msg[0]))
@@ -87,7 +90,7 @@ namespace Discord.Commands
 				if (commands == null)
 				{
 					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null);
-					RaiseCommandError(CommandErrorType.UnknownCommand, errorArgs);
+					OnCommandError(CommandErrorType.UnknownCommand, errorArgs);
 					return;
 				}
 				else
@@ -104,7 +107,7 @@ namespace Discord.Commands
 							else
 							{
 								var errorArgs = new CommandEventArgs(e.Message, command, null);
-								RaiseCommandError(error.Value, errorArgs);
+								OnCommandError(error.Value, errorArgs);
 								return;
 							}
 						}
@@ -115,24 +118,24 @@ namespace Discord.Commands
 						string errorText;
 						if (!command.CanRun(eventArgs.User, eventArgs.Channel, out errorText))
 						{
-							RaiseCommandError(CommandErrorType.BadPermissions, eventArgs, errorText != null ? new Exception(errorText) : null);
+							OnCommandError(CommandErrorType.BadPermissions, eventArgs, errorText != null ? new Exception(errorText) : null);
 							return;
 						}
 
 						// Run the command
 						try
 						{
-							RaiseRanCommand(eventArgs);
+							OnCommand(eventArgs);
 							await command.Run(eventArgs).ConfigureAwait(false);
 						}
 						catch (Exception ex)
 						{
-							RaiseCommandError(CommandErrorType.Exception, eventArgs, ex);
+							OnCommandError(CommandErrorType.Exception, eventArgs, ex);
 						}
 						return;
 					}
 					var errorArgs2 = new CommandEventArgs(e.Message, null, null);
-					RaiseCommandError(CommandErrorType.BadArgCount, errorArgs2);
+					OnCommandError(CommandErrorType.BadArgCount, errorArgs2);
 				}
             };
         }
@@ -184,7 +187,7 @@ namespace Discord.Commands
 			{
 				output.Append("\n\n");
 
-				var chars = _config.CommandChars;
+				var chars = Config.CommandChars;
 				if (chars.Length > 0)
 				{
 					if (chars.Length == 1)
@@ -294,8 +297,8 @@ namespace Discord.Commands
 				output.AppendLine($"Aliases: `" + string.Join("`, `", command.Aliases) + '`');
         }
 
-		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null) => _root.CreateGroup(cmd, config);
-		public CommandBuilder CreateCommand(string cmd) => _root.CreateCommand(cmd);
+		public void CreateGroup(string cmd, Action<CommandGroupBuilder> config = null) => Root.CreateGroup(cmd, config);
+		public CommandBuilder CreateCommand(string cmd) => Root.CreateCommand(cmd);
 
 		internal void AddCommand(Command command)
 		{

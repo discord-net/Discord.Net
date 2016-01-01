@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord.Modules
 {
-    public class ModuleManager
+    public sealed class ModuleManager
 	{
 		public event EventHandler<ServerEventArgs> ServerEnabled = delegate { };
         public event EventHandler<ServerEventArgs> ServerDisabled = delegate { };

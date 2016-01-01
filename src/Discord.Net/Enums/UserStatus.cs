@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public class UserStatus : StringEnum
+	public sealed class UserStatus : StringEnum
 	{
 		/// <summary> User is currently online and active. </summary>
 		public static UserStatus Online { get; } = new UserStatus("online");

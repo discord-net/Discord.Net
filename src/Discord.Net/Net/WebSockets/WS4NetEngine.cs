@@ -10,7 +10,7 @@ using WebSocketClient = WebSocket4Net.WebSocket;
 
 namespace Discord.Net.WebSockets
 {
-    internal class WS4NetEngine : IWebSocketEngine
+    internal sealed class WS4NetEngine : IWebSocketEngine
     {
         private readonly DiscordConfig _config;
         private readonly ConcurrentQueue<string> _sendQueue;
@@ -18,12 +18,12 @@ namespace Discord.Net.WebSockets
         private WebSocketClient _webSocket;
         private ManualResetEventSlim _waitUntilConnect, _waitUntilDisconnect;
 
-        public event EventHandler<WebSocketBinaryMessageEventArgs> BinaryMessage = delegate { };
-        public event EventHandler<WebSocketTextMessageEventArgs> TextMessage = delegate { };
+        public event EventHandler<BinaryMessageEventArgs> BinaryMessage = delegate { };
+        public event EventHandler<TextMessageEventArgs> TextMessage = delegate { };
         private void OnBinaryMessage(byte[] data)
-            => BinaryMessage(this, new WebSocketBinaryMessageEventArgs(data));
+            => BinaryMessage(this, new BinaryMessageEventArgs(data));
         private void OnTextMessage(string msg)
-            => TextMessage(this, new WebSocketTextMessageEventArgs(msg));
+            => TextMessage(this, new TextMessageEventArgs(msg));
 
         internal WS4NetEngine(DiscordConfig config, TaskManager taskManager)
         {
