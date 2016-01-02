@@ -115,7 +115,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <Content Include="project.json" />
     <Content Include="project.lock.json">
       <DependentUpon>project.json</DependentUpon>
