@@ -239,7 +239,7 @@ namespace Discord
             if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
 
             //Modify the roles collection and filter out the everyone role
-            var roleIds = roles == null ? null : roles
+            var roleIds = (roles ?? Roles)
                 .Where(x => !x.IsEveryone)
                 .Select(x => x.Id)
                 .Distinct()
