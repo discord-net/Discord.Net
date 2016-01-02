@@ -29,9 +29,9 @@ namespace Discord
             }
         }        
 
-        private ConcurrentDictionary<ulong, Role> _roles;
-        private ConcurrentDictionary<ulong, Member> _users;
-        private ConcurrentDictionary<ulong, Channel> _channels;
+        private readonly ConcurrentDictionary<ulong, Role> _roles;
+        private readonly ConcurrentDictionary<ulong, Member> _users;
+        private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private ulong _ownerId;
         private ulong? _afkChannelId;
         
@@ -39,6 +39,11 @@ namespace Discord
 
         /// <summary> Gets the unique identifier for this server. </summary>
         public ulong Id { get; }
+        /// <summary> Gets the default channel for this server. </summary>
+        public Channel DefaultChannel { get; }
+        /// <summary> Gets the the role representing all users in a server. </summary>
+        public Role EveryoneRole { get; }
+
         /// <summary> Gets the name of this server. </summary>
         public string Name { get; private set; }
         /// <summary> Gets the voice region for this server. </summary>
@@ -49,10 +54,6 @@ namespace Discord
         public int AFKTimeout { get; private set; }
         /// <summary> Gets the date and time you joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
-        /// <summary> Gets the default channel for this server. </summary>
-        public Channel DefaultChannel { get; private set; }
-        /// <summary> Gets the the role representing all users in a server. </summary>
-        public Role EveryoneRole { get; private set; }
 
         /// <summary> Gets the user that created this server. </summary>
         public User Owner => GetUser(_ownerId);
@@ -75,23 +76,17 @@ namespace Discord
         public IEnumerable<User> Users => _users.Select(x => x.Value.User);
         /// <summary> Gets a collection of all roles in this server. </summary>
         public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-
+        
         internal Server(DiscordClient client, ulong id)
         {
             Client = client;
             Id = id;
+
             _channels = new ConcurrentDictionary<ulong, Channel>();
             _roles = new ConcurrentDictionary<ulong, Role>();
             _users = new ConcurrentDictionary<ulong, Member>();
-
-            EveryoneRole = new Role(id, this);
-            DefaultChannel = new Channel(client, id, this);
-        }
-        internal Server(DiscordClient client, ExtendedGuild model)
-        {
-            Client = client;
-            Id = model.Id;
-            Update(model);
+            DefaultChannel = AddChannel(id);
+            EveryoneRole = AddRole(id);
         }
         
         internal void Update(GuildReference model)
@@ -123,78 +118,28 @@ namespace Discord
         }
         internal void Update(ExtendedGuild model)
         {
-            var everyone = EveryoneRole;
-            var defaultChannel = DefaultChannel;
+            Update(model as Guild);
 
-            //Bulk create dictionary items
-            if (model.Members != null)
-            {
-                _users = new ConcurrentDictionary<ulong, Member>(
-                    model.Members.Select(x => new KeyValuePair<ulong, Member>(x.User.Id, new Member(new User(Client, x.User.Id, this)))));
-            }
-            else
-                _users = new ConcurrentDictionary<ulong, Member>();
-            if (model.Channels != null)
-            {
-                _channels = new ConcurrentDictionary<ulong, Channel>(
-                    model.Channels.Select(x => new KeyValuePair<ulong, Channel>(x.Id, new Channel(Client, x.Id, this))));
-            }
-            else
-                _channels = new ConcurrentDictionary<ulong, Channel>();
-            if (model.Roles != null)
-            {
-                _roles = new ConcurrentDictionary<ulong, Role>(
-                    model.Roles.Select(x => new KeyValuePair<ulong, Role>(x.Id, new Role(x.Id, this))));
-            }
-            else
-                _roles = new ConcurrentDictionary<ulong, Role>();
-
-            //Preserve old models
-            if (everyone != null)
-                _roles[Id] = everyone;
-            else
-                EveryoneRole = _roles[Id];
-            if (defaultChannel != null)
-                _channels[Id] = defaultChannel;
-            else
-                DefaultChannel = _channels[Id];
-
-            //Update models
             if (model.Channels != null)
             {
                 foreach (var subModel in model.Channels)
-                {
-                    var channel = _channels[subModel.Id];
-                    channel.Update(subModel);
-                    Client.AddChannel(channel);
-                }
+                    AddChannel(subModel.Id).Update(subModel);
             }
             if (model.Members != null)
             {
                 foreach (var subModel in model.Members)
-                    _users[subModel.User.Id].User.Update(subModel);
+                    AddUser(subModel.User.Id).Update(subModel);
             }
             if (model.VoiceStates != null)
             {
                 foreach (var subModel in model.VoiceStates)
-                    _users[subModel.UserId].User.Update(subModel);
+                    GetUser(subModel.UserId)?.Update(subModel);
             }
             if (model.Presences != null)
             {
                 foreach (var subModel in model.Presences)
-                {
-                    if (subModel.User.Username != null)
-                        _users[subModel.User.Id].User.Update(subModel);
-                }
+                    GetUser(subModel.User.Id)?.Update(subModel);
             }
-            if (model.Roles != null)
-            {
-                foreach (var subModel in model.Roles)
-                    _roles[subModel.Id].Update(subModel);
-            }
-
-            model.Roles = null; //Don't double-process roles
-            Update(model as Guild);
         }
         
         /// <summary> Edits this server, changing only non-null attributes. </summary>
@@ -262,7 +207,8 @@ namespace Discord
         {
             var channel = new Channel(Client, id, this);
             Client.AddChannel(channel);
-            return _channels.GetOrAdd(id, x => channel);
+            channel = _channels.GetOrAdd(id, x => channel);
+            return channel;
         }
         internal Channel RemoveChannel(ulong id)
         {
