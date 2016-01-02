@@ -415,7 +415,9 @@ namespace Discord
 
         #region Servers
         private Server AddServer(ulong id)
-            => _servers.GetOrAdd(id, x => new Server(this, x));
+            => _servers.GetOrAdd(id, x => new Server(this, id));
+        private Server AddServer(API.Client.ExtendedGuild model)
+            => _servers.GetOrAdd(model.Id, x => new Server(this, model));
         private Server RemoveServer(ulong id)
         {
             Server server;
@@ -481,7 +483,7 @@ namespace Discord
                             {
                                 if (model.Unavailable != true)
                                 {
-                                    var server = AddServer(model.Id);
+                                    var server = AddServer(model);
                                     server.Update(model);
                                 }
                             }
@@ -505,7 +507,7 @@ namespace Discord
                             var data = e.Payload.ToObject<GuildCreateEvent>(_serializer);
                             if (data.Unavailable != true)
                             {
-                                var server = AddServer(data.Id);
+                                var server = AddServer(data);
                                 server.Update(data);
 
                                 if (Config.LogEvents)
