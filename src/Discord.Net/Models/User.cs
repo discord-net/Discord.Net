@@ -239,14 +239,18 @@ namespace Discord
             if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
 
             //Modify the roles collection and filter out the everyone role
-            var roleIds = roles == null ? null : roles.Where(x => !x.IsEveryone).Select(x => x.Id).Distinct();
+            var roleIds = roles == null ? null : roles
+                .Where(x => !x.IsEveryone)
+                .Select(x => x.Id)
+                .Distinct()
+                .ToArray();
 
             var request = new UpdateMemberRequest(Server.Id, Id)
             {
                 IsMuted = isMuted ?? IsServerMuted,
                 IsDeafened = isDeafened ?? IsServerDeafened,
                 VoiceChannelId = voiceChannel?.Id,
-                RoleIds = roleIds.ToArray()
+                RoleIds = roleIds
             };
             return Client.ClientAPI.Send(request);
         }
