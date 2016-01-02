@@ -57,6 +57,7 @@ namespace Discord
                 var loginResponse = await Client.ClientAPI.Send(loginRequest).ConfigureAwait(false);
                 Client.ClientAPI.Token = loginResponse.Token;
                 Client.GatewaySocket.Token = loginResponse.Token;
+                Client.GatewaySocket.SessionId = null;
             }
         }
 

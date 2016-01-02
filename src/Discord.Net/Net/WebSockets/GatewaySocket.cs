@@ -13,11 +13,10 @@ namespace Discord.Net.WebSockets
     public sealed class GatewaySocket : WebSocket
     {
         private uint _lastSequence;
-		private string _sessionId;
-        private string _token;
         private int _reconnects;
 
-        public string Token { get { return _token; } internal set { _token = value; _sessionId = null; } }
+        public string Token { get; internal set; }
+        public string SessionId { get; internal set; }
 
         public event EventHandler<WebSocketEventEventArgs> ReceivedDispatch = delegate { };
         private void OnReceivedDispatch(string type, JToken payload)
@@ -36,7 +35,7 @@ namespace Discord.Net.WebSockets
         public async Task Connect()
         {
             await BeginConnect().ConfigureAwait(false);
-            if (_sessionId == null)
+            if (SessionId == null)
                 SendIdentify(Token);
             else
                 SendResume();
@@ -81,7 +80,7 @@ namespace Discord.Net.WebSockets
         {
             var ex = _taskManager.Exception;
             if (ex == null || (ex as WebSocketException)?.Code != 1012) //if (ex == null || (ex as WebSocketException)?.Code != 1012)
-                _sessionId = null; //Reset session unless close code 1012
+                SessionId = null; //Reset session unless close code 1012
             return base.Cleanup();
         }
 
@@ -97,22 +96,12 @@ namespace Discord.Net.WebSockets
 			{
 				case OpCodes.Dispatch:
 					{
-						JToken token = msg.Payload as JToken;
-						if (msg.Type == "READY")
-						{
+						OnReceivedDispatch(msg.Type, msg.Payload as JToken);
+                        if (msg.Type == "READY" || msg.Type == "RESUMED")
+                        {
                             _reconnects = 0;
-                            var payload = token.ToObject<ReadyEvent>(_serializer);
-							_sessionId = payload.SessionId;
-                            _heartbeatInterval = payload.HeartbeatInterval;
-						}
-						else if (msg.Type == "RESUMED")
-						{
-							var payload = token.ToObject<ResumedEvent>(_serializer);
-							_heartbeatInterval = payload.HeartbeatInterval;
-						}
-						OnReceivedDispatch(msg.Type, token);
-						if (msg.Type == "READY" || msg.Type == "RESUMED")
-							EndConnect(); //Complete the connect
+                            EndConnect(); //Complete the connect
+                        }
 					}
 					break;
 				case OpCodes.Redirect:
@@ -153,7 +142,7 @@ namespace Discord.Net.WebSockets
 		}
 
         public void SendResume()
-            => QueueMessage(new ResumeCommand { SessionId = _sessionId, Sequence = _lastSequence });
+            => QueueMessage(new ResumeCommand { SessionId = SessionId, Sequence = _lastSequence });
 		public override void SendHeartbeat() 
             => QueueMessage(new HeartbeatCommand());
 		public void SendUpdateStatus(long? idleSince, string gameName) 
@@ -166,6 +155,11 @@ namespace Discord.Net.WebSockets
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
 		public void SendRequestMembers(ulong serverId, string query, int limit)
             => QueueMessage(new RequestMembersCommand { GuildId = serverId, Query = query, Limit = limit });
+
+        internal void StartHeartbeat(int interval)
+        {
+            _heartbeatInterval = interval;
+        }
 
         //Cancel if either DiscordClient.Disconnect is called, data socket errors or timeout is reached
         public override void WaitForConnection(CancellationToken cancelToken)

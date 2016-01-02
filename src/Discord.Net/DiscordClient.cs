@@ -224,6 +224,7 @@ namespace Discord
 
                 ClientAPI.Token = token;
                 GatewaySocket.Token = token;
+                GatewaySocket.SessionId = null;
 
                 //Get gateway and check token
                 try
@@ -274,6 +275,7 @@ namespace Discord
             await GatewaySocket.Disconnect();
             ClientAPI.Token = null;
             GatewaySocket.Token = null;
+            GatewaySocket.SessionId = null;
 
             _servers.Clear();
             _channels.Clear();
@@ -468,6 +470,8 @@ namespace Discord
                     case "READY":
                         {
                             var data = e.Payload.ToObject<ReadyEvent>(_serializer);
+                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
+                            GatewaySocket.SessionId = data.SessionId;
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
@@ -486,6 +490,12 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
+                        }
+                        break;
+                    case "RESUMED":
+                        {
+                            var data = e.Payload.ToObject<ResumedEvent>(_serializer);
+                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
                         }
                         break;
 
@@ -1002,9 +1012,6 @@ namespace Discord
                     case "GUILD_INTEGRATIONS_UPDATE":
                     case "VOICE_SERVER_UPDATE":
                     case "GUILD_EMOJIS_UPDATE":
-                        break;
-
-                    case "RESUMED": //Handled in DataWebSocket
                         break;
 
                     //Others
