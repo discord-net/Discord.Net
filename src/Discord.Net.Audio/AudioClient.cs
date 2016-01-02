@@ -2,6 +2,7 @@
 using Discord.Logging;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
+using Nito.AsyncEx;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace Discord.Audio
 {
 	internal class AudioClient : IAudioClient
     {
-        private readonly Semaphore _connectionLock;
+        private readonly AsyncLock _connectionLock;
         private readonly JsonSerializer _serializer;
         private CancellationTokenSource _cancelTokenSource;
 
@@ -31,7 +32,7 @@ namespace Discord.Audio
             GatewaySocket = gatewaySocket;
             Logger = logger;
             
-            _connectionLock = new Semaphore(1, 1);   
+            _connectionLock = new AsyncLock();   
                      
             _serializer = new JsonSerializer();
             _serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
@@ -92,8 +93,7 @@ namespace Discord.Audio
             if (VoiceSocket.Server == null)
                 throw new InvalidOperationException("This client has been closed.");
 
-                _connectionLock.WaitOne();
-            try
+            using (await _connectionLock.LockAsync())
             {
                 _cancelTokenSource = new CancellationTokenSource();
                 var cancelToken = _cancelTokenSource.Token;
@@ -106,25 +106,16 @@ namespace Discord.Audio
                     VoiceSocket.WaitForConnection(cancelToken);
                 });
             }
-            finally
-            {
-                _connectionLock.Release();
-            }
         }
         
         public async Task Disconnect()
         {
-            _connectionLock.WaitOne();
-            try
+            using (await _connectionLock.LockAsync())
             {
                 Service.RemoveClient(VoiceSocket.Server, this);
                 VoiceSocket.Channel = null;
                 SendVoiceUpdate();
                 await VoiceSocket.Disconnect();
-            }
-            finally
-            {
-                _connectionLock.Release();
             }
         }
 

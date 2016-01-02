@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nito.AsyncEx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
@@ -10,7 +11,7 @@ namespace Discord
     /// <summary> Helper class used to manage several tasks and keep them in sync. If any single task errors or stops, all other tasks will also be stopped. </summary>
     public sealed class TaskManager
     {
-        private readonly object _lock;
+        private readonly AsyncLock _lock;
         private readonly Func<Task> _stopAction;
 
         private CancellationTokenSource _cancelSource;
@@ -24,7 +25,7 @@ namespace Discord
 
         internal TaskManager()
         {
-            _lock = new object();
+            _lock = new AsyncLock();
         }
         public TaskManager(Action stopAction)
             : this()
@@ -45,7 +46,7 @@ namespace Discord
                 if (task != null)
                     await Stop().ConfigureAwait(false);
 
-                lock (_lock)
+                using (await _lock.LockAsync())
                 {
                     _cancelSource = cancelSource;
 
@@ -88,7 +89,7 @@ namespace Discord
 
         public void SignalStop(bool isExpected = false)
         {
-            lock (_lock)
+            using (_lock.Lock())
             {
                 if (isExpected)
                     _wasStopExpected = true;
@@ -100,28 +101,27 @@ namespace Discord
                     _cancelSource.Cancel();
             }
         }
-        public Task Stop(bool isExpected = false)
+        public async Task Stop(bool isExpected = false)
         {
             Task task;
-            lock (_lock)
+            using (await _lock.LockAsync())
             {
                 if (isExpected)
                     _wasStopExpected = true;
 
                 //Cache the task so we still have something to await if Cleanup is run really quickly
                 task = _task;
-                if (task == null) return TaskHelper.CompletedTask; //Are we running?
-                if (_cancelSource.IsCancellationRequested) return task;
+                if (task == null) return; //Are we running?
 
-                if (_cancelSource != null)
+                if (!_cancelSource.IsCancellationRequested && _cancelSource != null)
                     _cancelSource.Cancel();
             }
-            return task;
+            await task;
         }
 
         public void SignalError(Exception ex)
         {
-            lock (_lock)
+            using (_lock.Lock())
             {
                 if (_stopReason != null) return;
 
@@ -130,33 +130,34 @@ namespace Discord
                     _cancelSource.Cancel();
             }
         }
-        public Task Error(Exception ex)
+        public async Task Error(Exception ex)
         {
             Task task;
-            lock (_lock)
+            using (await _lock.LockAsync())
             {
-                if (_stopReason != null) return TaskHelper.CompletedTask;
+                if (_stopReason != null) return;
 
                 //Cache the task so we still have something to await if Cleanup is run really quickly
                 task = _task ?? TaskHelper.CompletedTask;
-                if (_cancelSource.IsCancellationRequested) return task;
-
-                _stopReason = ExceptionDispatchInfo.Capture(ex);
-                if (_cancelSource != null)
-                    _cancelSource.Cancel();
+                if (!_cancelSource.IsCancellationRequested)
+                {
+                    _stopReason = ExceptionDispatchInfo.Capture(ex);
+                    if (_cancelSource != null)
+                        _cancelSource.Cancel();
+                }
             }
-            return task;
+            await task;
         }
 
         /// <summary> Throws an exception if one was captured. </summary>
         public void ThrowException()
         {
-            lock (_lock)
+            using (_lock.Lock())
                 _stopReason?.Throw();
         }
         public void ClearException()
         {
-            lock (_lock)
+            using (_lock.Lock())
             {
                 _stopReason = null;
                 _wasStopExpected = false;

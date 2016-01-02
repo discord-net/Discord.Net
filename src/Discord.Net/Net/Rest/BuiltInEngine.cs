@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.Globalization;
+using Nito.AsyncEx;
 
 namespace Discord.Net.Rest
 {
@@ -20,7 +21,7 @@ namespace Discord.Net.Rest
 		private readonly HttpClient _client;
         private readonly string _baseUrl;
 
-        private readonly object _rateLimitLock;
+        private readonly AsyncLock _rateLimitLock;
         private DateTime _rateLimitTime;
 
         internal Logger Logger { get; }
@@ -31,7 +32,7 @@ namespace Discord.Net.Rest
             _baseUrl = baseUrl;
             Logger = logger;
 
-            _rateLimitLock = new object();
+            _rateLimitLock = new AsyncLock();
             _client = new HttpClient(new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
@@ -102,7 +103,7 @@ namespace Discord.Net.Rest
                         var now = DateTime.UtcNow;
                         if (now >= _rateLimitTime)
                         {
-                            lock (_rateLimitLock)
+                            using (await _rateLimitLock.LockAsync())
                             {
                                 if (now >= _rateLimitTime)
                                 {

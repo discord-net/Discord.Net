@@ -39,7 +39,7 @@ namespace Discord
 			public override int GetHashCode()
 				=> unchecked(ServerId.GetHashCode() + UserId.GetHashCode() + 23);
         }
-
+        
         private VoiceState _voiceState;
         private DateTime? _lastOnline;
         private ulong? _voiceChannelId;

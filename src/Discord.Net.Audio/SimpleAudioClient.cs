@@ -1,4 +1,5 @@
 ﻿using Discord.Logging;
+using Nito.AsyncEx;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,21 +28,20 @@ namespace Discord.Audio
             void IAudioClient.Wait() => _client.Wait();
         }
 
-        private readonly Semaphore _connectionLock;
+        private readonly AsyncLock _connectionLock;
 
         internal VirtualClient CurrentClient { get; private set; }
 
         public SimpleAudioClient(AudioService service, int id, Logger logger)
             : base(service, id, null, service.Client.GatewaySocket, logger)
         {
-            _connectionLock = new Semaphore(1, 1);
+            _connectionLock = new AsyncLock();
         }
 
         //Only disconnects if is current a member of this server
         public async Task Leave(VirtualClient client)
         {
-            _connectionLock.WaitOne();
-            try
+            using (await _connectionLock.LockAsync())
             {
                 if (CurrentClient == client)
                 {
@@ -49,16 +49,11 @@ namespace Discord.Audio
                     await Disconnect();
                 }
             }
-            finally
-            {
-                _connectionLock.Release();
-            }
         }
 
         internal async Task<IAudioClient> Connect(Channel channel)
         {
-            _connectionLock.WaitOne();
-            try
+            using (await _connectionLock.LockAsync())
             {
                 bool changeServer = channel.Server != VoiceSocket.Server;
                 if (changeServer || CurrentClient == null)
@@ -69,10 +64,6 @@ namespace Discord.Audio
                 }
                 await Join(channel);
                 return CurrentClient;
-            }
-            finally
-            {
-                _connectionLock.Release();
             }
         }
     }

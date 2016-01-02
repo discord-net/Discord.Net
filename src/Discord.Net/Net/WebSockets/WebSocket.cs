@@ -1,6 +1,7 @@
 ﻿using Discord.API.Client;
 using Discord.Logging;
 using Newtonsoft.Json;
+using Nito.AsyncEx;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -11,7 +12,7 @@ namespace Discord.Net.WebSockets
 {
 	public abstract partial class WebSocket
     {
-        private readonly Semaphore _lock;
+        private readonly AsyncLock _lock;
         protected readonly IWebSocketEngine _engine;
 		protected readonly DiscordClient _client;
 		protected readonly ManualResetEventSlim _connectedEvent;
@@ -45,7 +46,7 @@ namespace Discord.Net.WebSockets
             Logger = logger;
             _serializer = serializer;
 
-            _lock = new Semaphore(1, 1);
+            _lock = new AsyncLock();
             _taskManager = new TaskManager(Cleanup);
             CancelToken = new CancellationToken(true);
 			_connectedEvent = new ManualResetEventSlim(false);
@@ -74,8 +75,7 @@ namespace Discord.Net.WebSockets
 		{
             try
             {
-                _lock.WaitOne();
-                try
+                using (await _lock.LockAsync())
                 {
                     await _taskManager.Stop().ConfigureAwait(false);
                     _taskManager.ClearException();
@@ -87,10 +87,6 @@ namespace Discord.Net.WebSockets
 
                     await _engine.Connect(Host, CancelToken).ConfigureAwait(false);
                     await Run().ConfigureAwait(false);
-                }
-                finally
-                {
-                    _lock.Release();
                 }
 			}
 			catch (Exception ex)

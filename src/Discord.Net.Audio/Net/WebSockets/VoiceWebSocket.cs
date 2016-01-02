@@ -29,7 +29,7 @@ namespace Discord.Net.WebSockets
         private readonly ConcurrentDictionary<uint, OpusDecoder> _decoders;
         private readonly AudioClient _audioClient;
         private readonly AudioServiceConfig _config;
-        private Thread _sendThread, _receiveThread;
+        private Task _sendTask, _receiveTask;
         private VoiceBuffer _sendBuffer;
         private OpusEncoder _encoder;
         private uint _ssrc;
@@ -95,20 +95,9 @@ namespace Discord.Net.WebSockets
             _udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
 
             List<Task> tasks = new List<Task>();
-            if ((_config.Mode & AudioMode.Outgoing) != 0)
-            {
-                _sendThread = new Thread(new ThreadStart(() => SendVoiceAsync(CancelToken)));
-                _sendThread.IsBackground = true;
-                _sendThread.Start();
-            }
-            /*if ((_config.Mode & AudioMode.Incoming) != 0)
-            {*/
-            _receiveThread = new Thread(new ThreadStart(() => ReceiveVoiceAsync(CancelToken)));
-            _receiveThread.IsBackground = true;
-            _receiveThread.Start();
-            /*}
-            else
-                tasks.Add(Task.Run(() => ReceiveVoiceAsync(CancelToken)));*/
+            if (_config.Mode.HasFlag(AudioMode.Outgoing))
+                _sendTask = Task.Run(() => SendVoiceAsync(CancelToken));
+            _receiveTask = Task.Run(() => ReceiveVoiceAsync(CancelToken));
 
             SendIdentify();
 
@@ -119,14 +108,15 @@ namespace Discord.Net.WebSockets
             tasks.Add(HeartbeatAsync(CancelToken));
             await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
         }
-        protected override Task Cleanup()
+        protected override async Task Cleanup()
         {
-            if (_sendThread != null)
-                _sendThread.Join();
-            if (_receiveThread != null)
-                _receiveThread.Join();
-            _sendThread = null;
-            _receiveThread = null;
+            var sendThread = _sendTask;
+            if (sendThread != null) await sendThread;
+            _sendTask = null;
+
+            var receiveThread = _receiveTask;
+            if (receiveThread != null) await receiveThread;
+            _receiveTask = null;
 
             OpusDecoder decoder;
             foreach (var pair in _decoders)
@@ -138,10 +128,10 @@ namespace Discord.Net.WebSockets
             ClearPCMFrames();
             _udp = null;
 
-            return base.Cleanup();
+            await base.Cleanup();
         }
 
-        private void ReceiveVoiceAsync(CancellationToken cancelToken)
+        private async Task ReceiveVoiceAsync(CancellationToken cancelToken)
         {
             var closeTask = cancelToken.Wait();
             try
@@ -158,7 +148,7 @@ namespace Discord.Net.WebSockets
 
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    Thread.Sleep(1);
+                    await Task.Delay(1);
                     if (_udp.Available > 0)
                     {
 #if !DOTNET5_4
@@ -243,12 +233,12 @@ namespace Discord.Net.WebSockets
             catch (InvalidOperationException) { } //Includes ObjectDisposedException
         }
 
-        private void SendVoiceAsync(CancellationToken cancelToken)
+        private async Task SendVoiceAsync(CancellationToken cancelToken)
         {
             try
             {
                 while (!cancelToken.IsCancellationRequested && State != ConnectionState.Connected)
-                    Thread.Sleep(1);
+                    await Task.Delay(1);
 
                 if (cancelToken.IsCancellationRequested)
                     return;
@@ -370,10 +360,10 @@ namespace Discord.Net.WebSockets
                         {
                             int time = (int)Math.Floor(ticksToNextFrame / ticksPerMillisecond);
                             if (time > 0)
-                                Thread.Sleep(time);
+                                await Task.Delay(time);
                         }
                         else
-                            Thread.Sleep(1); //Give as much time to the encrypter as possible
+                            await Task.Delay(1); //Give as much time to the encrypter as possible
                     }
                 }
             }

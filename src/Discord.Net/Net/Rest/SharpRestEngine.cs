@@ -1,11 +1,13 @@
 ﻿#if !DOTNET5_4
 using Discord.Logging;
+using Nito.AsyncEx;
 using RestSharp;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using RestSharpClient = RestSharp.RestClient;
 
 namespace Discord.Net.Rest
 {
@@ -14,9 +16,9 @@ namespace Discord.Net.Rest
         private const int HR_SECURECHANNELFAILED = -2146233079;
 
         private readonly DiscordConfig _config;
-		private readonly RestSharp.RestClient _client;
+		private readonly RestSharpClient _client;
 
-        private readonly object _rateLimitLock;
+        private readonly AsyncLock _rateLimitLock;
         private DateTime _rateLimitTime;
 
         internal Logger Logger { get; }
@@ -26,8 +28,8 @@ namespace Discord.Net.Rest
 			_config = config;
             Logger = logger;
 
-            _rateLimitLock = new object();
-            _client = new RestSharp.RestClient(baseUrl)
+            _rateLimitLock = new AsyncLock();
+            _client = new RestSharpClient(baseUrl)
 			{
 				PreAuthenticate = false,
 				ReadWriteTimeout = _config.RestTimeout,
@@ -90,7 +92,7 @@ namespace Discord.Net.Rest
                         var now = DateTime.UtcNow;
                         if (now >= _rateLimitTime)
                         {
-                            lock (_rateLimitLock)
+                            using (await _rateLimitLock.LockAsync())
                             {
                                 if (now >= _rateLimitTime)
                                 {

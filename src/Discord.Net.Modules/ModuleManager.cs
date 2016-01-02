@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -48,8 +49,9 @@ namespace Discord.Modules
 		private readonly ConcurrentDictionary<ulong, Server> _enabledServers;
 		private readonly ConcurrentDictionary<ulong, Channel> _enabledChannels;
 		private readonly ConcurrentDictionary<ulong, int> _indirectServers;
+        private readonly AsyncLock _lock;
 
-		public DiscordClient Client => _client;
+        public DiscordClient Client => _client;
 		public string Name => _name;
 		public string Id => _id;
 		public FilterType FilterType => _filterType;
@@ -60,15 +62,17 @@ namespace Discord.Modules
 		{
 			_client = client;
 			_name = name;
-			_id = name.ToLowerInvariant();
 
-			_filterType = filterType;
+			_id = name.ToLowerInvariant();
+            _lock = new AsyncLock();
+
+            _filterType = filterType;
 			_allowAll = filterType == FilterType.Unrestricted;
 			_useServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
 			_useChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
 			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
 
-			_enabledServers = new ConcurrentDictionary<ulong, Server>();
+            _enabledServers = new ConcurrentDictionary<ulong, Server>();
 			_enabledChannels = new ConcurrentDictionary<ulong, Channel>();
 			_indirectServers = new ConcurrentDictionary<ulong, int>();
 
@@ -122,8 +126,8 @@ namespace Discord.Modules
 			if (server == null) throw new ArgumentNullException(nameof(server));
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
-			lock (this)
-				return EnableServerInternal(server);
+            using (_lock.Lock())
+                return EnableServerInternal(server);
 		}
 		public void EnableServers(IEnumerable<Server> servers)
 		{
@@ -131,8 +135,8 @@ namespace Discord.Modules
 			if (servers.Contains(null)) throw new ArgumentException("Collection cannot contain null.", nameof(servers));
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				foreach (var server in servers)
 					EnableServerInternal(server);
             }
@@ -153,8 +157,8 @@ namespace Discord.Modules
 			if (server == null) throw new ArgumentNullException(nameof(server));
             if (!_useServerWhitelist) return false;
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				if (_enabledServers.TryRemove(server.Id, out server))
 				{
 					if (ServerDisabled != null)
@@ -169,8 +173,8 @@ namespace Discord.Modules
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
             if (!_useServerWhitelist) return;
 
-            lock (this)
-			{
+            using (_lock.Lock())
+            {
 				if (ServerDisabled != null)
 				{
 					foreach (var server in _enabledServers)
@@ -186,8 +190,8 @@ namespace Discord.Modules
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
-			lock (this)
-				return EnableChannelInternal(channel);
+            using (_lock.Lock())
+                return EnableChannelInternal(channel);
 		}
 		public void EnableChannels(IEnumerable<Channel> channels)
 		{
@@ -195,8 +199,8 @@ namespace Discord.Modules
 			if (channels.Contains(null)) throw new ArgumentException("Collection cannot contain null.", nameof(channels));
 			if (!_useChannelWhitelist) throw new InvalidOperationException("This module is not configured to use a channel whitelist.");
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				foreach (var channel in channels)
 					EnableChannelInternal(channel);
             }
@@ -225,8 +229,8 @@ namespace Discord.Modules
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (!_useChannelWhitelist) return false;
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				Channel ignored;
 				if (_enabledChannels.TryRemove(channel.Id, out ignored))
 				{
@@ -252,8 +256,8 @@ namespace Discord.Modules
 		{
             if (!_useChannelWhitelist) return;
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				if (ChannelDisabled != null)
 				{
 					foreach (var channel in _enabledChannels)

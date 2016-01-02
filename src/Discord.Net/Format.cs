@@ -7,7 +7,7 @@ namespace Discord
 		private static readonly string[] _patterns;
 		private static readonly StringBuilder _builder;
 
-		static Format()
+        static Format()
 		{
 			_patterns = new string[] { "__", "_", "**", "*", "~~", "```", "`"};
 			_builder = new StringBuilder(DiscordConfig.MaxMessageSize);

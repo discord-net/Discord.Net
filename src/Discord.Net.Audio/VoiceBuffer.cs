@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nito.AsyncEx;
+using System;
 using System.Threading;
 
 namespace Discord.Audio
@@ -9,8 +10,9 @@ namespace Discord.Audio
 		private readonly byte[] _buffer;
 		private readonly byte[] _blankFrame;
 		private ushort _readCursor, _writeCursor;
-		private ManualResetEventSlim _notOverflowEvent;
+        private ManualResetEventSlim _notOverflowEvent;
 		private bool _isClearing;
+        private AsyncLock _lock;
 
 		public int FrameSize => _frameSize;
 		public int FrameCount => _frameCount;
@@ -27,6 +29,7 @@ namespace Discord.Audio
 			_buffer = new byte[_bufferSize];
 			_blankFrame = new byte[_frameSize];
 			_notOverflowEvent = new ManualResetEventSlim(); //Notifies when an overflow is solved
+            _lock = new AsyncLock();
         }
 
 		public void Push(byte[] buffer, int bytes, CancellationToken cancelToken)
@@ -38,8 +41,8 @@ namespace Discord.Audio
 			int expectedBytes = wholeFrames * _frameSize;
 			int lastFrameSize = bytes - expectedBytes;
 
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				for (int i = 0, pos = 0; i <= wholeFrames; i++, pos += _frameSize)
 				{
 					//If the read cursor is in the next position, wait for it to move.
@@ -83,35 +86,34 @@ namespace Discord.Audio
 		}
 
 		public bool Pop(byte[] buffer)
-		{
-            if (_writeCursor == _readCursor)
-			{
-				_notOverflowEvent.Set();
-				return false;
-			}
+        {
+            //using (_lock.Lock())
+            //{
+                if (_writeCursor == _readCursor)
+                {
+                    _notOverflowEvent.Set();
+                    return false;
+                }
 
-			bool isClearing = _isClearing;
-			if (!isClearing)
-				Buffer.BlockCopy(_buffer, _readCursor * _frameSize, buffer, 0, _frameSize);
+                bool isClearing = _isClearing;
+                if (!isClearing)
+                    Buffer.BlockCopy(_buffer, _readCursor * _frameSize, buffer, 0, _frameSize);
 
-			//Advance the read cursor to the next position
-			AdvanceCursorPos(ref _readCursor);
-			_notOverflowEvent.Set();
-			return !isClearing;
+                //Advance the read cursor to the next position
+                AdvanceCursorPos(ref _readCursor);
+                _notOverflowEvent.Set();
+                return !isClearing;
+            //}
 		}
 
 		public void Clear(CancellationToken cancelToken)
 		{
-			lock (this)
-			{
+            using (_lock.Lock())
+            {
 				_isClearing = true;
                 for (int i = 0; i < _frameCount; i++)
 					Buffer.BlockCopy(_blankFrame, 0, _buffer, i * _frameCount, i++);
-				try
-				{
-					Wait(cancelToken);
-                }
-				catch (OperationCanceledException) { }
+
 				_writeCursor = 0;
 				_readCursor = 0;
 				_isClearing = false;

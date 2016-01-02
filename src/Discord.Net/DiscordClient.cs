@@ -5,6 +5,7 @@ using Discord.Net;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
+using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Discord
     /// <summary> Provides a connection to the DiscordApp service. </summary>
     public partial class DiscordClient
     {
-        private readonly Semaphore _connectionLock;
+        private readonly AsyncLock _connectionLock;
         private readonly ManualResetEvent _disconnectedEvent;
         private readonly ManualResetEventSlim _connectedEvent;
         private readonly TaskManager _taskManager;
@@ -88,7 +89,7 @@ namespace Discord
 
             //Async
             _taskManager = new TaskManager(Cleanup);
-            _connectionLock = new Semaphore(1, 1);
+            _connectionLock = new AsyncLock();
             _disconnectedEvent = new ManualResetEvent(true);
             _connectedEvent = new ManualResetEventSlim(false);
             CancelToken = new CancellationToken(true);
@@ -157,8 +158,7 @@ namespace Discord
         {
             try
             {
-                _connectionLock.WaitOne();
-                try
+                using (await _connectionLock.LockAsync())
                 {
                     if (State != ConnectionState.Disconnected)
                         await Disconnect().ConfigureAwait(false);
@@ -181,10 +181,6 @@ namespace Discord
 
                     await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
-                }
-                finally
-                {
-                    _connectionLock.Release();
                 }
             }
             catch (Exception ex)
