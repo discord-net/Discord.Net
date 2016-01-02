@@ -91,11 +91,11 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
 			{
-                _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex);
                 throw;
 			}
 		}
-		protected void EndConnect()
+		protected async Task EndConnect()
 		{
 			try
             {
@@ -107,7 +107,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
             {
-                _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex);
             }
 		}
 

@@ -86,20 +86,20 @@ namespace Discord.Net.WebSockets
             return TaskHelper.CompletedTask;
         }
 
-        private void OnWebSocketError(object sender, ErrorEventArgs e)
+        private async void OnWebSocketError(object sender, ErrorEventArgs e)
         {
-            _taskManager.SignalError(e.Exception);
+            await _taskManager.SignalError(e.Exception);
             _waitUntilConnect.Set();
             _waitUntilDisconnect.Set();
         }
-        private void OnWebSocketClosed(object sender, EventArgs e)
+        private async void OnWebSocketClosed(object sender, EventArgs e)
         {
             Exception ex;
             if (e is ClosedEventArgs)
                 ex = new WebSocketException((e as ClosedEventArgs).Code, (e as ClosedEventArgs).Reason);
             else
                 ex = new Exception("Connection lost");
-            _taskManager.SignalError(ex);
+            await _taskManager.SignalError(ex);
             _waitUntilConnect.Set();
             _waitUntilDisconnect.Set();
         }

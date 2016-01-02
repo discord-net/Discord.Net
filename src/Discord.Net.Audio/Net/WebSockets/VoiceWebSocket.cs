@@ -434,7 +434,7 @@ namespace Discord.Net.WebSockets
                         var payload = (msg.Payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
                         _secretKey = payload.SecretKey;
                         SendSetSpeaking(true);
-                        EndConnect();
+                        await EndConnect();
                     }
                     break;
                 case OpCodes.Speaking:

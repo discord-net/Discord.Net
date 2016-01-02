@@ -185,7 +185,7 @@ namespace Discord
             }
             catch (Exception ex)
             {
-                _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex);
                 throw;
             }
         }

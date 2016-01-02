@@ -100,7 +100,7 @@ namespace Discord.Net.WebSockets
                         if (msg.Type == "READY" || msg.Type == "RESUMED")
                         {
                             _reconnects = 0;
-                            EndConnect(); //Complete the connect
+                            await EndConnect(); //Complete the connect
                         }
 					}
 					break;

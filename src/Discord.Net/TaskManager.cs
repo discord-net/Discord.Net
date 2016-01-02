@@ -67,14 +67,14 @@ namespace Discord
 
                         //Signal the rest of the tasks to stop
                         if (firstTask.Exception != null)
-                            SignalError(firstTask.Exception);
+                            await SignalError(firstTask.Exception);
                         else
-                            SignalStop();
+                            await SignalStop();
 
                         //Wait for the other tasks, and signal their errors too just in case
                         try { await allTasks.ConfigureAwait(false); }
-                        catch (AggregateException ex) { SignalError(ex.InnerExceptions.First()); } 
-                        catch (Exception ex) { SignalError(ex); }
+                        catch (AggregateException ex) { await SignalError(ex.InnerExceptions.First()); } 
+                        catch (Exception ex) { await SignalError(ex); }
 
                         //Run the cleanup function within our lock
                         if (_stopAction != null)
@@ -87,9 +87,9 @@ namespace Discord
             }
         }
 
-        public void SignalStop(bool isExpected = false)
+        public async Task SignalStop(bool isExpected = false)
         {
-            using (_lock.Lock())
+            using (await _lock.LockAsync())
             {
                 if (isExpected)
                     _wasStopExpected = true;
@@ -119,9 +119,9 @@ namespace Discord
             await task;
         }
 
-        public void SignalError(Exception ex)
+        public async Task SignalError(Exception ex)
         {
-            using (_lock.Lock())
+            using (await _lock.LockAsync())
             {
                 if (_stopReason != null) return;
 
