@@ -33,7 +33,7 @@
   },
 
   "dependencies": {
-    "Newtonsoft.Json": "7.0.1",
+    "Newtonsoft.Json": "8.0.1",
     "Nito.AsyncEx": "3.0.1"
   },
 
