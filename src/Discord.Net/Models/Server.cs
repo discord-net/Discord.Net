@@ -207,8 +207,7 @@ namespace Discord
         {
             var channel = new Channel(Client, id, this);
             Client.AddChannel(channel);
-            channel = _channels.GetOrAdd(id, x => channel);
-            return channel;
+            return _channels.GetOrAdd(id, x => channel);
         }
         internal Channel RemoveChannel(ulong id)
         {
