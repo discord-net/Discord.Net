@@ -9,6 +9,7 @@ using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -164,6 +165,10 @@ namespace Discord
                         await Disconnect().ConfigureAwait(false);
                     await _taskManager.Stop().ConfigureAwait(false);
                     _taskManager.ClearException();
+
+                    Stopwatch stopwatch = null;
+                    if (Config.LogLevel >= LogSeverity.Verbose)
+                        stopwatch = Stopwatch.StartNew();
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
 
@@ -181,6 +186,13 @@ namespace Discord
 
                     await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
+
+                    if (Config.LogLevel >= LogSeverity.Verbose)
+                    {
+                        stopwatch.Stop();
+                        double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
+                        Logger.Verbose($"Connection took {seconds} sec");
+                    }
                 }
             }
             catch (Exception ex)
@@ -471,6 +483,9 @@ namespace Discord
                     //Global
                     case "READY":
                         {
+                            Stopwatch stopwatch = null;
+                            if (Config.LogLevel >= LogSeverity.Verbose)
+                                stopwatch = Stopwatch.StartNew();
                             var data = e.Payload.ToObject<ReadyEvent>(_serializer);
                             GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
                             GatewaySocket.SessionId = data.SessionId;
@@ -491,6 +506,12 @@ namespace Discord
                             {
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
+                            }
+                            if (Config.LogLevel >= LogSeverity.Verbose)
+                            {
+                                stopwatch.Stop();
+                                double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
+                                Logger.Verbose($"READY took {seconds} sec");
                             }
                         }
                         break;
