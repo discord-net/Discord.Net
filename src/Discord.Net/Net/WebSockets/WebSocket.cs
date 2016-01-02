@@ -65,7 +65,7 @@ namespace Discord.Net.WebSockets
 			            zlib.CopyTo(decompressed);
 		            decompressed.Position = 0;
                     using (var reader = new StreamReader(decompressed))
-			            ProcessMessage(reader.ReadToEnd()).Wait();
+			            ProcessMessage(reader.ReadToEnd()).GetAwaiter().GetResult();
 	            }
             };
 			_engine.TextMessage += (s, e) => ProcessMessage(e.Message).Wait(); 

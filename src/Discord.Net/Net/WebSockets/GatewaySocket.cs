@@ -86,7 +86,7 @@ namespace Discord.Net.WebSockets
 
         protected override async Task ProcessMessage(string json)
 		{
-            base.ProcessMessage(json).Wait(); //This is just a CompletedTask, and we need to avoid asyncs in here
+            base.ProcessMessage(json).GetAwaiter().GetResult(); //This is just a CompletedTask, and we need to avoid asyncs in here
 			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
 			if (msg.Sequence.HasValue)
 				_lastSequence = msg.Sequence.Value;
