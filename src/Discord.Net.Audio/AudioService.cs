@@ -33,7 +33,7 @@ namespace Discord.Audio
 		{
 			Config = config;
 		}
-		public void Install(DiscordClient client)
+		void IService.Install(DiscordClient client)
 		{
 			Client = client;
             Config.Lock();
