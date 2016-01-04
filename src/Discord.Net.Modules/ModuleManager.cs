@@ -60,12 +60,12 @@ namespace Discord.Modules
         public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
 		public IEnumerable<Channel> EnabledChannels => _enabledChannels.Select(x => x.Value);
 
-		internal ModuleManager(DiscordClient client, string name, FilterType filterType, IModule instance)
+		internal ModuleManager(DiscordClient client, IModule instance, string name, FilterType filterType)
 		{
             Client = client;
+            Instance = instance;
             Name = name;
             FilterType = filterType;
-            Instance = instance;
 
             Id = name.ToLowerInvariant();
             _lock = new AsyncLock();
