@@ -51,22 +51,25 @@ namespace Discord.Modules
 		private readonly ConcurrentDictionary<ulong, int> _indirectServers;
         private readonly AsyncLock _lock;
 
-        public DiscordClient Client => _client;
-		public string Name => _name;
-		public string Id => _id;
-		public FilterType FilterType => _filterType;
-		public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
+        public DiscordClient Client { get; }
+        public IModule Instance { get; }
+        public string Name { get; }
+		public string Id { get; }
+		public FilterType FilterType { get; }
+
+        public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
 		public IEnumerable<Channel> EnabledChannels => _enabledChannels.Select(x => x.Value);
 
-		internal ModuleManager(DiscordClient client, string name, FilterType filterType)
+		internal ModuleManager(DiscordClient client, string name, FilterType filterType, IModule instance)
 		{
-			_client = client;
-			_name = name;
+            Client = client;
+            Name = name;
+            FilterType = filterType;
+            Instance = instance;
 
-			_id = name.ToLowerInvariant();
+            Id = name.ToLowerInvariant();
             _lock = new AsyncLock();
 
-            _filterType = filterType;
 			_allowAll = filterType == FilterType.Unrestricted;
 			_useServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
 			_useChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
