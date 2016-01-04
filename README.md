@@ -3,6 +3,9 @@ An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
 
+**Warning: documentation is currently outdated.**
+It will be rewritten once 0.9 approaches release, until then use [DiscordBot](https://github.com/RogueException/DiscordBot) for reference.
+
 ### Current Features
 - Using Discord API v3
 - Supports .Net Framework 4.5 and .Net Core 5.0
