@@ -1,7 +1,4 @@
 {
-  "dependencies": {
-    "Nito.AsyncEx": "3.0.1"
-  },
   "frameworks": {
     "net45": { }
   },

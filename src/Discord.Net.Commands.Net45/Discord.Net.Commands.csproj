@@ -125,6 +125,14 @@
       <Name>Discord.Net</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="project.lock.json">
+      <DependentUpon>project.json</DependentUpon>
+    </Content>
+  </ItemGroup>
   <Import Project="..\Discord.Net.Shared\Discord.Net.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
