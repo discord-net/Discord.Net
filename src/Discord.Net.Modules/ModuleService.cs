@@ -30,7 +30,7 @@ namespace Discord.Modules
             if (_modules.ContainsKey(module))
                 throw new InvalidOperationException("This module has already been added.");
 
-			var manager = new ModuleManager(Client, name, type, module);
+			var manager = new ModuleManager(Client, module, name, type);
 			_modules.Add(module, manager);
 			module.Install(manager);
         }
