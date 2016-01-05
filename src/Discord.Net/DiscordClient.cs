@@ -847,7 +847,6 @@ namespace Discord
                                     msg.Update(data);
                                     user.UpdateActivity();
 
-                                    msg.State = MessageState.Normal;
                                     if (Config.LogEvents)
                                         Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageReceived(msg);
@@ -869,7 +868,6 @@ namespace Discord
                                     if (msg != null)
                                     {
                                         msg.Update(data);
-                                        msg.State = MessageState.Normal;
                                         if (Config.LogEvents)
                                             Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                         OnMessageUpdated(msg);

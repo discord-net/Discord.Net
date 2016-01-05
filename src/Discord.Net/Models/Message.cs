@@ -14,11 +14,16 @@ using APIMessage = Discord.API.Client.Message;
 namespace Discord
 {
 	public enum MessageState : byte
-	{
+    {
+        /// <summary> Message did not originate from this session, or was successfully sent. </summary>
 		Normal = 0,
+        /// <summary> Message is current queued. </summary>
 		Queued,
+        /// <summary> Message was deleted before it was sent. </summary>
+        Aborted,
+        /// <summary> Message failed to be sent. </summary>
 		Failed
-	}
+    }
 
 	public sealed class Message
     {
@@ -177,7 +182,7 @@ namespace Discord
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
 		public MessageState State { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server. </summary>
-		public string RawText { get; private set; }
+		public string RawText { get; internal set; }
 		/// <summary> Returns the content of this message with any special references such as mentions converted. </summary>
 		public string Text { get; internal set; } 
 		/// <summary> Returns the timestamp for when this message was sent. </summary>
@@ -189,15 +194,17 @@ namespace Discord
 		/// <summary> Returns a collection of all embeded content in this message. </summary>
 		public Embed[] Embeds { get; private set; }
 
-		/// <summary> Returns a collection of all users mentioned in this message. </summary>
-		public IEnumerable<User> MentionedUsers { get; internal set; }
+        /// <summary> Returns a collection of all users mentioned in this message. </summary>
+        public IEnumerable<User> MentionedUsers { get; internal set; }
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
 		public IEnumerable<Channel> MentionedChannels { get; internal set; }
 		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
-        
-		/// <summary> Returns the server containing the channel this message was sent to. </summary>
-		public Server Server => Channel.Server;
+
+        internal int Nonce { get; set; }
+
+        /// <summary> Returns the server containing the channel this message was sent to. </summary>
+        public Server Server => Channel.Server;
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
         public bool IsAuthor => User.Id == Client.CurrentUser?.Id;
 
@@ -309,7 +316,7 @@ namespace Discord
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
 
             if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueEdit(channel.Id, Id, text);
+                Client.MessageQueue.QueueEdit(this, text);
             else
             {
                 var request = new UpdateMessageRequest(Channel.Id, Id)
@@ -321,9 +328,14 @@ namespace Discord
         }
         public async Task Delete()
         {
-            var request = new DeleteMessageRequest(Channel.Id, Id);
-            try { await Client.ClientAPI.Send(request).ConfigureAwait(false); }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+            if (Client.Config.UseMessageQueue)
+                Client.MessageQueue.QueueDelete(this);
+            else
+            {
+                var request = new DeleteMessageRequest(Channel.Id, Id);
+                try { await Client.ClientAPI.Send(request).ConfigureAwait(false); }
+                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
+            }
         }
 
         /// <summary> Returns true if the logged-in user was mentioned. </summary>

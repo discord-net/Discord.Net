@@ -243,6 +243,7 @@ namespace Discord
         internal Message AddMessage(ulong id, User user, DateTime timestamp)
         {
             Message message = new Message(id, this, user);
+            message.State = MessageState.Normal;
             var cacheLength = Client.Config.MessageCacheSize;
             if (cacheLength > 0)
             {
@@ -336,12 +337,11 @@ namespace Discord
         }
         private async Task<Message> SendMessageInternal(string text, bool isTTS)
         {
-            Message msg = null;
             if (text.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
 
             if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueSend(Id, text, isTTS);
+                return Client.MessageQueue.QueueSend(this, text, isTTS);
             else
             {
                 var request = new SendMessageRequest(Id)
@@ -351,10 +351,10 @@ namespace Discord
                     IsTTS = isTTS
                 };
                 var model = await Client.ClientAPI.Send(request).ConfigureAwait(false);
-                msg = AddMessage(model.Id, IsPrivate ? Client.PrivateUser : Server.CurrentUser, model.Timestamp.Value);
+                var msg = AddMessage(model.Id, IsPrivate ? Client.PrivateUser : Server.CurrentUser, model.Timestamp.Value);
                 msg.Update(model);
+                return msg;
             }
-            return msg;
         }
 
         public async Task<Message> SendFile(string filePath)
