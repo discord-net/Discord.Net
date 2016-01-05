@@ -325,14 +325,6 @@ namespace Discord
             try { await Client.ClientAPI.Send(request).ConfigureAwait(false); }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
-        
-        public Task Acknowledge()
-        {
-            if (User.Id != Client.CurrentUser.Id)
-                return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
-            else
-                return TaskHelper.CompletedTask;
-        }
 
         /// <summary> Returns true if the logged-in user was mentioned. </summary>
         public bool IsMentioningMe(bool includeRoles = false)
