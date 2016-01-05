@@ -32,18 +32,18 @@ namespace Discord.Audio
             _lock = new AsyncLock();
         }
 
-		public void Push(byte[] buffer, int bytes, CancellationToken cancelToken)
+		public void Push(byte[] buffer, int offset, int count, CancellationToken cancelToken)
 		{
 			if (cancelToken.IsCancellationRequested)
 				throw new OperationCanceledException("Client is disconnected.", cancelToken);
 
-            int wholeFrames = bytes / _frameSize;
+            int wholeFrames = count / _frameSize;
 			int expectedBytes = wholeFrames * _frameSize;
-			int lastFrameSize = bytes - expectedBytes;
+			int lastFrameSize = count - expectedBytes;
 
             using (_lock.Lock())
             {
-				for (int i = 0, pos = 0; i <= wholeFrames; i++, pos += _frameSize)
+				for (int i = 0, pos = offset; i <= wholeFrames; i++, pos += _frameSize)
 				{
 					//If the read cursor is in the next position, wait for it to move.
 					ushort nextPosition = _writeCursor;
