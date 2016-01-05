@@ -1,6 +1,6 @@
 ﻿using Discord.Logging;
 using Nito.AsyncEx;
-using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
@@ -14,6 +14,7 @@ namespace Discord.Audio
             ConnectionState IAudioClient.State => _client.VoiceSocket.State;
             Server IAudioClient.Server => _client.VoiceSocket.Server;
             Channel IAudioClient.Channel => _client.VoiceSocket.Channel;
+            Stream IAudioClient.OutputStream => _client.OutputStream;
 
             public VirtualClient(SimpleAudioClient client)
             {
@@ -23,7 +24,7 @@ namespace Discord.Audio
             Task IAudioClient.Disconnect() => _client.Leave(this);
             Task IAudioClient.Join(Channel channel) => _client.Join(channel);
 
-            void IAudioClient.Send(byte[] data, int count) => _client.Send(data, count);
+            void IAudioClient.Send(byte[] data, int offset, int count) => _client.Send(data, offset, count);
             void IAudioClient.Clear() => _client.Clear();
             void IAudioClient.Wait() => _client.Wait();
         }

@@ -4,6 +4,7 @@ using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,35 @@ namespace Discord.Audio
 {
 	internal class AudioClient : IAudioClient
     {
+        private class OutStream : Stream
+        {
+            public override bool CanRead => false;
+            public override bool CanSeek => false;
+            public override bool CanWrite => true;
+
+            private readonly AudioClient _client;
+
+            internal OutStream(AudioClient client)
+            {
+                _client = client;
+            }
+
+            public override long Length { get { throw new InvalidOperationException(); } }
+            public override long Position
+            {
+                get { throw new InvalidOperationException(); }
+                set { throw new InvalidOperationException(); }
+            }
+            public override void Flush() { throw new InvalidOperationException(); }
+            public override long Seek(long offset, SeekOrigin origin) { throw new InvalidOperationException(); }
+            public override void SetLength(long value) { throw new InvalidOperationException(); }
+            public override int Read(byte[] buffer, int offset, int count) { throw new InvalidOperationException(); }
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                _client.Send(buffer, offset, count);
+            }
+        }
+
         private readonly AsyncLock _connectionLock;
         private readonly JsonSerializer _serializer;
         private CancellationTokenSource _cancelTokenSource;
@@ -20,6 +50,7 @@ namespace Discord.Audio
         public int Id { get; }
         public GatewaySocket GatewaySocket { get; }
         public VoiceWebSocket VoiceSocket { get; }
+        public Stream OutputStream { get; }
 
         public ConnectionState State => VoiceSocket.State;
         public Server Server => VoiceSocket.Server;
@@ -31,7 +62,8 @@ namespace Discord.Audio
 			Id = clientId;
             GatewaySocket = gatewaySocket;
             Logger = logger;
-            
+            OutputStream = new OutStream(this);
+
             _connectionLock = new AsyncLock();   
                      
             _serializer = new JsonSerializer();
@@ -169,14 +201,15 @@ namespace Discord.Audio
         /// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
         /// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
         /// <param name="count">Number of bytes in this frame. </param>
-        public void Send(byte[] data, int count)
+        public void Send(byte[] data, int offset, int count)
 		{
 			if (data == null) throw new ArgumentException(nameof(data));
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(count));
             if (VoiceSocket.Server == null) return; //Has been closed
 
             if (count != 0)
-				VoiceSocket.SendPCMFrames(data, count);
+				VoiceSocket.SendPCMFrames(data, offset, count);
 		}
 
         /// <summary> Clears the PCM buffer. </summary>

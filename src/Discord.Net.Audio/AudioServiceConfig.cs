@@ -29,7 +29,7 @@ namespace Discord.Audio
 		public bool EnableMultiserver { get { return _enableMultiserver; } set { SetValue(ref _enableMultiserver, value); } }
 		private bool _enableMultiserver = false;
 
-		/// <summary> Gets or sets the max buffer length (in milliseconds) for outgoing voice packets. </summary>
+		/// <summary> Gets or sets the buffer length (in milliseconds) for outgoing voice packets. </summary>
 		public int BufferLength { get { return _bufferLength; } set { SetValue(ref _bufferLength, value); } }
 		private int _bufferLength = 1000;
 
