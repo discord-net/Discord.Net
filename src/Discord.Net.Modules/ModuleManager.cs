@@ -41,10 +41,7 @@ namespace Discord.Modules
         public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
         public event EventHandler<MessageEventArgs> MessageUpdated = delegate { };
         public event EventHandler<MessageEventArgs> MessageReadRemotely = delegate { };
-
-		private readonly DiscordClient _client;
-		private readonly string _name, _id;
-		private readonly FilterType _filterType;
+        
 		private readonly bool _useServerWhitelist, _useChannelWhitelist, _allowAll, _allowPrivate;
 		private readonly ConcurrentDictionary<ulong, Server> _enabledServers;
 		private readonly ConcurrentDictionary<ulong, Channel> _enabledChannels;
@@ -55,12 +52,12 @@ namespace Discord.Modules
         public IModule Instance { get; }
         public string Name { get; }
 		public string Id { get; }
-		public FilterType FilterType { get; }
+		public ModuleFilter FilterType { get; }
 
         public IEnumerable<Server> EnabledServers => _enabledServers.Select(x => x.Value);
 		public IEnumerable<Channel> EnabledChannels => _enabledChannels.Select(x => x.Value);
 
-		internal ModuleManager(DiscordClient client, IModule instance, string name, FilterType filterType)
+		internal ModuleManager(DiscordClient client, IModule instance, string name, ModuleFilter filterType)
 		{
             Client = client;
             Instance = instance;
@@ -70,10 +67,10 @@ namespace Discord.Modules
             Id = name.ToLowerInvariant();
             _lock = new AsyncLock();
 
-			_allowAll = filterType == FilterType.Unrestricted;
-			_useServerWhitelist = filterType.HasFlag(FilterType.ServerWhitelist);
-			_useChannelWhitelist = filterType.HasFlag(FilterType.ChannelWhitelist);
-			_allowPrivate = filterType.HasFlag(FilterType.AllowPrivate);
+			_allowAll = filterType == ModuleFilter.None;
+			_useServerWhitelist = filterType.HasFlag(ModuleFilter.ServerWhitelist);
+			_useChannelWhitelist = filterType.HasFlag(ModuleFilter.ChannelWhitelist);
+			_allowPrivate = filterType.HasFlag(ModuleFilter.AlwaysAllowPrivate);
 
             _enabledServers = new ConcurrentDictionary<ulong, Server>();
 			_enabledChannels = new ConcurrentDictionary<ulong, Channel>();
@@ -115,10 +112,10 @@ namespace Discord.Modules
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
 		{
-			var commandService = _client.Commands(true);
+			var commandService = Client.Commands(true);
 			commandService.CreateGroup(prefix, x =>
 			{
-				x.Category(_name);
+				x.Category(Name);
 				x.AddCheck(new ModuleChecker(this));
 				config(x);
             });

@@ -1,8 +1,16 @@
-﻿namespace Discord.Commands.Permissions.Levels
+﻿using System;
+
+namespace Discord.Commands.Permissions.Levels
 {
     public static class PermissionLevelExtensions
     {
-		public static CommandBuilder MinPermissions(this CommandBuilder builder, int minPermissions)
+        public static DiscordClient UsingPermissionLevels(this DiscordClient client, Func<User, Channel, int> permissionResolver)
+        {
+            client.Services.Add(new PermissionLevelService(permissionResolver));
+            return client;
+        }
+
+        public static CommandBuilder MinPermissions(this CommandBuilder builder, int minPermissions)
 		{
 			builder.AddCheck(new PermissionLevelChecker(builder.Service.Client, minPermissions));
             return builder;

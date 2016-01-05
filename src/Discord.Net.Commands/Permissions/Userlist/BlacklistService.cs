@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-
-namespace Discord.Commands.Permissions.Userlist
+﻿namespace Discord.Commands.Permissions.Userlist
 {
     public class BlacklistService : UserlistService
 	{
-		public BlacklistService(IEnumerable<ulong> initialList = null)
+		public BlacklistService(params ulong[] initialList)
 			: base(initialList)
 		{
 		}
 
         public bool CanRun(User user)
-		{
-			return !_userList.ContainsKey(user.Id);
-		}
+            => !_userList.ContainsKey(user.Id);
 	}
 }

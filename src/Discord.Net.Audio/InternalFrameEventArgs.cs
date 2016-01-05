@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public class VoicePacketEventArgs : EventArgs
+    internal class InternalFrameEventArgs : EventArgs
     {
         public ulong UserId { get; }
         public ulong ChannelId { get; }
@@ -10,7 +10,7 @@ namespace Discord
         public int Offset { get; }
         public int Count { get; }
 
-        public VoicePacketEventArgs(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
+        public InternalFrameEventArgs(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
         {
             UserId = userId;
             ChannelId = channelId;

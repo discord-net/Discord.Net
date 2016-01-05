@@ -50,14 +50,14 @@
     <Compile Include="..\Discord.Net.Modules\ModuleExtensions.cs">
       <Link>ModuleExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Modules\ModuleFilter.cs">
+      <Link>ModuleFilter.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Modules\ModuleManager.cs">
       <Link>ModuleManager.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Modules\ModuleService.cs">
       <Link>ModuleService.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net.Modules\ModuleType.cs">
-      <Link>ModuleType.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

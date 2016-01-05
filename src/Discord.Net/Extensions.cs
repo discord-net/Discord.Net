@@ -8,6 +8,22 @@ using System.Runtime.CompilerServices;
 
 namespace Discord
 {
+    public static class DiscordClientExtensions
+    {
+        public static DiscordClient AddService<T>(this DiscordClient client, T instance)
+            where T : class, IService
+        {
+            client.Services.Add(instance);
+            return client;
+        }
+        public static DiscordClient AddService<T>(this DiscordClient client)
+            where T : class, IService, new()
+        {
+            client.Services.Add(new T());
+            return client;
+        }
+    }
+
     internal static class InternalExtensions
     {
 		internal static readonly IFormatProvider _format = CultureInfo.InvariantCulture;

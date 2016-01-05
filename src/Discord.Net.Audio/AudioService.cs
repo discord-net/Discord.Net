@@ -17,15 +17,12 @@ namespace Discord.Audio
 
         public event EventHandler Connected = delegate { };
         public event EventHandler<VoiceDisconnectedEventArgs> Disconnected = delegate { };
-        public event EventHandler<VoicePacketEventArgs> PacketReceived = delegate { };
         public event EventHandler<UserIsSpeakingEventArgs> UserIsSpeakingUpdated = delegate { };
 
         private void OnConnected()
             => Connected(this, EventArgs.Empty);
 		private void OnDisconnected(ulong serverId, bool wasUnexpected, Exception ex)
             => Disconnected(this, new VoiceDisconnectedEventArgs(serverId, wasUnexpected, ex));
-		internal void OnPacketReceived(VoicePacketEventArgs e)
-            => PacketReceived(this, e);
 		private void OnUserIsSpeakingUpdated(User user, bool isSpeaking)
             => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, isSpeaking));
 

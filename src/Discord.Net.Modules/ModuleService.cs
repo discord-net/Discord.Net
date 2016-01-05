@@ -20,7 +20,7 @@ namespace Discord.Modules
             Client = client;
         }
 
-		public void Install<T>(T module, string name, FilterType type)
+		public T Add<T>(T module, string name, ModuleFilter type)
 			where T : class, IModule
 		{
 			if (module == null) throw new ArgumentNullException(nameof(module));
@@ -33,6 +33,7 @@ namespace Discord.Modules
 			var manager = new ModuleManager(Client, module, name, type);
 			_modules.Add(module, manager);
 			module.Install(manager);
+            return module;
         }
 
 		public ModuleManager GetManager(IModule module)

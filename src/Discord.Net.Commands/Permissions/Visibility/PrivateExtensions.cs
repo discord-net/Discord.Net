@@ -1,8 +1,8 @@
 ﻿namespace Discord.Commands.Permissions.Visibility
 {
     public static class PrivateExtensions
-	{
-		public static CommandBuilder PrivateOnly(this CommandBuilder builder)
+    {
+        public static CommandBuilder PrivateOnly(this CommandBuilder builder)
 		{
 			builder.AddCheck(new PrivateChecker());
             return builder;

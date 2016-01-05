@@ -49,6 +49,14 @@ namespace Discord.Net.WebSockets
         public int Ping => _ping;
         internal VoiceBuffer OutputBuffer => _sendBuffer;
 
+        internal event EventHandler<InternalIsSpeakingEventArgs> UserIsSpeaking = delegate { };
+        internal event EventHandler<InternalFrameEventArgs> FrameReceived = delegate { };
+
+        private void OnUserIsSpeaking(ulong userId, bool isSpeaking)
+            => UserIsSpeaking(this, new InternalIsSpeakingEventArgs(userId, isSpeaking));
+        internal void OnFrameReceived(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
+            => FrameReceived(this, new InternalFrameEventArgs(userId, channelId, buffer, offset, count));
+
         internal VoiceWebSocket(DiscordClient client, AudioClient audioClient, JsonSerializer serializer, Logger logger)
             : base(client, serializer, logger)
         {
@@ -58,7 +66,7 @@ namespace Discord.Net.WebSockets
             _targetAudioBufferLength = _config.BufferLength / 20; //20 ms frames
             _encodingBuffer = new byte[MaxOpusSize];
             _ssrcMapping = new ConcurrentDictionary<uint, ulong>();
-            _encoder = new OpusEncoder(48000, _config.Channels, 20, _config.Bitrate, OpusApplication.Audio);
+            _encoder = new OpusEncoder(48000, _config.Channels, 20, _config.Bitrate, OpusApplication.MusicOrMixed);
             _sendBuffer = new VoiceBuffer((int)Math.Ceiling(_config.BufferLength / (double)_encoder.FrameLength), _encoder.FrameSize);
         }
 
@@ -223,7 +231,7 @@ namespace Discord.Net.WebSockets
 
                                 ulong userId;
                                 if (_ssrcMapping.TryGetValue(ssrc, out userId))
-                                    RaiseOnPacket(userId, Channel.Id, result, resultOffset, resultLength);
+                                    OnFrameReceived(userId, Channel.Id, result, resultOffset, resultLength);
                             }
                         }
                     }
@@ -440,7 +448,7 @@ namespace Discord.Net.WebSockets
                 case OpCodes.Speaking:
                     {
                         var payload = (msg.Payload as JToken).ToObject<SpeakingEvent>(_serializer);
-                        RaiseIsSpeaking(payload.UserId, payload.IsSpeaking);
+                        OnUserIsSpeaking(payload.UserId, payload.IsSpeaking);
                     }
                     break;
                 default:
@@ -449,9 +457,9 @@ namespace Discord.Net.WebSockets
             }
         }
 
-        public void SendPCMFrames(byte[] data, int bytes)
+        public void SendPCMFrames(byte[] data, int offset, int count)
         {
-            _sendBuffer.Push(data, bytes, CancelToken);
+            _sendBuffer.Push(data, offset, count, CancelToken);
         }
         public void ClearPCMFrames()
         {

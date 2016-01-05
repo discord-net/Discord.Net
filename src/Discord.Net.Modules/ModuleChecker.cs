@@ -6,7 +6,7 @@ namespace Discord.Modules
 	public class ModuleChecker : IPermissionChecker
 	{
 		private readonly ModuleManager _manager;
-		private readonly FilterType _filterType;
+		private readonly ModuleFilter _filterType;
 
 		internal ModuleChecker(ModuleManager manager)
 		{
@@ -16,7 +16,7 @@ namespace Discord.Modules
 
 		public bool CanRun(Command command, User user, Channel channel, out string error)
 		{
-			if (_filterType == FilterType.Unrestricted || _filterType == FilterType.AllowPrivate || _manager.HasChannel(channel))
+			if (_filterType == ModuleFilter.None || _filterType == ModuleFilter.AlwaysAllowPrivate || _manager.HasChannel(channel))
 			{
 				error = null;
 				return true;

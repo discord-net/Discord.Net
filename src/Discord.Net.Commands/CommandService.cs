@@ -21,13 +21,13 @@ namespace Discord.Commands
 		//Groups store all commands by their module, used for more informative help
 		internal IEnumerable<CommandMap> Categories => _categories.Values;
 
-        public event EventHandler<CommandEventArgs> Command = delegate { };
-        public event EventHandler<CommandErrorEventArgs> CommandError = delegate { };
+        public event EventHandler<CommandEventArgs> CommandExecuted = delegate { };
+        public event EventHandler<CommandErrorEventArgs> CommandErrored = delegate { };
 
         private void OnCommand(CommandEventArgs args)
-            => Command(this, args);
+            => CommandExecuted(this, args);
         private void OnCommandError(CommandErrorType errorType, CommandEventArgs args, Exception ex = null)
-            => CommandError(this, new CommandErrorEventArgs(errorType, args, ex));
+            => CommandErrored(this, new CommandErrorEventArgs(errorType, args, ex));
 
         public CommandService(CommandServiceConfig config)
 		{
