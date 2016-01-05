@@ -7,10 +7,11 @@ Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or 
 It will be rewritten once 0.9 approaches release, until then use [DiscordBot](https://github.com/RogueException/DiscordBot) for reference.
 
 ### Installation
-You can download Discord.Net from NuGet:
+You can download Discord.Net and its extensions from NuGet:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 - [Discord.Net.Modules](https://www.nuget.org/packages/Discord.Net.Modules/)
+- Discord.Net.Audio (Coming Soon)
 
 ### Compiling
 In order to compile Discord.Net, you require at least the following:
