@@ -12,9 +12,23 @@ namespace Discord
 
         /// <summary> Gets the unique identifier for this user. </summary>
         public ulong Id { get; }
+        /// <summary> Gets the global name of this user. </summary>
+        public string Name => Client.PrivateUser.Name;
+        /// <summary> Gets the unique identifier for this user's current avatar. </summary>
+        public string AvatarId => Client.PrivateUser.AvatarId;
+        /// <summary> Gets the URL to this user's current avatar. </summary>
+        public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
+        /// <summary> Gets an id uniquely identifying from others with the same name. </summary>
+        public ushort Discriminator => Client.PrivateUser.Discriminator;
+        /// <summary> Gets the name of the game this user is currently playing. </summary>
+        public string CurrentGame => Client.PrivateUser.CurrentGame;
+        /// <summary> Gets the current status for this user. </summary>
+        public UserStatus Status => Client.PrivateUser.Status;
+        /// <summary> Returns the string used to mention this user. </summary>
+        public string Mention => $"<@{Id}>";
 
-		/// <summary> Gets the email for this user. </summary>
-		public string Email { get; private set; }
+        /// <summary> Gets the email for this user. </summary>
+        public string Email { get; private set; }
 		/// <summary> Gets if the email for this user has been verified. </summary>
 		public bool? IsVerified { get; private set; }
 
