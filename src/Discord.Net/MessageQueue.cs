@@ -131,7 +131,7 @@ namespace Discord.Net
                 {
                     var request = new SendMessageRequest(msg.Channel.Id)
                     {
-                        Content = msg.Text,
+                        Content = msg.RawText,
                         Nonce = msg.Nonce.ToString(),
                         IsTTS = msg.IsTTS
                     };
