@@ -17,7 +17,7 @@ namespace Discord
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId => Client.PrivateUser.AvatarId;
         /// <summary> Gets the URL to this user's current avatar. </summary>
-        public string AvatarUrl => User.GetAvatarUrl(Id, AvatarId);
+        public string AvatarUrl => Client.PrivateUser.AvatarUrl;
         /// <summary> Gets an id uniquely identifying from others with the same name. </summary>
         public ushort Discriminator => Client.PrivateUser.Discriminator;
         /// <summary> Gets the name of the game this user is currently playing. </summary>
