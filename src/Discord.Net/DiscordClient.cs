@@ -1052,13 +1052,13 @@ namespace Discord
         {
             try
             {
-                asyncAction().GetAwaiter().GetResult(); //Avoids creating AggregateExceptions
+                AsyncContext.Run(asyncAction);
             }
             catch (TaskCanceledException) { }
             _disconnectedEvent.WaitOne();
         }
         /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-        public void Run()
+        public void Wait()
         {
             _disconnectedEvent.WaitOne();
         }
