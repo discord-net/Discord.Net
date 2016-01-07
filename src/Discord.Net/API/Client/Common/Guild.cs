@@ -25,6 +25,7 @@ namespace Discord.API.Client
         [JsonProperty("roles")]
         public Role[] Roles { get; set; }
 
+        //Unknown
         [JsonProperty("splash")]
         public object Splash { get; set; }
         [JsonProperty("features")]
