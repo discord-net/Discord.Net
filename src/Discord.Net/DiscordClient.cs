@@ -865,7 +865,7 @@ namespace Discord
                                 var msg = channel.GetMessage(data.Id, data.Author?.Id);
                                 msg.Update(data);
                                 if (Config.LogEvents)
-                                    Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    Logger.Verbose($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnMessageUpdated(msg);
                             }
                             else
@@ -880,7 +880,7 @@ namespace Discord
                             {
                                 var msg = channel.RemoveMessage(data.Id);
                                 if (Config.LogEvents)
-                                    Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    Logger.Verbose($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                 OnMessageDeleted(msg);
                             }
                             else
