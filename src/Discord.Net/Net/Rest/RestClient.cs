@@ -13,6 +13,7 @@ namespace Discord.Net.Rest
 		private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
         private string _token;
+        private JsonSerializerSettings _deserializeSettings;
 
         internal Logger Logger { get; }
 
@@ -37,6 +38,15 @@ namespace Discord.Net.Rest
 			_engine = new RestSharpEngine(config, baseUrl, logger);
 #else
 			_engine = new BuiltInEngine(config, baseUrl, logger);
+#endif
+
+            _deserializeSettings = new JsonSerializerSettings();
+#if TEST_RESPONSES
+            _deserializeSettings.CheckAdditionalContent = true;
+            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Error;
+#else
+            _deserializeSettings.CheckAdditionalContent = false;
+            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
 #endif
         }
 
@@ -135,22 +145,13 @@ namespace Discord.Net.Rest
 			return responseJson;
 		}
 
-		private JsonSerializerSettings _deserializeSettings = new JsonSerializerSettings();
 		private T DeserializeResponse<T>(string json)
 		{
 #if TEST_RESPONSES
-			if (_deserializeSettings == null)
-			{
-				_deserializeSettings = new JsonSerializerSettings();
-				_deserializeSettings.CheckAdditionalContent = true;
-				_deserializeSettings.MissingMemberHandling = MissingMemberHandling.Error;
-			}
 			if (string.IsNullOrEmpty(json))
 				throw new Exception("API check failed: Response is empty.");
-			return JsonConvert.DeserializeObject<T>(json, _deserializeSettings);
-#else
-			return JsonConvert.DeserializeObject<T>(json);
 #endif
+            return JsonConvert.DeserializeObject<T>(json, _deserializeSettings);
 		}
 	}
 }

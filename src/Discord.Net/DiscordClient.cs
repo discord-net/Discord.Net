@@ -107,12 +107,14 @@ namespace Discord
             _serializer.CheckAdditionalContent = true;
             _serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #else
+            _serializer.CheckAdditionalContent = false;
+            _serializer.MissingMemberHandling = MissingMemberHandling.Ignore;
+#endif
             _serializer.Error += (s, e) =>
             {
                 e.ErrorContext.Handled = true;
                 Logger.Error("Serialization Failed", e.ErrorContext.Error);
             };
-#endif
 
             //Networking
             ClientAPI = new RestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
