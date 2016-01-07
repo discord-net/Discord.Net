@@ -340,6 +340,9 @@ namespace Discord
         
         public Task Acknowledge()
         {
+            if (Client.Config.Mode != DiscordMode.Client)
+                throw new InvalidOperationException("Message.Acknowledge may only be used in Client mode.");
+
             if (User.Id != Client.CurrentUser.Id)
                 return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
             else
