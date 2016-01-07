@@ -862,7 +862,7 @@ namespace Discord
                             var channel = GetChannel(data.ChannelId);
                             if (channel != null)
                             {
-                                var msg = channel.GetMessage(data.Id, data.Author.Id);
+                                var msg = channel.GetMessage(data.Id, data.Author?.Id);
                                 msg.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
