@@ -171,7 +171,7 @@ namespace Discord
         internal DiscordClient Client => Channel.Client;
 
         /// <summary> Returns the unique identifier for this message. </summary>
-        public ulong Id { get; }
+        public ulong Id { get; internal set; }
         /// <summary> Returns the channel this message was sent to. </summary>
         public Channel Channel { get; }
         /// <summary> Returns the author of this message. </summary>

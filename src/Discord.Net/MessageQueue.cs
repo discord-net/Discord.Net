@@ -136,6 +136,7 @@ namespace Discord.Net
                         IsTTS = msg.IsTTS
                     };
                     var response = await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    msg.Id = response.Id;
                     msg.Update(response);
                     msg.State = MessageState.Normal;
                 }
