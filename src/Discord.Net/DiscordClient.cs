@@ -858,45 +858,33 @@ namespace Discord
                         break;
                     case "MESSAGE_UPDATE":
                         {
-                            if (Config.MessageCacheSize > 0)
+                            var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
+                            var channel = GetChannel(data.ChannelId);
+                            if (channel != null)
                             {
-                                var data = e.Payload.ToObject<MessageUpdateEvent>(_serializer);
-                                var channel = GetChannel(data.ChannelId);
-                                if (channel != null)
-                                {
-                                    var msg = channel.GetMessage(data.Id);
-                                    if (msg != null)
-                                    {
-                                        msg.Update(data);
-                                        if (Config.LogEvents)
-                                            Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                        OnMessageUpdated(msg);
-                                    }
-                                }
-                                else
-                                    Logger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
+                                var msg = channel.GetMessage(data.Id, data.Author.Id);
+                                msg.Update(data);
+                                if (Config.LogEvents)
+                                    Logger.Info($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                OnMessageUpdated(msg);
                             }
+                            else
+                                Logger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
                         }
                         break;
                     case "MESSAGE_DELETE":
                         {
-                            if (Config.MessageCacheSize > 0)
+                            var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
+                            var channel = GetChannel(data.ChannelId);
+                            if (channel != null)
                             {
-                                var data = e.Payload.ToObject<MessageDeleteEvent>(_serializer);
-                                var channel = GetChannel(data.ChannelId);
-                                if (channel != null)
-                                {
-                                    var msg = channel.RemoveMessage(data.Id);
-                                    if (msg != null)
-                                    {
-                                        if (Config.LogEvents)
-                                            Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                        OnMessageDeleted(msg);
-                                    }
-                                }
-                                else
-                                    Logger.Warning("MESSAGE_DELETE referenced an unknown channel.");
+                                var msg = channel.RemoveMessage(data.Id);
+                                if (Config.LogEvents)
+                                    Logger.Info($"Message Deleted: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                OnMessageDeleted(msg);
                             }
+                            else
+                                Logger.Warning("MESSAGE_DELETE referenced an unknown channel.");
                         }
                         break;
                     case "MESSAGE_ACK":
@@ -907,7 +895,7 @@ namespace Discord
                                 var channel = GetChannel(data.ChannelId);
                                 if (channel != null)
                                 {
-                                    var msg = channel.GetMessage(data.MessageId);
+                                    var msg = channel.GetMessage(data.MessageId, null);
                                     if (msg != null)
                                     {
                                         if (Config.LogEvents)

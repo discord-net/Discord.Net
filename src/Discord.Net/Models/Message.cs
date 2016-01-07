@@ -206,7 +206,7 @@ namespace Discord
         /// <summary> Returns the server containing the channel this message was sent to. </summary>
         public Server Server => Channel.Server;
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
-        public bool IsAuthor => User.Id == Client.CurrentUser?.Id;
+        public bool IsAuthor => User != null && User.Id == Client.CurrentUser?.Id;
 
 		internal Message(ulong id, Channel channel, User user)
 		{
@@ -279,7 +279,7 @@ namespace Discord
 			}
 			if (model.IsMentioningEveryone != null)
 			{
-				if (model.IsMentioningEveryone.Value && User.GetPermissions(channel).MentionEveryone)
+				if (model.IsMentioningEveryone.Value && User != null && User.GetPermissions(channel).MentionEveryone)
 					MentionedRoles = new Role[] { Server.EveryoneRole };
 				else
 					MentionedRoles = new Role[0];
@@ -360,6 +360,6 @@ namespace Discord
 
         public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
 		public override int GetHashCode() => unchecked(Id.GetHashCode() + 9979);
-		public override string ToString() => $"{User}: {RawText}";
+		public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
 	}
 }

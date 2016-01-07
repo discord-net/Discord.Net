@@ -263,21 +263,25 @@ namespace Discord
             if (Client.Config.MessageCacheSize > 0)
             {
                 Message msg;
-                _messages.TryRemove(id, out msg);
-                return msg;
+                if (_messages.TryRemove(id, out msg))
+                    return msg;
             }
-            return null;
+            return new Message(id, this, null);
         }
 
         public Message GetMessage(ulong id)
+            => GetMessage(id, null);
+        internal Message GetMessage(ulong id, ulong? userId)
         {
-            if (Client.Config.MessageCacheSize <= 0)
-                throw new InvalidOperationException("Unable to retrieve a message when the message cache is disabled.");
-
-            Message result;
-            _messages.TryGetValue(id, out result);
-            return result;
+            if (Client.Config.MessageCacheSize > 0)
+            {
+                Message result;
+                if (_messages.TryGetValue(id, out result))
+                    return result;
+            }
+            return new Message(id, this, userId != null ? GetUser(userId.Value) : null);
         }
+
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
             RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
         {
