@@ -169,8 +169,12 @@ namespace Discord.Legacy
             return channel.DownloadMessages(limit, relativeMessageId, relativeDir, useCache);
         }
 
-        [Obsolete("Removed in 0.9a3", true)]
-        public static Task AckMessage(this DiscordClient client, Message message) => null;
+        [Obsolete("Use Message.Acknowledge")]
+        public static Task AckMessage(this DiscordClient client, Message message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            return message.Acknowledge();
+        }
 
         /*[Obsolete("Use Channel.ImportMessages")]
         public IEnumerable<Message> ImportMessages(Channel channel, string json)
