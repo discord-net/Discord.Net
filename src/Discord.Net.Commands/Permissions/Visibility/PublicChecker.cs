@@ -8,7 +8,7 @@
 		{
 			if (user.Server == null)
 			{
-				error = "This command can't be run in n a private chat.";
+				error = "This command can't be run in a private chat.";
 				return false;
 			}
 			else
