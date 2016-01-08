@@ -44,6 +44,15 @@ namespace Discord.API.Client
                 [JsonProperty("height")]
                 public int Height { get; set; }
             }
+            public sealed class VideoInfo
+            {
+                [JsonProperty("url")]
+                public string Url { get; set; }
+                [JsonProperty("width")]
+                public int Width { get; set; }
+                [JsonProperty("height")]
+                public int Height { get; set; }
+            }
 
             [JsonProperty("url")]
             public string Url { get; set; }
@@ -59,6 +68,8 @@ namespace Discord.API.Client
             public Reference Provider { get; set; }
             [JsonProperty("thumbnail")]
             public ThumbnailInfo Thumbnail { get; set; }
+            [JsonProperty("video")]
+            public VideoInfo Video { get; set; }
         }
 
         [JsonProperty("tts")]
