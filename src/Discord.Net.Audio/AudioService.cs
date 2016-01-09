@@ -140,7 +140,7 @@ namespace Discord.Audio
             
             if (!Config.EnableMultiserver)
             {
-                await (_defaultClient as SimpleAudioClient).Join(channel).ConfigureAwait(false);
+                await (_defaultClient as SimpleAudioClient).Connect(channel, false).ConfigureAwait(false);
                 return _defaultClient;
             }
             else
