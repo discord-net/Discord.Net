@@ -93,11 +93,10 @@ namespace Discord.Audio
                 int id = unchecked(++_nextClientId);
 
                 var gatewayLogger = Client.Log.CreateLogger($"Gateway #{id}");
-                var gatewaySocket = new GatewaySocket(Client, gatewayLogger);
-                await gatewaySocket.Connect().ConfigureAwait(false);
-
                 var voiceLogger = Client.Log.CreateLogger($"Voice #{id}");
+                var gatewaySocket = new GatewaySocket(Client, gatewayLogger);
                 var voiceClient = new AudioClient(this, id, server, Client.GatewaySocket, voiceLogger);
+
                 await voiceClient.Connect(true).ConfigureAwait(false);
 
                 /*voiceClient.VoiceSocket.FrameReceived += (s, e) =>
