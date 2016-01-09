@@ -77,7 +77,25 @@ namespace Discord
         public IEnumerable<Region> Regions => _regions.Select(x => x.Value);
 
         /// <summary> Initializes a new instance of the DiscordClient class. </summary>
-        public DiscordClient(DiscordConfig config = null)
+        public DiscordClient(Action<DiscordConfig> configFunc)
+            : this(ProcessConfig(configFunc))
+        {
+        }
+        private static DiscordConfig ProcessConfig(Action<DiscordConfig> func)
+        {
+            var config = new DiscordConfig();
+            func(config);
+            return config;
+        }
+
+        /// <summary> Initializes a new instance of the DiscordClient class. </summary>
+        public DiscordClient()
+            : this((DiscordConfig)null)
+        {
+        }
+
+        /// <summary> Initializes a new instance of the DiscordClient class. </summary>
+        public DiscordClient(DiscordConfig config)
         {
             Config = config ?? new DiscordConfig();
             Config.Lock();
