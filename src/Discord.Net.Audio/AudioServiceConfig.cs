@@ -36,7 +36,7 @@ namespace Discord.Audio
 		/// <summary> Gets or sets the bitrate used (in kbit/s, between 1 and 512 inclusively) for outgoing voice packets. A null value will use default Opus settings. </summary>
 		public int? Bitrate { get { return _bitrate; } set { SetValue(ref _bitrate, value); } }
 		private int? _bitrate = null;
-        /// <summary> Gets or sets the number of channels used (1 or 2) for outgoing voice packets. Defaults to 2 (stereo) </summary>
+        /// <summary> Gets or sets the number of channels (1 or 2) used in both input provided to IAudioClient and output send to Discord. Defaults to 2 (stereo). </summary>
         public int Channels { get { return _channels; } set { SetValue(ref _channels, value); } }
         private int _channels = 2;
 
