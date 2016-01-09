@@ -59,24 +59,17 @@ namespace Discord.Audio
         public AudioClient(AudioService service, int clientId, Server server, GatewaySocket gatewaySocket, Logger logger)
 		{
 			Service = service;
+            _serializer = service.Client.Serializer;
 			Id = clientId;
             GatewaySocket = gatewaySocket;
             Logger = logger;
             OutputStream = new OutStream(this);
 
-            _connectionLock = new AsyncLock();   
-                     
-            _serializer = new JsonSerializer();
-            _serializer.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-            _serializer.Error += (s, e) =>
-            {
-                e.ErrorContext.Handled = true;
-                Logger.Error("Serialization Failed", e.ErrorContext.Error);
-            };
+            _connectionLock = new AsyncLock();
 
             GatewaySocket.ReceivedDispatch += OnReceivedDispatch;
 
-            VoiceSocket = new VoiceWebSocket(service.Client, this, _serializer, logger);
+            VoiceSocket = new VoiceWebSocket(service.Client, this, logger);
             VoiceSocket.Server = server;
 
             /*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
@@ -124,27 +117,41 @@ namespace Discord.Audio
             if (channel == VoiceSocket.Channel) return;
             if (VoiceSocket.Server == null)
                 throw new InvalidOperationException("This client has been closed.");
-
-            using (await _connectionLock.LockAsync())
+            
+            using (await _connectionLock.LockAsync().ConfigureAwait(false))
             {
-                _cancelTokenSource = new CancellationTokenSource();
-                var cancelToken = _cancelTokenSource.Token;
-                VoiceSocket.ParentCancelToken = cancelToken;
                 VoiceSocket.Channel = channel;
 
                 await Task.Run(() =>
                 {
                     SendVoiceUpdate();
-                    VoiceSocket.WaitForConnection(cancelToken);
+                    VoiceSocket.WaitForConnection(_cancelTokenSource.Token);
                 });
             }
         }
         
+        public async Task Connect(bool connectGateway)
+        {
+            using (await _connectionLock.LockAsync().ConfigureAwait(false))
+            {
+                _cancelTokenSource = new CancellationTokenSource();
+                var cancelToken = _cancelTokenSource.Token;
+                VoiceSocket.ParentCancelToken = cancelToken;
+
+                if (connectGateway)
+                {
+                    GatewaySocket.ParentCancelToken = cancelToken;
+                    await GatewaySocket.Connect().ConfigureAwait(false);
+                    GatewaySocket.WaitForConnection(cancelToken);
+                }
+            }
+        }
+
         public async Task Disconnect()
         {
-            using (await _connectionLock.LockAsync())
+            using (await _connectionLock.LockAsync().ConfigureAwait(false))
             {
-                Service.RemoveClient(VoiceSocket.Server, this);
+                await Service.RemoveClient(VoiceSocket.Server, this).ConfigureAwait(false);
                 VoiceSocket.Channel = null;
                 SendVoiceUpdate();
                 await VoiceSocket.Disconnect();

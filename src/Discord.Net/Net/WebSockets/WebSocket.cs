@@ -24,9 +24,7 @@ namespace Discord.Net.WebSockets
         
         /// <summary> Gets the logger used for this client. </summary>
         protected internal Logger Logger { get; }
-
         public CancellationToken CancelToken { get; private set; }
-
         public CancellationToken? ParentCancelToken { get; set; }
 
 		public string Host { get; set; }
@@ -40,11 +38,11 @@ namespace Discord.Net.WebSockets
 		private void OnDisconnected(bool wasUnexpected, Exception error)
             => Disconnected(this, new DisconnectedEventArgs(wasUnexpected, error));
 
-		public WebSocket(DiscordClient client, JsonSerializer serializer, Logger logger)
+		public WebSocket(DiscordClient client, Logger logger)
 		{
             _client = client;
             Logger = logger;
-            _serializer = serializer;
+            _serializer = client.Serializer;
 
             _lock = new AsyncLock();
             _taskManager = new TaskManager(Cleanup);

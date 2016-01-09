@@ -57,8 +57,8 @@ namespace Discord.Net.WebSockets
         internal void OnFrameReceived(ulong userId, ulong channelId, byte[] buffer, int offset, int count)
             => FrameReceived(this, new InternalFrameEventArgs(userId, channelId, buffer, offset, count));
 
-        internal VoiceWebSocket(DiscordClient client, AudioClient audioClient, JsonSerializer serializer, Logger logger)
-            : base(client, serializer, logger)
+        internal VoiceWebSocket(DiscordClient client, AudioClient audioClient, Logger logger)
+            : base(client, logger)
         {
             _audioClient = audioClient;
             _config = client.Audio().Config;

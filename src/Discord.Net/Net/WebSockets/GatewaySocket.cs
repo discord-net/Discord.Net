@@ -22,8 +22,8 @@ namespace Discord.Net.WebSockets
         private void OnReceivedDispatch(string type, JToken payload)
             => ReceivedDispatch(this, new WebSocketEventEventArgs(type, payload));
 
-        public GatewaySocket(DiscordClient client, JsonSerializer serializer, Logger logger)
-			: base(client, serializer, logger)
+        public GatewaySocket(DiscordClient client, Logger logger)
+			: base(client, logger)
 		{
 			Disconnected += async (s, e) =>
 			{

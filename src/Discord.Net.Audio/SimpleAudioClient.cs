@@ -42,19 +42,19 @@ namespace Discord.Audio
         //Only disconnects if is current a member of this server
         public async Task Leave(VirtualClient client)
         {
-            using (await _connectionLock.LockAsync())
+            using (await _connectionLock.LockAsync().ConfigureAwait(false))
             {
                 if (CurrentClient == client)
                 {
                     CurrentClient = null;
-                    await Disconnect();
+                    await Disconnect().ConfigureAwait(false);
                 }
             }
         }
 
-        internal async Task<IAudioClient> Connect(Channel channel)
+        internal async Task<IAudioClient> Connect(Channel channel, bool connectGateway)
         {
-            using (await _connectionLock.LockAsync())
+            using (await _connectionLock.LockAsync().ConfigureAwait(false))
             {
                 bool changeServer = channel.Server != VoiceSocket.Server;
                 if (changeServer || CurrentClient == null)
@@ -62,8 +62,9 @@ namespace Discord.Audio
                     await Disconnect().ConfigureAwait(false);
                     CurrentClient = new VirtualClient(this);
                     VoiceSocket.Server = channel.Server;
+                    await Connect(connectGateway).ConfigureAwait(false);
                 }
-                await Join(channel);
+                await Join(channel).ConfigureAwait(false);
                 return CurrentClient;
             }
         }
