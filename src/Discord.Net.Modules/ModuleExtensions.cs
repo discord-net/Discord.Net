@@ -7,6 +7,7 @@
             client.Services.Add(new ModuleService());
             return client;
         }
+
         public static DiscordClient AddModule<T>(this DiscordClient client, T instance, string name = null, ModuleFilter filter = ModuleFilter.None)
             where T : class, IModule
         {
