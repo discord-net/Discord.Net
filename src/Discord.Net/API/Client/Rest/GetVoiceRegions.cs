@@ -21,5 +21,7 @@ namespace Discord.API.Client.Rest
         public string Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("vip")]
+        public bool Vip { get; set; }
     }
 }

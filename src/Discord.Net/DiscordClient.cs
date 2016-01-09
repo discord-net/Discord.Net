@@ -259,7 +259,7 @@ namespace Discord
 
                 //Cache other stuff
                 var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
-                _regions = regionsResponse.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port))
+                _regions = regionsResponse.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port, x.Vip))
                     .ToDictionary(x => x.Id);
                 break;
             }
@@ -424,7 +424,7 @@ namespace Discord
             if (_regions.TryGetValue(id, out region))
                 return region;
             else
-                return new Region(id, id, "", 0);
+                return new Region(id, id, "", 0, false);
         }
         #endregion
 
