@@ -22,9 +22,9 @@ namespace Discord.API.Client.Rest
         public sealed class Role
         {
             [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
-            public ulong Id { get; }
+            public ulong Id { get; set; }
             [JsonProperty("position")]
-            public int Position { get; }
+            public int Position { get; set; }
 
             public Role(ulong id, int pos)
             {
@@ -33,7 +33,7 @@ namespace Discord.API.Client.Rest
             }
         }
         
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         public ulong[] RoleIds { get; set; } = new ulong[0];
         public int StartPos { get; set; } = 0;

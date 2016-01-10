@@ -10,8 +10,8 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong ChannelId { get; }
-        public ulong TargetId { get; }
+        public ulong ChannelId { get; set; }
+        public ulong TargetId { get; set; }
 
         public RemoveChannelPermissionsRequest(ulong channelId, ulong targetId)
         {

@@ -10,8 +10,8 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong GuildId { get; }
-        public ulong UserId { get; }
+        public ulong GuildId { get; set; }
+        public ulong UserId { get; set; }
 
         public RemoveGuildBanRequest(ulong guildId, ulong userId)
         {

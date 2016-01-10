@@ -12,8 +12,8 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong GuildId { get; }
-        public ulong UserId { get; }
+        public ulong GuildId { get; set; }
+        public ulong UserId { get; set; }
 
         [JsonProperty("mute")]
         public bool IsMuted { get; set; }

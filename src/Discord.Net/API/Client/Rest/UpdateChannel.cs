@@ -10,7 +10,7 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong ChannelId { get; }
+        public ulong ChannelId { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

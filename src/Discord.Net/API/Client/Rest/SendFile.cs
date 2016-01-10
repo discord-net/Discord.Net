@@ -13,7 +13,7 @@ namespace Discord.API.Client.Rest
         string IRestFileRequest.Filename => Filename;
         Stream IRestFileRequest.Stream => Stream;
 
-        public ulong ChannelId { get; }
+        public ulong ChannelId { get; set; }
 
         public string Filename { get; set; }
         public Stream Stream { get; set; }

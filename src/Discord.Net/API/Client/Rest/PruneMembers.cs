@@ -10,7 +10,7 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         public int Days { get; set; } = 30;
         public bool IsSimulation { get; set; } = false;

@@ -21,7 +21,7 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong ChannelId { get; }
+        public ulong ChannelId { get; set; }
 
         public int Limit { get; set; } = 100;
         public string RelativeDir { get; set; } = null;

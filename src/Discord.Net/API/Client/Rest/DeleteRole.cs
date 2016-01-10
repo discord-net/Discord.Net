@@ -10,8 +10,8 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong GuildId { get; }
-        public ulong RoleId { get; }
+        public ulong GuildId { get; set; }
+        public ulong RoleId { get; set; }
 
         public DeleteRoleRequest(ulong guildId, ulong roleId)
         {

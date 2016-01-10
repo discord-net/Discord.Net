@@ -11,7 +11,7 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
-        public ulong ChannelId { get; }
+        public ulong ChannelId { get; set; }
 
         [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
         public ulong TargetId { get; set; }

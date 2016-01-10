@@ -10,7 +10,7 @@ namespace Discord.API.Client.Rest
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
 
-        public string InviteId { get; }
+        public string InviteId { get; set; }
 
         public AcceptInviteRequest(string inviteId)
         {

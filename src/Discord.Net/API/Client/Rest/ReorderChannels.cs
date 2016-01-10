@@ -22,9 +22,9 @@ namespace Discord.API.Client.Rest
         public sealed class Channel
         {
             [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
-            public ulong Id;
+            public ulong Id { get; set; }
             [JsonProperty("position")]
-            public int Position;
+            public int Position { get; set; }
 
             public Channel(ulong id, int position)
             {
@@ -33,7 +33,7 @@ namespace Discord.API.Client.Rest
             }
         }
         
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         public ulong[] ChannelIds { get; set; } = new ulong[0];
         public int StartPos { get; set; } = 0;
