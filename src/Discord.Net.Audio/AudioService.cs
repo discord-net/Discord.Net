@@ -47,10 +47,17 @@ namespace Discord.Audio
 
 			client.Disconnected += async (s, e) =>
 			{
-				if (Config.EnableMultiserver)
-				{
-					var tasks = _voiceClients
-						.Select(x => x.Value.Disconnect())
+                if (Config.EnableMultiserver)
+                {
+                    var tasks = _voiceClients
+                        .Select(x =>
+                        {
+                            var val = x.Value;
+                            if (val != null)
+                                return x.Value.Disconnect();
+                            else
+                                return TaskHelper.CompletedTask;
+                        })
 						.ToArray();
 					await Task.WhenAll(tasks).ConfigureAwait(false);
 					_voiceClients.Clear();
