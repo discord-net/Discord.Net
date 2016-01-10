@@ -89,6 +89,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
 			{
+                //TODO: Should this be inside the lock?
                 await _taskManager.SignalError(ex);
                 throw;
 			}

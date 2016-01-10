@@ -51,8 +51,8 @@ namespace Discord
             => OnEvent(MessageDeleted, new MessageEventArgs(msg));
         private void OnMessageReceived(Message msg)
             => OnEvent(MessageReceived, new MessageEventArgs(msg));
-        /*private void OnMessageSent(Message msg)
-            => OnEvent(MessageSent, new MessageEventArgs(msg));*/
+        internal void OnMessageSent(Message msg)
+            => OnEvent(MessageSent, new MessageEventArgs(msg));
         private void OnMessageUpdated(Message msg)
             => OnEvent(MessageUpdated, new MessageEventArgs(msg));
 

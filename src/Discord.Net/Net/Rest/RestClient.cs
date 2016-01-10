@@ -10,7 +10,27 @@ namespace Discord.Net.Rest
 {
     public sealed partial class RestClient
 	{
-		private readonly DiscordConfig _config;
+        private struct RestResults
+        {
+            public string Response { get; set; }
+            public double Milliseconds { get; set; }
+
+            public RestResults(string response, double milliseconds)
+            {
+                Response = response;
+                Milliseconds = milliseconds;
+            }
+        }
+
+        public event EventHandler<RequestEventArgs> SendingRequest = delegate { };
+        public event EventHandler<CompletedRequestEventArgs> SentRequest = delegate { };
+
+        private void OnSendingRequest(IRestRequest request)
+            => SendingRequest(this, new RequestEventArgs(request));
+        private void OnSentRequest(IRestRequest request, object response, string responseJson, double milliseconds)
+            => SentRequest(this, new CompletedRequestEventArgs(request, response, responseJson, milliseconds));
+
+        private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
         private string _token;
         private JsonSerializerSettings _deserializeSettings;
@@ -48,21 +68,48 @@ namespace Discord.Net.Rest
             _deserializeSettings.CheckAdditionalContent = false;
             _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
 #endif
+
+            if (Logger.Level >= LogSeverity.Verbose)
+            {
+                this.SentRequest += (s, e) =>
+                {
+                    string log = $"{e.Request.Method} {e.Request.Endpoint}: {e.Milliseconds} ms";
+                    if (_config.LogLevel >= LogSeverity.Debug)
+                    {
+                        if (e.Request is IRestFileRequest)
+                            log += $" [{(e.Request as IRestFileRequest).Filename}]";
+                        else if (e.Response != null)
+                        {
+                            if (e.Request.IsPrivate)
+                                log += $" [Hidden]";
+                            else
+                                log += $" {e.ResponseJson}";
+                        }
+                    }
+                    Logger.Verbose(log);
+                };
+            }
         }
 
         public async Task<ResponseT> Send<ResponseT>(IRestRequest<ResponseT> request)
 			where ResponseT : class
 		{
             if (request == null) throw new ArgumentNullException(nameof(request));
-            
-            string responseJson = await Send(request, true).ConfigureAwait(false);
-            return DeserializeResponse<ResponseT>(responseJson);
-		}
-        public Task Send(IRestRequest request)
+
+            OnSendingRequest(request);
+            var results = await Send(request, true).ConfigureAwait(false);
+            var response = DeserializeResponse<ResponseT>(results.Response);
+            OnSentRequest(request, response, results.Response, results.Milliseconds);
+
+            return response;
+        }
+        public async Task Send(IRestRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            
-            return Send(request, false);
+
+            OnSendingRequest(request);
+            var results = await Send(request, false).ConfigureAwait(false);
+            OnSentRequest(request, null, null, results.Milliseconds);
         }
 
         public async Task<ResponseT> Send<ResponseT>(IRestFileRequest<ResponseT> request)
@@ -70,80 +117,47 @@ namespace Discord.Net.Rest
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            string requestJson = JsonConvert.SerializeObject(request.Payload);
-            string responseJson = await SendFile(request, true).ConfigureAwait(false);
-            return DeserializeResponse<ResponseT>(responseJson);
+            OnSendingRequest(request);
+            var requestJson = JsonConvert.SerializeObject(request.Payload);
+            var results = await SendFile(request, true).ConfigureAwait(false);
+            var response = DeserializeResponse<ResponseT>(results.Response);
+            OnSentRequest(request, response, results.Response, results.Milliseconds);
+
+            return response;
         }
-        public Task Send(IRestFileRequest request)
+        public async Task Send(IRestFileRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            
-            return SendFile(request, false);
+
+            OnSendingRequest(request);
+            var results = await SendFile(request, false);
+            OnSentRequest(request, null, null, results.Milliseconds);
         }
 
-        private async Task<string> Send(IRestRequest request, bool hasResponse)
+        private async Task<RestResults> Send(IRestRequest request, bool hasResponse)
         {
-            var method = request.Method;
-            var path = request.Endpoint;
             object payload = request.Payload;
-            var isPrivate = request.IsPrivate;
-
             string requestJson = null;
             if (payload != null)
 				requestJson = JsonConvert.SerializeObject(payload);
 
-            Stopwatch stopwatch = null;
-            if (Logger.Level >= LogSeverity.Verbose)
-				stopwatch = Stopwatch.StartNew();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            string responseJson = await _engine.Send(request.Method, request.Endpoint, requestJson, CancelToken).ConfigureAwait(false);
+            stopwatch.Stop();
 
-            string responseJson = await _engine.Send(method, path, requestJson, CancelToken).ConfigureAwait(false);
-
-			if (Logger.Level >= LogSeverity.Verbose)
-			{
-				stopwatch.Stop();
-                double milliseconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2);
-
-                string log = $"{method} {path}: {milliseconds} ms";
-                if (payload != null && _config.LogLevel >= LogSeverity.Debug)
-				{
-					if (isPrivate)
-                        log += $" [Hidden]";
-                    else
-                        log += $" {requestJson}";
-				}
-                Logger.Verbose(log);
-            }
-
-			return responseJson;
+            double milliseconds = Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);            
+            return new RestResults(responseJson, milliseconds);
 		}
         
-		private async Task<string> SendFile(IRestFileRequest request, bool hasResponse)
+		private async Task<RestResults> SendFile(IRestFileRequest request, bool hasResponse)
 		{
-            var method = request.Method;
-            var path = request.Endpoint;
-            var filename = request.Filename;
-            var stream = request.Stream;
-            var isPrivate = request.IsPrivate;
+			Stopwatch stopwatch = Stopwatch.StartNew();			
+			string responseJson = await _engine.SendFile(request.Method, request.Endpoint, request.Filename, request.Stream, CancelToken).ConfigureAwait(false);
+            stopwatch.Stop();
 
-			Stopwatch stopwatch = null;
-			if (Logger.Level >= LogSeverity.Verbose)
-				stopwatch = Stopwatch.StartNew();
-			
-			string responseJson = await _engine.SendFile(method, path, filename, stream, CancelToken).ConfigureAwait(false);
-
-			if (Logger.Level >= LogSeverity.Verbose)
-			{
-				stopwatch.Stop();
-                double milliseconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2);
-
-                string log = $"{method} {path}: {milliseconds} ms";
-                if (_config.LogLevel >= LogSeverity.Debug && !isPrivate)
-                    log += $" {filename}";
-                Logger.Verbose(log);
-            }
-
-			return responseJson;
-		}
+            double milliseconds = Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
+            return new RestResults(responseJson, milliseconds);
+        }
 
 		private T DeserializeResponse<T>(string json)
 		{
