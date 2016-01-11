@@ -23,6 +23,8 @@ namespace Discord.API.Client.Rest
         public ulong? AFKChannelId { get; set; }
         [JsonProperty("afk_timeout")]
         public int AFKTimeout { get; set; }
+        [JsonProperty("splash")]
+        public string Splash { get; set; }
 
         public UpdateGuildRequest(ulong guildId)
         {
