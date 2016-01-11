@@ -4,8 +4,14 @@ namespace Discord.API.Client
 {
     public class InviteReference
     {
+        public sealed class GuildData : GuildReference
+        {
+            [JsonProperty("splash_hash")]
+            public string Splash { get; set; }
+        }
+
         [JsonProperty("guild")]
-        public GuildReference Guild { get; set; }
+        public GuildData Guild { get; set; }
         [JsonProperty("channel")]
         public ChannelReference Channel { get; set; }
         [JsonProperty("code")]
