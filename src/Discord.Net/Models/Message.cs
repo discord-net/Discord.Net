@@ -135,23 +135,23 @@ namespace Discord
 			/// <summary> Summary of this embed. </summary>
 			public string Description { get; internal set; }
 			/// <summary> Returns information about the author of this embed. </summary>
-			public EmbedReference Author { get; internal set; }
+			public EmbedLink Author { get; internal set; }
 			/// <summary> Returns information about the providing website of this embed. </summary>
-			public EmbedReference Provider { get; internal set; }
+			public EmbedLink Provider { get; internal set; }
 			/// <summary> Returns the thumbnail of this embed. </summary>
 			public File Thumbnail { get; internal set; }
 
 			internal Embed() { }
 		}
 
-		public sealed class EmbedReference
-		{
+		public sealed class EmbedLink
+        {
 			/// <summary> URL of this embed provider. </summary>
 			public string Url { get; internal set; }
 			/// <summary> Name of this embed provider. </summary>
 			public string Name { get; internal set; }
 
-			internal EmbedReference() { }
+			internal EmbedLink() { }
 		}
 
 		public class File
@@ -241,13 +241,13 @@ namespace Discord
 			{
 				Embeds = model.Embeds.Select(x =>
 				{
-					EmbedReference author = null, provider = null;
+                    EmbedLink author = null, provider = null;
 					File thumbnail = null;
 
 					if (x.Author != null)
-						author = new EmbedReference { Url = x.Author.Url, Name = x.Author.Name };
+						author = new EmbedLink { Url = x.Author.Url, Name = x.Author.Name };
 					if (x.Provider != null)
-						provider = new EmbedReference { Url = x.Provider.Url, Name = x.Provider.Name };
+						provider = new EmbedLink { Url = x.Provider.Url, Name = x.Provider.Name };
 					if (x.Thumbnail != null)
 						thumbnail = new File { Url = x.Thumbnail.Url, ProxyUrl = x.Thumbnail.ProxyUrl, Width = x.Thumbnail.Width, Height = x.Thumbnail.Height };
 

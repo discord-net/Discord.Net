@@ -12,7 +12,7 @@ namespace Discord
 	public sealed class User
     {
         internal static string GetAvatarUrl(ulong userId, string avatarId) 
-            => avatarId != null ? $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.jpg" : null;
+            => avatarId != null ? $"{DiscordConfig.ClientAPIUrl}users/{userId}/avatars/{avatarId}.jpg" : null;
 
         [Flags]
         private enum VoiceState : byte

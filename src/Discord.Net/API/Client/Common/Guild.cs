@@ -6,6 +6,20 @@ namespace Discord.API.Client
 {
     public class Guild : GuildReference
     {
+        public sealed class EmojiData
+        {
+            [JsonProperty("id")]
+            public string Id { get; set; }
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            [JsonProperty("roles"), JsonConverter(typeof(LongStringArrayConverter))]
+            public ulong[] RoleIds { get; set; }
+            [JsonProperty("require_colons")]
+            public bool RequireColons { get; set; }
+            [JsonProperty("managed")]
+            public bool IsManaged { get; set; }
+        }
+
         [JsonProperty("afk_channel_id"), JsonConverter(typeof(NullableLongStringConverter))]
         public ulong? AFKChannelId { get; set; }
         [JsonProperty("afk_timeout")]
@@ -24,13 +38,11 @@ namespace Discord.API.Client
         public string Region { get; set; }
         [JsonProperty("roles")]
         public Role[] Roles { get; set; }
-
-        //Unknown
-        [JsonProperty("splash")]
-        public object Splash { get; set; }
         [JsonProperty("features")]
-        public object Features { get; set; }
+        public string[] Features { get; set; }
         [JsonProperty("emojis")]
-        public object Emojis { get; set; }
+        public EmojiData[] Emojis { get; set; }
+        [JsonProperty("splash")]
+        public string Splash { get; set; }
     }
 }

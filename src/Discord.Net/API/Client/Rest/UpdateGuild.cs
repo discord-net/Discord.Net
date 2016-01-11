@@ -24,7 +24,7 @@ namespace Discord.API.Client.Rest
         [JsonProperty("afk_timeout")]
         public int AFKTimeout { get; set; }
         [JsonProperty("splash")]
-        public string Splash { get; set; }
+        public object Splash { get; set; }
 
         public UpdateGuildRequest(ulong guildId)
         {

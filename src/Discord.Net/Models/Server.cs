@@ -15,8 +15,24 @@ namespace Discord
 	public sealed class Server
     {
         internal static string GetIconUrl(ulong serverId, string iconId)
-            => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{serverId}/{iconId}.jpg" : null;
+            => iconId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/${serverId}/icons/${iconId}.jpg" : null;
+        internal static string GetSplashUrl(ulong serverId, string splashId)
+            => splashId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/splashes/{splashId}.jpg" : null;
 
+        public class Emoji
+        {
+            public string Id { get; }
+
+            public string Name { get; internal set; }
+            public bool IsManaged { get; internal set; }
+            public bool RequireColons { get; internal set; }
+            public IEnumerable<Role> Roles { get; internal set; }
+
+            internal Emoji(string id)
+            {
+                Id = id;
+            }
+        }
         private struct Member
         {
             public readonly User User;
@@ -27,7 +43,7 @@ namespace Discord
                 Permissions = new ServerPermissions();
                 Permissions.Lock();
             }
-        }        
+        }
 
         private readonly ConcurrentDictionary<ulong, Role> _roles;
         private readonly ConcurrentDictionary<ulong, Member> _users;
@@ -50,10 +66,16 @@ namespace Discord
         public Region Region { get; private set; }
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string IconId { get; private set; }
+        /// <summary> Gets the unique identifier for this server's custom splash image. </summary>
+        public string SplashId { get; private set; }
         /// <summary> Gets the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK voice channel, if one is set. </summary>
         public int AFKTimeout { get; private set; }
         /// <summary> Gets the date and time you joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
+        /// <summary> Gets all extra features added to this server. </summary>
+        public IEnumerable<string> Features { get; private set; }
+        /// <summary> Gets all custom emojis on this server. </summary>
+        public IEnumerable<Emoji> CustomEmojis { get; private set; }
 
         /// <summary> Gets the user that created this server. </summary>
         public User Owner => GetUser(_ownerId);
@@ -65,7 +87,8 @@ namespace Discord
         public User CurrentUser => GetUser(Client.CurrentUser.Id);
         /// <summary> Gets the URL to this user's current avatar. </summary>
         public string IconUrl => GetIconUrl(Id, IconId);
-        
+        public string SplashUrl => GetSplashUrl(Id, SplashId);
+
         /// <summary> Gets a collection of all channels in this server. </summary>
         public IEnumerable<Channel> AllChannels => _channels.Select(x => x.Value);
         /// <summary> Gets a collection of text channels in this server. </summary>
@@ -100,7 +123,6 @@ namespace Discord
 
             if (model.AFKTimeout != null)
                 AFKTimeout = model.AFKTimeout.Value;
-            _afkChannelId = model.AFKChannelId; //Can be null
             if (model.JoinedAt != null)
                 JoinedAt = model.JoinedAt.Value;
             if (model.OwnerId != null)
@@ -109,6 +131,22 @@ namespace Discord
                 Region = Client.GetRegion(model.Region);
             if (model.Icon != null)
                 IconId = model.Icon;
+            if (model.Features != null)
+                Features = model.Features;
+            if (model.Emojis != null)
+            {
+                CustomEmojis = model.Emojis.Select(x => new Emoji(x.Id)
+                {
+                    Name = x.Name,
+                    IsManaged = x.IsManaged,
+                    RequireColons = x.RequireColons,
+                    Roles = x.RoleIds.Select(y => GetRole(y)).Where(y => y != null).ToArray()
+                }).ToArray();
+            }
+
+            //Can be null
+            _afkChannelId = model.AFKChannelId;
+            SplashId = model.Splash;
 
             if (model.Roles != null)
             {
@@ -151,7 +189,8 @@ namespace Discord
                 Region = region ?? Region.Id,
                 IconBase64 = icon.Base64(iconType, IconId),
                 AFKChannelId = AFKChannel?.Id,
-                AFKTimeout = AFKTimeout
+                AFKTimeout = AFKTimeout,
+                Splash = SplashId
             };
             return Client.ClientAPI.Send(request);
         }
