@@ -19,7 +19,7 @@ namespace Discord
         internal static string GetSplashUrl(ulong serverId, string splashId)
             => splashId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/splashes/{splashId}.jpg" : null;
 
-        public class Emoji
+        public sealed class Emoji
         {
             public string Id { get; }
 
