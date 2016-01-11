@@ -432,15 +432,17 @@ namespace Discord
                         newPermissions &= ~denyRole.Permissions.Deny.RawValue;
                     foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
                         newPermissions |= allowRole.Permissions.Allow.RawValue;
-                    foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Deny.RawValue != 0))
+                    foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.Deny.RawValue != 0))
                         newPermissions &= ~denyUser.Permissions.Deny.RawValue;
-                    foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == Id && x.Permissions.Allow.RawValue != 0))
+                    foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.Allow.RawValue != 0))
                         newPermissions |= allowUser.Permissions.Allow.RawValue;
 
                     if (newPermissions.HasBit((byte)PermissionsBits.ManageRolesOrPermissions))
                         newPermissions = mask; //ManageRolesOrPermissions gives all permisions
                     else if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionsBits.ReadMessages))
                         newPermissions = 0; //No read permission on a text channel removes all other permissions
+                    else if (Type == ChannelType.Voice && !newPermissions.HasBit((byte)PermissionsBits.Connect))
+                        newPermissions = 0; //No connect permissions on a voice channel removes all other permissions
                     else
                         newPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from serverPerms, for example)
                 }
