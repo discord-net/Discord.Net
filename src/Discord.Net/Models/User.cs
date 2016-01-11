@@ -9,7 +9,7 @@ using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
-	public sealed class User
+	public sealed class User : IMentionable
     {
         internal static string GetAvatarUrl(ulong userId, string avatarId) 
             => avatarId != null ? $"{DiscordConfig.ClientAPIUrl}users/{userId}/avatars/{avatarId}.jpg" : null;

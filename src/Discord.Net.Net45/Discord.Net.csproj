@@ -424,6 +424,9 @@
     <Compile Include="..\Discord.Net\Format.cs">
       <Link>Format.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\IMentionable.cs">
+      <Link>IMentionable.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\IService.cs">
       <Link>IService.cs</Link>
     </Compile>

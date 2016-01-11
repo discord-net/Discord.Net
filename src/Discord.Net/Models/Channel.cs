@@ -12,7 +12,7 @@ using APIChannel = Discord.API.Client.Channel;
 
 namespace Discord
 {
-    public sealed class Channel
+    public sealed class Channel : IMentionable
     {
         private struct Member
         {

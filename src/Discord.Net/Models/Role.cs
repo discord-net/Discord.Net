@@ -9,7 +9,7 @@ using APIRole = Discord.API.Client.Role;
 
 namespace Discord
 {
-	public sealed class Role
+	public sealed class Role : IMentionable
     {
         internal DiscordClient Client => Server.Client;
 
@@ -37,16 +37,7 @@ namespace Discord
         public IEnumerable<User> Members => IsEveryone ? Server.Users : Server.Users.Where(x => x.HasRole(this));
 
         /// <summary> Gets the string used to mention this role. </summary>
-        public string Mention
-        {
-            get
-            {
-                if (IsEveryone)
-                    return "@everyone";
-                else
-                    throw new InvalidOperationException("Roles may only be mentioned if IsEveryone is true");
-            }
-        }
+        public string Mention => IsEveryone ? "@everyone" : "";
 
 		internal Role(ulong id, Server server)
 		{
