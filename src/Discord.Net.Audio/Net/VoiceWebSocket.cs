@@ -272,24 +272,6 @@ namespace Discord.Net.WebSockets
                     voicePacket = new byte[MaxOpusSize + 12];
 
                 pingPacket = new byte[8];
-                pingPacket[0] = 0x80; //Flags;
-                pingPacket[1] = 0xC9; //Payload Type
-                pingPacket[2] = 0x00; //Length
-                pingPacket[3] = 0x01; //Length (1*8 bytes)
-                pingPacket[4] = (byte)((_ssrc >> 24) & 0xFF);
-                pingPacket[5] = (byte)((_ssrc >> 16) & 0xFF);
-                pingPacket[6] = (byte)((_ssrc >> 8) & 0xFF);
-                pingPacket[7] = (byte)((_ssrc >> 0) & 0xFF);
-                if (_isEncrypted)
-                {
-                    Buffer.BlockCopy(pingPacket, 0, nonce, 0, 8);
-                    int ret = SecretBox.Encrypt(pingPacket, 8, encodedFrame, 0, nonce, _secretKey);
-                    if (ret != 0)
-                        throw new InvalidOperationException("Failed to encrypt ping packet");
-                    pingPacket = new byte[pingPacket.Length + 16];
-                    Buffer.BlockCopy(encodedFrame, 0, pingPacket, 0, pingPacket.Length);
-                    Array.Clear(nonce, 0, nonce.Length);
-                }
 
                 int rtpPacketLength = 0;
                 voicePacket[0] = 0x80; //Flags;
@@ -358,6 +340,18 @@ namespace Discord.Net.WebSockets
                         //Is it time to send out another ping?
                         if (currentTicks > nextPingTicks)
                         {
+                            //Increment in LE
+                            for (int i = 0; i < 8; i++)
+                            {
+                                var b = pingPacket[i];
+                                if (b == byte.MaxValue)
+                                    pingPacket[i] = 0;
+                                else
+                                {
+                                    pingPacket[i] = (byte)(b + 1);
+                                    break;
+                                }
+                            }
                             _udp.Send(pingPacket, pingPacket.Length);
                             nextPingTicks = currentTicks + 5 * ticksPerSeconds;
                         }
