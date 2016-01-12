@@ -1,5 +1,6 @@
 ﻿using Discord.API.Client;
 using Discord.API.Client.GatewaySocket;
+using Discord.API.Client.Rest;
 using Discord.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -34,6 +35,11 @@ namespace Discord.Net.WebSockets
 
         public async Task Connect()
         {
+            var gatewayResponse = await _client.ClientAPI.Send(new GatewayRequest()).ConfigureAwait(false);
+            Host = gatewayResponse.Url;
+            if (Logger.Level >= LogSeverity.Verbose)
+                Logger.Verbose($"Login successful, gateway: {gatewayResponse.Url}");
+
             await BeginConnect().ConfigureAwait(false);
             if (SessionId == null)
                 SendIdentify(Token);
@@ -49,6 +55,7 @@ namespace Discord.Net.WebSockets
 				    await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
                 else
                     await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+
                 while (!cancelToken.IsCancellationRequested)
 				{
 					try

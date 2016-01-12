@@ -159,8 +159,8 @@ namespace Discord
         }
 
         /// <summary> Connects to the Discord server with the provided email and password. </summary>
-        /// <returns> Returns a token that can be optionally stored for future connections. </returns>
-        public async Task<string> Connect(string email, string password)
+        /// <returns> Returns a token that can be optionally stored to speed up future connections. </returns>
+        public async Task<string> Connect(string email, string password, string token = null)
         {
             if (email == null) throw new ArgumentNullException(email);
             if (password == null) throw new ArgumentNullException(password);
@@ -168,13 +168,13 @@ namespace Discord
             await BeginConnect(email, password, null).ConfigureAwait(false);
             return ClientAPI.Token;
         }
-        /// <summary> Connects to the Discord server with the provided token. </summary>
+        /*/// <summary> Connects to the Discord server with the provided token. </summary>
         public async Task Connect(string token)
         {
             if (token == null) throw new ArgumentNullException(token);
 
             await BeginConnect(null, null, token).ConfigureAwait(false);
-        }
+        }*/
 
         private async Task BeginConnect(string email, string password, string token = null)
         {
@@ -222,65 +222,40 @@ namespace Discord
                 throw;
             }
         }
-        private async Task Login(string email, string password, string token)
+        private async Task Login(string email, string password, string token = null)
         {
-            bool useCache = Config.CacheToken;
-            while (true)
+            string tokenPath = null, oldToken = null;
+            byte[] cacheKey = null;
+
+            //Get Token
+            if (token == null && Config.CacheToken)
             {
-                //Get Token
-                if (token == null)
-                {
-                    if (useCache)
-                    {
-                        Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
-                            new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
-                        byte[] key = deriveBytes.GetBytes(16);
+                Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
+                    new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
+                cacheKey = deriveBytes.GetBytes(16);
 
-                        string tokenPath = GetTokenCachePath(email);
-                        token = LoadToken(tokenPath, key);
-                        if (token == null)
-                        {
-                            var request = new LoginRequest() { Email = email, Password = password };
-                            var response = await ClientAPI.Send(request).ConfigureAwait(false);
-                            token = response.Token;
-                            SaveToken(tokenPath, key, token);
-                            useCache = false;
-                        }
-                    }
-                    else
-                    {
-                        var request = new LoginRequest() { Email = email, Password = password };
-                        var response = await ClientAPI.Send(request).ConfigureAwait(false);
-                        token = response.Token;
-                    }
-                }
-
-                ClientAPI.Token = token;
-                GatewaySocket.Token = token;
-                GatewaySocket.SessionId = null;
-
-                //Get gateway and check token
-                try
-                {
-                    var gatewayResponse = await ClientAPI.Send(new GatewayRequest()).ConfigureAwait(false);
-                    var gateway = gatewayResponse.Url;
-                    GatewaySocket.Host = gateway;
-                    if (Config.LogLevel >= LogSeverity.Verbose)
-                        Logger.Verbose($"Login successful, gateway: {gateway}");
-                }
-                catch (HttpException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized && useCache)
-                {
-                    useCache = false; //Cached token is bad, retry without cache
-                    token = null;
-                    continue;
-                }
-
-                //Cache other stuff
-                var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
-                _regions = regionsResponse.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port, x.Vip))
-                    .ToDictionary(x => x.Id);
-                break;
+                tokenPath = GetTokenCachePath(email);
+                oldToken = LoadToken(tokenPath, cacheKey);
+                ClientAPI.Token = oldToken;
             }
+            else
+                ClientAPI.Token = token;
+                
+            var request = new LoginRequest() { Email = email, Password = password };
+            var response = await ClientAPI.Send(request).ConfigureAwait(false);
+            token = response.Token;
+            if (Config.CacheToken && token != oldToken)
+                SaveToken(tokenPath, cacheKey, token);
+
+            ClientAPI.Token = token;
+
+            GatewaySocket.Token = token;
+            GatewaySocket.SessionId = null;
+
+            //Cache other stuff
+            var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
+            _regions = regionsResponse.Select(x => new Region(x.Id, x.Name, x.Hostname, x.Port, x.Vip))
+                .ToDictionary(x => x.Id);
         }
         private void EndConnect()
         {
