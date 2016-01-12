@@ -30,7 +30,7 @@ namespace Discord
         public const string LibUrl = "https://github.com/RogueException/Discord.Net";
 
         public const string ClientAPIUrl = "https://discordapp.com/api/";
-        public const string StatusAPIUrl = "https://status.discordapp.com/api/v2/";
+        public const string StatusAPIUrl = "https://srhpyqt94yxb.statuspage.io/api/v2/"; //"https://status.discordapp.com/api/v2/";
         //public const string CDNUrl = "https://cdn.discordapp.com/";
         public const string InviteUrl = "https://discord.gg/";
 

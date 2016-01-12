@@ -3,10 +3,10 @@
 namespace Discord.API.Status.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetUpcomingIncidentsRequest : IRestRequest<Incident>
+    public sealed class GetAllIncidentsRequest : IRestRequest<StatusResult>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"scheduled-maintenances/upcoming.json";
+        string IRestRequest.Endpoint => $"incidents.json";
         object IRestRequest.Payload => null;
         bool IRestRequest.IsPrivate => false;
     }

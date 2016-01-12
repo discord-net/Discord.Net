@@ -370,14 +370,20 @@
     <Compile Include="..\Discord.Net\API\IRestRequest.cs">
       <Link>API\IRestRequest.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Status\Common\Incident.cs">
-      <Link>API\Status\Common\Incident.cs</Link>
+    <Compile Include="..\Discord.Net\API\Status\Common\StatusResult.cs">
+      <Link>API\Status\Common\StatusResult.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Status\Rest\Active.cs">
-      <Link>API\Status\Rest\Active.cs</Link>
+    <Compile Include="..\Discord.Net\API\Status\Rest\ActiveMaintenances.cs">
+      <Link>API\Status\Rest\ActiveMaintenances.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Status\Rest\Upcoming.cs">
-      <Link>API\Status\Rest\Upcoming.cs</Link>
+    <Compile Include="..\Discord.Net\API\Status\Rest\AllIncidents.cs">
+      <Link>API\Status\Rest\AllIncidents.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Status\Rest\UnresolvedIncidents.cs">
+      <Link>API\Status\Rest\UnresolvedIncidents.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\API\Status\Rest\UpcomingMaintenances.cs">
+      <Link>API\Status\Rest\UpcomingMaintenances.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\ChannelEventArgs.cs">
       <Link>ChannelEventArgs.cs</Link>

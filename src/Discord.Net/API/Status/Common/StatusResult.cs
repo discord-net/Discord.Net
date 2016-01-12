@@ -1,10 +1,9 @@
-﻿using Discord.API.Converters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 
 namespace Discord.API.Status
 {
-    public class Incident
+    public class StatusResult
     {
         public sealed class PageData
         {
@@ -37,7 +36,7 @@ namespace Discord.API.Status
             [JsonProperty("created_at")]
             public DateTime CreatedAt { get; set; }
             [JsonProperty("updated_at")]
-            public DateTime? UpdatedAt { get; set; }
+            public DateTime UpdatedAt { get; set; }
             [JsonProperty("monitoring_at")]
             public DateTime? MonitoringAt { get; set; }
             [JsonProperty("resolved_at")]
@@ -55,8 +54,8 @@ namespace Discord.API.Status
         {
             [JsonProperty("id")]
             public string Id { get; set; }
-            /*[JsonProperty("incident_id")]
-            public string IncidentId { get; set; }*/
+            [JsonProperty("incident_id")]
+            public string IncidentId { get; set; }
             [JsonProperty("status")]
             public string Status { get; set; }
             [JsonProperty("body")]
@@ -75,5 +74,7 @@ namespace Discord.API.Status
         public PageData Page { get; set; }
         [JsonProperty("scheduled_maintenances")]
         public IncidentData[] ScheduledMaintenances { get; set; }
+        [JsonProperty("incidents")]
+        public IncidentData[] Incidents { get; set; }
     }
 }
