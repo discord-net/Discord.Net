@@ -160,7 +160,7 @@ namespace Discord
 			public string Url { get; internal set; }
 			/// <summary> Preview url for this file. </summary>
 			public string ProxyUrl { get; internal set; }
-			/// <summary> Width of the this file, if it is an image. </summary>
+			/// <summary> Width of this file, if it is an image. </summary>
 			public int? Width { get; internal set; }
 			/// <summary> Height of this file, if it is an image. </summary>
 			public int? Height { get; internal set; }
