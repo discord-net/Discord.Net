@@ -17,7 +17,7 @@ namespace Discord.Audio
 		public int FrameSize => _frameSize;
 		public int FrameCount => _frameCount;
 		public ushort ReadPos => _readCursor;
-		public ushort WritePos => _readCursor;
+		public ushort WritePos => _writeCursor;
 
 		public VoiceBuffer(int frameCount, int frameSize)
 		{
