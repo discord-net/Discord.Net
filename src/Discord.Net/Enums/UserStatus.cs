@@ -29,10 +29,12 @@
 			}
 		}
 
-		public static implicit operator UserStatus(string value) => FromString(value);
-		public static bool operator ==(UserStatus a, UserStatus b) => a?.Value == b?.Value;
-		public static bool operator !=(UserStatus a, UserStatus b) => a?.Value != b?.Value;
-		public override bool Equals(object obj) => (obj as UserStatus)?.Value == Value;
-		public override int GetHashCode() => Value.GetHashCode();
-	}
+
+        public static implicit operator UserStatus(string value) => FromString(value);
+        public static bool operator ==(UserStatus a, UserStatus b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(UserStatus a, UserStatus b) => !(a == b);
+        public override int GetHashCode() => Value.GetHashCode();
+        public override bool Equals(object obj) => (obj as UserStatus)?.Equals(this) ?? false;
+        public bool Equals(UserStatus type) => type != null && type.Value == Value;
+    }
 }

@@ -77,7 +77,7 @@ namespace Discord
 		public bool ManageChannel { get { return GetBit(PermissionsBits.ManageChannel); } set { SetBit(PermissionsBits.ManageChannel, value); } }
 	}
 
-	public abstract class Permissions
+	public abstract class Permissions : IEquatable<Permissions>
 	{
 		private bool _isLocked;
 		private uint _rawValue;
@@ -144,8 +144,11 @@ namespace Discord
 				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
 		}
 
-		public override bool Equals(object obj) => obj is Permissions && (obj as Permissions)._rawValue == _rawValue;
-		public override int GetHashCode() => unchecked(_rawValue.GetHashCode() + 393);
+        public static bool operator ==(Permissions a, Permissions b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(Permissions a, Permissions b) => !(a == b);
+        public override int GetHashCode() => _rawValue.GetHashCode();
+        public override bool Equals(object obj) => (obj as Permissions)?.Equals(this) ?? false;
+        public bool Equals(Permissions permission) => permission?._rawValue == _rawValue;
     }
 
 	public sealed class DualChannelPermissions
@@ -231,9 +234,10 @@ namespace Discord
 		}
 		public DualChannelPermissions Copy() => new DualChannelPermissions(Allow.RawValue, Deny.RawValue);
 
-		public override bool Equals(object obj) => obj is DualChannelPermissions && 
-			(obj as DualChannelPermissions).Allow.Equals(Allow) &&
-			(obj as DualChannelPermissions).Deny.Equals(Deny);
-		public override int GetHashCode() => unchecked(Allow.GetHashCode() + Deny.GetHashCode() + 1724);
-	}
+        public static bool operator ==(DualChannelPermissions a, DualChannelPermissions b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(DualChannelPermissions a, DualChannelPermissions b) => !(a == b);
+        public override int GetHashCode() => Allow.GetHashCode() ^ Deny.GetHashCode();
+        public override bool Equals(object obj) => (obj as DualChannelPermissions)?.Equals(this) ?? false;
+        public bool Equals(DualChannelPermissions permission) => permission != null && permission.Allow == Allow && permission.Deny == Deny;
+    }
 }

@@ -25,10 +25,11 @@
 			}
 		}
 
-		public static implicit operator PermissionTarget(string value) => FromString(value);
-		public static bool operator ==(PermissionTarget a, PermissionTarget b) => a?.Value == b?.Value;
-		public static bool operator !=(PermissionTarget a, PermissionTarget b) => a?.Value != b?.Value;
-		public override bool Equals(object obj) => (obj as PermissionTarget)?.Value == Value;
-		public override int GetHashCode() => Value.GetHashCode();
-	}
+        public static implicit operator PermissionTarget(string value) => FromString(value);
+        public static bool operator ==(PermissionTarget a, PermissionTarget b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(PermissionTarget a, PermissionTarget b) => !(a == b);
+        public override int GetHashCode() => Value.GetHashCode();
+        public override bool Equals(object obj) => (obj as PermissionTarget)?.Equals(this) ?? false;
+        public bool Equals(PermissionTarget type) => type != null && type.Value == Value;
+    }
 }

@@ -1,6 +1,8 @@
-﻿namespace Discord
+﻿using System;
+
+namespace Discord
 {
-	public sealed class ChannelType : StringEnum
+	public sealed class ChannelType : StringEnum, IEquatable<ChannelType>
 	{
 		/// <summary> A text-only channel. </summary>
 		public static ChannelType Text { get; } = new ChannelType("text");
@@ -25,10 +27,11 @@
 			}
 		}
 
-		public static implicit operator ChannelType(string value) => FromString(value);
-		public static bool operator ==(ChannelType a, ChannelType b) => a?.Value == b?.Value;
-		public static bool operator !=(ChannelType a, ChannelType b) => a?.Value != b?.Value;
-		public override bool Equals(object obj) => (obj as ChannelType)?.Value == Value;
-		public override int GetHashCode() => Value.GetHashCode();
-	}
+        public static implicit operator ChannelType(string value) => FromString(value);
+        public static bool operator ==(ChannelType a, ChannelType b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(ChannelType a, ChannelType b) => !(a == b);
+        public override int GetHashCode() => Value.GetHashCode();
+        public override bool Equals(object obj) => (obj as ChannelType)?.Equals(this) ?? false;
+        public bool Equals(ChannelType type) => type != null && type.Value == Value;
+    }
 }

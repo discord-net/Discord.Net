@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-	public sealed class Color
+	public sealed class Color : IEquatable<Color>
 	{
 		public static readonly Color Default = PresetColor(0);
 
@@ -77,8 +77,12 @@ namespace Discord
             _rawValue = (_rawValue & mask) | ((uint)value << bit);
 		}
 
-		public override bool Equals(object obj) => obj is Color && (obj as Color)._rawValue == _rawValue;
-		public override int GetHashCode() => unchecked(_rawValue.GetHashCode() + 1678);
-		public override string ToString() => '#' + _rawValue.ToString("X");
-	}
+        public static bool operator ==(Color a, Color b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
+        public static bool operator !=(Color a, Color b) => !(a == b);
+        public override int GetHashCode() => _rawValue.GetHashCode();
+        public override bool Equals(object obj) => (obj as Color)?.Equals(this) ?? false;
+        public bool Equals(Color color) => color != null && color._rawValue == _rawValue;
+
+        public override string ToString() => '#' + _rawValue.ToString("X");
+    }
 }
