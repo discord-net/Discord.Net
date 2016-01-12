@@ -176,9 +176,9 @@ namespace Discord
             else if (model.IsServerMuted == false)
                 _voiceState &= ~VoiceState.ServerMuted;
 
-            if (model.IsServerDeafened.Value == true)
+            if (model.IsServerDeafened == true)
                 _voiceState |= VoiceState.ServerDeafened;
-            else if (model.IsServerDeafened.Value == false)
+            else if (model.IsServerDeafened == false)
                 _voiceState &= ~VoiceState.ServerDeafened;
         }
 		internal void Update(MemberPresence model)
