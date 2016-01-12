@@ -498,9 +498,7 @@ namespace Discord
         public void RequestOfflineUsers()
             => Client.GatewaySocket.SendRequestMembers(Id, "", 0);
         #endregion
-
-        public override bool Equals(object obj) => obj is Server && (obj as Server).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 5175);
+        
 		public override string ToString() => Name ?? Id.ToIdString();
 	}
 }

@@ -332,11 +332,13 @@ namespace Discord
         public Task<Message> SendMessage(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
+            if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
             return SendMessageInternal(text, false);
         }
         public Task<Message> SendTTSMessage(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
+            if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
             return SendMessageInternal(text, true);
         }
         private async Task<Message> SendMessageInternal(string text, bool isTTS)
@@ -596,8 +598,6 @@ namespace Discord
         }
         #endregion
 
-        public override bool Equals(object obj) => obj is Channel && (obj as Channel).Id == Id;
-        public override int GetHashCode() => unchecked(Id.GetHashCode() + 5658);
         public override string ToString() => Name ?? Id.ToIdString();
     }
 }

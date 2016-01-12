@@ -117,14 +117,7 @@ namespace Discord
             try { await Client.ClientAPI.Send(new DeleteRoleRequest(Server.Id, Id)).ConfigureAwait(false); }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
-
-        public override bool Equals(object obj) => obj is Role && (obj as Role).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 6653);
+        
 		public override string ToString() => Name ?? Id.ToIdString();
-
-        internal object Where(Func<object, bool> p)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
