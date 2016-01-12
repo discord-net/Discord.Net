@@ -210,13 +210,13 @@ namespace Discord.Audio
         /// <param name="count">Number of bytes in this frame. </param>
         public void Send(byte[] data, int offset, int count)
 		{
-			if (data == null) throw new ArgumentException(nameof(data));
-			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (data == null) throw new ArgumentException(nameof(data));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(count));
             if (VoiceSocket.Server == null) return; //Has been closed
+            if (count == 0) return;
 
-            if (count != 0)
-				VoiceSocket.SendPCMFrames(data, offset, count);
+	        VoiceSocket.SendPCMFrames(data, offset, count);
 		}
 
         /// <summary> Clears the PCM buffer. </summary>
