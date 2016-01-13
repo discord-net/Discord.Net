@@ -99,10 +99,10 @@ namespace Discord.Net.WebSockets
 			try
             {
                 State = ConnectionState.Connected;
-
-				_connectedEvent.Set();
                 Logger.Info($"Connected");
+
                 OnConnected();
+                _connectedEvent.Set();
 			}
 			catch (Exception ex)
             {
@@ -173,7 +173,10 @@ namespace Discord.Net.WebSockets
             try
             {
                 if (!_connectedEvent.Wait(_client.Config.ConnectionTimeout, cancelToken))
-                    throw new TimeoutException();
+                {
+                    if (State != ConnectionState.Connected)
+                        throw new TimeoutException();
+                }
             }
             catch (OperationCanceledException)
             {
