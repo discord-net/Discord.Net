@@ -168,13 +168,13 @@ namespace Discord
             await BeginConnect(email, password, null).ConfigureAwait(false);
             return ClientAPI.Token;
         }
-        /*/// <summary> Connects to the Discord server with the provided token. </summary>
+        /// <summary> Connects to the Discord server with the provided token. </summary>
         public async Task Connect(string token)
         {
             if (token == null) throw new ArgumentNullException(token);
 
             await BeginConnect(null, null, token).ConfigureAwait(false);
-        }*/
+        }
 
         private async Task BeginConnect(string email, string password, string token = null)
         {
@@ -222,7 +222,7 @@ namespace Discord
                 throw;
             }
         }
-        private async Task Login(string email, string password, string token = null)
+        private async Task Login(string email = null, string password = null, string token = null)
         {
             string tokenPath = null, oldToken = null;
             byte[] cacheKey = null;

@@ -208,7 +208,7 @@ namespace Discord
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
         public bool IsAuthor => User != null && User.Id == Client.CurrentUser?.Id;
 
-		internal Message(ulong id, Channel channel, User user)
+        internal Message(ulong id, Channel channel, User user)
 		{
             Id = id;
             Channel = channel;

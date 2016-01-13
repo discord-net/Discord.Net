@@ -5,14 +5,14 @@ namespace Discord.API.Client.Rest
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class LoginRequest : IRestRequest<LoginResponse>
 	{
-        string IRestRequest.Method => "POST";
+        string IRestRequest.Method => Email != null ? "POST" : "GET";
         string IRestRequest.Endpoint => $"auth/login";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
-        [JsonProperty("email")]
+        [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
 		public string Email { get; set; }
-		[JsonProperty("password")]
+		[JsonProperty("password", NullValueHandling = NullValueHandling.Ignore)]
 		public string Password { get; set; }
     }
 
