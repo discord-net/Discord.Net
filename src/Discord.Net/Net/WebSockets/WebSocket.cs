@@ -73,7 +73,7 @@ namespace Discord.Net.WebSockets
 		{
             try
             {
-                using (await _lock.LockAsync())
+                using (await _lock.LockAsync().ConfigureAwait(false))
                 {
                     await _taskManager.Stop().ConfigureAwait(false);
                     _taskManager.ClearException();
@@ -90,7 +90,7 @@ namespace Discord.Net.WebSockets
 			catch (Exception ex)
 			{
                 //TODO: Should this be inside the lock?
-                await _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex).ConfigureAwait(false);
                 throw;
 			}
 		}
@@ -106,7 +106,7 @@ namespace Discord.Net.WebSockets
 			}
 			catch (Exception ex)
             {
-                await _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex).ConfigureAwait(false);
             }
 		}
 

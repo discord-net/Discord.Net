@@ -46,7 +46,7 @@ namespace Discord
                 if (task != null)
                     await Stop().ConfigureAwait(false);
 
-                using (await _lock.LockAsync())
+                using (await _lock.LockAsync().ConfigureAwait(false))
                 {
                     _cancelSource = cancelSource;
 
@@ -67,14 +67,14 @@ namespace Discord
 
                         //Signal the rest of the tasks to stop
                         if (firstTask.Exception != null)
-                            await SignalError(firstTask.Exception);
+                            await SignalError(firstTask.Exception).ConfigureAwait(false);
                         else
-                            await SignalStop();
+                            await SignalStop().ConfigureAwait(false);
 
                         //Wait for the other tasks, and signal their errors too just in case
                         try { await allTasks.ConfigureAwait(false); }
-                        catch (AggregateException ex) { await SignalError(ex.InnerExceptions.First()); } 
-                        catch (Exception ex) { await SignalError(ex); }
+                        catch (AggregateException ex) { await SignalError(ex.InnerExceptions.First()).ConfigureAwait(false); } 
+                        catch (Exception ex) { await SignalError(ex).ConfigureAwait(false); }
 
                         //Run the cleanup function within our lock
                         if (_stopAction != null)
@@ -89,7 +89,7 @@ namespace Discord
 
         public async Task SignalStop(bool isExpected = false)
         {
-            using (await _lock.LockAsync())
+            using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (isExpected)
                     _wasStopExpected = true;
@@ -104,7 +104,7 @@ namespace Discord
         public async Task Stop(bool isExpected = false)
         {
             Task task;
-            using (await _lock.LockAsync())
+            using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (isExpected)
                     _wasStopExpected = true;
@@ -116,12 +116,12 @@ namespace Discord
                 if (!_cancelSource.IsCancellationRequested && _cancelSource != null)
                     _cancelSource.Cancel();
             }
-            await task;
+            await task.ConfigureAwait(false);
         }
 
         public async Task SignalError(Exception ex)
         {
-            using (await _lock.LockAsync())
+            using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (_stopReason != null) return;
 
@@ -133,7 +133,7 @@ namespace Discord
         public async Task Error(Exception ex)
         {
             Task task;
-            using (await _lock.LockAsync())
+            using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (_stopReason != null) return;
 
@@ -146,7 +146,7 @@ namespace Discord
                         _cancelSource.Cancel();
                 }
             }
-            await task;
+            await task.ConfigureAwait(false);
         }
 
         /// <summary> Throws an exception if one was captured. </summary>

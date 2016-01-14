@@ -92,7 +92,7 @@ namespace Discord.Net.Rest
                         var now = DateTime.UtcNow;
                         if (now >= _rateLimitTime)
                         {
-                            using (await _rateLimitLock.LockAsync())
+                            using (await _rateLimitLock.LockAsync().ConfigureAwait(false))
                             {
                                 if (now >= _rateLimitTime)
                                 {

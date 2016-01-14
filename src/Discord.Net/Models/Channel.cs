@@ -366,7 +366,7 @@ namespace Discord
         public async Task<Message> SendFile(string filePath)
         { 
             using (var stream = File.OpenRead(filePath))
-                return await SendFile(Path.GetFileName(filePath), stream);
+                return await SendFile(Path.GetFileName(filePath), stream).ConfigureAwait(false);
         }
         public async Task<Message> SendFile(string filename, Stream stream)
         {

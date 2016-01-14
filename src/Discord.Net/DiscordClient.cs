@@ -180,7 +180,7 @@ namespace Discord
         {
             try
             {
-                using (await _connectionLock.LockAsync())
+                using (await _connectionLock.LockAsync().ConfigureAwait(false))
                 {
                     if (State != ConnectionState.Disconnected)
                         await Disconnect().ConfigureAwait(false);
@@ -218,7 +218,7 @@ namespace Discord
             }
             catch (Exception ex)
             {
-                await _taskManager.SignalError(ex);
+                await _taskManager.SignalError(ex).ConfigureAwait(false);
                 throw;
             }
         }
@@ -268,19 +268,20 @@ namespace Discord
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
-        public async Task Disconnect()
-        {
-            if (State == ConnectionState.Connected)
-			    await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
-            await _taskManager.Stop(true).ConfigureAwait(false);
-        }
+        public Task Disconnect() => _taskManager.Stop(true);
 		private async Task Cleanup()
         {
+            var oldState = State;
             State = ConnectionState.Disconnecting;
+
+            if (oldState == ConnectionState.Connected)
+                await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
+
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
 
-            await GatewaySocket.Disconnect();
+
+            await GatewaySocket.Disconnect().ConfigureAwait(false);
             ClientAPI.Token = null;
             GatewaySocket.Token = null;
             GatewaySocket.SessionId = null;

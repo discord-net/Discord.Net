@@ -130,7 +130,7 @@ namespace Discord.Net.Rest
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             OnSendingRequest(request);
-            var results = await SendFile(request, false);
+            var results = await SendFile(request, false).ConfigureAwait(false);
             OnSentRequest(request, null, null, results.Milliseconds);
         }
 

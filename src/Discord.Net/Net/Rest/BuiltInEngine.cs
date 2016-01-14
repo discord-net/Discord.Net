@@ -58,7 +58,7 @@ namespace Discord.Net.Rest
             {
                 if (json != null)
                     request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                return await Send(request, cancelToken);
+                return await Send(request, cancelToken).ConfigureAwait(false);
             }
         }
 		public async Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken)
@@ -68,7 +68,7 @@ namespace Discord.Net.Rest
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 content.Add(new StreamContent(File.OpenRead(path)), "file", filename);
                 request.Content = content;
-                return await Send(request, cancelToken);
+                return await Send(request, cancelToken).ConfigureAwait(false);
             }
         }
 		private async Task<string> Send(HttpRequestMessage request, CancellationToken cancelToken)
@@ -103,7 +103,7 @@ namespace Discord.Net.Rest
                         var now = DateTime.UtcNow;
                         if (now >= _rateLimitTime)
                         {
-                            using (await _rateLimitLock.LockAsync())
+                            using (await _rateLimitLock.LockAsync().ConfigureAwait(false))
                             {
                                 if (now >= _rateLimitTime)
                                 {
@@ -120,7 +120,7 @@ namespace Discord.Net.Rest
                 else if (statusCode < 200 || statusCode >= 300) //2xx = Success
                     throw new HttpException(response.StatusCode);
                 else
-                    return await response.Content.ReadAsStringAsync();
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
 		}
 

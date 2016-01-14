@@ -116,7 +116,7 @@ namespace Discord.Net
 
                     IQueuedAction queuedAction;
                     while (_pendingActions.TryDequeue(out queuedAction))
-                        await queuedAction.Do(this);
+                        await queuedAction.Do(this).ConfigureAwait(false);
 
                     await Task.Delay(interval).ConfigureAwait(false);
                 }
