@@ -535,8 +535,8 @@
     <Compile Include="..\Discord.Net\ProfileEventArgs.cs">
       <Link>ProfileEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\RelativeDirection.cs">
-      <Link>RelativeDirection.cs</Link>
+    <Compile Include="..\Discord.Net\Relative.cs">
+      <Link>Relative.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\RoleEventArgs.cs">
       <Link>RoleEventArgs.cs</Link>

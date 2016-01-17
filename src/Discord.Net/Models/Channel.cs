@@ -283,7 +283,7 @@ namespace Discord
         }
 
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
-            RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+            Relative relativeDir = Relative.Before, bool useCache = true)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0 || Type != ChannelType.Text) return new Message[0];
@@ -293,7 +293,7 @@ namespace Discord
                 var request = new GetMessagesRequest(Id)
                 {
                     Limit = limit,
-                    RelativeDir = relativeMessageId.HasValue ? relativeDir == RelativeDirection.Before ? "before" : "after" : null,
+                    RelativeDir = relativeMessageId.HasValue ? relativeDir == Relative.Before ? "before" : "after" : null,
                     RelativeId = relativeMessageId ?? 0
                 };
                 var msgs = await Client.ClientAPI.Send(request).ConfigureAwait(false);

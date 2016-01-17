@@ -163,7 +163,7 @@ namespace Discord.Legacy
         }
 
         [Obsolete("Use Channel.DownloadMessages")]
-        public static Task<Message[]> DownloadMessages(this DiscordClient client, Channel channel, int limit = 100, ulong? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+        public static Task<Message[]> DownloadMessages(this DiscordClient client, Channel channel, int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before, bool useCache = true)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.DownloadMessages(limit, relativeMessageId, relativeDir, useCache);
