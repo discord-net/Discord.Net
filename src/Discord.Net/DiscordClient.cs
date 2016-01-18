@@ -1040,8 +1040,8 @@ namespace Discord
         #endregion
 
         #region Async Wrapper
-        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-        public void Run(Func<Task> asyncAction)
+        /// <summary> Blocking call that will execute the provided async method and wait until client has been manually stopped. This is mainly intended for use in console applications. </summary>
+        public void ExecuteAndWait(Func<Task> asyncAction)
         {
             try
             {
@@ -1050,7 +1050,7 @@ namespace Discord
             catch (TaskCanceledException) { }
             _disconnectedEvent.WaitOne();
         }
-        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+        /// <summary> Blocking call and wait until client has been manually stopped. This is mainly intended for use in console applications. </summary>
         public void Wait()
         {
             _disconnectedEvent.WaitOne();
