@@ -1043,11 +1043,7 @@ namespace Discord
         /// <summary> Blocking call that will execute the provided async method and wait until client has been manually stopped. This is mainly intended for use in console applications. </summary>
         public void ExecuteAndWait(Func<Task> asyncAction)
         {
-            try
-            {
-                AsyncContext.Run(asyncAction);
-            }
-            catch (TaskCanceledException) { }
+            asyncAction().GetAwaiter().GetResult();
             _disconnectedEvent.WaitOne();
         }
         /// <summary> Blocking call and wait until client has been manually stopped. This is mainly intended for use in console applications. </summary>
