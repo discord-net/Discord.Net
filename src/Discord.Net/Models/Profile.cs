@@ -8,6 +8,8 @@ namespace Discord
 {
     public sealed class Profile
     {
+        private readonly static Action<Profile, Profile> _cloner = DynamicIL.CreateCloner<Profile>();
+
         internal DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this user. </summary>
@@ -74,6 +76,14 @@ namespace Discord
                 Client.GatewaySocket.SessionId = null;
             }
         }
+
+        internal Profile Clone()
+        {
+            var result = new Profile();
+            _cloner(this, result);
+            return result;
+        }
+        private Profile() { } //Used for cloning
 
         public override string ToString() => Id.ToIdString();
     }

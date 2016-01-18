@@ -3,8 +3,10 @@
 namespace Discord
 {
 	public sealed class Color : IEquatable<Color>
-	{
-		public static readonly Color Default = PresetColor(0);
+    {
+        private readonly static Action<Color, Color> _cloner = DynamicIL.CreateCloner<Color>();
+
+        public static readonly Color Default = PresetColor(0);
 
 		public static readonly Color Teal = PresetColor(0x1ABC9C);
 		public static readonly Color DarkTeal = PresetColor(0x11806A);
@@ -82,6 +84,14 @@ namespace Discord
         public override int GetHashCode() => _rawValue.GetHashCode();
         public override bool Equals(object obj) => (obj as Color)?.Equals(this) ?? false;
         public bool Equals(Color color) => color != null && color._rawValue == _rawValue;
+
+        internal Color Clone()
+        {
+            var result = new Color();
+            _cloner(this, result);
+            return result;
+        }
+        private Color() { } //Used for cloning
 
         public override string ToString() => '#' + _rawValue.ToString("X");
     }

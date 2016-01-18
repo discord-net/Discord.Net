@@ -14,6 +14,8 @@ namespace Discord
 {
     public sealed class Channel : IMentionable
     {
+        private readonly static Action<Channel, Channel> _cloner = DynamicIL.CreateCloner<Channel>();
+
         private struct Member
         {
             public readonly User User;
@@ -102,7 +104,7 @@ namespace Discord
                 return Enumerable.Empty<User>();
             }
         }
-
+                
         internal Channel(DiscordClient client, ulong id, Server server)
             : this(client, id)
         {
@@ -597,6 +599,14 @@ namespace Discord
             return result.User;
         }
         #endregion
+
+        internal Channel Clone()
+        {
+            var result = new Channel();
+            _cloner(this, result);
+            return result;
+        }
+        private Channel() { }
 
         public override string ToString() => Name ?? Id.ToIdString();
     }

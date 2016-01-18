@@ -9,8 +9,10 @@ using APIInvite = Discord.API.Client.Invite;
 namespace Discord
 {
 	public sealed class Invite
-	{
-		public sealed class ServerInfo
+    {
+        private readonly static Action<Invite, Invite> _cloner = DynamicIL.CreateCloner<Invite>();
+
+        public sealed class ServerInfo
 		{
 			/// <summary> Returns the unique identifier of this server. </summary>
 			public ulong Id { get; }
@@ -126,8 +128,14 @@ namespace Discord
         public Task Accept() 
             => Client.ClientAPI.Send(new AcceptInviteRequest(Code));
 
-        public override bool Equals(object obj) => obj is Invite && (obj as Invite).Code == Code;
-		public override int GetHashCode() => unchecked(Code.GetHashCode() + 9980);
-		public override string ToString() => XkcdCode ?? Code;
+        internal Invite Clone()
+        {
+            var result = new Invite();
+            _cloner(this, result);
+            return result;
+        }
+        private Invite() { } //Used for cloning
+
+        public override string ToString() => XkcdCode ?? Code;
 	}
 }

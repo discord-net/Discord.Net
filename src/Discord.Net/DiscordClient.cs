@@ -546,10 +546,11 @@ namespace Discord
                             var server = GetServer(data.Id);
                             if (server != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? server.Clone() : null;
                                 server.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Server Updated: {server.Name}");
-                                OnServerUpdated(server);
+                                OnServerUpdated(before, server);
                             }
                             else
                                 Logger.Warning("GUILD_UPDATE referenced an unknown guild.");
@@ -609,10 +610,11 @@ namespace Discord
                             var channel = GetChannel(data.Id);
                             if (channel != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? channel.Clone() : null;
                                 channel.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Channel Updated: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                OnChannelUpdated(channel);
+                                OnChannelUpdated(before, channel);
                             }
                             else
                                 Logger.Warning("CHANNEL_UPDATE referenced an unknown channel.");
@@ -660,10 +662,11 @@ namespace Discord
                                 var user = server.GetUser(data.User.Id);
                                 if (user != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     if (Config.LogEvents)
                                         Logger.Info($"User Updated: {server.Name}/{user.Name}");
-                                    OnUserUpdated(user);
+                                    OnUserUpdated(before, user);
                                 }
                                 else
                                     Logger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
@@ -721,7 +724,7 @@ namespace Discord
                                 role.Update(data.Data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Role Created: {server.Name}/{role.Name}");
-                                OnRoleUpdated(role);
+                                OnRoleCreated(role);
                             }
                             else
                                 Logger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");
@@ -736,10 +739,11 @@ namespace Discord
                                 var role = server.GetRole(data.Data.Id);
                                 if (role != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
                                     role.Update(data.Data);
                                     if (Config.LogEvents)
                                         Logger.Info($"Role Updated: {server.Name}/{role.Name}");
-                                    OnRoleUpdated(role);
+                                    OnRoleUpdated(before, role);
                                 }
                                 else
                                     Logger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
@@ -860,10 +864,11 @@ namespace Discord
                             if (channel != null)
                             {
                                 var msg = channel.GetMessage(data.Id, data.Author?.Id);
+                                var before = Config.EnablePreUpdateEvents ? msg.Clone() : null;
                                 msg.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Verbose($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                OnMessageUpdated(msg);
+                                OnMessageUpdated(before, msg);
                             }
                             else
                                 Logger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
@@ -936,9 +941,10 @@ namespace Discord
 
                             if (user != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                 user.Update(data);
                                 //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
-                                OnUserPresenceUpdated(user);
+                                OnUserUpdated(before, user);
                             }
                             /*else //Occurs when a user leaves a server
                                 Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
@@ -982,9 +988,10 @@ namespace Discord
                                 var user = server.GetUser(data.UserId);
                                 if (user != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
-                                    OnUserVoiceStateUpdated(user);
+                                    OnUserUpdated(user, user);
                                 }
                                 /*else //Occurs when a user leaves a server
                                     Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");*/
@@ -1000,13 +1007,14 @@ namespace Discord
                             var data = e.Payload.ToObject<UserUpdateEvent>(Serializer);
                             if (data.Id == CurrentUser.Id)
                             {
+                                var before = Config.EnablePreUpdateEvents ? CurrentUser.Clone() : null;
                                 CurrentUser.Update(data);
                                 PrivateUser.Update(data);
                                 foreach (var server in _servers)
                                     server.Value.CurrentUser.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info("Profile Updated");
-                                OnProfileUpdated(CurrentUser);
+                                OnProfileUpdated(before, CurrentUser);
                             }
                         }
                         break;

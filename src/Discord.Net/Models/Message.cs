@@ -1,12 +1,9 @@
 ﻿using Discord.API.Client.Rest;
 using Discord.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using APIMessage = Discord.API.Client.Message;
@@ -27,9 +24,11 @@ namespace Discord
 
 	public sealed class Message
     {
-        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>", RegexOptions.Compiled);
-        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>", RegexOptions.Compiled);
-        private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
+        private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCloner<Message>();
+
+        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>");
+        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>");
+        private static readonly Regex _roleRegex = new Regex(@"@everyone");
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
 
@@ -369,8 +368,14 @@ namespace Discord
             return Resolve(Channel, text);
         }
 
-        public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 9979);
-		public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
+        internal Message Clone()
+        {
+            var result = new Message();
+            _cloner(this, result);
+            return result;
+        }
+        private Message() { } //Used for cloning
+
+        public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
 	}
 }

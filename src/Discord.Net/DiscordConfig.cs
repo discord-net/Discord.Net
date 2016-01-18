@@ -103,6 +103,9 @@ namespace Discord
         /// <summary> Gets or sets whether the permissions cache should be used. This makes operations such as User.GetPermissions(Channel), User.ServerPermissions and Channel.Members </summary>
         public bool UsePermissionsCache { get { return _usePermissionsCache; } set { SetValue(ref _usePermissionsCache, value); } }
         private bool _usePermissionsCache = true;
+        /// <summary> Gets or sets whether the a copy of a model is generated on an update event to allow a user to check which properties changed. </summary>
+        public bool EnablePreUpdateEvents { get { return _enablePreUpdateEvents; } set { SetValue(ref _enablePreUpdateEvents, value); } }
+        private bool _enablePreUpdateEvents = true;
 
         public DiscordConfig()
         {
