@@ -248,7 +248,6 @@ namespace Discord
                 SaveToken(tokenPath, cacheKey, token);
 
             ClientAPI.Token = token;
-
             GatewaySocket.Token = token;
             GatewaySocket.SessionId = null;
 
@@ -991,7 +990,7 @@ namespace Discord
                                     var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
-                                    OnUserUpdated(user, user);
+                                    OnUserUpdated(before, user);
                                 }
                                 /*else //Occurs when a user leaves a server
                                     Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");*/
