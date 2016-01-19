@@ -155,7 +155,7 @@ namespace Discord.Net
                     };
                     await _client.ClientAPI.Send(request).ConfigureAwait(false);
                 }
-                catch (Exception ex) { msg.State = MessageState.Failed; _logger.Error("Failed to edit message", ex); }
+                catch (Exception ex) { _logger.Error("Failed to edit message", ex); }
             }
         }
         internal async Task Delete(Message msg)
@@ -167,7 +167,8 @@ namespace Discord.Net
                     var request = new DeleteMessageRequest(msg.Channel.Id, msg.Id);
                     await _client.ClientAPI.Send(request).ConfigureAwait(false);
                 }
-                catch (Exception ex) { msg.State = MessageState.Failed; _logger.Error("Failed to delete message", ex); }
+                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
+                catch (Exception ex) { _logger.Error("Failed to delete message", ex); }
             }
         }
 
