@@ -7,7 +7,7 @@ namespace Discord.API.Client.Rest
     public sealed class AddChannelPermissionsRequest : IRestRequest
     {
         string IRestRequest.Method => "PUT";
-        string IRestRequest.Endpoint => $"channels/{ChannelId}/permissions";
+        string IRestRequest.Endpoint => $"channels/{ChannelId}/permissions/{TargetId}";
         object IRestRequest.Payload => this;
         bool IRestRequest.IsPrivate => false;
 
