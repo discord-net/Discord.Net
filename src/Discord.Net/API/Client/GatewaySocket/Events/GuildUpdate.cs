@@ -1,4 +1,4 @@
 ﻿namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class GuildUpdateEvent : Guild { }
+    public class GuildUpdateEvent : Guild { }
 }

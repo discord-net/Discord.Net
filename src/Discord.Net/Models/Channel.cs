@@ -12,7 +12,7 @@ using APIChannel = Discord.API.Client.Channel;
 
 namespace Discord
 {
-    public sealed class Channel : IMentionable
+    public class Channel : IMentionable
     {
         private readonly static Action<Channel, Channel> _cloner = DynamicIL.CreateCloner<Channel>();
 
@@ -28,7 +28,7 @@ namespace Discord
             }
         }
 
-        public sealed class PermissionOverwrite
+        public class PermissionOverwrite
         {
             public PermissionTarget TargetType { get; }
             public ulong TargetId { get; }

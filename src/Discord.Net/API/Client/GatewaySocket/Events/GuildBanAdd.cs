@@ -1,4 +1,4 @@
 ﻿namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class GuildBanAddEvent : MemberReference { }
+    public class GuildBanAddEvent : MemberReference { }
 }

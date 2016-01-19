@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class CreateInviteRequest : IRestRequest<Invite>
+    public class CreateInviteRequest : IRestRequest<Invite>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/invites";

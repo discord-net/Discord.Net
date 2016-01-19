@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class LoginRequest : IRestRequest<LoginResponse>
+    public class LoginRequest : IRestRequest<LoginResponse>
 	{
         string IRestRequest.Method => Email != null ? "POST" : "GET";
         string IRestRequest.Endpoint => $"auth/login";
@@ -16,7 +16,7 @@ namespace Discord.API.Client.Rest
 		public string Password { get; set; }
     }
 
-	public sealed class LoginResponse
+	public class LoginResponse
 	{
 		[JsonProperty("token")]
 		public string Token { get; set; }

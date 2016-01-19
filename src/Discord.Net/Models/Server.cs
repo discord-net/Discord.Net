@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> Represents a Discord server (also known as a guild). </summary>
-	public sealed class Server
+	public class Server
     {
         private readonly static Action<Server, Server> _cloner = DynamicIL.CreateCloner<Server>();
 
@@ -21,7 +21,7 @@ namespace Discord
         internal static string GetSplashUrl(ulong serverId, string splashId)
             => splashId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/splashes/{splashId}.jpg" : null;
 
-        public sealed class Emoji
+        public class Emoji
         {
             public string Id { get; }
 

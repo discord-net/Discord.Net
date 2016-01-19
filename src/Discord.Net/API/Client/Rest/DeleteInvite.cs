@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class DeleteInviteRequest : IRestRequest<Invite>
+    public class DeleteInviteRequest : IRestRequest<Invite>
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"invite/{InviteCode}";

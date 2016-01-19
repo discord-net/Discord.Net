@@ -1,5 +1,6 @@
 ﻿using Discord.API.Client.Rest;
 using Discord.Logging;
+using Discord.Net.Rest;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Discord.Net
 {
     /// <summary> Manages an outgoing message queue for DiscordClient. </summary>
-    public sealed class MessageQueue
+    public class MessageQueue
     {
         private interface IQueuedAction
         {
@@ -52,7 +53,7 @@ namespace Discord.Net
         private const int WarningStart = 30;
 
         private readonly Random _nonceRand;
-        private readonly DiscordClient _client;
+        private readonly RestClient _rest;
         private readonly Logger _logger;
         private readonly ConcurrentQueue<IQueuedAction> _pendingActions;
         private readonly ConcurrentDictionary<int, Message> _pendingSends;
@@ -61,9 +62,9 @@ namespace Discord.Net
         /// <summary> Gets the current number of queued actions. </summary>
         public int Count { get; private set; }
 
-        internal MessageQueue(DiscordClient client, Logger logger)
+        internal MessageQueue(RestClient rest, Logger logger)
         {
-            _client = client;
+            _rest = rest;
             _logger = logger;
 
             _nonceRand = new Random();
@@ -73,7 +74,7 @@ namespace Discord.Net
 
         internal Message QueueSend(Channel channel, string text, bool isTTS)
         {
-            Message msg = new Message(0, channel, channel.IsPrivate ? _client.PrivateUser : channel.Server.CurrentUser);
+            Message msg = new Message(0, channel, channel.IsPrivate ? channel.Client.PrivateUser : channel.Server.CurrentUser);
             msg.RawText = text;
             msg.Text = msg.Resolve(text);
             msg.Nonce = GenerateNonce();
@@ -135,7 +136,7 @@ namespace Discord.Net
                         Nonce = msg.Nonce.ToString(),
                         IsTTS = msg.IsTTS
                     };
-                    var response = await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    var response = await _rest.Send(request).ConfigureAwait(false);
                     msg.Id = response.Id;
                     msg.Update(response);
                     msg.State = MessageState.Normal;
@@ -153,7 +154,7 @@ namespace Discord.Net
                     {
                         Content = text
                     };
-                    await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    await _rest.Send(request).ConfigureAwait(false);
                 }
                 catch (Exception ex) { _logger.Error("Failed to edit message", ex); }
             }
@@ -165,7 +166,7 @@ namespace Discord.Net
                 try
                 {
                     var request = new DeleteMessageRequest(msg.Channel.Id, msg.Id);
-                    await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    await _rest.Send(request).ConfigureAwait(false);
                 }
                 catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
                 catch (Exception ex) { _logger.Error("Failed to delete message", ex); }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Client.VoiceSocket
 {
-    public sealed class IdentifyCommand : IWebSocketMessage
+    public class IdentifyCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.Identify;
         object IWebSocketMessage.Payload => this;

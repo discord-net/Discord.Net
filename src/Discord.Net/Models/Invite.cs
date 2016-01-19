@@ -8,11 +8,11 @@ using APIInvite = Discord.API.Client.Invite;
 
 namespace Discord
 {
-	public sealed class Invite
+	public class Invite
     {
         private readonly static Action<Invite, Invite> _cloner = DynamicIL.CreateCloner<Invite>();
 
-        public sealed class ServerInfo
+        public class ServerInfo
 		{
 			/// <summary> Returns the unique identifier of this server. </summary>
 			public ulong Id { get; }
@@ -25,7 +25,7 @@ namespace Discord
 				Name = name;
 			}
 		}
-		public sealed class ChannelInfo
+		public class ChannelInfo
 		{
 			/// <summary> Returns the unique identifier of this channel. </summary>
 			public ulong Id { get; }
@@ -38,7 +38,7 @@ namespace Discord
 				Name = name;
 			}
 		}
-		public sealed class InviterInfo
+		public class InviterInfo
 		{
 			/// <summary> Returns the unique identifier for this user. </summary>
 			public ulong Id { get; }

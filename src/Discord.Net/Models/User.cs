@@ -9,7 +9,7 @@ using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
-	public sealed class User
+	public class User
     {
         private readonly static Action<User, User> _cloner = DynamicIL.CreateCloner<User>();
 

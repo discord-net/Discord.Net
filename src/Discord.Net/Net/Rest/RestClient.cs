@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    public sealed partial class RestClient
+    public partial class RestClient
 	{
         private struct RestResults
         {

@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateRoleRequest : IRestRequest<Role>
+    public class UpdateRoleRequest : IRestRequest<Role>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/roles/{RoleId}";

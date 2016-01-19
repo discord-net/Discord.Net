@@ -4,7 +4,7 @@ using System.IO;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class SendFileRequest : IRestFileRequest<Message>
+    public class SendFileRequest : IRestFileRequest<Message>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages";

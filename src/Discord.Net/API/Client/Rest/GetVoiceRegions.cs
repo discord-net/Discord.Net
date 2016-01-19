@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetVoiceRegionsRequest : IRestRequest<GetVoiceRegionsResponse[]>
+    public class GetVoiceRegionsRequest : IRestRequest<GetVoiceRegionsResponse[]>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"voice/regions";
@@ -11,7 +11,7 @@ namespace Discord.API.Client.Rest
         bool IRestRequest.IsPrivate => false;
     }
     
-    public sealed class GetVoiceRegionsResponse
+    public class GetVoiceRegionsResponse
     {
         [JsonProperty("sample_hostname")]
         public string Hostname { get; set; }

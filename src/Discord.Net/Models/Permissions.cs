@@ -31,7 +31,7 @@ namespace Discord
 		UseVoiceActivation = 25
 	}
 
-	public sealed class ServerPermissions : Permissions
+	public class ServerPermissions : Permissions
     {
         private readonly static Action<ServerPermissions, ServerPermissions> _cloner = DynamicIL.CreateCloner<ServerPermissions>();
 
@@ -60,7 +60,7 @@ namespace Discord
 		public bool ManageServer { get { return GetBit(PermissionsBits.ManageServer); } set { SetBit(PermissionsBits.ManageServer, value); } }
 	}
 
-	public sealed class ChannelPermissions : Permissions
+	public class ChannelPermissions : Permissions
     {
         private readonly static Action<ChannelPermissions, ChannelPermissions> _cloner = DynamicIL.CreateCloner<ChannelPermissions>();
 
@@ -167,7 +167,7 @@ namespace Discord
         public bool Equals(Permissions permission) => permission?._rawValue == _rawValue;
     }
 
-	public sealed class DualChannelPermissions
+	public class DualChannelPermissions
     {
         private readonly static Action<DualChannelPermissions, DualChannelPermissions> _cloner = DynamicIL.CreateCloner<DualChannelPermissions>();
 

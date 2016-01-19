@@ -7,7 +7,7 @@ namespace Discord.Net
 #if NET46
     [Serializable]
 #endif
-	public sealed class HttpException : Exception
+	public class HttpException : Exception
 	{
 		public HttpStatusCode StatusCode { get; }
 

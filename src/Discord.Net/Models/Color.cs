@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-	public sealed class Color : IEquatable<Color>
+	public class Color : IEquatable<Color>
     {
         private readonly static Action<Color, Color> _cloner = DynamicIL.CreateCloner<Color>();
 

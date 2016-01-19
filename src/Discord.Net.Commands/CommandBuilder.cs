@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    //TODO: Make this more friendly and expose it to be extendable
 	public sealed class CommandBuilder
 	{
 		private readonly CommandService _service;
@@ -18,17 +19,20 @@ namespace Discord.Commands
 
 		public CommandService Service => _service;
 
-		internal CommandBuilder(CommandService service, Command command, string prefix = "", string category = "", IEnumerable<IPermissionChecker> initialChecks = null)
+		internal CommandBuilder(CommandService service, string text, string prefix = "", string category = "", IEnumerable<IPermissionChecker> initialChecks = null)
 		{
-			_service = service;
-			_command = command;
-			_command.Category = category;
-			_params = new List<CommandParameter>();
+            _service = service;
+            _prefix = prefix;
+
+            _command = new Command(AppendPrefix(prefix, text));
+            _command.Category = category;
+
 			if (initialChecks != null)
 				_checks = new List<IPermissionChecker>(initialChecks);
 			else
 				_checks = new List<IPermissionChecker>();
-			_prefix = prefix;
+
+            _params = new List<CommandParameter>();
 			_aliases = new List<string>();
 
 			_allowRequiredParams = true;
@@ -112,7 +116,7 @@ namespace Discord.Commands
 				return prefix;
 		}
 	}
-	public sealed class CommandGroupBuilder
+	public class CommandGroupBuilder
 	{
 		private readonly CommandService _service;
 		private readonly string _prefix;
@@ -154,9 +158,6 @@ namespace Discord.Commands
 		public CommandBuilder CreateCommand()
 			=> CreateCommand("");
         public CommandBuilder CreateCommand(string cmd)
-		{
-            var command = new Command(CommandBuilder.AppendPrefix(_prefix, cmd));
-            return new CommandBuilder(_service, command, _prefix, _category, _checks);
-		}
+            => new CommandBuilder(_service, cmd, _prefix, _category, _checks);
 	}
 }

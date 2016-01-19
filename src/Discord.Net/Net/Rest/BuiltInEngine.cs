@@ -13,7 +13,7 @@ using Nito.AsyncEx;
 
 namespace Discord.Net.Rest
 {
-    internal sealed class BuiltInEngine : IRestEngine
+    internal class BuiltInEngine : IRestEngine
     {
         private const int HR_SECURECHANNELFAILED = -2146233079;
 

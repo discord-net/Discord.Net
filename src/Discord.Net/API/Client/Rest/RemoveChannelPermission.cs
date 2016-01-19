@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class RemoveChannelPermissionsRequest : IRestRequest
+    public class RemoveChannelPermissionsRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/permissions/{TargetId}";

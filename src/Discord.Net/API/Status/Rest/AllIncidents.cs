@@ -3,7 +3,7 @@
 namespace Discord.API.Status.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetAllIncidentsRequest : IRestRequest<StatusResult>
+    public class GetAllIncidentsRequest : IRestRequest<StatusResult>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"incidents.json";

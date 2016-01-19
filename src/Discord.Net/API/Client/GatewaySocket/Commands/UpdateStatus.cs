@@ -3,13 +3,13 @@
 namespace Discord.API.Client.GatewaySocket
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateStatusCommand : IWebSocketMessage
+    public class UpdateStatusCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.StatusUpdate;
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        public sealed class GameInfo
+        public class GameInfo
         {
             [JsonProperty("name")]
             public string Name { get; set; }

@@ -57,7 +57,6 @@ namespace Discord
         private DiscordMode _mode = DiscordMode.Bot;
 
         /// <summary> User Agent string to use when connecting to Discord. </summary>
-        [JsonIgnore]
         public string UserAgent { get; private set; }
 
         //Rest

@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class CreateGuildRequest : IRestRequest<Guild>
+    public class CreateGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"guilds";

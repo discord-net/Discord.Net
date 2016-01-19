@@ -31,7 +31,6 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private readonly ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
-        private CancellationTokenSource _cancelTokenSource;
 
         internal Logger Logger { get; }
 
@@ -138,7 +137,7 @@ namespace Discord
             //Networking
             ClientAPI = new RestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
             StatusAPI = new RestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
-            GatewaySocket = new GatewaySocket(this, Log.CreateLogger("Gateway"));
+            GatewaySocket = new GatewaySocket(Config, Serializer, Log.CreateLogger("Gateway"));
             GatewaySocket.Connected += (s, e) =>
             {
                 if (State == ConnectionState.Connecting)
@@ -148,7 +147,7 @@ namespace Discord
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
 
             if (Config.UseMessageQueue)
-                MessageQueue = new MessageQueue(this, Log.CreateLogger("MessageQueue"));
+                MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
 
             //Extensibility
             Services = new ServiceManager(this);
@@ -182,9 +181,7 @@ namespace Discord
             {
                 using (await _connectionLock.LockAsync().ConfigureAwait(false))
                 {
-                    if (State != ConnectionState.Disconnected)
-                        await Disconnect().ConfigureAwait(false);
-                    await _taskManager.Stop().ConfigureAwait(false);
+                    await Disconnect().ConfigureAwait(false);
                     _taskManager.ClearException();
 
                     Stopwatch stopwatch = null;
@@ -193,19 +190,20 @@ namespace Discord
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
 
-                    _cancelTokenSource = new CancellationTokenSource();
-                    CancelToken = _cancelTokenSource.Token;
-                    GatewaySocket.ParentCancelToken = CancelToken;
+                    var cancelSource = new CancellationTokenSource();
+                    CancelToken = cancelSource.Token;
+                    ClientAPI.CancelToken = CancelToken;
+                    StatusAPI.CancelToken = CancelToken;
 
                     await Login(email, password, token).ConfigureAwait(false);
-                    await GatewaySocket.Connect().ConfigureAwait(false);
+                    await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
 
                     List<Task> tasks = new List<Task>();
                     tasks.Add(CancelToken.Wait());
                     if (Config.UseMessageQueue)
                         tasks.Add(MessageQueue.Run(CancelToken, Config.MessageQueueInterval));
 
-                    await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
+                    await _taskManager.Start(tasks, cancelSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
 
                     if (Config.LogLevel >= LogSeverity.Verbose)
@@ -248,8 +246,6 @@ namespace Discord
                 SaveToken(tokenPath, cacheKey, token);
 
             ClientAPI.Token = token;
-            GatewaySocket.Token = token;
-            GatewaySocket.SessionId = null;
 
             //Cache other stuff
             var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
@@ -261,7 +257,6 @@ namespace Discord
             State = ConnectionState.Connected;
             _connectedEvent.Set();
 
-            ClientAPI.CancelToken = CancelToken;
             SendStatus();
             OnConnected();
         }
@@ -274,7 +269,10 @@ namespace Discord
             State = ConnectionState.Disconnecting;
 
             if (oldState == ConnectionState.Connected)
-                await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
+            {
+                try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
+                catch (OperationCanceledException) { }
+            }
 
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
@@ -282,8 +280,6 @@ namespace Discord
 
             await GatewaySocket.Disconnect().ConfigureAwait(false);
             ClientAPI.Token = null;
-            GatewaySocket.Token = null;
-            GatewaySocket.SessionId = null;
 
             _servers.Clear();
             _channels.Clear();
@@ -481,8 +477,6 @@ namespace Discord
                             if (Config.LogLevel >= LogSeverity.Verbose)
                                 stopwatch = Stopwatch.StartNew();
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
-                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
-                            GatewaySocket.SessionId = data.SessionId;
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
@@ -507,12 +501,6 @@ namespace Discord
                                 double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
                                 Logger.Verbose($"READY took {seconds} sec");
                             }
-                        }
-                        break;
-                    case "RESUMED":
-                        {
-                            var data = e.Payload.ToObject<ResumedEvent>(Serializer);
-                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
                         }
                         break;
 
@@ -1016,6 +1004,10 @@ namespace Discord
                                 OnProfileUpdated(before, CurrentUser);
                             }
                         }
+                        break;
+
+                    //Handled in GatewaySocket
+                    case "RESUMED":
                         break;
 
                     //Ignored

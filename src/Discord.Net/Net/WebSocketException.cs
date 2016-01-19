@@ -2,7 +2,7 @@
 
 namespace Discord.Net
 {
-    public sealed class WebSocketException : Exception
+    public class WebSocketException : Exception
     {
         public int Code { get; }
         public string Reason { get; }

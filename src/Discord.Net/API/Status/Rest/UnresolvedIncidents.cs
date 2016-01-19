@@ -3,7 +3,7 @@
 namespace Discord.API.Status.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetUnresolvedIncidentsRequest : IRestRequest<StatusResult>
+    public class GetUnresolvedIncidentsRequest : IRestRequest<StatusResult>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"incidents/unresolved.json";

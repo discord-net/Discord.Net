@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateMemberRequest : IRestRequest
+    public class UpdateMemberRequest : IRestRequest
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/members/{UserId}";

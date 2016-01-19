@@ -9,7 +9,7 @@ using APIRole = Discord.API.Client.Role;
 
 namespace Discord
 {
-	public sealed class Role : IMentionable
+	public class Role : IMentionable
     {
         private readonly static Action<Role, Role> _cloner = DynamicIL.CreateCloner<Role>();
 

@@ -11,7 +11,7 @@ using RestSharpClient = RestSharp.RestClient;
 
 namespace Discord.Net.Rest
 {
-    internal sealed class RestSharpEngine : IRestEngine
+    internal class RestSharpEngine : IRestEngine
 	{
         private const int HR_SECURECHANNELFAILED = -2146233079;
 

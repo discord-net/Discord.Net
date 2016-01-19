@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class AckMessageRequest : IRestRequest
+    public class AckMessageRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages/{MessageId}/ack";

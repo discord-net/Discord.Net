@@ -12,7 +12,7 @@ using WebSocketClient = System.Net.WebSockets.ClientWebSocket;
 
 namespace Discord.Net.WebSockets
 {
-    internal sealed class BuiltInEngine : IWebSocketEngine
+    internal class BuiltInEngine : IWebSocketEngine
     {
         private const int ReceiveChunkSize = 12 * 1024; //12KB
         private const int SendChunkSize = 4 * 1024; //4KB
@@ -81,7 +81,7 @@ namespace Discord.Net.WebSockets
 
                             try
                             {
-                                result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken);//.ConfigureAwait(false);
+                                result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken).ConfigureAwait(false);
                             }
                             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
                             {

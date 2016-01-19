@@ -6,7 +6,7 @@ using APIUser = Discord.API.Client.User;
 
 namespace Discord
 {
-    public sealed class Profile
+    public class Profile
     {
         private readonly static Action<Profile, Profile> _cloner = DynamicIL.CreateCloner<Profile>();
 
@@ -72,8 +72,6 @@ namespace Discord
                 };
                 var loginResponse = await Client.ClientAPI.Send(loginRequest).ConfigureAwait(false);
                 Client.ClientAPI.Token = loginResponse.Token;
-                Client.GatewaySocket.Token = loginResponse.Token;
-                Client.GatewaySocket.SessionId = null;
             }
         }
 

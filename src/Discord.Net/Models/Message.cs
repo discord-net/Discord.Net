@@ -22,7 +22,7 @@ namespace Discord
 		Failed
     }
 
-	public sealed class Message
+	public class Message
     {
         private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCloner<Message>();
 
@@ -111,7 +111,7 @@ namespace Discord
 			}
 		}*/
 
-        public sealed class Attachment : File
+        public class Attachment : File
 		{
 			/// <summary> Unique identifier for this file. </summary>
 			public string Id { get; internal set; }
@@ -123,7 +123,7 @@ namespace Discord
 			internal Attachment() { }
 		}
 
-		public sealed class Embed
+		public class Embed
 		{
 			/// <summary> URL of this embed. </summary>
 			public string Url { get; internal set; }
@@ -143,7 +143,7 @@ namespace Discord
 			internal Embed() { }
 		}
 
-		public sealed class EmbedLink
+		public class EmbedLink
         {
 			/// <summary> URL of this embed provider. </summary>
 			public string Url { get; internal set; }

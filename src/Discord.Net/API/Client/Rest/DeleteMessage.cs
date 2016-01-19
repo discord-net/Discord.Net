@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class DeleteMessageRequest : IRestRequest
+    public class DeleteMessageRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages/{MessageId}";

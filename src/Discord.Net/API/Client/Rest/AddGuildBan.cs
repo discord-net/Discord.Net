@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class AddGuildBanRequest : IRestRequest
+    public class AddGuildBanRequest : IRestRequest
     {
         string IRestRequest.Method => "PUT";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/bans/{UserId}?delete-message-days={PruneDays}";

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.GatewaySocket
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateVoiceCommand : IWebSocketMessage
+    public class UpdateVoiceCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.VoiceStateUpdate;
         object IWebSocketMessage.Payload => this;
