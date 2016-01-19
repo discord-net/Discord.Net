@@ -121,10 +121,11 @@ namespace Discord.Commands
 
 		public CommandService Service => _service;
 
-		internal CommandGroupBuilder(CommandService service, string prefix, IEnumerable<IPermissionChecker> initialChecks = null)
+		internal CommandGroupBuilder(CommandService service, string prefix = "", string category = null, IEnumerable<IPermissionChecker> initialChecks = null)
 		{
 			_service = service;
 			_prefix = prefix;
+            _category = category;
 			if (initialChecks != null)
 				_checks = new List<IPermissionChecker>(initialChecks);
 			else
@@ -145,9 +146,9 @@ namespace Discord.Commands
 			_checks.Add(new GenericPermissionChecker(checkFunc, errorMsg));
 		}
 
-		public CommandGroupBuilder CreateGroup(string cmd, Action<CommandGroupBuilder> config = null)
-		{			
-			config(new CommandGroupBuilder(_service, CommandBuilder.AppendPrefix(_prefix, cmd), _checks));
+		public CommandGroupBuilder CreateGroup(string cmd, Action<CommandGroupBuilder> config)
+		{
+            config(new CommandGroupBuilder(_service, CommandBuilder.AppendPrefix(_prefix, cmd), _category, _checks));
 			return this;
 		}
 		public CommandBuilder CreateCommand()
