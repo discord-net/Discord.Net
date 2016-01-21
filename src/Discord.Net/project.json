@@ -15,8 +15,9 @@
     "url": "git://github.com/RogueException/Discord.Net"
   },
   "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
-  
+
   "compilationOptions": {
+    "allowUnsafe": true,
     "warningsAsErrors": true
   },
 
