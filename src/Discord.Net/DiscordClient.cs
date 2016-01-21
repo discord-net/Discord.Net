@@ -226,25 +226,26 @@ namespace Discord
             byte[] cacheKey = null;
 
             //Get Token
-            if (token == null && Config.CacheToken)
+            if (email != null && Config.CacheToken)
             {
-                Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
-                    new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
-                cacheKey = deriveBytes.GetBytes(16);
-
                 tokenPath = GetTokenCachePath(email);
-                oldToken = LoadToken(tokenPath, cacheKey);
-                ClientAPI.Token = oldToken;
+                if (token == null && password != null)
+                {
+                    Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
+                        new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
+                    cacheKey = deriveBytes.GetBytes(16);
+
+                    oldToken = LoadToken(tokenPath, cacheKey);
+                    token = oldToken;
+                }
             }
-            else
-                ClientAPI.Token = token;
-                
+
+            ClientAPI.Token = token;                
             var request = new LoginRequest() { Email = email, Password = password };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
             token = response.Token;
-            if (Config.CacheToken && token != oldToken)
+            if (Config.CacheToken && token != oldToken && tokenPath != null)
                 SaveToken(tokenPath, cacheKey, token);
-
             ClientAPI.Token = token;
 
             //Cache other stuff
