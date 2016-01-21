@@ -12,26 +12,28 @@ namespace Discord
             var method = new DynamicMethod("CopyFields", null, new[] { typeof(T), typeof(T) }, typeof(T), true);
             var generator = method.GetILGenerator();
             var typeInfo = typeof(T).GetTypeInfo();
-            
-            CopyFields(generator, typeInfo);
+
+            typeInfo.ForEachField(f =>
+            {
+                generator.Emit(OpCodes.Ldarg_1); //Stack: TargetRef
+                generator.Emit(OpCodes.Ldarg_0); //Stack: TargetRef, SourceRef
+                generator.Emit(OpCodes.Ldfld, f); //Stack: TargetRef, Value
+                generator.Emit(OpCodes.Stfld, f); //Stack:
+            });
 
             generator.Emit(OpCodes.Ret);
 
             return method.CreateDelegate(typeof(Action<T, T>)) as Action<T, T>;
         }
-        private static void CopyFields(ILGenerator generator, TypeInfo typeInfo)
+        
+        public static void ForEachField(this TypeInfo typeInfo, Action<FieldInfo> fieldProcessor)
         {
-            foreach (var field in typeInfo.DeclaredFields.Where(x => !x.IsStatic))
-            {
-                generator.Emit(OpCodes.Ldarg_1); //Stack: TargetRef
-                generator.Emit(OpCodes.Ldarg_0); //Stack: TargetRef, SourceRef
-                generator.Emit(OpCodes.Ldfld, field); //Stack: TargetRef, Value
-                generator.Emit(OpCodes.Stfld, field); //Stack:
-            }
-
             var baseType = typeInfo.BaseType;
-            if (baseType != null && baseType.AssemblyQualifiedName == typeInfo.AssemblyQualifiedName)
-                CopyFields(generator, baseType.GetTypeInfo());
+            if (baseType != null)
+                ForEachField(baseType.GetTypeInfo(), fieldProcessor);
+
+            foreach (var field in typeInfo.DeclaredFields.Where(x => !x.IsStatic))
+                fieldProcessor(field);
         }
     }
 }
