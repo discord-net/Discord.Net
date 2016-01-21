@@ -139,8 +139,10 @@ namespace Discord
 			public EmbedLink Provider { get; internal set; }
 			/// <summary> Returns the thumbnail of this embed. </summary>
 			public File Thumbnail { get; internal set; }
+            /// <summary> Returns the video information of this embed. </summary>
+            public File Video { get; internal set; }
 
-			internal Embed() { }
+            internal Embed() { }
 		}
 
 		public class EmbedLink
@@ -241,7 +243,7 @@ namespace Discord
 				Embeds = model.Embeds.Select(x =>
 				{
                     EmbedLink author = null, provider = null;
-					File thumbnail = null;
+					File thumbnail = null, video = null;
 
 					if (x.Author != null)
 						author = new EmbedLink { Url = x.Author.Url, Name = x.Author.Name };
@@ -249,8 +251,10 @@ namespace Discord
 						provider = new EmbedLink { Url = x.Provider.Url, Name = x.Provider.Name };
 					if (x.Thumbnail != null)
 						thumbnail = new File { Url = x.Thumbnail.Url, ProxyUrl = x.Thumbnail.ProxyUrl, Width = x.Thumbnail.Width, Height = x.Thumbnail.Height };
+                    if (x.Video != null)
+                        video = new File { Url = x.Video.Url, ProxyUrl = x.Video.ProxyUrl, Width = x.Video.Width, Height = x.Video.Height };
 
-					return new Embed
+                    return new Embed
 					{
 						Url = x.Url,
 						Type = x.Type,
@@ -258,7 +262,8 @@ namespace Discord
 						Description = x.Description,
 						Author = author,
 						Provider = provider,
-						Thumbnail = thumbnail
+						Thumbnail = thumbnail,
+                        Video = video
 					};
 				}).ToArray();
 			}
