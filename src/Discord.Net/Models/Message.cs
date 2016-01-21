@@ -252,7 +252,7 @@ namespace Discord
 					if (x.Thumbnail != null)
 						thumbnail = new File { Url = x.Thumbnail.Url, ProxyUrl = x.Thumbnail.ProxyUrl, Width = x.Thumbnail.Width, Height = x.Thumbnail.Height };
                     if (x.Video != null)
-                        video = new File { Url = x.Video.Url, ProxyUrl = x.Video.ProxyUrl, Width = x.Video.Width, Height = x.Video.Height };
+                        video = new File { Url = x.Video.Url, ProxyUrl = null, Width = x.Video.Width, Height = x.Video.Height };
 
                     return new Embed
 					{
