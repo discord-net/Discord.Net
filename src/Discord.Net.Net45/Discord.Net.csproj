@@ -421,14 +421,14 @@
     <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
       <Link>Enums\UserStatus.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\ETF\ETFDecoder.cs">
-      <Link>ETF\ETFDecoder.cs</Link>
-    </Compile>
-    <Compile Include="..\Discord.Net\ETF\ETFEncoder.cs">
-      <Link>ETF\ETFEncoder.cs</Link>
+    <Compile Include="..\Discord.Net\ETF\ETFReader.cs">
+      <Link>ETF\ETFReader.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\ETF\ETFType.cs">
       <Link>ETF\ETFType.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\ETF\ETFWriter.cs">
+      <Link>ETF\ETFWriter.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Events\ChannelEventArgs.cs">
       <Link>Events\ChannelEventArgs.cs</Link>

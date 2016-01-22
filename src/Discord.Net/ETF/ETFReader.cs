@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Discord.ETF
 {
-    public class ETFDecoder
+    public class ETFReader
     {
     }
 }
