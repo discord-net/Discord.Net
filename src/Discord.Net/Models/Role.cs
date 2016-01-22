@@ -11,7 +11,7 @@ namespace Discord
 {
 	public class Role : IMentionable
     {
-        private readonly static Action<Role, Role> _cloner = DynamicIL.CreateCloner<Role>();
+        private readonly static Action<Role, Role> _cloner = DynamicIL.CreateCopyMethod<Role>();
 
         internal DiscordClient Client => Server.Client;
 

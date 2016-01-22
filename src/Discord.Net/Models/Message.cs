@@ -24,7 +24,7 @@ namespace Discord
 
 	public class Message
     {
-        private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCloner<Message>();
+        private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCopyMethod<Message>();
 
         private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>");
         private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>");

@@ -33,7 +33,7 @@ namespace Discord
 
 	public class ServerPermissions : Permissions
     {
-        private readonly static Action<ServerPermissions, ServerPermissions> _cloner = DynamicIL.CreateCloner<ServerPermissions>();
+        private readonly static Action<ServerPermissions, ServerPermissions> _cloner = DynamicIL.CreateCopyMethod<ServerPermissions>();
 
         public static ServerPermissions None { get; } = new ServerPermissions();
 		public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
@@ -62,7 +62,7 @@ namespace Discord
 
 	public class ChannelPermissions : Permissions
     {
-        private readonly static Action<ChannelPermissions, ChannelPermissions> _cloner = DynamicIL.CreateCloner<ChannelPermissions>();
+        private readonly static Action<ChannelPermissions, ChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<ChannelPermissions>();
 
         public static ChannelPermissions None { get; } = new ChannelPermissions();
         public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
@@ -169,7 +169,7 @@ namespace Discord
 
 	public class DualChannelPermissions
     {
-        private readonly static Action<DualChannelPermissions, DualChannelPermissions> _cloner = DynamicIL.CreateCloner<DualChannelPermissions>();
+        private readonly static Action<DualChannelPermissions, DualChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<DualChannelPermissions>();
 
         public ChannelPermissions Allow { get; }
 		public ChannelPermissions Deny { get; }

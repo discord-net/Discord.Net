@@ -4,7 +4,7 @@ namespace Discord
 {
 	public class Color : IEquatable<Color>
     {
-        private readonly static Action<Color, Color> _cloner = DynamicIL.CreateCloner<Color>();
+        private readonly static Action<Color, Color> _cloner = DynamicIL.CreateCopyMethod<Color>();
 
         public static readonly Color Default = PresetColor(0);
 

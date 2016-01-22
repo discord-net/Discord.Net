@@ -14,7 +14,7 @@ namespace Discord
     /// <summary> Represents a Discord server (also known as a guild). </summary>
 	public class Server
     {
-        private readonly static Action<Server, Server> _cloner = DynamicIL.CreateCloner<Server>();
+        private readonly static Action<Server, Server> _cloner = DynamicIL.CreateCopyMethod<Server>();
 
         internal static string GetIconUrl(ulong serverId, string iconId)
             => iconId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/${serverId}/icons/${iconId}.jpg" : null;

@@ -8,7 +8,7 @@ namespace Discord
 {
     public class Profile
     {
-        private readonly static Action<Profile, Profile> _cloner = DynamicIL.CreateCloner<Profile>();
+        private readonly static Action<Profile, Profile> _cloner = DynamicIL.CreateCopyMethod<Profile>();
 
         internal DiscordClient Client { get; }
 

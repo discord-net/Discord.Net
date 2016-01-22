@@ -10,7 +10,7 @@ namespace Discord
 {
 	public class Invite
     {
-        private readonly static Action<Invite, Invite> _cloner = DynamicIL.CreateCloner<Invite>();
+        private readonly static Action<Invite, Invite> _cloner = DynamicIL.CreateCopyMethod<Invite>();
 
         public class ServerInfo
 		{

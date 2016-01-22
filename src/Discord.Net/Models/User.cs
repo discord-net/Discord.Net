@@ -11,7 +11,7 @@ namespace Discord
 {
 	public class User
     {
-        private readonly static Action<User, User> _cloner = DynamicIL.CreateCloner<User>();
+        private readonly static Action<User, User> _cloner = DynamicIL.CreateCopyMethod<User>();
 
         internal static string GetAvatarUrl(ulong userId, string avatarId) 
             => avatarId != null ? $"{DiscordConfig.ClientAPIUrl}users/{userId}/avatars/{avatarId}.jpg" : null;

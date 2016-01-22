@@ -14,7 +14,7 @@ namespace Discord
 {
     public class Channel : IMentionable
     {
-        private readonly static Action<Channel, Channel> _cloner = DynamicIL.CreateCloner<Channel>();
+        private readonly static Action<Channel, Channel> _cloner = DynamicIL.CreateCopyMethod<Channel>();
 
         private struct Member
         {
