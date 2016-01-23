@@ -12,6 +12,8 @@ namespace Discord.Audio
 
 	public class AudioServiceConfig
 	{
+        public const int MaxBitrate = 128;
+
 		/// <summary> Max time in milliseconds to wait for DiscordAudioClient to connect and initialize. </summary>
 		public int ConnectionTimeout { get { return _connectionTimeout; } set { SetValue(ref _connectionTimeout, value); } }
 		private int _connectionTimeout = 30000;
@@ -33,8 +35,8 @@ namespace Discord.Audio
 		public int BufferLength { get { return _bufferLength; } set { SetValue(ref _bufferLength, value); } }
 		private int _bufferLength = 1000;
 
-		/// <summary> Gets or sets the bitrate used (in kbit/s, between 1 and 128 inclusively) for outgoing voice packets. A null value will use default Opus settings. </summary>
-		public int? Bitrate { get { return _bitrate; } set { SetValue(ref _bitrate, value); } }
+        /// <summary> Gets or sets the bitrate used (in kbit/s, between 1 and MaxBitrate inclusively) for outgoing voice packets. A null value will use default Opus settings. </summary>
+        public int? Bitrate { get { return _bitrate; } set { SetValue(ref _bitrate, value); } }
 		private int? _bitrate = null;
         /// <summary> Gets or sets the number of channels (1 or 2) used in both input provided to IAudioClient and output send to Discord. Defaults to 2 (stereo). </summary>
         public int Channels { get { return _channels; } set { SetValue(ref _channels, value); } }

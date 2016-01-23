@@ -18,7 +18,7 @@ namespace Discord.Audio.Opus
         public OpusEncoder(int samplingRate, int channels, int frameLength, int? bitrate, OpusApplication application)
             : base(samplingRate, channels, frameLength)
 		{
-			if (bitrate != null && (bitrate < 1 || bitrate > 512))
+			if (bitrate != null && (bitrate < 1 || bitrate > AudioServiceConfig.MaxBitrate))
 				throw new ArgumentOutOfRangeException(nameof(bitrate));
 
 			BitRate = bitrate;
