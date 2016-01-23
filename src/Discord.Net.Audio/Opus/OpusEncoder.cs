@@ -2,7 +2,6 @@
 
 namespace Discord.Audio.Opus
 {
-	/// <summary> Opus codec wrapper. </summary>
 	internal class OpusEncoder : OpusConverter
     {
         /// <summary> Gets the bit rate in kbit/s. </summary>

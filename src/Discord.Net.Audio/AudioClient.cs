@@ -50,34 +50,21 @@ namespace Discord.Audio
         private ConnectionState _gatewayState;
 
         internal Logger Logger { get; }
-
-        /// <summary> Gets the unique identifier for this client. </summary>
+        
         public int Id { get; }
-        /// <summary> Gets the service managing this client. </summary>
         public AudioService Service { get; }
-        /// <summary> Gets the configuration object used to make this client. </summary>
         public AudioServiceConfig Config { get; }
-        /// <summary> Gets the internal RestClient for the Client API endpoint. </summary>
         public RestClient ClientAPI { get; }
-        /// <summary> Gets the internal WebSocket for the Gateway event stream. </summary>
         public GatewaySocket GatewaySocket { get; }
-        /// <summary> Gets the internal WebSocket for the Voice control stream. </summary>
         public VoiceSocket VoiceSocket { get; }
-        /// <summary> Gets the JSON serializer used by this client. </summary>
         public JsonSerializer Serializer { get; }
-        /// <summary>  </summary>
         public Stream OutputStream { get; }
-
-        /// <summary> Gets a cancellation token that triggers when the client is manually disconnected. </summary>
+        
         public CancellationToken CancelToken { get; private set; }
-        /// <summary> Gets the session id for the current connection. </summary>
         public string SessionId { get; private set; }
-
-        /// <summary> Gets the current state of this client. </summary>
+        
         public ConnectionState State => VoiceSocket.State;
-        /// <summary> Gets the server this client is bound to. </summary>
         public Server Server => VoiceSocket.Server;
-        /// <summary> Gets the channel  </summary>
         public Channel Channel => VoiceSocket.Channel;
 
         public AudioClient(DiscordClient client, Server server, int id)
@@ -116,7 +103,6 @@ namespace Discord.Audio
             OutputStream = new OutStream(this);
         }
 
-        /// <summary> Connects to the Discord server with the provided token. </summary>
         public async Task Connect()
         {
             if (Config.EnableMultiserver)
@@ -172,7 +158,6 @@ namespace Discord.Audio
             _gatewayState = ConnectionState.Connected;
         }
         
-        /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
         public async Task Disconnect()
         {
             await _taskManager.Stop(true).ConfigureAwait(false);
@@ -277,9 +262,6 @@ namespace Discord.Audio
             }
         }
 
-        /// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
-        /// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
-        /// <param name="count">Number of bytes in this frame. </param>
         public void Send(byte[] data, int offset, int count)
 		{
             if (data == null) throw new ArgumentException(nameof(data));
@@ -291,14 +273,11 @@ namespace Discord.Audio
 	        VoiceSocket.SendPCMFrames(data, offset, count);
 		}
 
-        /// <summary> Clears the PCM buffer. </summary>
         public void Clear()
         {
             if (VoiceSocket.Server == null) return; //Has been closed
             VoiceSocket.ClearPCMFrames();
         }
-
-		/// <summary> Returns a task that completes once the voice output buffer is empty. </summary>
 		public void Wait()
         {
             if (VoiceSocket.Server == null) return; //Has been closed
