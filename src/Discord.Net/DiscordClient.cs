@@ -135,8 +135,8 @@ namespace Discord
             };
 
             //Networking
-            ClientAPI = new RestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
-            StatusAPI = new RestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
+            ClientAPI = new JsonRestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
+            StatusAPI = new JsonRestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
             GatewaySocket = new GatewaySocket(Config, Serializer, Log.CreateLogger("Gateway"));
             GatewaySocket.Connected += (s, e) =>
             {

@@ -87,7 +87,7 @@ namespace Discord.Audio
             //Networking
             if (Config.EnableMultiserver)
             {
-                ClientAPI = new RestClient(_config, DiscordConfig.ClientAPIUrl, client.Log.CreateLogger($"ClientAPI #{id}"));
+                ClientAPI = new JsonRestClient(_config, DiscordConfig.ClientAPIUrl, client.Log.CreateLogger($"ClientAPI #{id}"));
                 GatewaySocket = new GatewaySocket(_config, client.Serializer, client.Log.CreateLogger($"Gateway #{id}"));
                 GatewaySocket.Connected += (s, e) =>
                 {

@@ -532,8 +532,14 @@
     <Compile Include="..\Discord.Net\Net\Rest\CompletedRequestEventArgs.cs">
       <Link>Net\Rest\CompletedRequestEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Net\Rest\ETFRestClient.cs">
+      <Link>Net\Rest\ETFRestClient.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\IRestEngine.cs">
       <Link>Net\Rest\IRestEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Net\Rest\JsonRestClient.cs">
+      <Link>Net\Rest\JsonRestClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\Rest\RequestEventArgs.cs">
       <Link>Net\Rest\RequestEventArgs.cs</Link>

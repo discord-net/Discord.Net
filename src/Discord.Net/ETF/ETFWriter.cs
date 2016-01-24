@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,7 @@ namespace Discord.ETF
     public unsafe class ETFWriter : IDisposable
     {
         private readonly static byte[] _nilBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 3, (byte)'n', (byte)'i', (byte)'l' };
+        private readonly static byte[] _nilExtBytes = new byte[] { (byte)ETFType.NIL_EXT};
         private readonly static byte[] _falseBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 5, (byte)'f', (byte)'a', (byte)'l', (byte)'s', (byte)'e' };
         private readonly static byte[] _trueBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 4, (byte)'t', (byte)'r', (byte)'u', (byte)'e' };
 
@@ -238,6 +240,45 @@ namespace Discord.ETF
             else
                 WriteNil();
         }
+        public void Write<T>(IEnumerable<T> obj)
+        {
+            if (obj != null)
+            {
+                var array = obj.ToArray();
+                int length = array.Length;
+                _buffer[0] = (byte)ETFType.LIST_EXT;
+                _buffer[1] = (byte)((length >> 24) & 0xFF);
+                _buffer[2] = (byte)((length >> 16) & 0xFF);
+                _buffer[3] = (byte)((length >> 8) & 0xFF);
+                _buffer[4] = (byte)(length & 0xFF);
+                for (int i = 0; i < array.Length; i++)
+                    Write(array[i]);
+                WriteNilExt();
+                _stream.Write(_buffer, 0, 5);
+            }
+            else
+                WriteNil();
+        }
+        public void Write<TKey, TValue>(IDictionary<TKey, TValue> obj)
+        {
+            if (obj != null)
+            {
+                int length = obj.Count;
+                _buffer[0] = (byte)ETFType.MAP_EXT;
+                _buffer[1] = (byte)((length >> 24) & 0xFF);
+                _buffer[2] = (byte)((length >> 16) & 0xFF);
+                _buffer[3] = (byte)((length >> 8) & 0xFF);
+                _buffer[4] = (byte)(length & 0xFF);
+                foreach (var pair in obj)
+                {
+                    Write(pair.Key);
+                    Write(pair.Value);
+                }
+                _stream.Write(_buffer, 0, 5);
+            }
+            else
+                WriteNil();
+        }
         public void Write(object obj)
         {
             if (obj != null)
@@ -302,8 +343,12 @@ namespace Discord.ETF
                     //TODO: Add field/property names
                     typeInfo.ForEachField(f =>
                     {
-                        if (!f.IsPublic) return;
+                        string name;
+                        if (!f.IsPublic || !IsETFProperty(f, out name)) return;
 
+                        generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
+                        generator.Emit(OpCodes.Ldstr, name); //ETFWriter(this), name
+                        generator.EmitCall(OpCodes.Call, GetWriteMethod(typeof(string)), null);
                         generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
                         generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), obj
                         generator.Emit(OpCodes.Ldfld, f); //ETFWriter(this), obj.fieldValue
@@ -314,8 +359,12 @@ namespace Discord.ETF
 
                     typeInfo.ForEachProperty(p =>
                     {
-                        if (!p.CanRead || !p.GetMethod.IsPublic) return;
+                        string name;
+                        if (!p.CanRead || !p.GetMethod.IsPublic || !IsETFProperty(p, out name)) return;
 
+                        generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
+                        generator.Emit(OpCodes.Ldstr, name); //ETFWriter(this), name
+                        generator.EmitCall(OpCodes.Call, GetWriteMethod(typeof(string)), null);
                         generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
                         generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), obj
                         generator.EmitCall(OpCodes.Callvirt, p.GetMethod, null); //ETFWriter(this), obj.propValue
@@ -400,6 +449,30 @@ namespace Discord.ETF
         }
 
         private void WriteNil() => _stream.Write(_nilBytes, 0, _nilBytes.Length);
+        private void WriteNilExt() => _stream.Write(_nilExtBytes, 0, _nilExtBytes.Length);
+
+        private bool IsETFProperty(FieldInfo f, out string name)
+        {
+            var attrib = f.CustomAttributes.Where(x => x.AttributeType == typeof(JsonPropertyAttribute)).FirstOrDefault();
+            if (attrib != null)
+            {
+                name = attrib.ConstructorArguments.FirstOrDefault().Value as string ?? f.Name;
+                return true;
+            }
+            name = null;
+            return false;
+        }
+        private bool IsETFProperty(PropertyInfo p, out string name)
+        {
+            var attrib = p.CustomAttributes.Where(x => x.AttributeType == typeof(JsonPropertyAttribute)).FirstOrDefault();
+            if (attrib != null)
+            {
+                name = attrib.ConstructorArguments.FirstOrDefault().Value as string ?? p.Name;
+                return true;
+            }
+            name = null;
+            return false;
+        }
 
         #region IDisposable
         private bool _isDisposed = false;
