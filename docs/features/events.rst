@@ -21,8 +21,8 @@ Connection Events will be raised when the Connection State of your client change
 Messages
 --------
 
-MessageReceived, MessageUpdated and MessageDeleted are raised when a new message arrives, an existing one has been updated (by the user, or by Discord itself), or deleted.
-MessageAcknowledged is only triggered in client mode, and occurs when a message is read on another device logged-in with your account.
+- MessageReceived, MessageUpdated and MessageDeleted are raised when a new message arrives, an existing one has been updated (by the user, or by Discord itself), or deleted.
+- MessageAcknowledged is only triggered in client mode, and occurs when a message is read on another device logged-in with your account.
 
 Example of MessageReceived:
 
@@ -43,12 +43,12 @@ Users
 
 There are several user events:
 
-UserBanned: A user has been banned from a server.
-UserUnbanned: A user was unbanned.
-UserJoined: A user joins a server.
-UserLeft: A user left (or was kicked from) a server.
-UserIsTyping: A user in a channel starts typing.
-UserUpdated: A user object was updated (presence update, role/permission change, or a voice state update).
+- UserBanned: A user has been banned from a server.
+- UserUnbanned: A user was unbanned.
+- UserJoined: A user joins a server.
+- UserLeft: A user left (or was kicked from) a server.
+- UserIsTyping: A user in a channel starts typing.
+- UserUpdated: A user object was updated (presence update, role/permission change, or a voice state update).
 
 .. note::
     UserUpdated Events include a ``User`` object for Before and After the change.
