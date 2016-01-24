@@ -129,9 +129,11 @@ namespace Discord.Net.WebSockets
                     Logger.Info("Disconnected");
                 else
                     Logger.Error("Disconnected", ex);
+                State = ConnectionState.Disconnected;
                 OnDisconnected(!_taskManager.WasStopExpected, _taskManager.Exception);
             }
-            State = ConnectionState.Disconnected;
+            else
+                State = ConnectionState.Disconnected;
         }
 
 		protected virtual Task ProcessMessage(string json)
