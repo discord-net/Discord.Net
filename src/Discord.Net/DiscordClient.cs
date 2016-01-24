@@ -143,7 +143,7 @@ namespace Discord
                 if (State == ConnectionState.Connecting)
                     EndConnect();
             };
-            GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
+            //GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
 
             if (Config.UseMessageQueue)
@@ -259,7 +259,7 @@ namespace Discord
             _connectedEvent.Set();
 
             SendStatus();
-            OnConnected();
+            OnLoggedIn();
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -879,19 +879,16 @@ namespace Discord
                         break;
                     case "MESSAGE_ACK":
                         {
-                            if (Config.MessageCacheSize > 0)
+                            if (Config.Mode == DiscordMode.Client)
                             {
                                 var data = e.Payload.ToObject<MessageAckEvent>(Serializer);
                                 var channel = GetChannel(data.ChannelId);
                                 if (channel != null)
                                 {
                                     var msg = channel.GetMessage(data.MessageId, null);
-                                    if (msg != null)
-                                    {
-                                        if (Config.LogEvents)
-                                            Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                        OnMessageAcknowledged(msg);
-                                    }
+                                    if (Config.LogEvents)
+                                        Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    OnMessageAcknowledged(msg);
                                 }
                                 else
                                     Logger.Warning("MESSAGE_ACK referenced an unknown channel.");

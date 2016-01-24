@@ -5,8 +5,8 @@ namespace Discord
 {
     public partial class DiscordClient
     {
-        public event EventHandler Connected = delegate { };
-        public event EventHandler<DisconnectedEventArgs> Disconnected = delegate { };
+        public event EventHandler LoggedIn = delegate { };
+        //public event EventHandler<DisconnectedEventArgs> LoggedOut = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
         public event EventHandler<ChannelUpdatedEventArgs> ChannelUpdated = delegate { };
@@ -31,10 +31,10 @@ namespace Discord
         public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
 
-        private void OnConnected()
-            => OnEvent(Connected);
-        private void OnDisconnected(bool wasUnexpected, Exception ex)
-            => OnEvent(Disconnected, new DisconnectedEventArgs(wasUnexpected, ex));
+        private void OnLoggedIn()
+            => OnEvent(LoggedIn);
+        /*private void OnLoggedOut(bool wasUnexpected, Exception ex)
+            => OnEvent(LoggedOut, new DisconnectedEventArgs(wasUnexpected, ex));*/
 
         private void OnChannelCreated(Channel channel)
             => OnEvent(ChannelCreated, new ChannelEventArgs(channel));
