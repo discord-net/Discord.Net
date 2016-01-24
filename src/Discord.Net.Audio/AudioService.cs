@@ -49,7 +49,7 @@ namespace Discord.Audio
 			}
 			_talkingUsers = new ConcurrentDictionary<User, bool>();
 
-			client.Disconnected += async (s, e) =>
+			client.GatewaySocket.Disconnected += async (s, e) =>
 			{
                 if (Config.EnableMultiserver)
                 {
