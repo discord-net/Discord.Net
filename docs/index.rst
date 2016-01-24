@@ -28,6 +28,7 @@ This Documentation is **currently undergoing a rewrite**. Some pages (marked wit
    :maxdepth: 2
 
    getting_started
+   features/modes
    features/logging
    features/management
    features/permissions
