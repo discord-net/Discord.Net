@@ -1,4 +1,0 @@
-|stub| Profile
-===================
-
-|stub-desc|
