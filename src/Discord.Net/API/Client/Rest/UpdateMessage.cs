@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateMessageRequest : IRestRequest<Message>
+    public class UpdateMessageRequest : IRestRequest<Message>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages/{MessageId}";

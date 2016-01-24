@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Client.VoiceSocket
 {
-    public sealed class SpeakingEvent
+    public class SpeakingEvent
     {
         [JsonProperty("user_id"), JsonConverter(typeof(LongStringConverter))]
         public ulong UserId { get; set; }

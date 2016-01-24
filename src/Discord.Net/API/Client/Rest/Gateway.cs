@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GatewayRequest : IRestRequest<GatewayResponse>
+    public class GatewayRequest : IRestRequest<GatewayResponse>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"gateway";
@@ -11,7 +11,7 @@ namespace Discord.API.Client.Rest
         bool IRestRequest.IsPrivate => false;
     }
     
-    public sealed class GatewayResponse
+    public class GatewayResponse
 	{
 		[JsonProperty("url")]
 		public string Url { get; set; }

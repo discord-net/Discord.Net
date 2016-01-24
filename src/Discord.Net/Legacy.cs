@@ -25,6 +25,17 @@ namespace Discord.Legacy
 
     public static class LegacyExtensions
     {
+        [Obsolete("Use DiscordClient.ExecuteAndWait")]
+        public static void Run(this DiscordClient client, Func<Task> asyncAction)
+        {
+            client.ExecuteAndWait(asyncAction);
+        }
+        [Obsolete("Use DiscordClient.Wait")]
+        public static void Run(this DiscordClient client)
+        {
+            client.Wait();
+        }
+
         [Obsolete("Use Server.FindChannels")]
         public static IEnumerable<Channel> FindChannels(this DiscordClient client, Server server, string name, ChannelType type = null, bool exactMatch = false)
         {
@@ -163,7 +174,7 @@ namespace Discord.Legacy
         }
 
         [Obsolete("Use Channel.DownloadMessages")]
-        public static Task<Message[]> DownloadMessages(this DiscordClient client, Channel channel, int limit = 100, ulong? relativeMessageId = null, RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+        public static Task<Message[]> DownloadMessages(this DiscordClient client, Channel channel, int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before, bool useCache = true)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.DownloadMessages(limit, relativeMessageId, relativeDir, useCache);

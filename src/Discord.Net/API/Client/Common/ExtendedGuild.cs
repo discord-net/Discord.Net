@@ -4,7 +4,7 @@ namespace Discord.API.Client
 {
     public class ExtendedGuild : Guild
     {
-        public sealed class ExtendedMemberInfo : Member
+        public class ExtendedMemberInfo : Member
         {
             [JsonProperty("mute")]
             public bool? IsServerMuted { get; set; }

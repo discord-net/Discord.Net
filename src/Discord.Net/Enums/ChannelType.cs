@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-	public sealed class ChannelType : StringEnum, IEquatable<ChannelType>
+	public class ChannelType : StringEnum, IEquatable<ChannelType>
 	{
 		/// <summary> A text-only channel. </summary>
 		public static ChannelType Text { get; } = new ChannelType("text");

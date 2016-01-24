@@ -1,28 +1,14 @@
-// Finding User Permissions
+// Find a User's Channel Permissions
+var userChannelPermissions = user.GetPermissions(channel);
 
-void FindPermissions(User u, Channel c)
-{
-	ChannelPermissions cperms = u.GetPermissions(c);
-	ServerPermissions sperms = u.GetServerPermissions();
-}
+// Find a User's Server Permissions
+var userServerPermissions = user.ServerPermissions();
+var userServerPermissions = server.GetPermissions(user);
 
-void SetPermissionsChannelPerms(User u, Channel c)
-{
-	ChannelPermissions allow = new ChannelPermissions();
-	ChannelPermissions deny = new ChannelPermissions();
+// Set a User's Channel Permissions (using DualChannelPermissions)
 
-	allow.Connect = true;
-	deny.AttachFiles = true;
-
-	client.SetChannelPermissions(c, u, allow, deny)
-}
-
-void SetPermissionsDualPerms(User u, Channel c)
-{
-	DualChannelPermissions dual = new DualChannelPermissions();
-    dual.ReadMessageHistory = false;
-    dual.Connect = true;
-    dual.AttachFiles = null;
-
-    client.SetChannelPermissions(c, u, dual);
+var userPerms = user.GetPermissions(channel);
+userPerms.ReadMessageHistory = false;
+userPerms.AttachFiles = null;
+channel.AddPermissionsRule(user, userPerms);
 }

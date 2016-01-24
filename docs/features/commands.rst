@@ -1,5 +1,5 @@
-Commands
-========
+|stub| Commands
+===============
 
 The `Discord.Net.Commands`_ package DiscordBotClient extends DiscordClient with support for commands.
 
@@ -11,7 +11,7 @@ Example (Simple)
 .. literalinclude:: /samples/command.cs
    :language: csharp6
    :tab-width: 2
-   
+
 Example (Groups)
 ----------------
 

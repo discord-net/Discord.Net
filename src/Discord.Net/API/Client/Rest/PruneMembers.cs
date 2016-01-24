@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class PruneMembersRequest : IRestRequest<PruneMembersResponse>
+    public class PruneMembersRequest : IRestRequest<PruneMembersResponse>
     {
         string IRestRequest.Method => IsSimulation ? "GET" : "POST";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/prune?days={Days}";
@@ -21,7 +21,7 @@ namespace Discord.API.Client.Rest
         }
     }
 
-    public sealed class PruneMembersResponse
+    public class PruneMembersResponse
     {
         [JsonProperty("pruned")]
         public int Pruned { get; set; }

@@ -20,16 +20,20 @@ namespace Discord.Commands
 		public IEnumerable<Command> Commands => _commands;
 		public IEnumerable<CommandMap> SubGroups => _items.Values;
 
-		public CommandMap(CommandMap parent, string name, string fullName)
+        public CommandMap()
+        {
+            _items = new Dictionary<string, CommandMap>();
+            _commands = new List<Command>();
+            _isVisible = false;
+            _hasNonAliases = false;
+            _hasSubGroups = false;
+        }
+        public CommandMap(CommandMap parent, string name, string fullName)
+            : this()
 		{
 			_parent = parent;
 			_name = name;
 			_fullName = fullName;
-            _items = new Dictionary<string, CommandMap>();
-			_commands = new List<Command>();
-			_isVisible = false;
-			_hasNonAliases = false;
-			_hasSubGroups = false;
         }
 		
 		public CommandMap GetItem(string text)

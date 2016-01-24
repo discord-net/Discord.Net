@@ -5,7 +5,7 @@ namespace Discord.API.Client
 {
     public class Message : MessageReference
     {
-        public sealed class Attachment
+        public class Attachment
         {
             [JsonProperty("id")]
             public string Id { get; set; }
@@ -18,14 +18,14 @@ namespace Discord.API.Client
             [JsonProperty("filename")]
             public string Filename { get; set; }
             [JsonProperty("width")]
-            public int Width { get; set; }
+            public int? Width { get; set; }
             [JsonProperty("height")]
-            public int Height { get; set; }
+            public int? Height { get; set; }
         }
 
-        public sealed class Embed
+        public class Embed
         {
-            public sealed class Reference
+            public class Reference
             {
                 [JsonProperty("url")]
                 public string Url { get; set; }
@@ -33,25 +33,25 @@ namespace Discord.API.Client
                 public string Name { get; set; }
             }
 
-            public sealed class ThumbnailInfo
+            public class ThumbnailInfo
             {
                 [JsonProperty("url")]
                 public string Url { get; set; }
                 [JsonProperty("proxy_url")]
                 public string ProxyUrl { get; set; }
                 [JsonProperty("width")]
-                public int Width { get; set; }
+                public int? Width { get; set; }
                 [JsonProperty("height")]
-                public int Height { get; set; }
+                public int? Height { get; set; }
             }
-            public sealed class VideoInfo
+            public class VideoInfo
             {
                 [JsonProperty("url")]
                 public string Url { get; set; }
                 [JsonProperty("width")]
-                public int Width { get; set; }
+                public int? Width { get; set; }
                 [JsonProperty("height")]
-                public int Height { get; set; }
+                public int? Height { get; set; }
             }
 
             [JsonProperty("url")]

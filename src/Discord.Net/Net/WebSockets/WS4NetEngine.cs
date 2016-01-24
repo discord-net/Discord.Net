@@ -10,7 +10,7 @@ using WebSocketClient = WebSocket4Net.WebSocket;
 
 namespace Discord.Net.WebSockets
 {
-    internal sealed class WS4NetEngine : IWebSocketEngine
+    internal class WS4NetEngine : IWebSocketEngine
     {
         private readonly DiscordConfig _config;
         private readonly ConcurrentQueue<string> _sendQueue;

@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class RemoveGuildBanRequest : IRestRequest
+    public class RemoveGuildBanRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/bans/{UserId}";

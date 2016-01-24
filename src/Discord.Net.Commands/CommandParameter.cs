@@ -11,13 +11,13 @@
         /// <summary> Catches all remaining text as a single optional parameter. </summary>
         Unparsed
     }
-    public sealed class CommandParameter
+    public class CommandParameter
     {
         public string Name { get; }
         public int Id { get; internal set; }
         public ParameterType Type { get; }
 
-        public CommandParameter(string name, ParameterType type)
+        internal CommandParameter(string name, ParameterType type)
         {
             Name = name;
             Type = type;

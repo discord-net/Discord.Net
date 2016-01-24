@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Discord.Modules
 {
-    public sealed class ModuleManager
+    public class ModuleManager
 	{
 		public event EventHandler<ServerEventArgs> ServerEnabled = delegate { };
         public event EventHandler<ServerEventArgs> ServerDisabled = delegate { };
@@ -15,31 +15,31 @@ namespace Discord.Modules
         public event EventHandler<ChannelEventArgs> ChannelDisabled = delegate { };
 
         public event EventHandler<ServerEventArgs> LeftServer = delegate { };
-        public event EventHandler<ServerEventArgs> ServerUpdated = delegate { };
+        public event EventHandler<ServerUpdatedEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
         public event EventHandler<ServerEventArgs> ServerAvailable = delegate { };
         
         public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
-        public event EventHandler<ChannelEventArgs> ChannelUpdated = delegate { };
+        public event EventHandler<ChannelUpdatedEventArgs> ChannelUpdated = delegate { };
 
         public event EventHandler<RoleEventArgs> RoleCreated = delegate { };
-        public event EventHandler<RoleEventArgs> RoleUpdated = delegate { };
+        public event EventHandler<RoleUpdatedEventArgs> RoleUpdated = delegate { };
         public event EventHandler<RoleEventArgs> RoleDeleted = delegate { };
 
         public event EventHandler<UserEventArgs> UserBanned = delegate { };
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
-        public event EventHandler<UserEventArgs> UserUpdated = delegate { };
-        public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
-        public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
+        public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };
+        //public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
+        //public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
-        public event EventHandler<ChannelUserEventArgs> UserIsTypingUpdated = delegate { };
+        public event EventHandler<ChannelUserEventArgs> UserIsTyping = delegate { };
 
         public event EventHandler<MessageEventArgs> MessageReceived = delegate { };
         public event EventHandler<MessageEventArgs> MessageSent = delegate { };
         public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
-        public event EventHandler<MessageEventArgs> MessageUpdated = delegate { };
+        public event EventHandler<MessageUpdatedEventArgs> MessageUpdated = delegate { };
         public event EventHandler<MessageEventArgs> MessageReadRemotely = delegate { };
         
 		private readonly bool _useServerWhitelist, _useChannelWhitelist, _allowAll, _allowPrivate;
@@ -79,11 +79,12 @@ namespace Discord.Modules
 			if (_allowAll || _useServerWhitelist) //Server-only events
 			{
 				client.ChannelCreated += (s, e) => { if (e.Server != null && HasServer(e.Server)) ChannelCreated(s, e); };
-				client.UserVoiceStateUpdated += (s, e) => { if (HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
+                //TODO: This *is* a channel update if the before/after voice channel is whitelisted
+				//client.UserVoiceStateUpdated += (s, e) => { if (HasServer(e.Server)) UserVoiceStateUpdated(s, e); };
 			}
 
 			client.ChannelDestroyed += (s, e) => { if (HasChannel(e.Channel)) ChannelDestroyed(s, e); };
-			client.ChannelUpdated += (s, e) => { if (HasChannel(e.Channel)) ChannelUpdated(s, e); };
+			client.ChannelUpdated += (s, e) => { if (HasChannel(e.After)) ChannelUpdated(s, e); };
 
 			client.MessageReceived += (s, e) => { if (HasChannel(e.Channel)) MessageReceived(s, e); };
 			client.MessageSent += (s, e) => { if (HasChannel(e.Channel)) MessageSent(s, e); };
@@ -96,16 +97,16 @@ namespace Discord.Modules
 			client.RoleDeleted += (s, e) => { if (HasIndirectServer(e.Server)) RoleDeleted(s, e); };
 
 			client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
-			client.ServerUpdated += (s, e) => { if (HasIndirectServer(e.Server)) ServerUpdated(s, e); };
+			client.ServerUpdated += (s, e) => { if (HasIndirectServer(e.After)) ServerUpdated(s, e); };
 			client.ServerUnavailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
 			client.ServerAvailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerAvailable(s, e); };
 
 			client.UserJoined += (s, e) => { if (HasIndirectServer(e.Server)) UserJoined(s, e); };
 			client.UserLeft += (s, e) => { if (HasIndirectServer(e.Server)) UserLeft(s, e); };
 			client.UserUpdated += (s, e) => { if (HasIndirectServer(e.Server)) UserUpdated(s, e); };
-			client.UserIsTypingUpdated += (s, e) => { if (HasChannel(e.Channel)) UserIsTypingUpdated(s, e); };
+			client.UserIsTyping += (s, e) => { if (HasChannel(e.Channel)) UserIsTyping(s, e); };
 			//TODO: We aren't getting events from UserPresence if AllowPrivate is enabled, but the server we know that user through isn't on the whitelist
-			client.UserPresenceUpdated += (s, e) => { if (HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
+			//client.UserPresenceUpdated += (s, e) => { if (HasIndirectServer(e.Server)) UserPresenceUpdated(s, e); };
 			client.UserBanned += (s, e) => { if (HasIndirectServer(e.Server)) UserBanned(s, e); };
 			client.UserUnbanned += (s, e) => { if (HasIndirectServer(e.Server)) UserUnbanned(s, e); };
 		}

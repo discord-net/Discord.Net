@@ -5,7 +5,7 @@ using System.Linq;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class ReorderRolesRequest : IRestRequest<Role[]>
+    public class ReorderRolesRequest : IRestRequest<Role[]>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/roles";
@@ -19,7 +19,7 @@ namespace Discord.API.Client.Rest
         }
         bool IRestRequest.IsPrivate => false;
 
-        public sealed class Role
+        public class Role
         {
             [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
             public ulong Id { get; set; }

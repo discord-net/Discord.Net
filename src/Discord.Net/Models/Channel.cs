@@ -12,8 +12,10 @@ using APIChannel = Discord.API.Client.Channel;
 
 namespace Discord
 {
-    public sealed class Channel : IMentionable
+    public class Channel : IMentionable
     {
+        private readonly static Action<Channel, Channel> _cloner = DynamicIL.CreateCopyMethod<Channel>();
+
         private struct Member
         {
             public readonly User User;
@@ -26,7 +28,7 @@ namespace Discord
             }
         }
 
-        public sealed class PermissionOverwrite
+        public class PermissionOverwrite
         {
             public PermissionTarget TargetType { get; }
             public ulong TargetId { get; }
@@ -102,7 +104,7 @@ namespace Discord
                 return Enumerable.Empty<User>();
             }
         }
-
+                
         internal Channel(DiscordClient client, ulong id, Server server)
             : this(client, id)
         {
@@ -283,7 +285,7 @@ namespace Discord
         }
 
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
-            RelativeDirection relativeDir = RelativeDirection.Before, bool useCache = true)
+            Relative relativeDir = Relative.Before, bool useCache = true)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0 || Type != ChannelType.Text) return new Message[0];
@@ -293,7 +295,7 @@ namespace Discord
                 var request = new GetMessagesRequest(Id)
                 {
                     Limit = limit,
-                    RelativeDir = relativeMessageId.HasValue ? relativeDir == RelativeDirection.Before ? "before" : "after" : null,
+                    RelativeDir = relativeMessageId.HasValue ? relativeDir == Relative.Before ? "before" : "after" : null,
                     RelativeId = relativeMessageId ?? 0
                 };
                 var msgs = await Client.ClientAPI.Send(request).ConfigureAwait(false);
@@ -597,6 +599,14 @@ namespace Discord
             return result.User;
         }
         #endregion
+
+        internal Channel Clone()
+        {
+            var result = new Channel();
+            _cloner(this, result);
+            return result;
+        }
+        private Channel() { }
 
         public override string ToString() => Name ?? Id.ToIdString();
     }

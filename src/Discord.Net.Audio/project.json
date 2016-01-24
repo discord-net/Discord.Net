@@ -13,8 +13,8 @@
   "contentFiles": [ "libsodium.dll", "opus.dll" ],
 
   "compilationOptions": {
-    "warningsAsErrors": true,
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "warningsAsErrors": true
   },
 
   "dependencies": {

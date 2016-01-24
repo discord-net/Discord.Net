@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateProfileRequest : IRestRequest<User>
+    public class UpdateProfileRequest : IRestRequest<User>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"users/@me";

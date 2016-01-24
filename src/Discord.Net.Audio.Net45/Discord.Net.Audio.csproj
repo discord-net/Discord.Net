@@ -62,8 +62,8 @@
     <Compile Include="..\Discord.Net.Audio\InternalIsSpeakingEventArgs.cs">
       <Link>InternalIsSpeakingEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\Net\VoiceWebSocket.cs">
-      <Link>Net\VoiceWebSocket.cs</Link>
+    <Compile Include="..\Discord.Net.Audio\Net\VoiceSocket.cs">
+      <Link>Net\VoiceSocket.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\Opus\OpusConverter.cs">
       <Link>Opus\OpusConverter.cs</Link>
@@ -74,14 +74,14 @@
     <Compile Include="..\Discord.Net.Audio\Opus\OpusEncoder.cs">
       <Link>Opus\OpusEncoder.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net.Audio\SimpleAudioClient.cs">
-      <Link>SimpleAudioClient.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net.Audio\Sodium\SecretBox.cs">
       <Link>Sodium\SecretBox.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\UserIsTalkingEventArgs.cs">
       <Link>UserIsTalkingEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Audio\VirtualClient.cs">
+      <Link>VirtualClient.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Audio\VoiceBuffer.cs">
       <Link>VoiceBuffer.cs</Link>

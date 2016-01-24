@@ -1,9 +1,12 @@
 ﻿using Discord.API.Client.GatewaySocket;
+using Discord.API.Client.Rest;
 using Discord.Logging;
+using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,124 +44,175 @@ namespace Discord.Audio
             }
         }
 
+        private readonly DiscordConfig _config;
         private readonly AsyncLock _connectionLock;
-        private readonly JsonSerializer _serializer;
-        private CancellationTokenSource _cancelTokenSource;
+        private readonly TaskManager _taskManager;
+        private ConnectionState _gatewayState;
 
-        internal AudioService Service { get; }
         internal Logger Logger { get; }
+        
         public int Id { get; }
+        public AudioService Service { get; }
+        public AudioServiceConfig Config { get; }
+        public RestClient ClientAPI { get; }
         public GatewaySocket GatewaySocket { get; }
-        public VoiceWebSocket VoiceSocket { get; }
+        public VoiceSocket VoiceSocket { get; }
+        public JsonSerializer Serializer { get; }
         public Stream OutputStream { get; }
-
+        
+        public CancellationToken CancelToken { get; private set; }
+        public string SessionId { get; private set; }
+        
         public ConnectionState State => VoiceSocket.State;
         public Server Server => VoiceSocket.Server;
         public Channel Channel => VoiceSocket.Channel;
 
-        public AudioClient(AudioService service, int clientId, Server server, GatewaySocket gatewaySocket, Logger logger)
+        public AudioClient(DiscordClient client, Server server, int id)
 		{
-			Service = service;
-            _serializer = service.Client.Serializer;
-			Id = clientId;
-            GatewaySocket = gatewaySocket;
-            Logger = logger;
-            OutputStream = new OutStream(this);
+            Id = id;
+            _config = client.Config;
+            Service = client.Audio();
+            Config = Service.Config;
+            Serializer = client.Serializer;
+            _gatewayState = (int)ConnectionState.Disconnected;
 
+            //Logging
+            Logger = client.Log.CreateLogger($"AudioClient #{id}");
+
+            //Async
+            _taskManager = new TaskManager(Cleanup, false);
             _connectionLock = new AsyncLock();
+            CancelToken = new CancellationToken(true);
 
-            GatewaySocket.ReceivedDispatch += OnReceivedDispatch;
-
-            VoiceSocket = new VoiceWebSocket(service.Client, this, logger);
+            //Networking
+            if (Config.EnableMultiserver)
+            {
+                ClientAPI = new RestClient(_config, DiscordConfig.ClientAPIUrl, client.Log.CreateLogger($"ClientAPI #{id}"));
+                GatewaySocket = new GatewaySocket(_config, client.Serializer, client.Log.CreateLogger($"Gateway #{id}"));
+                GatewaySocket.Connected += (s, e) =>
+                {
+                    if (_gatewayState == ConnectionState.Connecting)
+                        EndGatewayConnect();
+                };
+            }
+            else
+                GatewaySocket = client.GatewaySocket;
+            GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
+            VoiceSocket = new VoiceSocket(_config, Config, client.Serializer, client.Log.CreateLogger($"Voice #{id}"));
             VoiceSocket.Server = server;
+            OutputStream = new OutStream(this);
+        }
 
-            /*_voiceSocket.Connected += (s, e) => RaiseVoiceConnected();
-			_voiceSocket.Disconnected += async (s, e) =>
-			{
-				_voiceSocket.CurrentServerId;
-				if (voiceServerId != null)
-					_gatewaySocket.SendLeaveVoice(voiceServerId.Value);
-				await _voiceSocket.Disconnect().ConfigureAwait(false);
-				RaiseVoiceDisconnected(socket.CurrentServerId.Value, e);
-				if (e.WasUnexpected)
-					await socket.Reconnect().ConfigureAwait(false);
-			};*/
+        public async Task Connect()
+        {
+            if (Config.EnableMultiserver)
+                await BeginGatewayConnect().ConfigureAwait(false);
+            else
+            {
+                var cancelSource = new CancellationTokenSource();
+                CancelToken = cancelSource.Token;
+                await _taskManager.Start(new Task[0], cancelSource).ConfigureAwait(false);
+            }
+        }
+        private async Task BeginGatewayConnect()
+        {
+            try
+            {
+                using (await _connectionLock.LockAsync().ConfigureAwait(false))
+                {
+                    await Disconnect().ConfigureAwait(false);
+                    _taskManager.ClearException();
 
-            /*_voiceSocket.IsSpeaking += (s, e) =>
-			{
-				if (_voiceSocket.State == WebSocketState.Connected)
-				{
-					var user = _users[e.UserId, socket.CurrentServerId];
-					bool value = e.IsSpeaking;
-					if (user.IsSpeaking != value)
-					{
-						user.IsSpeaking = value;
-						var channel = _channels[_voiceSocket.CurrentChannelId];
-						RaiseUserIsSpeaking(user, channel, value);
-						if (Config.TrackActivity)
-							user.UpdateActivity();
-					}
-				}
-			};*/
+                    ClientAPI.Token = Service.Client.ClientAPI.Token;
 
-            /*this.Connected += (s, e) =>
-			{
-				_voiceSocket.ParentCancelToken = _cancelToken;
-			};*/
+                    Stopwatch stopwatch = null;
+                    if (_config.LogLevel >= LogSeverity.Verbose)
+                        stopwatch = Stopwatch.StartNew();
+                    _gatewayState = ConnectionState.Connecting;
+
+                    var cancelSource = new CancellationTokenSource();
+                    CancelToken = cancelSource.Token;
+                    ClientAPI.CancelToken = CancelToken;
+                    
+                    await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
+
+                    await _taskManager.Start(new Task[0], cancelSource).ConfigureAwait(false);
+                    GatewaySocket.WaitForConnection(CancelToken);
+
+                    if (_config.LogLevel >= LogSeverity.Verbose)
+                    {
+                        stopwatch.Stop();
+                        double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
+                        Logger.Verbose($"Connection took {seconds} sec");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await _taskManager.SignalError(ex).ConfigureAwait(false);
+                throw;
+            }
+        }
+        private void EndGatewayConnect()
+        {
+            _gatewayState = ConnectionState.Connected;
+        }
+        
+        public async Task Disconnect()
+        {
+            await _taskManager.Stop(true).ConfigureAwait(false);
+            if (Config.EnableMultiserver)
+                ClientAPI.Token = null;
+        }
+        private async Task Cleanup()
+        {
+            var oldState = _gatewayState;
+            _gatewayState = ConnectionState.Disconnecting;
+
+            if (Config.EnableMultiserver)
+            {
+                if (oldState == ConnectionState.Connected)
+                {
+                    try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
+                    catch (OperationCanceledException) { }
+                }
+
+                await GatewaySocket.Disconnect().ConfigureAwait(false);
+                ClientAPI.Token = null;
+            }
+
+            var server = VoiceSocket.Server;
+            VoiceSocket.Server = null;
+            VoiceSocket.Channel = null;
+            if (Config.EnableMultiserver)
+                await Service.RemoveClient(server, this).ConfigureAwait(false);
+            SendVoiceUpdate(server.Id, null);
+
+            await VoiceSocket.Disconnect().ConfigureAwait(false);
+            if (Config.EnableMultiserver)
+                await GatewaySocket.Disconnect().ConfigureAwait(false);
+
+            _gatewayState = (int)ConnectionState.Disconnected;
         }
 
         public async Task Join(Channel channel)
-		{
-			if (channel == null) throw new ArgumentNullException(nameof(channel));
+        {
+            if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (channel.Type != ChannelType.Voice)
-                throw new ArgumentException("Channel must be a voice channel.", nameof(channel));            
-            if (channel.Server != VoiceSocket.Server)
-                throw new ArgumentException("This is channel is not part of the current server.", nameof(channel));
+                throw new ArgumentException("Channel must be a voice channel.", nameof(channel));
             if (channel == VoiceSocket.Channel) return;
+            var server = channel.Server;
+            if (server != VoiceSocket.Server)
+                throw new ArgumentException("This is channel is not part of the current server.", nameof(channel));
             if (VoiceSocket.Server == null)
                 throw new InvalidOperationException("This client has been closed.");
-            
-            using (await _connectionLock.LockAsync().ConfigureAwait(false))
-            {
-                VoiceSocket.Channel = channel;
 
-                await Task.Run(() =>
-                {
-                    SendVoiceUpdate();
-                    VoiceSocket.WaitForConnection(_cancelTokenSource.Token);
-                });
-            }
-        }
-        
-        public async Task Connect(bool connectGateway)
-        {
+            SendVoiceUpdate(channel.Server.Id, channel.Id);
             using (await _connectionLock.LockAsync().ConfigureAwait(false))
-            {
-                _cancelTokenSource = new CancellationTokenSource();
-                var cancelToken = _cancelTokenSource.Token;
-                VoiceSocket.ParentCancelToken = cancelToken;
-
-                if (connectGateway)
-                {
-                    GatewaySocket.ParentCancelToken = cancelToken;
-                    await GatewaySocket.Connect().ConfigureAwait(false);
-                    GatewaySocket.WaitForConnection(cancelToken);
-                }
-            }
+                await Task.Run(() => VoiceSocket.WaitForConnection(CancelToken));
         }
 
-        public async Task Disconnect()
-        {
-            using (await _connectionLock.LockAsync().ConfigureAwait(false))
-            {
-                await Service.RemoveClient(VoiceSocket.Server, this).ConfigureAwait(false);
-                VoiceSocket.Channel = null;
-                SendVoiceUpdate();
-                await VoiceSocket.Disconnect();
-            }
-        }
-
-        private async void OnReceivedDispatch(object sender, WebSocketEventEventArgs e)
+        private async void OnReceivedEvent(WebSocketEventEventArgs e)
         {
             try
             {
@@ -166,11 +220,11 @@ namespace Discord.Audio
                 {
                     case "VOICE_STATE_UPDATE":
                         {
-                            var data = e.Payload.ToObject<VoiceStateUpdateEvent>(_serializer);
+                            var data = e.Payload.ToObject<VoiceStateUpdateEvent>(Serializer);
                             if (data.GuildId == VoiceSocket.Server?.Id && data.UserId == Service.Client.CurrentUser?.Id)
                             {
                                 if (data.ChannelId == null)
-                                    await Disconnect();
+                                    await Disconnect().ConfigureAwait(false);
                                 else
                                 {
                                     var channel = Service.Client.GetChannel(data.ChannelId.Value);
@@ -179,7 +233,7 @@ namespace Discord.Audio
                                     else
                                     {
                                         Logger.Warning("VOICE_STATE_UPDATE referenced an unknown channel, disconnecting.");
-                                        await Disconnect();
+                                        await Disconnect().ConfigureAwait(false);
                                     }
                                 }
                             }
@@ -187,13 +241,16 @@ namespace Discord.Audio
                         break;
                     case "VOICE_SERVER_UPDATE":
                         {
-                            var data = e.Payload.ToObject<VoiceServerUpdateEvent>(_serializer);
+                            var data = e.Payload.ToObject<VoiceServerUpdateEvent>(Serializer);
                             if (data.GuildId == VoiceSocket.Server?.Id)
                             {
                                 var client = Service.Client;
-                                VoiceSocket.Token = data.Token;
-                                VoiceSocket.Host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
-                                await VoiceSocket.Connect().ConfigureAwait(false);
+                                var id = client.CurrentUser?.Id;
+                                if (id != null)
+                                {
+                                    var host = "wss://" + e.Payload.Value<string>("endpoint").Split(':')[0];
+                                    await VoiceSocket.Connect(host, data.Token, id.Value, GatewaySocket.SessionId, CancelToken).ConfigureAwait(false);
+                                }
                             }
                         }
                         break;
@@ -205,9 +262,6 @@ namespace Discord.Audio
             }
         }
 
-        /// <summary> Sends a PCM frame to the voice server. Will block until space frees up in the outgoing buffer. </summary>
-        /// <param name="data">PCM frame to send. This must be a single or collection of uncompressed 48Kz monochannel 20ms PCM frames. </param>
-        /// <param name="count">Number of bytes in this frame. </param>
         public void Send(byte[] data, int offset, int count)
 		{
             if (data == null) throw new ArgumentException(nameof(data));
@@ -219,29 +273,22 @@ namespace Discord.Audio
 	        VoiceSocket.SendPCMFrames(data, offset, count);
 		}
 
-        /// <summary> Clears the PCM buffer. </summary>
         public void Clear()
         {
             if (VoiceSocket.Server == null) return; //Has been closed
             VoiceSocket.ClearPCMFrames();
         }
-
-		/// <summary> Returns a task that completes once the voice output buffer is empty. </summary>
 		public void Wait()
         {
             if (VoiceSocket.Server == null) return; //Has been closed
             VoiceSocket.WaitForQueue();
 		}
 
-        private void SendVoiceUpdate()
+        public void SendVoiceUpdate(ulong? serverId, ulong? channelId)
         {
-            var serverId = VoiceSocket.Server?.Id;
-            if (serverId != null)
-            {
-                GatewaySocket.SendUpdateVoice(serverId, VoiceSocket.Channel?.Id,
-                    (Service.Config.Mode | AudioMode.Outgoing) == 0,
-                    (Service.Config.Mode | AudioMode.Incoming) == 0);
-            }
+            GatewaySocket.SendUpdateVoice(serverId, channelId,
+                (Service.Config.Mode | AudioMode.Outgoing) == 0,
+                (Service.Config.Mode | AudioMode.Incoming) == 0);
         }
 	}
 }

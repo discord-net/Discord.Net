@@ -2,7 +2,7 @@
 
 namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class RedirectEvent
+    public class RedirectEvent
     {
         [JsonProperty("url")]
         public string Url { get; set; }

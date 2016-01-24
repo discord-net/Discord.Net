@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateChannelRequest : IRestRequest<Channel>
+    public class UpdateChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"channels/{ChannelId}";

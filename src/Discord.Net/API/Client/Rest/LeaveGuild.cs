@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class LeaveGuildRequest : IRestRequest<Guild>
+    public class LeaveGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"guilds/{GuildId}";
