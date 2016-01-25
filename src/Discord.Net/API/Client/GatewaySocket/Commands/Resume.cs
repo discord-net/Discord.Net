@@ -3,7 +3,7 @@
 namespace Discord.API.Client.GatewaySocket
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class ResumeCommand : IWebSocketMessage
+    public class ResumeCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.Resume;
         object IWebSocketMessage.Payload => this;

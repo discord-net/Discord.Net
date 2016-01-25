@@ -2,7 +2,7 @@
 
 namespace Discord.API.Client.VoiceSocket
 {
-    public sealed class ReadyEvent
+    public class ReadyEvent
     {
         [JsonProperty("ssrc")]
         public uint SSRC { get; set; }

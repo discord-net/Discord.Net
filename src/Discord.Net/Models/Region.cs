@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public sealed class Region
+	public class Region
     {
         public string Id { get; }
         public string Name { get; }
@@ -16,5 +16,5 @@
             Port = port;
             Vip = vip;
         }
-	}
+    }
 }

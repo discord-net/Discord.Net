@@ -1,75 +1,78 @@
-|stub| Events
-=============
+Events
+======
 
 Usage
 -----
-To take advantage of Events in Discord.Net, you need to hook into them. 
+Messages from the Discord server are exposed via events on the DiscordClient class and follow the standard EventHandler<EventArgs> C# pattern. 
 
-There are two ways of hooking into events. See the example for examples on using these events.
+.. warning::
+    Note that all synchronous code in an event handler will run on the gateway socket's thread and should be handled as quickly as possible. 
+    Using the async-await pattern to let the thread continue immediately is recommended and is demonstrated in the examples below.
 
-Usable Events
--------------
-+--------------------+--------------------+------------------------------------------+
-| Event Name         | EventArgs          | Description                              |
-+====================+====================+==========================================+
-| UserBanned         | BanEventArgs       | Called when a user is banned.            |
-+--------------------+--------------------+------------------------------------------+
-| UserUnbanned       | BanEventArgs       | Called when a user is unbanned.          |
-+--------------------+--------------------+------------------------------------------+
-| ChannelCreated     | ChannelEventArgs   | Called when a channel is created.        |
-+--------------------+--------------------+------------------------------------------+
-| ChannelDestroyed   | ChannelEventArgs   | Called when a channel is destroyed.      |
-+--------------------+--------------------+------------------------------------------+
-| ChannelUpdated     | ChannelEventArgs   | Called when a channel is updated.        |
-+--------------------+--------------------+------------------------------------------+
-| MessageReceived    | MessageEventArgs   | Called when a message is received.       |
-+--------------------+--------------------+------------------------------------------+
-| MessageSent        | MessageEventArgs   | Called when a message is sent.           |
-+--------------------+--------------------+------------------------------------------+
-| MessageDeleted     | MessageEventArgs   | Called when a message is deleted.        |
-+--------------------+--------------------+------------------------------------------+
-| MessageUpdated     | MessageEventArgs   | Called when a message is updated\\edited.|
-+--------------------+--------------------+------------------------------------------+
-| MessageReadRemotely| MessageEventArgs   | Called when a message is read.           |
-+--------------------+--------------------+------------------------------------------+
-| RoleCreated        | RoleEventArgs      | Called when a role is created.           |
-+--------------------+--------------------+------------------------------------------+
-| RoleUpdated        | RoleEventArgs      | Called when a role is updated.           |
-+--------------------+--------------------+------------------------------------------+
-| RoleDeleted        | RoleEventArgs      | Called when a role is deleted.           |
-+--------------------+--------------------+------------------------------------------+
-| JoinedServer       | ServerEventArgs    | Called when a member joins a server.     |
-+--------------------+--------------------+------------------------------------------+
-| LeftServer         | ServerEventArgs    | Called when a member leaves a server.    |
-+--------------------+--------------------+------------------------------------------+
-| ServerUpdated      | ServerEventArgs    | Called when a server is updated.         |
-+--------------------+--------------------+------------------------------------------+
-| ServerUnavailable  | ServerEventArgs    | Called when a Discord server goes down.  |
-+--------------------+--------------------+------------------------------------------+
-| ServerAvailable    | ServerEventArgs    |Called when a Discord server goes back up.|
-+--------------------+--------------------+------------------------------------------+
-| UserJoined         | UserEventArgs      | Called when a user joins a Channel.      |
-+--------------------+--------------------+------------------------------------------+
-| UserLeft           | UserEventArgs      | Called when a user leaves a Channel.     |
-+--------------------+--------------------+------------------------------------------+
-| UserUpdated        | UserEventArgs      | ---                                      |
-+--------------------+--------------------+------------------------------------------+
-| UserPresenceUpdated| UserEventArgs      | Called when a user's presence changes.   |
-|                    |                    | (Here\\Away)                             |
-+--------------------+--------------------+------------------------------------------+
-| UserVoiceState     | UserEventArgs      | Called when a user's voice state changes.|
-| Updated            |                    | (Muted\\Unmuted)                         |
-+--------------------+--------------------+------------------------------------------+
-|UserIsTypingUpdated | UserEventArgs      | Called when a user starts\\stops typing. |
-+--------------------+--------------------+------------------------------------------+
-| UserIsSpeaking     | UserEventArgs      | Called when a user's voice state changes.|
-| Updated            |                    | (Speaking\\Not Speaking)                 |
-+--------------------+--------------------+------------------------------------------+
-| ProfileUpdated     | N/A                | Called when a user's profile changes.    |
-+--------------------+--------------------+------------------------------------------+
-Example
--------
-   
-.. literalinclude:: /samples/events.cs
-   :language: csharp6
-   :tab-width: 2
+Connection State
+----------------
+
+Connection Events will be raised when the Connection State of your client changes.
+
+.. warning::
+    You should not use DiscordClient.Connected to run code when your client first connects to Discord.
+    If you lose connection and automatically reconnect, this code will be ran again, which may lead to unexpected behavior.
+    
+Messages
+--------
+
+- MessageReceived, MessageUpdated and MessageDeleted are raised when a new message arrives, an existing one has been updated (by the user, or by Discord itself), or deleted.
+- MessageAcknowledged is only triggered in client mode, and occurs when a message is read on another device logged-in with your account.
+
+Example of MessageReceived:
+
+.. code-block:: c#
+
+    // (Preface: Echo Bots are discouraged, make sure your bot is not running in a public server if you use them)
+
+    // Hook into the MessageReceived event using a Lambda
+    _client.MessageReceived += async (s, e) => {
+            // Check to make sure that the bot is not the author
+            if (!e.Message.IsAuthor)
+                // Echo the message back to the channel
+                await e.Channel.SendMessage(e.Message);
+    };
+
+Users
+-----
+
+There are several user events:
+
+- UserBanned: A user has been banned from a server.
+- UserUnbanned: A user was unbanned.
+- UserJoined: A user joins a server.
+- UserLeft: A user left (or was kicked from) a server.
+- UserIsTyping: A user in a channel starts typing.
+- UserUpdated: A user object was updated (presence update, role/permission change, or a voice state update).
+
+.. note::
+    UserUpdated Events include a ``User`` object for Before and After the change.
+    When accessing the User, you should only use ``e.Before`` if comparing changes, otherwise use ``e.After``
+
+Examples:
+
+.. code-block:: c#
+
+    // Register a Hook into the UserBanned event using a Lambda
+    _client.UserBanned += async (s, e) => {
+        // Create a Channel object by searching for a channel named '#logs' on the server the ban occurred in.
+        var logChannel = e.Server.FindChannels("logs").FirstOrDefault();
+        // Send a message to the server's log channel, stating that a user was banned.
+        await logChannel.SendMessage($"User Banned: {e.User.Name}");
+    };
+
+    // Register a Hook into the UserUpdated event using a Lambda
+    _client.UserUpdated += async (s, e) => {
+        // Check that the user is in a Voice channel
+        if (e.After.VoiceChannel == null) return;
+
+        // See if they changed Voice channels
+        if (e.Before.VoiceChannel == e.After.VoiceChannel) return;
+
+        await logChannel.SendMessage($"User {e.After.Name} changed voice channels!");
+    };

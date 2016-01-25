@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Converters
 {
-	public sealed class LongStringConverter : JsonConverter
+	public class LongStringConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType) 
             => objectType == typeof(ulong);
@@ -14,7 +14,7 @@ namespace Discord.API.Converters
             => writer.WriteValue(((ulong)value).ToIdString());
 	}
 
-	public sealed class NullableLongStringConverter : JsonConverter
+	public class NullableLongStringConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType) 
             => objectType == typeof(ulong?);
@@ -24,7 +24,7 @@ namespace Discord.API.Converters
             => writer.WriteValue(((ulong?)value).ToIdString());
 	}
 
-    /*public sealed class LongStringEnumerableConverter : JsonConverter
+    /*public class LongStringEnumerableConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType) => objectType == typeof(IEnumerable<ulong>);
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -55,7 +55,7 @@ namespace Discord.API.Converters
 		}
 	}*/
 
-    internal sealed class LongStringArrayConverter : JsonConverter
+    internal class LongStringArrayConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType) => objectType == typeof(IEnumerable<ulong[]>);
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

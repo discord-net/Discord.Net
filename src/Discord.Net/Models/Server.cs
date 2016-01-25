@@ -12,14 +12,16 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> Represents a Discord server (also known as a guild). </summary>
-	public sealed class Server
+	public class Server
     {
+        private readonly static Action<Server, Server> _cloner = DynamicIL.CreateCopyMethod<Server>();
+
         internal static string GetIconUrl(ulong serverId, string iconId)
             => iconId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/${serverId}/icons/${iconId}.jpg" : null;
         internal static string GetSplashUrl(ulong serverId, string splashId)
             => splashId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/splashes/{splashId}.jpg" : null;
 
-        public sealed class Emoji
+        public class Emoji
         {
             public string Id { get; }
 
@@ -85,8 +87,9 @@ namespace Discord
         public Channel AFKChannel => _afkChannelId != null ? GetChannel(_afkChannelId.Value) : null;
         /// <summary> Gets the current user in this server. </summary>
         public User CurrentUser => GetUser(Client.CurrentUser.Id);
-        /// <summary> Gets the URL to this user's current avatar. </summary>
+        /// <summary> Gets the URL to this server's current icon. </summary>
         public string IconUrl => GetIconUrl(Id, IconId);
+        /// <summary> Gets the URL to this servers's splash image. </summary>
         public string SplashUrl => GetSplashUrl(Id, SplashId);
 
         /// <summary> Gets a collection of all channels in this server. </summary>
@@ -143,16 +146,15 @@ namespace Discord
                     Roles = x.RoleIds.Select(y => GetRole(y)).Where(y => y != null).ToArray()
                 }).ToArray();
             }
-
-            //Can be null
-            _afkChannelId = model.AFKChannelId;
-            SplashId = model.Splash;
-
             if (model.Roles != null)
             {
                 foreach (var x in model.Roles)
                     AddRole(x.Id).Update(x);
             }
+
+            //Can be null
+            _afkChannelId = model.AFKChannelId;
+            SplashId = model.Splash;
         }
         internal void Update(ExtendedGuild model)
         {
@@ -498,7 +500,15 @@ namespace Discord
         public void RequestOfflineUsers()
             => Client.GatewaySocket.SendRequestMembers(Id, "", 0);
         #endregion
-        
-		public override string ToString() => Name ?? Id.ToIdString();
+
+        internal Server Clone()
+        {
+            var result = new Server();
+            _cloner(this, result);
+            return result;
+        }
+        private Server() { } //Used for cloning
+
+        public override string ToString() => Name ?? Id.ToIdString();
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord
 {
-    public sealed class ServiceManager
+    public class ServiceManager
     {
         private readonly Dictionary<Type, IService> _services;
 

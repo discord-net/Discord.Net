@@ -1,20 +1,21 @@
-client.CreateCommandGroup("invites", invites =>
-{
-	invites.DefaultMinPermissions((int)Permissions.Admin);
-	
-	//Usage: invites accept [inviteCode]
-	invites.CreateCommand("accept")
-		.ArgsEqual(1)
-		.Do(async e =>
-		{
-			try
-			{
-				await _client.AcceptInvite(e.Args[0]);
-				await _client.SendMessage(e.Channel, "Invite \"" + e.Args[0] + "\" accepted.");
-			}
-			catch (HttpException ex)
-			{
-				await _client.SendMessage(e.Channel, "Error: " + ex.Message);
-			}
-		});
-});
+//we would run our commands with ~do greet X and ~do bye X
+commands.CreateGroup("do", cgb =>
+        {
+            cgb.CreateCommand("greet")
+                    .Alias(new string[] { "gr", "hi" })
+                    .Description("Greets a person.")
+                    .Parameter("GreetedPerson", ParameterType.Required)
+                    .Do(async e =>
+                    {
+                        await client.SendMessage(e.Channel, e.User.Name + " greets " + e.GetArg("GreetedPerson"));
+                    });
+
+            cgb.CreateCommand("bye")
+                    .Alias(new string[] { "bb", "gb" })
+                    .Description("Greets a person.")
+                    .Parameter("GreetedPerson", ParameterType.Required)
+                    .Do(async e =>
+                    {
+                        await client.SendMessage(e.Channel, e.User.Name + " says goodbye to " + e.GetArg("GreetedPerson"));
+                    });
+        });

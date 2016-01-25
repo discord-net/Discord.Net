@@ -2,6 +2,7 @@
 using Discord.API.Client.GatewaySocket;
 using Discord.API.Client.Rest;
 using Discord.Logging;
+using Discord.Net.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,20 +12,21 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public sealed class GatewaySocket : WebSocket
+    public class GatewaySocket : WebSocket
     {
+        private RestClient _rest;
         private uint _lastSequence;
         private int _reconnects;
 
-        public string Token { get; internal set; }
-        public string SessionId { get; internal set; }
+        //public string Token { get; private set; }
+        public string SessionId { get; private set; }
 
         public event EventHandler<WebSocketEventEventArgs> ReceivedDispatch = delegate { };
         private void OnReceivedDispatch(string type, JToken payload)
             => ReceivedDispatch(this, new WebSocketEventEventArgs(type, payload));
 
-        public GatewaySocket(DiscordClient client, Logger logger)
-			: base(client, logger)
+        public GatewaySocket(DiscordConfig config, JsonSerializer serializer, Logger logger)
+			: base(config, serializer, logger)
 		{
 			Disconnected += async (s, e) =>
 			{
@@ -32,17 +34,19 @@ namespace Discord.Net.WebSockets
 					await Reconnect().ConfigureAwait(false);
 			};
 		}
-
-        public async Task Connect()
+        
+        public async Task Connect(RestClient rest, CancellationToken parentCancelToken)
         {
-            var gatewayResponse = await _client.ClientAPI.Send(new GatewayRequest()).ConfigureAwait(false);
-            Host = gatewayResponse.Url;
-            if (Logger.Level >= LogSeverity.Verbose)
-                Logger.Verbose($"Login successful, gateway: {gatewayResponse.Url}");
+            _rest = rest;
+            //Token = rest.Token;
 
-            await BeginConnect().ConfigureAwait(false);
+            var gatewayResponse = await rest.Send(new GatewayRequest()).ConfigureAwait(false);
+            Logger.Verbose($"Login successful, gateway: {gatewayResponse.Url}");
+
+            Host = gatewayResponse.Url;
+            await BeginConnect(parentCancelToken).ConfigureAwait(false);
             if (SessionId == null)
-                SendIdentify(Token);
+                SendIdentify(_rest.Token);
             else
                 SendResume();
         }
@@ -50,17 +54,17 @@ namespace Discord.Net.WebSockets
 		{
 			try
 			{
-				var cancelToken = ParentCancelToken.Value;
+				var cancelToken = _parentCancelToken;
                 if (_reconnects++ == 0)
-				    await Task.Delay(_client.Config.ReconnectDelay, cancelToken).ConfigureAwait(false);
+				    await Task.Delay(_config.ReconnectDelay, cancelToken).ConfigureAwait(false);
                 else
-                    await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+                    await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 
                 while (!cancelToken.IsCancellationRequested)
 				{
 					try
                     {
-                        await Connect().ConfigureAwait(false);
+                        await Connect(_rest, _parentCancelToken).ConfigureAwait(false);
 						break;
 					}
 					catch (OperationCanceledException) { throw; }
@@ -68,20 +72,25 @@ namespace Discord.Net.WebSockets
 					{
 						Logger.Error("Reconnect failed", ex);
 						//Net is down? We can keep trying to reconnect until the user runs Disconnect()
-						await Task.Delay(_client.Config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
+						await Task.Delay(_config.FailedReconnectDelay, cancelToken).ConfigureAwait(false);
 					}
 				}
 			}
 			catch (OperationCanceledException) { }
 		}
-        public Task Disconnect() => _taskManager.Stop(true);
+        public async Task Disconnect()
+        {
+            await _taskManager.Stop(true).ConfigureAwait(false);
+            //Token = null;
+            SessionId = null;
+        }
 
 		protected override async Task Run()
         {
             List<Task> tasks = new List<Task>();
             tasks.AddRange(_engine.GetTasks(CancelToken));
             tasks.Add(HeartbeatAsync(CancelToken));
-            await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
+            await _taskManager.Start(tasks, _cancelSource).ConfigureAwait(false);
         }
         protected override Task Cleanup()
         {
@@ -103,11 +112,16 @@ namespace Discord.Net.WebSockets
 			{
 				case OpCodes.Dispatch:
 					{
-						OnReceivedDispatch(msg.Type, msg.Payload as JToken);
+                        if (msg.Type == "READY")
+                            SessionId = (msg.Payload as JToken).Value<string>("session_id");
+
+                        OnReceivedDispatch(msg.Type, msg.Payload as JToken);
+
                         if (msg.Type == "READY" || msg.Type == "RESUMED")
                         {
+                            _heartbeatInterval = (msg.Payload as JToken).Value<int>("heartbeat_interval");
                             _reconnects = 0;
-                            await EndConnect(); //Complete the connect
+                            await EndConnect().ConfigureAwait(false); //Complete the connect
                         }
 					}
 					break;
@@ -142,7 +156,7 @@ namespace Discord.Net.WebSockets
                 Version = 3,
                 Token = token,
                 Properties = props, 
-                LargeThreshold = _client.Config.UseLargeThreshold ? 100 : (int?)null,
+                LargeThreshold = _config.UseLargeThreshold ? 100 : (int?)null,
                 UseCompression = true
             };
 			QueueMessage(msg);
@@ -162,11 +176,6 @@ namespace Discord.Net.WebSockets
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
 		public void SendRequestMembers(ulong serverId, string query, int limit)
             => QueueMessage(new RequestMembersCommand { GuildId = serverId, Query = query, Limit = limit });
-
-        internal void StartHeartbeat(int interval)
-        {
-            _heartbeatInterval = interval;
-        }
 
         //Cancel if either DiscordClient.Disconnect is called, data socket errors or timeout is reached
         public override void WaitForConnection(CancellationToken cancelToken)

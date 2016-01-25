@@ -1,4 +1,4 @@
 ﻿namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class ChannelDeleteEvent : Channel { }
+    public class ChannelDeleteEvent : Channel { }
 }

@@ -31,7 +31,6 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private readonly ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
-        private CancellationTokenSource _cancelTokenSource;
 
         internal Logger Logger { get; }
 
@@ -136,19 +135,19 @@ namespace Discord
             };
 
             //Networking
-            ClientAPI = new RestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
-            StatusAPI = new RestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
-            GatewaySocket = new GatewaySocket(this, Log.CreateLogger("Gateway"));
+            ClientAPI = new JsonRestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
+            StatusAPI = new JsonRestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
+            GatewaySocket = new GatewaySocket(Config, Serializer, Log.CreateLogger("Gateway"));
             GatewaySocket.Connected += (s, e) =>
             {
                 if (State == ConnectionState.Connecting)
                     EndConnect();
             };
-            GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
+            //GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
 
             if (Config.UseMessageQueue)
-                MessageQueue = new MessageQueue(this, Log.CreateLogger("MessageQueue"));
+                MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
 
             //Extensibility
             Services = new ServiceManager(this);
@@ -182,9 +181,7 @@ namespace Discord
             {
                 using (await _connectionLock.LockAsync().ConfigureAwait(false))
                 {
-                    if (State != ConnectionState.Disconnected)
-                        await Disconnect().ConfigureAwait(false);
-                    await _taskManager.Stop().ConfigureAwait(false);
+                    await Disconnect().ConfigureAwait(false);
                     _taskManager.ClearException();
 
                     Stopwatch stopwatch = null;
@@ -193,19 +190,20 @@ namespace Discord
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
 
-                    _cancelTokenSource = new CancellationTokenSource();
-                    CancelToken = _cancelTokenSource.Token;
-                    GatewaySocket.ParentCancelToken = CancelToken;
+                    var cancelSource = new CancellationTokenSource();
+                    CancelToken = cancelSource.Token;
+                    ClientAPI.CancelToken = CancelToken;
+                    StatusAPI.CancelToken = CancelToken;
 
                     await Login(email, password, token).ConfigureAwait(false);
-                    await GatewaySocket.Connect().ConfigureAwait(false);
+                    await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
 
                     List<Task> tasks = new List<Task>();
                     tasks.Add(CancelToken.Wait());
                     if (Config.UseMessageQueue)
                         tasks.Add(MessageQueue.Run(CancelToken, Config.MessageQueueInterval));
 
-                    await _taskManager.Start(tasks, _cancelTokenSource).ConfigureAwait(false);
+                    await _taskManager.Start(tasks, cancelSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
 
                     if (Config.LogLevel >= LogSeverity.Verbose)
@@ -228,29 +226,27 @@ namespace Discord
             byte[] cacheKey = null;
 
             //Get Token
-            if (token == null && Config.CacheToken)
+            if (email != null && Config.CacheToken)
             {
-                Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
-                    new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
-                cacheKey = deriveBytes.GetBytes(16);
-
                 tokenPath = GetTokenCachePath(email);
-                oldToken = LoadToken(tokenPath, cacheKey);
-                ClientAPI.Token = oldToken;
+                if (token == null && password != null)
+                {
+                    Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password,
+                        new byte[] { 0x5A, 0x2A, 0xF8, 0xCF, 0x78, 0xD3, 0x7D, 0x0D });
+                    cacheKey = deriveBytes.GetBytes(16);
+
+                    oldToken = LoadToken(tokenPath, cacheKey);
+                    token = oldToken;
+                }
             }
-            else
-                ClientAPI.Token = token;
-                
+
+            ClientAPI.Token = token;                
             var request = new LoginRequest() { Email = email, Password = password };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
             token = response.Token;
-            if (Config.CacheToken && token != oldToken)
+            if (Config.CacheToken && token != oldToken && tokenPath != null)
                 SaveToken(tokenPath, cacheKey, token);
-
             ClientAPI.Token = token;
-
-            GatewaySocket.Token = token;
-            GatewaySocket.SessionId = null;
 
             //Cache other stuff
             var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));
@@ -262,9 +258,8 @@ namespace Discord
             State = ConnectionState.Connected;
             _connectedEvent.Set();
 
-            ClientAPI.CancelToken = CancelToken;
             SendStatus();
-            OnConnected();
+            OnLoggedIn();
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -275,7 +270,10 @@ namespace Discord
             State = ConnectionState.Disconnecting;
 
             if (oldState == ConnectionState.Connected)
-                await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false);
+            {
+                try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
+                catch (OperationCanceledException) { }
+            }
 
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
@@ -283,8 +281,6 @@ namespace Discord
 
             await GatewaySocket.Disconnect().ConfigureAwait(false);
             ClientAPI.Token = null;
-            GatewaySocket.Token = null;
-            GatewaySocket.SessionId = null;
 
             _servers.Clear();
             _channels.Clear();
@@ -482,8 +478,6 @@ namespace Discord
                             if (Config.LogLevel >= LogSeverity.Verbose)
                                 stopwatch = Stopwatch.StartNew();
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
-                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
-                            GatewaySocket.SessionId = data.SessionId;
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
@@ -508,12 +502,6 @@ namespace Discord
                                 double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
                                 Logger.Verbose($"READY took {seconds} sec");
                             }
-                        }
-                        break;
-                    case "RESUMED":
-                        {
-                            var data = e.Payload.ToObject<ResumedEvent>(Serializer);
-                            GatewaySocket.StartHeartbeat(data.HeartbeatInterval);
                         }
                         break;
 
@@ -546,10 +534,11 @@ namespace Discord
                             var server = GetServer(data.Id);
                             if (server != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? server.Clone() : null;
                                 server.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Server Updated: {server.Name}");
-                                OnServerUpdated(server);
+                                OnServerUpdated(before, server);
                             }
                             else
                                 Logger.Warning("GUILD_UPDATE referenced an unknown guild.");
@@ -609,10 +598,11 @@ namespace Discord
                             var channel = GetChannel(data.Id);
                             if (channel != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? channel.Clone() : null;
                                 channel.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Channel Updated: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                OnChannelUpdated(channel);
+                                OnChannelUpdated(before, channel);
                             }
                             else
                                 Logger.Warning("CHANNEL_UPDATE referenced an unknown channel.");
@@ -660,10 +650,11 @@ namespace Discord
                                 var user = server.GetUser(data.User.Id);
                                 if (user != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     if (Config.LogEvents)
                                         Logger.Info($"User Updated: {server.Name}/{user.Name}");
-                                    OnUserUpdated(user);
+                                    OnUserUpdated(before, user);
                                 }
                                 else
                                     Logger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
@@ -721,7 +712,7 @@ namespace Discord
                                 role.Update(data.Data);
                                 if (Config.LogEvents)
                                     Logger.Info($"Role Created: {server.Name}/{role.Name}");
-                                OnRoleUpdated(role);
+                                OnRoleCreated(role);
                             }
                             else
                                 Logger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");
@@ -736,10 +727,11 @@ namespace Discord
                                 var role = server.GetRole(data.Data.Id);
                                 if (role != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
                                     role.Update(data.Data);
                                     if (Config.LogEvents)
                                         Logger.Info($"Role Updated: {server.Name}/{role.Name}");
-                                    OnRoleUpdated(role);
+                                    OnRoleUpdated(before, role);
                                 }
                                 else
                                     Logger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
@@ -860,10 +852,11 @@ namespace Discord
                             if (channel != null)
                             {
                                 var msg = channel.GetMessage(data.Id, data.Author?.Id);
+                                var before = Config.EnablePreUpdateEvents ? msg.Clone() : null;
                                 msg.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Verbose($"Message Update: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                OnMessageUpdated(msg);
+                                OnMessageUpdated(before, msg);
                             }
                             else
                                 Logger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
@@ -886,19 +879,16 @@ namespace Discord
                         break;
                     case "MESSAGE_ACK":
                         {
-                            if (Config.MessageCacheSize > 0)
+                            if (Config.Mode == DiscordMode.Client)
                             {
                                 var data = e.Payload.ToObject<MessageAckEvent>(Serializer);
                                 var channel = GetChannel(data.ChannelId);
                                 if (channel != null)
                                 {
                                     var msg = channel.GetMessage(data.MessageId, null);
-                                    if (msg != null)
-                                    {
-                                        if (Config.LogEvents)
-                                            Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                        OnMessageAcknowledged(msg);
-                                    }
+                                    if (Config.LogEvents)
+                                        Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
+                                    OnMessageAcknowledged(msg);
                                 }
                                 else
                                     Logger.Warning("MESSAGE_ACK referenced an unknown channel.");
@@ -936,9 +926,10 @@ namespace Discord
 
                             if (user != null)
                             {
+                                var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                 user.Update(data);
                                 //Logger.Verbose($"Presence Updated: {server.Name}/{user.Name}");
-                                OnUserPresenceUpdated(user);
+                                OnUserUpdated(before, user);
                             }
                             /*else //Occurs when a user leaves a server
                                 Logger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
@@ -982,9 +973,10 @@ namespace Discord
                                 var user = server.GetUser(data.UserId);
                                 if (user != null)
                                 {
+                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
-                                    OnUserVoiceStateUpdated(user);
+                                    OnUserUpdated(before, user);
                                 }
                                 /*else //Occurs when a user leaves a server
                                     Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");*/
@@ -1000,15 +992,20 @@ namespace Discord
                             var data = e.Payload.ToObject<UserUpdateEvent>(Serializer);
                             if (data.Id == CurrentUser.Id)
                             {
+                                var before = Config.EnablePreUpdateEvents ? CurrentUser.Clone() : null;
                                 CurrentUser.Update(data);
                                 PrivateUser.Update(data);
                                 foreach (var server in _servers)
                                     server.Value.CurrentUser.Update(data);
                                 if (Config.LogEvents)
                                     Logger.Info("Profile Updated");
-                                OnProfileUpdated(CurrentUser);
+                                OnProfileUpdated(before, CurrentUser);
                             }
                         }
+                        break;
+
+                    //Handled in GatewaySocket
+                    case "RESUMED":
                         break;
 
                     //Ignored
@@ -1032,17 +1029,13 @@ namespace Discord
         #endregion
 
         #region Async Wrapper
-        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
-        public void Run(Func<Task> asyncAction)
+        /// <summary> Blocking call that will execute the provided async method and wait until the client has been manually stopped. This is mainly intended for use in console applications. </summary>
+        public void ExecuteAndWait(Func<Task> asyncAction)
         {
-            try
-            {
-                AsyncContext.Run(asyncAction);
-            }
-            catch (TaskCanceledException) { }
+            asyncAction().GetAwaiter().GetResult();
             _disconnectedEvent.WaitOne();
         }
-        /// <summary> Blocking call that will not return until client has been stopped. This is mainly intended for use in console applications. </summary>
+        /// <summary> Blocking call and wait until the client has been manually stopped. This is mainly intended for use in console applications. </summary>
         public void Wait()
         {
             _disconnectedEvent.WaitOne();

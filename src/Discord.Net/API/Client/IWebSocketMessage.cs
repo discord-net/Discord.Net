@@ -8,7 +8,7 @@ namespace Discord.API.Client
         object Payload { get; }
         bool IsPrivate { get; }
     }
-    public sealed class WebSocketMessage
+    public class WebSocketMessage
     {
         [JsonProperty("op")]
         public int? Operation { get; set; }

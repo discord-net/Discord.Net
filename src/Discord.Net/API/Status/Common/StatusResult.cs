@@ -5,7 +5,7 @@ namespace Discord.API.Status
 {
     public class StatusResult
     {
-        public sealed class PageData
+        public class PageData
         {
             [JsonProperty("id")]
             public string Id { get; set; }
@@ -17,7 +17,7 @@ namespace Discord.API.Status
             public DateTime? UpdatedAt { get; set; }
         }
 
-        public sealed class IncidentData
+        public class IncidentData
         {
             [JsonProperty("id")]
             public string Id { get; set; }
@@ -50,7 +50,7 @@ namespace Discord.API.Status
             public IncidentUpdateData[] Updates { get; set; }
         }
 
-        public sealed class IncidentUpdateData
+        public class IncidentUpdateData
         {
             [JsonProperty("id")]
             public string Id { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Discord.API.Client.VoiceSocket
 {
-    public sealed class SetSpeakingCommand : IWebSocketMessage
+    public class SetSpeakingCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.Speaking;
         object IWebSocketMessage.Payload => this;

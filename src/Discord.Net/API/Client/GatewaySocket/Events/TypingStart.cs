@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class TypingStartEvent
+    public class TypingStartEvent
     {
         [JsonProperty("user_id"), JsonConverter(typeof(LongStringConverter))]
         public ulong UserId { get; set; }

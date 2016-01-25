@@ -5,7 +5,7 @@ namespace Discord.API.Client
 {
     public class MemberPresence : MemberReference
     {
-        public sealed class GameInfo
+        public class GameInfo
         {
             [JsonProperty("name")]
             public string Name { get; set; }

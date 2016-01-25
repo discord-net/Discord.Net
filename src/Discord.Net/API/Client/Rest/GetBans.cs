@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetBansRequest : IRestRequest<UserReference[]>
+    public class GetBansRequest : IRestRequest<UserReference[]>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/bans";

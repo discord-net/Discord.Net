@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-	public sealed class Command
+    //TODO: Make this more friendly and expose it to be extendable
+    public class Command
     {
         private string[] _aliases;
         internal CommandParameter[] _parameters;

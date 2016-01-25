@@ -1,14 +1,15 @@
 ﻿using Discord.API;
+using Discord.ETF;
 using Discord.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    public sealed partial class RestClient
+    public abstract partial class RestClient
 	{
         private struct RestResults
         {
@@ -32,8 +33,8 @@ namespace Discord.Net.Rest
 
         private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
+        private readonly ETFWriter _serializer;
         private string _token;
-        private JsonSerializerSettings _deserializeSettings;
 
         internal Logger Logger { get; }
 
@@ -49,24 +50,15 @@ namespace Discord.Net.Rest
             }
         }
 
-        public RestClient(DiscordConfig config, string baseUrl, Logger logger)
+        protected RestClient(DiscordConfig config, string baseUrl, Logger logger)
 		{
 			_config = config;
             Logger = logger;
 
 #if !DOTNET5_4
-			_engine = new RestSharpEngine(config, baseUrl, logger);
+            _engine = new RestSharpEngine(config, baseUrl, logger);
 #else
 			_engine = new BuiltInEngine(config, baseUrl, logger);
-#endif
-
-            _deserializeSettings = new JsonSerializerSettings();
-#if TEST_RESPONSES
-            _deserializeSettings.CheckAdditionalContent = true;
-            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Error;
-#else
-            _deserializeSettings.CheckAdditionalContent = false;
-            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
 #endif
 
             if (Logger.Level >= LogSeverity.Verbose)
@@ -98,7 +90,7 @@ namespace Discord.Net.Rest
 
             OnSendingRequest(request);
             var results = await Send(request, true).ConfigureAwait(false);
-            var response = DeserializeResponse<ResponseT>(results.Response);
+            var response = Deserialize<ResponseT>(results.Response);
             OnSentRequest(request, response, results.Response, results.Milliseconds);
 
             return response;
@@ -118,9 +110,8 @@ namespace Discord.Net.Rest
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             OnSendingRequest(request);
-            var requestJson = JsonConvert.SerializeObject(request.Payload);
             var results = await SendFile(request, true).ConfigureAwait(false);
-            var response = DeserializeResponse<ResponseT>(results.Response);
+            var response = Deserialize<ResponseT>(results.Response);
             OnSentRequest(request, response, results.Response, results.Milliseconds);
 
             return response;
@@ -139,7 +130,7 @@ namespace Discord.Net.Rest
             object payload = request.Payload;
             string requestJson = null;
             if (payload != null)
-				requestJson = JsonConvert.SerializeObject(payload);
+				requestJson = Serialize(payload);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             string responseJson = await _engine.Send(request.Method, request.Endpoint, requestJson, CancelToken).ConfigureAwait(false);
@@ -159,13 +150,7 @@ namespace Discord.Net.Rest
             return new RestResults(responseJson, milliseconds);
         }
 
-		private T DeserializeResponse<T>(string json)
-		{
-#if TEST_RESPONSES
-			if (string.IsNullOrEmpty(json))
-				throw new Exception("API check failed: Response is empty.");
-#endif
-            return JsonConvert.DeserializeObject<T>(json, _deserializeSettings);
-		}
+        protected abstract string Serialize<T>(T obj);
+        protected abstract T Deserialize<T>(string json);
 	}
 }

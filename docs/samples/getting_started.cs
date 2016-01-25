@@ -11,17 +11,17 @@ class Program
 		client.MessageReceived += async (s, e) =>
 		{
 			if (!e.Message.IsAuthor)
-				await client.SendMessage(e.Channel, e.Message.Text);
+				await e.Channel.SendMessage(e.Message.Text);
 		};
 
 		//Convert our sync method to an async one and block the Main function until the bot disconnects
-		client.Run(async () =>
+		client.ExecuteAndWait(async () =>
 		{
 			//Connect to the Discord server using our email and password
 			await client.Connect("discordtest@email.com", "Password123");
 
 			//If we are not a member of any server, use our invite code (made beforehand in the official Discord Client)
-			if (!client.AllServers.Any())
+			if (!client.Servers.Any())
 				await client.AcceptInvite(client.GetInvite("aaabbbcccdddeee"));
 		});
 	}

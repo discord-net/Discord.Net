@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-	public sealed class PermissionTarget : StringEnum
+	public class PermissionTarget : StringEnum
 	{
 		/// <summary> A text-only channel. </summary>
 		public static PermissionTarget Role { get; } = new PermissionTarget("role");

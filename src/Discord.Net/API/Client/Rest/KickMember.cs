@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class KickMemberRequest : IRestRequest
+    public class KickMemberRequest : IRestRequest
     {
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/members/{UserId}";

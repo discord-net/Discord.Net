@@ -4,7 +4,7 @@ using System.Text;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetMessagesRequest : IRestRequest<Message[]>
+    public class GetMessagesRequest : IRestRequest<Message[]>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint

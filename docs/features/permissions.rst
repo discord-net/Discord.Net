@@ -1,11 +1,11 @@
 Permissions
-==================
+===========
 
 There are two types of permissions: *Channel Permissions* and *Server Permissions*.
 
 Channel Permissions
 -------------------
-Channel Permissions have a set of bools behind them:
+Channel Permissions are controlled using a set of flags:
 
 ======================= ======= ==============
 Flag                    Type    Description
@@ -49,7 +49,7 @@ Otherwise, you can use a single DualChannelPermissions.
 Server Permissions
 ------------------
 
-Server permisisons are read-only, you cannot change them. You may still access them, however, using User.GetServerPermissions();
+Server Permissions can be accessed by ``Server.GetPermissions(User)``, and updated with ``Server.UpdatePermissions(User, ServerPermissions)``
 
 A user's server permissions also contain the default values for it's channel permissions, so the channel permissions listed above are also valid flags for Server Permissions. There are also a few extra Server Permissions:
 
@@ -57,7 +57,7 @@ A user's server permissions also contain the default values for it's channel per
 Flag                    Type    Description
 ======================= ======= ==============
 BanMembers              Server  Ban users from the server.
-KickMembers             Server  Kick users from the server. They can stil rejoin.
+KickMembers             Server  Kick users from the server. They can still rejoin.
 ManageRoles             Server  Manage roles on the server, and their permissions.
 ManageChannels          Server  Manage channels that exist on the server (add, remove them)
 ManageServer            Server  Manage the server settings.
@@ -69,7 +69,7 @@ Managing permissions for roles is much easier than for users in channels. For ro
 
 Example
 -------
-   
+
 .. literalinclude:: /samples/permissions.cs
    :language: csharp6
    :tab-width: 2

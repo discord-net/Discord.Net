@@ -9,37 +9,41 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> Helper class used to manage several tasks and keep them in sync. If any single task errors or stops, all other tasks will also be stopped. </summary>
-    public sealed class TaskManager
+    public class TaskManager
     {
         private readonly AsyncLock _lock;
         private readonly Func<Task> _stopAction;
+        private ExceptionDispatchInfo _stopReason;
 
         private CancellationTokenSource _cancelSource;
         private Task _task;
 
-        public bool WasStopExpected => _wasStopExpected;
-        private bool _wasStopExpected;
+        public bool StopOnCompletion { get; }
+        public bool WasStopExpected { get; private set; }
 
         public Exception Exception => _stopReason?.SourceException;
-        private ExceptionDispatchInfo _stopReason;
 
-        internal TaskManager()
+        internal TaskManager(bool stopOnCompletion)
         {
             _lock = new AsyncLock();
+            StopOnCompletion = stopOnCompletion;
         }
-        public TaskManager(Action stopAction)
-            : this()
+        public TaskManager(Action stopAction, bool stopOnCompletion = true)
+            : this(stopOnCompletion)
         {
             _stopAction = TaskHelper.ToAsync(stopAction);
         }
-        public TaskManager(Func<Task> stopAction)
-            : this()
+        public TaskManager(Func<Task> stopAction, bool stopOnCompletion = true)
+            : this(stopOnCompletion)
         {
             _stopAction = stopAction;
         }
 
         public async Task Start(IEnumerable<Task> tasks, CancellationTokenSource cancelSource)
         {
+            if (tasks == null) throw new ArgumentNullException(nameof(tasks));
+            if (cancelSource == null) throw new ArgumentNullException(nameof(cancelSource));
+
             while (true)
             {
                 var task = _task;
@@ -54,27 +58,36 @@ namespace Discord
                         continue; //Another thread sneaked in and started this manager before we got a lock, loop and try again
 
                     _stopReason = null;
-                    _wasStopExpected = false;
+                    WasStopExpected = false;
 
                     Task[] tasksArray = tasks.ToArray();
-                    Task<Task> anyTask = Task.WhenAny(tasksArray);
-                    Task allTasks = Task.WhenAll(tasksArray);
 
                     _task = Task.Run(async () =>
                     {
-                        //Wait for the first task to stop or error
-                        Task firstTask = await anyTask.ConfigureAwait(false);
+                        if (tasksArray.Length > 0)
+                        {
+                            Task<Task> anyTask = tasksArray.Length > 0 ? Task.WhenAny(tasksArray) : null;
+                            Task allTasks = tasksArray.Length > 0 ? Task.WhenAll(tasksArray) : null;
+                            //Wait for the first task to stop or error
+                            Task firstTask = await anyTask.ConfigureAwait(false);
 
-                        //Signal the rest of the tasks to stop
-                        if (firstTask.Exception != null)
-                            await SignalError(firstTask.Exception).ConfigureAwait(false);
-                        else
-                            await SignalStop().ConfigureAwait(false);
+                            //Signal the rest of the tasks to stop
+                            if (firstTask.Exception != null)
+                                await SignalError(firstTask.Exception).ConfigureAwait(false);
+                            else if (StopOnCompletion) //Unless we allow for natural completions
+                                await SignalStop().ConfigureAwait(false);
 
-                        //Wait for the other tasks, and signal their errors too just in case
-                        try { await allTasks.ConfigureAwait(false); }
-                        catch (AggregateException ex) { await SignalError(ex.InnerExceptions.First()).ConfigureAwait(false); } 
-                        catch (Exception ex) { await SignalError(ex).ConfigureAwait(false); }
+                            //Wait for the other tasks, and signal their errors too just in case
+                            try { await allTasks.ConfigureAwait(false); }
+                            catch (AggregateException ex) { await SignalError(ex.InnerExceptions.First()).ConfigureAwait(false); }
+                            catch (Exception ex) { await SignalError(ex).ConfigureAwait(false); }
+                        }
+
+                        if (!StopOnCompletion && !_cancelSource.IsCancellationRequested)
+                        {
+                            try { await Task.Delay(-1, _cancelSource.Token).ConfigureAwait(false); } //Pause until TaskManager is stopped
+                            catch (OperationCanceledException) { }
+                        }
 
                         //Run the cleanup function within our lock
                         if (_stopAction != null)
@@ -92,13 +105,9 @@ namespace Discord
             using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (isExpected)
-                    _wasStopExpected = true;
+                    WasStopExpected = true;
 
-                if (_task == null) return; //Are we running?
-                if (_cancelSource.IsCancellationRequested) return;
-
-                if (_cancelSource != null)
-                    _cancelSource.Cancel();
+                Cancel();
             }
         }
         public async Task Stop(bool isExpected = false)
@@ -107,14 +116,11 @@ namespace Discord
             using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 if (isExpected)
-                    _wasStopExpected = true;
+                    WasStopExpected = true;
 
                 //Cache the task so we still have something to await if Cleanup is run really quickly
-                task = _task;
-                if (task == null) return; //Are we running?
-
-                if (!_cancelSource.IsCancellationRequested && _cancelSource != null)
-                    _cancelSource.Cancel();
+                task = _task ?? TaskHelper.CompletedTask;
+                Cancel();
             }
             await task.ConfigureAwait(false);
         }
@@ -125,9 +131,7 @@ namespace Discord
             {
                 if (_stopReason != null) return;
 
-                _stopReason = ExceptionDispatchInfo.Capture(ex);
-                if (_cancelSource != null)
-                    _cancelSource.Cancel();
+                Cancel(ex);
             }
         }
         public async Task Error(Exception ex)
@@ -139,14 +143,19 @@ namespace Discord
 
                 //Cache the task so we still have something to await if Cleanup is run really quickly
                 task = _task ?? TaskHelper.CompletedTask;
-                if (!_cancelSource.IsCancellationRequested)
-                {
-                    _stopReason = ExceptionDispatchInfo.Capture(ex);
-                    if (_cancelSource != null)
-                        _cancelSource.Cancel();
-                }
+                Cancel(ex);
             }
             await task.ConfigureAwait(false);
+        }
+        private void Cancel(Exception ex = null)
+        {
+            var source = _cancelSource;
+            if (source != null && !source.IsCancellationRequested)
+            {
+                if (ex != null)
+                    _stopReason = ExceptionDispatchInfo.Capture(ex);
+                _cancelSource.Cancel();
+            }
         }
 
         /// <summary> Throws an exception if one was captured. </summary>
@@ -160,7 +169,7 @@ namespace Discord
             using (_lock.Lock())
             {
                 _stopReason = null;
-                _wasStopExpected = false;
+                WasStopExpected = false;
             }
         }
     }

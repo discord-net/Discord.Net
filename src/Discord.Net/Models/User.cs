@@ -9,8 +9,10 @@ using APIMember = Discord.API.Client.Member;
 
 namespace Discord
 {
-	public sealed class User : IMentionable
+	public class User
     {
+        private readonly static Action<User, User> _cloner = DynamicIL.CreateCopyMethod<User>();
+
         internal static string GetAvatarUrl(ulong userId, string avatarId) 
             => avatarId != null ? $"{DiscordConfig.ClientAPIUrl}users/{userId}/avatars/{avatarId}.jpg" : null;
 
@@ -338,6 +340,14 @@ namespace Discord
             => Edit(roles: Roles.Except(roles));
         #endregion
 
-		public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
+        internal User Clone()
+        {
+            var result = new User();
+            _cloner(this, result);
+            return result;
+        }
+        private User() { } //Used for cloning
+
+        public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
 	}
 }

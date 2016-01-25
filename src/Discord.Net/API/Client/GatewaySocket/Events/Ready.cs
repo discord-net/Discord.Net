@@ -2,9 +2,9 @@
 
 namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class ReadyEvent
+    public class ReadyEvent
     {
-        public sealed class ReadState
+        public class ReadState
         {
             [JsonProperty("id")]
             public string ChannelId { get; set; }
