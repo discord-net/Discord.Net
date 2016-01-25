@@ -283,10 +283,10 @@ namespace Discord.Commands
 						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Multiple:
-						output.Append(" [...]");
+						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Unparsed:
-						output.Append(" [--]");
+						output.Append($" {param.Name}]");
 						break;
 				}
 			}
