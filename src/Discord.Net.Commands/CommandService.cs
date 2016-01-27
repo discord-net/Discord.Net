@@ -286,7 +286,7 @@ namespace Discord.Commands
 						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Unparsed:
-						output.Append($" {param.Name}]");
+						output.Append($" {param.Name}");
 						break;
 				}
 			}
