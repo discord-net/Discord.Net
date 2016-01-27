@@ -98,6 +98,11 @@ namespace Discord.Commands
                         msg = msg.Substring(e.Server.CurrentUser.Mention.Length);
                         activated = true;
                     }
+                    else if (e.Channel.IsPrivate && msg.StartsWith($"@{client.CurrentUser.Name}"))
+                    {
+                        msg = msg.Substring(client.CurrentUser.Name.Length);
+                        activated = true;
+                    }
                 }
 
                 // Checking if that's null with the Custom flag set on launch and  throwing an
@@ -112,7 +117,8 @@ namespace Discord.Commands
                     }
                 }
 
-                // This kills trying to parse messages when you don't have a command char set or anything else
+                // This kills trying to parse messages when you don't have a command char set,
+                // but also keeps it from trying to parse everything when you *do* have something set
                 if (!activated)
                     return;
 
