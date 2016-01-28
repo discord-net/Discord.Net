@@ -840,6 +840,8 @@ namespace Discord
                                         Logger.Verbose($"Message Received: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
                                     OnMessageReceived(msg);
                                 }
+                                else
+                                    Logger.Warning("MESSAGE_CREATE referenced an unknown user.");
                             }
                             else
                                 Logger.Warning("MESSAGE_CREATE referenced an unknown channel.");
