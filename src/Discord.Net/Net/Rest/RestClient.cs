@@ -26,8 +26,12 @@ namespace Discord.Net.Rest
         public event EventHandler<RequestEventArgs> SendingRequest = delegate { };
         public event EventHandler<CompletedRequestEventArgs> SentRequest = delegate { };
 
-        private void OnSendingRequest(IRestRequest request)
-            => SendingRequest(this, new RequestEventArgs(request));
+        private bool OnSendingRequest(IRestRequest request)
+        {
+            var eventArgs = new RequestEventArgs(request);
+            SendingRequest(this, eventArgs);
+            return !eventArgs.Cancel;
+        }
         private void OnSentRequest(IRestRequest request, object response, string responseJson, double milliseconds)
             => SentRequest(this, new CompletedRequestEventArgs(request, response, responseJson, milliseconds));
 
@@ -88,7 +92,7 @@ namespace Discord.Net.Rest
 		{
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            OnSendingRequest(request);
+            if (!OnSendingRequest(request)) throw new OperationCanceledException();
             var results = await Send(request, true).ConfigureAwait(false);
             var response = Deserialize<ResponseT>(results.Response);
             OnSentRequest(request, response, results.Response, results.Milliseconds);
@@ -99,7 +103,7 @@ namespace Discord.Net.Rest
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            OnSendingRequest(request);
+            if (!OnSendingRequest(request)) throw new OperationCanceledException();
             var results = await Send(request, false).ConfigureAwait(false);
             OnSentRequest(request, null, null, results.Milliseconds);
         }
@@ -109,7 +113,7 @@ namespace Discord.Net.Rest
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            OnSendingRequest(request);
+            if (!OnSendingRequest(request)) throw new OperationCanceledException();
             var results = await SendFile(request, true).ConfigureAwait(false);
             var response = Deserialize<ResponseT>(results.Response);
             OnSentRequest(request, response, results.Response, results.Milliseconds);
@@ -120,7 +124,7 @@ namespace Discord.Net.Rest
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            OnSendingRequest(request);
+            if (!OnSendingRequest(request)) throw new OperationCanceledException();
             var results = await SendFile(request, false).ConfigureAwait(false);
             OnSentRequest(request, null, null, results.Milliseconds);
         }
