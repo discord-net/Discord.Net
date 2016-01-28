@@ -13,23 +13,13 @@ namespace Discord.ETF
     public unsafe class ETFWriter : IDisposable
     {
         private readonly static byte[] _nilBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 3, (byte)'n', (byte)'i', (byte)'l' };
-        private readonly static byte[] _nilExtBytes = new byte[] { (byte)ETFType.NIL_EXT};
         private readonly static byte[] _falseBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 5, (byte)'f', (byte)'a', (byte)'l', (byte)'s', (byte)'e' };
         private readonly static byte[] _trueBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 4, (byte)'t', (byte)'r', (byte)'u', (byte)'e' };
 
-        private readonly static MethodInfo _writeTMethod = typeof(ETFWriter).GetTypeInfo()
-            .GetDeclaredMethods(nameof(Write))
-            .Where(x => x.IsGenericMethodDefinition && x.GetParameters()[0].ParameterType == x.GetGenericArguments()[0])
-            .Single();
-        private readonly static MethodInfo _writeNullableTMethod = typeof(ETFWriter).GetTypeInfo()
-            .GetDeclaredMethods(nameof(Write))
-            .Where(x =>
-            {
-                if (!x.IsGenericMethodDefinition) return false;
-                var p = x.GetParameters()[0].ParameterType.GetTypeInfo();
-                return p.IsGenericType && p.GetGenericTypeDefinition() == typeof(Nullable<>);
-            })
-            .Single();
+        private readonly static MethodInfo _writeTMethod = GetGenericWriteMethod(null);
+        private readonly static MethodInfo _writeNullableTMethod = GetGenericWriteMethod(typeof(Nullable<>));
+        private readonly static MethodInfo _writeDictionaryTMethod = GetGenericWriteMethod(typeof(IDictionary<,>));
+        private readonly static MethodInfo _writeEnumerableTMethod = GetGenericWriteMethod(typeof(IEnumerable<>));
         private readonly static DateTime _epochTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private readonly Stream _stream;
@@ -57,29 +47,6 @@ namespace Discord.ETF
             _encoding = Encoding.UTF8;
             _serializers = new ConcurrentDictionary<Type, Delegate>();
             _indirectSerializers = new ConcurrentDictionary<Type, Delegate>();
-        }
-
-        enum EnumTest1 { A, B, C }
-        public static byte[] Test()
-        {
-            using (var stream = new MemoryStream())
-            {
-                using (var writer = new ETFWriter(stream))
-                {
-                    var request = new API.Client.Rest.SendMessageRequest(109384029348)
-                    {
-                        Content = "TestMsg",
-                        Nonce = null,
-                        IsTTS = false
-                    };
-                    writer.Write(request);
-                    /*writer.Write<EnumTest1>((EnumTest1?)EnumTest1.C);
-                    writer.Write((object)(EnumTest1?)EnumTest1.C);
-                    writer.Write<EnumTest1>((EnumTest1?)null);
-                    writer.Write((object)(EnumTest1?)null);*/
-                }
-                return stream.ToArray();
-            }
         }
         
         public void Write(bool value)
@@ -177,18 +144,19 @@ namespace Discord.ETF
             _stream.Write(_buffer, 0, 9);
         }
 
-        public void Write(DateTime value) => Write((ulong)((value.Ticks - _epochTime.Ticks) / TimeSpan.TicksPerMillisecond));
+        public void Write(DateTime value) => Write((ulong)((value.Ticks - _epochTime.Ticks) / TimeSpan.TicksPerSecond));
 
-        public void Write(byte? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
+        public void Write(bool? value) { if (value.HasValue) Write((bool)value.Value); else WriteNil(); }
         public void Write(sbyte? value) { if (value.HasValue) Write((long)value.Value); else WriteNil(); }
-        public void Write(ushort? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
+        public void Write(byte? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
         public void Write(short? value) { if (value.HasValue) Write((long)value.Value); else WriteNil(); }
-        public void Write(uint? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
+        public void Write(ushort? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
         public void Write(int? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
-        public void Write(ulong? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
+        public void Write(uint? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
         public void Write(long? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
-        public void Write(float? value) { if (value.HasValue) Write((double)value.Value); else WriteNil(); }
+        public void Write(ulong? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
         public void Write(double? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
+        public void Write(float? value) { if (value.HasValue) Write((double)value.Value); else WriteNil(); }
         public void Write(DateTime? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
 
         public void Write(byte[] value)
@@ -251,10 +219,13 @@ namespace Discord.ETF
                 _buffer[2] = (byte)((length >> 16) & 0xFF);
                 _buffer[3] = (byte)((length >> 8) & 0xFF);
                 _buffer[4] = (byte)(length & 0xFF);
+                _stream.Write(_buffer, 0, 5);
+
                 for (int i = 0; i < array.Length; i++)
                     Write(array[i]);
-                WriteNilExt();
-                _stream.Write(_buffer, 0, 5);
+
+                _buffer[0] = (byte)ETFType.NIL_EXT;
+                _stream.Write(_buffer, 0, 1);
             }
             else
                 WriteNil();
@@ -269,12 +240,13 @@ namespace Discord.ETF
                 _buffer[2] = (byte)((length >> 16) & 0xFF);
                 _buffer[3] = (byte)((length >> 8) & 0xFF);
                 _buffer[4] = (byte)(length & 0xFF);
+                _stream.Write(_buffer, 0, 5);
+
                 foreach (var pair in obj)
                 {
                     Write(pair.Key);
                     Write(pair.Value);
                 }
-                _stream.Write(_buffer, 0, 5);
             }
             else
                 WriteNil();
@@ -292,55 +264,95 @@ namespace Discord.ETF
                 WriteNil();
         }
 
+        private void WriteNil() => _stream.Write(_nilBytes, 0, _nilBytes.Length);
+
         public virtual void Flush() => _stream.Flush();
         public virtual long Seek(int offset, SeekOrigin origin) => _stream.Seek(offset, origin);
-        
-        private Action<ETFWriter, T> CreateSerializer<T>(Type type, TypeInfo typeInfo, bool isObject)
-        {
-            var method = new DynamicMethod(!isObject ? "SerializeETF" : "SerializeIndirectETF", 
-                null, new[] { typeof(ETFWriter), isObject? typeof(object) : type }, true);
-            var generator = method.GetILGenerator();
 
-            if (typeInfo.IsPrimitive || typeInfo.IsEnum)
+        #region Emit
+        private Action<ETFWriter, T> CreateSerializer<T>(Type type, TypeInfo typeInfo, bool isDirect)
+        {
+            var method = new DynamicMethod(isDirect ? "SerializeETF" : "SerializeIndirectETF", 
+                null, new[] { typeof(ETFWriter), isDirect ? type : typeof(object) }, true);
+            var generator = method.GetILGenerator();
+            
+            generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
+            generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), value
+            if (!isDirect)
             {
-                generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
-                generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), value
-                if (isObject && typeInfo.IsValueType)
-                    generator.Emit(OpCodes.Unbox_Any, type); //ETFWriter(this), value
-                EmitETFWriteValue(generator, type, typeInfo);
+                if (typeInfo.IsValueType) //Unbox value types
+                    generator.Emit(OpCodes.Unbox_Any, type); //ETFWriter(this), real_value
+                else //Cast reference types
+                    generator.Emit(OpCodes.Castclass, type); //ETFWriter(this), real_value
+                generator.EmitCall(OpCodes.Call, _writeTMethod.MakeGenericMethod(type), null); //Call generic version
             }
             else
-            {
-                //Scan for certain interfaces
-                Type dictionaryI = null, enumerableI = null;
-                foreach (var i in typeInfo.ImplementedInterfaces
-                    .Where(x => x.IsConstructedGenericType))
-                {
-                    if (i.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-                    {
-                        //TODO: Emit null check
-                        dictionaryI = i;
-                        break;
-                    }
-                    else if (i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                    {
-                        //TODO: Emit null check
-                        enumerableI = i;
-                        break;
-                    }
-                }
+                EmitWriteValue(generator, type, typeInfo, true);
 
-                if (dictionaryI != null)
+            generator.Emit(OpCodes.Ret);
+            return method.CreateDelegate(typeof(Action<ETFWriter, T>)) as Action<ETFWriter, T>;
+        }
+        private void EmitWriteValue(ILGenerator generator, Type type, TypeInfo typeInfo, bool isTop)
+        {            
+            //Convert enum types to their base type
+            if (typeInfo.IsEnum)
+            {
+                type = Enum.GetUnderlyingType(type);
+                typeInfo = type.GetTypeInfo();
+            }
+            
+            //Primitives/Enums
+            Type targetType = null;
+            if (!typeInfo.IsEnum && IsType(type, typeof(long), typeof(ulong), typeof(double), typeof(bool), typeof(string),
+                             typeof(sbyte?), typeof(byte?), typeof(short?), typeof(ushort?),
+                             typeof(int?), typeof(uint?), typeof(long?), typeof(ulong?),
+                             typeof(bool?), typeof(float?), typeof(double?),
+                             typeof(object), typeof(DateTime)))
+            {
+                //No conversion needed
+                targetType = type;
+            }
+            else if (IsType(type, typeof(sbyte), typeof(short), typeof(int)))
+            {
+                //Convert to long
+                generator.Emit(OpCodes.Conv_I8);
+                targetType = typeof(long);
+            }
+            else if (IsType(type, typeof(byte), typeof(ushort), typeof(uint)))
+            {
+                //Convert to ulong
+                generator.Emit(OpCodes.Conv_U8);
+                targetType = typeof(ulong);
+            }
+            else if (IsType(type, typeof(float)))
+            {
+                //Convert to double
+                generator.Emit(OpCodes.Conv_R8);
+                targetType = typeof(double);
+            }
+            if (targetType != null)
+                generator.EmitCall(OpCodes.Call, GetWriteMethod(targetType), null);
+
+            //Dictionaries
+            else if (!typeInfo.IsValueType && typeInfo.ImplementedInterfaces
+                    .Any(x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+                generator.EmitCall(OpCodes.Call, _writeDictionaryTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
+
+            //Enumerable
+            else if (!typeInfo.IsValueType && typeInfo.ImplementedInterfaces
+                    .Any(x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                generator.EmitCall(OpCodes.Call, _writeEnumerableTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
+
+            //Nullable Structs
+            else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) && 
+                    typeInfo.GenericTypeParameters[0].GetTypeInfo().IsValueType)
+                generator.EmitCall(OpCodes.Call, _writeNullableTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
+
+            //Structs/Classes
+            else if (typeInfo.IsClass || (typeInfo.IsValueType && !typeInfo.IsPrimitive))
+            {
+                if (isTop)
                 {
-                    throw new NotImplementedException();
-                }
-                else if (enumerableI != null)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    //TODO: Add field/property names
                     typeInfo.ForEachField(f =>
                     {
                         string name;
@@ -352,9 +364,7 @@ namespace Discord.ETF
                         generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
                         generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), obj
                         generator.Emit(OpCodes.Ldfld, f); //ETFWriter(this), obj.fieldValue
-                        if (isObject && typeInfo.IsValueType)
-                            generator.Emit(OpCodes.Unbox_Any, type); //ETFWriter(this), obj.fieldValue
-                        EmitETFWriteValue(generator, f.FieldType);
+                        EmitWriteValue(generator, f.FieldType, f.FieldType.GetTypeInfo(), false);
                     });
 
                     typeInfo.ForEachProperty(p =>
@@ -368,71 +378,23 @@ namespace Discord.ETF
                         generator.Emit(OpCodes.Ldarg_0); //ETFWriter(this)
                         generator.Emit(OpCodes.Ldarg_1); //ETFWriter(this), obj
                         generator.EmitCall(OpCodes.Callvirt, p.GetMethod, null); //ETFWriter(this), obj.propValue
-                        if (isObject && typeInfo.IsValueType)
-                            generator.Emit(OpCodes.Unbox_Any, type); //ETFWriter(this), obj.propValue
-                        EmitETFWriteValue(generator, p.PropertyType);
+                        EmitWriteValue(generator, p.PropertyType, p.PropertyType.GetTypeInfo(), false);
                     });
                 }
+                else
+                {
+                    //While we could drill deeper and make a large serializer that also serializes all subclasses, 
+                    //it's more efficient to serialize on a per-type basis via another Write<T> call.
+                    generator.EmitCall(OpCodes.Call, _writeTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
+                }
             }
-
-            generator.Emit(OpCodes.Ret);
-            return method.CreateDelegate(typeof(Action<ETFWriter, T>)) as Action<ETFWriter, T>;
-        }
-
-        private void EmitETFWriteValue(ILGenerator generator, Type type, TypeInfo typeInfo = null)
-        {
-            if (typeInfo == null)
-                typeInfo = type.GetTypeInfo();
-            
-            //Convert enum types to their base type
-            if (typeInfo.IsEnum)
-            {
-                type = Enum.GetUnderlyingType(type);
-                typeInfo = type.GetTypeInfo();
-            }            
-            
-            //Check if this type already has a direct call or simple conversion
-            Type targetType = null;
-            if (!typeInfo.IsEnum && IsType(type, typeof(long), typeof(ulong), typeof(double), typeof(bool), typeof(string),
-                             typeof(sbyte?), typeof(byte?), typeof(short?), typeof(ushort?),
-                             typeof(int?), typeof(uint?), typeof(long?), typeof(ulong?),
-                             typeof(bool?), typeof(float?), typeof(double?),
-                             typeof(object), typeof(DateTime)))
-                targetType = type; //Direct
-            else if (IsType(type, typeof(sbyte), typeof(short), typeof(int)))
-            {
-                generator.Emit(OpCodes.Conv_I8);
-                targetType = typeof(long);
-            }
-            else if (IsType(type, typeof(byte), typeof(ushort), typeof(uint)))
-            {
-                generator.Emit(OpCodes.Conv_U8);
-                targetType = typeof(ulong);
-            }
-            else if (IsType(type, typeof(float)))
-            {
-                generator.Emit(OpCodes.Conv_R8);
-                targetType = typeof(double);
-            }
-
-            //Primitives/Enums
-            if (targetType != null)
-                generator.EmitCall(OpCodes.Call, GetWriteMethod(targetType), null);
-
-            //Nullable Non-Primitives
-            else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>))
-                generator.EmitCall(OpCodes.Call, _writeNullableTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
-
-            //Structs/Classes
-            else if (typeInfo.IsClass || (typeInfo.IsValueType && !typeInfo.IsPrimitive))
-                generator.EmitCall(OpCodes.Call, _writeTMethod.MakeGenericMethod(type), null);
 
             //Unsupported (decimal, char)
             else
                 throw new InvalidOperationException($"Serializing {type.Name} is not supported.");
         }
 
-        private bool IsType(Type type, params Type[] types)
+        private static bool IsType(Type type, params Type[] types)
         {
             for (int i = 0; i < types.Length; i++)
             {
@@ -441,17 +403,7 @@ namespace Discord.ETF
             }
             return false;
         }
-        private MethodInfo GetWriteMethod(Type paramType)
-        {
-            return typeof(ETFWriter).GetTypeInfo().GetDeclaredMethods(nameof(Write))
-                .Where(x => x.GetParameters()[0].ParameterType == paramType)
-                .FirstOrDefault();
-        }
-
-        private void WriteNil() => _stream.Write(_nilBytes, 0, _nilBytes.Length);
-        private void WriteNilExt() => _stream.Write(_nilExtBytes, 0, _nilExtBytes.Length);
-
-        private bool IsETFProperty(FieldInfo f, out string name)
+        private static bool IsETFProperty(FieldInfo f, out string name)
         {
             var attrib = f.CustomAttributes.Where(x => x.AttributeType == typeof(JsonPropertyAttribute)).FirstOrDefault();
             if (attrib != null)
@@ -462,7 +414,7 @@ namespace Discord.ETF
             name = null;
             return false;
         }
-        private bool IsETFProperty(PropertyInfo p, out string name)
+        private static bool IsETFProperty(PropertyInfo p, out string name)
         {
             var attrib = p.CustomAttributes.Where(x => x.AttributeType == typeof(JsonPropertyAttribute)).FirstOrDefault();
             if (attrib != null)
@@ -473,6 +425,36 @@ namespace Discord.ETF
             name = null;
             return false;
         }
+
+        private static MethodInfo GetWriteMethod(Type paramType)
+        {
+            return typeof(ETFWriter).GetTypeInfo().GetDeclaredMethods(nameof(Write))
+                .Where(x => x.GetParameters()[0].ParameterType == paramType)
+                .FirstOrDefault();
+        }
+        private static MethodInfo GetGenericWriteMethod(Type genericType)
+        {
+            if (genericType == null)
+            {
+                return typeof(ETFWriter).GetTypeInfo()
+                    .GetDeclaredMethods(nameof(Write))
+                    .Where(x => x.IsGenericMethodDefinition && x.GetParameters()[0].ParameterType == x.GetGenericArguments()[0])
+                    .Single();
+            }
+            else
+            {
+                return typeof(ETFWriter).GetTypeInfo()
+                   .GetDeclaredMethods(nameof(Write))
+                   .Where(x =>
+                   {
+                       if (!x.IsGenericMethodDefinition) return false;
+                       var p = x.GetParameters()[0].ParameterType.GetTypeInfo();
+                       return p.IsGenericType && p.GetGenericTypeDefinition() == genericType;
+                   })
+                   .Single();
+            }
+        }
+        #endregion
 
         #region IDisposable
         private bool _isDisposed = false;
