@@ -141,7 +141,7 @@ namespace Discord.Audio
                 {
                     if (_defaultClient.Server != server)
                     {
-                        await _defaultClient.Disconnect();
+                        await _defaultClient.Disconnect().ConfigureAwait(false);
                         _defaultClient.VoiceSocket.Server = server;
                         await _defaultClient.Connect().ConfigureAwait(false);
                     }

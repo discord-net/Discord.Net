@@ -129,11 +129,11 @@ namespace Discord.Net.WebSockets
         protected override async Task Cleanup()
         {
             var sendThread = _sendTask;
-            if (sendThread != null) await sendThread;
+            if (sendThread != null) await sendThread.ConfigureAwait(false);
             _sendTask = null;
 
             var receiveThread = _receiveTask;
-            if (receiveThread != null) await receiveThread;
+            if (receiveThread != null) await receiveThread.ConfigureAwait(false);
             _receiveTask = null;
 
             OpusDecoder decoder;
@@ -146,7 +146,7 @@ namespace Discord.Net.WebSockets
             ClearPCMFrames();
             _udp = null;
 
-            await base.Cleanup();
+            await base.Cleanup().ConfigureAwait(false);
         }
 
         private async Task ReceiveVoiceAsync(CancellationToken cancelToken)
@@ -166,7 +166,7 @@ namespace Discord.Net.WebSockets
 
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    await Task.Delay(1);
+                    await Task.Delay(1).ConfigureAwait(false);
                     if (_udp.Available > 0)
                     {
 #if !DOTNET5_4
@@ -256,7 +256,7 @@ namespace Discord.Net.WebSockets
             try
             {
                 while (!cancelToken.IsCancellationRequested && State != ConnectionState.Connected)
-                    await Task.Delay(1);
+                    await Task.Delay(1).ConfigureAwait(false);
 
                 if (cancelToken.IsCancellationRequested)
                     return;
@@ -372,10 +372,10 @@ namespace Discord.Net.WebSockets
                         {
                             int time = (int)Math.Floor(ticksToNextFrame / ticksPerMillisecond);
                             if (time > 0)
-                                await Task.Delay(time);
+                                await Task.Delay(time).ConfigureAwait(false);
                         }
                         else
-                            await Task.Delay(1); //Give as much time to the encrypter as possible
+                            await Task.Delay(1).ConfigureAwait(false); //Give as much time to the encrypter as possible
                     }
                 }
             }
@@ -446,7 +446,7 @@ namespace Discord.Net.WebSockets
                         var payload = (msg.Payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
                         _secretKey = payload.SecretKey;
                         SendSetSpeaking(true);
-                        await EndConnect();
+                        await EndConnect().ConfigureAwait(false);
                     }
                     break;
                 case OpCodes.Speaking:
