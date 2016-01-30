@@ -278,7 +278,6 @@ namespace Discord
             if (Config.UseMessageQueue)
                 MessageQueue.Clear();
 
-
             await GatewaySocket.Disconnect().ConfigureAwait(false);
             ClientAPI.Token = null;
 

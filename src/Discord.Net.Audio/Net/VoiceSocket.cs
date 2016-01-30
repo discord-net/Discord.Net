@@ -129,11 +129,19 @@ namespace Discord.Net.WebSockets
         protected override async Task Cleanup()
         {
             var sendThread = _sendTask;
-            if (sendThread != null) await sendThread.ConfigureAwait(false);
+            if (sendThread != null)
+            {
+                try { await sendThread.ConfigureAwait(false); }
+                catch (Exception) { } //Ignore any errors during cleanup
+            }
             _sendTask = null;
 
             var receiveThread = _receiveTask;
-            if (receiveThread != null) await receiveThread.ConfigureAwait(false);
+            if (receiveThread != null)
+            {
+                try { await receiveThread.ConfigureAwait(false); }
+                catch (Exception) { } //Ignore any errors during cleanup
+            }
             _receiveTask = null;
 
             OpusDecoder decoder;
@@ -384,8 +392,11 @@ namespace Discord.Net.WebSockets
         }
 #if !DOTNET5_4
         //Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
-        private Task WatcherAsync()
-            => CancelToken.Wait().ContinueWith(_ => _udp.Close());
+        private async Task WatcherAsync()
+        {
+            await CancelToken.Wait();
+            _udp.Close();
+        }
 #endif
 
         protected override async Task ProcessMessage(string json)
