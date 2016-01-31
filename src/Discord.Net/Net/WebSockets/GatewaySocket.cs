@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -103,7 +104,11 @@ namespace Discord.Net.WebSockets
         protected override async Task ProcessMessage(string json)
 		{
             base.ProcessMessage(json).GetAwaiter().GetResult(); //This is just a CompletedTask, and we need to avoid asyncs in here
-			var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
+
+            WebSocketMessage msg;
+            using (var reader = new JsonTextReader(new StringReader(json)))
+                msg = _serializer.Deserialize(reader, typeof(WebSocketMessage)) as WebSocketMessage;
+            
 			if (msg.Sequence.HasValue)
 				_lastSequence = msg.Sequence.Value;
 

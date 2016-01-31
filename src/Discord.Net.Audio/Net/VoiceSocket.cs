@@ -10,6 +10,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -402,7 +403,11 @@ namespace Discord.Net.WebSockets
         protected override async Task ProcessMessage(string json)
         {
             await base.ProcessMessage(json).ConfigureAwait(false);
-            var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
+
+            WebSocketMessage msg;
+            using (var reader = new JsonTextReader(new StringReader(json)))
+                msg = _serializer.Deserialize(reader, typeof(WebSocketMessage)) as WebSocketMessage;
+            
             var opCode = (OpCodes)msg.Operation;
             switch (opCode)
             {

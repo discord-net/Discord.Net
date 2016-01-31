@@ -1,22 +1,23 @@
 ﻿using Discord.Logging;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Discord.Net.Rest
 {
     public class JsonRestClient : RestClient
     {
-        private JsonSerializerSettings _deserializeSettings;
+        private JsonSerializer _serializer;
 
         public JsonRestClient(DiscordConfig config, string baseUrl, Logger logger)
             : base(config, baseUrl, logger)
         {
-            _deserializeSettings = new JsonSerializerSettings();
+            _serializer = new JsonSerializer();
 #if TEST_RESPONSES
-            _deserializeSettings.CheckAdditionalContent = true;
-            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Error;
+            _serializer.CheckAdditionalContent = true;
+            _serializer.MissingMemberHandling = MissingMemberHandling.Error;
 #else
-            _deserializeSettings.CheckAdditionalContent = false;
-            _deserializeSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            _serializer.CheckAdditionalContent = false;
+            _serializer.MissingMemberHandling = MissingMemberHandling.Ignore;
 #endif
         }
 
@@ -31,7 +32,8 @@ namespace Discord.Net.Rest
 			if (string.IsNullOrEmpty(json))
 				throw new Exception("API check failed: Response is empty.");
 #endif
-            return JsonConvert.DeserializeObject<T>(json, _deserializeSettings);
+            using (var reader = new JsonTextReader(new StringReader(json)))
+                return (T)_serializer.Deserialize(reader, typeof(T));
         }
     }
 }
