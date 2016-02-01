@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> Provides a connection to the DiscordApp service. </summary>
-    public partial class DiscordClient
+    public partial class DiscordClient : IDisposable
     {
         private readonly AsyncLock _connectionLock;
         private readonly ManualResetEvent _disconnectedEvent;
