@@ -2,7 +2,6 @@
 
 namespace Discord.Audio.Opus
 {
-	/// <summary> Opus codec wrapper. </summary>
 	internal class OpusDecoder : OpusConverter
     {
         /// <summary> Creates a new Opus decoder. </summary>

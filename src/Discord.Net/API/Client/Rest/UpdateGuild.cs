@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class UpdateGuildRequest : IRestRequest<Guild>
+    public class UpdateGuildRequest : IRestRequest<Guild>
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}";

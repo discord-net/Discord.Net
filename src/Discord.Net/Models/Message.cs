@@ -1,12 +1,9 @@
 ﻿using Discord.API.Client.Rest;
 using Discord.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using APIMessage = Discord.API.Client.Message;
@@ -25,11 +22,13 @@ namespace Discord
 		Failed
     }
 
-	public sealed class Message
+	public class Message
     {
-        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>", RegexOptions.Compiled);
-        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>", RegexOptions.Compiled);
-        private static readonly Regex _roleRegex = new Regex(@"@everyone", RegexOptions.Compiled);
+        private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCopyMethod<Message>();
+
+        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>");
+        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>");
+        private static readonly Regex _roleRegex = new Regex(@"@everyone");
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
 
@@ -112,7 +111,7 @@ namespace Discord
 			}
 		}*/
 
-        public sealed class Attachment : File
+        public class Attachment : File
 		{
 			/// <summary> Unique identifier for this file. </summary>
 			public string Id { get; internal set; }
@@ -124,7 +123,7 @@ namespace Discord
 			internal Attachment() { }
 		}
 
-		public sealed class Embed
+		public class Embed
 		{
 			/// <summary> URL of this embed. </summary>
 			public string Url { get; internal set; }
@@ -140,11 +139,13 @@ namespace Discord
 			public EmbedLink Provider { get; internal set; }
 			/// <summary> Returns the thumbnail of this embed. </summary>
 			public File Thumbnail { get; internal set; }
+            /// <summary> Returns the video information of this embed. </summary>
+            public File Video { get; internal set; }
 
-			internal Embed() { }
+            internal Embed() { }
 		}
 
-		public sealed class EmbedLink
+		public class EmbedLink
         {
 			/// <summary> URL of this embed provider. </summary>
 			public string Url { get; internal set; }
@@ -242,7 +243,7 @@ namespace Discord
 				Embeds = model.Embeds.Select(x =>
 				{
                     EmbedLink author = null, provider = null;
-					File thumbnail = null;
+					File thumbnail = null, video = null;
 
 					if (x.Author != null)
 						author = new EmbedLink { Url = x.Author.Url, Name = x.Author.Name };
@@ -250,8 +251,10 @@ namespace Discord
 						provider = new EmbedLink { Url = x.Provider.Url, Name = x.Provider.Name };
 					if (x.Thumbnail != null)
 						thumbnail = new File { Url = x.Thumbnail.Url, ProxyUrl = x.Thumbnail.ProxyUrl, Width = x.Thumbnail.Width, Height = x.Thumbnail.Height };
+                    if (x.Video != null)
+                        video = new File { Url = x.Video.Url, ProxyUrl = null, Width = x.Video.Width, Height = x.Video.Height };
 
-					return new Embed
+                    return new Embed
 					{
 						Url = x.Url,
 						Type = x.Type,
@@ -259,7 +262,8 @@ namespace Discord
 						Description = x.Description,
 						Author = author,
 						Provider = provider,
-						Thumbnail = thumbnail
+						Thumbnail = thumbnail,
+                        Video = video
 					};
 				}).ToArray();
 			}
@@ -369,8 +373,14 @@ namespace Discord
             return Resolve(Channel, text);
         }
 
-        public override bool Equals(object obj) => obj is Message && (obj as Message).Id == Id;
-		public override int GetHashCode() => unchecked(Id.GetHashCode() + 9979);
-		public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
+        internal Message Clone()
+        {
+            var result = new Message();
+            _cloner(this, result);
+            return result;
+        }
+        private Message() { } //Used for cloning
+
+        public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
 	}
 }

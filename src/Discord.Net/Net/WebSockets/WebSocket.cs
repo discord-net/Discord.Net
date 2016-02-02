@@ -14,18 +14,18 @@ namespace Discord.Net.WebSockets
     {
         private readonly AsyncLock _lock;
         protected readonly IWebSocketEngine _engine;
-		protected readonly DiscordClient _client;
+		protected readonly DiscordConfig _config;
 		protected readonly ManualResetEventSlim _connectedEvent;
         protected readonly TaskManager _taskManager;
         protected readonly JsonSerializer _serializer;
-        protected CancellationTokenSource _cancelTokenSource;
+        protected CancellationTokenSource _cancelSource;
+        protected CancellationToken _parentCancelToken;
         protected int _heartbeatInterval;
 		private DateTime _lastHeartbeat;
-        
+
         /// <summary> Gets the logger used for this client. </summary>
         protected internal Logger Logger { get; }
         public CancellationToken CancelToken { get; private set; }
-        public CancellationToken? ParentCancelToken { get; set; }
 
 		public string Host { get; set; }
         /// <summary> Gets the current connection state of this client. </summary>
@@ -38,11 +38,11 @@ namespace Discord.Net.WebSockets
 		private void OnDisconnected(bool wasUnexpected, Exception error)
             => Disconnected(this, new DisconnectedEventArgs(wasUnexpected, error));
 
-		public WebSocket(DiscordClient client, Logger logger)
+		public WebSocket(DiscordConfig config, JsonSerializer serializer, Logger logger)
 		{
-            _client = client;
+            _config = config;
+            _serializer = serializer;
             Logger = logger;
-            _serializer = client.Serializer;
 
             _lock = new AsyncLock();
             _taskManager = new TaskManager(Cleanup);
@@ -50,9 +50,9 @@ namespace Discord.Net.WebSockets
 			_connectedEvent = new ManualResetEventSlim(false);
 
 #if !DOTNET5_4
-			_engine = new WS4NetEngine(client.Config, _taskManager);
+			_engine = new WS4NetEngine(config, _taskManager);
 #else
-			_engine = new BuiltInEngine(client.Config);
+            _engine = new BuiltInEngine(config);
 #endif
             _engine.BinaryMessage += (s, e) =>
             {
@@ -69,18 +69,20 @@ namespace Discord.Net.WebSockets
 			_engine.TextMessage += (s, e) => ProcessMessage(e.Message).Wait(); 
 		}
 
-		protected async Task BeginConnect()
+		protected async Task BeginConnect(CancellationToken parentCancelToken)
 		{
             try
             {
                 using (await _lock.LockAsync().ConfigureAwait(false))
                 {
+                    _parentCancelToken = parentCancelToken;
+
                     await _taskManager.Stop().ConfigureAwait(false);
                     _taskManager.ClearException();
                     State = ConnectionState.Connecting;
                     
-                    _cancelTokenSource = new CancellationTokenSource();
-                    CancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, ParentCancelToken.Value).Token;
+                    _cancelSource = new CancellationTokenSource();
+                    CancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelSource.Token, parentCancelToken).Token;
                     _lastHeartbeat = DateTime.UtcNow;
 
                     await _engine.Connect(Host, CancelToken).ConfigureAwait(false);
@@ -117,7 +119,7 @@ namespace Discord.Net.WebSockets
             State = ConnectionState.Disconnecting;
 
             await _engine.Disconnect().ConfigureAwait(false);
-			_cancelTokenSource = null;
+			_cancelSource = null;
 			_connectedEvent.Reset();
 
             if (oldState == ConnectionState.Connecting || oldState == ConnectionState.Connected)
@@ -127,9 +129,11 @@ namespace Discord.Net.WebSockets
                     Logger.Info("Disconnected");
                 else
                     Logger.Error("Disconnected", ex);
+                State = ConnectionState.Disconnected;
                 OnDisconnected(!_taskManager.WasStopExpected, _taskManager.Exception);
             }
-            State = ConnectionState.Disconnected;
+            else
+                State = ConnectionState.Disconnected;
         }
 
 		protected virtual Task ProcessMessage(string json)
@@ -154,7 +158,7 @@ namespace Discord.Net.WebSockets
 				{
 					while (!cancelToken.IsCancellationRequested)
 					{
-						if (this.State == ConnectionState.Connected)
+						if (this.State == ConnectionState.Connected && _heartbeatInterval > 0)
 						{
                             SendHeartbeat();
 							await Task.Delay(_heartbeatInterval, cancelToken).ConfigureAwait(false);
@@ -172,7 +176,7 @@ namespace Discord.Net.WebSockets
         {
             try
             {
-                if (!_connectedEvent.Wait(_client.Config.ConnectionTimeout, cancelToken))
+                if (!_connectedEvent.Wait(_config.ConnectionTimeout, cancelToken))
                 {
                     if (State != ConnectionState.Connected)
                         throw new TimeoutException();

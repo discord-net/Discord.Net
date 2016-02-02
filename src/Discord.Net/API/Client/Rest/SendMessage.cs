@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class SendMessageRequest : IRestRequest<Message>
+    public class SendMessageRequest : IRestRequest<Message>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages";

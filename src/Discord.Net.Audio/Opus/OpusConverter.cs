@@ -4,13 +4,13 @@ using System.Security;
 
 namespace Discord.Audio.Opus
 {
-    public enum OpusApplication : int
+    internal enum OpusApplication : int
     {
         Voice = 2048,
         MusicOrMixed = 2049,
         LowLatency = 2051
     }
-    public enum OpusError : int
+    internal enum OpusError : int
     {
         OK = 0,
         BadArg = -1,
@@ -22,7 +22,7 @@ namespace Discord.Audio.Opus
         AllocFail = -7
     }
 
-    public abstract class OpusConverter : IDisposable
+    internal abstract class OpusConverter : IDisposable
     {
         protected enum Ctl : int
         {

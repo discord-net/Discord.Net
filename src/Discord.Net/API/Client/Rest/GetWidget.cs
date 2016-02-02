@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetWidgetRequest : IRestRequest<GetWidgetResponse>
+    public class GetWidgetRequest : IRestRequest<GetWidgetResponse>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"servers/{GuildId}/widget.json";
@@ -19,9 +19,9 @@ namespace Discord.API.Client.Rest
         }
     }
 
-    public sealed class GetWidgetResponse
+    public class GetWidgetResponse
     {
-        public sealed class Channel
+        public class Channel
         {
             [JsonProperty("id"), JsonConverter(typeof(LongStringConverter))]
             public ulong Id { get; set; }
@@ -30,7 +30,7 @@ namespace Discord.API.Client.Rest
             [JsonProperty("position")]
             public int Position { get; set; }
         }
-        public sealed class User : UserReference
+        public class User : UserReference
         {
             [JsonProperty("avatar_url")]
             public string AvatarUrl { get; set; }
@@ -39,7 +39,7 @@ namespace Discord.API.Client.Rest
             [JsonProperty("game")]
             public UserGame Game { get; set; }
         }
-        public sealed class UserGame
+        public class UserGame
         {
             [JsonProperty("id")]
             public int Id { get; set; }

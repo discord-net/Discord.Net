@@ -6,7 +6,7 @@ namespace Discord.API.Client
 {
     public class Guild : GuildReference
     {
-        public sealed class EmojiData
+        public class EmojiData
         {
             [JsonProperty("id")]
             public string Id { get; set; }

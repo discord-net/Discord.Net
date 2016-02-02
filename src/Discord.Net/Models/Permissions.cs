@@ -31,17 +31,25 @@ namespace Discord
 		UseVoiceActivation = 25
 	}
 
-	public sealed class ServerPermissions : Permissions
-	{
-		public static ServerPermissions None { get; } = new ServerPermissions();
+	public class ServerPermissions : Permissions
+    {
+        private readonly static Action<ServerPermissions, ServerPermissions> _cloner = DynamicIL.CreateCopyMethod<ServerPermissions>();
+
+        public static ServerPermissions None { get; } = new ServerPermissions();
 		public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
 
 		public ServerPermissions() : base() { }
 		public ServerPermissions(uint rawValue) : base(rawValue) { }
 		public ServerPermissions Copy() => new ServerPermissions(RawValue);
+        internal ServerPermissions Clone()
+        {
+            var result = new ServerPermissions();
+            _cloner(this, result);
+            return result;
+        }
 
-		/// <summary> If True, a user may ban users from the server. </summary>
-		public bool BanMembers { get { return GetBit(PermissionsBits.BanMembers); } set { SetBit(PermissionsBits.BanMembers, value); } }
+        /// <summary> If True, a user may ban users from the server. </summary>
+        public bool BanMembers { get { return GetBit(PermissionsBits.BanMembers); } set { SetBit(PermissionsBits.BanMembers, value); } }
 		/// <summary> If True, a user may kick users from the server. </summary>
 		public bool KickMembers { get { return GetBit(PermissionsBits.KickMembers); } set { SetBit(PermissionsBits.KickMembers, value); } }
 		/// <summary> If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
@@ -52,9 +60,11 @@ namespace Discord
 		public bool ManageServer { get { return GetBit(PermissionsBits.ManageServer); } set { SetBit(PermissionsBits.ManageServer, value); } }
 	}
 
-	public sealed class ChannelPermissions : Permissions
-	{
-		public static ChannelPermissions None { get; } = new ChannelPermissions();
+	public class ChannelPermissions : Permissions
+    {
+        private readonly static Action<ChannelPermissions, ChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<ChannelPermissions>();
+
+        public static ChannelPermissions None { get; } = new ChannelPermissions();
         public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
 		public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
 		public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
@@ -70,9 +80,15 @@ namespace Discord
 		public ChannelPermissions() : base() { }
 		public ChannelPermissions(uint rawValue) : base(rawValue) { }
 		public ChannelPermissions Copy() => new ChannelPermissions(RawValue);
+        internal ChannelPermissions Clone()
+        {
+            var result = new ChannelPermissions();
+            _cloner(this, result);
+            return result;
+        }
 
-		/// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-		public bool ManagePermissions { get { return GetBit(PermissionsBits.ManageRolesOrPermissions); } set { SetBit(PermissionsBits.ManageRolesOrPermissions, value); } }
+        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+        public bool ManagePermissions { get { return GetBit(PermissionsBits.ManageRolesOrPermissions); } set { SetBit(PermissionsBits.ManageRolesOrPermissions, value); } }
 		/// <summary> If True, a user may create, delete and modify this channel. </summary>
 		public bool ManageChannel { get { return GetBit(PermissionsBits.ManageChannel); } set { SetBit(PermissionsBits.ManageChannel, value); } }
 	}
@@ -151,9 +167,11 @@ namespace Discord
         public bool Equals(Permissions permission) => permission?._rawValue == _rawValue;
     }
 
-	public sealed class DualChannelPermissions
-	{
-		public ChannelPermissions Allow { get; }
+	public class DualChannelPermissions
+    {
+        private readonly static Action<DualChannelPermissions, DualChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<DualChannelPermissions>();
+
+        public ChannelPermissions Allow { get; }
 		public ChannelPermissions Deny { get; }
 		
 		public DualChannelPermissions(uint allow = 0, uint deny = 0)
@@ -233,6 +251,12 @@ namespace Discord
 			Deny.Lock();
 		}
 		public DualChannelPermissions Copy() => new DualChannelPermissions(Allow.RawValue, Deny.RawValue);
+        internal DualChannelPermissions Clone()
+        {
+            var result = new DualChannelPermissions();
+            _cloner(this, result);
+            return result;
+        }
 
         public static bool operator ==(DualChannelPermissions a, DualChannelPermissions b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
         public static bool operator !=(DualChannelPermissions a, DualChannelPermissions b) => !(a == b);

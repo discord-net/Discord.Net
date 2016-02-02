@@ -1,4 +1,4 @@
-﻿using Discord.Net.WebSockets;
+﻿using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -8,8 +8,10 @@ namespace Discord.Audio
 {
 	public class AudioService : IService
     {
-        private AudioClient _defaultClient;
-		private ConcurrentDictionary<ulong, IAudioClient> _voiceClients;
+        private readonly AsyncLock _asyncLock;
+        private AudioClient _defaultClient; //Only used for single server
+        private VirtualClient _currentClient; //Only used for single server
+        private ConcurrentDictionary<ulong, AudioClient> _voiceClients;
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		private int _nextClientId;
 
@@ -30,22 +32,24 @@ namespace Discord.Audio
 		public AudioService(AudioServiceConfig config)
 		{
 			Config = config;
-		}
+            _asyncLock = new AsyncLock();
+
+        }
 		void IService.Install(DiscordClient client)
 		{
 			Client = client;
             Config.Lock();
 
             if (Config.EnableMultiserver)
-				_voiceClients = new ConcurrentDictionary<ulong, IAudioClient>();
+				_voiceClients = new ConcurrentDictionary<ulong, AudioClient>();
 			else
 			{
 				var logger = Client.Log.CreateLogger("Voice");
-				_defaultClient = new SimpleAudioClient(this, 0, logger);
+				_defaultClient = new AudioClient(Client, null, 0);
 			}
 			_talkingUsers = new ConcurrentDictionary<User, bool>();
 
-			client.Disconnected += async (s, e) =>
+			client.GatewaySocket.Disconnected += async (s, e) =>
 			{
                 if (Config.EnableMultiserver)
                 {
@@ -75,68 +79,30 @@ namespace Discord.Audio
 		{
 			if (server == null) throw new ArgumentNullException(nameof(server));
 
-            if (!Config.EnableMultiserver)
+            if (Config.EnableMultiserver)
             {
-                if (server == _defaultClient.Server)
-                    return (_defaultClient as SimpleAudioClient).CurrentClient;
-                else
-                    return null;
-            }
-            else
-            {
-                IAudioClient client;
+                AudioClient client;
                 if (_voiceClients.TryGetValue(server.Id, out client))
                     return client;
                 else
                     return null;
             }
-		}
-		private async Task<IAudioClient> CreateClient(Server server)
-		{
-            var client = _voiceClients.GetOrAdd(server.Id, _ => null); //Placeholder, so we can't have two clients connecting at once
-
-            if (client == null)
+            else
             {
-                int id = unchecked(++_nextClientId);
-
-                var gatewayLogger = Client.Log.CreateLogger($"Gateway #{id}");
-                var voiceLogger = Client.Log.CreateLogger($"Voice #{id}");
-                var gatewaySocket = new GatewaySocket(Client, gatewayLogger);
-                var voiceClient = new AudioClient(this, id, server, Client.GatewaySocket, voiceLogger);
-
-                await voiceClient.Connect(true).ConfigureAwait(false);
-
-                /*voiceClient.VoiceSocket.FrameReceived += (s, e) =>
-                {
-                    OnFrameReceieved(e);
-                };
-                voiceClient.VoiceSocket.UserIsSpeaking += (s, e) =>
-                {
-                    var user = server.GetUser(e.UserId);
-                    OnUserIsSpeakingUpdated(user, e.IsSpeaking);
-                };*/
-
-                //Update the placeholder only it still exists (RemoveClient wasnt called)
-                if (!_voiceClients.TryUpdate(server.Id, voiceClient, null))
-                {
-                    //If it was, cleanup
-                    await voiceClient.Disconnect().ConfigureAwait(false); ;
-                    await gatewaySocket.Disconnect().ConfigureAwait(false); ;
-                }
+                if (server == _currentClient.Server)
+                    return _currentClient;
+                else
+                    return null;
             }
-            return client;
 		}
-
-        //TODO: This isn't threadsafe
-        internal async Task RemoveClient(Server server, IAudioClient client)
+        
+        //Called from AudioClient.Disconnect
+        internal async Task RemoveClient(Server server, AudioClient client)
         {
-            if (Config.EnableMultiserver && server != null)
+            using (await _asyncLock.LockAsync().ConfigureAwait(false))
             {
-                if (_voiceClients.TryRemove(server.Id, out client))
-                {
-                    await client.Disconnect();
-                    await (client as AudioClient).GatewaySocket.Disconnect();
-                }
+                if (_voiceClients.TryUpdate(server.Id, null, client))
+                    _voiceClients.TryRemove(server.Id, out client);
             }
         }
 
@@ -144,16 +110,48 @@ namespace Discord.Audio
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             
-            if (!Config.EnableMultiserver)
+            var server = channel.Server;
+            using (await _asyncLock.LockAsync().ConfigureAwait(false))
             {
-                await (_defaultClient as SimpleAudioClient).Connect(channel, false).ConfigureAwait(false);
-                return _defaultClient;
-            }
-            else
-            {
-                var client = await CreateClient(channel.Server).ConfigureAwait(false);
-                await client.Join(channel).ConfigureAwait(false);
-                return client;
+                if (Config.EnableMultiserver)
+                {
+                    AudioClient client;
+                    if (!_voiceClients.TryGetValue(server.Id, out client))
+                    {
+                        client = new AudioClient(Client, server, unchecked(++_nextClientId));
+                        _voiceClients[server.Id] = client;
+
+                        await client.Connect().ConfigureAwait(false);
+
+                        /*voiceClient.VoiceSocket.FrameReceived += (s, e) =>
+                        {
+                            OnFrameReceieved(e);
+                        };
+                        voiceClient.VoiceSocket.UserIsSpeaking += (s, e) =>
+                        {
+                            var user = server.GetUser(e.UserId);
+                            OnUserIsSpeakingUpdated(user, e.IsSpeaking);
+                        };*/
+                    }
+
+                    await client.Join(channel).ConfigureAwait(false);
+                    return client;
+                }
+                else
+                {
+                    if (_defaultClient.Server != server)
+                    {
+                        await _defaultClient.Disconnect().ConfigureAwait(false);
+                        _defaultClient.VoiceSocket.Server = server;
+                        await _defaultClient.Connect().ConfigureAwait(false);
+                    }
+                    var client = new VirtualClient(_defaultClient, server);
+                    _currentClient = client;
+
+                    await client.Join(channel).ConfigureAwait(false);
+                    return client;
+                }
+
             }
 		}
 		
@@ -163,15 +161,18 @@ namespace Discord.Audio
 
             if (Config.EnableMultiserver)
             {
-                IAudioClient client;
+                AudioClient client;
                 if (_voiceClients.TryRemove(server.Id, out client))
                     await client.Disconnect().ConfigureAwait(false);
             }
             else
             {
-                IAudioClient client = GetClient(server);
-                if (client != null)
-                    await (_defaultClient as SimpleAudioClient).Leave(client as SimpleAudioClient.VirtualClient).ConfigureAwait(false);
+                using (await _asyncLock.LockAsync().ConfigureAwait(false))
+                {
+                    var client = GetClient(server) as VirtualClient;
+                    if (client != null)
+                        await _defaultClient.Disconnect().ConfigureAwait(false);
+                }
             }
 		}
 	}

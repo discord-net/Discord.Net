@@ -5,7 +5,7 @@ namespace Discord.API.Client
 {
     public class Channel : ChannelReference
     {
-        public sealed class PermissionOverwrite
+        public class PermissionOverwrite
         {
             [JsonProperty("type")]
             public string Type { get; set; }

@@ -1,4 +1,4 @@
 ﻿namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class MessageDeleteEvent : MessageReference { }
+    public class MessageDeleteEvent : MessageReference { }
 }

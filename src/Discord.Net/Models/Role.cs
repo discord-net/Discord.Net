@@ -9,8 +9,10 @@ using APIRole = Discord.API.Client.Role;
 
 namespace Discord
 {
-	public sealed class Role : IMentionable
+	public class Role : IMentionable
     {
+        private readonly static Action<Role, Role> _cloner = DynamicIL.CreateCopyMethod<Role>();
+
         internal DiscordClient Client => Server.Client;
 
         /// <summary> Gets the unique identifier for this role. </summary>
@@ -117,7 +119,15 @@ namespace Discord
             try { await Client.ClientAPI.Send(new DeleteRoleRequest(Server.Id, Id)).ConfigureAwait(false); }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
-        
-		public override string ToString() => Name ?? Id.ToIdString();
+
+        internal Role Clone()
+        {
+            var result = new Role();
+            _cloner(this, result);
+            return result;
+        }
+        private Role() { } //Used for cloning
+
+        public override string ToString() => Name ?? Id.ToIdString();
     }
 }

@@ -34,9 +34,9 @@ namespace Discord.Commands
             Config = config;
 
 			_allCommands = new List<Command>();
-			_map = new CommandMap(null, "", "");
+			_map = new CommandMap();
 			_categories = new Dictionary<string, CommandMap>();
-            Root = new CommandGroupBuilder(this, "", null);
+            Root = new CommandGroupBuilder(this);
 		}
 
 		void IService.Install(DiscordClient client)
@@ -309,7 +309,7 @@ namespace Discord.Commands
             string categoryName = command.Category ?? "";
 			if (!_categories.TryGetValue(categoryName, out category))
 			{
-				category = new CommandMap(null, "", "");
+				category = new CommandMap();
 				_categories.Add(categoryName, category);
 			}
 

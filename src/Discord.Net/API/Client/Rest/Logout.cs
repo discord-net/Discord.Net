@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class LogoutRequest : IRestRequest
+    public class LogoutRequest : IRestRequest
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"auth/logout";

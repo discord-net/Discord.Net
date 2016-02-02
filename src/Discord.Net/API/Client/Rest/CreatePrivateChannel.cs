@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class CreatePrivateChannelRequest : IRestRequest<Channel>
+    public class CreatePrivateChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"users/@me/channels";

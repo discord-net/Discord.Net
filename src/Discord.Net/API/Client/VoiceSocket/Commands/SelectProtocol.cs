@@ -2,13 +2,13 @@
 
 namespace Discord.API.Client.VoiceSocket
 {
-    public sealed class SelectProtocolCommand : IWebSocketMessage
+    public class SelectProtocolCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.SelectProtocol;
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        public sealed class Data
+        public class Data
         {
             [JsonProperty("address")]
             public string Address { get; set; }

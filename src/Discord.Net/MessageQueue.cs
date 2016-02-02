@@ -1,5 +1,6 @@
 ﻿using Discord.API.Client.Rest;
 using Discord.Logging;
+using Discord.Net.Rest;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Discord.Net
 {
     /// <summary> Manages an outgoing message queue for DiscordClient. </summary>
-    public sealed class MessageQueue
+    public class MessageQueue
     {
         private interface IQueuedAction
         {
@@ -52,7 +53,7 @@ namespace Discord.Net
         private const int WarningStart = 30;
 
         private readonly Random _nonceRand;
-        private readonly DiscordClient _client;
+        private readonly RestClient _rest;
         private readonly Logger _logger;
         private readonly ConcurrentQueue<IQueuedAction> _pendingActions;
         private readonly ConcurrentDictionary<int, Message> _pendingSends;
@@ -61,9 +62,9 @@ namespace Discord.Net
         /// <summary> Gets the current number of queued actions. </summary>
         public int Count { get; private set; }
 
-        internal MessageQueue(DiscordClient client, Logger logger)
+        internal MessageQueue(RestClient rest, Logger logger)
         {
-            _client = client;
+            _rest = rest;
             _logger = logger;
 
             _nonceRand = new Random();
@@ -73,7 +74,7 @@ namespace Discord.Net
 
         internal Message QueueSend(Channel channel, string text, bool isTTS)
         {
-            Message msg = new Message(0, channel, channel.IsPrivate ? _client.PrivateUser : channel.Server.CurrentUser);
+            Message msg = new Message(0, channel, channel.IsPrivate ? channel.Client.PrivateUser : channel.Server.CurrentUser);
             msg.RawText = text;
             msg.Text = msg.Resolve(text);
             msg.Nonce = GenerateNonce();
@@ -103,23 +104,27 @@ namespace Discord.Net
             _nextWarning = WarningStart;
             return Task.Run(async () =>
             {
-                while (!cancelToken.IsCancellationRequested)
+                try
                 {
-                    Count = _pendingActions.Count;
-                    if (Count >= _nextWarning)
+                    while (!cancelToken.IsCancellationRequested)
                     {
-                        _nextWarning *= 2;
-                        _logger.Warning($"Queue is backed up, currently at {Count} actions.");
+                        Count = _pendingActions.Count;
+                        if (Count >= _nextWarning)
+                        {
+                            _nextWarning *= 2;
+                            _logger.Warning($"Queue is backed up, currently at {Count} actions.");
+                        }
+                        else if (Count < WarningStart) //Reset once the problem is solved
+                            _nextWarning = WarningStart;
+
+                        IQueuedAction queuedAction;
+                        while (_pendingActions.TryDequeue(out queuedAction))
+                            await queuedAction.Do(this).ConfigureAwait(false);
+
+                        await Task.Delay(interval).ConfigureAwait(false);
                     }
-                    else if (Count < WarningStart) //Reset once the problem is solved
-                        _nextWarning = WarningStart;
-
-                    IQueuedAction queuedAction;
-                    while (_pendingActions.TryDequeue(out queuedAction))
-                        await queuedAction.Do(this).ConfigureAwait(false);
-
-                    await Task.Delay(interval).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException) { }
             });
         }
 
@@ -135,12 +140,16 @@ namespace Discord.Net
                         Nonce = msg.Nonce.ToString(),
                         IsTTS = msg.IsTTS
                     };
-                    var response = await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    var response = await _rest.Send(request).ConfigureAwait(false);
                     msg.Id = response.Id;
                     msg.Update(response);
                     msg.State = MessageState.Normal;
                 }
-                catch (Exception ex) { msg.State = MessageState.Failed; _logger.Error("Failed to send message", ex); }
+                catch (Exception ex)
+                {
+                    msg.State = MessageState.Failed;
+                    _logger.Error("Failed to send message", ex);
+                }
             }
         }
         internal async Task Edit(Message msg, string text)
@@ -153,9 +162,12 @@ namespace Discord.Net
                     {
                         Content = text
                     };
-                    await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    await _rest.Send(request).ConfigureAwait(false);
                 }
-                catch (Exception ex) { msg.State = MessageState.Failed; _logger.Error("Failed to edit message", ex); }
+                catch (Exception ex)
+                {
+                    _logger.Error("Failed to edit message", ex);
+                }
             }
         }
         internal async Task Delete(Message msg)
@@ -165,9 +177,13 @@ namespace Discord.Net
                 try
                 {
                     var request = new DeleteMessageRequest(msg.Channel.Id, msg.Id);
-                    await _client.ClientAPI.Send(request).ConfigureAwait(false);
+                    await _rest.Send(request).ConfigureAwait(false);
                 }
-                catch (Exception ex) { msg.State = MessageState.Failed; _logger.Error("Failed to delete message", ex); }
+                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
+                catch (Exception ex)
+                {
+                    _logger.Error("Failed to delete message", ex);
+                }
             }
         }
 

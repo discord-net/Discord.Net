@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Discord.API.Client.GatewaySocket
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class IdentifyCommand : IWebSocketMessage
+    public class IdentifyCommand : IWebSocketMessage
     {
         int IWebSocketMessage.OpCode => (int)OpCodes.Identify;
         object IWebSocketMessage.Payload => this;

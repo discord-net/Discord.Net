@@ -4,7 +4,7 @@ namespace Discord.API.Client
 {
     public class InviteReference
     {
-        public sealed class GuildData : GuildReference
+        public class GuildData : GuildReference
         {
             [JsonProperty("splash_hash")]
             public string Splash { get; set; }

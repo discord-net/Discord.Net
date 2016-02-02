@@ -2,7 +2,7 @@
 
 namespace Discord.API.Client.GatewaySocket
 {
-    public sealed class ResumedEvent 
+    public class ResumedEvent 
     { 
         [JsonProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }

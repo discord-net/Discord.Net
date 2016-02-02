@@ -15,8 +15,9 @@
     "url": "git://github.com/RogueException/Discord.Net"
   },
   "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
-  
+
   "compilationOptions": {
+    "allowUnsafe": true,
     "warningsAsErrors": true
   },
 
@@ -50,6 +51,8 @@
         "System.Net.Sockets": "4.1.0-beta-23409",
         "System.Net.Requests": "4.0.11-beta-23516",
         "System.Net.WebSockets.Client": "4.0.0-beta-23516",
+        "System.Reflection": "4.1.0-beta-23516",
+        "System.Reflection.Emit.Lightweight": "4.0.1-beta-23516",
         "System.Runtime.InteropServices": "4.0.21-beta-23516",
         "System.Security.Cryptography.Algorithms": "4.0.0-beta-23516",
         "System.Text.RegularExpressions": "4.0.11-beta-23516",

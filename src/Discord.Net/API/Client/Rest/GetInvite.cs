@@ -3,7 +3,7 @@
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class GetInviteRequest : IRestRequest<InviteReference>
+    public class GetInviteRequest : IRestRequest<InviteReference>
     {
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"invite/{InviteCode}";
