@@ -270,7 +270,6 @@ namespace Discord
         public IEnumerable<Channel> FindChannels(string name, ChannelType type = null, bool exactMatch = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (type == null) throw new ArgumentNullException(nameof(type));
 
             return _channels.Select(x => x.Value).Find(name, type, exactMatch);
         }
