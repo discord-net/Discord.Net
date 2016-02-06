@@ -11,12 +11,10 @@ namespace Discord.Legacy
         [Obsolete("Use User.Mention instead")]
         public static string User(User user)
             => user.Mention;
-
         /// <summary> Returns the string used to create a channel mention. </summary>
         [Obsolete("Use Channel.Mention instead")]
         public static string Channel(Channel channel)
             => channel.Mention;
-
         /// <summary> Returns the string used to create a mention to everyone in a channel. </summary>
         [Obsolete("Use Server.EveryoneRole.Mention instead")]
         public static string Everyone()
@@ -179,50 +177,6 @@ namespace Discord.Legacy
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.DownloadMessages(limit, relativeMessageId, relativeDir, useCache);
         }
-
-        [Obsolete("Use Message.Acknowledge")]
-        public static Task AckMessage(this DiscordClient client, Message message)
-        {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            return message.Acknowledge();
-        }
-
-        /*[Obsolete("Use Channel.ImportMessages")]
-        public IEnumerable<Message> ImportMessages(Channel channel, string json)
-        {
-            if (json == null) throw new ArgumentNullException(nameof(json));
-
-            var dic = JArray.Parse(json)
-                .Select(x =>
-                {
-                    var msg = new Message(this,
-                        x["Id"].Value<ulong>(),
-                        channel.Id,
-                        x["UserId"].Value<ulong>());
-
-                    var reader = x.CreateReader();
-                    _messageImporter.Populate(reader, msg);
-                    msg.Text = Mention.Resolve(msg, msg.RawText);
-                    return msg;
-                })
-                .ToDictionary(x => x.Id);
-            _messages.Import(dic);
-            foreach (var msg in dic.Values)
-            {
-                var user = msg.User;
-                if (user != null)
-                    user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
-            }
-            return dic.Values;
-        }
-        
-        [Obsolete("Use Channel.ExportMessages")]
-        public string ExportMessages(Channel channel)
-        {
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
-
-            return JsonConvert.SerializeObject(channel.Messages);
-        }*/
 
         [Obsolete("Use Server.GetUser")]
         public static User GetUser(this DiscordClient client, Server server, ulong userId)
@@ -404,6 +358,22 @@ namespace Discord.Legacy
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.RemovePermissionsRule(role);
+        }
+
+        [Obsolete("Removed", true)]
+        public static Task AckMessage(this DiscordClient client, Message message)
+        {
+            throw new InvalidOperationException();
+        }
+        [Obsolete("Use Channel.ImportMessages", true)]
+        public static IEnumerable<Message> ImportMessages(Channel channel, string json)
+        {
+            throw new InvalidOperationException();
+        }
+        [Obsolete("Use Channel.ExportMessages", true)]
+        public static string ExportMessages(Channel channel)
+        {
+            throw new InvalidOperationException();
         }
     }
 }

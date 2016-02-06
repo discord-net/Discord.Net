@@ -878,24 +878,6 @@ namespace Discord
                                 Logger.Warning("MESSAGE_DELETE referenced an unknown channel.");
                         }
                         break;
-                    case "MESSAGE_ACK":
-                        {
-                            if (Config.Mode == DiscordMode.Client)
-                            {
-                                var data = e.Payload.ToObject<MessageAckEvent>(Serializer);
-                                var channel = GetChannel(data.ChannelId);
-                                if (channel != null)
-                                {
-                                    var msg = channel.GetMessage(data.MessageId, null);
-                                    if (Config.LogEvents)
-                                        Logger.Verbose($"Message Ack: {channel.Server?.Name ?? "[Private]"}/{channel.Name}");
-                                    OnMessageAcknowledged(msg);
-                                }
-                                else
-                                    Logger.Warning("MESSAGE_ACK referenced an unknown channel.");
-                            }
-                        }
-                        break;
 
                     //Statuses
                     case "PRESENCE_UPDATE":
@@ -1014,6 +996,7 @@ namespace Discord
                     case "GUILD_INTEGRATIONS_UPDATE":
                     case "VOICE_SERVER_UPDATE":
                     case "GUILD_EMOJIS_UPDATE":
+                    case "MESSAGE_ACK":
                         break;
 
                     //Others

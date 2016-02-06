@@ -295,10 +295,10 @@ namespace Discord.Net.WebSockets
                 int rtpPacketLength = 0;
                 voicePacket[0] = 0x80; //Flags;
                 voicePacket[1] = 0x78; //Payload Type
-                voicePacket[8] = (byte)((_ssrc >> 24) & 0xFF);
-                voicePacket[9] = (byte)((_ssrc >> 16) & 0xFF);
-                voicePacket[10] = (byte)((_ssrc >> 8) & 0xFF);
-                voicePacket[11] = (byte)((_ssrc >> 0) & 0xFF);
+                voicePacket[8] = (byte)(_ssrc >> 24);
+                voicePacket[9] = (byte)(_ssrc >> 16);
+                voicePacket[10] = (byte)(_ssrc >> 8);
+                voicePacket[11] = (byte)(_ssrc >> 0);
 
                 if (_isEncrypted)
                     Buffer.BlockCopy(voicePacket, 0, nonce, 0, 12);
@@ -309,12 +309,12 @@ namespace Discord.Net.WebSockets
                     if (!hasFrame && _sendBuffer.Pop(frame))
                     {
                         ushort sequence = unchecked(_sequence++);
-                        voicePacket[2] = (byte)((sequence >> 8) & 0xFF);
-                        voicePacket[3] = (byte)((sequence >> 0) & 0xFF);
-                        voicePacket[4] = (byte)((timestamp >> 24) & 0xFF);
-                        voicePacket[5] = (byte)((timestamp >> 16) & 0xFF);
-                        voicePacket[6] = (byte)((timestamp >> 8) & 0xFF);
-                        voicePacket[7] = (byte)((timestamp >> 0) & 0xFF);
+                        voicePacket[2] = (byte)(sequence >> 8);
+                        voicePacket[3] = (byte)(sequence >> 0);
+                        voicePacket[4] = (byte)(timestamp >> 24);
+                        voicePacket[5] = (byte)(timestamp >> 16);
+                        voicePacket[6] = (byte)(timestamp >> 8);
+                        voicePacket[7] = (byte)(timestamp >> 0);
 
                         //Encode
                         int encodedLength = _encoder.EncodeFrame(frame, 0, encodedFrame);

@@ -5,13 +5,6 @@ using System.Text;
 
 namespace Discord
 {
-    public enum DiscordMode
-    {
-        /// <summary> Enable bot-only functions. Use this mode if you are creating a bot, automated application, or interface. </summary>
-        Bot = 0,
-        /// <summary> Enables client-only functions. Use this mode if you are creating a custom client. </summary>
-        Client
-    }
 	public enum LogSeverity : byte
 	{
 		Error = 1,
@@ -52,9 +45,6 @@ namespace Discord
         /// <summary> Enables or disables the default event logger. </summary>
         public bool LogEvents { get { return _logEvents; } set { SetValue(ref _logEvents, value); } }
         private bool _logEvents = true;
-        /// <summary> Specifies the mode that this application should run in. </summary>
-        public DiscordMode Mode { get { return _mode; } set { SetValue(ref _mode, value); } }
-        private DiscordMode _mode = DiscordMode.Bot;
 
         /// <summary> User Agent string to use when connecting to Discord. </summary>
         public string UserAgent { get; private set; }

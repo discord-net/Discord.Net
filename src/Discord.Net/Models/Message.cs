@@ -341,17 +341,6 @@ namespace Discord
                 catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
             }
         }
-        
-        public Task Acknowledge()
-        {
-            if (Client.Config.Mode != DiscordMode.Client)
-                throw new InvalidOperationException("This function may only be used in Client mode.");
-
-            if (User.Id != Client.CurrentUser.Id)
-                return Client.ClientAPI.Send(new AckMessageRequest(Channel.Id, Id));
-            else
-                return TaskHelper.CompletedTask;
-        }
 
         /// <summary> Returns true if the logged-in user was mentioned. </summary>
         public bool IsMentioningMe(bool includeRoles = false)
