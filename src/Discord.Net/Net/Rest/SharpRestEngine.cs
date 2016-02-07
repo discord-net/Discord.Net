@@ -19,14 +19,13 @@ namespace Discord.Net.Rest
 		private readonly RestSharpClient _client;
 
         private readonly AsyncLock _rateLimitLock;
+        private readonly ILogger _logger;
         private DateTime _rateLimitTime;
 
-        internal Logger Logger { get; }
-
-        public RestSharpEngine(DiscordConfig config, string baseUrl, Logger logger)
+        public RestSharpEngine(DiscordConfig config, string baseUrl, ILogger logger)
 		{
 			_config = config;
-            Logger = logger;
+            _logger = logger;
 
             _rateLimitLock = new AsyncLock();
             _client = new RestSharpClient(baseUrl)
@@ -89,15 +88,18 @@ namespace Discord.Net.Rest
                     int milliseconds;
                     if (retryAfter != null && int.TryParse((string)retryAfter.Value, out milliseconds))
                     {
-                        var now = DateTime.UtcNow;
-                        if (now >= _rateLimitTime)
+                        if (_logger != null)
                         {
-                            using (await _rateLimitLock.LockAsync().ConfigureAwait(false))
+                            var now = DateTime.UtcNow;
+                            if (now >= _rateLimitTime)
                             {
-                                if (now >= _rateLimitTime)
+                                using (await _rateLimitLock.LockAsync().ConfigureAwait(false))
                                 {
-                                    _rateLimitTime = now.AddMilliseconds(milliseconds);
-                                    Logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
+                                    if (now >= _rateLimitTime)
+                                    {
+                                        _rateLimitTime = now.AddMilliseconds(milliseconds);
+                                        _logger.Warning($"Rate limit hit, waiting {Math.Round(milliseconds / 1000.0f, 2)} seconds");
+                                    }
                                 }
                             }
                         }

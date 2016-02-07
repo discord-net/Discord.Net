@@ -8,7 +8,7 @@ namespace Discord.Net.Rest
     {
         private JsonSerializer _serializer;
 
-        public JsonRestClient(DiscordConfig config, string baseUrl, Logger logger)
+        public JsonRestClient(DiscordConfig config, string baseUrl, ILogger logger = null)
             : base(config, baseUrl, logger)
         {
             _serializer = new JsonSerializer();

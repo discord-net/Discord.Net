@@ -487,6 +487,9 @@
     <Compile Include="..\Discord.Net\Legacy.cs">
       <Link>Legacy.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Logging\ILogger.cs">
+      <Link>Logging\ILogger.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Logging\Logger.cs">
       <Link>Logging\Logger.cs</Link>
     </Compile>

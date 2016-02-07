@@ -38,9 +38,8 @@ namespace Discord.Net.Rest
         private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
         private readonly ETFWriter _serializer;
+        private readonly ILogger _logger;
         private string _token;
-
-        internal Logger Logger { get; }
 
         public CancellationToken CancelToken { get; set; }
 
@@ -54,10 +53,10 @@ namespace Discord.Net.Rest
             }
         }
 
-        protected RestClient(DiscordConfig config, string baseUrl, Logger logger)
+        protected RestClient(DiscordConfig config, string baseUrl, ILogger logger = null)
 		{
 			_config = config;
-            Logger = logger;
+            _logger = logger;
 
 #if !DOTNET5_4
             _engine = new RestSharpEngine(config, baseUrl, logger);
@@ -65,7 +64,7 @@ namespace Discord.Net.Rest
 			_engine = new BuiltInEngine(config, baseUrl, logger);
 #endif
 
-            if (Logger.Level >= LogSeverity.Verbose)
+            if (_logger != null && _logger.Level >= LogSeverity.Verbose)
             {
                 this.SentRequest += (s, e) =>
                 {
@@ -82,7 +81,7 @@ namespace Discord.Net.Rest
                                 log += $" {e.ResponseJson}";
                         }
                     }
-                    Logger.Verbose(log);
+                    _logger.Verbose(log);
                 };
             }
         }

@@ -9,7 +9,7 @@ namespace Discord.Net.Rest
     {
         private readonly ETFWriter _serializer;
 
-        public ETFRestClient(DiscordConfig config, string baseUrl, Logger logger)
+        public ETFRestClient(DiscordConfig config, string baseUrl, ILogger logger = null)
             : base(config, baseUrl, logger)
         {
             _serializer = new ETFWriter(new MemoryStream());
