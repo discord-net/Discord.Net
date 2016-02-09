@@ -441,10 +441,10 @@ namespace Discord.Net.WebSockets
                             _sequence = 0;// (ushort)_rand.Next(0, ushort.MaxValue);
                                           //No thread issue here because SendAsync doesn't start until _isReady is true
                             byte[] packet = new byte[70];
-                            packet[0] = (byte)((_ssrc >> 24) & 0xFF);
-                            packet[1] = (byte)((_ssrc >> 16) & 0xFF);
-                            packet[2] = (byte)((_ssrc >> 8) & 0xFF);
-                            packet[3] = (byte)((_ssrc >> 0) & 0xFF);
+                            packet[0] = (byte)(_ssrc >> 24);
+                            packet[1] = (byte)(_ssrc >> 16);
+                            packet[2] = (byte)(_ssrc >> 8);
+                            packet[3] = (byte)(_ssrc >> 0);
                             await _udp.SendAsync(packet, 70).ConfigureAwait(false);
                         }
                     }

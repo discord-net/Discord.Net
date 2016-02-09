@@ -56,7 +56,6 @@ namespace Discord.ETF
             else
                 _stream.Write(_falseBytes, 0, _falseBytes.Length);
         }
-
         public void Write(sbyte value) => Write((long)value);
         public void Write(byte value) => Write((ulong)value);
         public void Write(short value) => Write((long)value);
@@ -74,10 +73,10 @@ namespace Discord.ETF
             else if (value >= int.MinValue && value <= int.MaxValue)
             {
                 _buffer[0] = (byte)ETFType.INTEGER_EXT;
-                _buffer[1] = (byte)((value >> 24) & 0xFF);
-                _buffer[2] = (byte)((value >> 16) & 0xFF);
-                _buffer[3] = (byte)((value >> 8) & 0xFF);
-                _buffer[4] = (byte)(value & 0xFF);
+                _buffer[1] = (byte)(value >> 24);
+                _buffer[2] = (byte)(value >> 16);
+                _buffer[3] = (byte)(value >> 8);
+                _buffer[4] = (byte)value;
                 _stream.Write(_buffer, 0, 5);
             }
             else
@@ -91,7 +90,7 @@ namespace Discord.ETF
 
                 byte bytes = 0;
                 while (value > 0)
-                    _buffer[3 + bytes++] = (byte)((value >>= 8) & 0xFF);
+                    _buffer[3 + bytes++] = (byte)(value >>= 8);
                 _buffer[1] = bytes; //Encoded bytes
 
                 _stream.Write(_buffer, 0, 3 + bytes);
@@ -108,10 +107,10 @@ namespace Discord.ETF
             else if (value <= int.MaxValue)
             {
                 _buffer[0] = (byte)ETFType.INTEGER_EXT;
-                _buffer[1] = (byte)((value >> 24) & 0xFF);
-                _buffer[2] = (byte)((value >> 16) & 0xFF);
-                _buffer[3] = (byte)((value >> 8) & 0xFF);
-                _buffer[4] = (byte)(value & 0xFF);
+                _buffer[1] = (byte)(value >> 24);
+                _buffer[2] = (byte)(value >> 16);
+                _buffer[3] = (byte)(value >> 8);
+                _buffer[4] = (byte)value;
                 _stream.Write(_buffer, 0, 5);
             }
             else
@@ -121,7 +120,7 @@ namespace Discord.ETF
 
                 byte bytes = 0;
                 while (value > 0)
-                    _buffer[3 + bytes++] = (byte)((value >>= 8) & 0xFF);
+                    _buffer[3 + bytes++] = (byte)(value >>= 8);
                 _buffer[1] = bytes; //Encoded bytes
 
                 _stream.Write(_buffer, 0, 3 + bytes);
@@ -133,14 +132,14 @@ namespace Discord.ETF
         {
             ulong value2 = *(ulong*)&value;
             _buffer[0] = (byte)ETFType.NEW_FLOAT_EXT;
-            _buffer[1] = (byte)((value2 >> 56) & 0xFF);
-            _buffer[2] = (byte)((value2 >> 48) & 0xFF);
-            _buffer[3] = (byte)((value2 >> 40) & 0xFF);
-            _buffer[4] = (byte)((value2 >> 32) & 0xFF);
-            _buffer[5] = (byte)((value2 >> 24) & 0xFF);
-            _buffer[6] = (byte)((value2 >> 16) & 0xFF);
-            _buffer[7] = (byte)((value2 >> 8) & 0xFF);
-            _buffer[8] = (byte)(value2 & 0xFF);
+            _buffer[1] = (byte)(value2 >> 56);
+            _buffer[2] = (byte)(value2 >> 48);
+            _buffer[3] = (byte)(value2 >> 40);
+            _buffer[4] = (byte)(value2 >> 32);
+            _buffer[5] = (byte)(value2 >> 24);
+            _buffer[6] = (byte)(value2 >> 16);
+            _buffer[7] = (byte)(value2 >> 8);
+            _buffer[8] = (byte)value2;
             _stream.Write(_buffer, 0, 9);
         }
 
@@ -165,10 +164,10 @@ namespace Discord.ETF
             {
                 int count = value.Length;
                 _buffer[0] = (byte)ETFType.BINARY_EXT;
-                _buffer[1] = (byte)((count >> 24) & 0xFF);
-                _buffer[2] = (byte)((count >> 16) & 0xFF);
-                _buffer[3] = (byte)((count >> 8) & 0xFF);
-                _buffer[4] = (byte)(count & 0xFF);
+                _buffer[1] = (byte)(count >> 24);
+                _buffer[2] = (byte)(count >> 16);
+                _buffer[3] = (byte)(count >> 8);
+                _buffer[4] = (byte)count;
                 _stream.Write(_buffer, 0, 5);
                 _stream.Write(value, 0, value.Length);
             }
@@ -182,10 +181,10 @@ namespace Discord.ETF
                 var bytes = _encoding.GetBytes(value);
                 int count = bytes.Length;
                 _buffer[0] = (byte)ETFType.BINARY_EXT;
-                _buffer[1] = (byte)((count >> 24) & 0xFF);
-                _buffer[2] = (byte)((count >> 16) & 0xFF);
-                _buffer[3] = (byte)((count >> 8) & 0xFF);
-                _buffer[4] = (byte)(count & 0xFF);
+                _buffer[1] = (byte)(count >> 24);
+                _buffer[2] = (byte)(count >> 16);
+                _buffer[3] = (byte)(count >> 8);
+                _buffer[4] = (byte)count;
                 _stream.Write(_buffer, 0, 5);
                 _stream.Write(bytes, 0, bytes.Length);
             }
@@ -215,10 +214,10 @@ namespace Discord.ETF
                 var array = obj.ToArray();
                 int length = array.Length;
                 _buffer[0] = (byte)ETFType.LIST_EXT;
-                _buffer[1] = (byte)((length >> 24) & 0xFF);
-                _buffer[2] = (byte)((length >> 16) & 0xFF);
-                _buffer[3] = (byte)((length >> 8) & 0xFF);
-                _buffer[4] = (byte)(length & 0xFF);
+                _buffer[1] = (byte)(length >> 24);
+                _buffer[2] = (byte)(length >> 16);
+                _buffer[3] = (byte)(length >> 8);
+                _buffer[4] = (byte)length;
                 _stream.Write(_buffer, 0, 5);
 
                 for (int i = 0; i < array.Length; i++)
@@ -236,10 +235,10 @@ namespace Discord.ETF
             {
                 int length = obj.Count;
                 _buffer[0] = (byte)ETFType.MAP_EXT;
-                _buffer[1] = (byte)((length >> 24) & 0xFF);
-                _buffer[2] = (byte)((length >> 16) & 0xFF);
-                _buffer[3] = (byte)((length >> 8) & 0xFF);
-                _buffer[4] = (byte)(length & 0xFF);
+                _buffer[1] = (byte)(length >> 24);
+                _buffer[2] = (byte)(length >> 16);
+                _buffer[3] = (byte)(length >> 8);
+                _buffer[4] = (byte)length;
                 _stream.Write(_buffer, 0, 5);
 
                 foreach (var pair in obj)

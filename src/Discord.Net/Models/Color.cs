@@ -67,7 +67,7 @@ namespace Discord
 			//Bypasses isLocked for API changes.
 			_rawValue = rawValue;
 		}
-        private byte GetByte(int pos) => (byte)((_rawValue >> (8 * (pos - 1))) & 0xFF);
+        private byte GetByte(int pos) => (byte)(_rawValue >> (8 * (pos - 1)));
 		private void SetByte(int pos, byte value)
 		{
 			if (_isLocked)
@@ -75,7 +75,7 @@ namespace Discord
 
 			uint original = _rawValue;
 			int bit = 8 * (pos - 1);
-			uint mask = (uint)~(0xFF << bit);
+			uint mask = ~(0xFFU << bit);
             _rawValue = (_rawValue & mask) | ((uint)value << bit);
 		}
 
