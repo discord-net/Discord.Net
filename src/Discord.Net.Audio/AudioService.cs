@@ -153,27 +153,34 @@ namespace Discord.Audio
                 }
 
             }
-		}
-		
-		public async Task Leave(Server server)
-		{
-			if (server == null) throw new ArgumentNullException(nameof(server));
+		}		
+
+		public Task Leave(Server server) => Leave(server, null);
+        public Task Leave(Channel channel) => Leave(channel.Server, channel);
+        private async Task Leave(Server server, Channel channel)
+        {
+            if (server == null) throw new ArgumentNullException(nameof(server));
 
             if (Config.EnableMultiserver)
             {
                 AudioClient client;
-                if (_voiceClients.TryRemove(server.Id, out client))
-                    await client.Disconnect().ConfigureAwait(false);
+                //Potential race condition if changing channels during this call, but that's acceptable
+                if (channel == null || (_voiceClients.TryGetValue(server.Id, out client) && client.Channel == channel)) 
+                {
+                    if (_voiceClients.TryRemove(server.Id, out client))
+                        await client.Disconnect().ConfigureAwait(false);
+                }
             }
             else
             {
                 using (await _asyncLock.LockAsync().ConfigureAwait(false))
                 {
                     var client = GetClient(server) as VirtualClient;
-                    if (client != null)
+                    if (client != null && client.Channel == channel)
                         await _defaultClient.Disconnect().ConfigureAwait(false);
                 }
             }
-		}
-	}
+
+        }
+    }
 }
