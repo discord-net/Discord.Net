@@ -74,17 +74,56 @@ namespace Discord.Commands
                 string msg = e.Message.RawText;
                 if (msg.Length == 0) return;
 
-				//Check for command char if one is provided
-				var chars = Config.CommandChars;
-                if (chars.Length > 0)
+                bool activated = false; // Either this or nested if statements
+                                        // Also needs a clearer name
+
+                if ((Config.ActivationMode & ActivationMode.Char) != 0)
                 {
-					if (!chars.Contains(msg[0]))
-						return;
-                    msg = msg.Substring(1);
+                    //Check for command char if one is provided
+                    var chars = Config.CommandChars;
+                    if (chars.Length > 0)
+                    {
+                        if (chars.Contains(msg[0]))
+                        {
+                            msg = msg.Substring(1);
+                            activated = true;
+                        }
+                    }
                 }
 
-				//Parse command
-				IEnumerable<Command> commands;
+                if (!activated && (Config.ActivationMode & ActivationMode.Mention) != 0)
+                {
+                    if (e.Message.IsMentioningMe() && msg.StartsWith(e.Server.CurrentUser.Mention))
+                    {
+                        msg = msg.Substring(e.Server.CurrentUser.Mention.Length);
+                        activated = true;
+                    }
+                    else if (e.Channel.IsPrivate && msg.StartsWith($"@{client.CurrentUser.Name}"))
+                    {
+                        msg = msg.Substring(client.CurrentUser.Name.Length);
+                        activated = true;
+                    }
+                }
+
+                // Checking if that's null with the Custom flag set on launch and  throwing an
+                // exception (similar to commands with several unparsed parameters) would probably be better than the null check here
+                if (!activated && (Config.ActivationMode & ActivationMode.Custom) != 0 && Config.CustomActivator != null)
+                {
+                    int index = Config.CustomActivator(e.Message);
+                    if (index > 0)
+                    {
+                        msg = msg.Substring(index);
+                        activated = true;
+                    }
+                }
+
+                // This kills trying to parse messages when you don't have a command char set,
+                // but also keeps it from trying to parse everything when you *do* have something set
+                if (!activated)
+                    return;
+
+                //Parse command
+                IEnumerable<Command> commands;
 				int argPos;
 				CommandParser.ParseCommand(msg, _map, out commands, out argPos);				
 				if (commands == null)
@@ -283,10 +322,10 @@ namespace Discord.Commands
 						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Multiple:
-						output.Append(" [...]");
+						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Unparsed:
-						output.Append(" [--]");
+						output.Append($" {param.Name}");
 						break;
 				}
 			}
