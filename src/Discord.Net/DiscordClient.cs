@@ -151,10 +151,6 @@ namespace Discord
 
             //Extensibility
             Services = new ServiceManager(this);
-
-            //Import/Export
-            //_messageImporter = new JsonSerializer();
-            //_messageImporter.ContractResolver = new Message.ImportResolver();
         }
 
         /// <summary> Connects to the Discord server with the provided email and password. </summary>
