@@ -39,6 +39,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Discord.Net.Commands\ActivationMode.cs">
+      <Link>ActivationMode.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Commands\Command.cs">
       <Link>Command.cs</Link>
     </Compile>
@@ -68,6 +71,9 @@
     </Compile>
     <Compile Include="..\Discord.Net.Commands\CommandServiceConfig.cs">
       <Link>CommandServiceConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net.Commands\HelpMode.cs">
+      <Link>HelpMode.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net.Commands\Permissions\GenericPermissionChecker.cs">
       <Link>Permissions\GenericPermissionChecker.cs</Link>

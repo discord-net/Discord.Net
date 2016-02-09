@@ -2,56 +2,30 @@
 
 namespace Discord.Commands
 {
-	public enum HelpMode
-	{
-		/// <summary> Disable the automatic help command. </summary>
-		Disable,
-		/// <summary> Use the automatic help command and respond in the channel the command is used. </summary>
-		Public,
-		/// <summary> Use the automatic help command and respond in a private message. </summary>
-		Private
-	}
-    [Flags]
-    public enum ActivationMode
-    {
-        // All of these probably need to be changed
-        /// <summary> Enable command activation by char. </summary>
-        Char = 0x1,
-        /// <summary> Enable command activation when mentioned. </summary>
-        Mention = 0x2,
-        /// <summary> Enable command activation by custom function. </summary>
-        Custom = 0x4
-    }
 	public class CommandServiceConfig
-	{
-		public char? CommandChar
-		{
-			get
-			{
-				return _commandChars.Length > 0 ? _commandChars[0] : (char?)null;
-			}
-			set
-			{
-				if (value != null)
-					CommandChars = new char[] { value.Value };
-				else
-					CommandChars = new char[0];
-			}
-		}
-		public char[] CommandChars { get { return _commandChars; } set { SetValue(ref _commandChars, value); } }
-		private char[] _commandChars = new char[] { '!' };
-        
-        public Func<Message, int> CustomActivator { get { return _customActivator; } set { SetValue(ref _customActivator, value); } }
-        private Func<Message, int> _customActivator = null;
+    {
+        /// <summary> Gets or sets the prefix character used to trigger commands, if ActivationMode has the Char flag set. </summary>
+		public char? PrefixChar { get { return _prefixChar; } set { SetValue(ref _prefixChar, value); } }
+		private char? _prefixChar = null;
 
+        /// <summary> Gets or sets whether a message beginning with a mention to the logged-in user should be treated as a command. </summary>
+        public bool AllowMentionPrefix { get { return _allowMentionPrefix; } set { SetValue(ref _allowMentionPrefix, value); } }
+        private bool _allowMentionPrefix = true;
+
+        /// <summary> 
+        /// Gets or sets a custom function used to detect messages that should be treated as commands.
+        /// This function should a positive one indicating the index of where the in the message's RawText the command begins, 
+        /// and a negative value if the message should be ignored.
+        /// </summary>
+        public Func<Message, int> CustomPrefixHandler { get { return _customPrefixHandler; } set { SetValue(ref _customPrefixHandler, value); } }
+        private Func<Message, int> _customPrefixHandler = null;
+
+        /// <summary> Gets or sets whether a help function should be automatically generated. </summary>
 		public HelpMode HelpMode { get { return _helpMode; } set { SetValue(ref _helpMode, value); } }
 		private HelpMode _helpMode = HelpMode.Disable;
 
-        public ActivationMode ActivationMode { get { return _activationMode; } set { SetValue(ref _activationMode, value); } }
-        private ActivationMode _activationMode = ActivationMode.Char; // Set char as default, not sure if it's the best method of doing it
-
-		//Lock
-		protected bool _isLocked;
+        //Lock
+        protected bool _isLocked;
 		internal void Lock() { _isLocked = true; }
 		protected void SetValue<T>(ref T storage, T value)
 		{
@@ -59,5 +33,5 @@ namespace Discord.Commands
 				throw new InvalidOperationException("Unable to modify a service's configuration after it has been created.");
 			storage = value;
 		}
-	}
+    }
 }

@@ -74,53 +74,33 @@ namespace Discord.Commands
                 string msg = e.Message.RawText;
                 if (msg.Length == 0) return;
 
-                bool activated = false; // Either this or nested if statements
-                                        // Also needs a clearer name
+                string cmdMsg = null;
 
-                if ((Config.ActivationMode & ActivationMode.Char) != 0)
+                //Check for command char
+                if (Config.PrefixChar.HasValue)
                 {
-                    //Check for command char if one is provided
-                    var chars = Config.CommandChars;
-                    if (chars.Length > 0)
-                    {
-                        if (chars.Contains(msg[0]))
-                        {
-                            msg = msg.Substring(1);
-                            activated = true;
-                        }
-                    }
+                    if (msg[0] == Config.PrefixChar.Value)
+                        cmdMsg = msg.Substring(1);
                 }
 
-                if (!activated && (Config.ActivationMode & ActivationMode.Mention) != 0)
+                //Check for mention
+                if (cmdMsg == null && Config.AllowMentionPrefix)
                 {
-                    if (e.Message.IsMentioningMe() && msg.StartsWith(e.Server.CurrentUser.Mention))
-                    {
-                        msg = msg.Substring(e.Server.CurrentUser.Mention.Length);
-                        activated = true;
-                    }
-                    else if (e.Channel.IsPrivate && msg.StartsWith($"@{client.CurrentUser.Name}"))
-                    {
-                        msg = msg.Substring(client.CurrentUser.Name.Length);
-                        activated = true;
-                    }
+                    if (msg.StartsWith(e.Server.CurrentUser.Mention))
+                        cmdMsg = msg.Substring(e.Server.CurrentUser.Mention.Length);
+                    else if (msg.StartsWith($"@{client.CurrentUser.Name}"))
+                        cmdMsg = msg.Substring(client.CurrentUser.Name.Length);
                 }
-
-                // Checking if that's null with the Custom flag set on launch and  throwing an
-                // exception (similar to commands with several unparsed parameters) would probably be better than the null check here
-                if (!activated && (Config.ActivationMode & ActivationMode.Custom) != 0 && Config.CustomActivator != null)
+                
+                //Check using custom activator
+                if (cmdMsg == null && Config.CustomPrefixHandler != null)
                 {
-                    int index = Config.CustomActivator(e.Message);
-                    if (index > 0)
-                    {
-                        msg = msg.Substring(index);
-                        activated = true;
-                    }
+                    int index = Config.CustomPrefixHandler(e.Message);
+                    if (index >= 0)
+                        cmdMsg = msg.Substring(index);
                 }
-
-                // This kills trying to parse messages when you don't have a command char set,
-                // but also keeps it from trying to parse everything when you *do* have something set
-                if (!activated)
-                    return;
+                
+                if (cmdMsg == null) return;
 
                 //Parse command
                 IEnumerable<Command> commands;
@@ -225,18 +205,9 @@ namespace Discord.Commands
 			else
 			{
 				output.Append("\n\n");
-
-				var chars = Config.CommandChars;
-				if (chars.Length > 0)
-				{
-					if (chars.Length == 1)
-						output.AppendLine($"You can use `{chars[0]}` to call a command.");
-					else
-						output.AppendLine($"You can use `{string.Join(" ", chars.Take(chars.Length - 1))}` or `{chars.Last()}` to call a command.");
-					output.AppendLine($"`{chars[0]}help <command>` can tell you more about how to use a command.");
-				}
-				else
-					output.AppendLine($"`help <command>` can tell you more about how to use a command.");
+                
+				output.AppendLine($"You can use `{Config.PrefixChar}` to call a command.");
+				output.AppendLine($"`{Config.PrefixChar}help <command>` can tell you more about how to use a command.");
 			}
 
             return (replyChannel ?? channel).SendMessage(output.ToString());
@@ -322,10 +293,10 @@ namespace Discord.Commands
 						output.Append($" [{param.Name}]");
 						break;
 					case ParameterType.Multiple:
-						output.Append($" [{param.Name}]");
+						output.Append($" [{param.Name}...]");
 						break;
 					case ParameterType.Unparsed:
-						output.Append($" {param.Name}");
+						output.Append($" [-]");
 						break;
 				}
 			}
