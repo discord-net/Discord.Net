@@ -87,9 +87,9 @@ namespace Discord.Commands
                 if (cmdMsg == null && Config.AllowMentionPrefix)
                 {
                     if (msg.StartsWith(e.Server.CurrentUser.Mention))
-                        cmdMsg = msg.Substring(e.Server.CurrentUser.Mention.Length);
+                        cmdMsg = msg.Substring(e.Server.CurrentUser.Mention.Length + 1);
                     else if (msg.StartsWith($"@{client.CurrentUser.Name}"))
-                        cmdMsg = msg.Substring(client.CurrentUser.Name.Length);
+                        cmdMsg = msg.Substring(client.CurrentUser.Name.Length + 1);
                 }
                 
                 //Check using custom activator
@@ -105,7 +105,7 @@ namespace Discord.Commands
                 //Parse command
                 IEnumerable<Command> commands;
 				int argPos;
-				CommandParser.ParseCommand(msg, _map, out commands, out argPos);				
+				CommandParser.ParseCommand(cmdMsg, _map, out commands, out argPos);				
 				if (commands == null)
 				{
 					CommandEventArgs errorArgs = new CommandEventArgs(e.Message, null, null);
@@ -118,7 +118,7 @@ namespace Discord.Commands
 					{
 						//Parse arguments
 						string[] args;
-						var error = CommandParser.ParseArgs(msg, argPos, command, out args);
+						var error = CommandParser.ParseArgs(cmdMsg, argPos, command, out args);
 						if (error != null)
 						{
 							if (error == CommandErrorType.BadArgCount)
