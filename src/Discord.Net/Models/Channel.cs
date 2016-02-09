@@ -46,7 +46,7 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Message> _messages;
         private Dictionary<ulong, PermissionOverwrite> _permissionOverwrites;
         
-        internal DiscordClient Client { get; }
+        public DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this channel. </summary>
         public ulong Id { get; }

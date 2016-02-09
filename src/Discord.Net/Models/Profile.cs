@@ -10,7 +10,7 @@ namespace Discord
     {
         private readonly static Action<Profile, Profile> _cloner = DynamicIL.CreateCopyMethod<Profile>();
 
-        internal DiscordClient Client { get; }
+        public DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this user. </summary>
         public ulong Id { get; }

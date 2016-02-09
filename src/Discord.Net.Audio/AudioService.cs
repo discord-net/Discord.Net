@@ -15,7 +15,7 @@ namespace Discord.Audio
 		private ConcurrentDictionary<User, bool> _talkingUsers;
 		private int _nextClientId;
 
-		internal DiscordClient Client { get; private set; }
+        public DiscordClient Client { get; private set; }
 		public AudioServiceConfig Config { get; }
 
         public event EventHandler Connected = delegate { };

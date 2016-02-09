@@ -46,8 +46,8 @@ namespace Discord
         private DateTime? _lastOnline;
         private ulong? _voiceChannelId;
         private Dictionary<ulong, Role> _roles;
-        
-        internal DiscordClient Client { get; }
+
+        public DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this user. </summary>
         public ulong Id { get; }

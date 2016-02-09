@@ -61,7 +61,7 @@ namespace Discord
 			}
 		}
 
-        internal DiscordClient Client { get; }
+        public DiscordClient Client { get; }
 
         /// <summary> Gets the unique code for this invite. </summary>
         public string Code { get; }

@@ -169,7 +169,7 @@ namespace Discord
 			internal File() { }
 		}
 
-        internal DiscordClient Client => Channel.Client;
+        public DiscordClient Client => Channel.Client;
 
         /// <summary> Returns the unique identifier for this message. </summary>
         public ulong Id { get; internal set; }

@@ -13,7 +13,7 @@ namespace Discord
     {
         private readonly static Action<Role, Role> _cloner = DynamicIL.CreateCopyMethod<Role>();
 
-        internal DiscordClient Client => Server.Client;
+        public DiscordClient Client => Server.Client;
 
         /// <summary> Gets the unique identifier for this role. </summary>
         public ulong Id { get; }

@@ -52,8 +52,8 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private ulong _ownerId;
         private ulong? _afkChannelId;
-        
-        internal DiscordClient Client { get; }
+
+        public DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this server. </summary>
         public ulong Id { get; }
