@@ -205,10 +205,25 @@ namespace Discord.Commands
 			else
 			{
 				output.Append("\n\n");
-                
-				output.AppendLine($"You can use `{Config.PrefixChar}` to call a command.");
-				output.AppendLine($"`{Config.PrefixChar}help <command>` can tell you more about how to use a command.");
-			}
+
+                //TODO: Should prefix be stated in the help message or not?
+                /*StringBuilder builder = new StringBuilder();
+                if (Config.PrefixChar != null)
+                {
+                    builder.Append('`');
+                    builder.Append(Config.PrefixChar.Value);
+                    builder.Append('`');
+                }
+                if (Config.AllowMentionPrefix)
+                {
+                    if (builder.Length > 0)
+                        builder.Append(" or ");
+                    builder.Append(Client.CurrentUser.Mention);
+                }
+                if (builder.Length > 0)
+                    output.AppendLine($"Start your message with {builder.ToString()} to run a command.");*/
+                output.AppendLine($"Run `help <command>` for more information.");
+            }
 
             return (replyChannel ?? channel).SendMessage(output.ToString());
         }
