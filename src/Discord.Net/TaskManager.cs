@@ -162,7 +162,10 @@ namespace Discord
         public void ThrowException()
         {
             using (_lock.Lock())
-                _stopReason?.Throw();
+            {
+                if (!WasStopExpected)
+                    _stopReason?.Throw();
+            }
         }
         public void ClearException()
         {
