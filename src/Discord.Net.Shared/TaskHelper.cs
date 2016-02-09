@@ -5,15 +5,11 @@ namespace Discord
 {
     internal static class TaskHelper
     {
-        public static Task CompletedTask { get; }
-        static TaskHelper()
-        {
 #if DOTNET54
-            CompletedTask = Task.CompletedTask;
+        public static Task CompletedTask => Task.CompletedTask;                
 #else
-            CompletedTask = Task.Delay(0);
+        public static Task CompletedTask => Task.Delay(0);
 #endif
-        }
 
         public static Func<Task> ToAsync(Action action)
         {

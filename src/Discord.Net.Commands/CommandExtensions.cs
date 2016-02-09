@@ -9,14 +9,12 @@ namespace Discord.Commands
             client.Services.Add(new CommandService(config));
             return client;
         }
-        public static DiscordClient UsingCommands(this DiscordClient client, Action<CommandServiceConfig> configFunc = null)
+        public static DiscordClient UsingCommands(this DiscordClient client, Action<CommandServiceConfigBuilder> configFunc = null)
         {
-            var config = new CommandServiceConfig();
-            configFunc(config);
-            client.Services.Add(new CommandService(config));
+            var builder = new CommandServiceConfigBuilder();
+            configFunc(builder);
+            client.Services.Add(new CommandService(builder));
             return client;
         }
-        public static CommandService Commands(this DiscordClient client, bool required = true)
-			=> client.Services.Get<CommandService>(required);
     }
 }

@@ -65,9 +65,7 @@ namespace Discord.Net.WebSockets
         {
             return Task.Run(async () =>
             {
-                var sendInterval = _config.WebSocketInterval;
-                //var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
-                var buffer = new byte[ReceiveChunkSize];
+                var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
                 var stream = new MemoryStream();
 
                 try
@@ -81,7 +79,7 @@ namespace Discord.Net.WebSockets
 
                             try
                             {
-                                result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancelToken).ConfigureAwait(false);
+                                result = await _webSocket.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
                             }
                             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
                             {
@@ -91,7 +89,7 @@ namespace Discord.Net.WebSockets
                             if (result.MessageType == WebSocketMessageType.Close)
                                 throw new WebSocketException((int)result.CloseStatus.Value, result.CloseStatusDescription);
                             else
-                                stream.Write(buffer, 0, result.Count);
+                                stream.Write(buffer.Array, buffer.Offset, buffer.Count);
 
                         }
                         while (result == null || !result.EndOfMessage);
@@ -114,7 +112,6 @@ namespace Discord.Net.WebSockets
             return Task.Run(async () =>
             {
                 byte[] bytes = new byte[SendChunkSize];
-                var sendInterval = _config.WebSocketInterval;
 
                 try
                 {
@@ -147,7 +144,7 @@ namespace Discord.Net.WebSockets
                                 }
                             }
                         }
-                        await Task.Delay(sendInterval, cancelToken).ConfigureAwait(false);
+                        await Task.Delay(DiscordConfig.WebSocketQueueInterval, cancelToken).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }

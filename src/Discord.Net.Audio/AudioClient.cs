@@ -61,8 +61,8 @@ namespace Discord.Audio
         public Stream OutputStream { get; }
         
         public CancellationToken CancelToken { get; private set; }
-        public string SessionId { get; private set; }
-        
+        public string SessionId => GatewaySocket.SessionId;
+
         public ConnectionState State => VoiceSocket.State;
         public Server Server => VoiceSocket.Server;
         public Channel Channel => VoiceSocket.Channel;
@@ -71,7 +71,7 @@ namespace Discord.Audio
 		{
             Id = id;
             _config = client.Config;
-            Service = client.Audio();
+            Service = client.Services.Get<AudioService>();
             Config = Service.Config;
             Serializer = client.Serializer;
             _gatewayState = (int)ConnectionState.Disconnected;

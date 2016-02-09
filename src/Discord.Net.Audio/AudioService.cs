@@ -29,16 +29,23 @@ namespace Discord.Audio
 		private void OnUserIsSpeakingUpdated(User user, bool isSpeaking)
             => UserIsSpeakingUpdated(this, new UserIsSpeakingEventArgs(user, isSpeaking));
 
-		public AudioService(AudioServiceConfig config)
+        public AudioService()
+            : this(new AudioServiceConfigBuilder())
+        {
+        }
+        public AudioService(AudioServiceConfigBuilder builder)
+            : this(builder.Build())
+        {
+        }
+        public AudioService(AudioServiceConfig config)
 		{
-			Config = config;
+            Config = config;
             _asyncLock = new AsyncLock();
 
         }
 		void IService.Install(DiscordClient client)
 		{
 			Client = client;
-            Config.Lock();
 
             if (Config.EnableMultiserver)
 				_voiceClients = new ConcurrentDictionary<ulong, AudioClient>();

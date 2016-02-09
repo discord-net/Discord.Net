@@ -3,7 +3,7 @@
     public enum HelpMode
     {
         /// <summary> Disable the automatic help command. </summary>
-        Disable,
+        Disabled,
         /// <summary> Use the automatic help command and respond in the channel the command is used. </summary>
         Public,
         /// <summary> Use the automatic help command and respond in a private message. </summary>

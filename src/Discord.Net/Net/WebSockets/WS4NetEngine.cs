@@ -118,7 +118,6 @@ namespace Discord.Net.WebSockets
 
         private Task SendAsync(CancellationToken cancelToken)
         {
-            var sendInterval = _config.WebSocketInterval;
             return Task.Run(async () =>
             {
                 try
@@ -128,7 +127,7 @@ namespace Discord.Net.WebSockets
                         string json;
                         while (_sendQueue.TryDequeue(out json))
                             _webSocket.Send(json);
-                        await Task.Delay(sendInterval, cancelToken).ConfigureAwait(false);
+                        await Task.Delay(DiscordConfig.WebSocketQueueInterval, cancelToken).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }

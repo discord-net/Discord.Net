@@ -99,10 +99,10 @@ namespace Discord.Net
             _pendingActions.Enqueue(new DeleteAction(msg));
         }
 
-        internal Task Run(CancellationToken cancelToken, int interval)
+        internal Task Run(CancellationToken cancelToken)
         {
             _nextWarning = WarningStart;
-            return Task.Run(async () =>
+            return Task.Run((Func<Task>)(async () =>
             {
                 try
                 {
@@ -121,11 +121,11 @@ namespace Discord.Net
                         while (_pendingActions.TryDequeue(out queuedAction))
                             await queuedAction.Do(this).ConfigureAwait(false);
 
-                        await Task.Delay(interval).ConfigureAwait(false);
+                        await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
-            });
+            }));
         }
 
         internal async Task Send(Message msg)

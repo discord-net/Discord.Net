@@ -76,28 +76,33 @@ namespace Discord
         public IEnumerable<Region> Regions => _regions.Select(x => x.Value);
 
         /// <summary> Initializes a new instance of the DiscordClient class. </summary>
-        public DiscordClient(Action<DiscordConfig> configFunc)
+        public DiscordClient(Action<DiscordConfigBuilder> configFunc)
             : this(ProcessConfig(configFunc))
         {
         }
-        private static DiscordConfig ProcessConfig(Action<DiscordConfig> func)
+        private static DiscordConfigBuilder ProcessConfig(Action<DiscordConfigBuilder> func)
         {
-            var config = new DiscordConfig();
+            var config = new DiscordConfigBuilder();
             func(config);
             return config;
         }
 
         /// <summary> Initializes a new instance of the DiscordClient class. </summary>
         public DiscordClient()
-            : this((DiscordConfig)null)
+            : this(new DiscordConfigBuilder())
         {
         }
-
+        /// <summary> Initializes a new instance of the DiscordClient class. </summary>
+        public DiscordClient(DiscordConfigBuilder builder)
+            : this(builder.Build())
+        {
+            if (builder.LogHandler != null)
+                Log.Message += builder.LogHandler;
+        }
         /// <summary> Initializes a new instance of the DiscordClient class. </summary>
         public DiscordClient(DiscordConfig config)
         {
-            Config = config ?? new DiscordConfig();
-            Config.Lock();
+            Config = config;
 
             State = (int)ConnectionState.Disconnected;
             Status = UserStatus.Online;
@@ -145,9 +150,8 @@ namespace Discord
             };
             //GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
-
-            if (Config.UseMessageQueue)
-                MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
+            
+            MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
 
             //Extensibility
             Services = new ServiceManager(this);
@@ -194,10 +198,11 @@ namespace Discord
                     await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
 
-                    List<Task> tasks = new List<Task>();
-                    tasks.Add(CancelToken.Wait());
-                    if (Config.UseMessageQueue)
-                        tasks.Add(MessageQueue.Run(CancelToken, Config.MessageQueueInterval));
+                    Task[] tasks = new[]
+                    {
+                        CancelToken.Wait(),
+                        MessageQueue.Run(CancelToken)
+                    };
 
                     await _taskManager.Start(tasks, cancelSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
@@ -222,7 +227,7 @@ namespace Discord
             byte[] cacheKey = null;
 
             //Get Token
-            if (email != null && Config.CacheToken)
+            if (email != null && Config.CacheDir != null)
             {
                 tokenPath = GetTokenCachePath(email);
                 if (token == null && password != null)
@@ -240,7 +245,7 @@ namespace Discord
             var request = new LoginRequest() { Email = email, Password = password };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
             token = response.Token;
-            if (Config.CacheToken && token != oldToken && tokenPath != null)
+            if (Config.CacheDir != null && token != oldToken && tokenPath != null)
                 SaveToken(tokenPath, cacheKey, token);
             ClientAPI.Token = token;
 
@@ -270,9 +275,8 @@ namespace Discord
                 try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
                 catch (OperationCanceledException) { }
             }
-
-            if (Config.UseMessageQueue)
-                MessageQueue.Clear();
+            
+            MessageQueue.Clear();
 
             await GatewaySocket.Disconnect().ConfigureAwait(false);
             ClientAPI.Token = null;
@@ -1053,7 +1057,7 @@ namespace Discord
                 StringBuilder filenameBuilder = new StringBuilder();
                 for (int i = 0; i < data.Length; i++)
                     filenameBuilder.Append(data[i].ToString("x2"));
-                return Path.Combine(Path.GetTempPath(), Config.AppName ?? "Discord.Net", filenameBuilder.ToString());
+                return Path.Combine(Config.CacheDir, filenameBuilder.ToString());
             }
         }
         private string LoadToken(string path, byte[] key)

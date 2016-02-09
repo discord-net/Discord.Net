@@ -47,6 +47,9 @@
     <Compile Include="..\Discord.Net.Audio\AudioExtensions.cs">
       <Link>AudioExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.Audio\AudioMode.cs">
+      <Link>AudioMode.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net.Audio\AudioService.cs">
       <Link>AudioService.cs</Link>
     </Compile>

@@ -29,6 +29,18 @@ namespace Discord.Commands
         private void OnCommandError(CommandErrorType errorType, CommandEventArgs args, Exception ex = null)
             => CommandErrored(this, new CommandErrorEventArgs(errorType, args, ex));
 
+        public CommandService()
+            : this(new CommandServiceConfigBuilder())
+        {
+        }
+        public CommandService(CommandServiceConfigBuilder builder)
+            : this(builder.Build())
+        {
+            if (builder.ExecuteHandler != null)
+                CommandExecuted += builder.ExecuteHandler;
+            if (builder.ErrorHandler != null)
+                CommandErrored += builder.ErrorHandler;
+        }
         public CommandService(CommandServiceConfig config)
 		{
             Config = config;
@@ -42,9 +54,8 @@ namespace Discord.Commands
 		void IService.Install(DiscordClient client)
 		{
             Client = client;
-            Config.Lock();
 
-			if (Config.HelpMode != HelpMode.Disable)
+			if (Config.HelpMode != HelpMode.Disabled)
             {
 				CreateCommand("help")
 					.Parameter("command", ParameterType.Multiple)

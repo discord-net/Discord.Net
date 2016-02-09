@@ -343,26 +343,12 @@ namespace Discord
             if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
             return SendMessageInternal(text, true);
         }
-        private async Task<Message> SendMessageInternal(string text, bool isTTS)
+        private Task<Message> SendMessageInternal(string text, bool isTTS)
         {
             if (text.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
-
-            if (Client.Config.UseMessageQueue)
-                return Client.MessageQueue.QueueSend(this, text, isTTS);
-            else
-            {
-                var request = new SendMessageRequest(Id)
-                {
-                    Content = text,
-                    Nonce = null,
-                    IsTTS = isTTS
-                };
-                var model = await Client.ClientAPI.Send(request).ConfigureAwait(false);
-                var msg = AddMessage(model.Id, IsPrivate ? Client.PrivateUser : Server.CurrentUser, model.Timestamp.Value);
-                msg.Update(model);
-                return msg;
-            }
+            
+            return Task.FromResult(Client.MessageQueue.QueueSend(this, text, isTTS));
         }
 
         public async Task<Message> SendFile(string filePath)

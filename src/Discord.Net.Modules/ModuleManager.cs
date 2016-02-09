@@ -113,7 +113,7 @@ namespace Discord.Modules
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
 		{
-			var commandService = Client.Commands(true);
+			var commandService = Client.Services.Get<CommandService>();
 			commandService.CreateGroup(prefix, x =>
 			{
 				x.Category(Name);

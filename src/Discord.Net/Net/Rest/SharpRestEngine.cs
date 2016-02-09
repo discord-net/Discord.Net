@@ -31,7 +31,7 @@ namespace Discord.Net.Rest
             _client = new RestSharpClient(baseUrl)
 			{
 				PreAuthenticate = false,
-				ReadWriteTimeout = _config.RestTimeout,
+				ReadWriteTimeout = DiscordConfig.RestTimeout,
 				UserAgent = config.UserAgent
             };
 			_client.Proxy = null;

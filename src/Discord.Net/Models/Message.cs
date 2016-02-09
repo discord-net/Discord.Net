@@ -310,7 +310,7 @@ namespace Discord
 			}
         }
 
-        public async Task Edit(string text)
+        public Task Edit(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
@@ -318,28 +318,14 @@ namespace Discord
 
             if (text.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
-
-            if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueEdit(this, text);
-            else
-            {
-                var request = new UpdateMessageRequest(Channel.Id, Id)
-                {
-                    Content = text
-                };
-                await Client.ClientAPI.Send(request).ConfigureAwait(false);
-            }
+            
+            Client.MessageQueue.QueueEdit(this, text);
+            return TaskHelper.CompletedTask;
         }
-        public async Task Delete()
+        public Task Delete()
         {
-            if (Client.Config.UseMessageQueue)
-                Client.MessageQueue.QueueDelete(this);
-            else
-            {
-                var request = new DeleteMessageRequest(Channel.Id, Id);
-                try { await Client.ClientAPI.Send(request).ConfigureAwait(false); }
-                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
-            }
+            Client.MessageQueue.QueueDelete(this);
+            return TaskHelper.CompletedTask;
         }
 
         /// <summary> Returns true if the logged-in user was mentioned. </summary>
