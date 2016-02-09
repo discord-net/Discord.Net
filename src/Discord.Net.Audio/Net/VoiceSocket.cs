@@ -371,7 +371,7 @@ namespace Discord.Net.WebSockets
                                     break;
                                 }
                             }
-                            _udp.Send(pingPacket, pingPacket.Length);
+                            await _udp.SendAsync(pingPacket, pingPacket.Length);
                             nextPingTicks = currentTicks + 5 * ticksPerSeconds;
                         }
                     }
