@@ -17,14 +17,14 @@ namespace Discord.Logging
 
         public void Log(LogSeverity severity, string message, Exception exception = null)
             => _manager.Log(severity, Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Log(LogSeverity severity, FormattableString message, Exception exception = null)
             => _manager.Log(severity, Name, message, exception);
 #endif
 
         public void Error(string message, Exception exception = null)
             => _manager.Error(Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Error(FormattableString message, Exception exception = null)
             => _manager.Error(Name, message, exception);
 #endif
@@ -33,7 +33,7 @@ namespace Discord.Logging
 
         public void Warning(string message, Exception exception = null)
             => _manager.Warning(Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Warning(FormattableString message, Exception exception = null)
             => _manager.Warning(Name, message, exception);
 #endif
@@ -42,7 +42,7 @@ namespace Discord.Logging
 
         public void Info(string message, Exception exception = null)
             => _manager.Info(Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Info(FormattableString message, Exception exception = null)
             => _manager.Info(Name, message, exception);
 #endif
@@ -51,7 +51,7 @@ namespace Discord.Logging
 
         public void Verbose(string message, Exception exception = null)
             => _manager.Verbose(Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Verbose(FormattableString message, Exception exception = null)
             => _manager.Verbose(Name, message, exception);
 #endif
@@ -60,7 +60,7 @@ namespace Discord.Logging
 
         public void Debug(string message, Exception exception = null)
             => _manager.Debug(Name, message, exception);
-#if !NET45
+#if DOTNET5_4
         public void Debug(FormattableString message, Exception exception = null)
             => _manager.Debug(Name, message, exception);
 #endif

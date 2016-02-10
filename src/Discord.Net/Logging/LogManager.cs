@@ -16,7 +16,7 @@ namespace Discord.Logging
             Level = client.Config.LogLevel;
         }
 
-#if !NET45
+#if DOTNET5_4
         public void Log(LogSeverity severity, string source, FormattableString message, Exception exception = null)
         {
             if (severity <= Level)
@@ -37,7 +37,7 @@ namespace Discord.Logging
 
         public void Error(string source, string message, Exception ex = null)
             => Log(LogSeverity.Error, source, message, ex);
-#if !NET45
+#if DOTNET5_4
         public void Error(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Error, source, message, ex);
 #endif
@@ -46,7 +46,7 @@ namespace Discord.Logging
 
         public void Warning(string source, string message, Exception ex = null)
             => Log(LogSeverity.Warning, source, message, ex);
-#if !NET45
+#if DOTNET5_4
         public void Warning(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Warning, source, message, ex);
 #endif
@@ -55,7 +55,7 @@ namespace Discord.Logging
 
         public void Info(string source, string message, Exception ex = null)
             => Log(LogSeverity.Info, source, message, ex);
-#if !NET45
+#if DOTNET5_4
         public void Info(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Info, source, message, ex);
 #endif
@@ -64,7 +64,7 @@ namespace Discord.Logging
 
         public void Verbose(string source, string message, Exception ex = null)
             => Log(LogSeverity.Verbose, source, message, ex);
-#if !NET45
+#if DOTNET5_4
         public void Verbose(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Verbose, source, message, ex);
 #endif
@@ -73,7 +73,7 @@ namespace Discord.Logging
 
         public void Debug(string source, string message, Exception ex = null)
             => Log(LogSeverity.Debug, source, message, ex);
-#if !NET45
+#if DOTNET5_4
         public void Debug(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Debug, source, message, ex);
 #endif
