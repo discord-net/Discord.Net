@@ -1,4 +1,6 @@
-﻿namespace Discord.Commands.Permissions.Userlist
+﻿using System.Collections.Generic;
+
+namespace Discord.Commands.Permissions.Userlist
 {
     public static class BlacklistExtensions
     {
@@ -23,5 +25,24 @@
 			service.Root.AddCheck(new BlacklistChecker(service.Client));
 			return service;
 		}
-	}
+
+        public static IEnumerable<ulong> GetBlacklistedUserIds(this DiscordClient client)
+            => client.Services.Get<BlacklistService>().UserIds;
+        public static void BlacklistUser(this DiscordClient client, User user)
+        {
+            client.Services.Get<BlacklistService>().Add(user.Id);
+        }
+        public static void BlacklistUser(this DiscordClient client, ulong userId)
+        {
+            client.Services.Get<BlacklistService>().Add(userId);
+        }
+        public static void UnBlacklistUser(this DiscordClient client, User user)
+        {
+            client.Services.Get<BlacklistService>().Remove(user.Id);
+        }
+        public static void UnBlacklistUser(this DiscordClient client, ulong userId)
+        {
+            client.Services.Get<BlacklistService>().Remove(userId);
+        }
+    }
 }
