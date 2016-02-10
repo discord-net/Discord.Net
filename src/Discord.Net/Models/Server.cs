@@ -17,7 +17,7 @@ namespace Discord
         private readonly static Action<Server, Server> _cloner = DynamicIL.CreateCopyMethod<Server>();
 
         internal static string GetIconUrl(ulong serverId, string iconId)
-            => iconId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/${serverId}/icons/${iconId}.jpg" : null;
+            => iconId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/icons/{iconId}.jpg" : null;
         internal static string GetSplashUrl(ulong serverId, string splashId)
             => splashId != null ? $"{DiscordConfig.ClientAPIUrl}guilds/{serverId}/splashes/{splashId}.jpg" : null;
 
