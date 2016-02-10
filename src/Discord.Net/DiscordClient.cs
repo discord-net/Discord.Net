@@ -68,8 +68,6 @@ namespace Discord
 
         /// <summary> Gets a collection of all servers this client is a member of. </summary>
         public IEnumerable<Server> Servers => _servers.Select(x => x.Value);
-        // /// <summary> Gets a collection of all channels this client is a member of. </summary>
-        // public IEnumerable<Channel> Channels => _channels.Select(x => x.Value);
         /// <summary> Gets a collection of all private channels this client is a member of. </summary>
         public IEnumerable<Channel> PrivateChannels => _privateChannels.Select(x => x.Value);
         /// <summary> Gets a collection of all voice regions currently offered by Discord. </summary>
@@ -198,11 +196,8 @@ namespace Discord
                     await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
 
-                    Task[] tasks = new[]
-                    {
-                        CancelToken.Wait(),
-                        MessageQueue.Run(CancelToken)
-                    };
+                    var tasks = new[] { CancelToken.Wait() }
+                        .Concat(MessageQueue.Run(CancelToken));
 
                     await _taskManager.Start(tasks, cancelSource).ConfigureAwait(false);
                     GatewaySocket.WaitForConnection(CancelToken);
