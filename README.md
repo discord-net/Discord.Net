@@ -16,6 +16,7 @@ You can download Discord.Net and its extensions from NuGet:
 ### Compiling
 In order to compile Discord.Net, you require at least the following:
 - [Visual Studio 2015](https://www.visualstudio.com/downloads/download-visual-studio-vs)
+- Visual Studio 2015 Update 1 (available through Visual Studio)
 - [ASP.Net 5 RC1](https://get.asp.net)
 - NuGet 3.3 (available through Visual Studio)
 
