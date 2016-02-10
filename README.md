@@ -11,7 +11,7 @@ You can download Discord.Net and its extensions from NuGet:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 - [Discord.Net.Modules](https://www.nuget.org/packages/Discord.Net.Modules/)
-- Discord.Net.Audio (Coming Soon)
+- [Discord.Net.Audio](https://www.nuget.org/packages/Discord.Net.Audio/)
 
 ### Compiling
 In order to compile Discord.Net, you require at least the following:
