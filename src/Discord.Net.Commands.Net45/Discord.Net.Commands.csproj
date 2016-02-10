@@ -39,9 +39,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Discord.Net.Commands\ActivationMode.cs">
-      <Link>ActivationMode.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net.Commands\Command.cs">
       <Link>Command.cs</Link>
     </Compile>

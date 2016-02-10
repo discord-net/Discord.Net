@@ -385,9 +385,6 @@
     <Compile Include="..\Discord.Net\API\Status\Rest\UpcomingMaintenances.cs">
       <Link>API\Status\Rest\UpcomingMaintenances.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Config.cs">
-      <Link>Config.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\DiscordClient.cs">
       <Link>DiscordClient.cs</Link>
     </Compile>
