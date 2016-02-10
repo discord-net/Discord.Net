@@ -267,13 +267,13 @@ namespace Discord.Legacy
         }
 
         [Obsolete("Use Server.CreateRole")]
-        public static Task<Role> CreateRole(this DiscordClient client, Server server, string name, ServerPermissions permissions = null, Color color = null, bool isHoisted = false)
+        public static Task<Role> CreateRole(this DiscordClient client, Server server, string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
             return server.CreateRole(name, permissions, color);
         }
         [Obsolete("Use Role.Edit")]
-        public static Task EditRole(this DiscordClient client, Role role, string name = null, ServerPermissions permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
+        public static Task EditRole(this DiscordClient client, Role role, string name = null, ServerPermissions? permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             return role.Edit(name, permissions, color, isHoisted, position);
@@ -312,37 +312,35 @@ namespace Discord.Legacy
             => client.Regions;
 
         [Obsolete("Use Channel.GetPermissionRule")]
-        public static DualChannelPermissions GetChannelPermissions(this DiscordClient client, Channel channel, User user)
+        public static ChannelPermissionOverrides GetChannelPermissions(this DiscordClient client, Channel channel, User user)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.GetPermissionsRule(user);
         }
         [Obsolete("Use Channel.GetPermissionRule")]
-        public static DualChannelPermissions GetChannelPermissions(this DiscordClient client, Channel channel, Role role)
+        public static ChannelPermissionOverrides GetChannelPermissions(this DiscordClient client, Channel channel, Role role)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.GetPermissionsRule(role);
         }
-        [Obsolete("Use Channel.AddPermissionRule")]
-        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        [Obsolete("Use Channel.AddPermissionRule(DualChannelPermissions)", true)]
+        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, User user, ChannelPermissions allow, ChannelPermissions deny)
         {
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
-            return channel.AddPermissionsRule(user, allow, deny);
+            throw new InvalidOperationException();
         }
         [Obsolete("Use Channel.AddPermissionRule")]
-        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, User user, DualChannelPermissions permissions = null)
+        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, User user, ChannelPermissionOverrides permissions)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.AddPermissionsRule(user, permissions);
         }
-        [Obsolete("Use Channel.AddPermissionRule")]
-        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        [Obsolete("Use Channel.AddPermissionRule(DualChannelPermissions)")]
+        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, Role role, ChannelPermissions allow, ChannelPermissions deny)
         {
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
-            return channel.AddPermissionsRule(role, allow, deny);
+            throw new InvalidOperationException();
         }
         [Obsolete("Use Channel.AddPermissionRule")]
-        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, Role role, DualChannelPermissions permissions = null)
+        public static Task SetChannelPermissions(this DiscordClient client, Channel channel, Role role, ChannelPermissionOverrides permissions)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return channel.AddPermissionsRule(role, permissions);

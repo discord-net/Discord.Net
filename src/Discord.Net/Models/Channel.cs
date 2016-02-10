@@ -18,13 +18,13 @@ namespace Discord
 
         private struct Member
         {
-            public readonly User User;
-            public readonly ChannelPermissions Permissions;
-            public Member(User user)
+            public User User { get; }
+            public ChannelPermissions Permissions { get; }
+
+            public Member(User user, ChannelPermissions permissions)
             {
                 User = user;
-                Permissions = new ChannelPermissions();
-                Permissions.Lock();
+                Permissions = permissions;
             }
         }
 
@@ -32,13 +32,13 @@ namespace Discord
         {
             public PermissionTarget TargetType { get; }
             public ulong TargetId { get; }
-            public DualChannelPermissions Permissions { get; }
+            public ChannelPermissionOverrides Permissions { get; }
+
             internal PermissionOverwrite(PermissionTarget targetType, ulong targetId, uint allow, uint deny)
             {
                 TargetType = targetType;
                 TargetId = targetId;
-                Permissions = new DualChannelPermissions(allow, deny);
-                Permissions.Lock();
+                Permissions = new ChannelPermissionOverrides(allow, deny);
             }
         }
         
@@ -94,7 +94,7 @@ namespace Discord
                         ChannelPermissions perms = new ChannelPermissions();
                         return Server.Users.Where(x =>
                         {
-                            UpdatePermissions(x, perms);
+                            UpdatePermissions(x, ref perms);
                             return perms.ReadMessages == true;
                         });
                     }
@@ -385,8 +385,10 @@ namespace Discord
 
             foreach (var pair in _users)
             {
-                Member member = pair.Value;
-                UpdatePermissions(member.User, member.Permissions);
+                var member = pair.Value;
+                var perms = member.Permissions;
+                if (UpdatePermissions(member.User, ref perms))
+                    _users[pair.Key] = new Member(member.User, perms);
             }
         }
         internal void UpdatePermissions(User user)
@@ -396,9 +398,13 @@ namespace Discord
 
             Member member;
             if (_users.TryGetValue(user.Id, out member))
-                UpdatePermissions(member.User, member.Permissions);
+            {
+                var perms = member.Permissions;
+                if  (UpdatePermissions(member.User, ref perms))
+                    _users[user.Id] = new Member(member.User, perms);
+            }
         }
-        internal void UpdatePermissions(User user, ChannelPermissions permissions)
+        internal bool UpdatePermissions(User user, ref ChannelPermissions permissions)
         {
             uint newPermissions = 0;
             var server = Server;
@@ -418,20 +424,20 @@ namespace Discord
                     var channelOverwrites = PermissionOverwrites;
 
                     var roles = user.Roles;
-                    foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Deny.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-                        newPermissions &= ~denyRole.Permissions.Deny.RawValue;
-                    foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.Allow.RawValue != 0 && roles.Any(y => y.Id == x.TargetId)))
-                        newPermissions |= allowRole.Permissions.Allow.RawValue;
-                    foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.Deny.RawValue != 0))
-                        newPermissions &= ~denyUser.Permissions.Deny.RawValue;
-                    foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.Allow.RawValue != 0))
-                        newPermissions |= allowUser.Permissions.Allow.RawValue;
+                    foreach (var denyRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.DenyValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+                        newPermissions &= ~denyRole.Permissions.DenyValue;
+                    foreach (var allowRole in channelOverwrites.Where(x => x.TargetType == PermissionTarget.Role && x.Permissions.AllowValue != 0 && roles.Any(y => y.Id == x.TargetId)))
+                        newPermissions |= allowRole.Permissions.AllowValue;
+                    foreach (var denyUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.DenyValue != 0))
+                        newPermissions &= ~denyUser.Permissions.DenyValue;
+                    foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.AllowValue != 0))
+                        newPermissions |= allowUser.Permissions.AllowValue;
 
-                    if (newPermissions.HasBit((byte)PermissionsBits.ManageRolesOrPermissions))
+                    if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
                         newPermissions = mask; //ManageRolesOrPermissions gives all permisions
-                    else if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionsBits.ReadMessages))
+                    else if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionBits.ReadMessages))
                         newPermissions = 0; //No read permission on a text channel removes all other permissions
-                    else if (Type == ChannelType.Voice && !newPermissions.HasBit((byte)PermissionsBits.Connect))
+                    else if (Type == ChannelType.Voice && !newPermissions.HasBit((byte)PermissionBits.Connect))
                         newPermissions = 0; //No connect permissions on a voice channel removes all other permissions
                     else
                         newPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from serverPerms, for example)
@@ -441,7 +447,11 @@ namespace Discord
                 newPermissions = mask; //Private messages always have all permissions
 
             if (newPermissions != permissions.RawValue)
-                permissions.SetRawValueInternal(newPermissions);
+            {
+                permissions = new ChannelPermissions(newPermissions);
+                return true;
+            }
+            return false;
         }
         internal ChannelPermissions GetPermissions(User user)
         {
@@ -451,17 +461,17 @@ namespace Discord
                 if (_users.TryGetValue(user.Id, out member))
                     return member.Permissions;
                 else
-                    return null;
+                    return ChannelPermissions.None;
             }
             else
             {
                 ChannelPermissions perms = new ChannelPermissions();
-                UpdatePermissions(user, perms);
+                UpdatePermissions(user, ref perms);
                 return perms;
             }
         }
         
-        public DualChannelPermissions GetPermissionsRule(User user)
+        public ChannelPermissionOverrides GetPermissionsRule(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -470,7 +480,7 @@ namespace Discord
                 .Select(x => x.Permissions)
                 .FirstOrDefault();
         }
-        public DualChannelPermissions GetPermissionsRule(Role role)
+        public ChannelPermissionOverrides GetPermissionsRule(Role role)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
 
@@ -480,38 +490,38 @@ namespace Discord
                 .FirstOrDefault();
         }
         
-        public Task AddPermissionsRule(User user, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        public Task AddPermissionsRule(User user, ChannelPermissions allow, ChannelPermissions deny)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            return AddPermissionsRule(user.Id, PermissionTarget.User, allow, deny);
+            return AddPermissionsRule(user.Id, PermissionTarget.User, allow.RawValue, deny.RawValue);
         }
-        public Task AddPermissionsRule(User user, DualChannelPermissions permissions = null)
+        public Task AddPermissionsRule(User user, ChannelPermissionOverrides permissions)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            return AddPermissionsRule(user.Id, PermissionTarget.User, permissions?.Allow, permissions?.Deny);
+            return AddPermissionsRule(user.Id, PermissionTarget.User, permissions.AllowValue, permissions.DenyValue);
         }
-        public Task AddPermissionsRule(Role role, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        public Task AddPermissionsRule(Role role, ChannelPermissions allow, ChannelPermissions deny)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
 
-            return AddPermissionsRule(role.Id, PermissionTarget.Role, allow, deny);
+            return AddPermissionsRule(role.Id, PermissionTarget.Role, allow.RawValue, deny.RawValue);
         }
-        public Task AddPermissionsRule(Role role, DualChannelPermissions permissions = null)
+        public Task AddPermissionsRule(Role role, ChannelPermissionOverrides permissions)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
 
-            return AddPermissionsRule(role.Id, PermissionTarget.Role, permissions?.Allow, permissions?.Deny);
+            return AddPermissionsRule(role.Id, PermissionTarget.Role, permissions.AllowValue, permissions.DenyValue);
         }
-        private Task AddPermissionsRule(ulong targetId, PermissionTarget targetType, ChannelPermissions allow = null, ChannelPermissions deny = null)
+        private Task AddPermissionsRule(ulong targetId, PermissionTarget targetType, uint allow, uint deny)
         {
             var request = new AddChannelPermissionsRequest(Id)
             {
                 TargetId = targetId,
                 TargetType = targetType.Value,
-                Allow = allow?.RawValue ?? 0,
-                Deny = deny?.RawValue ?? 0
+                Allow = allow,
+                Deny = deny
             };
             return Client.ClientAPI.Send(request);
         }
@@ -543,9 +553,10 @@ namespace Discord
             if (!Client.Config.UsePermissionsCache)
                 return;
 
-            var member = new Member(user);
-            if (_users.TryAdd(user.Id, member))
-                UpdatePermissions(user, member.Permissions);
+            var perms = new ChannelPermissions();
+            UpdatePermissions(user, ref perms);
+            var member = new Member(user, ChannelPermissions.None);
+            _users[user.Id] = new Member(user, ChannelPermissions.None);
         }
         internal void RemoveUser(ulong id)
         {
@@ -565,7 +576,7 @@ namespace Discord
                     if (user != null)
                     {
                         ChannelPermissions perms = new ChannelPermissions();
-                        UpdatePermissions(user, perms);
+                        UpdatePermissions(user, ref perms);
                         if (perms.ReadMessages)
                             return user;
                     }

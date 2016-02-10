@@ -409,8 +409,14 @@
     <Compile Include="..\Discord.Net\Enums\LogSeverity.cs">
       <Link>Enums\LogSeverity.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Enums\PermissionBits.cs">
+      <Link>Enums\PermissionBits.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Enums\PermissionTarget.cs">
       <Link>Enums\PermissionTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Enums\PermValue.cs">
+      <Link>Enums\PermValue.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Enums\Relative.cs">
       <Link>Enums\Relative.cs</Link>

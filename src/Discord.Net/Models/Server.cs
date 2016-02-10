@@ -39,11 +39,10 @@ namespace Discord
         {
             public readonly User User;
             public readonly ServerPermissions Permissions;
-            public Member(User user)
+            public Member(User user, ServerPermissions permissions)
             {
                 User = user;
-                Permissions = new ServerPermissions();
-                Permissions.Lock();
+                Permissions = permissions;
             }
         }
 
@@ -350,7 +349,7 @@ namespace Discord
         }
         
         /// <summary> Creates a new role. </summary>
-        public async Task<Role> CreateRole(string name, ServerPermissions permissions = null, Color color = null, bool isHoisted = false)
+        public async Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
@@ -392,17 +391,25 @@ namespace Discord
 			if (_users.TryGetValue(user.Id, out member))
 				return member.Permissions;
 			else
-				return null;
+				return ServerPermissions.None;
 		}
 
 		internal void UpdatePermissions(User user)
 		{
             Member member;
-			if (_users.TryGetValue(user.Id, out member))
-				UpdatePermissions(member.User, member.Permissions);
+            if (_users.TryGetValue(user.Id, out member))
+            {
+                var perms = member.Permissions;
+                if (UpdatePermissions(member.User, ref perms))
+                {
+                    _users[user.Id] = new Member(member.User, perms);
+                    foreach (var channel in _channels)
+                        channel.Value.UpdatePermissions(user);
+                }
+            }
 		}
 
-        private void UpdatePermissions(User user, ServerPermissions permissions)
+        private bool UpdatePermissions(User user, ref ServerPermissions permissions)
 		{
 			uint newPermissions = 0;
 
@@ -414,22 +421,22 @@ namespace Discord
 					newPermissions |= serverRole.Permissions.RawValue;
 			}
 
-			if (newPermissions.HasBit((byte)PermissionsBits.ManageRolesOrPermissions))
+			if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
 				newPermissions = ServerPermissions.All.RawValue;
 
 			if (newPermissions != permissions.RawValue)
 			{
-				permissions.SetRawValueInternal(newPermissions);
-				foreach (var channel in _channels)
-					channel.Value.UpdatePermissions(user);
+				permissions = new ServerPermissions(newPermissions);
+                return true;
 			}
+            return false;
 		}
         #endregion
 
         #region Users
         internal User AddUser(ulong id)
         {
-            Member member = new Member(new User(Client, id, this));
+            Member member = new Member(new User(Client, id, this), ServerPermissions.None);
             if (id == Client.CurrentUser.Id)
             {
                 member.User.CurrentGame = Client.CurrentGame;

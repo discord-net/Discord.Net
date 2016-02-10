@@ -1,267 +1,335 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Discord
 {
-	internal enum PermissionsBits : byte
-	{
-		//General
-		CreateInstantInvite = 0,
-        KickMembers = 1,
-        BanMembers = 2,
-		ManageRolesOrPermissions = 3,
-		ManageChannel = 4,
-		ManageServer = 5,
-
-		//Text
-		ReadMessages = 10,
-		SendMessages = 11,
-		SendTTSMessages = 12,
-		ManageMessages = 13,
-		EmbedLinks = 14,
-		AttachFiles = 15,
-		ReadMessageHistory = 16,
-		MentionEveryone = 17,
-
-		//Voice
-		Connect = 20,
-		Speak = 21,
-		MuteMembers = 22,
-		DeafenMembers = 23,
-		MoveMembers = 24,
-		UseVoiceActivation = 25
-	}
-
-	public class ServerPermissions : Permissions
+    public struct ServerPermissions
     {
-        private readonly static Action<ServerPermissions, ServerPermissions> _cloner = DynamicIL.CreateCopyMethod<ServerPermissions>();
-
         public static ServerPermissions None { get; } = new ServerPermissions();
-		public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
+        public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
 
-		public ServerPermissions() : base() { }
-		public ServerPermissions(uint rawValue) : base(rawValue) { }
-		public ServerPermissions Copy() => new ServerPermissions(RawValue);
-        internal ServerPermissions Clone()
-        {
-            var result = new ServerPermissions();
-            _cloner(this, result);
-            return result;
-        }
+        public uint RawValue { get; }
 
+        /// <summary> If True, a user may create invites. </summary>
+        public bool CreateInstantInvite => PermissionsHelper.GetValue(RawValue, PermissionBits.CreateInstantInvite);
         /// <summary> If True, a user may ban users from the server. </summary>
-        public bool BanMembers { get { return GetBit(PermissionsBits.BanMembers); } set { SetBit(PermissionsBits.BanMembers, value); } }
-		/// <summary> If True, a user may kick users from the server. </summary>
-		public bool KickMembers { get { return GetBit(PermissionsBits.KickMembers); } set { SetBit(PermissionsBits.KickMembers, value); } }
-		/// <summary> If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
-		public bool ManageRoles { get { return GetBit(PermissionsBits.ManageRolesOrPermissions); } set { SetBit(PermissionsBits.ManageRolesOrPermissions, value); } }
-		/// <summary> If True, a user may create, delete and modify channels. </summary>
-		public bool ManageChannels { get { return GetBit(PermissionsBits.ManageChannel); } set { SetBit(PermissionsBits.ManageChannel, value); } }
-		/// <summary> If True, a user may adjust server properties. </summary>
-		public bool ManageServer { get { return GetBit(PermissionsBits.ManageServer); } set { SetBit(PermissionsBits.ManageServer, value); } }
-	}
+        public bool BanMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.BanMembers);
+        /// <summary> If True, a user may kick users from the server. </summary>
+        public bool KickMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.KickMembers);
+        /// <summary> If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
+        public bool ManageRoles => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user may create, delete and modify channels. </summary>
+        public bool ManageChannels => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageChannel);
+        /// <summary> If True, a user may adjust server properties. </summary>
+        public bool ManageServer => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageServer);
 
-	public class ChannelPermissions : Permissions
-    {
-        private readonly static Action<ChannelPermissions, ChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<ChannelPermissions>();
+        /// <summary> If True, a user may join channels. </summary>
+        public bool ReadMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.ReadMessages);
+        /// <summary> If True, a user may send messages. </summary>
+        public bool SendMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.SendMessages);
+        /// <summary> If True, a user may send text-to-speech messages. </summary>
+        public bool SendTTSMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.SendTTSMessages);
+        /// <summary> If True, a user may delete messages. </summary>
+        public bool ManageMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageMessages);
+        /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
+        public bool EmbedLinks => PermissionsHelper.GetValue(RawValue, PermissionBits.EmbedLinks);
+        /// <summary> If True, a user may send files. </summary>
+        public bool AttachFiles => PermissionsHelper.GetValue(RawValue, PermissionBits.AttachFiles);
+        /// <summary> If True, a user may read previous messages. </summary>
+        public bool ReadMessageHistory => PermissionsHelper.GetValue(RawValue, PermissionBits.ReadMessageHistory);
+        /// <summary> If True, a user may mention @everyone. </summary>
+        public bool MentionEveryone => PermissionsHelper.GetValue(RawValue, PermissionBits.MentionEveryone);
 
-        public static ChannelPermissions None { get; } = new ChannelPermissions();
-        public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
-		public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
-		public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
-		public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
-        public static ChannelPermissions All(ChannelType channelType, bool isPrivate)
-		{
-			if (isPrivate) return PrivateOnly;
-			else if (channelType == ChannelType.Text) return TextOnly;
-			else if (channelType == ChannelType.Voice) return VoiceOnly;
-			else return None;
-		}
+        /// <summary> If True, a user may connect to a voice channel. </summary>
+        public bool Connect => PermissionsHelper.GetValue(RawValue, PermissionBits.Connect);
+        /// <summary> If True, a user may speak in a voice channel. </summary>
+        public bool Speak => PermissionsHelper.GetValue(RawValue, PermissionBits.Speak);
+        /// <summary> If True, a user may mute users. </summary>
+        public bool MuteMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.MuteMembers);
+        /// <summary> If True, a user may deafen users. </summary>
+        public bool DeafenMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.DeafenMembers);
+        /// <summary> If True, a user may move other users between voice channels. </summary>
+        public bool MoveMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.MoveMembers);
+        /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
+        public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBits.UseVoiceActivation);
 
-		public ChannelPermissions() : base() { }
-		public ChannelPermissions(uint rawValue) : base(rawValue) { }
-		public ChannelPermissions Copy() => new ChannelPermissions(RawValue);
-        internal ChannelPermissions Clone()
+        public ServerPermissions(bool? createInstantInvite = null, bool? manageRoles = null,
+            bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
+            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
+            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
+            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null)
+            : this(new ServerPermissions(), createInstantInvite, manageRoles, kickMembers, banMembers, manageChannel, manageServer, readMessages,
+                  sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers,
+                  moveMembers, useVoiceActivation)
         {
-            var result = new ChannelPermissions();
-            _cloner(this, result);
-            return result;
         }
-
-        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public bool ManagePermissions { get { return GetBit(PermissionsBits.ManageRolesOrPermissions); } set { SetBit(PermissionsBits.ManageRolesOrPermissions, value); } }
-		/// <summary> If True, a user may create, delete and modify this channel. </summary>
-		public bool ManageChannel { get { return GetBit(PermissionsBits.ManageChannel); } set { SetBit(PermissionsBits.ManageChannel, value); } }
-	}
-
-	public abstract class Permissions : IEquatable<Permissions>
-	{
-		private bool _isLocked;
-		private uint _rawValue;
-
-		protected Permissions() { }
-		protected Permissions(uint rawValue) { _rawValue = rawValue; }
-
-		/// <summary> If True, a user may create invites. </summary>
-		public bool CreateInstantInvite { get { return GetBit(PermissionsBits.CreateInstantInvite); } set { SetBit(PermissionsBits.CreateInstantInvite, value); } }
-		/// <summary> If True, a user may join channels. </summary>
-		public bool ReadMessages { get { return GetBit(PermissionsBits.ReadMessages); } set { SetBit(PermissionsBits.ReadMessages, value); } }
-		/// <summary> If True, a user may send messages. </summary>
-		public bool SendMessages { get { return GetBit(PermissionsBits.SendMessages); } set { SetBit(PermissionsBits.SendMessages, value); } }
-		/// <summary> If True, a user may send text-to-speech messages. </summary>
-		public bool SendTTSMessages { get { return GetBit(PermissionsBits.SendTTSMessages); } set { SetBit(PermissionsBits.SendTTSMessages, value); } }
-		/// <summary> If True, a user may delete messages. </summary>
-		public bool ManageMessages { get { return GetBit(PermissionsBits.ManageMessages); } set { SetBit(PermissionsBits.ManageMessages, value); } }
-		/// <summary> If True, Discord will auto-embed links sent by this user. </summary>
-		public bool EmbedLinks { get { return GetBit(PermissionsBits.EmbedLinks); } set { SetBit(PermissionsBits.EmbedLinks, value); } }
-		/// <summary> If True, a user may send files. </summary>
-		public bool AttachFiles { get { return GetBit(PermissionsBits.AttachFiles); } set { SetBit(PermissionsBits.AttachFiles, value); } }
-		/// <summary> If True, a user may read previous messages. </summary>
-		public bool ReadMessageHistory { get { return GetBit(PermissionsBits.ReadMessageHistory); } set { SetBit(PermissionsBits.ReadMessageHistory, value); } }
-		/// <summary> If True, a user may mention @everyone. </summary>
-		public bool MentionEveryone { get { return GetBit(PermissionsBits.MentionEveryone); } set { SetBit(PermissionsBits.MentionEveryone, value); } }
-
-		/// <summary> If True, a user may connect to a voice channel. </summary>
-		public bool Connect { get { return GetBit(PermissionsBits.Connect); } set { SetBit(PermissionsBits.Connect, value); } }
-		/// <summary> If True, a user may speak in a voice channel. </summary>
-		public bool Speak { get { return GetBit(PermissionsBits.Speak); } set { SetBit(PermissionsBits.Speak, value); } }
-		/// <summary> If True, a user may mute users. </summary>
-		public bool MuteMembers { get { return GetBit(PermissionsBits.MuteMembers); } set { SetBit(PermissionsBits.MuteMembers, value); } }
-		/// <summary> If True, a user may deafen users. </summary>
-		public bool DeafenMembers { get { return GetBit(PermissionsBits.DeafenMembers); } set { SetBit(PermissionsBits.DeafenMembers, value); } }
-		/// <summary> If True, a user may move other users between voice channels. </summary>
-		public bool MoveMembers { get { return GetBit(PermissionsBits.MoveMembers); } set { SetBit(PermissionsBits.MoveMembers, value); } }
-		/// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
-		public bool UseVoiceActivation { get { return GetBit(PermissionsBits.UseVoiceActivation); } set { SetBit(PermissionsBits.UseVoiceActivation, value); } }
-
-		public uint RawValue
-		{
-			get { return _rawValue; }
-			set { CheckLock(); _rawValue = value; }
-		}
-		internal void SetRawValueInternal(uint rawValue)
-		{
-			_rawValue = rawValue;
-		}
-
-        internal bool GetBit(PermissionsBits bit) => _rawValue.HasBit((byte)bit);
-		internal void SetBit(PermissionsBits bit, bool value) { CheckLock(); SetBitInternal((byte)bit, value); }
-        internal void SetBitInternal(int pos, bool value)
+        public ServerPermissions(ServerPermissions basePerms, bool? createInstantInvite = null, bool? manageRoles = null,
+            bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
+            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
+            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
+            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null)
         {
-            if (value)
-                _rawValue |= (1U << pos);
-            else
-                _rawValue &= ~(1U << pos);
+            uint value = basePerms.RawValue;
+
+            PermissionsHelper.SetValue(ref value, createInstantInvite, PermissionBits.CreateInstantInvite);
+            PermissionsHelper.SetValue(ref value, banMembers, PermissionBits.BanMembers);
+            PermissionsHelper.SetValue(ref value, kickMembers, PermissionBits.KickMembers);
+            PermissionsHelper.SetValue(ref value, manageRoles, PermissionBits.ManageRolesOrPermissions);
+            PermissionsHelper.SetValue(ref value, manageChannel, PermissionBits.ManageChannel);
+            PermissionsHelper.SetValue(ref value, manageServer, PermissionBits.ManageServer);
+            PermissionsHelper.SetValue(ref value, readMessages, PermissionBits.ReadMessages);
+            PermissionsHelper.SetValue(ref value, sendMessages, PermissionBits.SendMessages);
+            PermissionsHelper.SetValue(ref value, sendTTSMessages, PermissionBits.SendTTSMessages);
+            PermissionsHelper.SetValue(ref value, manageMessages, PermissionBits.ManageMessages);
+            PermissionsHelper.SetValue(ref value, embedLinks, PermissionBits.EmbedLinks);
+            PermissionsHelper.SetValue(ref value, attachFiles, PermissionBits.AttachFiles);
+            PermissionsHelper.SetValue(ref value, readMessageHistory, PermissionBits.ReadMessageHistory);
+            PermissionsHelper.SetValue(ref value, mentionEveryone, PermissionBits.MentionEveryone);
+            PermissionsHelper.SetValue(ref value, connect, PermissionBits.Connect);
+            PermissionsHelper.SetValue(ref value, speak, PermissionBits.Speak);
+            PermissionsHelper.SetValue(ref value, muteMembers, PermissionBits.MuteMembers);
+            PermissionsHelper.SetValue(ref value, deafenMembers, PermissionBits.DeafenMembers);
+            PermissionsHelper.SetValue(ref value, moveMembers, PermissionBits.MoveMembers);
+            PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBits.UseVoiceActivation);
+
+            RawValue = value;
         }
-
-		internal void Lock() => _isLocked = true;
-		protected void CheckLock()
-		{
-			if (_isLocked)
-				throw new InvalidOperationException("Unable to edit cached permissions directly, use Copy() to make an editable copy.");
-		}
-
-        public static bool operator ==(Permissions a, Permissions b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
-        public static bool operator !=(Permissions a, Permissions b) => !(a == b);
-        public override int GetHashCode() => _rawValue.GetHashCode();
-        public override bool Equals(object obj) => (obj as Permissions)?.Equals(this) ?? false;
-        public bool Equals(Permissions permission) => permission?._rawValue == _rawValue;
+        public ServerPermissions(uint rawValue) { RawValue = rawValue; }
     }
 
-	public class DualChannelPermissions
+    public struct ChannelPermissions
     {
-        private readonly static Action<DualChannelPermissions, DualChannelPermissions> _cloner = DynamicIL.CreateCopyMethod<DualChannelPermissions>();
-
-        public ChannelPermissions Allow { get; }
-		public ChannelPermissions Deny { get; }
-		
-		public DualChannelPermissions(uint allow = 0, uint deny = 0)
-		{
-			Allow = new ChannelPermissions(allow);
-			Deny = new ChannelPermissions(deny);
-		}
-
-		/// <summary> If True, a user may create invites. </summary>
-		public bool? CreateInstantInvite { get { return GetBit(PermissionsBits.CreateInstantInvite); } set { SetBit(PermissionsBits.CreateInstantInvite, value); } }
-		/// <summary> If True, a user may join channels. </summary>
-		public bool? ReadMessages { get { return GetBit(PermissionsBits.ReadMessages); } set { SetBit(PermissionsBits.ReadMessages, value); } }
-		/// <summary> If True, a user may send messages. </summary>
-		public bool? SendMessages { get { return GetBit(PermissionsBits.SendMessages); } set { SetBit(PermissionsBits.SendMessages, value); } }
-		/// <summary> If True, a user may send text-to-speech messages. </summary>
-		public bool? SendTTSMessages { get { return GetBit(PermissionsBits.SendTTSMessages); } set { SetBit(PermissionsBits.SendTTSMessages, value); } }
-		/// <summary> If True, a user may delete messages. </summary>
-		public bool? ManageMessages { get { return GetBit(PermissionsBits.ManageMessages); } set { SetBit(PermissionsBits.ManageMessages, value); } }
-		/// <summary> If True, Discord will auto-embed links sent by this user. </summary>
-		public bool? EmbedLinks { get { return GetBit(PermissionsBits.EmbedLinks); } set { SetBit(PermissionsBits.EmbedLinks, value); } }
-		/// <summary> If True, a user may send files. </summary>
-		public bool? AttachFiles { get { return GetBit(PermissionsBits.AttachFiles); } set { SetBit(PermissionsBits.AttachFiles, value); } }
-		/// <summary> If True, a user may read previous messages. </summary>
-		public bool? ReadMessageHistory { get { return GetBit(PermissionsBits.ReadMessageHistory); } set { SetBit(PermissionsBits.ReadMessageHistory, value); } }
-		/// <summary> If True, a user may mention @everyone. </summary>
-		public bool? MentionEveryone { get { return GetBit(PermissionsBits.MentionEveryone); } set { SetBit(PermissionsBits.MentionEveryone, value); } }
-
-		/// <summary> If True, a user may connect to a voice channel. </summary>
-		public bool? Connect { get { return GetBit(PermissionsBits.Connect); } set { SetBit(PermissionsBits.Connect, value); } }
-		/// <summary> If True, a user may speak in a voice channel. </summary>
-		public bool? Speak { get { return GetBit(PermissionsBits.Speak); } set { SetBit(PermissionsBits.Speak, value); } }
-		/// <summary> If True, a user may mute users. </summary>
-		public bool? MuteMembers { get { return GetBit(PermissionsBits.MuteMembers); } set { SetBit(PermissionsBits.MuteMembers, value); } }
-		/// <summary> If True, a user may deafen users. </summary>
-		public bool? DeafenMembers { get { return GetBit(PermissionsBits.DeafenMembers); } set { SetBit(PermissionsBits.DeafenMembers, value); } }
-		/// <summary> If True, a user may move other users between voice channels. </summary>
-		public bool? MoveMembers { get { return GetBit(PermissionsBits.MoveMembers); } set { SetBit(PermissionsBits.MoveMembers, value); } }
-		/// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
-		public bool? UseVoiceActivation { get { return GetBit(PermissionsBits.UseVoiceActivation); } set { SetBit(PermissionsBits.UseVoiceActivation, value); } }
-
-		/// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-		public bool? ManagePermissions { get { return GetBit(PermissionsBits.ManageRolesOrPermissions); } set { SetBit(PermissionsBits.ManageRolesOrPermissions, value); } }
-		/// <summary> If True, a user may create, delete and modify this channel. </summary>
-		public bool? ManageChannel { get { return GetBit(PermissionsBits.ManageChannel); } set { SetBit(PermissionsBits.ManageChannel, value); } }
-
-		private bool? GetBit(PermissionsBits pos)
-		{
-			if (Allow.GetBit(pos))
-				return true;
-			else if (Deny.GetBit(pos))
-				return false;
-			else
-				return null;
-		}
-		private void SetBit(PermissionsBits pos, bool? value)
-		{
-			if (value == true)
-			{
-				Allow.SetBit(pos, true);
-				Deny.SetBit(pos, false);
-			}
-			else if (value == false)
-			{
-				Allow.SetBit(pos, false);
-				Deny.SetBit(pos, true);
-			}
-			else
-			{
-				Allow.SetBit(pos, false);
-				Deny.SetBit(pos, false);
-			}
-		}
-
-		internal void Lock()
-		{
-			Allow.Lock();
-			Deny.Lock();
-		}
-		public DualChannelPermissions Copy() => new DualChannelPermissions(Allow.RawValue, Deny.RawValue);
-        internal DualChannelPermissions Clone()
+        public static ChannelPermissions None { get; } = new ChannelPermissions();
+        public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
+        public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
+        public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
+        public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
+        public static ChannelPermissions All(ChannelType channelType, bool isPrivate)
         {
-            var result = new DualChannelPermissions();
-            _cloner(this, result);
-            return result;
+            if (isPrivate) return PrivateOnly;
+            else if (channelType == ChannelType.Text) return TextOnly;
+            else if (channelType == ChannelType.Voice) return VoiceOnly;
+            else return None;
         }
 
-        public static bool operator ==(DualChannelPermissions a, DualChannelPermissions b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
-        public static bool operator !=(DualChannelPermissions a, DualChannelPermissions b) => !(a == b);
-        public override int GetHashCode() => Allow.GetHashCode() ^ Deny.GetHashCode();
-        public override bool Equals(object obj) => (obj as DualChannelPermissions)?.Equals(this) ?? false;
-        public bool Equals(DualChannelPermissions permission) => permission != null && permission.Allow == Allow && permission.Deny == Deny;
+        public uint RawValue { get; }
+
+        /// <summary> If True, a user may create invites. </summary>
+        public bool CreateInstantInvite => PermissionsHelper.GetValue(RawValue, PermissionBits.CreateInstantInvite);
+        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+        public bool ManagePermissions => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user may create, delete and modify this channel. </summary>
+        public bool ManageChannel => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageChannel);
+
+        /// <summary> If True, a user may join channels. </summary>
+        public bool ReadMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.ReadMessages);
+        /// <summary> If True, a user may send messages. </summary>
+        public bool SendMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.SendMessages);
+        /// <summary> If True, a user may send text-to-speech messages. </summary>
+        public bool SendTTSMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.SendTTSMessages);
+        /// <summary> If True, a user may delete messages. </summary>
+        public bool ManageMessages => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageMessages);
+        /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
+        public bool EmbedLinks => PermissionsHelper.GetValue(RawValue, PermissionBits.EmbedLinks);
+        /// <summary> If True, a user may send files. </summary>
+        public bool AttachFiles => PermissionsHelper.GetValue(RawValue, PermissionBits.AttachFiles);
+        /// <summary> If True, a user may read previous messages. </summary>
+        public bool ReadMessageHistory => PermissionsHelper.GetValue(RawValue, PermissionBits.ReadMessageHistory);
+        /// <summary> If True, a user may mention @everyone. </summary>
+        public bool MentionEveryone => PermissionsHelper.GetValue(RawValue, PermissionBits.MentionEveryone);
+
+        /// <summary> If True, a user may connect to a voice channel. </summary>
+        public bool Connect => PermissionsHelper.GetValue(RawValue, PermissionBits.Connect);
+        /// <summary> If True, a user may speak in a voice channel. </summary>
+        public bool Speak => PermissionsHelper.GetValue(RawValue, PermissionBits.Speak);
+        /// <summary> If True, a user may mute users. </summary>
+        public bool MuteMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.MuteMembers);
+        /// <summary> If True, a user may deafen users. </summary>
+        public bool DeafenMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.DeafenMembers);
+        /// <summary> If True, a user may move other users between voice channels. </summary>
+        public bool MoveMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.MoveMembers);
+        /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
+        public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBits.UseVoiceActivation);
+
+        public ChannelPermissions(bool? createInstantInvite = null, bool? managePermissions = null,
+            bool? manageChannel = null, bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,
+            bool? manageMessages = null, bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,
+            bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null)
+            : this(new ChannelPermissions(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
+                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation)
+        {
+        }
+        public ChannelPermissions(ChannelPermissions basePerms, bool? createInstantInvite = null, bool? managePermissions = null,
+            bool? manageChannel = null, bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,
+            bool? manageMessages = null, bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,
+            bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null)
+        {
+            uint value = basePerms.RawValue;
+
+            PermissionsHelper.SetValue(ref value, createInstantInvite, PermissionBits.CreateInstantInvite);
+            PermissionsHelper.SetValue(ref value, managePermissions, PermissionBits.ManageRolesOrPermissions);
+            PermissionsHelper.SetValue(ref value, manageChannel, PermissionBits.ManageChannel);
+            PermissionsHelper.SetValue(ref value, readMessages, PermissionBits.ReadMessages);
+            PermissionsHelper.SetValue(ref value, sendMessages, PermissionBits.SendMessages);
+            PermissionsHelper.SetValue(ref value, sendTTSMessages, PermissionBits.SendTTSMessages);
+            PermissionsHelper.SetValue(ref value, manageMessages, PermissionBits.ManageMessages);
+            PermissionsHelper.SetValue(ref value, embedLinks, PermissionBits.EmbedLinks);
+            PermissionsHelper.SetValue(ref value, attachFiles, PermissionBits.AttachFiles);
+            PermissionsHelper.SetValue(ref value, readMessageHistory, PermissionBits.ReadMessageHistory);
+            PermissionsHelper.SetValue(ref value, mentionEveryone, PermissionBits.MentionEveryone);
+            PermissionsHelper.SetValue(ref value, connect, PermissionBits.Connect);
+            PermissionsHelper.SetValue(ref value, speak, PermissionBits.Speak);
+            PermissionsHelper.SetValue(ref value, muteMembers, PermissionBits.MuteMembers);
+            PermissionsHelper.SetValue(ref value, deafenMembers, PermissionBits.DeafenMembers);
+            PermissionsHelper.SetValue(ref value, moveMembers, PermissionBits.MoveMembers);
+            PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBits.UseVoiceActivation);
+
+            RawValue = value;
+        }
+        public ChannelPermissions(uint rawValue) { RawValue = rawValue; }
+    }
+
+    public struct ChannelPermissionOverrides
+    {
+        public uint AllowValue { get; }
+        public uint DenyValue { get; }
+
+		/// <summary> If True, a user may create invites. </summary>
+		public PermValue CreateInstantInvite => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.CreateInstantInvite);
+        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+        public PermValue ManagePermissions => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user may create, delete and modify this channel. </summary>
+        public PermValue ManageChannel => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageChannel);
+        /// <summary> If True, a user may join channels. </summary>
+        public PermValue ReadMessages => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ReadMessages);
+		/// <summary> If True, a user may send messages. </summary>
+		public PermValue SendMessages => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.SendMessages);
+		/// <summary> If True, a user may send text-to-speech messages. </summary>
+		public PermValue SendTTSMessages => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.SendTTSMessages);
+		/// <summary> If True, a user may delete messages. </summary>
+		public PermValue ManageMessages => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageMessages);
+		/// <summary> If True, Discord will auto-embed links sent by this user. </summary>
+		public PermValue EmbedLinks => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.EmbedLinks);
+		/// <summary> If True, a user may send files. </summary>
+		public PermValue AttachFiles => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.AttachFiles);
+		/// <summary> If True, a user may read previous messages. </summary>
+		public PermValue ReadMessageHistory => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ReadMessageHistory);
+		/// <summary> If True, a user may mention @everyone. </summary>
+		public PermValue MentionEveryone => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.MentionEveryone);
+
+		/// <summary> If True, a user may connect to a voice channel. </summary>
+		public PermValue Connect => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.Connect);
+		/// <summary> If True, a user may speak in a voice channel. </summary>
+		public PermValue Speak => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.Speak);
+		/// <summary> If True, a user may mute users. </summary>
+		public PermValue MuteMembers => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.MuteMembers);
+		/// <summary> If True, a user may deafen users. </summary>
+		public PermValue DeafenMembers => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.DeafenMembers);
+		/// <summary> If True, a user may move other users between voice channels. </summary>
+		public PermValue MoveMembers => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.MoveMembers);
+        /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
+        public PermValue UseVoiceActivation => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.UseVoiceActivation);
+
+        public ChannelPermissionOverrides(PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+            PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
+            PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
+            PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
+            PermValue? moveMembers = null, PermValue? useVoiceActivation = null)
+            : this(new ChannelPermissionOverrides(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
+                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation)
+        {
+        }
+        public ChannelPermissionOverrides(ChannelPermissionOverrides basePerms, PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+            PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
+            PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
+            PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
+            PermValue? moveMembers = null, PermValue? useVoiceActivation = null)
+        {
+            uint allow = basePerms.AllowValue, deny = basePerms.DenyValue;
+
+            PermissionsHelper.SetValue(ref allow, ref deny, createInstantInvite, PermissionBits.CreateInstantInvite);
+            PermissionsHelper.SetValue(ref allow, ref deny, managePermissions, PermissionBits.ManageRolesOrPermissions);
+            PermissionsHelper.SetValue(ref allow, ref deny, manageChannel, PermissionBits.ManageChannel);
+            PermissionsHelper.SetValue(ref allow, ref deny, readMessages, PermissionBits.ReadMessages);
+            PermissionsHelper.SetValue(ref allow, ref deny, sendMessages, PermissionBits.SendMessages);
+            PermissionsHelper.SetValue(ref allow, ref deny, sendTTSMessages, PermissionBits.SendTTSMessages);
+            PermissionsHelper.SetValue(ref allow, ref deny, manageMessages, PermissionBits.ManageMessages);
+            PermissionsHelper.SetValue(ref allow, ref deny, embedLinks, PermissionBits.EmbedLinks);
+            PermissionsHelper.SetValue(ref allow, ref deny, attachFiles, PermissionBits.AttachFiles);
+            PermissionsHelper.SetValue(ref allow, ref deny, readMessageHistory, PermissionBits.ReadMessageHistory);
+            PermissionsHelper.SetValue(ref allow, ref deny, mentionEveryone, PermissionBits.MentionEveryone);
+            PermissionsHelper.SetValue(ref allow, ref deny, connect, PermissionBits.Connect);
+            PermissionsHelper.SetValue(ref allow, ref deny, speak, PermissionBits.Speak);
+            PermissionsHelper.SetValue(ref allow, ref deny, muteMembers, PermissionBits.MuteMembers);
+            PermissionsHelper.SetValue(ref allow, ref deny, deafenMembers, PermissionBits.DeafenMembers);
+            PermissionsHelper.SetValue(ref allow, ref deny, moveMembers, PermissionBits.MoveMembers);
+            PermissionsHelper.SetValue(ref allow, ref deny, useVoiceActivation, PermissionBits.UseVoiceActivation);
+
+            AllowValue = allow;
+            DenyValue = deny;
+        }
+        public ChannelPermissionOverrides(uint allow = 0, uint deny = 0)
+        {
+            AllowValue = allow;
+            DenyValue = deny;
+        }
+    }
+    internal static class PermissionsHelper
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PermValue GetValue(uint allow, uint deny, PermissionBits bit)
+        {
+            if (allow.HasBit((byte)bit))
+                return PermValue.Allow;
+            else if (deny.HasBit((byte)bit))
+                return PermValue.Deny;
+            else
+                return PermValue.Inherit;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool GetValue(uint value, PermissionBits bit) => value.HasBit((byte)bit);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetValue(ref uint rawValue, bool? value, PermissionBits bit)
+        {
+            if (value.HasValue)
+            {
+                if (value == true)
+                    SetBit(ref rawValue, bit);
+                else
+                    UnsetBit(ref rawValue, bit);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetValue(ref uint allow, ref uint deny, PermValue? value, PermissionBits bit)
+        {
+            if (value.HasValue)
+            {
+                switch (value)
+                {
+                    case PermValue.Allow:
+                        SetBit(ref allow, bit);
+                        UnsetBit(ref deny, bit);
+                        break;
+                    case PermValue.Deny:
+                        UnsetBit(ref allow, bit);
+                        SetBit(ref deny, bit);
+                        break;
+                    default:
+                        UnsetBit(ref allow, bit);
+                        UnsetBit(ref deny, bit);
+                        break;
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void SetBit(ref uint value, PermissionBits bit) => value |= 1U << (int)bit;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void UnsetBit(ref uint value, PermissionBits bit) => value &= ~(1U << (int)bit);
     }
 }

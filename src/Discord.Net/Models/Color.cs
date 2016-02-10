@@ -2,97 +2,47 @@
 
 namespace Discord
 {
-	public class Color : IEquatable<Color>
+	public class Color
     {
-        private readonly static Action<Color, Color> _cloner = DynamicIL.CreateCopyMethod<Color>();
+        public static readonly Color Default = new Color(0);
 
-        public static readonly Color Default = PresetColor(0);
+		public static readonly Color Teal = new Color(0x1ABC9C);
+		public static readonly Color DarkTeal = new Color(0x11806A);
+		public static readonly Color Green = new Color(0x2ECC71);
+		public static readonly Color DarkGreen = new Color(0x1F8B4C);
+		public static readonly Color Blue = new Color(0x3498DB);
+		public static readonly Color DarkBlue = new Color(0x206694);
+		public static readonly Color Purple = new Color(0x9B59B6);
+		public static readonly Color DarkPurple = new Color(0x71368A);
+		public static readonly Color Magenta = new Color(0xE91E63);
+		public static readonly Color DarkMagenta = new Color(0xAD1457);
+		public static readonly Color Gold = new Color(0xF1C40F);
+		public static readonly Color DarkGold = new Color(0xC27C0E);
+		public static readonly Color Orange = new Color(0xE67E22);
+		public static readonly Color DarkOrange = new Color(0xA84300);
+		public static readonly Color Red = new Color(0xE74C3C);
+		public static readonly Color DarkRed = new Color(0x992D22);
 
-		public static readonly Color Teal = PresetColor(0x1ABC9C);
-		public static readonly Color DarkTeal = PresetColor(0x11806A);
-		public static readonly Color Green = PresetColor(0x2ECC71);
-		public static readonly Color DarkGreen = PresetColor(0x1F8B4C);
-		public static readonly Color Blue = PresetColor(0x3498DB);
-		public static readonly Color DarkBlue = PresetColor(0x206694);
-		public static readonly Color Purple = PresetColor(0x9B59B6);
-		public static readonly Color DarkPurple = PresetColor(0x71368A);
-		public static readonly Color Magenta = PresetColor(0xE91E63);
-		public static readonly Color DarkMagenta = PresetColor(0xAD1457);
-		public static readonly Color Gold = PresetColor(0xF1C40F);
-		public static readonly Color DarkGold = PresetColor(0xC27C0E);
-		public static readonly Color Orange = PresetColor(0xE67E22);
-		public static readonly Color DarkOrange = PresetColor(0xA84300);
-		public static readonly Color Red = PresetColor(0xE74C3C);
-		public static readonly Color DarkRed = PresetColor(0x992D22);
-
-		public static readonly Color LighterGrey = PresetColor(0x95A5A6);
-		public static readonly Color DarkGrey = PresetColor(0x607D8B);
-		public static readonly Color LightGrey = PresetColor(0x979C9F);
-		public static readonly Color DarkerGrey = PresetColor(0x546E7A);
-
-		private static Color PresetColor(uint packedValue)
-		{
-			Color color = new Color(packedValue);
-			color.Lock();
-			return color;
-		}
-
-		private bool _isLocked;
-		private uint _rawValue;
-		public uint RawValue
-		{
-			get { return _rawValue; }
-			set
-			{
-				if (_isLocked)
-					throw new InvalidOperationException("Unable to edit cached colors directly, use Copy() to make an editable copy.");
-				_rawValue = value;
-			}
-		} 
+		public static readonly Color LighterGrey = new Color(0x95A5A6);
+		public static readonly Color DarkGrey = new Color(0x607D8B);
+		public static readonly Color LightGrey = new Color(0x979C9F);
+		public static readonly Color DarkerGrey = new Color(0x546E7A);
+        
+		public uint RawValue { get; }
 		
-		public Color(uint rawValue) { _rawValue = rawValue; }
+		public Color(uint rawValue) { RawValue = rawValue; }
 		public Color(byte r, byte g, byte b) : this(((uint)r << 16) | ((uint)g << 8) | b) { }
 		public Color(float r, float g, float b) : this((byte)(r * 255.0f), (byte)(g * 255.0f), (byte)(b * 255.0f)) { }
 
 		/// <summary> Gets or sets the red component for this color. </summary>
-		public byte R { get { return GetByte(3); } set { SetByte(3, value); } }
-		/// <summary> Gets or sets the green component for this color. </summary>
-		public byte G { get { return GetByte(2); } set { SetByte(2, value); } }
-		/// <summary> Gets or sets the blue component for this color. </summary>
-		public byte B { get { return GetByte(1); } set { SetByte(1, value); } }
+		public byte R => (byte)(RawValue >> 16);
+        /// <summary> Gets or sets the green component for this color. </summary>
+        public byte G => (byte)(RawValue >> 8);
+        /// <summary> Gets or sets the blue component for this color. </summary>
+        public byte B => (byte)(RawValue);
 
-		internal void Lock() => _isLocked = true;
-		internal void SetRawValue(uint rawValue)
-		{
-			//Bypasses isLocked for API changes.
-			_rawValue = rawValue;
-		}
-        private byte GetByte(int pos) => (byte)(_rawValue >> (8 * (pos - 1)));
-		private void SetByte(int pos, byte value)
-		{
-			if (_isLocked)
-				throw new InvalidOperationException("Unable to edit cached colors directly, use Copy() to make an editable copy.");
+        private byte GetByte(int pos) => (byte)(RawValue >> (8 * (pos - 1)));
 
-			uint original = _rawValue;
-			int bit = 8 * (pos - 1);
-			uint mask = ~(0xFFU << bit);
-            _rawValue = (_rawValue & mask) | ((uint)value << bit);
-		}
-
-        public static bool operator ==(Color a, Color b) => ((object)a == null && (object)b == null) || (a?.Equals(b) ?? false);
-        public static bool operator !=(Color a, Color b) => !(a == b);
-        public override int GetHashCode() => _rawValue.GetHashCode();
-        public override bool Equals(object obj) => (obj as Color)?.Equals(this) ?? false;
-        public bool Equals(Color color) => color != null && color._rawValue == _rawValue;
-
-        internal Color Clone()
-        {
-            var result = new Color();
-            _cloner(this, result);
-            return result;
-        }
-        private Color() { } //Used for cloning
-
-        public override string ToString() => '#' + _rawValue.ToString("X");
+        public override string ToString() => '#' + RawValue.ToString("X");
     }
 }

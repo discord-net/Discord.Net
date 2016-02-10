@@ -115,7 +115,7 @@ namespace Discord
                         return Server.AllChannels
                             .Where(x =>
                             {
-                                x.UpdatePermissions(this, perms);
+                                x.UpdatePermissions(this, ref perms);
                                 return (x.Type == ChannelType.Text && perms.ReadMessages) ||
                                        (x.Type == ChannelType.Voice && perms.Connect);
                             });

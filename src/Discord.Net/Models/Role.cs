@@ -19,10 +19,6 @@ namespace Discord
         public ulong Id { get; }
         /// <summary> Gets the server this role is a member of. </summary>
         public Server Server { get; }
-        /// <summary> Gets the the permissions contained by this role. </summary>
-        public ServerPermissions Permissions { get; }
-        /// <summary> Gets the color of this role. </summary>
-        public Color Color { get; }
 
         /// <summary> Gets the name of this role. </summary>
         public string Name { get; private set; }
@@ -32,6 +28,10 @@ namespace Discord
         public int Position { get; private set; }
         /// <summary> Gets whether this role is managed by server (e.g. for Twitch integration) </summary>
         public bool IsManaged { get; private set; }
+        /// <summary> Gets the the permissions given to this role. </summary>
+        public ServerPermissions Permissions { get; private set; }
+        /// <summary> Gets the color of this role. </summary>
+        public Color Color { get; private set; }
 
         /// <summary> Gets true if this is the role representing all users in a server. </summary>
         public bool IsEveryone => Id == Server.Id;
@@ -47,9 +47,7 @@ namespace Discord
             Server = server;
 
 			Permissions = new ServerPermissions(0);
-			Permissions.Lock();
 			Color = new Color(0);
-			Color.Lock();
 		}
 
 		internal void Update(APIRole model)
@@ -63,15 +61,15 @@ namespace Discord
 			if (model.Position != null && !IsEveryone)
 				Position = model.Position.Value;
 			if (model.Color != null)
-				Color.SetRawValue(model.Color.Value);
+				Color = new Color(model.Color.Value);
 			if (model.Permissions != null)
-				Permissions.SetRawValueInternal(model.Permissions.Value);
+				Permissions = new ServerPermissions(model.Permissions.Value);
 
 			foreach (var member in Members)
 				Server.UpdatePermissions(member);
 		}
         
-        public async Task Edit(string name = null, ServerPermissions permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
+        public async Task Edit(string name = null, ServerPermissions? permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
         {
             var updateRequest = new UpdateRoleRequest(Server.Id, Id)
             {
