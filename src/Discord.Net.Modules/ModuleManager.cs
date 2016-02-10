@@ -14,6 +14,7 @@ namespace Discord.Modules
         public event EventHandler<ChannelEventArgs> ChannelEnabled = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelDisabled = delegate { };
 
+        public event EventHandler<ServerEventArgs> JoinedServer = delegate { };
         public event EventHandler<ServerEventArgs> LeftServer = delegate { };
         public event EventHandler<ServerUpdatedEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
@@ -96,7 +97,8 @@ namespace Discord.Modules
 			client.RoleUpdated += (s, e) => { if (HasIndirectServer(e.Server)) RoleUpdated(s, e); };
 			client.RoleDeleted += (s, e) => { if (HasIndirectServer(e.Server)) RoleDeleted(s, e); };
 
-			client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
+            client.JoinedServer += (s, e) => { if (_allowAll) JoinedServer(s, e); };
+            client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
 			client.ServerUpdated += (s, e) => { if (HasIndirectServer(e.After)) ServerUpdated(s, e); };
 			client.ServerUnavailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
 			client.ServerAvailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerAvailable(s, e); };
