@@ -73,8 +73,11 @@ namespace Discord.Net
         internal void QueueEdit(Message msg, string text)
         {
             string msgText = msg.RawText;
-            if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryUpdate(msg.Nonce,  msgText, text))
+            if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryUpdate(msg.Nonce, msgText, text))
+            {
+                //Successfully edited the message before it was sent.
                 return;
+            }
             IncrementCount();
             _pendingEdits.Enqueue(new MessageEdit(msg, text));
         }
@@ -83,7 +86,7 @@ namespace Discord.Net
             string ignored;
             if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryRemove(msg.Nonce, out ignored))
             {
-                //Successfully stopped the message from being sent in the first place
+                //Successfully stopped the message from being sent
                 msg.State = MessageState.Aborted;
                 return;
             }
