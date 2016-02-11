@@ -195,6 +195,8 @@ namespace Discord
 
     public struct ChannelPermissionOverrides
     {
+        public static ChannelPermissionOverrides InheritAll { get; } = new ChannelPermissionOverrides();
+
         public uint AllowValue { get; }
         public uint DenyValue { get; }
 
