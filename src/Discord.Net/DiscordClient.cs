@@ -315,7 +315,9 @@ namespace Discord
                     current.CurrentGame = CurrentGame;
                 }
             }
-            GatewaySocket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
+            var socket = GatewaySocket;
+            if (socket != null)
+                socket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
         }
 
         #region Channels
