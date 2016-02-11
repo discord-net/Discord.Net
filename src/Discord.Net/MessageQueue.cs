@@ -30,11 +30,11 @@ namespace Discord.Net
         private readonly Random _nonceRand;
         private readonly RestClient _rest;
         private readonly Logger _logger;
-        private readonly ConcurrentQueue<int> _pendingSends;
+        private readonly ConcurrentQueue<Message> _pendingSends;
         private readonly ConcurrentQueue<MessageEdit> _pendingEdits;
         private readonly ConcurrentQueue<Message> _pendingDeletes;
-        private readonly ConcurrentDictionary<int, Message> _pendingSendsByNonce;
-        private readonly ConcurrentQueue<Task> _pendingTasks;
+        private readonly ConcurrentDictionary<int, string> _pendingSendsByNonce;
+        //private readonly ConcurrentQueue<Task> _pendingTasks;
         private int _nextWarning;
         private int _count;
 
@@ -47,11 +47,11 @@ namespace Discord.Net
             _logger = logger;
 
             _nonceRand = new Random();
-            _pendingSends = new ConcurrentQueue<int>();
+            _pendingSends = new ConcurrentQueue<Message>();
             _pendingEdits = new ConcurrentQueue<MessageEdit>();
             _pendingDeletes = new ConcurrentQueue<Message>();
-            _pendingSendsByNonce = new ConcurrentDictionary<int, Message>();
-            _pendingTasks = new ConcurrentQueue<Task>();
+            _pendingSendsByNonce = new ConcurrentDictionary<int, string>();
+            //_pendingTasks = new ConcurrentQueue<Task>();
         }
 
         internal Message QueueSend(Channel channel, string text, bool isTTS)
@@ -60,11 +60,11 @@ namespace Discord.Net
             msg.RawText = text;
             msg.Text = msg.Resolve(text);
             msg.Nonce = GenerateNonce();
-            if (_pendingSendsByNonce.TryAdd(msg.Nonce, msg))
+            if (_pendingSendsByNonce.TryAdd(msg.Nonce, text))
             {
                 msg.State = MessageState.Queued;
                 IncrementCount();
-                _pendingSends.Enqueue(msg.Nonce);
+                _pendingSends.Enqueue(msg);
             }
             else
                 msg.State = MessageState.Failed;
@@ -72,12 +72,15 @@ namespace Discord.Net
         }
         internal void QueueEdit(Message msg, string text)
         {
+            string msgText = msg.RawText;
+            if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryUpdate(msg.Nonce,  msgText, text))
+                return;
             IncrementCount();
             _pendingEdits.Enqueue(new MessageEdit(msg, text));
         }
         internal void QueueDelete(Message msg)
         {
-            Message ignored;
+            string ignored;
             if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryRemove(msg.Nonce, out ignored))
             {
                 //Successfully stopped the message from being sent in the first place
@@ -95,7 +98,7 @@ namespace Discord.Net
                 RunSendQueue(cancelToken),
                 RunEditQueue(cancelToken),
                 RunDeleteQueue(cancelToken),
-                RunTaskQueue(cancelToken)
+                //RunTaskQueue(cancelToken)
             };
         }
         private Task RunSendQueue(CancellationToken cancelToken)
@@ -107,12 +110,16 @@ namespace Discord.Net
                 {
                     while (!cancelToken.IsCancellationRequested)
                     {
-                        int nonce;
-                        while (_pendingSends.TryDequeue(out nonce))
+                        Message msg;
+                        while (_pendingSends.TryDequeue(out msg))
                         {
-                            Message msg;
-                            if (_pendingSendsByNonce.TryRemove(nonce, out msg)) //If it was delete from queue, this will fail
+                            string text;
+                            if (_pendingSendsByNonce.TryRemove(msg.Nonce, out text)) //If it was delete from queue, this will fail
+                            {
+                                msg.RawText = text;
+                                msg.Text = msg.Resolve(text);
                                 await Send(msg).ConfigureAwait(false);
+                            }
                         }
 
                         await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
@@ -135,7 +142,7 @@ namespace Discord.Net
                         {
                             _pendingEdits.TryDequeue(out edit);
                             if (edit.Message.State == MessageState.Normal)
-                                await Edit(edit.Message, edit.NewText);
+                                await Edit(edit.Message, edit.NewText).ConfigureAwait(false);
                         }
 
                         await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
@@ -158,7 +165,7 @@ namespace Discord.Net
                         {
                             _pendingDeletes.TryDequeue(out msg);
                             if (msg.State == MessageState.Normal)
-                                _pendingTasks.Enqueue(Delete(msg));
+                                await Delete(msg).ConfigureAwait(false);
                         }
 
                         await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
@@ -167,7 +174,7 @@ namespace Discord.Net
                 catch (OperationCanceledException) { }
             }));
         }
-        private Task RunTaskQueue(CancellationToken cancelToken)
+        /*private Task RunTaskQueue(CancellationToken cancelToken)
         {
             return Task.Run(async () =>
             {
@@ -190,7 +197,7 @@ namespace Discord.Net
                         await task.ConfigureAwait(false);
                 }
             });
-        }
+        }*/
 
         internal async Task Send(Message msg)
         {
@@ -263,14 +270,13 @@ namespace Discord.Net
         /// <summary> Clears all queued message sends/edits/deletes. </summary>
         public void Clear()
         {
-            int nonce;
-            while (_pendingSends.TryDequeue(out nonce)) { }
-
-            MessageEdit edit;
-            while (_pendingEdits.TryDequeue(out edit)) { }
-
             Message msg;
+            MessageEdit edit;
+
+            while (_pendingSends.TryDequeue(out msg)) { }
+            while (_pendingEdits.TryDequeue(out edit)) { }
             while (_pendingDeletes.TryDequeue(out msg)) { }
+            _pendingSendsByNonce.Clear();
         }
 
         private int GenerateNonce()
