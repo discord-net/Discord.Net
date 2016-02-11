@@ -45,6 +45,7 @@ namespace Discord.Net
         {
             _rest = rest;
             _logger = logger;
+            _nextWarning = WarningStart;
 
             _nonceRand = new Random();
             _pendingSends = new ConcurrentQueue<Message>();
@@ -73,7 +74,7 @@ namespace Discord.Net
         internal void QueueEdit(Message msg, string text)
         {
             string msgText = msg.RawText;
-            if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryUpdate(msg.Nonce, msgText, text))
+            if (msg.State == MessageState.Queued && _pendingSendsByNonce.TryUpdate(msg.Nonce, text, msgText))
             {
                 //Successfully edited the message before it was sent.
                 return;
@@ -106,7 +107,6 @@ namespace Discord.Net
         }
         private Task RunSendQueue(CancellationToken cancelToken)
         {
-            _nextWarning = WarningStart;
             return Task.Run((Func<Task>)(async () =>
             {
                 try
@@ -133,7 +133,6 @@ namespace Discord.Net
         }
         private Task RunEditQueue(CancellationToken cancelToken)
         {
-            _nextWarning = WarningStart;
             return Task.Run((Func<Task>)(async () =>
             {
                 try
@@ -156,7 +155,6 @@ namespace Discord.Net
         }
         private Task RunDeleteQueue(CancellationToken cancelToken)
         {
-            _nextWarning = WarningStart;
             return Task.Run((Func<Task>)(async () =>
             {
                 try
