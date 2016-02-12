@@ -1,9 +1,6 @@
-﻿using Discord.API.Client.Rest;
-using Discord.Net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using APIMessage = Discord.API.Client.Message;

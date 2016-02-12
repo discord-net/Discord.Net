@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -8,7 +8,7 @@ namespace Discord.ETF
 {
     public class ETFReader
     {
-        /*
+        
         private readonly Stream _stream;
         private readonly byte[] _buffer;
         private readonly bool _leaveOpen;
@@ -168,6 +168,5 @@ namespace Discord.ETF
         }
 
         public void Write(DateTime value) => Write((ulong)((value.Ticks - _epochTime.Ticks) / TimeSpan.TicksPerSecond));
-*/
     }
-}
+}*/

@@ -3,7 +3,6 @@ using Discord.ETF;
 using Discord.Logging;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 

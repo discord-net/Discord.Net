@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+#if NET45
 using System.Security;
+#endif
 
 namespace Discord.Audio.Opus
 {

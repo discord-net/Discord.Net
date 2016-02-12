@@ -3,7 +3,6 @@ using Discord.Logging;
 using Discord.Net.Rest;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;

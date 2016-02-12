@@ -1,5 +1,4 @@
-﻿using Discord.API.Converters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Discord.API.Client.Rest
 {
