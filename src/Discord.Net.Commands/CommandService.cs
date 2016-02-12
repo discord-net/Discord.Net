@@ -97,8 +97,8 @@ namespace Discord.Commands
                 //Check for mention
                 if (cmdMsg == null && Config.AllowMentionPrefix)
                 {
-                    if (msg.StartsWith(e.Server.CurrentUser.Mention))
-                        cmdMsg = msg.Substring(e.Server.CurrentUser.Mention.Length + 1);
+                    if (msg.StartsWith(client.CurrentUser.Mention))
+                        cmdMsg = msg.Substring(client.CurrentUser.Mention.Length + 1);
                     else if (msg.StartsWith($"@{client.CurrentUser.Name}"))
                         cmdMsg = msg.Substring(client.CurrentUser.Name.Length + 1);
                 }
