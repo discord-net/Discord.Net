@@ -5,6 +5,7 @@ namespace Discord
 {
     public class ServiceManager
     {
+        public IEnumerable<IService> Services => _services.Values;
         private readonly Dictionary<Type, IService> _services;
 
         internal DiscordClient Client { get; }
