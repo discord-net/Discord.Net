@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord
 {
-    public class ServiceManager
+    public class ServiceManager : IEnumerable<IService>
     {
         private readonly Dictionary<Type, IService> _services;
 
@@ -37,6 +37,8 @@ namespace Discord
                 throw new InvalidOperationException($"This operation requires {typeof(T).Name} to be added to {nameof(DiscordClient)}.");
             return singletonT;
         }
+
+        IEnumerator<IService> IEnumerable<IService>.GetEnumerator() => _services.Values.GetEnumerator();
 
         public IEnumerator GetEnumerator() => _services.Values.GetEnumerator();
     }
