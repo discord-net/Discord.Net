@@ -121,6 +121,7 @@ namespace Discord
             Recipient = recipient;
             AddUser(client.PrivateUser);
             AddUser(recipient);
+            Type = ChannelType.Text; //Discord doesn't give us a type for private channels
         }
         private Channel(DiscordClient client, ulong id)
         {
