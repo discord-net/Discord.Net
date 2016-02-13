@@ -496,7 +496,8 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
-                            GatewaySocket.SendRequestMembers(largeServers, "", 0);
+                            if (largeServers.Count > 0)
+                                GatewaySocket.SendRequestMembers(largeServers, "", 0);
                             if (Config.LogLevel >= LogSeverity.Verbose)
                             {
                                 stopwatch.Stop();
