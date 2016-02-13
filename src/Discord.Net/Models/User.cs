@@ -169,7 +169,7 @@ namespace Discord
 			if (model.Roles != null)
 				UpdateRoles(model.Roles.Select(x => Server.GetRole(x)));
         }
-		internal void Update(ExtendedGuild.ExtendedMemberInfo model)
+		internal void Update(ExtendedMember model)
 		{
 			Update(model as APIMember);
             

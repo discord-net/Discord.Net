@@ -72,7 +72,7 @@ namespace Discord
         public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
         /// <summary> Gets a collection of all custom permissions used for this channel. </summary>
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites.Select(x => x.Value);
-
+        
         /// <summary> Gets a collection of all users with read access to this channel. </summary>
         public IEnumerable<User> Users
         {
@@ -104,7 +104,7 @@ namespace Discord
                 return Enumerable.Empty<User>();
             }
         }
-                
+
         internal Channel(DiscordClient client, ulong id, Server server)
             : this(client, id)
         {

@@ -67,6 +67,9 @@
     <Compile Include="..\Discord.Net\API\Client\Common\ExtendedGuild.cs">
       <Link>API\Client\Common\ExtendedGuild.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Common\ExtendedMember.cs">
+      <Link>API\Client\Common\ExtendedMember.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Common\Guild.cs">
       <Link>API\Client\Common\Guild.cs</Link>
     </Compile>

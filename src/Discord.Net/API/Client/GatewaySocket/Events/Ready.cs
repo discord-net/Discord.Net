@@ -34,5 +34,7 @@ namespace Discord.API.Client.GatewaySocket
         public object UserSettings { get; set; }
         [JsonProperty("user_guild_settings")]
         public object UserGuildSettings { get; set; }
+        [JsonProperty("tutorial")]
+        public object Tutorial { get; set; }
     }
 }

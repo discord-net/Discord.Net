@@ -51,6 +51,7 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private ulong _ownerId;
         private ulong? _afkChannelId;
+        private int _userCount;
 
         public DiscordClient Client { get; }
 
@@ -101,7 +102,14 @@ namespace Discord
         public IEnumerable<User> Users => _users.Select(x => x.Value.User);
         /// <summary> Gets a collection of all roles in this server. </summary>
         public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
-        
+
+        /// <summary> Gets the number of channels in this server. </summary>
+        public int ChannelCount => _channels.Count;
+        /// <summary> Gets the number of users in this server. </summary>
+        public int UserCount => _userCount;
+        /// <summary> Gets the number of roles in this server. </summary>
+        public int RoleCount => _channels.Count;
+
         internal Server(DiscordClient client, ulong id)
         {
             Client = client;
@@ -179,6 +187,8 @@ namespace Discord
                 foreach (var subModel in model.Presences)
                     GetUser(subModel.User.Id)?.Update(subModel);
             }
+            if (model.MemberCount != null)
+                _userCount = model.MemberCount.Value;
         }
         
         /// <summary> Edits this server, changing only non-null attributes. </summary>
@@ -436,6 +446,7 @@ namespace Discord
         #region Users
         internal User AddUser(ulong id)
         {
+            _userCount++;
             Member member = new Member(new User(Client, id, this), ServerPermissions.None);
             if (id == Client.CurrentUser.Id)
             {
@@ -452,6 +463,7 @@ namespace Discord
         }
         internal User RemoveUser(ulong id)
         {
+            _userCount--;
             Member member;
             if (_users.TryRemove(id, out member))
             {

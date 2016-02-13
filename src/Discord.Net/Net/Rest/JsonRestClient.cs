@@ -1,5 +1,8 @@
 ﻿using Discord.Logging;
 using Newtonsoft.Json;
+#if TEST_RESPONSES
+using System;
+#endif
 using System.IO;
 
 namespace Discord.Net.Rest

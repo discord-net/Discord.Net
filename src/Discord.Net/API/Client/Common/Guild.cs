@@ -44,5 +44,7 @@ namespace Discord.API.Client
         public EmojiData[] Emojis { get; set; }
         [JsonProperty("splash")]
         public string Splash { get; set; }
+        [JsonProperty("verification_level")]
+        public int VerificationLevel { get; set; }
     }
 }
