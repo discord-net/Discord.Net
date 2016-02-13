@@ -17,7 +17,7 @@ namespace Discord.API.Client.GatewaySocket
         [JsonProperty("properties")]
         public Dictionary<string, string> Properties { get; set; }
         [JsonProperty("large_threshold", NullValueHandling = NullValueHandling.Ignore)]
-        public int? LargeThreshold { get; set; }
+        public int LargeThreshold { get; set; }
         [JsonProperty("compress")]
         public bool UseCompression { get; set; }
     }

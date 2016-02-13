@@ -161,7 +161,7 @@ namespace Discord.Net.WebSockets
                 Version = 3,
                 Token = token,
                 Properties = props, 
-                LargeThreshold = _config.UseLargeThreshold ? 100 : (int?)null,
+                LargeThreshold = _config.LargeThreshold,
                 UseCompression = true
             };
 			QueueMessage(msg);

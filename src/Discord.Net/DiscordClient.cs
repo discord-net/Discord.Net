@@ -896,12 +896,7 @@ namespace Discord
                                     break;
                                 }
                                 else
-                                {
-                                    if (Config.UseLargeThreshold)
-                                        user = server.AddUser(data.User.Id);
-                                    else
-                                        user = server.GetUser(data.User.Id);
-                                }
+                                    user = server.AddUser(data.User.Id);
                             }
 
                             if (user != null)
