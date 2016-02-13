@@ -479,12 +479,16 @@ namespace Discord
                             PrivateUser.Update(data.User);
                             CurrentUser = new Profile(this, data.User.Id);
                             CurrentUser.Update(data.User);
+
+                            List<ulong> largeServers = new List<ulong>();
                             foreach (var model in data.Guilds)
                             {
                                 if (model.Unavailable != true)
                                 {
                                     var server = AddServer(model.Id);
                                     server.Update(model);
+                                    if (model.IsLarge)
+                                        largeServers.Add(server.Id);
                                 }
                             }
                             foreach (var model in data.PrivateChannels)
@@ -492,6 +496,7 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
+                            GatewaySocket.SendRequestMembers(largeServers, "", 0);
                             if (Config.LogLevel >= LogSeverity.Verbose)
                             {
                                 stopwatch.Stop();

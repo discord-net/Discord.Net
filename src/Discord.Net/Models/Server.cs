@@ -501,10 +501,6 @@ namespace Discord
             var response = await Client.ClientAPI.Send(request).ConfigureAwait(false);
             return response.Pruned;
         }
-
-        /// <summary>When Config.UseLargeThreshold is enabled, running this command will request the Discord server to provide you with all offline users for this server.</summary>
-        public void RequestOfflineUsers()
-            => Client.GatewaySocket.SendRequestMembers(Id, "", 0);
         #endregion
 
         internal Server Clone()

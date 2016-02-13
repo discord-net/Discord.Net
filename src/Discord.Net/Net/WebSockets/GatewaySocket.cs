@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -179,8 +180,8 @@ namespace Discord.Net.WebSockets
             });
 		public void SendUpdateVoice(ulong? serverId, ulong? channelId, bool isSelfMuted, bool isSelfDeafened)
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
-		public void SendRequestMembers(ulong serverId, string query, int limit)
-            => QueueMessage(new RequestMembersCommand { GuildId = serverId, Query = query, Limit = limit });
+		public void SendRequestMembers(IEnumerable<ulong> serverId, string query, int limit)
+            => QueueMessage(new RequestMembersCommand { GuildId = serverId.ToArray(), Query = query, Limit = limit });
 
         //Cancel if either DiscordClient.Disconnect is called, data socket errors or timeout is reached
         public override void WaitForConnection(CancellationToken cancelToken)

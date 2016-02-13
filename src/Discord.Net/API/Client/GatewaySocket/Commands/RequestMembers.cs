@@ -10,8 +10,8 @@ namespace Discord.API.Client.GatewaySocket
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        [JsonProperty("guild_id"), JsonConverter(typeof(LongStringConverter))]
-        public ulong GuildId { get; set; }
+        [JsonProperty("guild_id"), JsonConverter(typeof(LongStringArrayConverter))]
+        public ulong[] GuildId { get; set; }
         [JsonProperty("query")]
         public string Query { get; set; }
         [JsonProperty("limit")]
