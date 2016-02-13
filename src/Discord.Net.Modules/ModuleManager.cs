@@ -98,7 +98,7 @@ namespace Discord.Modules
 			client.RoleDeleted += (s, e) => { if (HasIndirectServer(e.Server)) RoleDeleted(s, e); };
 
             client.JoinedServer += (s, e) => { if (_allowAll) JoinedServer(s, e); };
-            client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) { DisableServer(e.Server); LeftServer(s, e); } };
+            client.LeftServer += (s, e) => { if (HasIndirectServer(e.Server)) LeftServer(s, e); };
 			client.ServerUpdated += (s, e) => { if (HasIndirectServer(e.After)) ServerUpdated(s, e); };
 			client.ServerUnavailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerUnavailable(s, e); };
 			client.ServerAvailable += (s, e) => { if (HasIndirectServer(e.Server)) ServerAvailable(s, e); };

@@ -34,8 +34,6 @@ namespace Discord
 
         /// <summary> Gets or sets whether an encrypted login token should be saved to temp dir after successful login. </summary>
         public bool CacheToken { get; set; } = true;
-        /// <summary> Gets or sets whether Discord should send information about offline users, for servers with more than 100 users. </summary>
-        public bool UseLargeThreshold { get; set; } = false;
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 100;
         /// <summary> Gets or sets whether the permissions cache should be used. This makes operations such as User.GetPermissions(Channel), User.ServerPermissions and Channel.Members </summary>
@@ -74,7 +72,7 @@ namespace Discord
         public int ReconnectDelay { get; }
         public int FailedReconnectDelay { get; }
 
-        public bool UseLargeThreshold { get; }
+        public int LargeThreshold { get; } = 250;
         public int MessageCacheSize { get; }
         public bool UsePermissionsCache { get; }
         public bool EnablePreUpdateEvents { get; }
@@ -90,8 +88,7 @@ namespace Discord
             ConnectionTimeout = builder.ConnectionTimeout;
             ReconnectDelay = builder.ReconnectDelay;
             FailedReconnectDelay = builder.FailedReconnectDelay;
-
-            UseLargeThreshold = builder.UseLargeThreshold;
+            
             MessageCacheSize = builder.MessageCacheSize;
             UsePermissionsCache = builder.UsePermissionsCache;
             EnablePreUpdateEvents = builder.EnablePreUpdateEvents;

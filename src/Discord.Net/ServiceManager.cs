@@ -38,8 +38,7 @@ namespace Discord
             return singletonT;
         }
 
-        IEnumerator<IService> IEnumerable<IService>.GetEnumerator() => _services.Values.GetEnumerator();
-
-        public IEnumerator GetEnumerator() => _services.Values.GetEnumerator();
+        public IEnumerator<IService> GetEnumerator() => _services.Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => _services.Values.GetEnumerator();
     }
 }
