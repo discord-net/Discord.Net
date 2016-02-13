@@ -331,8 +331,11 @@ namespace Discord
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
 
-            return _roles.ContainsKey(role.Id);
+            return HasRole(role.Id);
         }
+
+	    public bool HasRole(ulong roleId) 
+            => _roles.ContainsKey(roleId);
 
         public Task AddRoles(params Role[] roles)
             => Edit(roles: Roles.Concat(roles));
