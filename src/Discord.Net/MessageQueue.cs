@@ -134,7 +134,7 @@ namespace Discord.Net
                                 catch (Exception ex)
                                 {
                                     msg.State = MessageState.Failed;
-                                    _logger.Error("Failed to send message", ex);
+                                    _logger.Error("Failed to send message to {msg.Server?.Id}/{msg.Channel?.Id}", ex);
                                 }
                             }
                         }
