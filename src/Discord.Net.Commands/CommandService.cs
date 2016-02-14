@@ -97,10 +97,15 @@ namespace Discord.Commands
                 //Check for mention
                 if (cmdMsg == null && Config.AllowMentionPrefix)
                 {
-                    if (msg.StartsWith(client.CurrentUser.Mention))
-                        cmdMsg = msg.Substring(client.CurrentUser.Mention.Length + 1);
-                    else if (msg.StartsWith($"@{client.CurrentUser.Name}"))
-                        cmdMsg = msg.Substring(client.CurrentUser.Name.Length + 1);
+                    string mention = client.CurrentUser.Mention;
+                    if (msg.StartsWith(mention) && msg.Length > mention.Length)
+                        cmdMsg = msg.Substring(mention.Length + 1);
+                    else
+                    {
+                        mention = $"@{client.CurrentUser.Name}";
+                        if (msg.StartsWith(mention) && msg.Length > mention.Length)
+                            cmdMsg = msg.Substring(mention.Length + 1);
+                    }
                 }
                 
                 //Check using custom activator
