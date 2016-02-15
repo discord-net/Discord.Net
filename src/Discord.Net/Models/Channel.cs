@@ -111,7 +111,7 @@ namespace Discord
             : this(client, id)
         {
             Server = server;
-            if (server != null)
+            if (server != null && Client.Config.UsePermissionsCache)
             {
                 foreach (var user in server.Users)
                     AddUser(user);
@@ -131,9 +131,15 @@ namespace Discord
             Id = id;
 
             _permissionOverwrites = new Dictionary<ulong, PermissionOverwrite>();
-            _users = new ConcurrentDictionary<ulong, Member>();
+            if (client.Config.UsePermissionsCache)
+            {
+                if (IsPrivate)
+                    _users = new ConcurrentDictionary<ulong, Member>(2, 2);
+                else
+                    _users = new ConcurrentDictionary<ulong, Member>(2, (int)(Server.UserCount * 1.05));
+            }
             if (client.Config.MessageCacheSize > 0)
-                _messages = new ConcurrentDictionary<ulong, Message>();
+                _messages = new ConcurrentDictionary<ulong, Message>(2, (int)(client.Config.MessageCacheSize * 1.05));
         }
 
         internal void Update(ChannelReference model)
@@ -542,8 +548,7 @@ namespace Discord
         #region Users
         internal void AddUser(User user)
         {
-            if (!Client.Config.UsePermissionsCache)
-                return;
+            if (!Client.Config.UsePermissionsCache) return;
 
             var perms = new ChannelPermissions();
             UpdatePermissions(user, ref perms);

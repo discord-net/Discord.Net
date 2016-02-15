@@ -46,9 +46,9 @@ namespace Discord
             }
         }
 
-        private readonly ConcurrentDictionary<ulong, Role> _roles;
-        private readonly ConcurrentDictionary<ulong, Member> _users;
-        private readonly ConcurrentDictionary<ulong, Channel> _channels;
+        private ConcurrentDictionary<ulong, Role> _roles;
+        private ConcurrentDictionary<ulong, Member> _users;
+        private ConcurrentDictionary<ulong, Channel> _channels;
         private ulong _ownerId;
         private ulong? _afkChannelId;
         private int _userCount;
@@ -117,9 +117,6 @@ namespace Discord
             Client = client;
             Id = id;
 
-            _channels = new ConcurrentDictionary<ulong, Channel>();
-            _roles = new ConcurrentDictionary<ulong, Role>();
-            _users = new ConcurrentDictionary<ulong, Member>();
             DefaultChannel = AddChannel(id);
             EveryoneRole = AddRole(id);
         }
@@ -157,6 +154,7 @@ namespace Discord
             }
             if (model.Roles != null)
             {
+                _roles = new ConcurrentDictionary<ulong, Role>(2, model.Roles.Length);
                 foreach (var x in model.Roles)
                     AddRole(x.Id).Update(x);
             }
@@ -171,11 +169,13 @@ namespace Discord
 
             if (model.Channels != null)
             {
+                _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
                 foreach (var subModel in model.Channels)
                     AddChannel(subModel.Id).Update(subModel);
             }
             if (model.Members != null)
             {
+                _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
                 foreach (var subModel in model.Members)
                     AddUser(subModel.User.Id).Update(subModel);
             }
