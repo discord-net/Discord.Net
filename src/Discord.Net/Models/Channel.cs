@@ -328,27 +328,17 @@ namespace Discord
         public IEnumerable<User> FindUsers(string name, bool exactMatch = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-
             return _users.Select(x => x.Value.User).Find(name, exactMatch: exactMatch);
         }
 
-        public Task<Message> SendMessage(string text)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
-            return SendMessageInternal(text, false);
-        }
-        public Task<Message> SendTTSMessage(string text)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
-            return SendMessageInternal(text, true);
-        }
+        public Task<Message> SendMessage(string text) => SendMessageInternal(text, false);
+        public Task<Message> SendTTSMessage(string text) => SendMessageInternal(text, true);
         private Task<Message> SendMessageInternal(string text, bool isTTS)
         {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
             if (text.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
-            
+                throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");            
             return Task.FromResult(Client.MessageQueue.QueueSend(this, text, isTTS));
         }
 
@@ -374,8 +364,7 @@ namespace Discord
             return msg;
         }
 
-        public Task SendIsTyping()
-            => Client.ClientAPI.Send(new SendIsTypingRequest(Id));
+        public Task SendIsTyping() => Client.ClientAPI.Send(new SendIsTypingRequest(Id));
         #endregion
 
         #region Permissions
