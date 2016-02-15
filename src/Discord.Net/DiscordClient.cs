@@ -902,7 +902,7 @@ namespace Discord
                                     break;
                                 }
                                 else
-                                    user = server.AddUser(data.User.Id);
+                                    user = server.GetUser(data.User.Id);
                             }
 
                             if (user != null)

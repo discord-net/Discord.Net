@@ -456,8 +456,8 @@ namespace Discord
             
             if (_users.TryGetOrAdd(id, member, out member))
             {
-                foreach (var channel in AllChannels)
-                    channel.AddUser(member.User);
+                foreach (var channel in _channels)
+                    channel.Value.AddUser(member.User);
             }
             return member.User;
         }
@@ -467,8 +467,8 @@ namespace Discord
             Member member;
             if (_users.TryRemove(id, out member))
             {
-                foreach (var channel in AllChannels)
-                    channel.RemoveUser(id);
+                foreach (var channel in _channels)
+                    channel.Value.RemoveUser(id);
                 return member.User;
             }
             return null;
