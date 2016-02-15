@@ -103,7 +103,7 @@ namespace Discord.Net
         }
         private Task RunSendQueue(CancellationToken cancelToken)
         {
-            return Task.Run((Func<Task>)(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
@@ -134,7 +134,7 @@ namespace Discord.Net
                                 catch (Exception ex)
                                 {
                                     msg.State = MessageState.Failed;
-                                    _logger.Error("Failed to send message", ex);
+                                    _logger.Error($"Failed to send message to {msg.Channel.Path}", ex);
                                 }
                             }
                         }
@@ -142,11 +142,11 @@ namespace Discord.Net
                     }
                 }
                 catch (OperationCanceledException) { }
-            }));
+            });
         }
         private Task RunEditQueue(CancellationToken cancelToken)
         {
-            return Task.Run((Func<Task>)(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
@@ -168,7 +168,7 @@ namespace Discord.Net
                                         };
                                         await _rest.Send(request).ConfigureAwait(false);
                                     }
-                                    catch (Exception ex) { _logger.Error("Failed to edit message", ex); }
+                                    catch (Exception ex) { _logger.Error($"Failed to edit message {edit.Message.Path}", ex); }
                                 }
                             }
                         }
@@ -176,11 +176,11 @@ namespace Discord.Net
                     }
                 }
                 catch (OperationCanceledException) { }
-            }));
+            });
         }
         private Task RunDeleteQueue(CancellationToken cancelToken)
         {
-            return Task.Run((Func<Task>)(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
@@ -200,7 +200,7 @@ namespace Discord.Net
                                         await _rest.Send(request).ConfigureAwait(false);
                                     }
                                     catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
-                                    catch (Exception ex) { _logger.Error("Failed to delete message", ex); }
+                                    catch (Exception ex) { _logger.Error($"Failed to delete message {msg.Path}", ex); }
                                 }
                             }
                         }
@@ -209,7 +209,7 @@ namespace Discord.Net
                     }
                 }
                 catch (OperationCanceledException) { }
-            }));
+            });
         }
 
         private void IncrementCount()
