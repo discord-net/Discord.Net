@@ -6,7 +6,7 @@ namespace Discord.Commands.Permissions.Levels
     {
         public static DiscordClient UsingPermissionLevels(this DiscordClient client, Func<User, Channel, int> permissionResolver)
         {
-            client.Services.Add(new PermissionLevelService(permissionResolver));
+            client.AddService(new PermissionLevelService(permissionResolver));
             return client;
         }
 

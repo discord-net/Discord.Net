@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace Discord
 {
-    public class ServiceManager : IEnumerable<IService>
+    internal class ServiceCollection : IEnumerable<IService>
     {
         private readonly Dictionary<Type, IService> _services;
 
         internal DiscordClient Client { get; }
 
-        internal ServiceManager(DiscordClient client)
+        internal ServiceCollection(DiscordClient client)
         {
             Client = client;
             _services = new Dictionary<Type, IService>();

@@ -481,14 +481,14 @@
     <Compile Include="..\Discord.Net\Events\UserUpdatedEventArgs.cs">
       <Link>Events\UserUpdatedEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
     <Compile Include="..\Discord.Net\Format.cs">
       <Link>Format.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\IMentionable.cs">
       <Link>IMentionable.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\InternalExtensions.cs">
+      <Link>InternalExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\IService.cs">
       <Link>IService.cs</Link>
@@ -592,8 +592,8 @@
     <Compile Include="..\Discord.Net\Net\WebSockets\WS4NetEngine.cs">
       <Link>Net\WebSockets\WS4NetEngine.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\ServiceManager.cs">
-      <Link>ServiceManager.cs</Link>
+    <Compile Include="..\Discord.Net\ServiceCollection.cs">
+      <Link>ServiceCollection.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>

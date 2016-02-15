@@ -27,6 +27,7 @@ namespace Discord
         private readonly ManualResetEvent _disconnectedEvent;
         private readonly ManualResetEventSlim _connectedEvent;
         private readonly TaskManager _taskManager;
+        private readonly ServiceCollection _services;
         private readonly ConcurrentDictionary<ulong, Server> _servers;
         private readonly ConcurrentDictionary<ulong, Channel> _channels;
         private readonly ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
@@ -44,8 +45,6 @@ namespace Discord
         public RestClient StatusAPI { get; }
         /// <summary> Gets the internal WebSocket for the Gateway event stream. </summary>
         public GatewaySocket GatewaySocket { get; }
-        /// <summary> Gets the service manager used for adding extensions to this client. </summary>
-        public ServiceManager Services { get; }
         /// <summary> Gets the queue used for outgoing messages, if enabled. </summary>
         public MessageQueue MessageQueue { get; }
         /// <summary> Gets the JSON serializer used by this client. </summary>
@@ -66,6 +65,8 @@ namespace Discord
         /// <summary> Gets the game the current user is displayed as playing. </summary>
         public string CurrentGame { get; private set; }
 
+        /// <summary> Gets a collection of all extensions added to this DiscordClient. </summary>
+        public IEnumerable<IService> Services => _services;
         /// <summary> Gets a collection of all servers this client is a member of. </summary>
         public IEnumerable<Server> Servers => _servers.Select(x => x.Value);
         /// <summary> Gets a collection of all private channels this client is a member of. </summary>
@@ -152,7 +153,7 @@ namespace Discord
             MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
 
             //Extensibility
-            Services = new ServiceManager(this);
+            _services = new ServiceCollection(this);
         }
 
         /// <summary> Connects to the Discord server with the provided email and password. </summary>
@@ -1008,6 +1009,18 @@ namespace Discord
                 Logger.Error($"Error handling {e.Type} event", ex);
             }
         }
+        #endregion
+
+        #region Services
+        public T AddService<T>(T instance)
+            where T : class, IService
+            => _services.Add(instance);
+        public T AddService<T>()
+            where T : class, IService, new()
+            => _services.Add(new T());
+        public T GetService<T>(bool isRequired = true)
+            where T : class, IService
+            => _services.Get<T>(isRequired);
         #endregion
 
         #region Async Wrapper

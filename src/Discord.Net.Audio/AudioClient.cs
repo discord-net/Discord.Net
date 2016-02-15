@@ -71,7 +71,7 @@ namespace Discord.Audio
 		{
             Id = id;
             _config = client.Config;
-            Service = client.Services.Get<AudioService>();
+            Service = client.GetService<AudioService>();
             Config = Service.Config;
             Serializer = client.Serializer;
             _gatewayState = (int)ConnectionState.Disconnected;

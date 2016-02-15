@@ -6,7 +6,7 @@ namespace Discord.Commands.Permissions.Userlist
     {
         public static DiscordClient UsingGlobalWhitelist(this DiscordClient client, params ulong[] initialUserIds)
         {
-            client.Services.Add(new WhitelistService(initialUserIds));
+            client.AddService(new WhitelistService(initialUserIds));
             return client;
         }
 
@@ -27,22 +27,22 @@ namespace Discord.Commands.Permissions.Userlist
         }
 
         public static IEnumerable<ulong> GetWhitelistedUserIds(this DiscordClient client)
-            => client.Services.Get<WhitelistService>().UserIds;
+            => client.GetService<WhitelistService>().UserIds;
         public static void WhitelistUser(this DiscordClient client, User user)
         {
-            client.Services.Get<WhitelistService>().Add(user.Id);
+            client.GetService<WhitelistService>().Add(user.Id);
         }
         public static void WhitelistUser(this DiscordClient client, ulong userId)
         {
-            client.Services.Get<WhitelistService>().Add(userId);
+            client.GetService<WhitelistService>().Add(userId);
         }
         public static void UnWhitelistUser(this DiscordClient client, User user)
         {
-            client.Services.Get<WhitelistService>().Remove(user.Id);
+            client.GetService<WhitelistService>().Remove(user.Id);
         }
         public static void RemoveFromWhitelist(this DiscordClient client, ulong userId)
         {
-            client.Services.Get<WhitelistService>().Remove(userId);
+            client.GetService<WhitelistService>().Remove(userId);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Discord.Commands.Permissions.Userlist
     {
         public static DiscordClient UsingGlobalBlacklist(this DiscordClient client, params ulong[] initialUserIds)
         {
-            client.Services.Add(new BlacklistService(initialUserIds));
+            client.AddService(new BlacklistService(initialUserIds));
             return client;
         }
 
@@ -27,22 +27,22 @@ namespace Discord.Commands.Permissions.Userlist
 		}
 
         public static IEnumerable<ulong> GetBlacklistedUserIds(this DiscordClient client)
-            => client.Services.Get<BlacklistService>().UserIds;
+            => client.GetService<BlacklistService>().UserIds;
         public static void BlacklistUser(this DiscordClient client, User user)
         {
-            client.Services.Get<BlacklistService>().Add(user.Id);
+            client.GetService<BlacklistService>().Add(user.Id);
         }
         public static void BlacklistUser(this DiscordClient client, ulong userId)
         {
-            client.Services.Get<BlacklistService>().Add(userId);
+            client.GetService<BlacklistService>().Add(userId);
         }
         public static void UnBlacklistUser(this DiscordClient client, User user)
         {
-            client.Services.Get<BlacklistService>().Remove(user.Id);
+            client.GetService<BlacklistService>().Remove(user.Id);
         }
         public static void UnBlacklistUser(this DiscordClient client, ulong userId)
         {
-            client.Services.Get<BlacklistService>().Remove(userId);
+            client.GetService<BlacklistService>().Remove(userId);
         }
     }
 }

@@ -7,6 +7,17 @@ using System.Linq;
 
 namespace Discord.Modules
 {
+    public class ModuleManager<T> : ModuleManager
+        where T : class, IModule
+    {
+        public new T Instance => base.Instance as T;
+
+        internal ModuleManager(DiscordClient client, T instance, string name, ModuleFilter filterType)
+            : base(client, instance, name, filterType)
+        {
+        }
+    }
+
     public class ModuleManager
 	{
 		public event EventHandler<ServerEventArgs> ServerEnabled = delegate { };
@@ -115,7 +126,7 @@ namespace Discord.Modules
 
 		public void CreateCommands(string prefix, Action<CommandGroupBuilder> config)
 		{
-			var commandService = Client.Services.Get<CommandService>();
+			var commandService = Client.GetService<CommandService>();
 			commandService.CreateGroup(prefix, x =>
 			{
 				x.Category(Name);

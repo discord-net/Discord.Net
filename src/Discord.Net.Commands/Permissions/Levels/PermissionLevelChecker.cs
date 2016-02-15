@@ -10,7 +10,7 @@
 
 		internal PermissionLevelChecker(DiscordClient client, int minPermissions)
 		{
-			_service = client.Services.Get<PermissionLevelService>(true);
+			_service = client.GetService<PermissionLevelService>(true);
 			_minPermissions = minPermissions;
         }
 
