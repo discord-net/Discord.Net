@@ -41,11 +41,11 @@ namespace Discord
                 Permissions = new ChannelPermissionOverrides(allow, deny);
             }
         }
-        
+
         private readonly ConcurrentDictionary<ulong, Member> _users;
         private readonly ConcurrentDictionary<ulong, Message> _messages;
         private Dictionary<ulong, PermissionOverwrite> _permissionOverwrites;
-        
+
         public DiscordClient Client { get; }
 
         /// <summary> Gets the unique identifier for this channel. </summary>
@@ -64,6 +64,8 @@ namespace Discord
         /// <summary> Gets the type of this channel). </summary>
         public ChannelType Type { get; private set; }
 
+        /// <summary> Gets the path to this object. </summary>
+        internal string Path => $"{Server?.Name ?? "[Private]"}/{Name}";
         /// <summary> Gets true if this is a private chat with another user. </summary>
         public bool IsPrivate => Recipient != null;
         /// <summary> Gets the string used to mention this channel. </summary>
@@ -345,7 +347,7 @@ namespace Discord
         public async Task<Message> SendFile(string filePath)
         { 
             using (var stream = File.OpenRead(filePath))
-                return await SendFile(Path.GetFileName(filePath), stream).ConfigureAwait(false);
+                return await SendFile(System.IO.Path.GetFileName(filePath), stream).ConfigureAwait(false);
         }
         public async Task<Message> SendFile(string filename, Stream stream)
         {

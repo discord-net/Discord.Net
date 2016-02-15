@@ -73,6 +73,8 @@ namespace Discord
         // /// <summary> Gets this user's voice token. </summary>
         // public string Token { get; private set; }
 
+        /// <summary> Gets the path to this object. </summary>
+        internal string Path => $"{Server?.Name ?? "[Private]"}/{Name}";
         /// <summary> Gets the current private channel for this user if one exists. </summary>
         public Channel PrivateChannel => Client.GetPrivateChannel(Id);
         /// <summary> Returns the string used to mention this user. </summary>

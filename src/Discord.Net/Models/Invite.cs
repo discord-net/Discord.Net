@@ -85,8 +85,10 @@ namespace Discord
         /// <summary> Gets when this invite was created. </summary>
 		public DateTime CreatedAt { get; private set; }
 
-		/// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
-		public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
+        /// <summary> Gets the path to this object. </summary>
+        internal string Path => $"{Server?.Name ?? "[Private]"}/{Code}";
+        /// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
+        public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
         internal Invite(DiscordClient client, string code, string xkcdPass)
 		{

@@ -79,6 +79,8 @@ namespace Discord
         /// <summary> Gets all custom emojis on this server. </summary>
         public IEnumerable<Emoji> CustomEmojis { get; private set; }
 
+        /// <summary> Gets the path to this object. </summary>
+        internal string Path => Name;
         /// <summary> Gets the user that created this server. </summary>
         public User Owner => GetUser(_ownerId);
         /// <summary> Returns true if the current user owns this server. </summary>

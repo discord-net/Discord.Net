@@ -201,6 +201,8 @@ namespace Discord
 
         internal int Nonce { get; set; }
 
+        /// <summary> Gets the path to this object. </summary>
+        internal string Path => $"{Server?.Name ?? "[Private]"}/{Id}";
         /// <summary> Returns the server containing the channel this message was sent to. </summary>
         public Server Server => Channel.Server;
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
