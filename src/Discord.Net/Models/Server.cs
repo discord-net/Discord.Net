@@ -108,7 +108,7 @@ namespace Discord
         /// <summary> Gets the number of users in this server. </summary>
         public int UserCount => _userCount;
         /// <summary> Gets the number of roles in this server. </summary>
-        public int RoleCount => _channels.Count;
+        public int RoleCount => _roles.Count;
 
         internal Server(DiscordClient client, ulong id)
         {
