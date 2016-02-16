@@ -547,35 +547,31 @@ namespace Discord
         }
         public User GetUser(ulong id)
         {
-            if (!Client.Config.UsePermissionsCache)
+            if (IsPrivate)
             {
-                if (Server != null)
+                if (id == Recipient.Id)
+                    return Recipient;
+                else if (id == Client.PrivateUser.Id)
+                    return Client.PrivateUser;
+            }
+            else if (!Client.Config.UsePermissionsCache)
+            {
+                var user = Server.GetUser(id);
+                if (user != null)
                 {
-                    var user = Server.GetUser(id);
-                    if (user != null)
-                    {
-                        ChannelPermissions perms = new ChannelPermissions();
-                        UpdatePermissions(user, ref perms);
-                        if (perms.ReadMessages)
-                            return user;
-                    }
+                    ChannelPermissions perms = new ChannelPermissions();
+                    UpdatePermissions(user, ref perms);
+                    if (perms.ReadMessages)
+                        return user;
                 }
-                else
-                {
-                    if (id == Recipient.Id)
-                        return Recipient;
-                    else if (id == Client.PrivateUser.Id)
-                        return Client.PrivateUser;
-                }
-                return null;
             }
             else
             {
                 Member result;
                 if (_users.TryGetValue(id, out result))
                     return result.User;
-                return null;
             }
+            return null;
         }
         #endregion
 
