@@ -29,58 +29,7 @@ namespace Discord.ETF
             _buffer = new byte[11];
             _encoding = Encoding.UTF8;
         }
-
-        private bool ReadNil(bool ignoreLength = false)
-        {
-            if (!ignoreLength)
-            {
-                _stream.Read(_buffer, 0, 1);
-                byte length = _buffer[0];
-                if (length != 3) return false;
-            }
-
-            _stream.Read(_buffer, 0, 3);
-            if (_buffer[0] == 'n' && _buffer[1] == 'i' && _buffer[2] == 'l')
-                return true;
-
-            return false;
-        }
-        private void ReadTrue()
-        {
-            _stream.Read(_buffer, 0, 4);
-            if (_buffer[0] != 't' || _buffer[1] != 'r' || _buffer[2] != 'u' || _buffer[3] != 'e')
-                throw new InvalidDataException();
-        }
-        private void ReadFalse()
-        {
-            _stream.Read(_buffer, 0, 5);
-            if (_buffer[0] != 'f' || _buffer[1] != 'a' || _buffer[2] != 'l' || _buffer[3] != 's' || _buffer[4] != 'e')
-                throw new InvalidDataException();
-        }
-
-        public bool? ReadNullableBool()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT)
-            {
-                _stream.Read(_buffer, 0, 1);
-                switch (_buffer[0]) //Length
-                {
-                    case 3:
-                        if (ReadNil())
-                            return null;
-                        break;
-                    case 4:
-                        ReadTrue();
-                        return true;
-                    case 5:
-                        ReadFalse();
-                        return false;
-                }
-            }
-            throw new InvalidDataException();
-        }
+        
         public bool ReadBool()
         {
             _stream.Read(_buffer, 0, 1);
@@ -99,6 +48,18 @@ namespace Discord.ETF
                 }
             }
             throw new InvalidDataException();
+        }
+        private void ReadTrue()
+        {
+            _stream.Read(_buffer, 0, 4);
+            if (_buffer[0] != 't' || _buffer[1] != 'r' || _buffer[2] != 'u' || _buffer[3] != 'e')
+                throw new InvalidDataException();
+        }
+        private void ReadFalse()
+        {
+            _stream.Read(_buffer, 0, 5);
+            if (_buffer[0] != 'f' || _buffer[1] != 'a' || _buffer[2] != 'l' || _buffer[3] != 's' || _buffer[4] != 'e')
+                throw new InvalidDataException();
         }
 
         public int ReadSByte()
@@ -194,6 +155,29 @@ namespace Discord.ETF
             throw new NotImplementedException();
         }
 
+        public bool? ReadNullableBool()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT)
+            {
+                _stream.Read(_buffer, 0, 1);
+                switch (_buffer[0]) //Length
+                {
+                    case 3:
+                        if (ReadNil())
+                            return null;
+                        break;
+                    case 4:
+                        ReadTrue();
+                        return true;
+                    case 5:
+                        ReadFalse();
+                        return false;
+                }
+            }
+            throw new InvalidDataException();
+        }
         public int? ReadNullableSByte()
         {
             _stream.Read(_buffer, 0, 1);
@@ -272,6 +256,48 @@ namespace Discord.ETF
         public byte[] ReadByteArray()
         {
             throw new NotImplementedException();
+        }
+
+        public T Read<T>()
+            where T : new()
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+            var action = _deserializers.GetOrAdd(type, _ => CreateDeserializer<T>(type, typeInfo)) as Func<ETFReader, T>;
+            return action(this);
+        }
+        /*public void Read<T, U>()
+            where T : Nullable<T>
+            where U : struct, new()
+        {
+        }*/
+        public T[] ReadArray<T>()
+        {
+            throw new NotImplementedException();
+        }
+        public IDictionary<TKey, TValue> ReadDictionary<TKey, TValue>()
+        {
+            throw new NotImplementedException();
+        }
+        /*public object Read(object obj)
+        {
+            throw new NotImplementedException();
+        }*/
+
+        private bool ReadNil(bool ignoreLength = false)
+        {
+            if (!ignoreLength)
+            {
+                _stream.Read(_buffer, 0, 1);
+                byte length = _buffer[0];
+                if (length != 3) return false;
+            }
+
+            _stream.Read(_buffer, 0, 3);
+            if (_buffer[0] == 'n' && _buffer[1] == 'i' && _buffer[2] == 'l')
+                return true;
+
+            return false;
         }
 
         #region Emit
