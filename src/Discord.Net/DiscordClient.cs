@@ -807,7 +807,8 @@ namespace Discord
                             Channel channel = GetChannel(data.ChannelId);
                             if (channel != null)
                             {
-                                var user = channel.GetUser(data.Author.Id);
+                                var user = channel.GetUserFast(data.Author.Id);
+
                                 if (user != null)
                                 {
                                     Message msg = null;

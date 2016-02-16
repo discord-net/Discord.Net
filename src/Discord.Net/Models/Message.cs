@@ -36,7 +36,7 @@ namespace Discord
                 ulong id;
                 if (e.Value.Substring(2, e.Value.Length - 3).TryToId(out id))
                 {
-                    var user = channel.GetUser(id);
+                    var user = channel.GetUserFast(id);
                     if (user != null)
                     {
                         if (users != null)
@@ -276,7 +276,7 @@ namespace Discord
 			if (model.Mentions != null)
 			{
 				MentionedUsers = model.Mentions
-					.Select(x => Channel.GetUser(x.Id))
+					.Select(x => Channel.GetUserFast(x.Id))
 					.Where(x => x != null)
 					.ToArray();
 			}

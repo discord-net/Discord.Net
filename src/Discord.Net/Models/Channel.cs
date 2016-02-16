@@ -275,7 +275,7 @@ namespace Discord
                 if (_messages.TryGetValue(id, out result))
                     return result;
             }
-            return new Message(id, this, userId != null ? GetUser(userId.Value) : null);
+            return new Message(id, this, userId != null ? GetUserFast(userId.Value) : null);
         }
 
         public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
@@ -298,13 +298,13 @@ namespace Discord
                     Message msg = null;
                     if (useCache)
                     {
-                        msg = AddMessage(x.Id, GetUser(x.Author.Id), x.Timestamp.Value);
+                        msg = AddMessage(x.Id, GetUserFast(x.Author.Id), x.Timestamp.Value);
                         var user = msg.User;
                         if (user != null)
                             user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
                     }
                     else
-                        msg = new Message(x.Id, this, GetUser(x.Author.Id));
+                        msg = new Message(x.Id, this, GetUserFast(x.Author.Id));
                     msg.Update(x);
                     return msg;
                 })
@@ -571,6 +571,20 @@ namespace Discord
                 if (_users.TryGetValue(id, out result))
                     return result.User;
             }
+            return null;
+        }
+        internal User GetUserFast(ulong id)
+        {
+            //Can return users not in this channel, but that's usually okay
+            if (IsPrivate)
+            {
+                if (id == Recipient.Id)
+                    return Recipient;
+                else if (id == Client.PrivateUser.Id)
+                    return Client.PrivateUser;
+            }
+            else
+                return Server.GetUser(id);
             return null;
         }
         #endregion
