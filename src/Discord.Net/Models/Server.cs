@@ -57,10 +57,6 @@ namespace Discord
 
         /// <summary> Gets the unique identifier for this server. </summary>
         public ulong Id { get; }
-        /// <summary> Gets the default channel for this server. </summary>
-        public Channel DefaultChannel { get; }
-        /// <summary> Gets the the role representing all users in a server. </summary>
-        public Role EveryoneRole { get; }
 
         /// <summary> Gets the name of this server. </summary>
         public string Name { get; private set; }
@@ -74,6 +70,10 @@ namespace Discord
         public int AFKTimeout { get; private set; }
         /// <summary> Gets the date and time you joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
+        /// <summary> Gets the default channel for this server. </summary>
+        public Channel DefaultChannel { get; private set; }
+        /// <summary> Gets the the role representing all users in a server. </summary>
+        public Role EveryoneRole { get; private set; }
         /// <summary> Gets all extra features added to this server. </summary>
         public IEnumerable<string> Features { get; private set; }
         /// <summary> Gets all custom emojis on this server. </summary>
@@ -116,20 +116,12 @@ namespace Discord
         {
             Client = client;
             Id = id;
-
-            DefaultChannel = AddChannel(id);
-            EveryoneRole = AddRole(id);
         }
         
-        internal void Update(GuildReference model)
+        internal void Update(Guild model)
         {
             if (model.Name != null)
                 Name = model.Name;
-        }
-        internal void Update(Guild model)
-        {
-            Update(model as GuildReference);
-
             if (model.AFKTimeout != null)
                 AFKTimeout = model.AFKTimeout.Value;
             if (model.JoinedAt != null)
@@ -142,7 +134,17 @@ namespace Discord
                 IconId = model.Icon;
             if (model.Features != null)
                 Features = model.Features;
-            if (model.Emojis != null)
+            if (model.Roles != null)
+            {
+                _roles = new ConcurrentDictionary<ulong, Role>(2, model.Roles.Length);
+                foreach (var x in model.Roles)
+                {
+                    var role = AddRole(x.Id);
+                    role.Update(x, false);
+                }
+                EveryoneRole = _roles[Id];
+            }
+            if (model.Emojis != null) //Needs Roles
             {
                 CustomEmojis = model.Emojis.Select(x => new Emoji(x.Id)
                 {
@@ -152,12 +154,6 @@ namespace Discord
                     Roles = x.RoleIds.Select(y => GetRole(y)).Where(y => y != null).ToArray()
                 }).ToArray();
             }
-            if (model.Roles != null)
-            {
-                _roles = new ConcurrentDictionary<ulong, Role>(2, model.Roles.Length);
-                foreach (var x in model.Roles)
-                    AddRole(x.Id).Update(x);
-            }
 
             //Can be null
             _afkChannelId = model.AFKChannelId;
@@ -165,14 +161,15 @@ namespace Discord
         }
         internal void Update(ExtendedGuild model)
         {
-            Update(model as Guild);
-
             if (model.Channels != null)
             {
                 _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
                 foreach (var subModel in model.Channels)
                     AddChannel(subModel.Id).Update(subModel);
+                DefaultChannel = _channels[Id];
             }
+            Update(model as Guild); //Needs channels
+
             if (model.Members != null)
             {
                 _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
@@ -368,7 +365,7 @@ namespace Discord
             var createRequest = new CreateRoleRequest(Id);
             var createResponse = await Client.ClientAPI.Send(createRequest).ConfigureAwait(false);
             var role = AddRole(createResponse.Id);
-            role.Update(createResponse);
+            role.Update(createResponse, false);
 
             var editRequest = new UpdateRoleRequest(role.Server.Id, role.Id)
             {
@@ -378,7 +375,7 @@ namespace Discord
                 IsHoisted = isHoisted
             };
             var editResponse = await Client.ClientAPI.Send(editRequest).ConfigureAwait(false);
-            role.Update(editResponse);
+            role.Update(editResponse, true);
 
             return role;
         }

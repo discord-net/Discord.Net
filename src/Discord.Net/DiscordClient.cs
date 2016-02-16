@@ -714,7 +714,7 @@ namespace Discord
                             if (server != null)
                             {
                                 var role = server.AddRole(data.Data.Id);
-                                role.Update(data.Data);
+                                role.Update(data.Data, false);
                                 Logger.Debug($"GUILD_ROLE_CREATE: {role.Path}");
                                 OnRoleCreated(role);
                             }
@@ -732,7 +732,7 @@ namespace Discord
                                 if (role != null)
                                 {
                                     var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
-                                    role.Update(data.Data);
+                                    role.Update(data.Data, true);
                                     Logger.Debug($"GUILD_ROLE_UPDATE: {role.Path}");
                                     OnRoleUpdated(before, role);
                                 }

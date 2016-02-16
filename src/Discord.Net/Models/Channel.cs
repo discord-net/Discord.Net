@@ -141,18 +141,13 @@ namespace Discord
             if (client.Config.MessageCacheSize > 0)
                 _messages = new ConcurrentDictionary<ulong, Message>(2, (int)(client.Config.MessageCacheSize * 1.05));
         }
-
-        internal void Update(ChannelReference model)
+        
+        internal void Update(APIChannel model)
         {
             if (!IsPrivate && model.Name != null)
                 Name = model.Name;
             if (model.Type != null)
                 Type = model.Type;
-        }
-        internal void Update(APIChannel model)
-        {
-            Update(model as ChannelReference);
-
             if (model.Position != null)
                 Position = model.Position.Value;
             if (model.Topic != null)

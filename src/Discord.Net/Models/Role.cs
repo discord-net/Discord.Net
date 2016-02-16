@@ -52,9 +52,9 @@ namespace Discord
 			Color = new Color(0);
 		}
 
-		internal void Update(APIRole model)
+		internal void Update(APIRole model, bool updatePermissions)
 		{
-			if (model.Name != null)
+            if (model.Name != null)
 				Name = model.Name;
 			if (model.Hoist != null)
 				IsHoisted = model.Hoist.Value;
@@ -64,11 +64,15 @@ namespace Discord
 				Position = model.Position.Value;
 			if (model.Color != null)
 				Color = new Color(model.Color.Value);
-			if (model.Permissions != null)
-				Permissions = new ServerPermissions(model.Permissions.Value);
-
-			foreach (var member in Members)
-				Server.UpdatePermissions(member);
+            if (model.Permissions != null)
+            {
+                Permissions = new ServerPermissions(model.Permissions.Value);
+                if (updatePermissions) //Dont update these during READY
+                {                    
+                    foreach (var member in Members)
+                        Server.UpdatePermissions(member);
+                }
+            }
 		}
         
         public async Task Edit(string name = null, ServerPermissions? permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
