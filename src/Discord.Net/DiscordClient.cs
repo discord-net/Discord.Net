@@ -239,7 +239,7 @@ namespace Discord
             }
 
             ClientAPI.Token = token;
-            var request = new LoginRequest();// { Email = email, Password = password };
+            var request = new LoginRequest() { Email = email, Password = password };
             var response = await ClientAPI.Send(request).ConfigureAwait(false);
             token = response.Token;
             if (Config.CacheDir != null && token != oldToken && tokenPath != null)
