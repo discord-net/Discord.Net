@@ -587,7 +587,7 @@ namespace Discord
                             {
                                 var server = GetServer(data.GuildId.Value);
                                 if (server != null)
-                                    channel = server.AddChannel(data.Id);
+                                    channel = server.AddChannel(data.Id, true);
                                 else
                                     Logger.Warning("CHANNEL_CREATE referenced an unknown guild.");
                             }
@@ -637,7 +637,7 @@ namespace Discord
                             var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
-                                var user = server.AddUser(data.User.Id);
+                                var user = server.AddUser(data.User.Id, true);
                                 user.Update(data);
                                 user.UpdateActivity();
                                 Logger.Debug($"GUILD_MEMBER_ADD: {user.Path}");
@@ -695,7 +695,7 @@ namespace Discord
                             {
                                 foreach (var memberData in data.Members)
                                 {
-                                    var user = server.AddUser(memberData.User.Id);
+                                    var user = server.AddUser(memberData.User.Id, true);
                                     user.Update(memberData);
                                     //OnUserAdded(user);
                                 }

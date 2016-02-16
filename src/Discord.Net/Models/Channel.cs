@@ -80,18 +80,20 @@ namespace Discord
         {
             get
             {
-                if (IsPrivate)
-                    return _users.Values.Select(x => x.User);
                 if (Client.Config.UsePermissionsCache)
                 {
-                    if (Type == ChannelType.Text)
+                    if (IsPrivate)
+                        return new User[] { Client.PrivateUser, Recipient };
+                    else if (Type == ChannelType.Text)
                         return _users.Values.Where(x => x.Permissions.ReadMessages == true).Select(x => x.User);
                     else if (Type == ChannelType.Voice)
                         return _users.Values.Select(x => x.User).Where(x => x.VoiceChannel == this);
                 }
                 else
                 {
-                    if (Type == ChannelType.Text)
+                    if (IsPrivate)
+                        return new User[] { Client.PrivateUser, Recipient };
+                    else if (Type == ChannelType.Text)
                     {
                         ChannelPermissions perms = new ChannelPermissions();
                         return Server.Users.Where(x =>
@@ -111,11 +113,6 @@ namespace Discord
             : this(client, id)
         {
             Server = server;
-            if (server != null && Client.Config.UsePermissionsCache)
-            {
-                foreach (var user in server.Users)
-                    AddUser(user);
-            }
             if (client.Config.UsePermissionsCache)
                 _users = new ConcurrentDictionary<ulong, Member>(2, (int)(server.UserCount * 1.05));
         }
@@ -123,11 +120,7 @@ namespace Discord
             : this(client, id)
         {
             Recipient = recipient;
-            AddUser(client.PrivateUser);
-            AddUser(recipient);
             Type = ChannelType.Text; //Discord doesn't give us a type for private channels
-            if (client.Config.UsePermissionsCache)
-                _users = new ConcurrentDictionary<ulong, Member>(2, 2);
         }
         private Channel(DiscordClient client, ulong id)
         {
@@ -328,7 +321,7 @@ namespace Discord
         public IEnumerable<User> FindUsers(string name, bool exactMatch = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return _users.Select(x => x.Value.User).Find(name, exactMatch: exactMatch);
+            return Users.Find(name, exactMatch: exactMatch);
         }
 
         public Task<Message> SendMessage(string text) => SendMessageInternal(text, false);
@@ -370,8 +363,7 @@ namespace Discord
         #region Permissions
         internal void UpdatePermissions()
         {
-            if (!Client.Config.UsePermissionsCache)
-                return;
+            if (!Client.Config.UsePermissionsCache) return;
 
             foreach (var pair in _users)
             {
@@ -383,8 +375,7 @@ namespace Discord
         }
         internal void UpdatePermissions(User user)
         {
-            if (!Client.Config.UsePermissionsCache)
-                return;
+            if (!Client.Config.UsePermissionsCache) return;
 
             Member member;
             if (_users.TryGetValue(user.Id, out member))
@@ -549,8 +540,7 @@ namespace Discord
         }
         internal void RemoveUser(ulong id)
         {
-            if (!Client.Config.UsePermissionsCache)
-                return;
+            if (!Client.Config.UsePermissionsCache) return;
 
             Member ignored;
             _users.TryRemove(id, out ignored);
@@ -579,10 +569,13 @@ namespace Discord
                 }
                 return null;
             }
-
-            Member result;
-            _users.TryGetValue(id, out result);
-            return result.User;
+            else
+            {
+                Member result;
+                if (_users.TryGetValue(id, out result))
+                    return result.User;
+                return null;
+            }
         }
         #endregion
 

@@ -309,13 +309,20 @@ namespace Discord
         #region Roles
         private void UpdateRoles(IEnumerable<Role> roles)
         {
+            bool updated = false;
             var newRoles = new Dictionary<ulong, Role>();
+
+            var oldRoles = _roles;
             if (roles != null)
             {
                 foreach (var r in roles)
                 {
                     if (r != null)
+                    {
                         newRoles[r.Id] = r;
+                        if (!oldRoles.ContainsKey(r.Id))
+                            updated = true; //Check for adds
+                    }
                 }
             }
 
@@ -324,10 +331,15 @@ namespace Discord
                 var everyone = Server.EveryoneRole;
                 newRoles[everyone.Id] = everyone;
             }
-            _roles = newRoles;
+            if (oldRoles.Count != newRoles.Count)
+                updated = true; //Check for removes
 
-            if (Server != null)
-                Server.UpdatePermissions(this);
+            if (updated)
+            {
+                _roles = newRoles;
+                if (Server != null)
+                    Server.UpdatePermissions(this);
+            }
         }
         public bool HasRole(Role role)
         {

@@ -161,21 +161,21 @@ namespace Discord
         }
         internal void Update(ExtendedGuild model)
         {
+            Update(model as Guild); //Needs channels
             if (model.Channels != null)
             {
                 _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
                 foreach (var subModel in model.Channels)
-                    AddChannel(subModel.Id).Update(subModel);
+                    AddChannel(subModel.Id, false).Update(subModel);
                 DefaultChannel = _channels[Id];
             }
-            Update(model as Guild); //Needs channels
-
             if (model.Members != null)
             {
                 _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
                 foreach (var subModel in model.Members)
-                    AddUser(subModel.User.Id).Update(subModel);
+                    AddUser(subModel.User.Id, false).Update(subModel);
             }
+
             if (model.VoiceStates != null)
             {
                 foreach (var subModel in model.VoiceStates)
@@ -248,9 +248,14 @@ namespace Discord
         #endregion
 
         #region Channels
-        internal Channel AddChannel(ulong id)
+        internal Channel AddChannel(ulong id, bool cachePerms)
         {
             var channel = new Channel(Client, id, this);
+            if (cachePerms && Client.Config.UsePermissionsCache)
+            {
+                foreach (var user in Users)
+                    channel.AddUser(user);
+            }
             Client.AddChannel(channel);
             return _channels.GetOrAdd(id, x => channel);
         }
@@ -287,7 +292,7 @@ namespace Discord
             var request = new CreateChannelRequest(Id) { Name = name, Type = type.Value };
             var response = await Client.ClientAPI.Send(request).ConfigureAwait(false);
 
-            var channel = AddChannel(response.Id);
+            var channel = AddChannel(response.Id, true);
             channel.Update(response);
             return channel;
         }
@@ -439,7 +444,7 @@ namespace Discord
         #endregion
 
         #region Users
-        internal User AddUser(ulong id)
+        internal User AddUser(ulong id, bool cachePerms)
         {
             _userCount++;
             Member member = new Member(new User(Client, id, this), ServerPermissions.None);
@@ -448,11 +453,14 @@ namespace Discord
                 member.User.CurrentGame = Client.CurrentGame;
                 member.User.Status = Client.Status;
             }
-            
+
             if (_users.TryGetOrAdd(id, member, out member))
             {
-                foreach (var channel in _channels)
-                    channel.Value.AddUser(member.User);
+                if (cachePerms && Client.Config.UsePermissionsCache)
+                {
+                    foreach (var channel in _channels)
+                        channel.Value.AddUser(member.User);
+                }
             }
             return member.User;
         }
