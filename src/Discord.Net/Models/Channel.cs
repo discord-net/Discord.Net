@@ -116,6 +116,8 @@ namespace Discord
                 foreach (var user in server.Users)
                     AddUser(user);
             }
+            if (client.Config.UsePermissionsCache)
+                _users = new ConcurrentDictionary<ulong, Member>(2, (int)(server.UserCount * 1.05));
         }
         internal Channel(DiscordClient client, ulong id, User recipient)
             : this(client, id)
@@ -124,6 +126,8 @@ namespace Discord
             AddUser(client.PrivateUser);
             AddUser(recipient);
             Type = ChannelType.Text; //Discord doesn't give us a type for private channels
+            if (client.Config.UsePermissionsCache)
+                _users = new ConcurrentDictionary<ulong, Member>(2, 2);
         }
         private Channel(DiscordClient client, ulong id)
         {
@@ -131,13 +135,6 @@ namespace Discord
             Id = id;
 
             _permissionOverwrites = new Dictionary<ulong, PermissionOverwrite>();
-            if (client.Config.UsePermissionsCache)
-            {
-                if (IsPrivate)
-                    _users = new ConcurrentDictionary<ulong, Member>(2, 2);
-                else
-                    _users = new ConcurrentDictionary<ulong, Member>(2, (int)(Server.UserCount * 1.05));
-            }
             if (client.Config.MessageCacheSize > 0)
                 _messages = new ConcurrentDictionary<ulong, Message>(2, (int)(client.Config.MessageCacheSize * 1.05));
         }
