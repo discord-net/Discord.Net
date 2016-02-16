@@ -161,7 +161,9 @@ namespace Discord
         }
         internal void Update(ExtendedGuild model)
         {
-            Update(model as Guild); //Needs channels
+            Update(model as Guild);
+
+            //Only channels or members should have AddXXX(cachePerms: true), not both
             if (model.Channels != null)
             {
                 _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
@@ -173,7 +175,7 @@ namespace Discord
             {
                 _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
                 foreach (var subModel in model.Members)
-                    AddUser(subModel.User.Id, false).Update(subModel);
+                    AddUser(subModel.User.Id, true).Update(subModel);
             }
 
             if (model.VoiceStates != null)
