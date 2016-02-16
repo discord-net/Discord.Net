@@ -256,6 +256,9 @@
     <Compile Include="..\Discord.Net\API\Client\Rest\DeleteChannel.cs">
       <Link>API\Client\Rest\DeleteChannel.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Rest\DeleteGuild.cs">
+      <Link>API\Client\Rest\DeleteGuild.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\DeleteInvite.cs">
       <Link>API\Client\Rest\DeleteInvite.cs</Link>
     </Compile>

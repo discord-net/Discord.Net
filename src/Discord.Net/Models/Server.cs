@@ -208,17 +208,13 @@ namespace Discord
         /// <summary> Leaves this server. This function will fail if you're the owner - use Delete instead. </summary>
         public async Task Leave()
         {
-            if (_ownerId == CurrentUser.Id)
-                throw new InvalidOperationException("Unable to leave a server you own, use Server.Delete instead");
             try { await Client.ClientAPI.Send(new LeaveGuildRequest(Id)).ConfigureAwait(false); }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
         /// <summary> Deletes this server. This function will fail if you're not the owner - use Leave instead. </summary>
         public async Task Delete()
         {
-            if (_ownerId != CurrentUser.Id)
-                throw new InvalidOperationException("Unable to delete a server you don't own, use Server.Leave instead");
-            try { await Client.ClientAPI.Send(new LeaveGuildRequest(Id)).ConfigureAwait(false); }
+            try { await Client.ClientAPI.Send(new DeleteGuildRequest(Id)).ConfigureAwait(false); }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
 
