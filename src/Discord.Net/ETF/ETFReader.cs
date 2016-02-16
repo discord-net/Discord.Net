@@ -12,7 +12,7 @@ namespace Discord.ETF
 {
     public class ETFReader : IDisposable
     {
-        private static readonly ConcurrentDictionary<Type, Delegate> _deserializers;
+        private static readonly ConcurrentDictionary<Type, Delegate> _deserializers = new ConcurrentDictionary<Type, Delegate>();
         private static readonly Dictionary<Type, MethodInfo> _readMethods = GetPrimitiveReadMethods();
 
         private readonly Stream _stream;
