@@ -107,24 +107,10 @@ namespace Discord.ETF
             ETFType type = (ETFType)_buffer[0];
             return (sbyte)ReadLongInternal(type);
         }
-        public int? ReadNullableSByte()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
-            return (sbyte)ReadLongInternal(type);
-        }
         public uint ReadByte()
         {
             _stream.Read(_buffer, 0, 1);
             ETFType type = (ETFType)_buffer[0];
-            return (byte)ReadLongInternal(type);
-        }
-        public uint? ReadNullableByte()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return (byte)ReadLongInternal(type);
         }
         public int ReadShort()
@@ -133,24 +119,10 @@ namespace Discord.ETF
             ETFType type = (ETFType)_buffer[0];
             return (short)ReadLongInternal(type);
         }
-        public int? ReadNullableShort()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
-            return (short)ReadLongInternal(type);
-        }
         public uint ReadUShort()
         {
             _stream.Read(_buffer, 0, 1);
             ETFType type = (ETFType)_buffer[0];
-            return (ushort)ReadLongInternal(type);
-        }
-        public uint? ReadNullableUShort()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return (ushort)ReadLongInternal(type);
         }
         public int ReadInt()
@@ -159,24 +131,10 @@ namespace Discord.ETF
             ETFType type = (ETFType)_buffer[0];
             return (int)ReadLongInternal(type);
         }
-        public int? ReadNullableInt()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
-            return (int)ReadLongInternal(type);
-        }
         public uint ReadUInt()
         {
             _stream.Read(_buffer, 0, 1);
             ETFType type = (ETFType)_buffer[0];
-            return (uint)ReadLongInternal(type);
-        }
-        public uint? ReadNullableUInt()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return (uint)ReadLongInternal(type);
         }
         public long ReadLong()
@@ -185,24 +143,10 @@ namespace Discord.ETF
             ETFType type = (ETFType)_buffer[0];
             return ReadLongInternal(type);
         }
-        public long? ReadNullableLong()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
-            return ReadLongInternal(type);
-        }
         public ulong ReadULong()
         {
             _stream.Read(_buffer, 0, 1);
             ETFType type = (ETFType)_buffer[0];
-            return (ulong)ReadLongInternal(type);
-        }
-        public ulong? ReadNullableULong()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return (ulong)ReadLongInternal(type);
         }
         public long ReadLongInternal(ETFType type)
@@ -239,6 +183,73 @@ namespace Discord.ETF
             ETFType type = (ETFType)_buffer[0];
             return (float)ReadDoubleInternal(type);
         }
+        public double ReadDouble()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            return ReadDoubleInternal(type);
+        }
+        public double ReadDoubleInternal(ETFType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int? ReadNullableSByte()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (sbyte)ReadLongInternal(type);
+        }
+        public uint? ReadNullableByte()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (byte)ReadLongInternal(type);
+        }
+        public int? ReadNullableShort()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (short)ReadLongInternal(type);
+        }
+        public uint? ReadNullableUShort()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (ushort)ReadLongInternal(type);
+        }
+        public int? ReadNullableInt()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (int)ReadLongInternal(type);
+        }
+        public uint? ReadNullableUInt()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (uint)ReadLongInternal(type);
+        }
+        public long? ReadNullableLong()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return ReadLongInternal(type);
+        }
+        public ulong? ReadNullableULong()
+        {
+            _stream.Read(_buffer, 0, 1);
+            ETFType type = (ETFType)_buffer[0];
+            if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
+            return (ulong)ReadLongInternal(type);
+        }
         public float? ReadNullableSingle()
         {
             _stream.Read(_buffer, 0, 1);
@@ -246,22 +257,12 @@ namespace Discord.ETF
             if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return (float)ReadDoubleInternal(type);
         }
-        public double ReadDouble()
-        {
-            _stream.Read(_buffer, 0, 1);
-            ETFType type = (ETFType)_buffer[0];
-            return ReadDoubleInternal(type);
-        }
         public double? ReadNullableDouble()
         {
             _stream.Read(_buffer, 0, 1);
             ETFType type = (ETFType)_buffer[0];
             if (type == ETFType.SMALL_ATOM_EXT && ReadNil()) return null;
             return ReadDoubleInternal(type);
-        }
-        public double ReadDoubleInternal(ETFType type)
-        {
-            throw new NotImplementedException();
         }
 
         public string ReadString()
