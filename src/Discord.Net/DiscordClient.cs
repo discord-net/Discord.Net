@@ -32,6 +32,7 @@ namespace Discord
         private ConcurrentDictionary<ulong, Channel> _channels;
         private ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
+        private Stopwatch _connectionStopwatch;
 
         internal Logger Logger { get; }
 
@@ -109,6 +110,8 @@ namespace Discord
             //Logging
             Log = new LogManager(this);
             Logger = Log.CreateLogger("Discord");
+            if (config.LogLevel >= LogSeverity.Verbose)
+                _connectionStopwatch = new Stopwatch();
 
             //Async
             _taskManager = new TaskManager(Cleanup);
@@ -143,11 +146,7 @@ namespace Discord
             ClientAPI = new JsonRestClient(Config, DiscordConfig.ClientAPIUrl, Log.CreateLogger("ClientAPI"));
             StatusAPI = new JsonRestClient(Config, DiscordConfig.StatusAPIUrl, Log.CreateLogger("StatusAPI"));
             GatewaySocket = new GatewaySocket(Config, Serializer, Log.CreateLogger("Gateway"));
-            GatewaySocket.Connected += (s, e) =>
-            {
-                if (State == ConnectionState.Connecting)
-                    EndConnect();
-            };
+
             //GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
             
@@ -186,7 +185,10 @@ namespace Discord
 
                     Stopwatch stopwatch = null;
                     if (Config.LogLevel >= LogSeverity.Verbose)
+                    {
+                        _connectionStopwatch.Restart();
                         stopwatch = Stopwatch.StartNew();
+                    }
                     State = ConnectionState.Connecting;
                     _disconnectedEvent.Reset();
 
@@ -208,7 +210,7 @@ namespace Discord
                     {
                         stopwatch.Stop();
                         double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
-                        Logger.Verbose($"Connection took {seconds} sec");
+                        Logger.Verbose($"Handshake + Ready took {seconds} sec");
                     }
                 }
             }
@@ -253,11 +255,21 @@ namespace Discord
         }
         private void EndConnect()
         {
-            State = ConnectionState.Connected;
-            _connectedEvent.Set();
+            if (State == ConnectionState.Connecting)
+            {
+                State = ConnectionState.Connected;
+                _connectedEvent.Set();
 
-            SendStatus();
-            OnLoggedIn();
+                if (Config.LogLevel >= LogSeverity.Verbose)
+                {
+                    _connectionStopwatch.Stop();
+                    double seconds = Math.Round(_connectionStopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
+                    Logger.Verbose($"Connection took {seconds} sec");
+                }
+
+                SendStatus();
+                OnLoggedIn();
+            }
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -472,9 +484,6 @@ namespace Discord
                     //Global
                     case "READY":
                         {
-                            Stopwatch stopwatch = null;
-                            if (Config.LogLevel >= LogSeverity.Verbose)
-                                stopwatch = Stopwatch.StartNew();
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
 
                             int channelCount = 0;
@@ -512,13 +521,8 @@ namespace Discord
                             }
                             if (largeServers.Count > 0)
                                 GatewaySocket.SendRequestMembers(largeServers, "", 0);
-
-                            if (Config.LogLevel >= LogSeverity.Verbose)
-                            {
-                                stopwatch.Stop();
-                                double seconds = Math.Round(stopwatch.ElapsedTicks / (double)TimeSpan.TicksPerSecond, 2);
-                                Logger.Verbose($"READY took {seconds} sec");
-                            }
+                            else
+                                EndConnect();
                         }
                         break;
 
@@ -532,9 +536,9 @@ namespace Discord
                                 server.Update(data);
                                 
                                 if (data.Unavailable != false)
-                                    Logger.Debug($"GUILD_CREATE: {server.Path}");
+                                    Logger.Info($"GUILD_CREATE: {server.Path}");
                                 else
-                                    Logger.Debug($"GUILD_AVAILABLE: {server.Path}");
+                                    Logger.Info($"GUILD_AVAILABLE: {server.Path}");
 
                                 if (data.Unavailable != false)
                                     OnJoinedServer(server);
@@ -550,7 +554,7 @@ namespace Discord
                             {
                                 var before = Config.EnablePreUpdateEvents ? server.Clone() : null;
                                 server.Update(data);
-                                Logger.Debug($"GUILD_UPDATE: {server.Path}");
+                                Logger.Info($"GUILD_UPDATE: {server.Path}");
                                 OnServerUpdated(before, server);
                             }
                             else
@@ -564,9 +568,9 @@ namespace Discord
                             if (server != null)
                             {
                                 if (data.Unavailable != true)
-                                    Logger.Debug($"GUILD_DELETE: {server.Path}");
+                                    Logger.Info($"GUILD_DELETE: {server.Path}");
                                 else
-                                    Logger.Debug($"GUILD_UNAVAILABLE: {server.Path}");
+                                    Logger.Info($"GUILD_UNAVAILABLE: {server.Path}");
 
                                 OnServerUnavailable(server);
                                 if (data.Unavailable != true)
@@ -596,7 +600,7 @@ namespace Discord
                             if (channel != null)
                             {
                                 channel.Update(data);
-                                Logger.Debug($"CHANNEL_CREATE: {channel.Path}");
+                                Logger.Info($"CHANNEL_CREATE: {channel.Path}");
                                 OnChannelCreated(channel);
                             }
                         }
@@ -609,7 +613,7 @@ namespace Discord
                             {
                                 var before = Config.EnablePreUpdateEvents ? channel.Clone() : null;
                                 channel.Update(data);
-                                Logger.Debug($"CHANNEL_UPDATE: {channel.Path}");
+                                Logger.Info($"CHANNEL_UPDATE: {channel.Path}");
                                 OnChannelUpdated(before, channel);
                             }
                             else
@@ -622,7 +626,7 @@ namespace Discord
                             var channel = RemoveChannel(data.Id);
                             if (channel != null)
                             {
-                                Logger.Debug($"CHANNEL_DELETE: {channel.Path}");
+                                Logger.Info($"CHANNEL_DELETE: {channel.Path}");
                                 OnChannelDestroyed(channel);
                             }
                             else
@@ -637,10 +641,10 @@ namespace Discord
                             var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
-                                var user = server.AddUser(data.User.Id, true);
+                                var user = server.AddUser(data.User.Id, true, true);
                                 user.Update(data);
                                 user.UpdateActivity();
-                                Logger.Debug($"GUILD_MEMBER_ADD: {user.Path}");
+                                Logger.Info($"GUILD_MEMBER_ADD: {user.Path}");
                                 OnUserJoined(user);
                             }
                             else
@@ -658,7 +662,7 @@ namespace Discord
                                 {
                                     var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
-                                    Logger.Debug($"GUILD_MEMBER_UPDATE: {user.Path}");
+                                    Logger.Info($"GUILD_MEMBER_UPDATE: {user.Path}");
                                     OnUserUpdated(before, user);
                                 }
                                 else
@@ -677,7 +681,7 @@ namespace Discord
                                 var user = server.RemoveUser(data.User.Id);
                                 if (user != null)
                                 {
-                                    Logger.Debug($"GUILD_MEMBER_REMOVE: {user.Path}");
+                                    Logger.Info($"GUILD_MEMBER_REMOVE: {user.Path}");
                                     OnUserLeft(user);
                                 }
                                 else
@@ -695,11 +699,23 @@ namespace Discord
                             {
                                 foreach (var memberData in data.Members)
                                 {
-                                    var user = server.AddUser(memberData.User.Id, true);
+                                    var user = server.AddUser(memberData.User.Id, true, false);
                                     user.Update(memberData);
                                     //OnUserAdded(user);
                                 }
-                                Logger.Debug($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
+                                Logger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
+
+                                if (server.CurrentUserCount >= server.UserCount) //Finished downloading for there
+                                {
+                                    bool isConnectComplete = true;
+                                    foreach (var server2 in _servers.Select(x => x.Value))
+                                    {
+                                        if (server2.CurrentUserCount < server2.UserCount)
+                                            isConnectComplete = false;
+                                    }
+                                    if (isConnectComplete)
+                                        EndConnect();
+                                }
                             }
                             else
                                 Logger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
@@ -715,7 +731,7 @@ namespace Discord
                             {
                                 var role = server.AddRole(data.Data.Id);
                                 role.Update(data.Data, false);
-                                Logger.Debug($"GUILD_ROLE_CREATE: {role.Path}");
+                                Logger.Info($"GUILD_ROLE_CREATE: {role.Path}");
                                 OnRoleCreated(role);
                             }
                             else
@@ -733,7 +749,7 @@ namespace Discord
                                 {
                                     var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
                                     role.Update(data.Data, true);
-                                    Logger.Debug($"GUILD_ROLE_UPDATE: {role.Path}");
+                                    Logger.Info($"GUILD_ROLE_UPDATE: {role.Path}");
                                     OnRoleUpdated(before, role);
                                 }
                                 else
@@ -752,7 +768,7 @@ namespace Discord
                                 var role = server.RemoveRole(data.RoleId);
                                 if (role != null)
                                 {
-                                    Logger.Debug($"GUILD_ROLE_DELETE: {role.Path}");
+                                    Logger.Info($"GUILD_ROLE_DELETE: {role.Path}");
                                     OnRoleDeleted(role);
                                 }
                                 else
@@ -773,7 +789,7 @@ namespace Discord
                                 var user = server.GetUser(data.User.Id);
                                 if (user != null)
                                 {
-                                    Logger.Debug($"GUILD_BAN_ADD: {user.Path}");
+                                    Logger.Info($"GUILD_BAN_ADD: {user.Path}");
                                     OnUserBanned(user);
                                 }
                                 else
@@ -791,7 +807,7 @@ namespace Discord
                             {
                                 var user = new User(this, data.User.Id, server);
                                 user.Update(data.User);
-                                Logger.Debug($"GUILD_BAN_REMOVE: {user.Path}");
+                                Logger.Info($"GUILD_BAN_REMOVE: {user.Path}");
                                 OnUserUnbanned(user);
                             }
                             else
@@ -837,7 +853,7 @@ namespace Discord
                                     msg.Update(data);
                                     user.UpdateActivity();
                                     
-                                    Logger.Debug($"MESSAGE_CREATE: {channel.Path} ({user.Name ?? "Unknown"})");
+                                    Logger.Verbose($"MESSAGE_CREATE: {channel.Path} ({user.Name ?? "Unknown"})");
                                     OnMessageReceived(msg);
                                 }
                                 else
@@ -856,7 +872,7 @@ namespace Discord
                                 var msg = channel.GetMessage(data.Id, data.Author?.Id);
                                 var before = Config.EnablePreUpdateEvents ? msg.Clone() : null;
                                 msg.Update(data);
-                                Logger.Debug($"MESSAGE_UPDATE: {channel.Path} ({data.Author?.Username ?? "Unknown"})");
+                                Logger.Verbose($"MESSAGE_UPDATE: {channel.Path} ({data.Author?.Username ?? "Unknown"})");
                                 OnMessageUpdated(before, msg);
                             }
                             else
@@ -870,7 +886,7 @@ namespace Discord
                             if (channel != null)
                             {
                                 var msg = channel.RemoveMessage(data.Id);
-                                Logger.Debug($"MESSAGE_DELETE: {channel.Path} ({msg.User?.Name ?? "Unknown"})");
+                                Logger.Verbose($"MESSAGE_DELETE: {channel.Path} ({msg.User?.Name ?? "Unknown"})");
                                 OnMessageDeleted(msg);
                             }
                             else
@@ -903,7 +919,8 @@ namespace Discord
 
                             if (user != null)
                             {
-                                Logger.Debug($"PRESENCE_UPDATE: {user.Path}");
+                                /*if (Config.LogLevel == LogSeverity.Debug)
+                                    Logger.Debug($"PRESENCE_UPDATE: {user.Path}");*/
                                 var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                 user.Update(data);
                                 OnUserUpdated(before, user);
@@ -930,7 +947,8 @@ namespace Discord
                                     user = channel.Server.GetUser(data.UserId);
                                 if (user != null)
                                 {
-                                    Logger.Debug($"TYPING_START: {channel.Path} ({user.Name})");
+                                    /*if (Config.LogLevel == LogSeverity.Debug)
+                                        Logger.Debug($"TYPING_START: {channel.Path} ({user.Name})");*/
                                     OnUserIsTypingUpdated(channel, user);
                                     user.UpdateActivity();
                                 }
@@ -950,7 +968,8 @@ namespace Discord
                                 var user = server.GetUser(data.UserId);
                                 if (user != null)
                                 {
-                                    Logger.Debug($"VOICE_STATE_UPDATE: {user.Path}");
+                                    /*if (Config.LogLevel == LogSeverity.Debug)
+                                        Logger.Debug($"VOICE_STATE_UPDATE: {user.Path}");*/
                                     var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
@@ -975,7 +994,7 @@ namespace Discord
                                 PrivateUser.Update(data);
                                 foreach (var server in _servers)
                                     server.Value.CurrentUser.Update(data);
-                                Logger.Debug($"USER_UPDATE");
+                                Logger.Info($"USER_UPDATE");
                                 OnProfileUpdated(before, CurrentUser);
                             }
                         }

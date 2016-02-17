@@ -107,10 +107,12 @@ namespace Discord
 
         /// <summary> Gets the number of channels in this server. </summary>
         public int ChannelCount => _channels.Count;
+        /// <summary> Gets the number of users downloaded for this server so far. </summary>
+        internal int CurrentUserCount => _users.Count;
         /// <summary> Gets the number of users in this server. </summary>
         public int UserCount => _userCount;
         /// <summary> Gets the number of roles in this server. </summary>
-        public int RoleCount => _channels.Count;
+        public int RoleCount => _roles.Count;
 
         internal Server(DiscordClient client, ulong id)
         {
@@ -175,7 +177,7 @@ namespace Discord
             {
                 _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
                 foreach (var subModel in model.Members)
-                    AddUser(subModel.User.Id, true).Update(subModel);
+                    AddUser(subModel.User.Id, true, true).Update(subModel);
             }
 
             if (model.VoiceStates != null)
@@ -446,9 +448,10 @@ namespace Discord
         #endregion
 
         #region Users
-        internal User AddUser(ulong id, bool cachePerms)
+        internal User AddUser(ulong id, bool cachePerms, bool incrementCount)
         {
-            _userCount++;
+            if  (incrementCount)
+                _userCount++;
             Member member = new Member(new User(Client, id, this), ServerPermissions.None);
             if (id == Client.CurrentUser.Id)
             {
