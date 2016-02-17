@@ -268,7 +268,7 @@ namespace Discord
                 }
 
                 SendStatus();
-                OnLoggedIn();
+                OnReady();
             }
         }
 
@@ -484,6 +484,8 @@ namespace Discord
                     //Global
                     case "READY":
                         {
+                            //TODO: None of this is really threadsafe - should only replace the cache collections when they have been fully populated
+
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
 
                             int channelCount = 0;
