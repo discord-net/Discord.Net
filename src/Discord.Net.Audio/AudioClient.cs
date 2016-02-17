@@ -70,7 +70,6 @@ namespace Discord.Audio
         public AudioClient(DiscordClient client, Server server, int id)
 		{
             Id = id;
-            _config = client.Config;
             Service = client.GetService<AudioService>();
             Config = Service.Config;
             Serializer = client.Serializer;
@@ -87,6 +86,25 @@ namespace Discord.Audio
             //Networking
             if (Config.EnableMultiserver)
             {
+                //TODO: We can remove this hack when official API launches
+                var baseConfig = client.Config;
+                var builder = new DiscordConfigBuilder
+                {
+                    AppName = baseConfig.AppName,
+                    AppUrl = baseConfig.AppUrl,
+                    AppVersion = baseConfig.AppVersion,
+                    CacheToken = baseConfig.CacheDir != null,
+                    ConnectionTimeout = baseConfig.ConnectionTimeout,
+                    EnablePreUpdateEvents = false,
+                    FailedReconnectDelay = baseConfig.FailedReconnectDelay,
+                    LargeThreshold = 1,
+                    LogLevel = baseConfig.LogLevel,
+                    MessageCacheSize = 0,
+                    ReconnectDelay = baseConfig.ReconnectDelay,
+                    UsePermissionsCache = false
+                };
+                _config = builder.Build();
+
                 ClientAPI = new JsonRestClient(_config, DiscordConfig.ClientAPIUrl, client.Log.CreateLogger($"ClientAPI #{id}"));
                 GatewaySocket = new GatewaySocket(_config, client.Serializer, client.Log.CreateLogger($"Gateway #{id}"));
                 GatewaySocket.Connected += (s, e) =>
@@ -96,7 +114,10 @@ namespace Discord.Audio
                 };
             }
             else
+            {
+                _config = client.Config;
                 GatewaySocket = client.GatewaySocket;
+            }
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
             VoiceSocket = new VoiceSocket(_config, Config, client.Serializer, client.Log.CreateLogger($"Voice #{id}"));
             VoiceSocket.Server = server;
