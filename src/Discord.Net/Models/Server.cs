@@ -173,25 +173,30 @@ namespace Discord
                     AddChannel(subModel.Id, false).Update(subModel);
                 DefaultChannel = _channels[Id];
             }
-            if (model.Members != null)
-            {
-                _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.Members.Length * 1.05));
-                foreach (var subModel in model.Members)
-                    AddUser(subModel.User.Id, true, true).Update(subModel);
-            }
-
-            if (model.VoiceStates != null)
-            {
-                foreach (var subModel in model.VoiceStates)
-                    GetUser(subModel.UserId)?.Update(subModel);
-            }
-            if (model.Presences != null)
-            {
-                foreach (var subModel in model.Presences)
-                    GetUser(subModel.User.Id)?.Update(subModel);
-            }
             if (model.MemberCount != null)
+            {
+                if (_users == null)
+                    _users = new ConcurrentDictionary<ulong, Member>(2, (int)(model.MemberCount * 1.05));
                 _userCount = model.MemberCount.Value;
+            }
+            if (!model.IsLarge)
+            {
+                if (model.Members != null)
+                {
+                    foreach (var subModel in model.Members)
+                        AddUser(subModel.User.Id, true, false).Update(subModel);
+                }
+                if (model.VoiceStates != null)
+                {
+                    foreach (var subModel in model.VoiceStates)
+                        GetUser(subModel.UserId)?.Update(subModel);
+                }
+                if (model.Presences != null)
+                {
+                    foreach (var subModel in model.Presences)
+                        GetUser(subModel.User.Id)?.Update(subModel);
+                }
+            }
         }
         
         /// <summary> Edits this server, changing only non-null attributes. </summary>
@@ -450,17 +455,20 @@ namespace Discord
         #region Users
         internal User AddUser(ulong id, bool cachePerms, bool incrementCount)
         {
-            if  (incrementCount)
+            if (incrementCount)
                 _userCount++;
-            Member member = new Member(new User(Client, id, this), ServerPermissions.None);
-            if (id == Client.CurrentUser.Id)
-            {
-                member.User.CurrentGame = Client.CurrentGame;
-                member.User.Status = Client.Status;
-            }
 
-            if (_users.TryGetOrAdd(id, member, out member))
+            Member member;
+            if (!_users.TryGetValue(id, out member)) //Users can only be added from websocket thread, ignore threadsafety
             {
+                member = new Member(new User(Client, id, this), ServerPermissions.None);
+                if (id == Client.CurrentUser.Id)
+                {
+                    member.User.CurrentGame = Client.CurrentGame;
+                    member.User.Status = Client.Status;
+                }
+
+                _users[id] = member;
                 if (cachePerms && Client.Config.UsePermissionsCache)
                 {
                     foreach (var channel in _channels)

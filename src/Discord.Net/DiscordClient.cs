@@ -701,7 +701,6 @@ namespace Discord
                                 {
                                     var user = server.AddUser(memberData.User.Id, true, false);
                                     user.Update(memberData);
-                                    //OnUserAdded(user);
                                 }
                                 Logger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
 
