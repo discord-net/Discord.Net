@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"users/@me/guilds/{GuildId}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
 

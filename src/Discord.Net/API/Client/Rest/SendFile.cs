@@ -9,7 +9,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
         string IRestFileRequest.Filename => Filename;
         Stream IRestFileRequest.Stream => Stream;
 

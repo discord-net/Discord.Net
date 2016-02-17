@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => Email != null ? "POST" : "GET";
         string IRestRequest.Endpoint => $"auth/login";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
 		public string Email { get; set; }

@@ -8,6 +8,5 @@ namespace Discord.API.Status.Rest
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"scheduled-maintenances/upcoming.json";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
     }
 }

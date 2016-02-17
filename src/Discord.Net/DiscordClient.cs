@@ -920,8 +920,8 @@ namespace Discord
 
                             if (user != null)
                             {
-                                /*if (Config.LogLevel == LogSeverity.Debug)
-                                    Logger.Debug($"PRESENCE_UPDATE: {user.Path}");*/
+                                if (Config.LogLevel == LogSeverity.Debug)
+                                    Logger.Debug($"PRESENCE_UPDATE: {user.Path}");
                                 var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                 user.Update(data);
                                 OnUserUpdated(before, user);
@@ -948,8 +948,8 @@ namespace Discord
                                     user = channel.Server.GetUser(data.UserId);
                                 if (user != null)
                                 {
-                                    /*if (Config.LogLevel == LogSeverity.Debug)
-                                        Logger.Debug($"TYPING_START: {channel.Path} ({user.Name})");*/
+                                    if (Config.LogLevel == LogSeverity.Debug)
+                                        Logger.Debug($"TYPING_START: {channel.Path} ({user.Name})");
                                     OnUserIsTypingUpdated(channel, user);
                                     user.UpdateActivity();
                                 }
@@ -969,8 +969,8 @@ namespace Discord
                                 var user = server.GetUser(data.UserId);
                                 if (user != null)
                                 {
-                                    /*if (Config.LogLevel == LogSeverity.Debug)
-                                        Logger.Debug($"VOICE_STATE_UPDATE: {user.Path}");*/
+                                    if (Config.LogLevel == LogSeverity.Debug)
+                                        Logger.Debug($"VOICE_STATE_UPDATE: {user.Path}");
                                     var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");

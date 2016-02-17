@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"guilds";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         [JsonProperty("name")]
         public string Name { get; set; }

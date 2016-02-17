@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"invite/{InviteCode}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public string InviteCode { get; set; }
 

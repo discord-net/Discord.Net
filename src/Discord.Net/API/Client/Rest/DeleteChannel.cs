@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "DELETE";
         string IRestRequest.Endpoint => $"channels/{ChannelId}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong ChannelId { get; set; }
 

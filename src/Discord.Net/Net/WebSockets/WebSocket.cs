@@ -138,15 +138,11 @@ namespace Discord.Net.WebSockets
 
 		protected virtual Task ProcessMessage(string json)
 		{
-			if (Logger.Level >= LogSeverity.Debug)
-                Logger.Debug( $"In: {json}");
 			return TaskHelper.CompletedTask;
 		}		
 		protected void QueueMessage(IWebSocketMessage message)
 		{
 			string json = JsonConvert.SerializeObject(new WebSocketMessage(message));
-			if (Logger.Level >= LogSeverity.Debug)
-                Logger.Debug( $"Out: {json}");
 			_engine.QueueMessage(json);
 		}
 

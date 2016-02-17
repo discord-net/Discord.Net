@@ -17,7 +17,6 @@ namespace Discord.API.Client.Rest
                 return RoleIds.Select(x => new Role(x, pos++));
             }
         }
-        bool IRestRequest.IsPrivate => false;
 
         public class Role
         {
