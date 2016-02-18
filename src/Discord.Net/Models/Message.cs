@@ -81,6 +81,7 @@ namespace Discord
 			}));
 		}*/
         
+        //TODO: Move this somewhere
         private static string Resolve(Channel channel, string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
