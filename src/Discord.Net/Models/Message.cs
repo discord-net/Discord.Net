@@ -177,7 +177,7 @@ namespace Discord
         public User User { get; }
 
         /// <summary> Returns true if the message was sent as text-to-speech by someone with permissions to do so. </summary>
-        public bool IsTTS { get; private set; }
+        public bool IsTTS { get; internal set; }
 		/// <summary> Returns the state of this message. Only useful if UseMessageQueue is true. </summary>
 		public MessageState State { get; internal set; }
 		/// <summary> Returns the raw content of this message as it was received from the server. </summary>

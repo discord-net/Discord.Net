@@ -55,6 +55,7 @@ namespace Discord.Net
         internal Message QueueSend(Channel channel, string text, bool isTTS)
         {
             Message msg = new Message(0, channel, channel.IsPrivate ? channel.Client.PrivateUser : channel.Server.CurrentUser);
+            msg.IsTTS = isTTS;
             msg.RawText = text;
             msg.Text = msg.Resolve(text);
             msg.Nonce = GenerateNonce();
