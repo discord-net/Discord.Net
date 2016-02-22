@@ -236,7 +236,7 @@ namespace Discord.Net
         private void DecrementCount()
         {
             int count = Interlocked.Decrement(ref _count);
-            if (count < WarningStart) //Reset once the problem is solved
+            if (count < (WarningStart / 2)) //Reset once the problem is solved
                 _nextWarning = WarningStart;
         }
 
