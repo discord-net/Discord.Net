@@ -33,11 +33,16 @@ namespace Discord.Net
         private readonly ConcurrentQueue<MessageEdit> _pendingEdits;
         private readonly ConcurrentQueue<Message> _pendingDeletes;
         private readonly ConcurrentDictionary<int, string> _pendingSendsByNonce;
-        private int _nextWarning;
-        private int _count;
+        private int _count, _nextWarning;
 
         /// <summary> Gets the current number of queued actions. </summary>
         public int Count => _count;
+        /// <summary> Gets the current number of queued sends. </summary>
+        public int SendCount => _pendingSends.Count;
+        /// <summary> Gets the current number of queued edits. </summary>
+        public int EditCount => _pendingEdits.Count;
+        /// <summary> Gets the current number of queued deletes. </summary>
+        public int DeleteCount => _pendingDeletes.Count;
 
         internal MessageQueue(RestClient rest, Logger logger)
         {
@@ -218,8 +223,12 @@ namespace Discord.Net
             int count = Interlocked.Increment(ref _count);
             if (count >= _nextWarning)
             {
-                _nextWarning *= 2;
-                _logger.Warning($"Queue is backed up, currently at {count} actions.");
+                _nextWarning <<= 1;
+                int sendCount = _pendingSends.Count;
+                int editCount = _pendingEdits.Count;
+                int deleteCount = _pendingDeletes.Count;
+                count = sendCount + editCount + deleteCount; //May not add up due to async
+                _logger.Warning($"Queue is backed up, currently at {count} actions ({sendCount} sends, {editCount} edits, {deleteCount} deletes).");
             }
             else if (count < WarningStart) //Reset once the problem is solved
                 _nextWarning = WarningStart;
