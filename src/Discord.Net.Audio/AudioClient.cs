@@ -230,7 +230,7 @@ namespace Discord.Audio
 
             SendVoiceUpdate(channel.Server.Id, channel.Id);
             using (await _connectionLock.LockAsync().ConfigureAwait(false))
-                await Task.Run(() => VoiceSocket.WaitForConnection(CancelToken));
+                await Task.Run(() => VoiceSocket.WaitForConnection(CancelToken)).ConfigureAwait(false);
         }
 
         private async void OnReceivedEvent(WebSocketEventEventArgs e)

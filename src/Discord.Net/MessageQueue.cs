@@ -144,7 +144,7 @@ namespace Discord.Net
                                 }
                             }
                         }
-                        await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
+                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -178,7 +178,7 @@ namespace Discord.Net
                                 }
                             }
                         }
-                        await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
+                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
@@ -211,7 +211,7 @@ namespace Discord.Net
                             }
                         }
 
-                        await Task.Delay((int)Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
+                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
