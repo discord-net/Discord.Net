@@ -97,6 +97,8 @@ namespace Discord
             RawValue = value;
         }
         public ServerPermissions(uint rawValue) { RawValue = rawValue; }
+
+        public override string ToString() => Convert.ToString(RawValue, 2);
     }
 
     public struct ChannelPermissions
@@ -105,13 +107,15 @@ namespace Discord
         public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
         public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
         public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
-        public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
-        public static ChannelPermissions All(ChannelType channelType, bool isPrivate)
+        public static ChannelPermissions All(ChannelType channelType)
         {
-            if (isPrivate) return PrivateOnly;
-            else if (channelType == ChannelType.Text) return TextOnly;
-            else if (channelType == ChannelType.Voice) return VoiceOnly;
-            else return None;
+            switch (channelType)
+            {
+                case ChannelType.Text: return TextOnly;
+                case ChannelType.Voice: return VoiceOnly;
+                case ChannelType.Private: return PrivateOnly;
+                default: return None;
+            }
         }
 
         public uint RawValue { get; }
@@ -191,11 +195,13 @@ namespace Discord
             RawValue = value;
         }
         public ChannelPermissions(uint rawValue) { RawValue = rawValue; }
+
+        public override string ToString() => Convert.ToString(RawValue, 2);
     }
 
-    public struct ChannelPermissionOverrides
+    public struct ChannelTriStatePermissions
     {
-        public static ChannelPermissionOverrides InheritAll { get; } = new ChannelPermissionOverrides();
+        public static ChannelTriStatePermissions InheritAll { get; } = new ChannelTriStatePermissions();
 
         public uint AllowValue { get; }
         public uint DenyValue { get; }
@@ -236,16 +242,16 @@ namespace Discord
         /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
         public PermValue UseVoiceActivation => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.UseVoiceActivation);
 
-        public ChannelPermissionOverrides(PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+        public ChannelTriStatePermissions(PermValue? createInstantInvite = null, PermValue? managePermissions = null,
             PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
             PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
             PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
             PermValue? moveMembers = null, PermValue? useVoiceActivation = null)
-            : this(new ChannelPermissionOverrides(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
+            : this(new ChannelTriStatePermissions(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
                   manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation)
         {
         }
-        public ChannelPermissionOverrides(ChannelPermissionOverrides basePerms, PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+        public ChannelTriStatePermissions(ChannelTriStatePermissions basePerms, PermValue? createInstantInvite = null, PermValue? managePermissions = null,
             PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
             PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
             PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
@@ -274,11 +280,13 @@ namespace Discord
             AllowValue = allow;
             DenyValue = deny;
         }
-        public ChannelPermissionOverrides(uint allow = 0, uint deny = 0)
+        public ChannelTriStatePermissions(uint allow = 0, uint deny = 0)
         {
             AllowValue = allow;
             DenyValue = deny;
         }
+
+        public override string ToString() => $"Allow: {Convert.ToString(AllowValue, 2)}, Deny: {Convert.ToString(DenyValue, 2)}";
     }
     internal static class PermissionsHelper
     {

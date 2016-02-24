@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0-rc3",
+  "version": "1.0.0-alpha1",
   "description": "A Discord.Net extension adding basic plugin support.",
   "authors": [ "RogueException" ],
   "tags": [ "discord", "discordapp" ],
@@ -16,8 +16,8 @@
   },
 
   "dependencies": {
-    "Discord.Net": "0.9.0-rc3-3",
-    "Discord.Net.Commands": "0.9.0-rc3-1"
+    "Discord.Net": "1.0.0-alpha1",
+    "Discord.Net.Commands": "1.0.0-alpha1"
   },
   "frameworks": {
     "net45": { },

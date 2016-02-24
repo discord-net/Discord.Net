@@ -29,5 +29,7 @@ namespace Discord.API.Client
         public PermissionOverwrite[] PermissionOverwrites { get; set; }
         [JsonProperty("recipient")]
         public UserReference Recipient { get; set; }
+        [JsonProperty("bitrate")]
+        public int Bitrate { get; set; }
     }
 }

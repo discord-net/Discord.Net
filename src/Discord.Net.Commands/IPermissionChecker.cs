@@ -2,6 +2,6 @@
 {
     public interface IPermissionChecker
     {
-		bool CanRun(Command command, User user, Channel channel, out string error);
+		bool CanRun(Command command, User user, ITextChannel channel, out string error);
     }
 }

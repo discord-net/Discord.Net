@@ -25,7 +25,7 @@ namespace Discord
         public event EventHandler<ServerUpdatedEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
         public event EventHandler<UserEventArgs> UserBanned = delegate { };
-        public event EventHandler<ChannelUserEventArgs> UserIsTyping = delegate { };
+        public event EventHandler<TypingEventArgs> UserIsTyping = delegate { };
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
         public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };
@@ -36,11 +36,11 @@ namespace Discord
         /*private void OnLoggedOut(bool wasUnexpected, Exception ex)
             => OnEvent(LoggedOut, new DisconnectedEventArgs(wasUnexpected, ex));*/
 
-        private void OnChannelCreated(Channel channel)
+        private void OnChannelCreated(IChannel channel)
             => OnEvent(ChannelCreated, new ChannelEventArgs(channel));
-        private void OnChannelDestroyed(Channel channel)
+        private void OnChannelDestroyed(IChannel channel)
             => OnEvent(ChannelDestroyed, new ChannelEventArgs(channel));
-        private void OnChannelUpdated(Channel before, Channel after)
+        private void OnChannelUpdated(IChannel before, IChannel after)
             => OnEvent(ChannelUpdated, new ChannelUpdatedEventArgs(before, after));
         
         private void OnMessageAcknowledged(Message msg)
@@ -77,8 +77,8 @@ namespace Discord
 
         private void OnUserBanned(User user)
             => OnEvent(UserBanned, new UserEventArgs(user));
-        private void OnUserIsTypingUpdated(Channel channel, User user)
-            => OnEvent(UserIsTyping, new ChannelUserEventArgs(channel, user));
+        private void OnUserIsTypingUpdated(ITextChannel channel, User user)
+            => OnEvent(UserIsTyping, new TypingEventArgs(channel, user));
         private void OnUserJoined(User user)
             => OnEvent(UserJoined, new UserEventArgs(user));
         private void OnUserLeft(User user)

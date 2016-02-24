@@ -57,12 +57,12 @@ namespace Discord.Net
             _pendingSendsByNonce = new ConcurrentDictionary<int, string>();
         }
 
-        internal Message QueueSend(Channel channel, string text, bool isTTS)
+        internal Message QueueSend(ITextChannel channel, string text, bool isTTS)
         {
-            Message msg = new Message(0, channel, channel.IsPrivate ? channel.Client.PrivateUser : channel.Server.CurrentUser);
+            Message msg = new Message(0, channel, (channel as Channel).CurrentUser);
             msg.IsTTS = isTTS;
             msg.RawText = text;
-            msg.Text = msg.Resolve(text);
+            msg.Text = Message.ResolveMentions(msg.Channel, msg.Text);
             msg.Nonce = GenerateNonce();
             if (_pendingSendsByNonce.TryAdd(msg.Nonce, text))
             {
@@ -111,110 +111,99 @@ namespace Discord.Net
         {
             return Task.Run(async () =>
             {
-                try
+                while (!cancelToken.IsCancellationRequested)
                 {
-                    while (!cancelToken.IsCancellationRequested)
+                    Message msg;
+                    while (_pendingSends.TryDequeue(out msg))
                     {
-                        Message msg;
-                        while (_pendingSends.TryDequeue(out msg))
+                        DecrementCount();
+                        string text;
+                        if (_pendingSendsByNonce.TryRemove(msg.Nonce, out text)) //If it was deleted from queue, this will fail
                         {
-                            DecrementCount();
-                            string text;
-                            if (_pendingSendsByNonce.TryRemove(msg.Nonce, out text)) //If it was deleted from queue, this will fail
+                            try
                             {
-                                try
+                                //msg.RawText = text;
+                                //msg.Text = Message.ResolveMentions(msg.Channel, text);
+                                var request = new SendMessageRequest(msg.Channel.Id)
                                 {
-                                    msg.RawText = text;
-                                    msg.Text = msg.Resolve(text);
-                                    var request = new SendMessageRequest(msg.Channel.Id)
-                                    {
-                                        Content = msg.RawText,
-                                        Nonce = msg.Nonce.ToString(),
-                                        IsTTS = msg.IsTTS
-                                    };
-                                    var response = await _rest.Send(request).ConfigureAwait(false);
-                                    msg.State = MessageState.Normal;
-                                    msg.Id = response.Id;
-                                    msg.Update(response);
-                                }
-                                catch (Exception ex)
-                                {
-                                    msg.State = MessageState.Failed;
-                                    _logger.Error($"Failed to send message to {msg.Channel.Path}", ex);
-                                }
+                                    Content = text,
+                                    Nonce = msg.Nonce.ToString(),
+                                    IsTTS = msg.IsTTS
+                                };
+                                var response = await _rest.Send(request).ConfigureAwait(false);
+                                msg.Id = response.Id;
+                                msg.State = MessageState.Normal;
+                                msg.Update(response);
+                            }
+                            catch (Exception ex)
+                            {
+                                msg.State = MessageState.Failed;
+                                _logger.Error($"Failed to send message to {msg.Channel}", ex);
                             }
                         }
-                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
+                    await Task.Delay(DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) { }
             });
         }
         private Task RunEditQueue(CancellationToken cancelToken)
         {
             return Task.Run(async () =>
             {
-                try
+                while (!cancelToken.IsCancellationRequested)
                 {
-                    while (!cancelToken.IsCancellationRequested)
+                    MessageEdit edit;
+                    while (_pendingEdits.TryPeek(out edit) && edit.Message.State != MessageState.Queued)
                     {
-                        MessageEdit edit;
-                        while (_pendingEdits.TryPeek(out edit) && edit.Message.State != MessageState.Queued)
+                        if (_pendingEdits.TryDequeue(out edit))
                         {
-                            if (_pendingEdits.TryDequeue(out edit))
+                            DecrementCount();
+                            if (edit.Message.State == MessageState.Normal)
                             {
-                                DecrementCount();
-                                if (edit.Message.State == MessageState.Normal)
+                                try
                                 {
-                                    try
+                                    var request = new UpdateMessageRequest(edit.Message.Channel.Id, edit.Message.Id)
                                     {
-                                        var request = new UpdateMessageRequest(edit.Message.Channel.Id, edit.Message.Id)
-                                        {
-                                            Content = edit.NewText
-                                        };
-                                        await _rest.Send(request).ConfigureAwait(false);
-                                    }
-                                    catch (Exception ex) { _logger.Error($"Failed to edit message {edit.Message.Path}", ex); }
+                                        Content = edit.NewText
+                                    };
+                                    await _rest.Send(request).ConfigureAwait(false);
                                 }
+                                catch (Exception ex) { _logger.Error($"Failed to edit message {edit.Message}", ex); }
                             }
                         }
-                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
+                    await Task.Delay(DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) { }
             });
         }
         private Task RunDeleteQueue(CancellationToken cancelToken)
         {
             return Task.Run(async () =>
             {
-                try
+                while (!cancelToken.IsCancellationRequested)
                 {
-                    while (!cancelToken.IsCancellationRequested)
+                    Message msg;
+                    while (_pendingDeletes.TryPeek(out msg) && msg.State != MessageState.Queued)
                     {
-                        Message msg;
-                        while (_pendingDeletes.TryPeek(out msg) && msg.State != MessageState.Queued)
+                        if (_pendingDeletes.TryDequeue(out msg))
                         {
-                            if (_pendingDeletes.TryDequeue(out msg))
+                            DecrementCount();
+                            if (msg.State == MessageState.Normal)
                             {
-                                DecrementCount();
-                                if (msg.State == MessageState.Normal)
+                                try
                                 {
-                                    try
-                                    {
-                                        var request = new DeleteMessageRequest(msg.Channel.Id, msg.Id);
-                                        await _rest.Send(request).ConfigureAwait(false);
-                                    }
-                                    catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
-                                    catch (Exception ex) { _logger.Error($"Failed to delete message {msg.Path}", ex); }
+                                    var request = new DeleteMessageRequest(msg.Channel.Id, msg.Id);
+                                    await _rest.Send(request).ConfigureAwait(false);
+                                    msg.State = MessageState.Deleted;
                                 }
+                                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { } //Ignore
+                                catch (Exception ex) { _logger.Error($"Failed to delete message {msg}", ex); }
                             }
                         }
-
-                        await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                     }
+
+                    await Task.Delay(Discord.DiscordConfig.MessageQueueInterval).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException) { }
             });
         }
 

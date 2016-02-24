@@ -17,6 +17,8 @@ namespace Discord.API.Client.Rest
         public string Topic { get; set; }
         [JsonProperty("position")]
         public int Position { get; set; }
+        [JsonProperty("bitrate")]
+        public int Bitrate { get; set; }
 
         public UpdateChannelRequest(ulong channelId)
         {

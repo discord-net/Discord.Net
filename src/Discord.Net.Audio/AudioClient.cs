@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using Nito.AsyncEx;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,35 +14,6 @@ namespace Discord.Audio
 {
 	internal class AudioClient : IAudioClient
     {
-        private class OutStream : Stream
-        {
-            public override bool CanRead => false;
-            public override bool CanSeek => false;
-            public override bool CanWrite => true;
-
-            private readonly AudioClient _client;
-
-            internal OutStream(AudioClient client)
-            {
-                _client = client;
-            }
-
-            public override long Length { get { throw new InvalidOperationException(); } }
-            public override long Position
-            {
-                get { throw new InvalidOperationException(); }
-                set { throw new InvalidOperationException(); }
-            }
-            public override void Flush() { throw new InvalidOperationException(); }
-            public override long Seek(long offset, SeekOrigin origin) { throw new InvalidOperationException(); }
-            public override void SetLength(long value) { throw new InvalidOperationException(); }
-            public override int Read(byte[] buffer, int offset, int count) { throw new InvalidOperationException(); }
-            public override void Write(byte[] buffer, int offset, int count)
-            {
-                _client.Send(buffer, offset, count);
-            }
-        }
-
         private readonly DiscordConfig _config;
         private readonly AsyncLock _connectionLock;
         private readonly TaskManager _taskManager;
@@ -58,14 +28,13 @@ namespace Discord.Audio
         public GatewaySocket GatewaySocket { get; }
         public VoiceSocket VoiceSocket { get; }
         public JsonSerializer Serializer { get; }
-        public Stream OutputStream { get; }
         
         public CancellationToken CancelToken { get; private set; }
         public string SessionId => GatewaySocket.SessionId;
 
         public ConnectionState State => VoiceSocket.State;
         public Server Server => VoiceSocket.Server;
-        public Channel Channel => VoiceSocket.Channel;
+        public VoiceChannel Channel => VoiceSocket.Channel;
 
         public AudioClient(DiscordClient client, Server server, int id)
 		{
@@ -121,7 +90,6 @@ namespace Discord.Audio
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
             VoiceSocket = new VoiceSocket(_config, Config, client.Serializer, client.Log.CreateLogger($"Voice #{id}"));
             VoiceSocket.Server = server;
-            OutputStream = new OutStream(this);
         }
 
         public async Task Connect()
@@ -216,7 +184,7 @@ namespace Discord.Audio
             _gatewayState = (int)ConnectionState.Disconnected;
         }
 
-        public async Task Join(Channel channel)
+        public async Task Join(VoiceChannel channel)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (channel.Type != ChannelType.Voice)
@@ -248,7 +216,7 @@ namespace Discord.Audio
                                     await Disconnect().ConfigureAwait(false);
                                 else
                                 {
-                                    var channel = Service.Client.GetChannel(data.ChannelId.Value);
+                                    var channel = Service.Client.GetChannel(data.ChannelId.Value) as VoiceChannel;
                                     if (channel != null)
                                         VoiceSocket.Channel = channel;
                                     else

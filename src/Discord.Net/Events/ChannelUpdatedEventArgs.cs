@@ -4,12 +4,10 @@ namespace Discord
 {
     public class ChannelUpdatedEventArgs : EventArgs
     {
-        public Channel Before { get; }
-        public Channel After { get; }
+        public IChannel Before { get; }
+        public IChannel After { get; }
 
-        public Server Server => After.Server;
-
-        public ChannelUpdatedEventArgs(Channel before, Channel after)
+        public ChannelUpdatedEventArgs(IChannel before, IChannel after)
         {
             Before = before;
             After = after;

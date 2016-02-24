@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Client.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class AddChannelPermissionsRequest : IRestRequest
+    public class AddOrUpdateChannelPermissionsRequest : IRestRequest
     {
         string IRestRequest.Method => "PUT";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/permissions/{TargetId}";
@@ -21,7 +21,7 @@ namespace Discord.API.Client.Rest
         [JsonProperty("deny")]
         public uint Deny { get; set; }
 
-        public AddChannelPermissionsRequest(ulong channelId)
+        public AddOrUpdateChannelPermissionsRequest(ulong channelId)
         {
             ChannelId = channelId;
         }

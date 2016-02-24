@@ -32,9 +32,7 @@ namespace Discord
         public ServerPermissions Permissions { get; private set; }
         /// <summary> Gets the color of this role. </summary>
         public Color Color { get; private set; }
-
-        /// <summary> Gets the path to this object. </summary>
-        internal string Path => $"{Server?.Name ?? "[Private]"}/{Name}";
+        
         /// <summary> Gets true if this is the role representing all users in a server. </summary>
         public bool IsEveryone => Id == Server.Id;
         /// <summary> Gets a list of all members in this role. </summary>
@@ -132,6 +130,6 @@ namespace Discord
         }
         private Role() { } //Used for cloning
 
-        public override string ToString() => Name ?? Id.ToIdString();
+        public override string ToString() => $"{Server}/{Name ?? Id.ToString()}";
     }
 }

@@ -116,7 +116,7 @@ namespace Discord.Commands
 			}
 		}
 
-		public bool CanRun(User user, Channel channel, out string error)
+		public bool CanRun(User user, ITextChannel channel, out string error)
 		{
 			error = null;
 			if (_commands.Count > 0)

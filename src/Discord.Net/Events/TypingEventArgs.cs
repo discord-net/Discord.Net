@@ -1,11 +1,11 @@
 ﻿namespace Discord
 {
-    public class ChannelUserEventArgs 
+    public class TypingEventArgs 
     {
-        public Channel Channel { get; }
+        public ITextChannel Channel { get; }
         public User User { get; }
 
-        public ChannelUserEventArgs(Channel channel, User user)
+        public TypingEventArgs(ITextChannel channel, User user)
         {
             Channel = channel;
             User = user;

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Discord
@@ -62,85 +60,6 @@ namespace Discord
                 }
             }
         }
-
-        public static IEnumerable<Channel> Find(this IEnumerable<Channel> channels, string name, ChannelType type = null, bool exactMatch = false)
-        {
-            //Search by name
-            var query = channels
-                .Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
-
-            if (!exactMatch)
-            {
-                if (name.Length >= 2 && name[0] == '<' && name[1] == '#' && name[name.Length - 1] == '>') //Search by raw mention
-                {
-                    ulong id;
-                    if (name.Substring(2, name.Length - 3).TryToId(out id))
-                    {
-                        var channel = channels.Where(x => x.Id == id).FirstOrDefault();
-                        if (channel != null)
-                            query = query.Concat(new Channel[] { channel });
-                    }
-                }
-                if (name.Length >= 1 && name[0] == '#' && (type == null || type == ChannelType.Text)) //Search by clean mention
-                {
-                    string name2 = name.Substring(1);
-                    query = query.Concat(channels
-                        .Where(x => x.Type == ChannelType.Text && string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
-                }
-            }
-
-            if (type != null)
-                query = query.Where(x => x.Type == type);
-            return query;
-        }
-
-        public static IEnumerable<User> Find(this IEnumerable<User> users,
-            string name, ushort? discriminator = null, bool exactMatch = false)
-        {
-            //Search by name
-            var query = users
-                .Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
-
-            if (!exactMatch)
-            {
-                if (name.Length >= 2 && name[0] == '<' && name[1] == '@' && name[name.Length - 1] == '>') //Search by raw mention
-                {
-                    ulong id;
-                    if (name.Substring(2, name.Length - 3).TryToId(out id))
-                    {
-                        var user = users.Where(x => x.Id == id).FirstOrDefault();
-                        if (user != null)
-                            query = query.Concat(new User[] { user });
-                    }
-                }
-                if (name.Length >= 1 && name[0] == '@') //Search by clean mention
-                {
-                    string name2 = name.Substring(1);
-                    query = query.Concat(users
-                        .Where(x => string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase)));
-                }
-            }
-
-            if (discriminator != null)
-                query = query.Where(x => x.Discriminator == discriminator.Value);
-            return query;
-        }
-
-        public static IEnumerable<Role> Find(this IEnumerable<Role> roles, string name, bool exactMatch = false)
-        {
-            // if (name.StartsWith("@"))
-            // {
-            // 	string name2 = name.Substring(1);
-            // 	return _roles.Where(x => x.Server.Id == server.Id &&
-            // 		string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) || 
-            // 		string.Equals(x.Name, name2, StringComparison.OrdinalIgnoreCase));
-            // }
-            // else
-            return roles.Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static IEnumerable<Server> Find(this IEnumerable<Server> servers, string name, bool exactMatch = false)
-            => servers.Where(x => string.Equals(x.Name, name, exactMatch ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
 
         public static string Base64(this Stream stream, ImageType type, string existingId)
         {

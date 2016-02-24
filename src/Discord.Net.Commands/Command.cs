@@ -52,7 +52,7 @@ namespace Discord.Commands
 			_checks = checks;
 		}
 
-		internal bool CanRun(User user, Channel channel, out string error)
+		internal bool CanRun(User user, ITextChannel channel, out string error)
 		{
 			for (int i = 0; i < _checks.Length; i++)
 			{

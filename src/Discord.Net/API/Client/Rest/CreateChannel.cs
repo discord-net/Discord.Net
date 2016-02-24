@@ -14,7 +14,7 @@ namespace Discord.API.Client.Rest
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public ChannelType Type { get; set; }
 
         public CreateChannelRequest(ulong guildId)
         {

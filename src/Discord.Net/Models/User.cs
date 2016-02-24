@@ -73,12 +73,11 @@ namespace Discord
         // /// <summary> Gets this user's voice token. </summary>
         // public string Token { get; private set; }
 
-        /// <summary> Gets the path to this object. </summary>
-        internal string Path => $"{Server?.Name ?? "[Private]"}/{Name}";
         /// <summary> Gets the current private channel for this user if one exists. </summary>
-        public Channel PrivateChannel => Client.GetPrivateChannel(Id);
+        public PrivateChannel PrivateChannel => Client.GetPrivateChannel(Id);
         /// <summary> Returns the string used to mention this user. </summary>
         public string Mention => $"<@{Id}>";
+        public bool IsOwner => Server == null ? false : this == Server.Owner;
         /// <summary> Returns true if this user has marked themselves as muted. </summary>
         public bool IsSelfMuted => (_voiceState & VoiceState.SelfMuted) != 0;
         /// <summary> Returns true if this user has marked themselves as deafened. </summary>
@@ -92,14 +91,15 @@ namespace Discord
 		/// <summary> Returns the time this user was last seen online in this server. </summary>
 		public DateTime? LastOnlineAt => Status != UserStatus.Offline ? DateTime.UtcNow : _lastOnline; 
         /// <summary> Gets this user's current voice channel. </summary>
-        public Channel VoiceChannel => _voiceChannelId != null ? Server.GetChannel(_voiceChannelId.Value) : null;
+        public VoiceChannel VoiceChannel => _voiceChannelId != null ? Server.GetVoiceChannel(_voiceChannelId.Value) : null;
         /// <summary> Gets the URL to this user's current avatar. </summary>
         public string AvatarUrl => GetAvatarUrl(Id, AvatarId);
         /// <summary> Gets all roles that have been assigned to this user, including the everyone role. </summary>
         public IEnumerable<Role> Roles => _roles.Select(x => x.Value);
+        public ServerPermissions ServerPermissions => Server.GetPermissions(this);
 
         /// <summary> Returns a collection of all channels this user has permissions to join on this server. </summary>
-        public IEnumerable<Channel> Channels
+        public IEnumerable<IChannel> Channels
 		{
 			get
 			{
@@ -108,8 +108,8 @@ namespace Discord
                     if (Client.Config.UsePermissionsCache)
                     {
                         return Server.AllChannels.Where(x => 
-                            (x.Type == ChannelType.Text && x.GetPermissions(this).ReadMessages) ||
-                            (x.Type == ChannelType.Voice && x.GetPermissions(this).Connect));
+                            (x.IsText && x.GetPermissions(this).ReadMessages) ||
+                            (x.IsVoice && x.GetPermissions(this).Connect));
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace Discord
                         return Server.AllChannels
                             .Where(x =>
                             {
-                                x.UpdatePermissions(this, ref perms);
+                                x.ResolvePermissions(this, ref perms);
                                 return (x.Type == ChannelType.Text && perms.ReadMessages) ||
                                        (x.Type == ChannelType.Voice && perms.Connect);
                             });
@@ -131,9 +131,9 @@ namespace Discord
                     {
                         var privateChannel = Client.GetPrivateChannel(Id);
                         if (privateChannel != null)
-                            return new Channel[] { privateChannel };
+                            return new IChannel[] { privateChannel };
                         else
-                            return new Channel[0];
+                            return new IChannel[0];
                     }
 				}
 			}
@@ -266,47 +266,15 @@ namespace Discord
             var request = new KickMemberRequest(Server.Id, Id);
             return Client.ClientAPI.Send(request);
         }
-
-        #region Permissions
-        public ServerPermissions ServerPermissions => Server.GetPermissions(this);
-		public ChannelPermissions GetPermissions(Channel channel)
+        
+		public ChannelPermissions GetPermissions(PublicChannel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
 			return channel.GetPermissions(this);
 		}
-        #endregion
-
-        #region Channels
-        public Task<Channel> CreatePMChannel()
-            => Client.CreatePMChannel(this);
-        #endregion
-
-        #region Messages
-        public async Task<Message> SendMessage(string text)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-
-            var channel = await CreatePMChannel().ConfigureAwait(false);
-            return await channel.SendMessage(text).ConfigureAwait(false);
-        }
-        public async Task<Message> SendFile(string filePath)
-        {
-            if (filePath == null) throw new ArgumentNullException(nameof(filePath));
-
-            var channel = await CreatePMChannel().ConfigureAwait(false);
-            return await channel.SendFile(filePath).ConfigureAwait(false);
-        }
-        public async Task<Message> SendFile(string filename, Stream stream)
-        {
-            if (filename == null) throw new ArgumentNullException(nameof(filename));
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            var channel = await CreatePMChannel().ConfigureAwait(false);
-            return await channel.SendFile(filename, stream).ConfigureAwait(false);
-        }
-        #endregion
-
-        #region Roles
+        
+        public Task<PrivateChannel> CreatePMChannel() => Client.CreatePrivateChannel(this);
+        
         private void UpdateRoles(IEnumerable<Role> roles)
         {
             bool updated = false;
@@ -348,11 +316,10 @@ namespace Discord
             return _roles.ContainsKey(role.Id);
         }
 
-        public Task AddRoles(params Role[] roles)
-            => Edit(roles: Roles.Concat(roles));
-        public Task RemoveRoles(params Role[] roles)
-            => Edit(roles: Roles.Except(roles));
-        #endregion
+        public Task AddRoles(params Role[] roles) => Edit(roles: Roles.Concat(roles));
+        public Task AddRoles(IEnumerable<Role> roles) => Edit(roles: Roles.Concat(roles));
+        public Task RemoveRoles(params Role[] roles) => Edit(roles: Roles.Except(roles));
+        public Task RemoveRoles(IEnumerable<Role> roles) => Edit(roles: Roles.Except(roles));
 
         internal User Clone()
         {
@@ -362,6 +329,19 @@ namespace Discord
         }
         private User() { } //Used for cloning
 
-        public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
-	}
+        public override string ToString()
+        {
+            if (Name != null)
+                return $"{Server?.Name ?? "[Private]"}/{Name}#{Discriminator}";
+            else
+                return $"{Server?.Name ?? "[Private]"}/{Id}";
+        }
+        internal string ToString(IChannel channel)
+        {
+            if (Name != null)
+                return $"{channel}/{Name}#{Discriminator}";
+            else
+                return $"{channel}/{Id}";
+        }
+    }
 }

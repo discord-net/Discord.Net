@@ -15,11 +15,9 @@ namespace Discord.Audio
         /// <summary> Gets the current state of this client. </summary>
         ConnectionState State { get; }
         /// <summary> Gets the channel this client is currently a member of. </summary>
-        Channel Channel { get; }
+        VoiceChannel Channel { get; }
         /// <summary> Gets the server this client is bound to. </summary>
         Server Server { get; }
-        /// <summary> Gets a stream object that wraps the Send() function. </summary>
-        Stream OutputStream { get; }
         /// <summary> Gets a cancellation token that triggers when the client is manually disconnected. </summary>
         CancellationToken CancelToken { get; }
 
@@ -31,7 +29,7 @@ namespace Discord.Audio
         VoiceSocket VoiceSocket { get; }
 
         /// <summary> Moves the client to another channel on the same server. </summary>
-        Task Join(Channel channel);
+        Task Join(VoiceChannel channel);
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
         Task Disconnect();
 

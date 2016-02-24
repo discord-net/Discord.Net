@@ -8,7 +8,7 @@ namespace Discord
         public Message After { get; }
 
         public User User => After.User;
-        public Channel Channel => After.Channel;
+        public ITextChannel Channel => After.Channel;
         public Server Server => After.Server;
 
         public MessageUpdatedEventArgs(Message before, Message after)

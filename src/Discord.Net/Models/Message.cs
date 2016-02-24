@@ -13,10 +13,14 @@ namespace Discord
 		Normal = 0,
         /// <summary> Message is current queued. </summary>
 		Queued,
+        /// <summary> Message was deleted. </summary>
+        Deleted,
         /// <summary> Message was deleted before it was sent. </summary>
         Aborted,
         /// <summary> Message failed to be sent. </summary>
-		Failed
+		Failed,
+        /// <summary> Message has been removed from cache and will no longer receive updates. </summary>
+        Detached
     }
 
 	public class Message
@@ -29,14 +33,14 @@ namespace Discord
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
 
-        internal static string CleanUserMentions(Channel channel, string text, List<User> users = null)
+        internal static string CleanUserMentions(PublicChannel channel, string text, List<User> users = null)
         {
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (e.Value.Substring(2, e.Value.Length - 3).TryToId(out id))
                 {
-                    var user = channel.GetUserFast(id);
+                    var user = channel.GetUser(id);
                     if (user != null)
                     {
                         if (users != null)
@@ -47,7 +51,7 @@ namespace Discord
                 return e.Value; //User not found or parse failed
             }));
         }
-        internal static string CleanChannelMentions(Channel channel, string text, List<Channel> channels = null)
+        internal static string CleanChannelMentions(PublicChannel channel, string text, List<PublicChannel> channels = null)
         {
             var server = channel.Server;
             if (server == null) return text;
@@ -81,33 +85,20 @@ namespace Discord
 			}));
 		}*/
         
-        //TODO: Move this somewhere
-        private static string Resolve(Channel channel, string text)
+        internal static string ResolveMentions(IChannel channel, string text)
         {
+            if (channel == null) throw new ArgumentNullException(nameof(channel));
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            var client = channel.Client;
-            text = CleanUserMentions(channel, text);
-            text = CleanChannelMentions(channel, text);
-            //text = CleanRoleMentions(Channel, text);
+            var publicChannel = channel as PublicChannel;
+            if (publicChannel != null)
+            {
+                text = CleanUserMentions(publicChannel, text);
+                text = CleanChannelMentions(publicChannel, text);
+                //text = CleanRoleMentions(publicChannel, text);
+            }
             return text;
         }
-
-        /*internal class ImportResolver : DefaultContractResolver
-		{
-			protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-			{
-				var property = base.CreateProperty(member, memberSerialization);
-				if (member is PropertyInfo)
-				{
-					if (member.Name == nameof(ChannelId) || !(member as PropertyInfo).CanWrite)
-						return null;
-
-					property.Writable = true; //Handles private setters
-				}
-				return property;
-			}
-		}*/
 
         public class Attachment : File
 		{
@@ -172,7 +163,7 @@ namespace Discord
         /// <summary> Returns the unique identifier for this message. </summary>
         public ulong Id { get; internal set; }
         /// <summary> Returns the channel this message was sent to. </summary>
-        public Channel Channel { get; }
+        public ITextChannel Channel { get; }
         /// <summary> Returns the author of this message. </summary>
         public User User { get; }
 
@@ -196,20 +187,18 @@ namespace Discord
         /// <summary> Returns a collection of all users mentioned in this message. </summary>
         public IEnumerable<User> MentionedUsers { get; internal set; }
 		/// <summary> Returns a collection of all channels mentioned in this message. </summary>
-		public IEnumerable<Channel> MentionedChannels { get; internal set; }
+		public IEnumerable<PublicChannel> MentionedChannels { get; internal set; }
 		/// <summary> Returns a collection of all roles mentioned in this message. </summary>
 		public IEnumerable<Role> MentionedRoles { get; internal set; }
 
         internal int Nonce { get; set; }
-
-        /// <summary> Gets the path to this object. </summary>
-        internal string Path => $"{Server?.Name ?? "[Private]"}/{Id}";
+        
         /// <summary> Returns the server containing the channel this message was sent to. </summary>
-        public Server Server => Channel.Server;
+        public Server Server => (Channel as PublicChannel)?.Server;
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
         public bool IsAuthor => User != null && User.Id == Client.CurrentUser?.Id;
 
-        internal Message(ulong id, Channel channel, User user)
+        internal Message(ulong id, ITextChannel channel, User user)
 		{
             Id = id;
             Channel = channel;
@@ -222,7 +211,6 @@ namespace Discord
 		internal void Update(APIMessage model)
 		{
 			var channel = Channel;
-			var server = channel.Server;
 			if (model.Attachments != null)
 			{
 				Attachments = model.Attachments
@@ -277,36 +265,34 @@ namespace Discord
 			if (model.Mentions != null)
 			{
 				MentionedUsers = model.Mentions
-					.Select(x => Channel.GetUserFast(x.Id))
+					.Select(x => (Channel as Channel).GetUser(x.Id))
 					.Where(x => x != null)
 					.ToArray();
 			}
 			if (model.IsMentioningEveryone != null)
-			{
-				if (model.IsMentioningEveryone.Value && User != null && User.GetPermissions(channel).MentionEveryone)
-					MentionedRoles = new Role[] { Server.EveryoneRole };
-				else
-					MentionedRoles = new Role[0];
+            {
+                var server = (channel as PublicChannel).Server;
+                if (model.IsMentioningEveryone.Value && server != null)
+                    MentionedRoles = new Role[] { server.EveryoneRole };
+                else
+                    MentionedRoles = Enumerable.Empty<Role>();
             }
 			if (model.Content != null)
 			{
 				string text = model.Content;
 				RawText = text;
 
-				//var mentionedUsers = new List<User>();
-				var mentionedChannels = new List<Channel>();
-				//var mentionedRoles = new List<Role>();
-				text = CleanUserMentions(Channel, text/*, mentionedUsers*/);
-				if (server != null)
-				{
-					text = CleanChannelMentions(Channel, text, mentionedChannels);
-					//text = CleanRoleMentions(_client, User, channel, text, mentionedRoles);
-				}
-				Text = text;
+                List<PublicChannel> mentionedChannels = null;
+                if (Channel.IsPublic)
+                    mentionedChannels = new List<PublicChannel>();
 
-				//MentionedUsers = mentionedUsers;
-				MentionedChannels = mentionedChannels;
-				//MentionedRoles = mentionedRoles;
+                text = CleanUserMentions(Channel as PublicChannel, text);
+                text = CleanChannelMentions(Channel as PublicChannel, text, mentionedChannels);
+
+                if (Channel.IsPublic)
+                    MentionedChannels = mentionedChannels;
+
+                Text = text;
 			}
         }
 
@@ -341,13 +327,6 @@ namespace Discord
                 return MentionedUsers?.Contains(me) ?? false;
         }
 
-        /// <summary>Resolves all mentions in a provided string to those users, channels or roles' names.</summary>
-        public string Resolve(string text)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            return Resolve(Channel, text);
-        }
-
         internal Message Clone()
         {
             var result = new Message();
@@ -356,6 +335,6 @@ namespace Discord
         }
         private Message() { } //Used for cloning
 
-        public override string ToString() => $"{User?.Name ?? "Unknown User"}: {RawText}";
+        public override string ToString() => $"{User}: {RawText}";
 	}
 }

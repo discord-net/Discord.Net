@@ -14,9 +14,11 @@ namespace Discord.Modules
 			_filterType = manager.FilterType;
         }
 
-		public bool CanRun(Command command, User user, Channel channel, out string error)
+		public bool CanRun(Command command, User user, ITextChannel channel, out string error)
 		{
-			if (_filterType == ModuleFilter.None || _filterType == ModuleFilter.AlwaysAllowPrivate || _manager.HasChannel(channel))
+			if (_filterType == ModuleFilter.None || 
+                _filterType == ModuleFilter.AlwaysAllowPrivate || 
+                (channel.IsPublic && _manager.HasChannel(channel)))
 			{
 				error = null;
 				return true;

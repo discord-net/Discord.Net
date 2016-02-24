@@ -526,8 +526,14 @@
     <Compile Include="..\Discord.Net\Models\Permissions.cs">
       <Link>Models\Permissions.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\PrivateChannel.cs">
+      <Link>Models\PrivateChannel.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Profile.cs">
       <Link>Models\Profile.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\PublicChannel.cs">
+      <Link>Models\PublicChannel.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Models\Region.cs">
       <Link>Models\Region.cs</Link>
@@ -538,8 +544,14 @@
     <Compile Include="..\Discord.Net\Models\Server.cs">
       <Link>Models\Server.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\TextChannel.cs">
+      <Link>Models\TextChannel.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\User.cs">
       <Link>Models\User.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Models\VoiceChannel.cs">
+      <Link>Models\VoiceChannel.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Net\HttpException.cs">
       <Link>Net\HttpException.cs</Link>

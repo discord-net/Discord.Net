@@ -83,6 +83,6 @@ namespace Discord
         }
         private Profile() { } //Used for cloning
 
-        public override string ToString() => Id.ToIdString();
+        public override string ToString() => Name;
     }
 }

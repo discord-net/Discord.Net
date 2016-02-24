@@ -1,10 +1,10 @@
-﻿using Discord.API.Client;
+﻿using APIInvite = Discord.API.Client.Invite;
+using Discord.API.Client;
 using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using APIInvite = Discord.API.Client.Invite;
 
 namespace Discord
 {
@@ -84,9 +84,7 @@ namespace Discord
 		public bool IsTemporary { get; private set; }
         /// <summary> Gets when this invite was created. </summary>
 		public DateTime CreatedAt { get; private set; }
-
-        /// <summary> Gets the path to this object. </summary>
-        internal string Path => $"{Server?.Name ?? "[Private]"}/{Code}";
+        
         /// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
         public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
@@ -138,6 +136,6 @@ namespace Discord
         }
         private Invite() { } //Used for cloning
 
-        public override string ToString() => XkcdCode ?? Code;
+        public override string ToString() => $"{Server}/{XkcdCode ?? Code}";
 	}
 }

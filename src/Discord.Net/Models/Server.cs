@@ -1,4 +1,5 @@
-﻿using Discord.API.Client;
+﻿using APIChannel = Discord.API.Client.Channel;
+using Discord.API.Client;
 using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
@@ -48,7 +49,7 @@ namespace Discord
 
         private ConcurrentDictionary<ulong, Role> _roles;
         private ConcurrentDictionary<ulong, Member> _users;
-        private ConcurrentDictionary<ulong, Channel> _channels;
+        private ConcurrentDictionary<ulong, PublicChannel> _channels;
         private ulong _ownerId;
         private ulong? _afkChannelId;
         private int _userCount;
@@ -59,34 +60,31 @@ namespace Discord
         public ulong Id { get; }
 
         /// <summary> Gets the name of this server. </summary>
-        public string Name { get; private set; }
+        public string Name { get; set; }
         /// <summary> Gets the voice region for this server. </summary>
-        public Region Region { get; private set; }
-        /// <summary> Gets the unique identifier for this user's current avatar. </summary>
-        public string IconId { get; private set; }
-        /// <summary> Gets the unique identifier for this server's custom splash image. </summary>
-        public string SplashId { get; private set; }
+        public Region Region { get; set; }
+        /// <summary> Gets the AFK voice channel for this server. </summary>
+        public VoiceChannel AFKChannel { get; set; }
         /// <summary> Gets the amount of time (in seconds) a user must be inactive for until they are automatically moved to the AFK voice channel, if one is set. </summary>
-        public int AFKTimeout { get; private set; }
+        public int AFKTimeout { get; set; }
+
         /// <summary> Gets the date and time you joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
-        /// <summary> Gets the default channel for this server. </summary>
-        public Channel DefaultChannel { get; private set; }
         /// <summary> Gets the the role representing all users in a server. </summary>
         public Role EveryoneRole { get; private set; }
         /// <summary> Gets all extra features added to this server. </summary>
         public IEnumerable<string> Features { get; private set; }
         /// <summary> Gets all custom emojis on this server. </summary>
         public IEnumerable<Emoji> CustomEmojis { get; private set; }
-
-        /// <summary> Gets the path to this object. </summary>
-        internal string Path => Name;
+        /// <summary> Gets the unique identifier for this user's current avatar. </summary>
+        public string IconId { get; private set; }
+        /// <summary> Gets the unique identifier for this server's custom splash image. </summary>
+        public string SplashId { get; private set; }
+        
         /// <summary> Gets the user that created this server. </summary>
         public User Owner => GetUser(_ownerId);
-        /// <summary> Returns true if the current user owns this server. </summary>
-        public bool IsOwner => _ownerId == Client.CurrentUser.Id;
-        /// <summary> Gets the AFK voice channel for this server. </summary>
-        public Channel AFKChannel => _afkChannelId != null ? GetChannel(_afkChannelId.Value) : null;
+        /// <summary> Gets the default channel for this server. </summary>
+        public TextChannel DefaultChannel => _channels[Id] as TextChannel;
         /// <summary> Gets the current user in this server. </summary>
         public User CurrentUser => GetUser(Client.CurrentUser.Id);
         /// <summary> Gets the URL to this server's current icon. </summary>
@@ -95,11 +93,11 @@ namespace Discord
         public string SplashUrl => GetSplashUrl(Id, SplashId);
 
         /// <summary> Gets a collection of all channels in this server. </summary>
-        public IEnumerable<Channel> AllChannels => _channels.Select(x => x.Value);
+        public IEnumerable<PublicChannel> AllChannels => _channels.Select(x => x.Value);
         /// <summary> Gets a collection of text channels in this server. </summary>
-        public IEnumerable<Channel> TextChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Text);
+        public IEnumerable<TextChannel> TextChannels => _channels.Where(x => x.Value.IsText).Select(x => x.Value as TextChannel);
         /// <summary> Gets a collection of voice channels in this server. </summary>
-        public IEnumerable<Channel> VoiceChannels => _channels.Select(x => x.Value).Where(x => x.Type == ChannelType.Voice);
+        public IEnumerable<VoiceChannel> VoiceChannels => _channels.Where(x => x.Value.IsVoice).Select(x => x.Value as VoiceChannel);
         /// <summary> Gets a collection of all members in this server. </summary>
         public IEnumerable<User> Users => _users.Select(x => x.Value.User);
         /// <summary> Gets a collection of all roles in this server. </summary>
@@ -168,10 +166,9 @@ namespace Discord
             //Only channels or members should have AddXXX(cachePerms: true), not both
             if (model.Channels != null)
             {
-                _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
+                _channels = new ConcurrentDictionary<ulong, PublicChannel>(2, (int)(model.Channels.Length * 1.05));
                 foreach (var subModel in model.Channels)
-                    AddChannel(subModel.Id, false).Update(subModel);
-                DefaultChannel = _channels[Id];
+                    AddChannel(subModel, false);
             }
             if (model.MemberCount != null)
             {
@@ -257,66 +254,52 @@ namespace Discord
         #endregion
 
         #region Channels
-        internal Channel AddChannel(ulong id, bool cachePerms)
+        internal PublicChannel AddChannel(APIChannel model, bool cachePerms)
         {
-            var channel = new Channel(Client, id, this);
+            PublicChannel channel;
+            ChannelType type = EnumConverters.ToChannelType(model.Type);
+            if (type == ChannelType.Voice)
+                channel = new VoiceChannel(model, this);
+            else
+                channel = new TextChannel(model, this);
+
             if (cachePerms && Client.Config.UsePermissionsCache)
             {
                 foreach (var user in Users)
                     channel.AddUser(user);
             }
             Client.AddChannel(channel);
-            return _channels.GetOrAdd(id, x => channel);
+            return _channels.GetOrAdd(model.Id, x => channel);
         }
-        internal Channel RemoveChannel(ulong id)
+        internal PublicChannel RemoveChannel(ulong id)
         {
-            Channel channel;
+            PublicChannel channel;
             _channels.TryRemove(id, out channel);
             return channel;
         }
 
         /// <summary> Gets the channel with the provided id and owned by this server, or null if not found. </summary>
-        public Channel GetChannel(ulong id)
+        public PublicChannel GetChannel(ulong id)
         {
-            Channel result;
+            PublicChannel result;
             _channels.TryGetValue(id, out result);
             return result;
         }
-
-        /// <summary> Returns all channels with the specified server and name. </summary>
-        /// <remarks> Name formats supported: Name, #Name and &lt;#Id&gt;. Search is case-insensitive if exactMatch is false.</remarks>
-        public IEnumerable<Channel> FindChannels(string name, ChannelType type = null, bool exactMatch = false)
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-
-            return _channels.Select(x => x.Value).Find(name, type, exactMatch);
-        }
+        public TextChannel GetTextChannel(ulong id) => GetChannel(id) as TextChannel;
+        public VoiceChannel GetVoiceChannel(ulong id) => GetChannel(id) as VoiceChannel;
 
         /// <summary> Creates a new channel. </summary>
-        public async Task<Channel> CreateChannel(string name, ChannelType type)
+        public async Task<PublicChannel> CreateChannel(string name, ChannelType type)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (type != ChannelType.Text && type != ChannelType.Voice) throw new ArgumentException("Invalid channel type", nameof(type));
 
-            var request = new CreateChannelRequest(Id) { Name = name, Type = type.Value };
+            var request = new CreateChannelRequest(Id) { Name = name, Type = type };
             var response = await Client.ClientAPI.Send(request).ConfigureAwait(false);
 
-            var channel = AddChannel(response.Id, true);
+            var channel = AddChannel(response, true);
             channel.Update(response);
             return channel;
-        }
-
-        /// <summary> Reorders the provided channels and optionally places them after a certain channel. </summary>
-        public Task ReorderChannels(IEnumerable<Channel> channels, Channel after = null)
-        {
-            if (channels == null) throw new ArgumentNullException(nameof(channels));
-
-            var request = new ReorderChannelsRequest(Id)
-            {
-                ChannelIds = channels.Select(x => x.Id).ToArray(),
-                StartPos = after != null ? after.Position + 1 : channels.Min(x => x.Position)
-            };
-            return Client.ClientAPI.Send(request);
         }
         #endregion
 
@@ -358,13 +341,6 @@ namespace Discord
             Role result;
             _roles.TryGetValue(id, out result);
             return result;
-        }
-        /// <summary> Returns all roles with the specified server and name. </summary>
-        /// <remarks> Search is case-insensitive if exactMatch is false.</remarks>
-        public IEnumerable<Role> FindRoles(string name, bool exactMatch = false)
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return _roles.Select(x => x.Value).Find(name, exactMatch);
         }
         
         /// <summary> Creates a new role. </summary>
@@ -504,15 +480,7 @@ namespace Discord
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            return _users.Select(x => x.Value.User).Find(name, discriminator: discriminator, exactMatch: false).FirstOrDefault();
-        }
-        /// <summary> Returns all members of this server with the specified name. </summary>
-        /// <remarks> Name formats supported: Name, @Name and &lt;@Id&gt;. Search is case-insensitive if exactMatch is false.</remarks>
-        public IEnumerable<User> FindUsers(string name, bool exactMatch = false)
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-
-            return _users.Select(x => x.Value.User).Find(name, exactMatch: exactMatch);
+            return _users.Select(x => x.Value.User).Where(x => x.Discriminator == discriminator && x.Name == name).SingleOrDefault();
         }
 
         /// <summary> Kicks all users with an inactivity greater or equal to the provided number of days. </summary>

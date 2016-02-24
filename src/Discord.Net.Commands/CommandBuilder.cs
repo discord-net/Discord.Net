@@ -79,7 +79,7 @@ namespace Discord.Commands
 			_checks.Add(check);
 			return this;
 		}
-		public CommandBuilder AddCheck(Func<Command, User, Channel, bool> checkFunc, string errorMsg = null)
+		public CommandBuilder AddCheck(Func<Command, User, ITextChannel, bool> checkFunc, string errorMsg = null)
 		{
 			_checks.Add(new GenericPermissionChecker(checkFunc, errorMsg));
 			return this;
@@ -145,7 +145,7 @@ namespace Discord.Commands
 		{
 			_checks.Add(checker);
 		}
-		public void AddCheck(Func<Command, User, Channel, bool> checkFunc, string errorMsg = null)
+		public void AddCheck(Func<Command, User, ITextChannel, bool> checkFunc, string errorMsg = null)
 		{
 			_checks.Add(new GenericPermissionChecker(checkFunc, errorMsg));
 		}

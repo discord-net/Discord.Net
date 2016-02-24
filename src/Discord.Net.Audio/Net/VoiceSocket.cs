@@ -46,7 +46,7 @@ namespace Discord.Net.WebSockets
 
         public string Token { get; internal set; }
         public Server Server { get; internal set; }
-        public Channel Channel { get; internal set; }
+        public VoiceChannel Channel { get; internal set; }
 
         public int Ping => _ping;
         internal VoiceBuffer OutputBuffer => _sendBuffer;

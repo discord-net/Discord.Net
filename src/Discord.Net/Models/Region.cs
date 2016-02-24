@@ -16,5 +16,7 @@
             Port = port;
             Vip = vip;
         }
+
+        public override string ToString() => Name;
     }
 }
