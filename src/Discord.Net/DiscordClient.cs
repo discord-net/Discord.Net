@@ -365,7 +365,7 @@ namespace Discord
         private PrivateChannel AddPrivateChannel(APIChannel model)
         {
             IChannel channel;
-            if (_channels.TryGetOrAdd(model.Id, x => new PrivateChannel(x, new User(this, model.Recipient.Id, null), model), out channel))
+            if (_channels.TryGetOrAdd(model.Id, x => new PrivateChannel(x, new User(model.Recipient, this, null), model), out channel))
                 _privateChannels[model.Recipient.Id] = channel as PrivateChannel;
             return channel as PrivateChannel;
         }
@@ -407,7 +407,7 @@ namespace Discord
             try
             {
                 var response = await ClientAPI.Send(new GetInviteRequest(inviteIdOrXkcd)).ConfigureAwait(false);
-                var invite = new Invite(this, response.Code, response.XkcdPass);
+                var invite = new Invite(response, this);
                 invite.Update(response);
                 return invite;
             }
@@ -430,7 +430,7 @@ namespace Discord
         #endregion
 
         #region Servers
-        private Server AddServer(ulong id) => _servers.GetOrAdd(id, x => new Server(this, x));
+        private Server AddServer(ulong id) => _servers.GetOrAdd(id, x => new Server(x, this));
         private Server RemoveServer(ulong id)
         {
             Server server;
@@ -494,9 +494,9 @@ namespace Discord
                             List<ulong> largeServers = new List<ulong>();
 
                             SessionId = data.SessionId;
-                            PrivateUser = new User(this, data.User.Id, null);
+                            PrivateUser = new User(data.User, this, null);
                             PrivateUser.Update(data.User);
-                            CurrentUser = new Profile(this, data.User.Id);
+                            CurrentUser = new Profile(data.User, this);
                             CurrentUser.Update(data.User);
 
                             for (int i = 0; i < data.Guilds.Length; i++)
@@ -633,7 +633,7 @@ namespace Discord
                             var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
-                                var user = server.AddUser(data.User.Id, true, true);
+                                var user = server.AddUser(data, true, true);
                                 user.Update(data);
                                 user.UpdateActivity();
                                 Logger.Info($"GUILD_MEMBER_ADD: {user}");
@@ -691,7 +691,7 @@ namespace Discord
                             {
                                 foreach (var memberData in data.Members)
                                 {
-                                    var user = server.AddUser(memberData.User.Id, true, false);
+                                    var user = server.AddUser(memberData, true, false);
                                     user.Update(memberData);
                                 }
                                 Logger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
@@ -796,7 +796,7 @@ namespace Discord
                             var server = GetServer(data.GuildId.Value);
                             if (server != null)
                             {
-                                var user = new User(this, data.User.Id, server);
+                                var user = new User(data.User, this, server);
                                 user.Update(data.User);
                                 Logger.Info($"GUILD_BAN_REMOVE: {user}");
                                 OnUserUnbanned(user);
@@ -819,9 +819,7 @@ namespace Discord
                                 if (user != null)
                                 {
                                     Message msg = null;
-                                    msg = (channel as Channel).MessageManager.Add(data.Id, user, data.Timestamp.Value);
-
-                                    msg.Update(data);
+                                    msg = (channel as Channel).MessageManager.Add(data, user);                                    
                                     user.UpdateActivity();
                                     
                                     Logger.Verbose($"MESSAGE_CREATE: {channel} ({user})");

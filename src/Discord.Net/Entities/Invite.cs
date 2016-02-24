@@ -88,20 +88,24 @@ namespace Discord
         /// <summary> Returns a URL for this invite using XkcdCode if available or Id if not. </summary>
         public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
-        internal Invite(DiscordClient client, string code, string xkcdPass)
+        internal Invite(APIInvite model, DiscordClient client)
+            : this(model.Code, model.XkcdPass)
 		{
             Client = client;
-            Code = code;
-			XkcdCode = xkcdPass;
-		}
-
-		internal void Update(InviteReference model)
-		{
-			if (model.Guild != null)
-				Server = new ServerInfo(model.Guild.Id, model.Guild.Name);
-			if (model.Channel != null)
-				Channel = new ChannelInfo(model.Channel.Id, model.Channel.Name);
+            Update(model);
         }
+        internal Invite(InviteReference model, DiscordClient client)
+            : this(model.Code, model.XkcdPass)
+        {
+            Client = client;
+            Update(model);
+        }
+        private Invite(string code, string xkcdCode)
+        {
+            Code = code;
+            XkcdCode = xkcdCode;
+        }
+
         internal void Update(APIInvite model)
 		{
 			Update(model as InviteReference);
@@ -118,8 +122,15 @@ namespace Discord
 				Uses = model.Uses.Value;
 			if (model.CreatedAt != null)
 				CreatedAt = model.CreatedAt.Value;
-		}
-        
+        }
+        internal void Update(InviteReference model)
+        {
+            if (model.Guild != null)
+                Server = new ServerInfo(model.Guild.Id, model.Guild.Name);
+            if (model.Channel != null)
+                Channel = new ChannelInfo(model.Channel.Id, model.Channel.Name);
+        }
+
         public async Task Delete()
         {
             try { await Client.ClientAPI.Send(new DeleteInviteRequest(Code)).ConfigureAwait(false); }
@@ -130,11 +141,10 @@ namespace Discord
 
         internal Invite Clone()
         {
-            var result = new Invite();
+            var result = new Invite(Code, XkcdCode);
             _cloner(this, result);
             return result;
         }
-        private Invite() { } //Used for cloning
 
         public override string ToString() => $"{Server}/{XkcdCode ?? Code}";
 	}

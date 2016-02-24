@@ -1,4 +1,5 @@
-﻿using Discord.API.Client.Rest;
+﻿using Discord.API.Client;
+using Discord.API.Client.Rest;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -34,10 +35,14 @@ namespace Discord
 		/// <summary> Gets if the email for this user has been verified. </summary>
 		public bool? IsVerified { get; private set; }
 
-        internal Profile(DiscordClient client, ulong id)
+        internal Profile(UserReference model, DiscordClient client)
+            : this(model.Id, client)
         {
-            Client = client;
+        }
+        private Profile(ulong id, DiscordClient client)
+        {
             Id = id;
+            Client = client;
         }
 
         internal void Update(APIUser model)
@@ -77,11 +82,10 @@ namespace Discord
 
         internal Profile Clone()
         {
-            var result = new Profile();
+            var result = new Profile(Id, Client);
             _cloner(this, result);
             return result;
         }
-        private Profile() { } //Used for cloning
 
         public override string ToString() => Name;
     }

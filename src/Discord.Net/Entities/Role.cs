@@ -124,11 +124,10 @@ namespace Discord
 
         internal Role Clone()
         {
-            var result = new Role();
+            var result = new Role(Id, Server);
             _cloner(this, result);
             return result;
         }
-        private Role() { } //Used for cloning
 
         public override string ToString() => $"{Server}/{Name ?? Id.ToString()}";
     }

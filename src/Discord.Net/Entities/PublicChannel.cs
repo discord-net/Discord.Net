@@ -97,7 +97,7 @@ namespace Discord
             };
 
             var response = await Client.ClientAPI.Send(request).ConfigureAwait(false);
-            var invite = new Invite(Client, response.Code, response.XkcdPass);
+            var invite = new Invite(response, Client);
             return invite;
         }
 

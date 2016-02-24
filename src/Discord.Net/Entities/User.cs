@@ -19,12 +19,12 @@ namespace Discord
         [Flags]
         private enum VoiceState : byte
         {
-            None = 0x0,
+            Normal = 0x0,
             SelfMuted = 0x01,
             SelfDeafened = 0x02,
-            ServerMuted = 0x04,
-            ServerDeafened = 0x08,
-            ServerSuppressed = 0x10,
+            ServerMuted = 0x10,
+            ServerDeafened = 0x20,
+            ServerSuppressed = 0x40,
         }
 
 		internal struct CompositeKey : IEquatable<CompositeKey>
@@ -139,18 +139,42 @@ namespace Discord
 			}
 		}
 
-		internal User(DiscordClient client, ulong id, Server server)
-		{
+		internal User(ExtendedMember model, DiscordClient client, Server server)
+            : this(model as APIMember, client, server)
+        {
+            if (model.IsServerMuted == true)
+                _voiceState |= VoiceState.ServerMuted;
+            else if (model.IsServerMuted == false)
+                _voiceState &= ~VoiceState.ServerMuted;
+
+            if (model.IsServerDeafened == true)
+                _voiceState |= VoiceState.ServerDeafened;
+            else if (model.IsServerDeafened == false)
+                _voiceState &= ~VoiceState.ServerDeafened;
+        }
+        internal User(APIMember model, DiscordClient client, Server server)
+            : this(model.User.Id, client, server)
+        {
+            if (server == null)
+                UpdateRoles(null);
+            Update(model);
+        }
+        internal User(UserReference model, DiscordClient client, Server server)
+            : this(model.Id, client, server)
+        {
+            if (server == null)
+                UpdateRoles(null);
+            Update(model);
+        }
+        private User(ulong id, DiscordClient client, Server server)
+        {
             Client = client;
             Id = id;
             Server = server;
 
-			_roles = new Dictionary<ulong, Role>();
-			Status = UserStatus.Offline;
-
-			if (server == null)
-				UpdateRoles(null);
-		}
+            _roles = new Dictionary<ulong, Role>();
+            Status = UserStatus.Offline;
+        }
 
 		internal void Update(UserReference model)
 		{
@@ -170,20 +194,6 @@ namespace Discord
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
 				UpdateRoles(model.Roles.Select(x => Server.GetRole(x)));
-        }
-		internal void Update(ExtendedMember model)
-		{
-			Update(model as APIMember);
-            
-            if (model.IsServerMuted == true)
-                _voiceState |= VoiceState.ServerMuted;
-            else if (model.IsServerMuted == false)
-                _voiceState &= ~VoiceState.ServerMuted;
-
-            if (model.IsServerDeafened == true)
-                _voiceState |= VoiceState.ServerDeafened;
-            else if (model.IsServerDeafened == false)
-                _voiceState &= ~VoiceState.ServerDeafened;
         }
 		internal void Update(MemberPresence model)
 		{
@@ -323,11 +333,10 @@ namespace Discord
 
         internal User Clone()
         {
-            var result = new User();
+            var result = new User(Id, Client, Server);
             _cloner(this, result);
             return result;
         }
-        private User() { } //Used for cloning
 
         public override string ToString()
         {

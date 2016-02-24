@@ -1,4 +1,5 @@
 ﻿using APIChannel = Discord.API.Client.Channel;
+using APIMember = Discord.API.Client.Member;
 using Discord.API.Client;
 using Discord.API.Client.Rest;
 using Discord.Net;
@@ -112,10 +113,10 @@ namespace Discord
         /// <summary> Gets the number of roles in this server. </summary>
         public int RoleCount => _roles.Count;
 
-        internal Server(DiscordClient client, ulong id)
+        internal Server(ulong id, DiscordClient client)
         {
-            Client = client;
             Id = id;
+            Client = client;
         }
         
         internal void Update(Guild model)
@@ -181,7 +182,7 @@ namespace Discord
                 if (model.Members != null)
                 {
                     foreach (var subModel in model.Members)
-                        AddUser(subModel.User.Id, true, false).Update(subModel);
+                        AddUser(subModel, true, false).Update(subModel);
                 }
                 if (model.VoiceStates != null)
                 {
@@ -230,8 +231,7 @@ namespace Discord
             var response = await Client.ClientAPI.Send(new GetBansRequest(Id)).ConfigureAwait(false);
             return response.Select(x =>
             {
-                var user = new User(Client, x.Id, this);
-                user.Update(x);
+                var user = new User(x, Client, this);
                 return user;
             });
         }
@@ -305,12 +305,12 @@ namespace Discord
 
         #region Invites
         /// <summary> Gets all active (non-expired) invites to this server. </summary>
-        public async Task<IEnumerable<Invite>> GetInvites()
+        public async Task<IEnumerable<Invite>> DownloadInvites()
         {
             var response = await Client.ClientAPI.Send(new GetInvitesRequest(Id)).ConfigureAwait(false);
             return response.Select(x =>
             {
-                var invite = new Invite(Client, x.Code, x.XkcdPass);
+                var invite = new Invite(x, Client);
                 invite.Update(x);
                 return invite;
             });
@@ -429,22 +429,22 @@ namespace Discord
         #endregion
 
         #region Users
-        internal User AddUser(ulong id, bool cachePerms, bool incrementCount)
+        internal User AddUser(APIMember model, bool cachePerms, bool incrementCount)
         {
             if (incrementCount)
                 _userCount++;
 
             Member member;
-            if (!_users.TryGetValue(id, out member)) //Users can only be added from websocket thread, ignore threadsafety
+            if (!_users.TryGetValue(model.User.Id, out member)) //Users can only be added from websocket thread, ignore threadsafety
             {
-                member = new Member(new User(Client, id, this), ServerPermissions.None);
-                if (id == Client.CurrentUser.Id)
+                member = new Member(new User(model, Client, this), ServerPermissions.None);
+                if (model.User.Id == Client.CurrentUser.Id)
                 {
                     member.User.CurrentGame = Client.CurrentGame;
                     member.User.Status = Client.Status;
                 }
 
-                _users[id] = member;
+                _users[model.User.Id] = member;
                 if (cachePerms && Client.Config.UsePermissionsCache)
                 {
                     foreach (var channel in _channels)
@@ -501,11 +501,10 @@ namespace Discord
 
         internal Server Clone()
         {
-            var result = new Server();
+            var result = new Server(Id, Client);
             _cloner(this, result);
             return result;
         }
-        private Server() { } //Used for cloning
 
         public override string ToString() => Name ?? Id.ToIdString();
 	}

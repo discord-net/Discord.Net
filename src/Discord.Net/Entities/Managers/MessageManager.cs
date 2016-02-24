@@ -1,4 +1,5 @@
-﻿using Discord.API.Client.Rest;
+﻿using APIMessage = Discord.API.Client.Message;
+using Discord.API.Client.Rest;
 using Discord.Net;
 using System;
 using System.Collections;
@@ -29,15 +30,16 @@ namespace Discord
             }
         }
 
-        internal Message Add(ulong id, User user, DateTime timestamp)
+        internal Message Add(APIMessage model, User user) => Add(new Message(model, _channel, user));
+        internal Message Add(ulong id, User user) => Add(new Message(id, _channel, user));
+        private Message Add(Message message)
         {
-            Message message = new Message(id, _channel, user);
             message.State = MessageState.Normal;
             if (_size > 0)
             {
-                if (_messages.TryAdd(id, message))
+                if (_messages.TryAdd(message.Id, message))
                 {
-                    _orderedMessages.Enqueue(id);
+                    _orderedMessages.Enqueue(message.Id);
 
                     ulong msgId;
                     while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out msgId))
@@ -93,15 +95,7 @@ namespace Discord
                     Message msg = null;
                     ulong id = x.Author.Id;
                     var user = server?.GetUser(id) ?? (_channel as Channel).GetUser(id);
-                    /*if (useCache)
-                    {
-                        msg = Add(x.Id, user, x.Timestamp.Value);
-                        if (user != null)
-                            user.UpdateActivity(msg.EditedTimestamp ?? msg.Timestamp);
-                    }
-                    else*/
-                        msg = new Message(x.Id, _channel, user);
-                    msg.Update(x);
+                    msg = new Message(x, _channel, user);
                     return msg;
                 }).ToArray();
             }
@@ -130,11 +124,9 @@ namespace Discord
                 Filename = filename,
                 Stream = stream
             };
-            var model = await _channel.Client.ClientAPI.Send(request).ConfigureAwait(false);
+            var response = await _channel.Client.ClientAPI.Send(request).ConfigureAwait(false);
 
-            var msg = Add(model.Id, (_channel as Channel).CurrentUser, model.Timestamp.Value);
-            msg.Update(model);
-            return msg;
+            return Add(response, (_channel as Channel).CurrentUser);
         }
 
         public IEnumerator<Message> GetEnumerator()

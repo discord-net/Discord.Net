@@ -7,22 +7,6 @@ using APIMessage = Discord.API.Client.Message;
 
 namespace Discord
 {
-	public enum MessageState : byte
-    {
-        /// <summary> Message did not originate from this session, or was successfully sent. </summary>
-		Normal = 0,
-        /// <summary> Message is current queued. </summary>
-		Queued,
-        /// <summary> Message was deleted. </summary>
-        Deleted,
-        /// <summary> Message was deleted before it was sent. </summary>
-        Aborted,
-        /// <summary> Message failed to be sent. </summary>
-		Failed,
-        /// <summary> Message has been removed from cache and will no longer receive updates. </summary>
-        Detached
-    }
-
 	public class Message
     {
         private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCopyMethod<Message>();
@@ -198,15 +182,19 @@ namespace Discord
         /// <summary> Returns if this message was sent from the logged-in accounts. </summary>
         public bool IsAuthor => User != null && User.Id == Client.CurrentUser?.Id;
 
-        internal Message(ulong id, ITextChannel channel, User user)
+        internal Message(APIMessage model, ITextChannel channel, User user)
+            : this(model.Id, channel, user)
 		{
+            Update(model);
+		}
+        internal Message(ulong id, ITextChannel channel, User user)
+        {
             Id = id;
             Channel = channel;
             User = user;
-
-			Attachments = _initialAttachments;
-			Embeds = _initialEmbeds;
-		}
+            Attachments = _initialAttachments;
+            Embeds = _initialEmbeds;
+        }
 
 		internal void Update(APIMessage model)
 		{
@@ -329,11 +317,10 @@ namespace Discord
 
         internal Message Clone()
         {
-            var result = new Message();
+            var result = new Message(Id, Channel, User);
             _cloner(this, result);
             return result;
         }
-        private Message() { } //Used for cloning
 
         public override string ToString() => $"{User}: {RawText}";
 	}
