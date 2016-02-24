@@ -1,4 +1,6 @@
-﻿namespace Discord.Net.Rest
+﻿using System.IO;
+
+namespace Discord.Net.Rest
 {
     public interface IRestRequest
     {
