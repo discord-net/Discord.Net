@@ -29,7 +29,8 @@ This Documentation is **currently undergoing a rewrite**. Some pages (marked wit
 
    getting_started
    features/logging
-   features/management
+   features/server-management
+   features/user-management
    features/permissions
    features/commands
    features/voice
