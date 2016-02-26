@@ -2,6 +2,7 @@
 {
     public interface IVoiceChannel : IChannel
     {
-        int Bitrate { get; set; }
+        /// <summary> Gets the requested bitrate, in bits per second, of this voice channel. </summary>
+        int Bitrate { get; }
     }
 }

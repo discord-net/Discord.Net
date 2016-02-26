@@ -23,7 +23,7 @@ namespace Discord
         public event EventHandler<ServerUpdatedEventArgs> ServerUpdated = delegate { };
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
         public event EventHandler<UserEventArgs> UserBanned = delegate { };
-        public event EventHandler<ChannelUserEventArgs> UserIsTyping = delegate { };
+        public event EventHandler<TypingEventArgs> UserIsTyping = delegate { };
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
         public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };

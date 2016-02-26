@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public class Role : IModel<ulong>, IMentionable
+	public class Role : IEntity<ulong>, IMentionable
     {
         public DiscordClient Client { get; }
 

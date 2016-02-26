@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public class Profile : IModel<ulong>
+    public class Profile : IEntity<ulong>
     {
         public DiscordClient Client { get; }
         

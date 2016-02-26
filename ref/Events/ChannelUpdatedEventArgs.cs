@@ -4,8 +4,8 @@ namespace Discord
 {
     public class ChannelUpdatedEventArgs : EventArgs
     {
-        public Channel Before => null;
-        public Channel After => null;
+        public IChannel Before => null;
+        public IChannel After => null;
         public Server Server => null;
     }
 }

@@ -1,49 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class VoiceChannel : IPublicChannel, IVoiceChannel
+    public class VoiceChannel : IPublicChannel, IVoiceChannel, IModifiable<VoiceChannel.Properties>
     {
+        public sealed class Properties
+        {
+            public int Bitrate { get; set; }
+        }
+
+        /// <inheritdoc />
         public ulong Id { get; }
+        /// <inheritdoc />
         public DiscordClient Client { get; }
-        public Server Server { get; }
+        /// <inheritdoc />
+        public ModelState State { get; }
+        /// <inheritdoc />
         public ChannelType Type { get; }
-        public bool IsText { get; }
-        public bool IsVoice { get; }
-        public bool IsPrivate { get; }
-        public bool IsPublic { get; }
+        /// <inheritdoc />
+        public bool IsPrivate => false;
+        /// <inheritdoc />
+        public bool IsPublic => true;
+        /// <inheritdoc />
+        public bool IsText => false;
+        /// <inheritdoc />
+        public bool IsVoice => true;
+
+        /// <inheritdoc />
+        public string Name { get; }
+        /// <inheritdoc />
+        public int Position { get; }
+        /// <inheritdoc />
+        public int Bitrate { get; }
+        /// <inheritdoc />
+        public Server Server { get; }
+        /// <inheritdoc />
         public IEnumerable<PermissionOverwrite> PermissionOverwrites { get; }
-        public IEnumerable<User> Users { get; }
 
-        public string Name { get; set; }
-        public int Position { get; set; }
-        public int Bitrate { get; set; }
+        /// <inheritdoc />
+        public PermissionOverwrite? GetPermissionOverwrite(User user) => null;
+        /// <inheritdoc />
+        public PermissionOverwrite? GetPermissionOverwrite(Role role) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<User>> GetUsers() => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Invite>> GetInvites() => null;
+                
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(User user, ChannelPermissions allow, ChannelPermissions deny) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(User user, TriStateChannelPermissions permissions) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(Role role, ChannelPermissions allow, ChannelPermissions deny) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(Role role, TriStateChannelPermissions permissions) => null;
+        /// <inheritdoc />
+        public Task RemovePermissionOverwrite(User user) => null;
+        /// <inheritdoc />
+        public Task RemovePermissionOverwrite(Role role) => null;
 
-        public Message GetMessage(ulong id) => null;
-        public PermissionOverwrite? GetPermissionsRule(User user) => null;
-        public PermissionOverwrite? GetPermissionsRule(Role role) => null;
+        /// <inheritdoc />
+        public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false) => null;
 
-        public Task<IEnumerable<Message>> DownloadMessages(int limit) => null;
-        public Task<IEnumerable<Message>> DownloadMessages(int limit, ulong? relativeMessageId, Relative relativeDir) => null;
-        public Task<IEnumerable<Invite>> DownloadInvites() => null;
-
-        public Task<Message> SendMessage(string text, bool isTTS = false) => null;
-        public Task<Message> SendFile(string path, string text = null, bool isTTS = false) => null;
-        public Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false) => null;
-
-        public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool tempMembership = false, bool withXkcd = false) => null;
-
-        public Task AddPermissionsRule(User user, ChannelPermissions allow, ChannelPermissions deny) => null;
-        public Task AddPermissionsRule(User user, TriStateChannelPermissions permissions) => null;
-        public Task AddPermissionsRule(Role role, ChannelPermissions allow, ChannelPermissions deny) => null;
-        public Task AddPermissionsRule(Role role, TriStateChannelPermissions permissions) => null;
-        public Task RemovePermissionsRule(User user) => null;
-        public Task RemovePermissionsRule(Role role) => null;
-
+        /// <inheritdoc />
         public Task Delete() => null;
-        public Task Save() => null;
+        /// <inheritdoc />
+        public Task Update() => null;
+        /// <inheritdoc />
+        public Task Modify(Action<Properties> func) => null;
     }
 }

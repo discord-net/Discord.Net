@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public class Server : IModel<ulong>
+	public class Server : IEntity<ulong>
     {
         public class Emoji
         {
@@ -28,7 +28,7 @@ namespace Discord
         public Role EveryoneRole { get; }
         public IEnumerable<string> Features { get; }
         public IEnumerable<Emoji> CustomEmojis { get; }
-        public IEnumerable<Channel> Channels { get; }
+        public IEnumerable<IChannel> Channels { get; }
         public IEnumerable<TextChannel> TextChannels { get; }
         public IEnumerable<VoiceChannel> VoiceChannels { get; }
         public IEnumerable<User> Users { get; }

@@ -29,7 +29,7 @@ namespace Discord
         public string CurrentGame { get; }
         
         public IEnumerable<Server> Servers { get; }
-        public IEnumerable<Channel> PrivateChannels { get; }
+        public IEnumerable<PrivateChannel> PrivateChannels { get; }
         public IEnumerable<Region> Regions { get; }
 
         public DiscordClient() { }
@@ -43,8 +43,8 @@ namespace Discord
         public void SetStatus(UserStatus status) { }
         public void SetGame(string game) { }
 
-        public Channel GetChannel(ulong id) => null;
-        public Task<Channel> CreatePrivateChannel(ulong userId) => null;
+        public PrivateChannel GetPrivateChannel(ulong id) => null;
+        public Task<PrivateChannel> CreatePrivateChannel(ulong userId) => null;
 
         public Task<Invite> GetInvite(string inviteIdOrXkcd) => null;
 

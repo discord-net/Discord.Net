@@ -1,50 +1,94 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class TextChannel : Channel, ITextChannel, IPublicChannel, IMentionable
+    public class TextChannel : ITextChannel, IPublicChannel, IMentionable, IModifiable<TextChannel.Properties>
     {
-        public Server Server { get; }
+        public sealed class Properties
+        {
+        }
+
+        /// <inheritdoc />
+        public ulong Id { get; }
+        /// <inheritdoc />
+        public DiscordClient Discord { get; }
+        /// <inheritdoc />
+        public ModelState State { get; }
+        /// <inheritdoc />
+        public ChannelType Type => ChannelType.Public | ChannelType.Text;
+        /// <inheritdoc />
+        public bool IsPrivate => false;
+        /// <inheritdoc />
+        public bool IsPublic => true;
+        /// <inheritdoc />
+        public bool IsText => true;
+        /// <inheritdoc />
+        public bool IsVoice => false;
+
+        /// <inheritdoc />
+        public string Name { get; }
+        /// <inheritdoc />
+        public string Topic { get; }
+        /// <inheritdoc />
+        public int Position { get; }
+        /// <inheritdoc />
         public string Mention { get; }
+        /// <inheritdoc />
+        public Server Server { get; }
+        /// <inheritdoc />
         public IEnumerable<PermissionOverwrite> PermissionOverwrites { get; }
-        public IEnumerable<Message> Messages { get; }
+        /// <inheritdoc />
+        public IEnumerable<User> Users { get; }
 
-        public string Topic { get; set; }
-        public bool IsTyping { get; set; }
-        public string Name { get; set; }
-        public int Position { get; set; }
+        /// <inheritdoc />
+        public Task<IEnumerable<User>> GetUsers() => null;
+        /// <inheritdoc />
+        public Task<Message> GetMessage(ulong id) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Message>> GetMessages(int limit = 100) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Message>> GetMessages(int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before) => null;
+        /// <inheritdoc />
+        public Task<PermissionOverwrite?> GetPermissionOverwrite(User user) => null;
+        /// <inheritdoc />
+        public Task<PermissionOverwrite?> GetPermissionOverwrite(Role role) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Invite>> GetInvites() => null;
 
-        public override DiscordClient Client => null;
-        public override ChannelType Type => default(ChannelType);
-        public override User CurrentUser => null;
-        public override IEnumerable<User> Users => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(User user, ChannelPermissions allow, ChannelPermissions deny) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(User user, TriStateChannelPermissions permissions) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(Role role, ChannelPermissions allow, ChannelPermissions deny) => null;
+        /// <inheritdoc />
+        public Task UpdatePermissionOverwrite(Role role, TriStateChannelPermissions permissions) => null;
+        /// <inheritdoc />
+        public Task RemovePermissionOverwrite(User user) => null;
+        /// <inheritdoc />
+        public Task RemovePermissionOverwrite(Role role) => null;
 
-        public Message GetMessage(ulong id) => null;
-        public PermissionOverwrite? GetPermissionsRule(User user) => null;
-        public PermissionOverwrite? GetPermissionsRule(Role role) => null;
-
-        public Task<IEnumerable<Message>> DownloadMessages(int limit) => null;
-        public Task<IEnumerable<Message>> DownloadMessages(int limit, ulong? relativeMessageId, Relative relativeDir) => null;
-        public Task<IEnumerable<Invite>> DownloadInvites() => null;
-
+        /// <inheritdoc />
         public Task<Message> SendMessage(string text, bool isTTS = false) => null;
-        public Task<Message> SendFile(string path, string text = null, bool isTTS = false) => null;
+        /// <inheritdoc />
+        public Task<Message> SendFile(string filePath, string text = null, bool isTTS = false) => null;
+        /// <inheritdoc />
         public Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false) => null;
 
+        /// <inheritdoc />
         public Task SendIsTyping() => null;
 
-        public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool tempMembership = false, bool withXkcd = false) => null;
+        /// <inheritdoc />
+        public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false) => null;
 
-        public Task AddPermissionsRule(User user, ChannelPermissions allow, ChannelPermissions deny) => null;
-        public Task AddPermissionsRule(User user, TriStateChannelPermissions permissions) => null;
-        public Task AddPermissionsRule(Role role, ChannelPermissions allow, ChannelPermissions deny) => null;
-        public Task AddPermissionsRule(Role role, TriStateChannelPermissions permissions) => null;
-        public Task RemovePermissionsRule(User user) => null;
-        public Task RemovePermissionsRule(Role role) => null;
-
+        /// <inheritdoc />
         public Task Delete() => null;
-        public override Task Save() => null;
+        /// <inheritdoc />
+        public Task Update() => null;
+        /// <inheritdoc />
+        public Task Modify(Action<Properties> func) => null;
     }
 }

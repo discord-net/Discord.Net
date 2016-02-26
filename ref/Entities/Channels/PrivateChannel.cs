@@ -1,31 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class PrivateChannel : Channel, ITextChannel, IPrivateChannel
-    {        
+    public class PrivateChannel : ITextChannel, IPrivateChannel
+    {
+        /// <inheritdoc />
+        public ulong Id { get; }
+        /// <inheritdoc />
+        public DiscordClient Client { get; }
+        /// <inheritdoc />
+        public ModelState State { get; }
+        /// <inheritdoc />
+        public ChannelType Type { get; }
+        /// <inheritdoc />
+        public bool IsPrivate => true;
+        /// <inheritdoc />
+        public bool IsPublic => false;
+        /// <inheritdoc />
+        public bool IsText => true;
+        /// <inheritdoc />
+        public bool IsVoice => false;
+
+        /// <inheritdoc />
+        public Server Server { get; }
+        /// <inheritdoc />
         public User Recipient { get; }
-        public IEnumerable<Message> Messages { get; }
 
-        public override DiscordClient Client => null;
-        public override ChannelType Type => default(ChannelType);
+        /// <inheritdoc />
+        public Task<IEnumerable<User>> GetUsers();
+        /// <inheritdoc />
+        public Task<Message> GetMessage(ulong id) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Message>> GetMessages(int limit = 100) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<Message>> GetMessages(int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before) => null;
 
-        public override User CurrentUser => null;
-        public override IEnumerable<User> Users => null;
-
-        public Message GetMessage(ulong id) => null;
-        public Task<IEnumerable<Message>> DownloadMessages(int limit) => null;
-        public Task<IEnumerable<Message>> DownloadMessages(int limit, ulong? relativeMessageId, Relative relativeDir) => null;
-
+        /// <inheritdoc />
         public Task<Message> SendMessage(string text, bool isTTS = false) => null;
-        public Task<Message> SendFile(string path, string text = null, bool isTTS = false) => null;
+        /// <inheritdoc />
+        public Task<Message> SendFile(string filePath, string text = null, bool isTTS = false) => null;
+        /// <inheritdoc />
         public Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false) => null;
 
+        /// <inheritdoc />
         public Task SendIsTyping() => null;
-
-        public override Task Save() => null;
+        
+        /// <inheritdoc />
+        public Task Delete() => null;
+        /// <inheritdoc />
+        public Task Update() => null;
     }
 }

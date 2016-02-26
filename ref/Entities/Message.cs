@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class Message : IModel<ulong>
+    public class Message : IEntity<ulong>
     {
         public class Attachment : File
         {
