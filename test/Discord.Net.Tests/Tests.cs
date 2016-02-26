@@ -42,7 +42,7 @@ namespace Discord.Tests
 			//Create new server and invite the other bots to it
 			_testServer = _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First()).Result;
 			_testServerChannel = _testServer.DefaultChannel;
-			Invite invite = _testServer.CreateInvite(60, 1, false, false).Result;
+			var invite = _testServer.CreateInvite(60, 2, false, false).Result;
 			WaitAll(
 				_targetBot.GetInvite(invite.Code).Result.Accept(),
                 _observerBot.GetInvite(invite.Code).Result.Accept());
@@ -121,6 +121,8 @@ namespace Discord.Tests
 				_targetBot.Disconnect(),
 				_observerBot.Disconnect());
 		}
+
+        // Unit Test Helpers
 
 		private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
 		{
