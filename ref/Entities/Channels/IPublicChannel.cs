@@ -15,9 +15,9 @@ namespace Discord
         int Position { get; }   
 
         /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
-        Task<PermissionOverwrite?> GetPermissionOverwrite(User user);
+        PermissionOverwrite? GetPermissionOverwrite(User user);
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
-        Task<PermissionOverwrite?> GetPermissionOverwrite(Role role);
+        PermissionOverwrite? GetPermissionOverwrite(Role role);
         /// <summary> Downloads a collection of all invites to this server. </summary>
         Task<IEnumerable<Invite>> GetInvites();
         

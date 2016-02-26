@@ -9,7 +9,7 @@ namespace Discord
         /// <inheritdoc />
         public ulong Id { get; }
         /// <inheritdoc />
-        public DiscordClient Client { get; }
+        public DiscordClient Discord { get; }
         /// <inheritdoc />
         public ModelState State { get; }
         /// <inheritdoc />

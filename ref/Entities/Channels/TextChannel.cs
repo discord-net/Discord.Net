@@ -9,6 +9,9 @@ namespace Discord
     {
         public sealed class Properties
         {
+            public string Name { get; }
+            public string Topic { get; }
+            public int Position { get; }
         }
 
         /// <inheritdoc />
@@ -44,6 +47,10 @@ namespace Discord
         public IEnumerable<User> Users { get; }
 
         /// <inheritdoc />
+        public PermissionOverwrite? GetPermissionOverwrite(User user) => null;
+        /// <inheritdoc />
+        public PermissionOverwrite? GetPermissionOverwrite(Role role) => null;
+        /// <inheritdoc />
         public Task<IEnumerable<User>> GetUsers() => null;
         /// <inheritdoc />
         public Task<Message> GetMessage(ulong id) => null;
@@ -51,10 +58,6 @@ namespace Discord
         public Task<IEnumerable<Message>> GetMessages(int limit = 100) => null;
         /// <inheritdoc />
         public Task<IEnumerable<Message>> GetMessages(int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before) => null;
-        /// <inheritdoc />
-        public Task<PermissionOverwrite?> GetPermissionOverwrite(User user) => null;
-        /// <inheritdoc />
-        public Task<PermissionOverwrite?> GetPermissionOverwrite(Role role) => null;
         /// <inheritdoc />
         public Task<IEnumerable<Invite>> GetInvites() => null;
 

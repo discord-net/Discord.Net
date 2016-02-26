@@ -11,7 +11,7 @@ namespace Discord
     public interface IEntity
     {
         /// <summary> Gets the DiscordClient that manages this object. </summary>
-        DiscordClient Client { get; }
+        DiscordClient Discord { get; }
         /// <summary> Gets the state of this object. </summary>
         ModelState State { get; }
 

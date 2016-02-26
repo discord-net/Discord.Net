@@ -8,13 +8,15 @@ namespace Discord
     {
         public sealed class Properties
         {
+            public string Name { get; }
             public int Bitrate { get; set; }
+            public int Position { get; }
         }
 
         /// <inheritdoc />
         public ulong Id { get; }
         /// <inheritdoc />
-        public DiscordClient Client { get; }
+        public DiscordClient Discord { get; }
         /// <inheritdoc />
         public ModelState State { get; }
         /// <inheritdoc />
