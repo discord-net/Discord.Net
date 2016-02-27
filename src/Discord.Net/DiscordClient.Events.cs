@@ -68,12 +68,12 @@ namespace Discord
             => OnEvent(JoinedServer, new ServerEventArgs(server));
         private void OnLeftServer(Server server)
             => OnEvent(LeftServer, new ServerEventArgs(server));
-        private void OnServerAvailable(Server server)
-            => OnEvent(ServerAvailable, new ServerEventArgs(server));
+        /*private void OnServerAvailable(Server server)
+            => OnEvent(ServerAvailable, new ServerEventArgs(server));*/
         private void OnServerUpdated(Server before, Server after)
             => OnEvent(ServerUpdated, new ServerUpdatedEventArgs(before, after));
-        private void OnServerUnavailable(Server server)
-            => OnEvent(ServerUnavailable, new ServerEventArgs(server));
+        /*private void OnServerUnavailable(Server server)
+            => OnEvent(ServerUnavailable, new ServerEventArgs(server));*/
 
         private void OnUserBanned(User user)
             => OnEvent(UserBanned, new UserEventArgs(user));

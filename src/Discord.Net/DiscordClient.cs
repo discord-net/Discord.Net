@@ -33,6 +33,7 @@ namespace Discord
         private ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
         private Stopwatch _connectionStopwatch;
+        private bool _isProcessingReady;
 
         internal Logger Logger { get; }
 
@@ -270,6 +271,7 @@ namespace Discord
                 SendStatus();
                 OnReady();
             }
+            _isProcessingReady = false;
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -487,6 +489,7 @@ namespace Discord
                             //TODO: None of this is really threadsafe - should only replace the cache collections when they have been fully populated
 
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
+                            _isProcessingReady = true;
 
                             int channelCount = 0;
                             for (int i = 0; i < data.Guilds.Length; i++)
@@ -543,8 +546,15 @@ namespace Discord
                                     Logger.Info($"GUILD_AVAILABLE: {server.Path}");
 
                                 if (data.Unavailable != false)
-                                    OnJoinedServer(server);
-                                OnServerAvailable(server);
+                                {
+                                    if (data.IsLarge)
+                                        GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
+                                    else
+                                    {
+                                        OnJoinedServer(server);
+                                        //OnServerAvailable(server);
+                                    }
+                                }
                             }
                         }
                         break;
@@ -574,9 +584,9 @@ namespace Discord
                                 else
                                     Logger.Info($"GUILD_UNAVAILABLE: {server.Path}");
 
-                                OnServerUnavailable(server);
-                                if (data.Unavailable != true)
-                                    OnLeftServer(server);
+                                //OnServerUnavailable(server);
+                                //if (data.Unavailable != true)
+                                OnLeftServer(server);
                             }
                             else
                                 Logger.Warning("GUILD_DELETE referenced an unknown guild.");
@@ -708,14 +718,23 @@ namespace Discord
 
                                 if (server.CurrentUserCount >= server.UserCount) //Finished downloading for there
                                 {
-                                    bool isConnectComplete = true;
-                                    foreach (var server2 in _servers.Select(x => x.Value))
+                                    if (_isProcessingReady)
                                     {
-                                        if (server2.CurrentUserCount < server2.UserCount)
-                                            isConnectComplete = false;
+                                        bool isConnectComplete = true;
+                                        foreach (var server2 in _servers.Select(x => x.Value))
+                                        {
+                                            if (server2.CurrentUserCount < server2.UserCount)
+                                                isConnectComplete = false;
+                                        }
+                                        if (isConnectComplete)
+                                            EndConnect();
                                     }
-                                    if (isConnectComplete)
-                                        EndConnect();
+                                    else
+                                    {
+                                        //TODO: Need to store if a server is available or not
+                                        OnJoinedServer(server);
+                                        //OnServerAvailable(server);
+                                    }
                                 }
                             }
                             else
