@@ -38,13 +38,14 @@ namespace Discord
             public int? Width { get; }
             public int? Height { get; }
         }
-
-        public DiscordClient Client { get; }        
+  
         public ulong Id { get; }
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
         public ITextChannel Channel { get; }
         public User User { get; }        
         public bool IsTTS { get; }
-        public MessageState State { get; }
         public string RawText { get; }
         public string Text { get; }
         public DateTime Timestamp { get; }
@@ -59,10 +60,9 @@ namespace Discord
         public Server Server => null;
         public bool IsAuthor => false;
         
-        public Task Delete() => null;
-
-        public Task Save() => null;
-
         public bool IsMentioningMe(bool includeRoles = false) => false;
+
+        public Task Update() => null;
+        public Task Delete() => null;
     }
 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public class Invite : IModel<string>
+	public class Invite : IEntity<string>
     {
         public class ServerInfo
 		{
@@ -23,10 +23,11 @@ namespace Discord
 			public string AvatarId { get; }            
 			public string AvatarUrl { get; }
         }
-        
-        public DiscordClient Client { get; }
 
-        string IModel<string>.Id => Code;
+        string IEntity<string>.Id => Code;
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
         public string Code { get; }
         public string XkcdCode { get; }
         
@@ -40,9 +41,9 @@ namespace Discord
         public DateTime CreatedAt { get; }        
         public string Url { get; }
 
-        public Task Delete() => null;
         public Task Accept() => null;
 
-        public Task Save() => null;
-	}
+        public Task Update() => null;
+        public Task Delete() => null;
+    }
 }

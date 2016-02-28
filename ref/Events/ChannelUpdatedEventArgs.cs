@@ -6,6 +6,5 @@ namespace Discord
     {
         public IChannel Before => null;
         public IChannel After => null;
-        public Server Server => null;
     }
 }

@@ -16,6 +16,9 @@ namespace Discord
         }
         
         public ulong Id { get; }
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
         public User CurrentUser { get; }
         public string IconId { get; }
         public string SplashId { get; }
@@ -50,11 +53,8 @@ namespace Discord
         public Task<IEnumerable<User>> DownloadBans() => null;
         public Task<IEnumerable<Invite>> DownloadInvites() => null;
 
-        public Task Leave() => null;
-        public Task Delete() => null;
-        public Task Save() => null;
-
-        public Task<Channel> CreateChannel(string name, ChannelType type) => null;
+        public Task<TextChannel> CreateTextChannel(string name) => null;
+        public Task<VoiceChannel> CreateVoiceChannel(string name) => null;
         public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false) => null;
         public Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false) => null;
 
@@ -62,9 +62,10 @@ namespace Discord
         public Task Unban(User user) => null;
         public Task Unban(ulong userId) => null;
         
-        public Task ReorderChannels(IEnumerable<Channel> channels) => null;
-        public Task ReorderRoles(IEnumerable<Role> roles, Role after = null) => null;
-        
         public Task<int> PruneUsers(int days = 30, bool simulate = false) => null;
-	}
+
+        public Task Update() => null;
+        public Task Leave() => null;
+        public Task Delete() => null;
+    }
 }

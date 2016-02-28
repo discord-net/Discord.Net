@@ -5,9 +5,10 @@ namespace Discord
 {
 	public class Role : IEntity<ulong>, IMentionable
     {
-        public DiscordClient Client { get; }
-
         public ulong Id { get; }
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
         public Server Server { get; }
         
         public string Name { get; }
@@ -21,9 +22,8 @@ namespace Discord
         public IEnumerable<User> Members { get; }
         
         public string Mention { get; }
-        
-        public Task Delete() => null;
 
-        public Task Save() => null;
+        public Task Update() => null;
+        public Task Delete() => null;
     }
 }

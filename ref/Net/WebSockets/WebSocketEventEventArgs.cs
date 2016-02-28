@@ -7,11 +7,5 @@ namespace Discord.Net.WebSockets
     {
         public string Type { get; }
         public JToken Payload { get; }
-
-        internal WebSocketEventEventArgs(string type, JToken data)
-        {
-            Type = type;
-            Payload = data;
-        }
     }
 }

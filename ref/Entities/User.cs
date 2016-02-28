@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-	public class User : IModel<ulong>
-    {
-        public DiscordClient Client { get; }
-        
+	public class User : IEntity<ulong>
+    {        
         public ulong Id { get; }
-        public Server Server { get; }
-        
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
+        public Server Server { get; }        
         public string Name { get; }
         public ushort Discriminator { get; }
         public string AvatarId { get; }
@@ -20,7 +20,6 @@ namespace Discord
         public DateTime JoinedAt { get; }
         public DateTime? LastActivityAt { get; }
         
-        public Channel PrivateChannel => null;
         public string Mention => null;
         public bool IsSelfMuted => false;
         public bool IsSelfDeafened => false;
@@ -28,18 +27,14 @@ namespace Discord
         public bool IsServerDeafened => false;
         public bool IsServerSuppressed => false;
         public DateTime? LastOnlineAt => null;
-        public Channel VoiceChannel => null;
+        public VoiceChannel VoiceChannel => null;
         public string AvatarUrl => null;
-        public IEnumerable<Role> Roles => null;
-        
-        public IEnumerable<Channel> Channels => null;
-
-        public Task Kick() => null;
-
+        public IEnumerable<Role> Roles => null;        
+        public IEnumerable<IPublicChannel> Channels => null;
         public ServerPermissions ServerPermissions => default(ServerPermissions);
-        public ChannelPermissions GetPermissions(Channel channel) => default(ChannelPermissions);
-        
-        public Task<Channel> CreatePMChannel() => null;
+
+        public ChannelPermissions GetPermissions(IPublicChannel channel) => default(ChannelPermissions);
+        public Task<PrivateChannel> GetPrivateChannel() => null;
 
         public Task<Message> SendMessage(string text) => null;
         public Task<Message> SendFile(string filePath) => null;
@@ -50,6 +45,7 @@ namespace Discord
         public Task AddRoles(params Role[] roles) => null;
         public Task RemoveRoles(params Role[] roles) => null;
 
-        public Task Save() => null;
+        public Task Update() => null;
+        public Task Kick() => null;
     }
 }

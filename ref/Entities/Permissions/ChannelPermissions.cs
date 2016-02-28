@@ -6,12 +6,11 @@
         public static ChannelPermissions TextOnly { get; }
         public static ChannelPermissions PrivateOnly { get; }
         public static ChannelPermissions VoiceOnly { get; }
-        public static ChannelPermissions All(Channel channel) => default(ChannelPermissions);
-        public static ChannelPermissions All(ChannelType channelType, bool isPrivate) => default(ChannelPermissions);
+        public static ChannelPermissions All(ChannelType channelType) => default(ChannelPermissions);
 
         public uint RawValue { get; }
 
-        public bool CreateInstantInvit { get; }
+        public bool CreateInstantInvite { get; }
         public bool ManagePermission { get; }
         public bool ManageChannel { get; }
 
@@ -44,7 +43,7 @@
         {
         }
 
-        public ChannelPermissions Modify(ChannelPermissions basePerms, bool? createInstantInvite = null, bool? managePermissions = null,
+        public ChannelPermissions Modify(bool? createInstantInvite = null, bool? managePermissions = null,
             bool? manageChannel = null, bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,
             bool? manageMessages = null, bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,
             bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,

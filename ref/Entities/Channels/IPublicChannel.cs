@@ -3,32 +3,34 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    public struct PermissionOverwriteEntry
+    {
+        public PermissionTarget TargetType { get; }
+        public ulong TargetId { get; }
+        public OverwritePermissions Permissions { get; }
+    }
     public interface IPublicChannel : IChannel
     {
         /// <summary> Gets the server this channel is a member of. </summary>
         Server Server { get; }
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
-        IEnumerable<PermissionOverwrite> PermissionOverwrites { get; }
+        IEnumerable<PermissionOverwriteEntry> PermissionOverwrites { get; }
         /// <summary> Gets the name of this public channel. </summary>
         string Name { get; }
         /// <summary> Gets the position of this public channel relative to others of the same type. </summary>
-        int Position { get; }   
+        int Position { get; }
 
         /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
-        PermissionOverwrite? GetPermissionOverwrite(User user);
+        OverwritePermissions? GetPermissionOverwrite(User user);
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
-        PermissionOverwrite? GetPermissionOverwrite(Role role);
+        OverwritePermissions? GetPermissionOverwrite(Role role);
         /// <summary> Downloads a collection of all invites to this server. </summary>
         Task<IEnumerable<Invite>> GetInvites();
         
         /// <summary> Adds or updates the permission overwrite for the given user. </summary>
-        Task UpdatePermissionOverwrite(User user, ChannelPermissions allow, ChannelPermissions deny);
-        /// <summary> Adds or updates the permission overwrite for the given user. </summary>
-        Task UpdatePermissionOverwrite(User user, TriStateChannelPermissions permissions);
+        Task UpdatePermissionOverwrite(User user, OverwritePermissions permissions);
         /// <summary> Adds or updates the permission overwrite for the given role. </summary>
-        Task UpdatePermissionOverwrite(Role role, ChannelPermissions allow, ChannelPermissions deny);
-        /// <summary> Adds or updates the permission overwrite for the given role. </summary>
-        Task UpdatePermissionOverwrite(Role role, TriStateChannelPermissions permissions);
+        Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions);
         /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
         Task RemovePermissionOverwrite(User user);
         /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>

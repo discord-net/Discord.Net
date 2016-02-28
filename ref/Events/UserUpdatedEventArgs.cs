@@ -5,6 +5,5 @@ namespace Discord
     {
         public User Before => null;
         public User After => null;
-        public Server Server => null;
     }
 }

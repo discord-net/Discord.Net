@@ -13,10 +13,8 @@ namespace Discord
         /// <summary> Gets the DiscordClient that manages this object. </summary>
         DiscordClient Discord { get; }
         /// <summary> Gets the state of this object. </summary>
-        ModelState State { get; }
-
-        /// <summary> Deletes this object. </summary>
-        Task Delete();
+        EntityState State { get; }
+        
         /// <summary> Downloads the latest values and updates this object. </summary>
         Task Update();
     }

@@ -11,7 +11,7 @@ namespace Discord
         /// <inheritdoc />
         public DiscordClient Discord { get; }
         /// <inheritdoc />
-        public ModelState State { get; }
+        public EntityState State { get; }
         /// <inheritdoc />
         public ChannelType Type { get; }
         /// <inheritdoc />
@@ -22,14 +22,12 @@ namespace Discord
         public bool IsText => true;
         /// <inheritdoc />
         public bool IsVoice => false;
-
-        /// <inheritdoc />
-        public Server Server { get; }
+        
         /// <inheritdoc />
         public User Recipient { get; }
 
         /// <inheritdoc />
-        public Task<IEnumerable<User>> GetUsers();
+        public Task<IEnumerable<User>> GetUsers() => null;
         /// <inheritdoc />
         public Task<Message> GetMessage(ulong id) => null;
         /// <inheritdoc />
@@ -46,10 +44,10 @@ namespace Discord
 
         /// <inheritdoc />
         public Task SendIsTyping() => null;
-        
-        /// <inheritdoc />
-        public Task Delete() => null;
+
         /// <inheritdoc />
         public Task Update() => null;
+        /// <inheritdoc />
+        public Task Delete() => null;
     }
 }

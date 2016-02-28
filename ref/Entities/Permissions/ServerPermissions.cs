@@ -44,7 +44,7 @@
         {
         }
 
-        public ServerPermissions Modify(ServerPermissions basePerms, bool? createInstantInvite = null, bool? manageRoles = null,
+        public ServerPermissions Modify(bool? createInstantInvite = null, bool? manageRoles = null,
             bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,

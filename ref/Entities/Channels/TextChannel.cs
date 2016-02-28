@@ -19,7 +19,7 @@ namespace Discord
         /// <inheritdoc />
         public DiscordClient Discord { get; }
         /// <inheritdoc />
-        public ModelState State { get; }
+        public EntityState State { get; }
         /// <inheritdoc />
         public ChannelType Type => ChannelType.Public | ChannelType.Text;
         /// <inheritdoc />
@@ -42,14 +42,14 @@ namespace Discord
         /// <inheritdoc />
         public Server Server { get; }
         /// <inheritdoc />
-        public IEnumerable<PermissionOverwrite> PermissionOverwrites { get; }
+        public IEnumerable<PermissionOverwriteEntry> PermissionOverwrites { get; }
         /// <inheritdoc />
         public IEnumerable<User> Users { get; }
 
         /// <inheritdoc />
-        public PermissionOverwrite? GetPermissionOverwrite(User user) => null;
+        public OverwritePermissions? GetPermissionOverwrite(User user) => null;
         /// <inheritdoc />
-        public PermissionOverwrite? GetPermissionOverwrite(Role role) => null;
+        public OverwritePermissions? GetPermissionOverwrite(Role role) => null;
         /// <inheritdoc />
         public Task<IEnumerable<User>> GetUsers() => null;
         /// <inheritdoc />
@@ -60,15 +60,11 @@ namespace Discord
         public Task<IEnumerable<Message>> GetMessages(int limit = 100, ulong? relativeMessageId = null, Relative relativeDir = Relative.Before) => null;
         /// <inheritdoc />
         public Task<IEnumerable<Invite>> GetInvites() => null;
-
+        
         /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(User user, ChannelPermissions allow, ChannelPermissions deny) => null;
+        public Task UpdatePermissionOverwrite(User user, OverwritePermissions permissions) => null;
         /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(User user, TriStateChannelPermissions permissions) => null;
-        /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(Role role, ChannelPermissions allow, ChannelPermissions deny) => null;
-        /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(Role role, TriStateChannelPermissions permissions) => null;
+        public Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions) => null;
         /// <inheritdoc />
         public Task RemovePermissionOverwrite(User user) => null;
         /// <inheritdoc />
@@ -88,10 +84,10 @@ namespace Discord
         public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false) => null;
 
         /// <inheritdoc />
-        public Task Delete() => null;
-        /// <inheritdoc />
         public Task Update() => null;
         /// <inheritdoc />
         public Task Modify(Action<Properties> func) => null;
+        /// <inheritdoc />
+        public Task Delete() => null;
     }
 }

@@ -3,10 +3,11 @@
 namespace Discord
 {
     public class Profile : IEntity<ulong>
-    {
-        public DiscordClient Client { get; }
-        
+    {        
         public ulong Id { get; }
+        public DiscordClient Discord { get; }
+        public EntityState State { get; }
+
         public string AvatarId { get; }
         public string AvatarUrl { get; }
         public ushort Discriminator { get; }
@@ -16,8 +17,9 @@ namespace Discord
         public string Email { get; }
 		public bool? IsVerified { get; }
 
-        public string Name { get; set; }
+        public string Name { get; set; }        
 
-        public Task Save() => null;
+        public Task Update() => null;
+        public Task Delete() => null;
     }
 }

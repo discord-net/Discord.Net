@@ -7,7 +7,6 @@ namespace Discord
         public Message Before => null;
         public Message After => null;
         public User User => null;
-        public Channel Channel => null;
-        public Server Server => null;
+        public ITextChannel Channel => null;
     }
 }
