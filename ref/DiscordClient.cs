@@ -1,7 +1,5 @@
-﻿using Discord.Net;
-using Discord.Net.Rest;
+﻿using Discord.Net.Rest;
 using Discord.Net.WebSockets;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +11,9 @@ namespace Discord
     /// <summary> Provides a connection to the DiscordApp service. </summary>
     public class DiscordClient : IDisposable
     {
-        public event EventHandler Ready = delegate { };
+        public event EventHandler LoggedIn = delegate { };
+        public event EventHandler LoggedOut = delegate { };
+        public event EventHandler<LogMessageEventArgs> Log = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
         public event EventHandler<ChannelUpdatedEventArgs> ChannelUpdated = delegate { };
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
@@ -39,11 +39,10 @@ namespace Discord
         public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
 
         public DiscordConfig Config { get; }
-        public RestClient ClientAPI { get; }
-        public RestClient StatusAPI { get; }
+        public IRestClient ClientAPI { get; }
+        public IRestClient StatusAPI { get; }
         public GatewaySocket GatewaySocket { get; }
         public MessageQueue MessageQueue { get; }
-        public JsonSerializer Serializer { get; }
         
         public ConnectionState State { get; }
         public CancellationToken CancelToken { get; }
@@ -59,10 +58,14 @@ namespace Discord
         public DiscordClient() { }
         public DiscordClient(DiscordConfig config) { }
         public DiscordClient(Action<DiscordConfig> configFunc) { }
+        
+        public Task<string> Login(string email, string password, string token = null) => null;
+        public Task Login(string token, bool validate = true) => null;
+        public Task Logout() => null;
 
-        public Task<string> Connect(string email, string password, string token = null) => null;
+        /*public Task<string> Connect(string email, string password, string token = null) => null;
         public Task Connect(string token) => null;        
-        public Task Disconnect() => null;
+        public Task Disconnect() => null;*/
 
         public void SetStatus(UserStatus status) { }
         public void SetGame(string game) { }
