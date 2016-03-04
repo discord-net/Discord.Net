@@ -1,4 +1,4 @@
-﻿namespace Discord.Net
+﻿namespace Discord
 {
     public class MessageQueue
     {
