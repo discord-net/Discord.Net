@@ -57,10 +57,6 @@ namespace Discord
         public Task<VoiceChannel> CreateVoiceChannel(string name) => null;
         public Task<Invite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool tempMembership = false, bool withXkcd = false) => null;
         public Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false) => null;
-
-        public Task Ban(User user, int pruneDays = 0) => null;
-        public Task Unban(User user) => null;
-        public Task Unban(ulong userId) => null;
         
         public Task<int> PruneUsers(int days = 30, bool simulate = false) => null;
 

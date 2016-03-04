@@ -11,7 +11,8 @@ namespace Discord
         public DiscordClient Discord { get; }
         public EntityState State { get; }
 
-        public Server Server { get; }        
+        public Server Server { get; }
+
         public string Name { get; }
         public ushort Discriminator { get; }
         public string AvatarId { get; }
@@ -47,5 +48,8 @@ namespace Discord
 
         public Task Update() => null;
         public Task Kick() => null;
+        public Task Ban(User user, int pruneDays = 0) => null;
+        public Task Unban(User user) => null;
+        public Task Unban(ulong userId) => null;
     }
 }
