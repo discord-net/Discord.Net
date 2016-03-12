@@ -9,13 +9,13 @@ Feel free to join us in the `Discord API chat`_.
 .. _Discord chat service: https://discordapp.com
 .. _Discord API chat: https://discord.gg/0SBTUU1wZTVjAMPx
 
-.. warn::
+.. warning::
 
-This is a beta!
+    This is a beta!
 
-This library has been built thanks to a community effort reverse engineering the Discord client.
-As the API is still unofficial, it may change at any time without notice, breaking this library as well.
-Discord.Net itself is still in development (and is currently undergoing a rewrite) and you may encounter breaking changes throughout development until the official Discord API is released.
+    This library has been built thanks to a community effort reverse engineering the Discord client.
+    As the API is still unofficial, it may change at any time without notice, breaking this library as well.
+    Discord.Net itself is still in development (and is currently undergoing a rewrite) and you may encounter breaking changes throughout development until the official Discord API is released.
 
 It is highly recommended that you always use the latest version and please report any bugs you find to our `Discord chat`_.
 
