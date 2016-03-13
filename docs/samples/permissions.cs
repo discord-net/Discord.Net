@@ -1,3 +1,5 @@
+/* --- OUTDATED --- */
+
 // Find a User's Channel Permissions
 var userChannelPermissions = user.GetPermissions(channel);
 
@@ -11,4 +13,3 @@ var userPerms = user.GetPermissions(channel);
 userPerms.ReadMessageHistory = false;
 userPerms.AttachFiles = null;
 channel.AddPermissionsRule(user, userPerms);
-}

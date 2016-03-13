@@ -2,10 +2,13 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		var client = new DiscordClient();
+		var client = new DiscordClient(x =>
+        {
+			LogLevel = LogSeverity.Info
+		});
 
 		//Display all log messages in the console
-		client.LogMessage += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
+		client.Log.Message += (s, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
 
 		//Echo back any message received, provided it didn't come from the bot itself
 		client.MessageReceived += async (s, e) =>
@@ -22,7 +25,7 @@ class Program
 
 			//If we are not a member of any server, use our invite code (made beforehand in the official Discord Client)
 			if (!client.Servers.Any())
-				await client.AcceptInvite(client.GetInvite("aaabbbcccdddeee"));
+				await (client.GetInvite("aaabbbcccdddeee")).Accept();
 		});
 	}
 }

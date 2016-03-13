@@ -1,20 +1,20 @@
 class Program
 {
-	private static DiscordBotClient _client;
+	private static DiscordClient _client;
 	static void Main(string[] args)
 	{
-		var client = new DiscordClient();
+		_client = new DiscordClient();
 
 		// Handle Events using Lambdas
-		client.MessageCreated += (s, e) =>
+		_client.MessageReceived += (s, e) =>
 		{
 			if (!e.Message.IsAuthor)
-				await client.SendMessage(e.Message.ChannelId, "foo");
+				await e.Channel.SendMessage("foo");
 		}
 
 		// Handle Events using Event Handlers
 		EventHandler<MessageEventArgs> handler = new EventHandler<MessageEventArgs>(HandleMessageCreated);
-		client.MessageCreated += handler;
+		client.MessageReceived += handler;
 	}
 
 
@@ -22,6 +22,6 @@ class Program
 	static void HandleMessageCreated(object sender, EventArgs e)
 	{
 		if (!e.Message.IsAuthor)
-				await client.SendMessage(e.Message.ChannelId, "foo");
+			await e.Channel.SendMessage("bar");
 	}
 }

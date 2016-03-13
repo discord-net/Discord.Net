@@ -1,7 +1,7 @@
 |stub| Commands
 ===============
 
-The `Discord.Net.Commands`_ package DiscordBotClient extends DiscordClient with support for commands.
+The `Discord.Net.Commands`_ package extends DiscordClient with a built-in Commands Handler.
 
 .. _Discord.Net.Commands: https://www.nuget.org/packages/Discord.Net.Commands
 
