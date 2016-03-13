@@ -44,7 +44,7 @@ namespace Discord
         public EntityState State { get; }
 
         public ITextChannel Channel { get; }
-        public User User { get; }        
+        public IUser User { get; }        
         public bool IsTTS { get; }
         public string RawText { get; }
         public string Text { get; }
@@ -53,9 +53,9 @@ namespace Discord
         public Attachment[] Attachments { get; }
         public Embed[] Embeds { get; }
         
-        public IEnumerable<User> MentionedUsers { get; }
-        public IEnumerable<IPublicChannel> MentionedChannels { get; }
-        public IEnumerable<Role> MentionedRoles { get; }
+        public IReadOnlyList<ServerUser> MentionedUsers { get; }
+        public IReadOnlyList<IPublicChannel> MentionedChannels { get; }
+        public IReadOnlyList<Role> MentionedRoles { get; }
         
         public Server Server => null;
         public bool IsAuthor => false;

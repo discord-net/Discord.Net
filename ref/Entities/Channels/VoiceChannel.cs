@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class VoiceChannel : IPublicChannel, IVoiceChannel, IModifiable<VoiceChannel.Properties>
+    public class VoiceChannel : IPublicChannel, IModifiable<VoiceChannel.Properties>
     {
         public sealed class Properties
         {
@@ -16,19 +16,14 @@ namespace Discord
         /// <inheritdoc />
         public ulong Id { get; }
         /// <inheritdoc />
-        public DiscordClient Discord { get; }
-        /// <inheritdoc />
         public EntityState State { get; }
         /// <inheritdoc />
-        public ChannelType Type { get; }
+        public Server Server { get; }
+
         /// <inheritdoc />
-        public bool IsPrivate => false;
+        public DiscordClient Discord { get; }
         /// <inheritdoc />
-        public bool IsPublic => true;
-        /// <inheritdoc />
-        public bool IsText => false;
-        /// <inheritdoc />
-        public bool IsVoice => true;
+        ChannelType IChannel.Type => ChannelType.Public | ChannelType.Voice;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -36,26 +31,33 @@ namespace Discord
         public int Position { get; }
         /// <inheritdoc />
         public int Bitrate { get; }
+
         /// <inheritdoc />
-        public Server Server { get; }
+        public string Mention { get; }
         /// <inheritdoc />
         public IEnumerable<PermissionOverwriteEntry> PermissionOverwrites { get; }
 
         /// <inheritdoc />
-        public OverwritePermissions? GetPermissionOverwrite(User user) => null;
+        public OverwritePermissions? GetPermissionOverwrite(ServerUser user) => null;
         /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(Role role) => null;
         /// <inheritdoc />
-        public Task<IEnumerable<User>> GetUsers() => null;
+        public Task<ServerUser> GetUser(ulong id) => null;
+        /// <inheritdoc />
+        Task<IUser> IChannel.GetUser(ulong id) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<ServerUser>> GetUsers() => null;
+        /// <inheritdoc />
+        Task<IEnumerable<IUser>> IChannel.GetUsers() => null;
         /// <inheritdoc />
         public Task<IEnumerable<Invite>> GetInvites() => null;
                 
         /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(User user, OverwritePermissions permissions) => null;
+        public Task UpdatePermissionOverwrite(ServerUser user, OverwritePermissions permissions) => null;
         /// <inheritdoc />
         public Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions) => null;
         /// <inheritdoc />
-        public Task RemovePermissionOverwrite(User user) => null;
+        public Task RemovePermissionOverwrite(ServerUser user) => null;
         /// <inheritdoc />
         public Task RemovePermissionOverwrite(Role role) => null;
 

@@ -3,36 +3,33 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public struct PermissionOverwriteEntry
-    {
-        public PermissionTarget TargetType { get; }
-        public ulong TargetId { get; }
-        public OverwritePermissions Permissions { get; }
-    }
     public interface IPublicChannel : IChannel
     {
         /// <summary> Gets the server this channel is a member of. </summary>
         Server Server { get; }
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
         IEnumerable<PermissionOverwriteEntry> PermissionOverwrites { get; }
-        /// <summary> Gets the name of this public channel. </summary>
-        string Name { get; }
         /// <summary> Gets the position of this public channel relative to others of the same type. </summary>
         int Position { get; }
 
+        /// <summary> Gets a user in this channel with the given id. </summary>
+        new Task<ServerUser> GetUser(ulong id);
+        /// <summary> Gets a collection of all users in this channel. </summary>
+        new Task<IEnumerable<ServerUser>> GetUsers();
+
         /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
-        OverwritePermissions? GetPermissionOverwrite(User user);
+        OverwritePermissions? GetPermissionOverwrite(ServerUser user);
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
         OverwritePermissions? GetPermissionOverwrite(Role role);
         /// <summary> Downloads a collection of all invites to this server. </summary>
         Task<IEnumerable<Invite>> GetInvites();
-        
+
         /// <summary> Adds or updates the permission overwrite for the given user. </summary>
-        Task UpdatePermissionOverwrite(User user, OverwritePermissions permissions);
+        Task UpdatePermissionOverwrite(ServerUser user, OverwritePermissions permissions);
         /// <summary> Adds or updates the permission overwrite for the given role. </summary>
         Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions);
         /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
-        Task RemovePermissionOverwrite(User user);
+        Task RemovePermissionOverwrite(ServerUser user);
         /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
         Task RemovePermissionOverwrite(Role role);
 

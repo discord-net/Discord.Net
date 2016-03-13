@@ -3,7 +3,7 @@ namespace Discord
 {
     public class UserUpdatedEventArgs : EventArgs
     {
-        public User Before => null;
-        public User After => null;
+        public IUser Before => null;
+        public IUser After => null;
     }
 }

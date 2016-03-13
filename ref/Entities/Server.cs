@@ -19,7 +19,7 @@ namespace Discord
         public DiscordClient Discord { get; }
         public EntityState State { get; }
 
-        public User CurrentUser { get; }
+        public ServerUser CurrentUser { get; }
         public string IconId { get; }
         public string SplashId { get; }
         public string IconUrl { get; }
@@ -34,24 +34,24 @@ namespace Discord
         public IEnumerable<IChannel> Channels { get; }
         public IEnumerable<TextChannel> TextChannels { get; }
         public IEnumerable<VoiceChannel> VoiceChannels { get; }
-        public IEnumerable<User> Users { get; }
+        public IEnumerable<ServerUser> Users { get; }
         public IEnumerable<Role> Roles { get; }
 
         public string Name { get; set; }
         public Region Region { get; set; }
         public int AFKTimeout { get; set; }
         public DateTime JoinedAt { get; set; }
-        public User Owner { get; set; }                
+        public ServerUser Owner { get; set; }                
         public VoiceChannel AFKChannel { get; set; }        
                 
-        public IPublicChannel GetChannel(ulong id) => null;
-        public IPublicChannel GetChannel(string mention) => null;
-        public Role GetRole(ulong id) => null;
-        public User GetUser(ulong id) => null;
-        public User GetUser(string name, ushort discriminator) => null;
-        public User GetUser(string mention) => null;
-        public Task<IEnumerable<User>> DownloadBans() => null;
-        public Task<IEnumerable<Invite>> DownloadInvites() => null;
+        public Task<IPublicChannel> GetChannel(ulong id) => null;
+        public Task<IPublicChannel> GetChannel(string mention) => null;
+        public Task<Role> GetRole(ulong id) => null;
+        public Task<ServerUser> GetUser(ulong id) => null;
+        public Task<ServerUser> GetUser(string name, ushort discriminator) => null;
+        public Task<ServerUser> GetUser(string mention) => null;
+        public Task<IEnumerable<ServerUser>> GetBans() => null;
+        public Task<IEnumerable<Invite>> GetInvites() => null;
 
         public Task<TextChannel> CreateTextChannel(string name) => null;
         public Task<VoiceChannel> CreateVoiceChannel(string name) => null;

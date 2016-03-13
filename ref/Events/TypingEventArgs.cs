@@ -3,9 +3,9 @@
     public class TypingEventArgs 
     {
         public ITextChannel Channel { get; }
-        public User User { get; }
+        public IUser User { get; }
 
-        public TypingEventArgs(ITextChannel channel, User user)
+        public TypingEventArgs(ITextChannel channel, IUser user)
         {
             Channel = channel;
             User = user;

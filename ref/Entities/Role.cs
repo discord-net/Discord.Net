@@ -19,7 +19,7 @@ namespace Discord
         public Color Color { get; }
         
         public bool IsEveryone { get; }
-        public IEnumerable<User> Members { get; }
+        public IEnumerable<ServerUser> Members { get; }
         
         public string Mention { get; }
 

@@ -4,30 +4,32 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class PrivateChannel : ITextChannel, IPrivateChannel
+    public class PrivateChannel : ITextChannel, IChannel
     {
-        /// <inheritdoc />
-        public ulong Id { get; }
         /// <inheritdoc />
         public DiscordClient Discord { get; }
         /// <inheritdoc />
         public EntityState State { get; }
         /// <inheritdoc />
-        public ChannelType Type { get; }
+        public ulong Id { get; }
         /// <inheritdoc />
-        public bool IsPrivate => true;
+        public PrivateUser Recipient { get; }
         /// <inheritdoc />
-        public bool IsPublic => false;
-        /// <inheritdoc />
-        public bool IsText => true;
-        /// <inheritdoc />
-        public bool IsVoice => false;
-        
-        /// <inheritdoc />
-        public User Recipient { get; }
+        public PrivateUser CurrentUser { get; }
 
         /// <inheritdoc />
-        public Task<IEnumerable<User>> GetUsers() => null;
+        ChannelType IChannel.Type => ChannelType.Private | ChannelType.Text;
+        /// <inheritdoc />
+        public string Name { get; }
+
+        /// <inheritdoc />
+        public Task<PrivateUser> GetUser(ulong id) => null;
+        /// <inheritdoc />
+        Task<IUser> IChannel.GetUser(ulong id) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<PrivateUser>> GetUsers() => null;
+        /// <inheritdoc />
+        Task<IEnumerable<IUser>> IChannel.GetUsers() => null;
         /// <inheritdoc />
         public Task<Message> GetMessage(ulong id) => null;
         /// <inheritdoc />

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public class TextChannel : ITextChannel, IPublicChannel, IMentionable, IModifiable<TextChannel.Properties>
+    public class TextChannel : ITextChannel, IMentionable, IModifiable<TextChannel.Properties>
     {
         public sealed class Properties
         {
@@ -15,21 +15,16 @@ namespace Discord
         }
 
         /// <inheritdoc />
+        public EntityState State { get; }
+        /// <inheritdoc />
         public ulong Id { get; }
+        /// <inheritdoc />
+        public Server Server { get; }
+
         /// <inheritdoc />
         public DiscordClient Discord { get; }
         /// <inheritdoc />
-        public EntityState State { get; }
-        /// <inheritdoc />
         public ChannelType Type => ChannelType.Public | ChannelType.Text;
-        /// <inheritdoc />
-        public bool IsPrivate => false;
-        /// <inheritdoc />
-        public bool IsPublic => true;
-        /// <inheritdoc />
-        public bool IsText => true;
-        /// <inheritdoc />
-        public bool IsVoice => false;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -37,21 +32,24 @@ namespace Discord
         public string Topic { get; }
         /// <inheritdoc />
         public int Position { get; }
+
         /// <inheritdoc />
         public string Mention { get; }
         /// <inheritdoc />
-        public Server Server { get; }
-        /// <inheritdoc />
         public IEnumerable<PermissionOverwriteEntry> PermissionOverwrites { get; }
-        /// <inheritdoc />
-        public IEnumerable<User> Users { get; }
 
         /// <inheritdoc />
-        public OverwritePermissions? GetPermissionOverwrite(User user) => null;
+        public OverwritePermissions? GetPermissionOverwrite(ServerUser user) => null;
         /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(Role role) => null;
         /// <inheritdoc />
-        public Task<IEnumerable<User>> GetUsers() => null;
+        public Task<ServerUser> GetUser(ulong id) => null;
+        /// <inheritdoc />
+        Task<IUser> IChannel.GetUser(ulong id) => null;
+        /// <inheritdoc />
+        public Task<IEnumerable<ServerUser>> GetUsers() => null;
+        /// <inheritdoc />
+        Task<IEnumerable<IUser>> IChannel.GetUsers() => null;
         /// <inheritdoc />
         public Task<Message> GetMessage(ulong id) => null;
         /// <inheritdoc />
@@ -62,11 +60,11 @@ namespace Discord
         public Task<IEnumerable<Invite>> GetInvites() => null;
         
         /// <inheritdoc />
-        public Task UpdatePermissionOverwrite(User user, OverwritePermissions permissions) => null;
+        public Task UpdatePermissionOverwrite(ServerUser user, OverwritePermissions permissions) => null;
         /// <inheritdoc />
         public Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions) => null;
         /// <inheritdoc />
-        public Task RemovePermissionOverwrite(User user) => null;
+        public Task RemovePermissionOverwrite(ServerUser user) => null;
         /// <inheritdoc />
         public Task RemovePermissionOverwrite(Role role) => null;
 
