@@ -17,47 +17,16 @@ namespace Discord.Tests
         private static DiscordClient _hostClient, _targetBot, _observerBot;
         private static Server _testServer;
         private static Channel _testServerChannel;
+        private static Channel _permRestrictedChannel;
         private static Random _random;
         private static Invite _testServerInvite;
 
         private static TestContext _context;
 
         [ClassInitialize]
-        public async static void Initialize(TestContext testContext)
+        public static void Initialize(TestContext testContext)
         {
             _context = testContext;
-
-            /*_context.WriteLine("Initializing.");
-
-            var settings = Settings.Instance;
-            _random = new Random();
-
-            _hostClient = new DiscordClient();
-            _targetBot = new DiscordClient();
-            _observerBot = new DiscordClient();
-
-            await _hostClient.Connect(settings.User1.Email, settings.User1.Password);
-            await _targetBot.Connect(settings.User2.Email, settings.User2.Password);
-            await _observerBot.Connect(settings.User3.Email, settings.User3.Password);
-
-            await Task.Delay(1000);
-
-            //Cleanup existing servers
-            WaitMany(
-                _hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()),
-                _targetBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()),
-                _observerBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()));
-            //Create new server and invite the other bots to it
-
-            _testServer = await _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First());
-            _testServerChannel = _testServer.DefaultChannel;
-
-            await Task.Delay(1000);
-
-            Invite invite = await _testServer.CreateInvite(60, 3, false, false);
-            WaitAll(
-                (await _targetBot.GetInvite(invite.Code)).Accept(),
-                (await _observerBot.GetInvite(invite.Code)).Accept());*/
         }
 
         [TestMethod]
@@ -115,6 +84,8 @@ namespace Discord.Tests
 
             _targetBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave());
         }
+
+        // Servers
 
         [TestMethod]
         [Priority(3)]
@@ -179,14 +150,64 @@ namespace Discord.Tests
 
         //Messages
         [TestMethod]
-        public void TestMessageReceived()
+        public void TestMessageEvents()
         {
+            string name = $"test_{_random.Next()}";
+            var channel = _testServer.CreateChannel(name, ChannelType.Text).Result;
+            _context.WriteLine($"Channel Name: {channel.Name} / {channel.Server.Name}");
             string text = $"test_{_random.Next()}";
+            Message message = null;
             AssertEvent<MessageEventArgs>(
                 "MessageCreated event never received",
-                () => _testServerChannel.SendMessage(text),
+                async () => message = await channel.SendMessage(text),
                 x => _targetBot.MessageReceived += x,
-                x => _targetBot.MessageReceived -= x);
+                x => _targetBot.MessageReceived -= x,
+                (s, e) => e.Message.Text == text);
+
+            AssertEvent<MessageUpdatedEventArgs>(
+                "MessageUpdated event never received",
+                async () => await message.Edit(text + " updated"),
+                x => _targetBot.MessageUpdated += x,
+                x => _targetBot.MessageUpdated -= x,
+                (s, e) => e.Before.Text == text && e.After.Text == text + " updated");
+
+            AssertEvent<MessageEventArgs>(
+                "MessageDeleted event never received",
+                async () => await message.Delete(),
+                x => _targetBot.MessageDeleted += x,
+                x => _targetBot.MessageDeleted -= x,
+                (s, e) => e.Message.Id == message.Id);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Net.HttpException))]
+        public async Task TestSendMessage_InvalidChannel()
+        {
+            string name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            await channel.Delete();
+            await channel.SendMessage($"test_{_random.Next()}");
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Net.HttpException))]
+        public async Task TestSendMessage_NoPermissions()
+        {
+            string name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            var overwrite = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
+            await channel.AddPermissionsRule(user, overwrite);
+            await _targetBot.Servers.FirstOrDefault().GetChannel(channel.Id).SendMessage($"test_{_random.Next()}");
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Net.HttpException))]
+        public async Task TestUpdateMessage_DeletedMessage()
+        {
+            string name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            var m = await channel.SendMessage($"test_{_random.Next()}");
+            await m.Delete();
+            await m.Edit($"test_{_random.Next()}");
         }
 
         [ClassCleanup]
