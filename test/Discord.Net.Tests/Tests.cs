@@ -23,10 +23,20 @@ namespace Discord.Tests
 
         private static TestContext _context;
 
+        private static string HostBotToken;
+        private static string ObserverBotToken;
+        private static string TargetEmail;
+        private static string TargetPassword;
+
         [ClassInitialize]
         public static void Initialize(TestContext testContext)
         {
             _context = testContext;
+
+            HostBotToken = Environment.GetEnvironmentVariable("discord-unit-host_token");
+            ObserverBotToken = Environment.GetEnvironmentVariable("discord-unit-observer_token");
+            TargetEmail = Environment.GetEnvironmentVariable("discord-unit-target_email");
+            TargetPassword = Environment.GetEnvironmentVariable("discord-unit-target_pass");
         }
 
         [TestMethod]
@@ -42,15 +52,12 @@ namespace Discord.Tests
             _targetBot = new DiscordClient();
             _observerBot = new DiscordClient();
 
-            await _hostClient.Connect(settings.User1.Email, settings.User1.Password);
-            await _observerBot.Connect(settings.User3.Email, settings.User3.Password);
+            await _hostClient.Connect(HostBotToken);
 
             await Task.Delay(3000);
 
             //Cleanup existing servers
-            WaitMany(
-                _hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()),
-                _observerBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave()));
+            _hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave());
             //Create new server and invite the other bots to it
 
             _testServer = await _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First());
@@ -61,12 +68,25 @@ namespace Discord.Tests
             Invite invite = await _testServer.CreateInvite(60, 3, false, false);
             _testServerInvite = invite;
 
-            await (await _observerBot.GetInvite(invite.Code)).Accept();
-
             await Task.Delay(1000);
 
             _context.WriteLine($"Host: {_hostClient.CurrentUser.Name} in {_hostClient.Servers.Count()}");
             _context.WriteLine($"Observer: {_observerBot.CurrentUser.Name} in {_observerBot.Servers.Count()}");
+        }
+
+        [TestMethod]
+        [Priority(2)]
+        public async Task TestTokenLogin_Ready()
+        {
+            AssertEvent(
+                "READY never received",
+                async () => await _observerBot.Connect(ObserverBotToken),
+                x => _observerBot.Ready += x,
+                x => _observerBot.Ready -= x,
+                null,
+                true);
+            _observerBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave());
+            await (await _observerBot.GetInvite(_testServerInvite.Code)).Accept();
         }
 
         // READY
@@ -76,7 +96,7 @@ namespace Discord.Tests
         {
             AssertEvent(
                 "READY never received",
-                async () => await _targetBot.Connect(Settings.Instance.User2.Email, Settings.Instance.User2.Password),
+                async () => await _targetBot.Connect(TargetEmail, TargetPassword),
                 x => _targetBot.Ready += x,
                 x => _targetBot.Ready -= x,
                 null,
