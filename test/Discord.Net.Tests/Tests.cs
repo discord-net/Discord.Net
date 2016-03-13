@@ -179,37 +179,6 @@ namespace Discord.Tests
                 (s, e) => e.Message.Id == message.Id);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Net.HttpException))]
-        public async Task TestSendMessage_InvalidChannel()
-        {
-            string name = $"test_{_random.Next()}";
-            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
-            await channel.Delete();
-            await channel.SendMessage($"test_{_random.Next()}");
-        }
-        [TestMethod]
-        [ExpectedException(typeof(Net.HttpException))]
-        public async Task TestSendMessage_NoPermissions()
-        {
-            string name = $"test_{_random.Next()}";
-            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
-            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
-            var overwrite = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
-            await channel.AddPermissionsRule(user, overwrite);
-            await _targetBot.Servers.FirstOrDefault().GetChannel(channel.Id).SendMessage($"test_{_random.Next()}");
-        }
-        [TestMethod]
-        [ExpectedException(typeof(Net.HttpException))]
-        public async Task TestUpdateMessage_DeletedMessage()
-        {
-            string name = $"test_{_random.Next()}";
-            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
-            var m = await channel.SendMessage($"test_{_random.Next()}");
-            await m.Delete();
-            await m.Edit($"test_{_random.Next()}");
-        }
-
         [ClassCleanup]
         public static void Cleanup()
         {
