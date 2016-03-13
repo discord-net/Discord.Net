@@ -178,6 +178,18 @@ namespace Discord.Tests
                 x => _targetBot.MessageDeleted -= x,
                 (s, e) => e.Message.Id == message.Id);
         }
+        
+        // Permissions
+        [TestMethod]
+        public async Task TestAddPermissionsRule()
+        {
+            var channel = await _testServer.CreateChannel($"test_{_random.Next()}", ChannelType.Text);
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            var perms = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
+            await channel.AddPermissionsRule(user, perms);
+            var resultPerms = channel.GetPermissionsRule(user);
+            Assert.AreEqual(perms, resultPerms, "Server Permissions did not match the ones we sent");
+        }
 
         [ClassCleanup]
         public static void Cleanup()
