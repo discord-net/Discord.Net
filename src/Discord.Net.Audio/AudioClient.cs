@@ -150,8 +150,6 @@ namespace Discord.Audio
         public async Task Disconnect()
         {
             await _taskManager.Stop(true).ConfigureAwait(false);
-            if (Config.EnableMultiserver)
-                ClientAPI.Token = null;
         }
         private async Task Cleanup()
         {
