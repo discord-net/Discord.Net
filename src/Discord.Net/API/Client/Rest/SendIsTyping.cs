@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/typing";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong ChannelId { get; set; }
 

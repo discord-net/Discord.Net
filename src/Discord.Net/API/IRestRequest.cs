@@ -7,7 +7,6 @@ namespace Discord.API
         string Method { get; }
         string Endpoint { get; }
         object Payload { get; }
-        bool IsPrivate { get; }
     }
     public interface IRestRequest<ResponseT> : IRestRequest
         where ResponseT : class

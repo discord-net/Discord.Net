@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"gateway";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
     }
     
     public class GatewayResponse

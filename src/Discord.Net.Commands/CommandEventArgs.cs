@@ -10,8 +10,7 @@ namespace Discord.Commands
         public Command Command { get; }
 
         public User User => Message.User;
-        public Channel Channel => Message.Channel;
-        public Server Server => Message.Channel.Server;
+        public ITextChannel Channel => Message.Channel;
 
         public CommandEventArgs(Message message, Command command, string[] args)
         {

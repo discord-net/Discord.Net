@@ -4,24 +4,26 @@
     {
         public static DiscordClient UsingModules(this DiscordClient client)
         {
-            client.Services.Add(new ModuleService());
+            client.AddService(new ModuleService());
             return client;
         }
 
-        public static DiscordClient AddModule<T>(this DiscordClient client, T instance, string name = null, ModuleFilter filter = ModuleFilter.None)
-            where T : class, IModule
+        public static void AddModule(this DiscordClient client, IModule instance, string name = null, ModuleFilter filter = ModuleFilter.None)
         {
-            client.Modules().Add(instance, name ?? nameof(T), filter);
-            return client;
+            client.GetService<ModuleService>().Add(instance, name, filter);
         }
-        public static DiscordClient AddModule<T>(this DiscordClient client, string name = null, ModuleFilter filter = ModuleFilter.None)
+        public static void AddModule<T>(this DiscordClient client, string name = null, ModuleFilter filter = ModuleFilter.None)
             where T : class, IModule, new()
         {
-            client.Modules().Add(new T(), name ?? nameof(T), filter);
-            return client;
+            client.GetService<ModuleService>().Add<T>(name, filter);
         }
-
-        public static ModuleService Modules(this DiscordClient client, bool required = true)
-			=> client.Services.Get<ModuleService>(required);
+        public static void AddModule<T>(this DiscordClient client, T instance, string name = null, ModuleFilter filter = ModuleFilter.None)
+            where T : class, IModule
+        {
+            client.GetService<ModuleService>().Add(instance, name, filter);
+        }
+        public static ModuleManager<T> GetModule<T>(this DiscordClient client)
+            where T : class, IModule
+            => client.GetService<ModuleService>().Get<T>();
     }
 }

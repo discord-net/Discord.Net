@@ -9,7 +9,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
 

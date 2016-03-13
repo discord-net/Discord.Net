@@ -46,7 +46,7 @@ namespace Discord.Net.WebSockets
 
         public string Token { get; internal set; }
         public Server Server { get; internal set; }
-        public Channel Channel { get; internal set; }
+        public VoiceChannel Channel { get; internal set; }
 
         public int Ping => _ping;
         internal VoiceBuffer OutputBuffer => _sendBuffer;
@@ -371,7 +371,7 @@ namespace Discord.Net.WebSockets
                                     break;
                                 }
                             }
-                            await _udp.SendAsync(pingPacket, pingPacket.Length);
+                            await _udp.SendAsync(pingPacket, pingPacket.Length).ConfigureAwait(false);
                             nextPingTicks = currentTicks + 5 * ticksPerSeconds;
                         }
                     }
@@ -395,7 +395,7 @@ namespace Discord.Net.WebSockets
         //Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
         private async Task WatcherAsync()
         {
-            await CancelToken.Wait();
+            await CancelToken.Wait().ConfigureAwait(false);
             _udp.Close();
         }
 #endif

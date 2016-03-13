@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "PUT";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/bans/{UserId}?delete-message-days={PruneDays}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
         public ulong UserId { get; set; }

@@ -9,7 +9,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"users/@me/channels";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         [JsonProperty("recipient_id"), JsonConverter(typeof(LongStringConverter))]
         public ulong RecipientId { get; set; }

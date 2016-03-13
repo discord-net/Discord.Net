@@ -17,7 +17,6 @@ namespace Discord.API.Client.Rest
                 return ChannelIds.Select(x => new Channel(x, pos++));
             }
         }
-        bool IRestRequest.IsPrivate => false;
 
         public class Channel
         {

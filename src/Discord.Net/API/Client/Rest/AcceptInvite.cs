@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"invite/{InviteId}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public string InviteId { get; set; }
 

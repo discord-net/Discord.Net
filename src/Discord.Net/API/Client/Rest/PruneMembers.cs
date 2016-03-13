@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => IsSimulation ? "GET" : "POST";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/prune?days={Days}";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
 

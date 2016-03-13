@@ -8,6 +8,5 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"auth/logout";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
     }
 }

@@ -12,21 +12,23 @@ namespace Discord.ETF
 {
     public unsafe class ETFWriter : IDisposable
     {
-        private readonly static byte[] _nilBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 3, (byte)'n', (byte)'i', (byte)'l' };
-        private readonly static byte[] _falseBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 5, (byte)'f', (byte)'a', (byte)'l', (byte)'s', (byte)'e' };
-        private readonly static byte[] _trueBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 4, (byte)'t', (byte)'r', (byte)'u', (byte)'e' };
+        private static readonly ConcurrentDictionary<Type, Delegate> _serializers = new ConcurrentDictionary<Type, Delegate>();
+        private static readonly ConcurrentDictionary<Type, Delegate> _indirectSerializers = new ConcurrentDictionary<Type, Delegate>();
 
-        private readonly static MethodInfo _writeTMethod = GetGenericWriteMethod(null);
-        private readonly static MethodInfo _writeNullableTMethod = GetGenericWriteMethod(typeof(Nullable<>));
-        private readonly static MethodInfo _writeDictionaryTMethod = GetGenericWriteMethod(typeof(IDictionary<,>));
-        private readonly static MethodInfo _writeEnumerableTMethod = GetGenericWriteMethod(typeof(IEnumerable<>));
-        private readonly static DateTime _epochTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly byte[] _nilBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 3, (byte)'n', (byte)'i', (byte)'l' };
+        private static readonly byte[] _falseBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 5, (byte)'f', (byte)'a', (byte)'l', (byte)'s', (byte)'e' };
+        private static readonly byte[] _trueBytes = new byte[] { (byte)ETFType.SMALL_ATOM_EXT, 4, (byte)'t', (byte)'r', (byte)'u', (byte)'e' };
+
+        private static readonly MethodInfo _writeTMethod = GetGenericWriteMethod(null);
+        private static readonly MethodInfo _writeNullableTMethod = GetGenericWriteMethod(typeof(Nullable<>));
+        private static readonly MethodInfo _writeDictionaryTMethod = GetGenericWriteMethod(typeof(IDictionary<,>));
+        private static readonly MethodInfo _writeEnumerableTMethod = GetGenericWriteMethod(typeof(IEnumerable<>));
+        private static readonly DateTime _epochTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private readonly Stream _stream;
         private readonly byte[] _buffer;
         private readonly bool _leaveOpen;
         private readonly Encoding _encoding;
-        private readonly ConcurrentDictionary<Type, Delegate> _serializers, _indirectSerializers;
 
         public virtual Stream BaseStream
         {
@@ -45,8 +47,6 @@ namespace Discord.ETF
             _leaveOpen = leaveOpen;
             _buffer = new byte[11];
             _encoding = Encoding.UTF8;
-            _serializers = new ConcurrentDictionary<Type, Delegate>();
-            _indirectSerializers = new ConcurrentDictionary<Type, Delegate>();
         }
         
         public void Write(bool value)
@@ -72,6 +72,7 @@ namespace Discord.ETF
             }
             else if (value >= int.MinValue && value <= int.MaxValue)
             {
+                //TODO: Does this encode negatives correctly?
                 _buffer[0] = (byte)ETFType.INTEGER_EXT;
                 _buffer[1] = (byte)(value >> 24);
                 _buffer[2] = (byte)(value >> 16);
@@ -145,7 +146,7 @@ namespace Discord.ETF
 
         public void Write(DateTime value) => Write((ulong)((value.Ticks - _epochTime.Ticks) / TimeSpan.TicksPerSecond));
 
-        public void Write(bool? value) { if (value.HasValue) Write((bool)value.Value); else WriteNil(); }
+        public void Write(bool? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
         public void Write(sbyte? value) { if (value.HasValue) Write((long)value.Value); else WriteNil(); }
         public void Write(byte? value) { if (value.HasValue) Write((ulong)value.Value); else WriteNil(); }
         public void Write(short? value) { if (value.HasValue) Write((long)value.Value); else WriteNil(); }
@@ -158,22 +159,6 @@ namespace Discord.ETF
         public void Write(float? value) { if (value.HasValue) Write((double)value.Value); else WriteNil(); }
         public void Write(DateTime? value) { if (value.HasValue) Write(value.Value); else WriteNil(); }
 
-        public void Write(byte[] value)
-        {
-            if (value != null)
-            {
-                int count = value.Length;
-                _buffer[0] = (byte)ETFType.BINARY_EXT;
-                _buffer[1] = (byte)(count >> 24);
-                _buffer[2] = (byte)(count >> 16);
-                _buffer[3] = (byte)(count >> 8);
-                _buffer[4] = (byte)count;
-                _stream.Write(_buffer, 0, 5);
-                _stream.Write(value, 0, value.Length);
-            }
-            else
-                WriteNil();
-        }
         public void Write(string value)
         {
             if (value != null)
@@ -187,6 +172,22 @@ namespace Discord.ETF
                 _buffer[4] = (byte)count;
                 _stream.Write(_buffer, 0, 5);
                 _stream.Write(bytes, 0, bytes.Length);
+            }
+            else
+                WriteNil();
+        }
+        public void Write(byte[] value)
+        {
+            if (value != null)
+            {
+                int count = value.Length;
+                _buffer[0] = (byte)ETFType.BINARY_EXT;
+                _buffer[1] = (byte)(count >> 24);
+                _buffer[2] = (byte)(count >> 16);
+                _buffer[3] = (byte)(count >> 8);
+                _buffer[4] = (byte)count;
+                _stream.Write(_buffer, 0, 5);
+                _stream.Write(value, 0, value.Length);
             }
             else
                 WriteNil();
@@ -269,7 +270,7 @@ namespace Discord.ETF
         public virtual long Seek(int offset, SeekOrigin origin) => _stream.Seek(offset, origin);
 
         #region Emit
-        private Action<ETFWriter, T> CreateSerializer<T>(Type type, TypeInfo typeInfo, bool isDirect)
+        private static Action<ETFWriter, T> CreateSerializer<T>(Type type, TypeInfo typeInfo, bool isDirect)
         {
             var method = new DynamicMethod(isDirect ? "SerializeETF" : "SerializeIndirectETF", 
                 null, new[] { typeof(ETFWriter), isDirect ? type : typeof(object) }, true);
@@ -291,7 +292,7 @@ namespace Discord.ETF
             generator.Emit(OpCodes.Ret);
             return method.CreateDelegate(typeof(Action<ETFWriter, T>)) as Action<ETFWriter, T>;
         }
-        private void EmitWriteValue(ILGenerator generator, Type type, TypeInfo typeInfo, bool isTop)
+        private static void EmitWriteValue(ILGenerator generator, Type type, TypeInfo typeInfo, bool isTop)
         {            
             //Convert enum types to their base type
             if (typeInfo.IsEnum)
@@ -335,18 +336,21 @@ namespace Discord.ETF
             //Dictionaries
             else if (!typeInfo.IsValueType && typeInfo.ImplementedInterfaces
                     .Any(x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+            {
                 generator.EmitCall(OpCodes.Call, _writeDictionaryTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
-
+            }
             //Enumerable
             else if (!typeInfo.IsValueType && typeInfo.ImplementedInterfaces
                     .Any(x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            {
                 generator.EmitCall(OpCodes.Call, _writeEnumerableTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
-
+            }
             //Nullable Structs
-            else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) && 
+            else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) &&
                     typeInfo.GenericTypeParameters[0].GetTypeInfo().IsValueType)
+            {
                 generator.EmitCall(OpCodes.Call, _writeNullableTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
-
+            }
             //Structs/Classes
             else if (typeInfo.IsClass || (typeInfo.IsValueType && !typeInfo.IsPrimitive))
             {
@@ -387,7 +391,6 @@ namespace Discord.ETF
                     generator.EmitCall(OpCodes.Call, _writeTMethod.MakeGenericMethod(typeInfo.GenericTypeParameters), null);
                 }
             }
-
             //Unsupported (decimal, char)
             else
                 throw new InvalidOperationException($"Serializing {type.Name} is not supported.");
@@ -429,7 +432,7 @@ namespace Discord.ETF
         {
             return typeof(ETFWriter).GetTypeInfo().GetDeclaredMethods(nameof(Write))
                 .Where(x => x.GetParameters()[0].ParameterType == paramType)
-                .FirstOrDefault();
+                .Single();
         }
         private static MethodInfo GetGenericWriteMethod(Type genericType)
         {

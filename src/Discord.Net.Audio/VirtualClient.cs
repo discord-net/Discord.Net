@@ -16,8 +16,7 @@ namespace Discord.Audio
         public string SessionId => _client.Server == Server ? _client.SessionId : null;
 
         public ConnectionState State => _client.Server == Server ? _client.State : ConnectionState.Disconnected;
-        public Channel Channel => _client.Server == Server ? _client.Channel : null;
-        public Stream OutputStream => _client.Server == Server ? _client.OutputStream : null;
+        public VoiceChannel Channel => _client.Server == Server ? _client.Channel : null;
         public CancellationToken CancelToken => _client.Server == Server ? _client.CancelToken : CancellationToken.None;
 
         public RestClient ClientAPI => _client.Server == Server ? _client.ClientAPI : null;
@@ -31,7 +30,7 @@ namespace Discord.Audio
         }
 
         public Task Disconnect() => _client.Service.Leave(Server);
-        public Task Join(Channel channel) => _client.Join(channel);
+        public Task Join(VoiceChannel channel) => _client.Join(channel);
 
         public void Send(byte[] data, int offset, int count) => _client.Send(data, offset, count);
         public void Clear() => _client.Clear();

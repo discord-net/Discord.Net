@@ -18,14 +18,16 @@ You can get Discord.Net from NuGet:
 * `Discord.Net`_
 * `Discord.Net.Commands`_
 * `Discord.Net.Modules`_
+* `Discord.Net.Audio`_
 
 If you have trouble installing from NuGet, try installing dependencies manually.
 
 You can also pull the latest source from `GitHub`_ 
 
-.. _Discord.Net: https://www.nuget.org/packages/Discord.Net/0.8.1-beta2
-.. _Discord.Net.Commands: https://www.nuget.org/packages/Discord.Net.Commands/0.8.1-beta2
-.. _Discord.Net.Modules: https://www.nuget.org/packages/Discord.Net.Modules/0.8.1-beta2
+.. _Discord.Net: https://www.nuget.org/packages/Discord.Net
+.. _Discord.Net.Commands: https://www.nuget.org/packages/Discord.Net.Commands
+.. _Discord.Net.Modules: https://www.nuget.org/packages/Discord.Net.Modules
+.. _Discord.Net.Modules: https://www.nuget.org/packages/Discord.Net.Audio
 .. _GitHub: https://github.com/RogueException/Discord.Net/
 
 Async

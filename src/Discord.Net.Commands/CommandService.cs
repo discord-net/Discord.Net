@@ -63,7 +63,7 @@ namespace Discord.Commands
                     .Description("Returns information about commands.")
                     .Do(async e =>
                     {
-						Channel replyChannel = Config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreatePMChannel().ConfigureAwait(false);
+                        ITextChannel replyChannel = Config.HelpMode == HelpMode.Public ? e.Channel : await e.User.CreatePMChannel().ConfigureAwait(false);
 						if (e.Args.Length > 0) //Show command help
 						{
 							var map = _map.GetItem(string.Join(" ", e.Args));
@@ -97,10 +97,15 @@ namespace Discord.Commands
                 //Check for mention
                 if (cmdMsg == null && Config.AllowMentionPrefix)
                 {
-                    if (msg.StartsWith(client.CurrentUser.Mention))
-                        cmdMsg = msg.Substring(client.CurrentUser.Mention.Length + 1);
-                    else if (msg.StartsWith($"@{client.CurrentUser.Name}"))
-                        cmdMsg = msg.Substring(client.CurrentUser.Name.Length + 1);
+                    string mention = client.CurrentUser.Mention;
+                    if (msg.StartsWith(mention) && msg.Length > mention.Length)
+                        cmdMsg = msg.Substring(mention.Length + 1);
+                    else
+                    {
+                        mention = $"@{client.CurrentUser.Name}";
+                        if (msg.StartsWith(mention) && msg.Length > mention.Length)
+                            cmdMsg = msg.Substring(mention.Length + 1);
+                    }
                 }
                 
                 //Check using custom activator
@@ -170,7 +175,7 @@ namespace Discord.Commands
             };
         }
 
-        public Task ShowGeneralHelp(User user, Channel channel, Channel replyChannel = null)
+        public Task ShowGeneralHelp(User user, ITextChannel channel, ITextChannel replyChannel = null)
         {
             StringBuilder output = new StringBuilder();
 			bool isFirstCategory = true;
@@ -214,32 +219,12 @@ namespace Discord.Commands
 			if (output.Length == 0)
 				output.Append("There are no commands you have permission to run.");
 			else
-			{
-				output.Append("\n\n");
-
-                //TODO: Should prefix be stated in the help message or not?
-                /*StringBuilder builder = new StringBuilder();
-                if (Config.PrefixChar != null)
-                {
-                    builder.Append('`');
-                    builder.Append(Config.PrefixChar.Value);
-                    builder.Append('`');
-                }
-                if (Config.AllowMentionPrefix)
-                {
-                    if (builder.Length > 0)
-                        builder.Append(" or ");
-                    builder.Append(Client.CurrentUser.Mention);
-                }
-                if (builder.Length > 0)
-                    output.AppendLine($"Start your message with {builder.ToString()} to run a command.");*/
-                output.AppendLine($"Run `help <command>` for more information.");
-            }
+                output.AppendLine("\n\nRun `help <command>` for more information.");
 
             return (replyChannel ?? channel).SendMessage(output.ToString());
         }
 
-		private Task ShowCommandHelp(CommandMap map, User user, Channel channel, Channel replyChannel = null)
+		private Task ShowCommandHelp(CommandMap map, User user, ITextChannel channel, ITextChannel replyChannel = null)
         {
 			StringBuilder output = new StringBuilder();
 
@@ -250,9 +235,7 @@ namespace Discord.Commands
 			{
 				foreach (var cmd in cmds)
 				{
-					if (!cmd.CanRun(user, channel, out error)) { }
-						//output.AppendLine(error ?? DefaultPermissionError);
-					else
+					if (cmd.CanRun(user, channel, out error))
 					{
 						if (isFirstCmd)
 							isFirstCmd = false;
@@ -294,7 +277,7 @@ namespace Discord.Commands
 
 			return (replyChannel ?? channel).SendMessage(output.ToString());
 		}
-		public Task ShowCommandHelp(Command command, User user, Channel channel, Channel replyChannel = null)
+		public Task ShowCommandHelp(Command command, User user, ITextChannel channel, ITextChannel replyChannel = null)
 		{
 			StringBuilder output = new StringBuilder();
 			string error;
@@ -304,7 +287,7 @@ namespace Discord.Commands
 				ShowCommandHelpInternal(command, user, channel, output);
             return (replyChannel ?? channel).SendMessage(output.ToString());
 		}
-		private void ShowCommandHelpInternal(Command command, User user, Channel channel, StringBuilder output)
+		private void ShowCommandHelpInternal(Command command, User user, ITextChannel channel, StringBuilder output)
 		{
 			output.Append('`');
 			output.Append(command.Text);

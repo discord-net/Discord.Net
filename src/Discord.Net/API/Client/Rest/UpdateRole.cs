@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/roles/{RoleId}";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
         public ulong RoleId { get; set; }

@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"users/@me";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         [JsonProperty("password")]
         public string CurrentPassword { get; set; }

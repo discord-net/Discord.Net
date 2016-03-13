@@ -1,0 +1,81 @@
+{
+  "version": "0.9.0-rc3-3",
+  "description": "An unofficial .Net API wrapper for the Discord client.",
+  "authors": [
+    "RogueException"
+  ],
+  "tags": [
+    "discord",
+    "discordapp"
+  ],
+  "projectUrl": "https://github.com/RogueException/Discord.Net",
+  "licenseUrl": "http://opensource.org/licenses/MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/RogueException/Discord.Net"
+  },
+  "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
+
+  "compilationOptions": {
+    "allowUnsafe": true,
+    "warningsAsErrors": true
+  },
+
+  "configurations": {
+    "TestResponses": {
+      "compilationOptions": {
+        "define": [
+          "DEBUG",
+          "TRACE",
+          "TEST_RESPONSES"
+        ]
+      }
+    }
+  },
+
+  "dependencies": {
+    "Newtonsoft.Json": "8.0.1",
+    "Nito.AsyncEx": "3.0.1"
+  },
+
+  "frameworks": {
+    "dotnet5.4": {
+      "dependencies": {
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Collections.Concurrent": "4.0.11-beta-23516",
+        "System.Dynamic.Runtime": "4.0.11-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
+        "System.IO.Compression": "4.1.0-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Net.Http": "4.0.1-beta-23516",
+        "System.Net.NameResolution": "4.0.0-beta-23516",
+        "System.Net.Sockets": "4.1.0-beta-23409",
+        "System.Net.Requests": "4.0.11-beta-23516",
+        "System.Net.WebSockets.Client": "4.0.0-beta-23516",
+        "System.Reflection": "4.1.0-beta-23516",
+        "System.Reflection.Emit.Lightweight": "4.0.1-beta-23516",
+        "System.Runtime.InteropServices": "4.0.21-beta-23516",
+        "System.Runtime.Serialization.Primitives": "4.1.0-beta-23516",
+        "System.Security.Cryptography.Algorithms": "4.0.0-beta-23516",
+        "System.Text.RegularExpressions": "4.0.11-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
+      }
+    },
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build",
+          "version": ""
+        },
+        "System.Threading.Tasks": {
+          "type": "build",
+          "version": ""
+        }
+      },
+      "dependencies": {
+        "WebSocket4Net": "0.14.1",
+        "RestSharp": "105.2.3"
+      }
+    }
+  }
+}

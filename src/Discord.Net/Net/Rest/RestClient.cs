@@ -63,26 +63,8 @@ namespace Discord.Net.Rest
 			_engine = new BuiltInEngine(config, baseUrl, logger);
 #endif
 
-            if (_logger != null && _logger.Level >= LogSeverity.Verbose)
-            {
-                this.SentRequest += (s, e) =>
-                {
-                    string log = $"{e.Request.Method} {e.Request.Endpoint}: {e.Milliseconds} ms";
-                    if (_config.LogLevel >= LogSeverity.Debug)
-                    {
-                        if (e.Request is IRestFileRequest)
-                            log += $" [{(e.Request as IRestFileRequest).Filename}]";
-                        else if (e.Response != null)
-                        {
-                            if (e.Request.IsPrivate)
-                                log += $" [Hidden]";
-                            else
-                                log += $" {e.ResponseJson}";
-                        }
-                    }
-                    _logger.Verbose(log);
-                };
-            }
+            if (logger != null && logger.Level >= LogSeverity.Verbose)
+                SentRequest += (s, e) => _logger.Verbose($"{e.Request.Method} {e.Request.Endpoint}: {e.Milliseconds} ms");
         }
 
         public async Task<ResponseT> Send<ResponseT>(IRestRequest<ResponseT> request)

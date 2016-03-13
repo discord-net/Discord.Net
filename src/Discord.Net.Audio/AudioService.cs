@@ -113,7 +113,7 @@ namespace Discord.Audio
             }
         }
 
-		public async Task<IAudioClient> Join(Channel channel)
+		public async Task<IAudioClient> Join(VoiceChannel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
             
@@ -163,8 +163,8 @@ namespace Discord.Audio
 		}		
 
 		public Task Leave(Server server) => Leave(server, null);
-        public Task Leave(Channel channel) => Leave(channel.Server, channel);
-        private async Task Leave(Server server, Channel channel)
+        public Task Leave(VoiceChannel channel) => Leave(channel.Server, channel);
+        private async Task Leave(Server server, VoiceChannel channel)
         {
             if (server == null) throw new ArgumentNullException(nameof(server));
 

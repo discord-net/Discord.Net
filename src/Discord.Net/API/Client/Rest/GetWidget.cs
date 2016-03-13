@@ -9,7 +9,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "GET";
         string IRestRequest.Endpoint => $"servers/{GuildId}/widget.json";
         object IRestRequest.Payload => null;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong GuildId { get; set; }
 

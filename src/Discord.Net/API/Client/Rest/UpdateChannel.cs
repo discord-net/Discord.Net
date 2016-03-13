@@ -8,7 +8,6 @@ namespace Discord.API.Client.Rest
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"channels/{ChannelId}";
         object IRestRequest.Payload => this;
-        bool IRestRequest.IsPrivate => false;
 
         public ulong ChannelId { get; set; }
 
@@ -18,6 +17,8 @@ namespace Discord.API.Client.Rest
         public string Topic { get; set; }
         [JsonProperty("position")]
         public int Position { get; set; }
+        [JsonProperty("bitrate")]
+        public int Bitrate { get; set; }
 
         public UpdateChannelRequest(ulong channelId)
         {
