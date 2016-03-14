@@ -45,7 +45,6 @@ namespace Discord.Tests
         {
             _context.WriteLine("Initializing.");
 
-            var settings = Settings.Instance;
             _random = new Random();
 
             _hostClient = new DiscordClient();
@@ -58,6 +57,7 @@ namespace Discord.Tests
 
             //Cleanup existing servers
             _hostClient.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave());
+            
             //Create new server and invite the other bots to it
 
             _testServer = await _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First());
@@ -68,10 +68,7 @@ namespace Discord.Tests
             Invite invite = await _testServer.CreateInvite(60, 3, false, false);
             _testServerInvite = invite;
 
-            await Task.Delay(1000);
-
             _context.WriteLine($"Host: {_hostClient.CurrentUser.Name} in {_hostClient.Servers.Count()}");
-            _context.WriteLine($"Observer: {_observerBot.CurrentUser.Name} in {_observerBot.Servers.Count()}");
         }
 
         [TestMethod]
@@ -201,14 +198,48 @@ namespace Discord.Tests
         
         // Permissions
         [TestMethod]
-        public async Task TestAddPermissionsRule()
+        public async Task Test_AddGet_PermissionsRule()
         {
             var channel = await _testServer.CreateChannel($"test_{_random.Next()}", ChannelType.Text);
             var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
             var perms = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
             await channel.AddPermissionsRule(user, perms);
             var resultPerms = channel.GetPermissionsRule(user);
-            Assert.AreEqual(perms, resultPerms, "Server Permissions did not match the ones we sent");
+            Assert.IsNotNull(resultPerms, "Perms retrieved from server were null.");
+        }
+        [TestMethod]
+        public async Task Test_AddRemove_PermissionsRule()
+        {
+            var channel = await _testServer.CreateChannel($"test_{_random.Next()}", ChannelType.Text);
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            var perms = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
+            await channel.AddPermissionsRule(user, perms);
+            await channel.RemovePermissionsRule(user);
+            await Task.Delay(200);
+            Assert.AreEqual(PermValue.Inherit, channel.GetPermissionsRule(user).SendMessages);
+        }
+        [TestMethod]
+        public async Task Test_Permissions_Event()
+        {
+            var channel = await _testServer.CreateChannel($"test_{_random.Next()}", ChannelType.Text);
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            var perms = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
+            AssertEvent<ChannelUpdatedEventArgs>
+                ("ChannelUpdatedEvent never fired.",
+                async () => await channel.AddPermissionsRule(user, perms),
+                x => _targetBot.ChannelUpdated += x,
+                x => _targetBot.ChannelUpdated -= x,
+                (s, e) => e.After.PermissionOverwrites.Count() != e.Before.PermissionOverwrites.Count());
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Net.HttpException))]
+        public async Task Test_Affect_Permissions_Invalid_Channel()
+        {
+            var channel = await _testServer.CreateChannel($"test_{_random.Next()}", ChannelType.Text);
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            var perms = new ChannelPermissionOverrides(sendMessages: PermValue.Deny);
+            await channel.Delete();
+            await channel.AddPermissionsRule(user, perms);
         }
 
         [ClassCleanup]
