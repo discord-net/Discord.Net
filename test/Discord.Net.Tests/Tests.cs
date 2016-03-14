@@ -28,6 +28,10 @@ namespace Discord.Tests
         private static string TargetEmail;
         private static string TargetPassword;
 
+        public static string RandomText => $"test_{_random.Next()}";
+
+        #region Initialization
+
         [ClassInitialize]
         public static void Initialize(TestContext testContext)
         {
@@ -61,7 +65,6 @@ namespace Discord.Tests
             //Create new server and invite the other bots to it
 
             _testServer = await _hostClient.CreateServer("Discord.Net Testing", _hostClient.Regions.First());
-            _testServerChannel = _testServer.DefaultChannel;
 
             await Task.Delay(1000);
 
@@ -86,7 +89,6 @@ namespace Discord.Tests
             await (await _observerBot.GetInvite(_testServerInvite.Code)).Accept();
         }
 
-        // READY
         [TestMethod]
         [Priority(2)]
         public void TestReady()
@@ -100,9 +102,14 @@ namespace Discord.Tests
                 true);
 
             _targetBot.Servers.Select(x => x.IsOwner ? x.Delete() : x.Leave());
+            _testServerChannel = _testServer.DefaultChannel;
         }
 
+        #endregion
+
         // Servers
+
+        #region Server Tests
 
         [TestMethod]
         [Priority(3)]
@@ -114,6 +121,10 @@ namespace Discord.Tests
                 x => _targetBot.JoinedServer += x,
                 x => _targetBot.JoinedServer -= x);
         }
+
+        #endregion
+
+        #region Channel Tests
 
         //Channels
         [TestMethod]
@@ -164,6 +175,49 @@ namespace Discord.Tests
             string name = $"#test_{_random.Next()}";
             await _testServer.CreateChannel($"", ChannelType.FromString("badtype"));
         }
+        [TestMethod]
+        public async Task Test_CreateGetChannel()
+        {
+            var name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            var get_channel = _testServer.GetChannel(channel.Id);
+            Assert.AreEqual(channel.Id, get_channel.Id, "ID of Channel and GetChannel were not equal.");
+        }
+        [TestMethod]
+        public void TestSendTyping()
+        {
+            var channel = _testServerChannel;
+            AssertEvent<ChannelUserEventArgs>(
+                "UserUpdated event never fired.",
+                async () => await channel.SendIsTyping(),
+                x => _targetBot.UserIsTyping += x,
+                x => _targetBot.UserIsTyping -= x);
+        }
+        [TestMethod]
+        public void TestEditChannel()
+        {
+            var channel = _testServerChannel;
+            AssertEvent<ChannelUpdatedEventArgs>(
+                "ChannelUpdated Never Received",
+                async () => await channel.Edit(RandomText, $"topic - {RandomText}", 26),
+                x => _targetBot.ChannelUpdated += x,
+                x => _targetBot.ChannelUpdated -= x);
+        }
+        [TestMethod]
+        public void TestChannelMention()
+        {
+            var channel = _testServerChannel;
+            Assert.AreEqual($"<#{channel.Id}>", channel.Mention, "Generated channel mention was not the expected channel mention.");
+        }
+        [TestMethod]
+        public void TestChannelUserCount()
+        {
+            Assert.AreEqual(3, _testServerChannel.Users.Count(), "Read an incorrect number of users in a channel");
+        }
+
+        #endregion
+
+        #region Message Tests
 
         //Messages
         [TestMethod]
@@ -195,7 +249,42 @@ namespace Discord.Tests
                 x => _targetBot.MessageDeleted -= x,
                 (s, e) => e.Message.Id == message.Id);
         }
-        
+        [TestMethod]
+        public async Task TestDownloadMessages_WithCache()
+        {
+            string name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            for (var i = 0; i < 10; i++) await channel.SendMessage(RandomText);
+            while (channel.Client.MessageQueue.Count > 0) await Task.Delay(100);
+            var messages = await channel.DownloadMessages(10);
+            Assert.AreEqual(10, messages.Count(), "Expected 10 messages in downloaded array, did not see 10.");
+        }
+        [TestMethod]
+        public async Task TestDownloadMessages_WithoutCache()
+        {
+            string name = $"test_{_random.Next()}";
+            var channel = await _testServer.CreateChannel(name, ChannelType.Text);
+            for (var i = 0; i < 10; i++) await channel.SendMessage(RandomText);
+            while (channel.Client.MessageQueue.Count > 0) await Task.Delay(100);
+            var messages = await channel.DownloadMessages(10, useCache: false);
+            Assert.AreEqual(10, messages.Count(), "Expected 10 messages in downloaded array, did not see 10.");
+        }
+        [TestMethod]
+        public async Task TestSendTTSMessage()
+        {
+            var channel = await _testServer.CreateChannel(RandomText, ChannelType.Text);
+            AssertEvent<MessageEventArgs>(
+                "MessageCreated event never fired",
+                async () => await channel.SendTTSMessage(RandomText),
+                x => _targetBot.MessageReceived += x,
+                x => _targetBot.MessageReceived -= x,
+                (s, e) => e.Message.IsTTS);
+        }
+
+        #endregion
+
+        #region Permission Tests
+
         // Permissions
         [TestMethod]
         public async Task Test_AddGet_PermissionsRule()
@@ -242,6 +331,9 @@ namespace Discord.Tests
             await channel.AddPermissionsRule(user, perms);
         }
 
+        #endregion
+
+
         [ClassCleanup]
         public static void Cleanup()
         {
@@ -255,6 +347,10 @@ namespace Discord.Tests
                 _targetBot.Disconnect(),
                 _observerBot.Disconnect());
         }
+
+        #region Helpers
+
+        // Task Helpers
 
         private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
         {
@@ -326,5 +422,7 @@ namespace Discord.Tests
         {
             Task.WaitAll(tasks.Where(x => x != null).SelectMany(x => x).ToArray());
         }
+
+        #endregion
     }
 }
