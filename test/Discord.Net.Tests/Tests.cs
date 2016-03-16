@@ -12,7 +12,7 @@ namespace Discord.Tests
     [TestClass]
     public class Tests
     {
-        private const int EventTimeout = 5000; //Max time in milliseconds to wait for an event response from our test actions
+        private const int EventTimeout = 10000; //Max time in milliseconds to wait for an event response from our test actions
 
         private static DiscordClient _hostClient, _targetBot, _observerBot;
         private static Server _testServer;
@@ -279,6 +279,69 @@ namespace Discord.Tests
                 x => _targetBot.MessageReceived += x,
                 x => _targetBot.MessageReceived -= x,
                 (s, e) => e.Message.IsTTS);
+        }
+
+        #endregion
+
+        #region User Tests
+
+        [TestMethod]
+        public void TestUserMentions()
+        {
+            var user = _targetBot.GetServer(_testServer.Id).CurrentUser;
+            Assert.AreEqual($"<@{user.Id}>", user.Mention);
+        }
+        [TestMethod]
+        public void TestUserEdit()
+        {
+            var user = _testServer.GetUser(_targetBot.CurrentUser.Id);
+            AssertEvent<UserUpdatedEventArgs>(
+                "UserUpdated never fired",
+                async () => await user.Edit(true, true, null, null),
+                x => _targetBot.UserUpdated += x,
+                x => _targetBot.UserUpdated -= x);
+        }
+        [TestMethod]
+        public void TestEditSelf()
+        {
+            var name = $"test_{_random.Next()}";
+            AssertEvent<UserUpdatedEventArgs>(
+                "UserUpdated never fired",
+                async () => await _targetBot.CurrentUser.Edit(TargetPassword, name),
+                x => _observerBot.UserUpdated += x,
+                x => _observerBot.UserUpdated -= x,
+                (s, e) => e.After.Name == name);
+        }
+        [TestMethod]
+        public void TestSetStatus()
+        {
+            AssertEvent<UserUpdatedEventArgs>(
+                "UserUpdated never fired",
+                async () => await SetStatus(_targetBot, UserStatus.Idle),
+                x => _observerBot.UserUpdated += x,
+                x => _observerBot.UserUpdated -= x,
+                (s, e) => e.After.Status == UserStatus.Idle);
+        }
+        private async Task SetStatus(DiscordClient _client, UserStatus status)
+        {
+            _client.SetStatus(status);
+            await Task.Delay(50);
+        }
+        [TestMethod]
+        public void TestSetGame()
+        {
+            AssertEvent<UserUpdatedEventArgs>(
+                "UserUpdated never fired",
+                async () => await SetGame(_targetBot, "test game"),
+                x => _observerBot.UserUpdated += x,
+                x => _observerBot.UserUpdated -= x,
+                (s, e) => _targetBot.CurrentGame == "test game");
+
+        }
+        private async Task SetGame(DiscordClient _client, string game)
+        {
+            _client.SetGame(game);
+            await Task.Delay(5);
         }
 
         #endregion
