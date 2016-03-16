@@ -1,9 +1,11 @@
-# Discord.Net v0.9.0-rc3
+# Discord.Net v0.9.0-rc4
+[![Build status](https://ci.appveyor.com/api/projects/status/p0n69xhqgmoobycf/branch/master?svg=true)](https://ci.appveyor.com/project/foxbot/discord-net/branch/master)
+
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
 
-##### Warning: documentation is currently outdated.
+##### Warning: Some of the documentation is outdated.
 It's current being rewritten. Until that's done, feel free to use my [DiscordBot](https://github.com/RogueException/DiscordBot) repo for reference.
 
 ### Installation
