@@ -38,23 +38,24 @@ The IAudioClient is used to connect/disconnect to/from a Voice Channel, and to s
 	
 	Disconnects the IAudioClient from the Voice Server.
 
-..function:: IAudioClient.Join(Channel);
+
+.. function:: IAudioClient.Join(Channel);
 	
 	Moves the IAudioClient to another channel on the Voice Server, or starts a connection if one has already been terminated.
 
 .. note::
 
 	Because versions previous to 0.9 do not discretely differentiate between Text and Voice Channels, you may want to ensure that users cannot request the audio client to join a text channel, as this will throw an exception, leading to potentially unexpected behavior
-
-..function:: IAudioClient.Wait();
+ 
+.. function:: IAudioClient.Wait();
 	
 	Blocks the current thread until the sending audio buffer has cleared out. 
 
-..function:: IAudioClient.Clear();
+.. function:: IAudioClient.Clear();
 	
 	Clears the sending audio buffer.
 
-..function:: IAudioClient.Send(byte[] data, int offset, int count);
+.. function:: IAudioClient.Send(byte[] data, int offset, int count);
 	
 	Adds a stream of data to the Audio Client's internal buffer, to be sent to Discord. Follows the standard c# Stream.Send() format.
 
@@ -109,7 +110,7 @@ Broadcasting with FFmpeg
 
 `FFmpeg`_ allows for a more advanced approach to sending audio, although it is multiplatform safe. The following example will show you how to stream a file to Discord.
 
-.. code-block::csharp6
+.. code-block:: csharp6
 
 	public void SendAudio(string pathOrUrl)
 	{
@@ -121,7 +122,7 @@ Broadcasting with FFmpeg
 			RedirectStandardOutput = true											// Capture the stdout of the process
 		});
 		Thread.Sleep(2000);															// Sleep for a few seconds to FFmpeg can prebuffer.
-
+		
 		int blockSize = 3840;														// The size of bytes to read per frame; 1920 for mono
 		byte[] buffer = new byte[blockSize];
 		int byteCount;
