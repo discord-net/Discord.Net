@@ -276,7 +276,7 @@ namespace Discord
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
         public Task Disconnect() => _taskManager.Stop(true);
-		private async Task Cleanup()
+        private async Task Cleanup()
         {
             var oldState = State;
             State = ConnectionState.Disconnecting;
@@ -525,7 +525,11 @@ namespace Discord
                                 channel.Update(model);
                             }
                             if (largeServers.Count > 0)
-                                GatewaySocket.SendRequestMembers(largeServers, "", 0);
+                            {
+                                int batches = (largeServers.Count + (DiscordConfig.ServerBatchCount - 1)) / DiscordConfig.ServerBatchCount;
+                                for (int i = 0; i < batches; i++)
+                                    GatewaySocket.SendRequestMembers(largeServers.Skip(i * DiscordConfig.ServerBatchCount), "", 0);
+                            }
                             else
                                 EndConnect();
                         }

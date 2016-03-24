@@ -61,6 +61,7 @@ namespace Discord
         internal const int RestTimeout = 10000;
         internal const int MessageQueueInterval = 100;
         internal const int WebSocketQueueInterval = 100;
+        internal const int ServerBatchCount = 50;
 
         public const string LibName = "Discord.Net";
         public static string LibVersion => typeof(DiscordConfigBuilder).GetTypeInfo().Assembly.GetName().Version.ToString(3);
@@ -87,7 +88,6 @@ namespace Discord
         public int MessageCacheSize { get; }
         public bool UsePermissionsCache { get; }
         public bool EnablePreUpdateEvents { get; }
-
 
         internal DiscordConfig(DiscordConfigBuilder builder)
         {
