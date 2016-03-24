@@ -1,9 +1,20 @@
-|stub| Permissions
-==================
+Permissions
+===========
 
 |outdated|
 
 There are two types of permissions: *Channel Permissions* and *Server Permissions*.
+
+Permission Overrides
+--------------------
+
+Channel Permissions are expressed using an enum, ``PermValue``.
+
+The three states are fairly straightforward - 
+
+``PermValue.Allow``: Allow the user to perform a permission.
+``PermValue.Deny``: Deny the user to perform a permission.
+``PermValue.Inherit``: The user will inherit the permission from its role.
 
 Channel Permissions
 -------------------
@@ -31,27 +42,24 @@ Speak                   Voice   Speak in a voice channel.
 UseVoiceActivation      Voice   Use Voice Activation in a text channel (for large channels where PTT is preferred)
 ======================= ======= ==============
 
-If a user has a permission, the value is true. Otherwise, it must be null.
-
-Dual Channel Permissions
-------------------------
-You may also access a user's permissions in a channel with the DualChannelPermissions class.
-Unlike normal ChannelPermissions, DualChannelPermissions hold three values:
-
-If a user has a permission, the value is true. If a user is denied a permission, it will be false. If the permission is not set, the value will return null.
+Each flag is a PermValue; see the section above.
 
 Setting Channel Permissions
 ---------------------------
 
-To set channel permissions, you may use either two ChannelPermissions, or one DualChannelPermissions.
+To set channel permissions, create a new ``ChannelPermissionOverrides``, and specify the flags/values that you want to override.
 
-In the case of using two Channel Permissions, you must create one list of allowed permissions, and one list of denied permissions.
-Otherwise, you can use a single DualChannelPermissions.
+Then, update the user, by doing ``Channel.AddPermissionsRule(_user, _overwrites);``
+
+Roles
+-----
+
+Accessing/modifying permissions for roles is done the same way as user permissions, just using the overload for a Role. See above sections.
 
 Server Permissions
 ------------------
 
-Server Permissions can be accessed by ``Server.GetPermissions(User)``, and updated with ``Server.UpdatePermissions(User, ServerPermissions)``
+Server Permissions can be viewed with ``User.ServerPermissions``, but **at the time of this writing** cannot be set.
 
 A user's server permissions also contain the default values for it's channel permissions, so the channel permissions listed above are also valid flags for Server Permissions. There are also a few extra Server Permissions:
 
@@ -64,11 +72,6 @@ ManageRoles             Server  Manage roles on the server, and their permission
 ManageChannels          Server  Manage channels that exist on the server (add, remove them)
 ManageServer            Server  Manage the server settings.
 ======================= ======= ==============
-
-Roles
------
-
-Managing permissions for roles is much easier than for users in channels. For roles, just access the flag under `Role.Permissions`.
 
 Example
 -------

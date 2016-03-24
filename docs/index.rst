@@ -23,6 +23,8 @@ It is highly recommended that you always use the latest version and please repor
 
 This Documentation is **currently undergoing a rewrite**. Some pages (marked with a wrench) are not updated, or are not completed yet.
 
+**The documentation is currently being written to reflect ``0.9-rc4``, which can be accessed via the latest git-master.**
+
 .. toctree::
    :caption: Documentation
    :maxdepth: 2

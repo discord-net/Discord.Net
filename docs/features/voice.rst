@@ -1,6 +1,16 @@
 Voice
 =====
 
+Installation
+------------
+
+Before setting up the AudioService, you must first install the package `from NuGet`_ or `GitHub`_.
+
+Add the package to your solution, and then import the namespace ``Discord.Audio``.
+
+.. _from NuGet: https://www.nuget.org/packages/Discord.Net.Audio/0.9.0-rc3
+.. _GitHub: https://github.com/RogueException/Discord.Net/tree/master/src/Discord.Net.Audio
+
 Setup
 -----
 
@@ -12,7 +22,7 @@ To use audio, you must install the AudioService to your DiscordClient.
 
 	_client.UsingAudio(x => // Opens an AudioConfigBuilder so we can configure our AudioService
 	{
-		x.Mode == AudioMode.Outgoing; // Tells the AudioService that we will only be sending audio
+		x.Mode = AudioMode.Outgoing; // Tells the AudioService that we will only be sending audio
 	});
 
 Joining a Channel
@@ -96,7 +106,7 @@ You can `download NAudio from NuGet`_.
 					for (int i = byteCount; i < blockSize; i++)
 						buffer[i] = 0;
 				}
-				_vClient.Send(buffer, 0, blockSize)									// Send the buffer to Discord
+				_vClient.Send(buffer, 0, blockSize);								// Send the buffer to Discord
 			}
 		}
 
@@ -130,12 +140,12 @@ Broadcasting with FFmpeg
 		while (true)																// Loop forever, so data will always be read
 		{
 			byteCount = process.StandardOutput.BaseStream							// Access the underlying MemoryStream from the stdout of FFmpeg
-				.Read(buffer, 0, blockSize)											// Read stdout into the buffer
+				.Read(buffer, 0, blockSize);										// Read stdout into the buffer
 
 			if (byteCount == 0)														// FFmpeg did not output anything
 				break;																// Break out of the while(true) loop, since there was nothing to read.
 
-			_vClient.Send(buffer, 0, byteCount)										// Send our data to Discord
+			_vClient.Send(buffer, 0, byteCount);									// Send our data to Discord
 		}
 		_vClient.Wait();															// Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
 	}
@@ -157,7 +167,7 @@ To prepare for Multi-Server Broadcasting, you must first enable it in your confi
 	
 	_client.UsingAudio(x => 
 	{
-		x.Mode == AudioMode.Outgoing;
+		x.Mode = AudioMode.Outgoing;
 		x.EnableMultiserver = true;	// Enable Multiserver
 	});
 
