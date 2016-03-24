@@ -22,12 +22,12 @@ You can get Discord.Net from NuGet:
 
 If you have trouble installing from NuGet, try installing dependencies manually.
 
-You can also pull the latest source from `GitHub`_ 
+You can also pull the latest source from `GitHub`_
 
 .. _Discord.Net: https://www.nuget.org/packages/Discord.Net
 .. _Discord.Net.Commands: https://www.nuget.org/packages/Discord.Net.Commands
 .. _Discord.Net.Modules: https://www.nuget.org/packages/Discord.Net.Modules
-.. _Discord.Net.Modules: https://www.nuget.org/packages/Discord.Net.Audio
+.. _Discord.Net.Audio: https://www.nuget.org/packages/Discord.Net.Audio
 .. _GitHub: https://github.com/RogueException/Discord.Net/
 
 Async
@@ -42,7 +42,7 @@ For more information, go to `MSDN's Await-Async section`_.
 
 Example
 -------
-   
+
 .. literalinclude:: samples/getting_started.cs
    :language: csharp6
    :tab-width: 2

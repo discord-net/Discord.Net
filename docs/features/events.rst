@@ -3,21 +3,19 @@ Events
 
 Usage
 -----
-Messages from the Discord server are exposed via events on the DiscordClient class and follow the standard EventHandler<EventArgs> C# pattern. 
+Messages from the Discord server are exposed via events on the DiscordClient class and follow the standard EventHandler<EventArgs> C# pattern.
 
 .. warning::
-    Note that all synchronous code in an event handler will run on the gateway socket's thread and should be handled as quickly as possible. 
+    Note that all synchronous code in an event handler will run on the gateway socket's thread and should be handled as quickly as possible.
     Using the async-await pattern to let the thread continue immediately is recommended and is demonstrated in the examples below.
 
-Connection State
-----------------
+Ready
+-----
 
-Connection Events will be raised when the Connection State of your client changes.
+The Ready Event is raised only once, when your client finishes processing the READY packet from Discord.
 
-.. warning::
-    You should not use DiscordClient.Connected to run code when your client first connects to Discord.
-    If you lose connection and automatically reconnect, this code will be ran again, which may lead to unexpected behavior.
-    
+This has replaced the previous "Connected" event, and indicates that it is safe to begin retrieving users, channels, or servers from the cache.
+
 Messages
 --------
 
@@ -26,7 +24,7 @@ Messages
 
 Example of MessageReceived:
 
-.. code-block:: c#
+.. code-block:: csharp6
 
     // (Preface: Echo Bots are discouraged, make sure your bot is not running in a public server if you use them)
 
@@ -56,7 +54,7 @@ There are several user events:
 
 Examples:
 
-.. code-block:: c#
+.. code-block:: csharp6
 
     // Register a Hook into the UserBanned event using a Lambda
     _client.UserBanned += async (s, e) => {

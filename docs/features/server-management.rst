@@ -10,7 +10,7 @@ You can create Channels, Invites, and Roles on a server using the CreateChannel,
 
 You may also edit a server's name, icon, and region.
 
-.. code-block:: c#
+.. code-block:: csharp6
 
     // Create a Channel and retrieve the Channel object
     var _channel = await _server.CreateChannel("announcements", ChannelType.Text);
