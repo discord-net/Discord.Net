@@ -528,7 +528,7 @@ namespace Discord
                             {
                                 int batches = (largeServers.Count + (DiscordConfig.ServerBatchCount - 1)) / DiscordConfig.ServerBatchCount;
                                 for (int i = 0; i < batches; i++)
-                                    GatewaySocket.SendRequestMembers(largeServers.Skip(i * DiscordConfig.ServerBatchCount), "", 0);
+                                    GatewaySocket.SendRequestMembers(largeServers.Skip(i * DiscordConfig.ServerBatchCount).Take(DiscordConfig.ServerBatchCount), "", 0);
                             }
                             else
                                 EndConnect();
