@@ -255,7 +255,7 @@ namespace Discord.Audio
 		{
             if (data == null) throw new ArgumentException(nameof(data));
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
             if (VoiceSocket.Server == null) return; //Has been closed
             if (count == 0) return;
 
