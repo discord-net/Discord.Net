@@ -12,17 +12,12 @@ namespace Discord
     {
 		internal static readonly IFormatProvider _format = CultureInfo.InvariantCulture;
 		
-		public static ulong ToId(this string value)
-			=> ulong.Parse(value, NumberStyles.None, _format);
-		public static ulong? ToNullableId(this string value)
-			=> value == null ? (ulong?)null : ulong.Parse(value, NumberStyles.None, _format);
-        public static bool TryToId(this string value, out ulong result)
-            => ulong.TryParse(value, NumberStyles.None, _format, out result);
+		public static ulong ToId(this string value) => ulong.Parse(value, NumberStyles.None, _format);
+		public static ulong? ToNullableId(this string value) => value == null ? (ulong?)null : ulong.Parse(value, NumberStyles.None, _format);
+        public static bool TryToId(this string value, out ulong result) => ulong.TryParse(value, NumberStyles.None, _format, out result);
 
-        public static string ToIdString(this ulong value)
-			=> value.ToString(_format);
-		public static string ToIdString(this ulong? value)
-			=> value?.ToString(_format);
+        public static string ToIdString(this ulong value) => value.ToString(_format);
+		public static string ToIdString(this ulong? value) => value?.ToString(_format);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasBit(this uint rawValue, byte bit) => ((rawValue >> bit) & 1U) == 1;
