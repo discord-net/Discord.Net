@@ -477,7 +477,7 @@ namespace Discord
         #endregion
 
         #region Gateway Events
-        private void OnReceivedEvent(WebSocketEventEventArgs e)
+        private async void OnReceivedEvent(WebSocketEventEventArgs e)
         {
             try
             {
@@ -528,7 +528,11 @@ namespace Discord
                             {
                                 int batches = (largeServers.Count + (DiscordConfig.ServerBatchCount - 1)) / DiscordConfig.ServerBatchCount;
                                 for (int i = 0; i < batches; i++)
+                                {
                                     GatewaySocket.SendRequestMembers(largeServers.Skip(i * DiscordConfig.ServerBatchCount).Take(DiscordConfig.ServerBatchCount), "", 0);
+                                    if (i != batches - 1)
+                                        await Task.Delay(1500);
+                                }
                             }
                             else
                                 EndConnect();
