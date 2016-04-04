@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    internal enum PermissionBits : byte
+    internal enum PermissionBit : byte
     {
         //General
         CreateInstantInvite = 0,
@@ -8,7 +8,7 @@
         BanMembers = 2,
         ManageRolesOrPermissions = 3,
         ManageChannel = 4,
-        ManageServer = 5,
+        ManageGuild = 5,
 
         //Text
         ReadMessages = 10,

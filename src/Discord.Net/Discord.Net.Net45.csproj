@@ -1,0 +1,305 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\TestBot\packages\Text.Analyzers.1.2.0-beta1-20160223-03\build\Text.Analyzers.props" Condition="Exists('..\..\..\TestBot\packages\Text.Analyzers.1.2.0-beta1-20160223-03\build\Text.Analyzers.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C6A50D24-CBD3-4E76-852C-4DCA60BBD608}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Discord</RootNamespace>
+    <AssemblyName>Discord.Net</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\Common\Attachment.cs" />
+    <Compile Include="API\Common\Channel.cs" />
+    <Compile Include="API\Common\Embed.cs" />
+    <Compile Include="API\Common\EmbedProvider.cs" />
+    <Compile Include="API\Common\EmbedThumbnail.cs" />
+    <Compile Include="API\Common\Emoji.cs" />
+    <Compile Include="API\Common\Guild.cs" />
+    <Compile Include="API\Common\GuildEmbed.cs" />
+    <Compile Include="API\Common\GuildMember.cs" />
+    <Compile Include="API\Common\Integration.cs" />
+    <Compile Include="API\Common\IntegrationAccount.cs" />
+    <Compile Include="API\Common\Invite.cs" />
+    <Compile Include="API\Common\InviteChannel.cs" />
+    <Compile Include="API\Common\InviteGuild.cs" />
+    <Compile Include="API\Common\InviteMetadata.cs" />
+    <Compile Include="API\Common\Message.cs" />
+    <Compile Include="API\Common\ReadState.cs" />
+    <Compile Include="API\Common\Unconfirmed\Connection.cs" />
+    <Compile Include="API\Common\Unconfirmed\ExtendedGuild.cs" />
+    <Compile Include="API\Common\Unconfirmed\ExtendedMember.cs" />
+    <Compile Include="API\Common\Unconfirmed\MemberPresence.cs" />
+    <Compile Include="API\Common\Unconfirmed\MemberPresenceGame.cs" />
+    <Compile Include="API\Common\Unconfirmed\MemberReference.cs" />
+    <Compile Include="API\Common\Unconfirmed\MemberVoiceState.cs" />
+    <Compile Include="API\Common\Unconfirmed\MessageReference.cs" />
+    <Compile Include="API\Common\Unconfirmed\Overwrite.cs" />
+    <Compile Include="API\Common\Unconfirmed\Role.cs" />
+    <Compile Include="API\Common\Unconfirmed\RoleReference.cs" />
+    <Compile Include="API\Common\User.cs" />
+    <Compile Include="API\Common\UserGuild.cs" />
+    <Compile Include="API\GatewaySocket\OpCode.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\Heartbeat.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\Identify.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\RequestMembers.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\Resume.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\UpdateStatus.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Commands\UpdateVoice.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\ChannelCreate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\ChannelDelete.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\ChannelUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildBanAdd.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildBanRemove.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildCreate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildDelete.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildMemberAdd.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildMemberRemove.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildMembersChunk.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildMemberUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildRoleCreate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildRoleDelete.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildRoleUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\GuildUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\MessageAck.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\MessageCreate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\MessageDelete.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\MessageUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\PresenceUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\Ready.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\Redirect.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\Resumed.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\TypingStart.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\UserUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\VoiceServerUpdate.cs" />
+    <Compile Include="API\GatewaySocket\Unconfirmed\Events\VoiceStateUpdate.cs" />
+    <Compile Include="API\IWebSocketMessage.cs" />
+    <Compile Include="API\Rest\AcceptInvite.cs" />
+    <Compile Include="API\Rest\AckMessage.cs" />
+    <Compile Include="API\Rest\BeginGuildPrune.cs" />
+    <Compile Include="API\Rest\CreateChannelInvite.cs" />
+    <Compile Include="API\Rest\CreateDMChannel.cs" />
+    <Compile Include="API\Rest\CreateGuild.cs" />
+    <Compile Include="API\Rest\CreateGuildBan.cs" />
+    <Compile Include="API\Rest\CreateGuildChannel.cs" />
+    <Compile Include="API\Rest\CreateGuildIntegration.cs" />
+    <Compile Include="API\Rest\CreateGuildRole.cs" />
+    <Compile Include="API\Rest\CreateMessage.cs" />
+    <Compile Include="API\Rest\DeleteChannel.cs" />
+    <Compile Include="API\Rest\DeleteChannelPermission.cs" />
+    <Compile Include="API\Rest\DeleteGuild.cs" />
+    <Compile Include="API\Rest\DeleteGuildIntegration.cs" />
+    <Compile Include="API\Rest\DeleteGuildRole.cs" />
+    <Compile Include="API\Rest\DeleteInvite.cs" />
+    <Compile Include="API\Rest\DeleteMessage.cs" />
+    <Compile Include="API\Rest\GetChannel.cs" />
+    <Compile Include="API\Rest\GetChannelInvites.cs" />
+    <Compile Include="API\Rest\GetChannelMessages.cs" />
+    <Compile Include="API\Rest\GetCurrentUser.cs" />
+    <Compile Include="API\Rest\GetCurrentUserConnections.cs" />
+    <Compile Include="API\Rest\GetCurrentUserDMs.cs" />
+    <Compile Include="API\Rest\GetCurrentUserGuilds.cs" />
+    <Compile Include="API\Rest\GetGateway.cs" />
+    <Compile Include="API\Rest\GetGuild.cs" />
+    <Compile Include="API\Rest\GetGuildBans.cs" />
+    <Compile Include="API\Rest\GetGuildChannels.cs" />
+    <Compile Include="API\Rest\GetGuildEmbed.cs" />
+    <Compile Include="API\Rest\GetGuildIntegrations.cs" />
+    <Compile Include="API\Rest\GetGuildInvites.cs" />
+    <Compile Include="API\Rest\GetGuildMember.cs" />
+    <Compile Include="API\Rest\GetGuildPruneCount.cs" />
+    <Compile Include="API\Rest\GetGuildRoles.cs" />
+    <Compile Include="API\Rest\GetGuildVoiceRegions.cs" />
+    <Compile Include="API\Rest\GetInvite.cs" />
+    <Compile Include="API\Rest\GetUser.cs" />
+    <Compile Include="API\Rest\GetVoiceRegions.cs" />
+    <Compile Include="API\Rest\LeaveGuild.cs" />
+    <Compile Include="API\Rest\ListGuildMembers.cs" />
+    <Compile Include="API\Rest\ModifyChannelPermission.cs" />
+    <Compile Include="API\Rest\ModifyCurrentUser.cs" />
+    <Compile Include="API\Rest\ModifyGuild.cs" />
+    <Compile Include="API\Rest\ModifyGuildChannel.cs" />
+    <Compile Include="API\Rest\ModifyGuildChannels.cs" />
+    <Compile Include="API\Rest\ModifyGuildEmbed.cs" />
+    <Compile Include="API\Rest\ModifyGuildIntegration.cs" />
+    <Compile Include="API\Rest\ModifyGuildMember.cs" />
+    <Compile Include="API\Rest\ModifyGuildRole.cs" />
+    <Compile Include="API\Rest\ModifyGuildRoles.cs" />
+    <Compile Include="API\Rest\ModifyMessage.cs" />
+    <Compile Include="API\Rest\ModifyTextChannel.cs" />
+    <Compile Include="API\Rest\ModifyVoiceChannel.cs" />
+    <Compile Include="API\Rest\QueryUser.cs" />
+    <Compile Include="API\Rest\RemoveGuildBan.cs" />
+    <Compile Include="API\Rest\RemoveGuildMember.cs" />
+    <Compile Include="API\Rest\SyncGuildIntegration.cs" />
+    <Compile Include="API\Rest\TriggerTypingIndicator.cs" />
+    <Compile Include="API\Rest\Unconfirmed\SendFile.cs" />
+    <Compile Include="API\VoiceSocket\OpCode.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Commands\Heartbeat.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Commands\Identify.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Commands\SelectProtocol.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Commands\SetSpeaking.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Events\Ready.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Events\SessionDescription.cs" />
+    <Compile Include="API\VoiceSocket\Unconfirmed\Events\Speaking.cs" />
+    <Compile Include="CDN.cs" />
+    <Compile Include="DiscordClient.cs" />
+    <Compile Include="DiscordConfig.cs" />
+    <Compile Include="DiscordSocketClient.cs" />
+    <Compile Include="Entities\Attachment.cs" />
+    <Compile Include="Entities\Channels\DMChannel.cs" />
+    <Compile Include="Entities\Channels\GuildChannel.cs" />
+    <Compile Include="Entities\Channels\IChannel.cs" />
+    <Compile Include="Entities\Channels\IMessageChannel.cs" />
+    <Compile Include="Entities\Channels\TextChannel.cs" />
+    <Compile Include="Entities\Channels\VoiceChannel.cs" />
+    <Compile Include="Entities\Color.cs" />
+    <Compile Include="Entities\Embed.cs" />
+    <Compile Include="Entities\EmbedProvider.cs" />
+    <Compile Include="Entities\EmbedThumbnail.cs" />
+    <Compile Include="Entities\Emoji.cs" />
+    <Compile Include="Entities\Guild.cs" />
+    <Compile Include="Entities\Helpers\InviteManager.cs" />
+    <Compile Include="Entities\Helpers\MentionHelper.cs" />
+    <Compile Include="Entities\Helpers\MessageManager.cs" />
+    <Compile Include="Entities\Helpers\PermissionManager.cs" />
+    <Compile Include="Entities\Helpers\PermissionsHelper.cs" />
+    <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Entities\IMentionable.cs" />
+    <Compile Include="Entities\Invites\GuildInvite.cs" />
+    <Compile Include="Entities\Invites\IInvite.cs" />
+    <Compile Include="Entities\Invites\Invite.cs" />
+    <Compile Include="Entities\Invites\InviteChannel.cs" />
+    <Compile Include="Entities\Invites\InviteGuild.cs" />
+    <Compile Include="Entities\Message.cs" />
+    <Compile Include="Entities\Permissions\ChannelPermissions.cs" />
+    <Compile Include="Entities\Permissions\GuildPermissions.cs" />
+    <Compile Include="Entities\Permissions\Overwrite.cs" />
+    <Compile Include="Entities\Permissions\OverwritePermissions.cs" />
+    <Compile Include="Entities\Presences\GuildPresence.cs" />
+    <Compile Include="Entities\Presences\Presence.cs" />
+    <Compile Include="Entities\Presences\VoiceState.cs" />
+    <Compile Include="Entities\Role.cs" />
+    <Compile Include="Entities\Users\DMUser.cs" />
+    <Compile Include="Entities\Users\GuildUser.cs" />
+    <Compile Include="Entities\Users\PublicUser.cs" />
+    <Compile Include="Entities\Users\SelfUser.cs" />
+    <Compile Include="Entities\Users\User.cs" />
+    <Compile Include="Entities\VoiceRegion.cs" />
+    <Compile Include="Enums\ChannelType.cs" />
+    <Compile Include="Enums\ConnectionState.cs" />
+    <Compile Include="Enums\LogSeverity.cs" />
+    <Compile Include="Enums\PermissionBits.cs" />
+    <Compile Include="Enums\PermissionTarget.cs" />
+    <Compile Include="Enums\PermValue.cs" />
+    <Compile Include="Enums\Relative.cs" />
+    <Compile Include="Enums\UserStatus.cs" />
+    <Compile Include="Events\ChannelEventArgs.cs" />
+    <Compile Include="Events\ChannelUpdatedEventArgs.cs" />
+    <Compile Include="Events\CurrentUserEventArgs.cs" />
+    <Compile Include="Events\CurrentUserUpdatedEventArgs.cs" />
+    <Compile Include="Events\DisconnectedEventArgs.cs" />
+    <Compile Include="Events\GuildEventArgs.cs" />
+    <Compile Include="Events\GuildUpdatedEventArgs.cs" />
+    <Compile Include="Events\LogMessageEventArgs.cs" />
+    <Compile Include="Events\MessageEventArgs.cs" />
+    <Compile Include="Events\MessageUpdatedEventArgs.cs" />
+    <Compile Include="Events\RoleEventArgs.cs" />
+    <Compile Include="Events\RoleUpdatedEventArgs.cs" />
+    <Compile Include="Events\TypingEventArgs.cs" />
+    <Compile Include="Events\UserEventArgs.cs" />
+    <Compile Include="Events\UserUpdatedEventArgs.cs" />
+    <Compile Include="Events\VoiceChannelEventArgs.cs" />
+    <Compile Include="Format.cs" />
+    <Compile Include="InternalExtensions.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="MessageQueue.cs" />
+    <Compile Include="Net\HttpException.cs" />
+    <Compile Include="Net\JsonConverters\ChannelTypeConverter.cs" />
+    <Compile Include="Net\JsonConverters\ImageConverter.cs" />
+    <Compile Include="Net\JsonConverters\NullableUInt64Converter.cs" />
+    <Compile Include="Net\JsonConverters\PermissionTargetConverter.cs" />
+    <Compile Include="Net\JsonConverters\StringEntityConverter.cs" />
+    <Compile Include="Net\JsonConverters\UInt64ArrayConverter.cs" />
+    <Compile Include="Net\JsonConverters\UInt64Converter.cs" />
+    <Compile Include="Net\JsonConverters\UInt64EntityConverter.cs" />
+    <Compile Include="Net\JsonConverters\UserStatusConverter.cs" />
+    <Compile Include="Net\Rest\DefaultRestEngine.cs" />
+    <Compile Include="Net\Rest\IRestEngine.cs" />
+    <Compile Include="Net\Rest\IRestRequest.cs" />
+    <Compile Include="Net\Rest\RestClient.cs" />
+    <Compile Include="Net\Rest\RestClientProvider.cs" />
+    <Compile Include="Net\Rest\RestParameter.cs" />
+    <Compile Include="Net\Rest\SentRequestEventArgs.cs" />
+    <Compile Include="Net\WebSockets\BinaryMessageEventArgs.cs" />
+    <Compile Include="Net\WebSockets\DefaultWebSocketEngine.cs" />
+    <Compile Include="Net\WebSockets\GatewaySocket.cs" />
+    <Compile Include="Net\WebSockets\IWebSocketEngine.cs" />
+    <Compile Include="Net\WebSockets\TextMessageEventArgs.cs" />
+    <Compile Include="Net\WebSockets\WebSocket.cs" />
+    <Compile Include="Net\WebSockets\WebSocketEventEventArgs.cs" />
+    <Compile Include="Net\WebSockets\WebSocketProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Discord.Net.Net45.project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="API\GatewaySocket\Commands\" />
+    <Folder Include="API\GatewaySocket\Events\" />
+    <Folder Include="API\VoiceSocket\Commands\" />
+    <Folder Include="API\VoiceSocket\Events\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\TestBot\packages\Text.Analyzers.1.2.0-beta1-20160223-03\build\Text.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\TestBot\packages\Text.Analyzers.1.2.0-beta1-20160223-03\build\Text.Analyzers.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

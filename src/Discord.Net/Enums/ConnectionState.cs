@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public enum ConnectionState : byte
+    public enum ConnectionState
     {
         Disconnected,
         Connecting,

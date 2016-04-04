@@ -6,8 +6,9 @@ namespace Discord
     {
         public Role Role { get; }
 
-        public Server Server => Role.Server;
-
-        public RoleEventArgs(Role role) { Role = role; }
+        public RoleEventArgs(Role role)
+        {
+            Role = role;
+        }
     }
 }

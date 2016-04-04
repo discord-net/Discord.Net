@@ -1,13 +1,14 @@
-﻿using System.IO;
-using System.Threading;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-	internal interface IRestEngine
-	{
-		void SetToken(string token);
-		Task<string> Send(string method, string path, string json, CancellationToken cancelToken);
-		Task<string> SendFile(string method, string path, string filename, Stream stream, CancellationToken cancelToken);
-	}
+    public interface IRestEngine : IDisposable
+    {
+        void SetHeader(string key, string value);
+        
+        Task<Stream> Send(IRestRequest request);
+        Task<Stream> Send(IRestFileRequest request);
+    }
 }

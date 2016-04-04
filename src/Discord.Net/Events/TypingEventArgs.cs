@@ -1,11 +1,13 @@
-﻿namespace Discord
+﻿using System;
+
+namespace Discord
 {
-    public class TypingEventArgs 
+    public class TypingEventArgs : EventArgs
     {
-        public ITextChannel Channel { get; }
+        public IMessageChannel Channel { get; }
         public User User { get; }
 
-        public TypingEventArgs(ITextChannel channel, User user)
+        public TypingEventArgs(IMessageChannel channel, User user)
         {
             Channel = channel;
             User = user;

@@ -1,7 +1,8 @@
 ﻿namespace Discord
 {
-    public enum LogSeverity : byte
+    public enum LogSeverity
     {
+        Critical = 0,
         Error = 1,
         Warning = 2,
         Info = 3,

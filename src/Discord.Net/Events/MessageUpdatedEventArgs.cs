@@ -1,20 +1,14 @@
-﻿using System;
-
-namespace Discord
+﻿namespace Discord
 {
-    public class MessageUpdatedEventArgs : EventArgs
+    public class MessageUpdatedEventArgs : MessageEventArgs
     {
         public Message Before { get; }
-        public Message After { get; }
-
-        public User User => After.User;
-        public ITextChannel Channel => After.Channel;
-        public Server Server => After.Server;
+        public Message After => Message;
 
         public MessageUpdatedEventArgs(Message before, Message after)
+            : base(after)
         {
             Before = before;
-            After = after;
         }
     }
 }

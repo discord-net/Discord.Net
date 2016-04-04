@@ -6,7 +6,7 @@ Banning
 
 To ban a user, invoke the Ban function on a Server object.
 
-.. code-block:: csharp6
+.. code-block:: c#
 
     _server.Ban(_user, 30);
 
@@ -17,6 +17,6 @@ Kicking
 
 To kick a user, invoke the Kick function on the User.
 
-.. code-block:: csharp6
+.. code-block:: c#
 
     _user.Kick();

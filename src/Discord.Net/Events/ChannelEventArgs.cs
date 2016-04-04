@@ -6,6 +6,9 @@ namespace Discord
     {
         public IChannel Channel { get; }
 
-        public ChannelEventArgs(IChannel channel) { Channel = channel; }
+        public ChannelEventArgs(IChannel channel)
+        {
+            Channel = channel;
+        }
     }
 }

@@ -1,17 +1,14 @@
-﻿using System;
-namespace Discord
+﻿namespace Discord
 {
-    public class UserUpdatedEventArgs : EventArgs
+    public class UserUpdatedEventArgs : UserEventArgs
     {
         public User Before { get; }
-        public User After { get; }
-
-        public Server Server => After.Server;
+        public User After => User;
 
         public UserUpdatedEventArgs(User before, User after)
+            : base(after)
         {
             Before = before;
-            After = after;
         }
     }
 }

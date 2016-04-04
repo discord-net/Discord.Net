@@ -1,8 +1,8 @@
 ﻿namespace Discord
 {
-	public enum PermissionTarget : byte
-	{
-        User,
-        Role
+    public enum PermissionTarget
+    {
+        Role,
+        User
     }
 }

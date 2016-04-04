@@ -7,10 +7,10 @@ namespace Discord
         public bool WasUnexpected { get; }
         public Exception Exception { get; }
 
-        public DisconnectedEventArgs(bool wasUnexpected, Exception ex)
+        public DisconnectedEventArgs(bool wasUnexpected, Exception exception = null)
         {
             WasUnexpected = wasUnexpected;
-            Exception = ex;
+            Exception = exception;
         }
     }
 }

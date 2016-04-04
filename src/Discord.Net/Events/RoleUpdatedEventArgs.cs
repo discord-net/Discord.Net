@@ -1,18 +1,14 @@
-﻿using System;
-
-namespace Discord
+﻿namespace Discord
 {
-    public class RoleUpdatedEventArgs : EventArgs
+    public class RoleUpdatedEventArgs : RoleEventArgs
     {
         public Role Before { get; }
-        public Role After { get; }
-
-        public Server Server => After.Server;
+        public Role After => Role;
 
         public RoleUpdatedEventArgs(Role before, Role after)
+            : base(after)
         {
             Before = before;
-            After = after;
         }
     }
 }

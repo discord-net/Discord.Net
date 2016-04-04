@@ -1,140 +1,98 @@
-﻿using Discord.API;
-using Discord.ETF;
-using Discord.Logging;
+﻿using Discord.Net.JsonConverters;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
-using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    public abstract partial class RestClient
-	{
-        private struct RestResults
+    public class RestClient
+    {
+        internal event EventHandler<SentRequestEventArgs> SentRequest;
+        
+        private readonly IRestEngine _engine;
+        private readonly JsonSerializer _serializer;
+
+        internal RestClient(IRestEngine engine)
         {
-            public string Response { get; set; }
-            public double Milliseconds { get; set; }
-
-            public RestResults(string response, double milliseconds)
-            {
-                Response = response;
-                Milliseconds = milliseconds;
-            }
+            _engine = engine;
+            _serializer = new JsonSerializer();
+            _serializer.Converters.Add(new ChannelTypeConverter());
+            _serializer.Converters.Add(new ImageConverter());
+            _serializer.Converters.Add(new NullableUInt64Converter());
+            _serializer.Converters.Add(new PermissionTargetConverter());
+            _serializer.Converters.Add(new StringEntityConverter());
+            _serializer.Converters.Add(new UInt64ArrayConverter());
+            _serializer.Converters.Add(new UInt64Converter());
+            _serializer.Converters.Add(new UInt64EntityConverter());
+            _serializer.Converters.Add(new UserStatusConverter());
         }
+        public void Dispose() => _engine.Dispose();
 
-        public event EventHandler<RequestEventArgs> SendingRequest = delegate { };
-        public event EventHandler<CompletedRequestEventArgs> SentRequest = delegate { };
+        public void SetHeader(string key, string value) => _engine.SetHeader(key, value);
 
-        private bool OnSendingRequest(IRestRequest request)
+        public async Task<TResponse> Send<TResponse>(IRestRequest<TResponse> request)
+            where TResponse : class
         {
-            var eventArgs = new RequestEventArgs(request);
-            SendingRequest(this, eventArgs);
-            return !eventArgs.Cancel;
-        }
-        private void OnSentRequest(IRestRequest request, object response, string responseJson, double milliseconds)
-            => SentRequest(this, new CompletedRequestEventArgs(request, response, responseJson, milliseconds));
-
-        private readonly DiscordConfig _config;
-		private readonly IRestEngine _engine;
-        private readonly ETFWriter _serializer;
-        private readonly ILogger _logger;
-        private string _token;
-
-        public CancellationToken CancelToken { get; set; }
-
-        public string Token
-        {
-            get { return _token; }
-            set
-            {
-                _token = value;
-                _engine.SetToken(value);
-            }
-        }
-
-        protected RestClient(DiscordConfig config, string baseUrl, ILogger logger = null)
-		{
-			_config = config;
-            _logger = logger;
-
-#if !DOTNET5_4
-            _engine = new RestSharpEngine(config, baseUrl, logger);
-#else
-			_engine = new BuiltInEngine(config, baseUrl, logger);
-#endif
-
-            if (logger != null && logger.Level >= LogSeverity.Verbose)
-                SentRequest += (s, e) => _logger.Verbose($"{e.Request.Method} {e.Request.Endpoint}: {e.Milliseconds} ms");
-        }
-
-        public async Task<ResponseT> Send<ResponseT>(IRestRequest<ResponseT> request)
-			where ResponseT : class
-		{
             if (request == null) throw new ArgumentNullException(nameof(request));
+            
+            var stopwatch = Stopwatch.StartNew();
+            Stream response = await _engine.Send(request).ConfigureAwait(false);
+            TResponse responseObj = Deserialize<TResponse>(response);
+            stopwatch.Stop();
 
-            if (!OnSendingRequest(request)) throw new OperationCanceledException();
-            var results = await Send(request, true).ConfigureAwait(false);
-            var response = Deserialize<ResponseT>(results.Response);
-            OnSentRequest(request, response, results.Response, results.Milliseconds);
-
-            return response;
+            SentRequest(this, new SentRequestEventArgs(request, responseObj, ToMilliseconds(stopwatch)));
+            return responseObj;
         }
         public async Task Send(IRestRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            if (!OnSendingRequest(request)) throw new OperationCanceledException();
-            var results = await Send(request, false).ConfigureAwait(false);
-            OnSentRequest(request, null, null, results.Milliseconds);
+            var stopwatch = Stopwatch.StartNew();
+            await _engine.Send(request).ConfigureAwait(false);
+            stopwatch.Stop();
+            
+            SentRequest(this, new SentRequestEventArgs(request, null, ToMilliseconds(stopwatch)));
         }
 
-        public async Task<ResponseT> Send<ResponseT>(IRestFileRequest<ResponseT> request)
-            where ResponseT : class
+        public async Task<TResponse> Send<TResponse>(IRestFileRequest<TResponse> request)
+            where TResponse : class
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            if (!OnSendingRequest(request)) throw new OperationCanceledException();
-            var results = await SendFile(request, true).ConfigureAwait(false);
-            var response = Deserialize<ResponseT>(results.Response);
-            OnSentRequest(request, response, results.Response, results.Milliseconds);
+            var stopwatch = Stopwatch.StartNew();
+            Stream response = await _engine.Send(request).ConfigureAwait(false);
+            TResponse responseObj = Deserialize<TResponse>(response);
+            stopwatch.Stop();
 
-            return response;
+            SentRequest(this, new SentRequestEventArgs(request, responseObj, ToMilliseconds(stopwatch)));
+            return responseObj;
         }
         public async Task Send(IRestFileRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            if (!OnSendingRequest(request)) throw new OperationCanceledException();
-            var results = await SendFile(request, false).ConfigureAwait(false);
-            OnSentRequest(request, null, null, results.Milliseconds);
+            var stopwatch = Stopwatch.StartNew();
+            await _engine.Send(request).ConfigureAwait(false);
+            stopwatch.Stop();
+
+            SentRequest(this, new SentRequestEventArgs(request, null, ToMilliseconds(stopwatch)));
         }
 
-        private async Task<RestResults> Send(IRestRequest request, bool hasResponse)
+        private void Serialize<T>(Stream stream, T value)
         {
-            object payload = request.Payload;
-            string requestJson = null;
-            if (payload != null)
-				requestJson = Serialize(payload);
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            string responseJson = await _engine.Send(request.Method, request.Endpoint, requestJson, CancelToken).ConfigureAwait(false);
-            stopwatch.Stop();
-
-            double milliseconds = Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);            
-            return new RestResults(responseJson, milliseconds);
-		}
-        
-		private async Task<RestResults> SendFile(IRestFileRequest request, bool hasResponse)
-		{
-			Stopwatch stopwatch = Stopwatch.StartNew();			
-			string responseJson = await _engine.SendFile(request.Method, request.Endpoint, request.Filename, request.Stream, CancelToken).ConfigureAwait(false);
-            stopwatch.Stop();
-
-            double milliseconds = Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-            return new RestResults(responseJson, milliseconds);
+            using (TextWriter text = new StreamWriter(stream))
+            using (JsonWriter writer = new JsonTextWriter(text))
+                _serializer.Serialize(writer, value, typeof(T));
+        }
+        private T Deserialize<T>(Stream stream)
+        {
+            using (TextReader text = new StreamReader(stream))
+            using (JsonReader reader = new JsonTextReader(text))
+                return _serializer.Deserialize<T>(reader);
         }
 
-        protected abstract string Serialize<T>(T obj);
-        protected abstract T Deserialize<T>(string json);
-	}
+        private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
+    }
 }

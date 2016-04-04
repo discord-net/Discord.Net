@@ -2,6 +2,7 @@
 {
     public enum Relative
     {
-        Before, After
+        Before,
+        After
     }
 }
