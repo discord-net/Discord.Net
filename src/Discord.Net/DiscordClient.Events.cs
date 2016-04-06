@@ -35,14 +35,14 @@ namespace Discord
             => OnEvent(Ready);
         /*private void OnLoggedOut(bool wasUnexpected, Exception ex)
             => OnEvent(LoggedOut, new DisconnectedEventArgs(wasUnexpected, ex));*/
-
+            
         private void OnChannelCreated(Channel channel)
             => OnEvent(ChannelCreated, new ChannelEventArgs(channel));
         private void OnChannelDestroyed(Channel channel)
             => OnEvent(ChannelDestroyed, new ChannelEventArgs(channel));
         private void OnChannelUpdated(Channel before, Channel after)
             => OnEvent(ChannelUpdated, new ChannelUpdatedEventArgs(before, after));
-        
+
         private void OnMessageAcknowledged(Message msg)
             => OnEvent(MessageAcknowledged, new MessageEventArgs(msg));
         private void OnMessageDeleted(Message msg)
@@ -68,12 +68,12 @@ namespace Discord
             => OnEvent(JoinedServer, new ServerEventArgs(server));
         private void OnLeftServer(Server server)
             => OnEvent(LeftServer, new ServerEventArgs(server));
-        /*private void OnServerAvailable(Server server)
-            => OnEvent(ServerAvailable, new ServerEventArgs(server));*/
+        private void OnServerAvailable(Server server)
+            => OnEvent(ServerAvailable, new ServerEventArgs(server));
         private void OnServerUpdated(Server before, Server after)
             => OnEvent(ServerUpdated, new ServerUpdatedEventArgs(before, after));
-        /*private void OnServerUnavailable(Server server)
-            => OnEvent(ServerUnavailable, new ServerEventArgs(server));*/
+        private void OnServerUnavailable(Server server)
+            => OnEvent(ServerUnavailable, new ServerEventArgs(server));
 
         private void OnUserBanned(User user)
             => OnEvent(UserBanned, new UserEventArgs(user));

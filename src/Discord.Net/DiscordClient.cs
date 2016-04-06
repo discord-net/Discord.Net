@@ -33,7 +33,6 @@ namespace Discord
         private ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
         private Stopwatch _connectionStopwatch;
-        private bool _isProcessingReady;
 
         internal Logger Logger { get; }
 
@@ -150,7 +149,7 @@ namespace Discord
 
             //GatewaySocket.Disconnected += (s, e) => OnDisconnected(e.WasUnexpected, e.Exception);
             GatewaySocket.ReceivedDispatch += (s, e) => OnReceivedEvent(e);
-            
+
             MessageQueue = new MessageQueue(ClientAPI, Log.CreateLogger("MessageQueue"));
 
             //Extensibility
@@ -271,7 +270,6 @@ namespace Discord
                 SendStatus();
                 OnReady();
             }
-            _isProcessingReady = false;
         }
 
         /// <summary> Disconnects from the Discord server, canceling any pending requests. </summary>
@@ -286,7 +284,7 @@ namespace Discord
                 try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
                 catch (OperationCanceledException) { }
             }
-            
+
             MessageQueue.Clear();
 
             await GatewaySocket.Disconnect().ConfigureAwait(false);
@@ -298,12 +296,12 @@ namespace Discord
 
             PrivateUser = null;
             CurrentUser = null;
-            
+
             State = (int)ConnectionState.Disconnected;
             _connectedEvent.Reset();
             _disconnectedEvent.Set();
         }
-        
+
         public void SetStatus(UserStatus status)
         {
             if (status == null) throw new ArgumentNullException(nameof(status));
@@ -477,7 +475,7 @@ namespace Discord
         #endregion
 
         #region Gateway Events
-        private async void OnReceivedEvent(WebSocketEventEventArgs e)
+        private void OnReceivedEvent(WebSocketEventEventArgs e)
         {
             try
             {
@@ -489,17 +487,11 @@ namespace Discord
                             //TODO: None of this is really threadsafe - should only replace the cache collections when they have been fully populated
 
                             var data = e.Payload.ToObject<ReadyEvent>(Serializer);
-                            _isProcessingReady = true;
-
-                            int channelCount = 0;
-                            for (int i = 0; i < data.Guilds.Length; i++)
-                                channelCount += data.Guilds[i].Channels.Length;
 
                             //ConcurrencyLevel = 2 (only REST and WebSocket can add/remove)
                             _servers = new ConcurrentDictionary<ulong, Server>(2, (int)(data.Guilds.Length * 1.05));
-                            _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(channelCount * 1.05));
+                            _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(data.Guilds.Length * 2 * 1.05));
                             _privateChannels = new ConcurrentDictionary<ulong, Channel>(2, (int)(data.PrivateChannels.Length * 1.05));
-                            List<ulong> largeServers = new List<ulong>();
 
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
@@ -514,8 +506,6 @@ namespace Discord
                                 {
                                     var server = AddServer(model.Id);
                                     server.Update(model);
-                                    if (model.IsLarge)
-                                        largeServers.Add(server.Id);
                                 }
                             }
                             for (int i = 0; i < data.PrivateChannels.Length; i++)
@@ -524,18 +514,7 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
-                            if (largeServers.Count > 0)
-                            {
-                                int batches = (largeServers.Count + (DiscordConfig.ServerBatchCount - 1)) / DiscordConfig.ServerBatchCount;
-                                for (int i = 0; i < batches; i++)
-                                {
-                                    GatewaySocket.SendRequestMembers(largeServers.Skip(i * DiscordConfig.ServerBatchCount).Take(DiscordConfig.ServerBatchCount), "", 0);
-                                    if (i != batches - 1)
-                                        await Task.Delay(1500);
-                                }
-                            }
-                            else
-                                EndConnect();
+                            EndConnect();
                         }
                         break;
 
@@ -547,21 +526,18 @@ namespace Discord
                             {
                                 var server = AddServer(data.Id);
                                 server.Update(data);
-                                
+
                                 if (data.Unavailable != false)
                                     Logger.Info($"GUILD_CREATE: {server.Path}");
                                 else
                                     Logger.Info($"GUILD_AVAILABLE: {server.Path}");
 
-                                if (data.Unavailable != false)
+                                if (data.IsLarge)
+                                    GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
+                                else
                                 {
-                                    if (data.IsLarge)
-                                        GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
-                                    else
-                                    {
-                                        OnJoinedServer(server);
-                                        //OnServerAvailable(server);
-                                    }
+                                    OnJoinedServer(server);
+                                    OnServerAvailable(server);
                                 }
                             }
                         }
@@ -592,9 +568,9 @@ namespace Discord
                                 else
                                     Logger.Info($"GUILD_UNAVAILABLE: {server.Path}");
 
-                                //OnServerUnavailable(server);
-                                //if (data.Unavailable != true)
-                                OnLeftServer(server);
+                                OnServerUnavailable(server);
+                                if (data.Unavailable != true)
+                                    OnLeftServer(server);
                             }
                             else
                                 Logger.Warning("GUILD_DELETE referenced an unknown guild.");
@@ -725,25 +701,7 @@ namespace Discord
                                 Logger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
 
                                 if (server.CurrentUserCount >= server.UserCount) //Finished downloading for there
-                                {
-                                    if (_isProcessingReady)
-                                    {
-                                        bool isConnectComplete = true;
-                                        foreach (var server2 in _servers.Select(x => x.Value))
-                                        {
-                                            if (server2.CurrentUserCount < server2.UserCount)
-                                                isConnectComplete = false;
-                                        }
-                                        if (isConnectComplete)
-                                            EndConnect();
-                                    }
-                                    else
-                                    {
-                                        //TODO: Need to store if a server is available or not
-                                        OnJoinedServer(server);
-                                        //OnServerAvailable(server);
-                                    }
-                                }
+                                    OnServerAvailable(server);
                             }
                             else
                                 Logger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
@@ -880,7 +838,7 @@ namespace Discord
 
                                     msg.Update(data);
                                     user.UpdateActivity();
-                                    
+
                                     Logger.Verbose($"MESSAGE_CREATE: {channel.Path} ({user.Name ?? "Unknown"})");
                                     OnMessageReceived(msg);
                                 }
@@ -1095,7 +1053,7 @@ namespace Discord
                 _isDisposed = true;
             }
         }
-        
+
         public void Dispose()
         {
             Dispose(true);
