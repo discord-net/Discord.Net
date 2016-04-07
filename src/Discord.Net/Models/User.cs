@@ -268,7 +268,16 @@ namespace Discord
         }
 
         #region Permissions
-        public ServerPermissions ServerPermissions => Server.GetPermissions(this);
+        public ServerPermissions ServerPermissions
+        {
+            get
+            {
+                if (Server == null) throw new InvalidOperationException("Unable to get server permissions from a private channel");
+
+                return Server.GetPermissions(this);
+            }
+        }
+
 		public ChannelPermissions GetPermissions(Channel channel)
 		{
 			if (channel == null) throw new ArgumentNullException(nameof(channel));
