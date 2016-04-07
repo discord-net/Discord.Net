@@ -46,7 +46,7 @@ namespace Discord.Net.WebSockets
             string url = $"{gatewayResponse.Url}?encoding=json&v=4";
             Logger.Verbose($"Login successful, gateway: {url}");
 
-            Host = gatewayResponse.Url;
+            Host = url;
             await BeginConnect(parentCancelToken).ConfigureAwait(false);
             if (SessionId == null)
                 SendIdentify(_rest.Token);
