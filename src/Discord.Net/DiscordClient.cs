@@ -34,6 +34,8 @@ namespace Discord
         private Dictionary<string, Region> _regions;
         private Stopwatch _connectionStopwatch;
 
+        private int _readyServerCount;
+
         internal Logger Logger { get; }
 
         /// <summary> Gets the configuration object used to make this client. </summary>
@@ -493,6 +495,8 @@ namespace Discord
                             _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(data.Guilds.Length * 2 * 1.05));
                             _privateChannels = new ConcurrentDictionary<ulong, Channel>(2, (int)(data.PrivateChannels.Length * 1.05));
 
+                            _readyServerCount = data.Guilds.Length;
+
                             SessionId = data.SessionId;
                             PrivateUser = new User(this, data.User.Id, null);
                             PrivateUser.Update(data.User);
@@ -514,7 +518,8 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
-                            EndConnect();
+                            Log.Info("Discord", "READY was processed, holding off to raise event until servers are filled.");
+                            //EndConnect();
                         }
                         break;
 
@@ -540,6 +545,8 @@ namespace Discord
                                     OnServerAvailable(server);
                                 }
                             }
+                            if (State == ConnectionState.Connecting && Servers.Count() >= _readyServerCount)
+                                EndConnect();
                         }
                         break;
                     case "GUILD_UPDATE":
