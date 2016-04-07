@@ -6,7 +6,7 @@ namespace Discord.API.Client.Rest
     public class GatewayRequest : IRestRequest<GatewayResponse>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"gateway?encoding=json&v=4";
+        string IRestRequest.Endpoint => $"gateway";
         object IRestRequest.Payload => null;
     }
 
