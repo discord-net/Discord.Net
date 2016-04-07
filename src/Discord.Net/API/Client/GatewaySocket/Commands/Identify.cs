@@ -10,8 +10,6 @@ namespace Discord.API.Client.GatewaySocket
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        [JsonProperty("v")]
-        public int Version { get; set; }
         [JsonProperty("token")]
         public string Token { get; set; }
         [JsonProperty("properties")]

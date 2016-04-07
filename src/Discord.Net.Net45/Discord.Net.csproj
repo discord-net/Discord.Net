@@ -199,8 +199,8 @@
     <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\Ready.cs">
       <Link>API\Client\GatewaySocket\Events\Ready.cs</Link>
     </Compile>
-    <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\Redirect.cs">
-      <Link>API\Client\GatewaySocket\Events\Redirect.cs</Link>
+    <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\Reconnect.cs">
+      <Link>API\Client\GatewaySocket\Events\Reconnect.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\API\Client\GatewaySocket\Events\Resumed.cs">
       <Link>API\Client\GatewaySocket\Events\Resumed.cs</Link>

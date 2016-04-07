@@ -131,15 +131,10 @@ namespace Discord.Net.WebSockets
                         }
 					}
 					break;
-				case OpCodes.Redirect:
+				case OpCodes.Reconnect:
 					{
-						var payload = (msg.Payload as JToken).ToObject<RedirectEvent>(_serializer);
-						if (payload.Url != null)
-						{
-							Host = payload.Url;
-							Logger.Info("Redirected to " + payload.Url);
-							await Reconnect().ConfigureAwait(false);
-						}
+						var payload = (msg.Payload as JToken).ToObject<ReconnectEvent>(_serializer);
+						await Reconnect().ConfigureAwait(false);
 					}
 					break;
 				default:
@@ -159,7 +154,6 @@ namespace Discord.Net.WebSockets
             };
             var msg = new IdentifyCommand()
             {
-                Version = 3,
                 Token = token,
                 Properties = props, 
                 LargeThreshold = _config.LargeThreshold,

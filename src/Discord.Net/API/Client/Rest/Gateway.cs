@@ -6,13 +6,13 @@ namespace Discord.API.Client.Rest
     public class GatewayRequest : IRestRequest<GatewayResponse>
     {
         string IRestRequest.Method => "GET";
-        string IRestRequest.Endpoint => $"gateway";
+        string IRestRequest.Endpoint => $"gateway?encoding=json&v=4";
         object IRestRequest.Payload => null;
     }
-    
+
     public class GatewayResponse
-	{
-		[JsonProperty("url")]
-		public string Url { get; set; }
+    {
+        [JsonProperty("url")]
+        public string Url { get; set; }
     }
 }
