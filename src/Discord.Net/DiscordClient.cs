@@ -540,7 +540,7 @@ namespace Discord
                                         while (largeServersCount < batchSize && _largeServers.TryDequeue(out serverIds[largeServersCount++])) { }
                                         if (largeServersCount > 0)
                                         {
-                                            Logger.Warning($"Downloading data for {largeServersCount} large servers.");
+                                            Logger.Verbose($"Downloading data for {largeServersCount} large servers.");
                                             cancelToken.ThrowIfCancellationRequested();
                                             GatewaySocket.SendRequestMembers(serverIds, "", 0);
                                             await Task.Delay(1500, cancelToken);
