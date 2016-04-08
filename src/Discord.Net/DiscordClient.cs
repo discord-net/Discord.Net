@@ -528,24 +528,22 @@ namespace Discord
                             {
                                 try
                                 {
-                                    ulong serverId;
-                                    ulong[] serverIds = new ulong[50];
-                                    int i = 0;
-
+                                    const short batchSize = 50;
+                                    int largeServersCount = 0;
                                     await Task.Delay(2500, cancelToken);
-                                    while (true)
+                                    do
                                     {
-                                        while (_largeServers.TryDequeue(out serverId) && i < 50)
-                                            serverIds[i++] = serverId;
-                                        if (i > 0)
+                                        largeServersCount = 0;
+                                        ulong[] serverIds = new ulong[batchSize];
+                                        while (largeServersCount < batchSize && _largeServers.TryDequeue(out serverIds[largeServersCount++])) { }
+                                        if (largeServersCount > 0)
                                         {
+                                            Logger.Verbose($"Downloading data for {largeServersCount} large servers.");
                                             cancelToken.ThrowIfCancellationRequested();
                                             GatewaySocket.SendRequestMembers(serverIds, "", 0);
                                             await Task.Delay(1500, cancelToken);
                                         }
-                                        if (i < 50)
-                                            break;
-                                    }
+                                    } while (largeServersCount == batchSize);
                                     await Task.Delay(2500, cancelToken);
                                     EndConnect();
                                 }
