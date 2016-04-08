@@ -407,7 +407,7 @@ namespace Discord.Net.WebSockets
             WebSocketMessage msg;
             using (var reader = new JsonTextReader(new StringReader(json)))
                 msg = _serializer.Deserialize(reader, typeof(WebSocketMessage)) as WebSocketMessage;
-            
+
             var opCode = (OpCodes)msg.Operation;
             switch (opCode)
             {
@@ -418,7 +418,11 @@ namespace Discord.Net.WebSockets
                             var payload = (msg.Payload as JToken).ToObject<ReadyEvent>(_serializer);
                             _heartbeatInterval = payload.HeartbeatInterval;
                             _ssrc = payload.SSRC;
-                            string hostname = Host.Substring(0, Host.IndexOf('?')).Replace("wss://", "");
+                            string hostname;
+                            if (Host.Contains("?"))
+                                hostname = Host.Substring(0, Host.IndexOf('?')).Replace("wss://", "");
+                            else
+                                hostname = Host.Replace("wss://", "");
                             var address = (await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false)).FirstOrDefault();
                             _endpoint = new IPEndPoint(address, payload.Port);
 
