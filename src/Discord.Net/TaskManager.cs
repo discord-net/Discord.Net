@@ -20,6 +20,7 @@ namespace Discord
 
         public bool StopOnCompletion { get; }
         public bool WasStopExpected { get; private set; }
+        public CancellationToken CancelToken => _cancelSource.Token;
 
         public Exception Exception => _stopReason?.SourceException;
 

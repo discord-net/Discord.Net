@@ -33,6 +33,7 @@ namespace Discord
         private ConcurrentDictionary<ulong, Channel> _privateChannels; //Key = RecipientId
         private Dictionary<string, Region> _regions;
         private Stopwatch _connectionStopwatch;
+        private ConcurrentQueue<ulong> _largeServers;
 
         internal Logger Logger { get; }
 
@@ -125,6 +126,7 @@ namespace Discord
             _servers = new ConcurrentDictionary<ulong, Server>(2, 0);
             _channels = new ConcurrentDictionary<ulong, Channel>(2, 0);
             _privateChannels = new ConcurrentDictionary<ulong, Channel>(2, 0);
+            _largeServers = new ConcurrentQueue<ulong>();
 
             //Serialization
             Serializer = new JsonSerializer();
@@ -284,6 +286,9 @@ namespace Discord
                 try { await ClientAPI.Send(new LogoutRequest()).ConfigureAwait(false); }
                 catch (OperationCanceledException) { }
             }
+
+            ulong serverId;
+            while (_largeServers.TryDequeue(out serverId)) { }
 
             MessageQueue.Clear();
 
@@ -507,6 +512,8 @@ namespace Discord
                                     var server = AddServer(model.Id);
                                     server.Update(model);
                                 }
+                                if (model.IsLarge)
+                                    _largeServers.Enqueue(model.Id);
                             }
                             for (int i = 0; i < data.PrivateChannels.Length; i++)
                             {
@@ -514,7 +521,36 @@ namespace Discord
                                 var channel = AddPrivateChannel(model.Id, model.Recipient.Id);
                                 channel.Update(model);
                             }
-                            EndConnect();
+
+                            //Temporary hotfix to download all large guilds before raising READY
+                            CancellationToken cancelToken = _taskManager.CancelToken;
+                            Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    ulong serverId;
+                                    ulong[] serverIds = new ulong[50];
+                                    int i = 0;
+
+                                    await Task.Delay(2500, cancelToken);
+                                    while (true)
+                                    {
+                                        while (_largeServers.TryDequeue(out serverId) && i < 50)
+                                            serverIds[i++] = serverId;
+                                        if (i > 0)
+                                        {
+                                            cancelToken.ThrowIfCancellationRequested();
+                                            GatewaySocket.SendRequestMembers(serverIds, "", 0);
+                                            await Task.Delay(1500, cancelToken);
+                                        }
+                                        if (i < 50)
+                                            break;
+                                    }
+                                    await Task.Delay(2500, cancelToken);
+                                    EndConnect();
+                                }
+                                catch (OperationCanceledException) { }
+                            });
                         }
                         break;
 
@@ -528,16 +564,21 @@ namespace Discord
                                 server.Update(data);
 
                                 if (data.Unavailable != false)
+                                {
                                     Logger.Info($"GUILD_CREATE: {server.Path}");
+                                    OnJoinedServer(server);
+                                }
                                 else
                                     Logger.Info($"GUILD_AVAILABLE: {server.Path}");
 
-                                if (data.IsLarge)
-                                    GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
+                                if (!data.IsLarge)
+                                    OnServerAvailable(server);
                                 else
                                 {
-                                    OnJoinedServer(server);
-                                    OnServerAvailable(server);
+                                    if (State == ConnectionState.Connected)
+                                        GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
+                                    else
+                                        _largeServers.Enqueue(data.Id);
                                 }
                             }
                         }

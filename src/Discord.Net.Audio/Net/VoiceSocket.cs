@@ -418,7 +418,8 @@ namespace Discord.Net.WebSockets
                             var payload = (msg.Payload as JToken).ToObject<ReadyEvent>(_serializer);
                             _heartbeatInterval = payload.HeartbeatInterval;
                             _ssrc = payload.SSRC;
-                            var address = (await Dns.GetHostAddressesAsync(Host.Replace("wss://", "")).ConfigureAwait(false)).FirstOrDefault();
+                            string hostname = Host.Substring(0, Host.IndexOf('?')).Replace("wss://", "");
+                            var address = (await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false)).FirstOrDefault();
                             _endpoint = new IPEndPoint(address, payload.Port);
 
                             if (_audioConfig.EnableEncryption)
