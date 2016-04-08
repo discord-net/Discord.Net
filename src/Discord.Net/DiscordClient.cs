@@ -202,7 +202,7 @@ namespace Discord
                     await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
 
-                    var tasks = new[] { CancelToken.Wait() }
+                    var tasks = new[] { CancelToken.Wait(), LargeServerDownloader(CancelToken) }
                         .Concat(MessageQueue.Run(CancelToken));
 
                     await _taskManager.Start(tasks, cancelSource).ConfigureAwait(false);
@@ -522,32 +522,7 @@ namespace Discord
                                 channel.Update(model);
                             }
 
-                            //Temporary hotfix to download all large guilds before raising READY
-                            CancellationToken cancelToken = _taskManager.CancelToken;
-                            Task.Run(async () =>
-                            {
-                                try
-                                {
-                                    const short batchSize = 50;
-                                    int count = 0;
-                                    await Task.Delay(1500, cancelToken);
-                                    do
-                                    {
-                                        count = 0;
-                                        ulong[] serverIds = new ulong[batchSize];
-                                        while (count < batchSize && _largeServers.TryDequeue(out serverIds[count++])) { }
-                                        if (count > 0)
-                                        {
-                                            cancelToken.ThrowIfCancellationRequested();
-                                            GatewaySocket.SendRequestMembers(serverIds, "", 0);
-                                            await Task.Delay(1250, cancelToken);
-                                        }
-                                    } while (count == batchSize);
-                                    await Task.Delay(1500, cancelToken);
-                                    EndConnect();
-                                }
-                                catch (OperationCanceledException) { }
-                            });
+                            EndConnect();
                         }
                         break;
 
@@ -571,12 +546,7 @@ namespace Discord
                                 if (!data.IsLarge)
                                     OnServerAvailable(server);
                                 else
-                                {
-                                    if (State == ConnectionState.Connected)
-                                        GatewaySocket.SendRequestMembers(new ulong[] { data.Id }, "", 0);
-                                    else
-                                        _largeServers.Enqueue(data.Id);
-                                }
+                                    _largeServers.Enqueue(data.Id);
                             }
                         }
                         break;
@@ -1097,6 +1067,35 @@ namespace Discord
             Dispose(true);
         }
         #endregion
+
+        private Task LargeServerDownloader(CancellationToken cancelToken)
+        {
+            //Temporary hotfix to download all large guilds before raising READY
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    const short batchSize = 50;
+                    ulong[] serverIds = new ulong[batchSize];
+
+                    while (true)
+                    {
+                        if (!cancelToken.IsCancellationRequested && State == ConnectionState.Connected)
+                        {
+                            int count = 0;
+
+                            while (count < batchSize && _largeServers.TryDequeue(out serverIds[count]))
+                                count++;
+
+                            if (count > 0 && !cancelToken.IsCancellationRequested)
+                                GatewaySocket.SendRequestMembers(serverIds.Take(count), "", 0);
+                        }
+                        await Task.Delay(1250);
+                    }
+                }
+                catch (OperationCanceledException) { }
+            });
+        }
 
         //Helpers
         private string GetTokenCachePath(string email)
