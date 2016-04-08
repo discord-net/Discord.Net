@@ -528,8 +528,6 @@ namespace Discord
                             {
                                 try
                                 {
-                                    ulong serverId;
-
                                     const short batchSize = 50;
                                     int largeServersCount = 0;
                                     await Task.Delay(2500, cancelToken);
