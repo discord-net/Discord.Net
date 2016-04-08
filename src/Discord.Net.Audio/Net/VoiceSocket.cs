@@ -418,11 +418,7 @@ namespace Discord.Net.WebSockets
                             var payload = (msg.Payload as JToken).ToObject<ReadyEvent>(_serializer);
                             _heartbeatInterval = payload.HeartbeatInterval;
                             _ssrc = payload.SSRC;
-                            string hostname;
-                            if (Host.Contains("?"))
-                                hostname = Host.Substring(0, Host.IndexOf('?')).Replace("wss://", "");
-                            else
-                                hostname = Host.Replace("wss://", "");
+                            string hostname = Host.Replace("wss://", "");
                             var address = (await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false)).FirstOrDefault();
                             _endpoint = new IPEndPoint(address, payload.Port);
 

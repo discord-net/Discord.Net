@@ -529,22 +529,21 @@ namespace Discord
                                 try
                                 {
                                     const short batchSize = 50;
-                                    int largeServersCount = 0;
-                                    await Task.Delay(2500, cancelToken);
+                                    int count = 0;
+                                    await Task.Delay(1500, cancelToken);
                                     do
                                     {
-                                        largeServersCount = 0;
+                                        count = 0;
                                         ulong[] serverIds = new ulong[batchSize];
-                                        while (largeServersCount < batchSize && _largeServers.TryDequeue(out serverIds[largeServersCount++])) { }
-                                        if (largeServersCount > 0)
+                                        while (count < batchSize && _largeServers.TryDequeue(out serverIds[count++])) { }
+                                        if (count > 0)
                                         {
-                                            Logger.Verbose($"Downloading data for {largeServersCount} large servers.");
                                             cancelToken.ThrowIfCancellationRequested();
                                             GatewaySocket.SendRequestMembers(serverIds, "", 0);
-                                            await Task.Delay(1500, cancelToken);
+                                            await Task.Delay(1250, cancelToken);
                                         }
-                                    } while (largeServersCount == batchSize);
-                                    await Task.Delay(2500, cancelToken);
+                                    } while (count == batchSize);
+                                    await Task.Delay(1500, cancelToken);
                                     EndConnect();
                                 }
                                 catch (OperationCanceledException) { }
