@@ -26,6 +26,6 @@
         MuteMembers = 22,
         DeafenMembers = 23,
         MoveMembers = 24,
-        UseVoiceActivation = 25
+        UseVAD = 25
     }
 }

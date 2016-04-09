@@ -27,9 +27,9 @@ namespace Discord
         /// <inheritdoc />
         public DiscordClient Discord => Guild.Discord;
         /// <summary> Gets a collection of all users in this channel. </summary>
-        public IEnumerable<GuildUser> Users => _permissions.GetUsers();
+        public IEnumerable<GuildUser> Users => _permissions.GetMembers();
         /// <inheritdoc />
-        IEnumerable<User> IChannel.Users => _permissions.GetUsers();
+        IEnumerable<IUser> IChannel.Users => _permissions.GetMembers();
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
         public IEnumerable<Overwrite> PermissionOverwrites => _permissions.Overwrites;
 
@@ -50,13 +50,12 @@ namespace Discord
         }
 
         /// <summary> Gets a user in this channel with the given id. </summary>
-        public GuildUser GetUser(ulong id)
-            => _permissions.GetUser(id);
+        public GuildUser GetUser(ulong id) => _permissions.GetUser(id);
         /// <inheritdoc />
-        User IChannel.GetUser(ulong id) => GetUser(id);
+        IUser IChannel.GetUser(ulong id) => GetUser(id);
 
         /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
-        public OverwritePermissions? GetPermissionOverwrite(GuildUser user)
+        public OverwritePermissions? GetPermissionOverwrite(IUser user)
             => _permissions.GetOverwrite(user);
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
         public OverwritePermissions? GetPermissionOverwrite(Role role)
@@ -74,23 +73,23 @@ namespace Discord
         }
 
         /// <summary> Adds or updates the permission overwrite for the given user. </summary>
-        public Task UpdatePermissionOverwrite(GuildUser user, OverwritePermissions permissions)
+        public Task UpdatePermissionOverwrite(IUser user, OverwritePermissions permissions)
             =>  _permissions.AddOrUpdateOverwrite(user, permissions);
         /// <summary> Adds or updates the permission overwrite for the given role. </summary>
         public Task UpdatePermissionOverwrite(Role role, OverwritePermissions permissions)
             => _permissions.AddOrUpdateOverwrite(role, permissions);
         /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
-        public Task RemovePermissionOverwrite(GuildUser user)
+        public Task RemovePermissionOverwrite(IUser user)
             => _permissions.RemoveOverwrite(user);
         /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
         public Task RemovePermissionOverwrite(Role role)
             => _permissions.RemoveOverwrite(role);
 
-        internal ChannelPermissions GetPermissions(GuildUser user)
+        internal ChannelPermissions GetPermissions(IUser user)
             => _permissions.GetPermissions(user);
         internal void UpdatePermissions()
             => _permissions.UpdatePermissions();
-        internal void UpdatePermissions(GuildUser user)
+        internal void UpdatePermissions(IUser user)
             => _permissions.UpdatePermissions(user);
 
         /// <summary> Creates a new invite to this channel. </summary>

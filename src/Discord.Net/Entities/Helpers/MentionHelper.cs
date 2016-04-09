@@ -11,7 +11,7 @@ namespace Discord
         private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>");
         private static readonly Regex _roleRegex = new Regex(@"@everyone");
 
-        internal static string Mention(User user) => $"<@{user.Id}>";
+        internal static string Mention(IUser user) => $"<@{user.Id}>";
         internal static string Mention(IChannel channel) => $"<#{channel.Id}>";
         internal static string Mention(Role role) => role.IsEveryone ? "@everyone" : "";
 

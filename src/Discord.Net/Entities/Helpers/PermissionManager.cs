@@ -46,7 +46,7 @@ namespace Discord
             UpdatePermissions();
         }
 
-        public OverwritePermissions? GetOverwrite(GuildUser user)
+        public OverwritePermissions? GetOverwrite(IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -64,7 +64,7 @@ namespace Discord
                 return rule.Permissions;
             return null;
         }
-        public Task AddOrUpdateOverwrite(GuildUser user, OverwritePermissions permissions)
+        public Task AddOrUpdateOverwrite(IUser user, OverwritePermissions permissions)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return AddOrUpdateOverwrite(user.Id, permissions);
@@ -83,7 +83,7 @@ namespace Discord
             };
             return _channel.Discord.RestClient.Send(request);
         }
-        public Task RemoveOverwrite(GuildUser user)
+        public Task RemoveOverwrite(IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return RemoveOverwrite(user.Id);
@@ -99,7 +99,7 @@ namespace Discord
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { }
         }
 
-        public ChannelPermissions GetPermissions(GuildUser user)
+        public ChannelPermissions GetPermissions(IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -131,7 +131,7 @@ namespace Discord
                 }
             }
         }
-        public void UpdatePermissions(GuildUser user)
+        public void UpdatePermissions(IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -147,22 +147,37 @@ namespace Discord
             }
         }
 
-
-        public ChannelPermissions ResolvePermissions(GuildUser user)
+        public ChannelPermissions ResolvePermissions(IUser user)
         {
             var permissions = new ChannelPermissions();
             ResolvePermissions(user, ref permissions);
             return permissions;
         }
-        public bool ResolvePermissions(GuildUser user, ref ChannelPermissions permissions)
+        private ChannelPermissions ResolvePermissions(GuildUser user)
+        {
+            var permissions = new ChannelPermissions();
+            ResolvePermissions(user, ref permissions);
+            return permissions;
+        }
+        public bool ResolvePermissions(IUser user, ref ChannelPermissions permissions)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
+            GuildUser guildUser = _channel.GetUser(user.Id);
+            if (guildUser == null)
+            {
+                permissions = ChannelPermissions.None;
+                return false;
+            }
+            else
+                return ResolvePermissions(user, ref permissions);
+        }
+        private bool ResolvePermissions(GuildUser user, ref ChannelPermissions permissions)
+        {
             uint newPermissions = 0;
-            var guild = user.Guild;
 
             uint mask = ChannelPermissions.All(_channel.Type).RawValue;
-            if (user == guild.Owner)
+            if (user == user.Guild.Owner)
                 newPermissions = mask; //Private messages and owners always have all permissions
             else
             {
@@ -171,7 +186,7 @@ namespace Discord
                 var rules = _rules;
 
                 Overwrite entry;
-                var roles = user.Presence.Roles.ToArray();
+                var roles = user.Roles.ToArray();
                 if (roles.Length > 0)
                 {
                     for (int i = 0; i < roles.Length; i++)
@@ -228,13 +243,13 @@ namespace Discord
                 }
                 else if (_channel.Type == ChannelType.Voice)
                 {
-                    if (user.VoiceState?.VoiceChannel == _channel)
+                    if (user.VoiceChannel == _channel)
                         return user;
                 }
             }
             return null;
         }
-        public IEnumerable<GuildUser> GetUsers()
+        public IEnumerable<GuildUser> GetMembers()
         {
             if (_users != null)
                 return _users.Select(x => x.Value.User);
@@ -247,7 +262,7 @@ namespace Discord
                     return users.Where(x => ResolvePermissions(x, ref perms));
                 }
                 else if (_channel.Type == ChannelType.Voice)
-                    return users.Where(x => x.VoiceState?.VoiceChannel == _channel);
+                    return users.Where(x => x.VoiceChannel == _channel);
             }
             return Enumerable.Empty<GuildUser>();
         }

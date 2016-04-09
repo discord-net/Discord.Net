@@ -21,13 +21,6 @@ namespace Discord
         internal const int MessageQueueInterval = 100;
         internal const int WebSocketQueueInterval = 100;
 
-        /// <summary> Gets or sets name of your application, used in the user agent. </summary>
-        public string AppName { get; set; } = null;
-        /// <summary> Gets or sets url to your application, used in the user agent. </summary>
-        public string AppUrl { get; set; } = null;
-        /// <summary> Gets or sets the version of your application, used in the user agent. </summary>
-        public string AppVersion { get; set; } = null;
-
         /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
         

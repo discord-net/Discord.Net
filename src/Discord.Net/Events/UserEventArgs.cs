@@ -4,9 +4,9 @@ namespace Discord
 {
     public class UserEventArgs : EventArgs
     {
-        public User User { get; }
+        public IUser User { get; }
 
-        public UserEventArgs(User user)
+        public UserEventArgs(IUser user)
         {
             User = user;
         }

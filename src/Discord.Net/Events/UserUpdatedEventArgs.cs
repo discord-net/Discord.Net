@@ -2,10 +2,10 @@
 {
     public class UserUpdatedEventArgs : UserEventArgs
     {
-        public User Before { get; }
-        public User After => User;
+        public IUser Before { get; }
+        public IUser After => User;
 
-        public UserUpdatedEventArgs(User before, User after)
+        public UserUpdatedEventArgs(IUser before, IUser after)
             : base(after)
         {
             Before = before;

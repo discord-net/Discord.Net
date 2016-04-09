@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class UpdateMemberRequest : IRestRequest
+    public class ModifyGuildMemberRequest : IRestRequest
     {
         string IRestRequest.Method => "PATCH";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/members/{UserId}";
@@ -22,7 +22,7 @@ namespace Discord.API.Rest
         [JsonProperty("channel_id")]
         public ulong? ChannelId { get; set; }
 
-        public UpdateMemberRequest(ulong guildId, ulong userId)
+        public ModifyGuildMemberRequest(ulong guildId, ulong userId)
         {
             GuildId = guildId;
             UserId = userId;

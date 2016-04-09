@@ -27,9 +27,9 @@ namespace Discord
 
         private ConcurrentDictionary<ulong, GuildChannel> _channels;
         private ConcurrentDictionary<ulong, Member> _members;
-        private ConcurrentDictionary<ulong, GuildPresence> _presences;
+        //private ConcurrentDictionary<ulong, GuildPresence> _presences;
         private ConcurrentDictionary<ulong, Role> _roles;
-        private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
+        //private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
         private ulong _ownerId;
         private ulong? _afkChannelId, _embedChannelId;
         private int _userCount;
@@ -100,9 +100,9 @@ namespace Discord
 
             _channels = new ConcurrentDictionary<ulong, GuildChannel>();
             _members = new ConcurrentDictionary<ulong, Member>();
-            _presences = new ConcurrentDictionary<ulong, GuildPresence>();
+            //_presences = new ConcurrentDictionary<ulong, GuildPresence>();
             _roles = new ConcurrentDictionary<ulong, Role>();
-            _voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
+            //_voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
         }
 
         internal void Update(Model model)
@@ -207,7 +207,7 @@ namespace Discord
         public GuildUser GetUser(string mention) => GetUser(MentionHelper.GetUserId(mention));
         private GuildUser GetUser(ulong? id) => id != null ? GetUser(id.Value) : null;
 
-        public async Task<IEnumerable<User>> GetBans()
+        public async Task<IEnumerable<IUser>> GetBans()
         {
             var discord = Discord;
             var response = await Discord.RestClient.Send(new GetGuildBansRequest(Id)).ConfigureAwait(false);
@@ -229,7 +229,7 @@ namespace Discord
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            var request = new CreateChannelRequest(Id) { Name = name, Type = ChannelType.Text };
+            var request = new CreateGuildChannelRequest(Id) { Name = name, Type = ChannelType.Text };
             var response = await Discord.RestClient.Send(request).ConfigureAwait(false);
 
             return Discord.CreateTextChannel(this, response);
@@ -238,7 +238,7 @@ namespace Discord
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            var request = new CreateChannelRequest(Id) { Name = name, Type = ChannelType.Voice };
+            var request = new CreateGuildChannelRequest(Id) { Name = name, Type = ChannelType.Voice };
             var response = await Discord.RestClient.Send(request).ConfigureAwait(false);
 
             return Discord.CreateVoiceChannel(this, response);
@@ -251,7 +251,7 @@ namespace Discord
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            var createRequest = new CreateRoleRequest(Id);
+            var createRequest = new CreateGuildRoleRequest(Id);
             var createResponse = await Discord.RestClient.Send(createRequest).ConfigureAwait(false);
             var role = Discord.CreateRole(this, createResponse);
 
@@ -347,7 +347,7 @@ namespace Discord
                 newPermissions = GuildPermissions.All.RawValue;
             else
             {
-                foreach (var role in user.Presence.Roles)
+                foreach (var role in user.Roles)
                     newPermissions |= role.Permissions.RawValue;
             }
 

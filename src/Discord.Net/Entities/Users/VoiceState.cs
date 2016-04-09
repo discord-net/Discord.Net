@@ -1,8 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
+﻿/*using System;
 using Model = Discord.API.MemberVoiceState;
 
 namespace Discord
@@ -63,4 +59,4 @@ namespace Discord
                 _voiceStates &= ~VoiceStates.Suppressed;
         }
     }
-}
+}*/

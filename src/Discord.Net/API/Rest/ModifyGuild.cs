@@ -27,7 +27,7 @@ namespace Discord.API.Rest
         [JsonProperty("icon"), JsonConverter(typeof(ImageConverter))]
         public Stream Icon { get; set; }
         [JsonProperty("owner_id")]
-        public GuildPresence Owner { get; set; }
+        public GuildMember Owner { get; set; }
         [JsonProperty("splash"), JsonConverter(typeof(ImageConverter))]
         public Stream Splash { get; set; }
 

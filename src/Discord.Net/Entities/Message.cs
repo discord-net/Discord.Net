@@ -3,6 +3,7 @@ using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
@@ -11,27 +12,28 @@ namespace Discord
 {
     public class Message : IEntity<ulong>
     {
+        //TODO: Docstrings
+
         /// <inheritdoc />
         public ulong Id { get; }
         public IMessageChannel Channel { get; }
-        public User User { get; }
+        public IUser User { get; }
 
-        public bool IsTTS { get; internal set; }
-        public string RawText { get; internal set; }
-        public string Text { get; internal set; }
-        public DateTime Timestamp { get; internal set; }
+        public bool IsTTS { get; private set; }
+        public string RawText { get; private set; }
+        public string Text { get; private set; }
+        public DateTime Timestamp { get; private set; }
         public DateTime? EditedTimestamp { get; private set; }
         public IReadOnlyList<Attachment> Attachments { get; private set; }
         public IReadOnlyList<Embed> Embeds { get; private set; }
         public IReadOnlyList<GuildUser> MentionedUsers { get; private set; }
         public IReadOnlyList<GuildChannel> MentionedChannels { get; private set; }
         public IReadOnlyList<Role> MentionedRoles { get; private set; }
-        internal int Nonce { get; set; }
         
         public DiscordClient Discord => Channel.Discord;
-        public bool IsAuthor => false;
+        public bool IsAuthor => User.Id == Discord.CurrentUser.Id;
 
-        internal Message(ulong id, IMessageChannel channel, User user)
+        internal Message(ulong id, IMessageChannel channel, IUser user)
         {
             Id = id;
             Channel = channel;
@@ -102,7 +104,28 @@ namespace Discord
             Text = text;                
         }
 
-        public bool IsMentioningMe(bool includeRoles = false) => false;
+        /// <summary> Returns true if the logged-in user was mentioned. </summary>
+        public bool IsMentioningMe(bool includeRoles = false)
+        {
+            var me = Channel.GetCurrentUser() as GuildUser;
+            if (me != null)
+            {
+                if (includeRoles)
+                    return MentionedUsers.Contains(me) || MentionedRoles.Any(x => me.HasRole(x));
+                else
+                    return MentionedUsers.Contains(me);
+            }
+            return false;
+        }
+
+        public async Task Modify(Action<ModifyMessageRequest> func)
+        {
+            if (func != null) throw new NullReferenceException(nameof(func));
+
+            var req = new ModifyMessageRequest(Channel.Id, Id);
+            func(req);
+            await Discord.RestClient.Send(req).ConfigureAwait(false);
+        }
 
         public Task Update() { throw new NotSupportedException(); } //TODO: Not supported yet 
 

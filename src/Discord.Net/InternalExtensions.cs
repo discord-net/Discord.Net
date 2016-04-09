@@ -2,7 +2,7 @@
 {
     internal static class InternalExtensions
     {
-        public static User GetCurrentUser(this IChannel channel)
+        public static IUser GetCurrentUser(this IChannel channel)
         {
             switch (channel.Type)
             {

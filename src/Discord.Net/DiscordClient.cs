@@ -49,7 +49,7 @@ namespace Discord
             _connectionLock = new SemaphoreSlim(1, 1);
             
             _restClientProvider = config.RestClientProvider;
-            UserAgent = GetUserAgent(config.AppName, config.AppVersion, config.AppUrl);
+            UserAgent = $"DiscordBot ({DiscordConfig.LibUrl}, v{DiscordConfig.LibVersion})";
 
             _logManager = new LogManager(config.LogLevel);
             _logManager.Message += (s, e) => Log(this, e);
@@ -165,18 +165,18 @@ namespace Discord
                 result[i] = CreateGuild(response[i]);
             return result.ToImmutable();
         }
-        public virtual async Task<User> GetUser(ulong id)
+        public virtual async Task<IUser> GetUser(ulong id)
         {
             var response = await RestClient.Send(new GetUserRequest(id));
-            var user = CreatePublicUser(response);
+            var user = CreateGlobalUser(response);
             return user;
         }
-        public virtual async Task<User> GetUser(string username, ushort discriminator)
+        public virtual async Task<IUser> GetUser(string username, ushort discriminator)
         {
             var response = await RestClient.Send(new QueryUserRequest() { Query = $"{username}#{discriminator}", Limit = 1 });
             if (response.Length > 0)
             {
-                var user = CreatePublicUser(response[0]);
+                var user = CreateGlobalUser(response[0]);
                 return user;
             }
             return null;
@@ -265,7 +265,7 @@ namespace Discord
             guild.Update(model);
             return guild;
         }
-        internal virtual Message CreateMessage(IMessageChannel channel, User user, API.Message model)
+        internal virtual Message CreateMessage(IMessageChannel channel, IUser user, API.Message model)
         {
             var msg = new Message(model.Id, channel, user);
             msg.Update(model);
@@ -277,33 +277,33 @@ namespace Discord
             role.Update(model);
             return role;
         }
-        internal virtual GuildUser CreateBannedUser(Guild guild, API.User model)
-        {
-            var user = new GuildUser(model.Id, guild, null, null);
-            user.Update(model);
-            return user;
-        }
         internal virtual DMUser CreateDMUser(DMChannel channel, API.User model)
         {
-            var user = new DMUser(model.Id, channel);
+            var user = new DMUser(CreateGlobalUser(model), channel);
             user.Update(model);
             return user;
         }
-        internal virtual GuildUser CreateGuildUser(Guild guild, GuildPresence presence, VoiceState voiceState, API.GuildMember model)
+        internal virtual GuildUser CreateGuildUser(Guild guild, API.GuildMember model)
         {
-            var user = new GuildUser(model.User.Id, guild, presence, voiceState);
+            var user = new GuildUser(CreateGlobalUser(model.User), guild);
             user.Update(model);
             return user;
         }
-        internal virtual PublicUser CreatePublicUser(API.User model)
+        internal virtual GuildUser CreateBannedUser(Guild guild, API.User model)
         {
-            var user = new PublicUser(model.Id, this);
-            user.Update(model);
+            var user = new GuildUser(CreateGlobalUser(model), guild);
+            //user.Update(model);
             return user;
         }
         internal virtual SelfUser CreateSelfUser(API.User model)
         {
             var user = new SelfUser(model.Id, this);
+            user.Update(model);
+            return user;
+        }
+        internal virtual GlobalUser CreateGlobalUser(API.User model)
+        {
+            var user = new GlobalUser(model.Id, this);
             user.Update(model);
             return user;
         }
@@ -313,6 +313,8 @@ namespace Discord
             region.Update(model);
             return region;
         }
+
+        internal virtual void RemoveUser(GlobalUser user) { }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -328,22 +330,6 @@ namespace Discord
             }
         }
         public void Dispose() => Dispose(true);
-
-        private static string GetUserAgent(string appName, string appVersion, string appUrl)
-        {
-            var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(appName))
-            {
-                sb.Append(appName);
-                if (!string.IsNullOrEmpty(appVersion))
-                    sb.Append($"/{appVersion}");
-                if (!string.IsNullOrEmpty(appUrl))
-                    sb.Append($" ({appUrl})");
-                sb.Append(' ');
-            }
-            sb.Append($"DiscordBot ({DiscordConfig.LibUrl}, v{DiscordConfig.LibVersion})");
-            return sb.ToString();
-        }
 
         protected void RaiseEvent(EventHandler eventHandler)
             => eventHandler?.Invoke(this, EventArgs.Empty);

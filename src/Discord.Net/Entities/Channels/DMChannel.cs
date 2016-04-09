@@ -22,11 +22,9 @@ namespace Discord
         /// <inheritdoc />
         public string Name => $"@{Recipient.Username}#{Recipient.Discriminator}";
         /// <inheritdoc />
-        public IEnumerable<User> Users => ImmutableArray.Create<User>(Discord.CurrentUser, Recipient);
+        public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
         /// <inheritdoc />
         ChannelType IChannel.Type => ChannelType.DM;
-        /// <inheritdoc />
-        IEnumerable<User> IChannel.Users => Users;
 
         private readonly MessageManager _messages;
         
@@ -45,7 +43,7 @@ namespace Discord
         }
 
         /// <inheritdoc />
-        public User GetUser(ulong id)
+        public IUser GetUser(ulong id)
         {
             if (id == Recipient.Id)
                 return Recipient;

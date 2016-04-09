@@ -29,7 +29,7 @@ namespace Discord
             }
         }
 
-        internal Message Add(Model model, User user)
+        internal Message Add(Model model, IUser user)
             => Add(_channel.Discord.CreateMessage(_channel, user, model));
         private Message Add(Message message)
         {

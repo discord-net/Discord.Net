@@ -197,7 +197,7 @@ namespace Discord
                             //{
                                 try
                                 {
-                                    var request = new UpdateMessageRequest(msg.Channel.Id, msg.Id)
+                                    var request = new ModifyMessageRequest(msg.Channel.Id, msg.Id)
                                     {
                                         Content = item.NewText
                                     };

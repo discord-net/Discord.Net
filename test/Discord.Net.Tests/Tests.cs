@@ -242,7 +242,7 @@ namespace Discord.Tests
                 "MessageUpdated event never received",
                 async () => await message.Modify(x =>
                 {
-                    x.Text = text + " updated";
+                    x.Content = text + " updated";
                 }),
                 x => _targetBot.MessageUpdated += x,
                 x => _targetBot.MessageUpdated -= x,
@@ -293,7 +293,11 @@ namespace Discord.Tests
             var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
             AssertEvent<UserUpdatedEventArgs>(
                 "UserUpdated never fired",
-                async () => await user.Modify(true, true, null, null),
+                async () => await user.Modify(x =>
+                {
+                    x.Deaf = true;
+                    x.Mute = true;
+                }),
                 x => _targetBot.UserUpdated += x,
                 x => _targetBot.UserUpdated -= x);
         }
@@ -319,7 +323,7 @@ namespace Discord.Tests
                 x => _observerBot.UserUpdated -= x,
                 (s, e) => e.After.Status == UserStatus.Idle);
         }
-        private async Task SetStatus(DiscordClient _client, UserStatus status)
+        private Task SetStatus(DiscordClient _client, UserStatus status)
         {
             throw new NotImplementedException();
             /*_client.SetStatus(status);
@@ -336,7 +340,7 @@ namespace Discord.Tests
                 (s, e) => _targetBot.CurrentUser.CurrentGame == "test game");
 
         }
-        private async Task SetGame(DiscordClient _client, string game)
+        private Task SetGame(DiscordClient _client, string game)
         {
             throw new NotImplementedException();
             //_client.SetGame(game);

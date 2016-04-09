@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rest
 {
-    public class CreateRoleRequest : IRestRequest<Role>
+    public class CreateGuildRoleRequest : IRestRequest<Role>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/roles";
@@ -10,7 +10,7 @@ namespace Discord.API.Rest
 
         public ulong GuildId { get; }
 
-        public CreateRoleRequest(ulong guildId)
+        public CreateGuildRoleRequest(ulong guildId)
         {
             GuildId = guildId;
         }

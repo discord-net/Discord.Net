@@ -63,8 +63,8 @@ namespace Discord
         public bool DeafenMembers => PermissionsHelper.GetValue(RawValue, PermissionBit.DeafenMembers);
         /// <summary> If True, a user may move other users between voice channels. </summary>
         public bool MoveMembers => PermissionsHelper.GetValue(RawValue, PermissionBit.MoveMembers);
-        /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
-        public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBit.UseVoiceActivation);
+        /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        public bool UseVAD => PermissionsHelper.GetValue(RawValue, PermissionBit.UseVAD);
 
         /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
         public ChannelPermissions(uint rawValue) { RawValue = rawValue; }
@@ -93,7 +93,7 @@ namespace Discord
             PermissionsHelper.SetValue(ref value, muteMembers, PermissionBit.MuteMembers);
             PermissionsHelper.SetValue(ref value, deafenMembers, PermissionBit.DeafenMembers);
             PermissionsHelper.SetValue(ref value, moveMembers, PermissionBit.MoveMembers);
-            PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBit.UseVoiceActivation);
+            PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBit.UseVAD);
 
             RawValue = value;
         }

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class CreateChannelRequest : IRestRequest<Channel>
+    public class CreateGuildChannelRequest : IRestRequest<Channel>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"guilds/{GuildId}/channels";
@@ -19,7 +19,7 @@ namespace Discord.API.Rest
         [JsonProperty("bitrate")]
         public int Bitrate { get; set; }
 
-        public CreateChannelRequest(ulong guildId)
+        public CreateGuildChannelRequest(ulong guildId)
         {
             GuildId = guildId;
         }

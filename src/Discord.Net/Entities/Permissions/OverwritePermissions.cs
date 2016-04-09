@@ -51,8 +51,8 @@ namespace Discord
         public PermValue DeafenMembers => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBit.DeafenMembers);
         /// <summary> If True, a user may move other users between voice channels. </summary>
         public PermValue MoveMembers => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBit.MoveMembers);
-        /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
-        public PermValue UseVoiceActivation => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBit.UseVoiceActivation);
+        /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        public PermValue UseVAD => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBit.UseVAD);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
         public OverwritePermissions(uint allowValue, uint denyValue)
@@ -83,7 +83,7 @@ namespace Discord
             PermissionsHelper.SetValue(ref allowValue, ref denyValue, muteMembers, PermissionBit.MuteMembers);
             PermissionsHelper.SetValue(ref allowValue, ref denyValue, deafenMembers, PermissionBit.DeafenMembers);
             PermissionsHelper.SetValue(ref allowValue, ref denyValue, moveMembers, PermissionBit.MoveMembers);
-            PermissionsHelper.SetValue(ref allowValue, ref denyValue, useVoiceActivation, PermissionBit.UseVoiceActivation);
+            PermissionsHelper.SetValue(ref allowValue, ref denyValue, useVoiceActivation, PermissionBit.UseVAD);
 
             AllowValue = allowValue;
             DenyValue = denyValue;
