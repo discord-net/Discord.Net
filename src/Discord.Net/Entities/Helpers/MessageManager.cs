@@ -157,7 +157,7 @@ namespace Discord
         }
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
-            var request = new SendFileRequest(_channel.Id)
+            var request = new UploadFileRequest(_channel.Id)
             {
                 Filename = filename,
                 Stream = stream

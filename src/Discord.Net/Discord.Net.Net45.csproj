@@ -169,7 +169,7 @@
     <Compile Include="API\Rest\RemoveGuildMember.cs" />
     <Compile Include="API\Rest\SyncGuildIntegration.cs" />
     <Compile Include="API\Rest\TriggerTypingIndicator.cs" />
-    <Compile Include="API\Rest\Unconfirmed\SendFile.cs" />
+    <Compile Include="API\Rest\UploadFile.cs" />
     <Compile Include="API\VoiceSocket\OpCode.cs" />
     <Compile Include="API\VoiceSocket\Unconfirmed\Commands\Heartbeat.cs" />
     <Compile Include="API\VoiceSocket\Unconfirmed\Commands\Identify.cs" />

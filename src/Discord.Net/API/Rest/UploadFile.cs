@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Discord.API.Rest
 {
-    public class SendFileRequest : IRestFileRequest<Message>
+    public class UploadFileRequest : IRestFileRequest<Message>
     {
         string IRestRequest.Method => "POST";
         string IRestRequest.Endpoint => $"channels/{ChannelId}/messages";
@@ -21,13 +21,13 @@ namespace Discord.API.Rest
 
         public ulong ChannelId { get; }
 
-        public string Filename { get; set; }
-        public Stream Stream { get; set; }
         public string Content { get; set; }
         public string Nonce { get; set; }
         public bool IsTTS { get; set; }
+        public Stream Stream { get; set; }
+        public string Filename { get; set; }
 
-        public SendFileRequest(ulong channelId)
+        public UploadFileRequest(ulong channelId)
         {
             ChannelId = channelId;
         }
