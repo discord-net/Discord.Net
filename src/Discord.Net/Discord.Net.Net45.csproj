@@ -71,7 +71,7 @@
     <Compile Include="API\Common\Unconfirmed\MemberVoiceState.cs" />
     <Compile Include="API\Common\Unconfirmed\MessageReference.cs" />
     <Compile Include="API\Common\Unconfirmed\Overwrite.cs" />
-    <Compile Include="API\Common\Unconfirmed\Role.cs" />
+    <Compile Include="API\Common\Role.cs" />
     <Compile Include="API\Common\Unconfirmed\RoleReference.cs" />
     <Compile Include="API\Common\User.cs" />
     <Compile Include="API\Common\UserGuild.cs" />
