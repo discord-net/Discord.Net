@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA1721
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Discord.API
 {
