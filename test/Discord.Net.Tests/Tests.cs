@@ -17,7 +17,6 @@ namespace Discord.Tests
         private static DiscordClient _hostClient, _targetBot, _observerBot;
         private static Server _testServer;
         private static Channel _testServerChannel;
-        private static Channel _permRestrictedChannel;
         private static Random _random;
         private static Invite _testServerInvite;
 

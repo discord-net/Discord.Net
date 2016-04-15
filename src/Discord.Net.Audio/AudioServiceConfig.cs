@@ -7,11 +7,6 @@
 
 		/// <summary> Enables the voice websocket and UDP client. This option requires the libsodium .dll or .so be in the local or system folder. </summary>
 		public bool EnableEncryption { get; set; } = true;
-		/// <summary> 
-        /// Enables the client to be simultaneously connected to multiple channels at once (Discord still limits you to one channel per server).
-        /// This option uses a lot of CPU power and network bandwidth, as a new gateway connection needs to be spun up per server. Use sparingly.
-        /// </summary>
-		public bool EnableMultiserver { get; set; } = false;
 
 		/// <summary> Gets or sets the buffer length (in milliseconds) for outgoing voice packets. </summary>
 		public int BufferLength { get; set; } = 1000;
@@ -30,7 +25,6 @@
         public AudioMode Mode { get; }
 
         public bool EnableEncryption { get; }
-        public bool EnableMultiserver { get; }
 
         public int BufferLength { get; }        
         public int? Bitrate { get; }
@@ -41,7 +35,6 @@
             Mode = builder.Mode;
 
             EnableEncryption = builder.EnableEncryption;
-            EnableMultiserver = builder.EnableMultiserver;
 
             BufferLength = builder.BufferLength;
             Bitrate = builder.Bitrate;
