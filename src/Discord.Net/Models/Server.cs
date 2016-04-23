@@ -70,10 +70,6 @@ namespace Discord
         public int AFKTimeout { get; private set; }
         /// <summary> Gets the date and time you joined this server. </summary>
         public DateTime JoinedAt { get; private set; }
-        /// <summary> Gets the default channel for this server. </summary>
-        public Channel DefaultChannel { get; private set; }
-        /// <summary> Gets the the role representing all users in a server. </summary>
-        public Role EveryoneRole { get; private set; }
         /// <summary> Gets all extra features added to this server. </summary>
         public IEnumerable<string> Features { get; private set; }
         /// <summary> Gets all custom emojis on this server. </summary>
@@ -93,6 +89,10 @@ namespace Discord
         public string IconUrl => GetIconUrl(Id, IconId);
         /// <summary> Gets the URL to this servers's splash image. </summary>
         public string SplashUrl => GetSplashUrl(Id, SplashId);
+        /// <summary> Gets the default channel for this server. </summary>
+        public Channel DefaultChannel => GetChannel(Id);
+        /// <summary> Gets the the role representing all users in a server. </summary>
+        public Role EveryoneRole => GetRole(Id);
 
         /// <summary> Gets a collection of all channels in this server. </summary>
         public IEnumerable<Channel> AllChannels => _channels.Select(x => x.Value);
@@ -119,7 +119,7 @@ namespace Discord
             Client = client;
             Id = id;
         }
-        
+
         internal void Update(Guild model)
         {
             if (model.Name != null)
@@ -144,7 +144,6 @@ namespace Discord
                     var role = AddRole(x.Id);
                     role.Update(x, false);
                 }
-                EveryoneRole = _roles[Id];
             }
             if (model.Emojis != null) //Needs Roles
             {
@@ -171,7 +170,6 @@ namespace Discord
                 _channels = new ConcurrentDictionary<ulong, Channel>(2, (int)(model.Channels.Length * 1.05));
                 foreach (var subModel in model.Channels)
                     AddChannel(subModel.Id, false).Update(subModel);
-                DefaultChannel = _channels[Id];
             }
             if (model.MemberCount != null)
             {
@@ -198,7 +196,7 @@ namespace Discord
                 }
             }
         }
-        
+
         /// <summary> Edits this server, changing only non-null attributes. </summary>
         public Task Edit(string name = null, string region = null, Stream icon = null, ImageType iconType = ImageType.Png)
         {
@@ -366,7 +364,7 @@ namespace Discord
             if (name == null) throw new ArgumentNullException(nameof(name));
             return _roles.Select(x => x.Value).Find(name, exactMatch);
         }
-        
+
         /// <summary> Creates a new role. </summary>
         public async Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false)
         {
@@ -405,16 +403,16 @@ namespace Discord
 
         #region Permissions
         internal ServerPermissions GetPermissions(User user)
-		{
-			Member member;
-			if (_users.TryGetValue(user.Id, out member))
-				return member.Permissions;
-			else
-				return ServerPermissions.None;
-		}
+        {
+            Member member;
+            if (_users.TryGetValue(user.Id, out member))
+                return member.Permissions;
+            else
+                return ServerPermissions.None;
+        }
 
-		internal void UpdatePermissions(User user)
-		{
+        internal void UpdatePermissions(User user)
+        {
             Member member;
             if (_users.TryGetValue(user.Id, out member))
             {
@@ -426,30 +424,30 @@ namespace Discord
                         channel.Value.UpdatePermissions(user);
                 }
             }
-		}
+        }
 
         private bool UpdatePermissions(User user, ref ServerPermissions permissions)
-		{
-			uint newPermissions = 0;
+        {
+            uint newPermissions = 0;
 
-			if (user.Id == _ownerId)
-				newPermissions = ServerPermissions.All.RawValue;
-			else
-			{
-				foreach (var serverRole in user.Roles)
-					newPermissions |= serverRole.Permissions.RawValue;
-			}
+            if (user.Id == _ownerId)
+                newPermissions = ServerPermissions.All.RawValue;
+            else
+            {
+                foreach (var serverRole in user.Roles)
+                    newPermissions |= serverRole.Permissions.RawValue;
+            }
 
-			if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
-				newPermissions = ServerPermissions.All.RawValue;
+            if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
+                newPermissions = ServerPermissions.All.RawValue;
 
-			if (newPermissions != permissions.RawValue)
-			{
-				permissions = new ServerPermissions(newPermissions);
+            if (newPermissions != permissions.RawValue)
+            {
+                permissions = new ServerPermissions(newPermissions);
                 return true;
-			}
+            }
             return false;
-		}
+        }
         #endregion
 
         #region Users
@@ -540,5 +538,5 @@ namespace Discord
         private Server() { } //Used for cloning
 
         public override string ToString() => Name ?? Id.ToIdString();
-	}
+    }
 }
