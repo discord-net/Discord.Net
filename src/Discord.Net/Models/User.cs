@@ -164,7 +164,6 @@ namespace Discord
 				AvatarId = model.Avatar;
             if (model.Bot != null)
                 IsBot = model.Bot.Value;
-            if (model.Bot == null) IsBot = false;
 
 		}
 		internal void Update(APIMember model)
