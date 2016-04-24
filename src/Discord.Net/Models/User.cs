@@ -62,6 +62,8 @@ namespace Discord
         public string AvatarId { get; private set; }
         /// <summary> Gets the name of the game this user is currently playing. </summary>
         public string CurrentGame { get; internal set; }
+        /// <summary> Determines whether this user is a Bot account. </summary>
+        public bool IsBot { get; internal set; }
         /// <summary> Gets the current status for this user. </summary>
         public UserStatus Status { get; internal set; }
         /// <summary> Gets the datetime that this user joined this server. </summary>
@@ -160,6 +162,10 @@ namespace Discord
 				Discriminator = model.Discriminator.Value;
 			if (model.Avatar != null)
 				AvatarId = model.Avatar;
+            if (model.Bot != null)
+                IsBot = model.Bot.Value;
+            if (model.Bot == null) IsBot = false;
+
 		}
 		internal void Update(APIMember model)
 		{
