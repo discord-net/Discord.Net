@@ -13,5 +13,7 @@ namespace Discord.API.Client
         public ushort? Discriminator { get; set; }
         [JsonProperty("avatar")]
         public string Avatar { get; set; }
+        [JsonProperty("bot")]
+        public bool? Bot { get; set; }
     }
 }
