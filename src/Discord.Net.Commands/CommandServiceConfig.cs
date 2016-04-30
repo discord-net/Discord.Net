@@ -14,6 +14,11 @@ namespace Discord.Commands
         /// and a negative value if the message should be ignored.
         /// </summary>
         public Func<Message, int> CustomPrefixHandler { get; set; } = null;
+        /// <summary>
+        /// Changing this to <see cref="true"/> makes the bot ignore all messages, except when the messages are from its own account.
+        /// This is desired behavior for "Self Bots" only, so unless this bot is being run under a normal user's account, leave it alone!!
+        /// </summary>
+        public bool IsSelfBot { get; set; } = false;
 
         /// <summary> Gets or sets whether a help function should be automatically generated. </summary>
 		public HelpMode HelpMode { get; set; } = HelpMode.Disabled;
@@ -28,9 +33,10 @@ namespace Discord.Commands
     }
     public class CommandServiceConfig
     {
-		public char? PrefixChar { get; }
+        public char? PrefixChar { get; }
         public bool AllowMentionPrefix { get; }
         public Func<Message, int> CustomPrefixHandler { get; }
+        public bool IsSelfBot { get; }
 
         /// <summary> Gets or sets whether a help function should be automatically generated. </summary>
 		public HelpMode HelpMode { get; set; } = HelpMode.Disabled;
@@ -41,6 +47,7 @@ namespace Discord.Commands
             AllowMentionPrefix = builder.AllowMentionPrefix;
             CustomPrefixHandler = builder.CustomPrefixHandler;
             HelpMode = builder.HelpMode;
+            IsSelfBot = builder.IsSelfBot;
         }
     }
 }
