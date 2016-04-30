@@ -19,5 +19,7 @@ namespace Discord.API.Client
         public uint? Color { get; set; }
         [JsonProperty("managed")]
         public bool? Managed { get; set; }
+        [JsonProperty("mentionable")]
+        public bool? Mentionable { get; set; }
     }
 }

@@ -25,7 +25,7 @@ namespace Discord
 
         private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>");
         private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>");
-        private static readonly Regex _roleRegex = new Regex(@"@everyone");
+        private static readonly Regex _roleRegex = new Regex(@"<@&[0-9]+>");
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
 
@@ -68,28 +68,36 @@ namespace Discord
                 return e.Value; //Channel not found or parse failed
             }));
         }
-        /*internal static string CleanRoleMentions(User user, Channel channel, string text, List<Role> roles = null)
+        internal static string CleanRoleMentions(Channel channel, string text, List<Role> roles = null)
 		{
             var server = channel.Server;
             if (server == null) return text;
 
-			return _roleRegex.Replace(text, new MatchEvaluator(e =>
+            return _roleRegex.Replace(text, new MatchEvaluator(e =>
 			{
-				if (roles != null && user.GetPermissions(channel).MentionEveryone)
-					roles.Add(server.EveryoneRole);
-				return e.Value;
+                ulong id;
+                if (e.Value.Substring(3, e.Value.Length - 4).TryToId(out id))
+                {
+                    var role = server.GetRole(id);
+                    if (role != null)
+                    {
+                        if (roles != null)
+                            roles.Add(role);
+                        return "@" + role.Name;
+                    }
+                }
+                return e.Value; //Role not found or parse failed
 			}));
-		}*/
+		}
         
         //TODO: Move this somewhere
         private static string Resolve(Channel channel, string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            var client = channel.Client;
             text = CleanUserMentions(channel, text);
             text = CleanChannelMentions(channel, text);
-            //text = CleanRoleMentions(Channel, text);
+            text = CleanRoleMentions(channel, text);
             return text;
         }
 
@@ -281,32 +289,28 @@ namespace Discord
 					.Where(x => x != null)
 					.ToArray();
 			}
-			if (model.IsMentioningEveryone != null)
-			{
-				if (model.IsMentioningEveryone.Value && User != null && User.GetPermissions(channel).MentionEveryone)
-					MentionedRoles = new Role[] { Server.EveryoneRole };
-				else
-					MentionedRoles = new Role[0];
-            }
+
 			if (model.Content != null)
 			{
 				string text = model.Content;
 				RawText = text;
-
 				//var mentionedUsers = new List<User>();
 				var mentionedChannels = new List<Channel>();
-				//var mentionedRoles = new List<Role>();
+				var mentionedRoles = new List<Role>();
 				text = CleanUserMentions(Channel, text/*, mentionedUsers*/);
 				if (server != null)
 				{
 					text = CleanChannelMentions(Channel, text, mentionedChannels);
-					//text = CleanRoleMentions(_client, User, channel, text, mentionedRoles);
+					text = CleanRoleMentions(Channel, text, mentionedRoles);
+					if (model.IsMentioningEveryone != null && model.IsMentioningEveryone.Value
+						&& User != null && User.GetPermissions(channel).MentionEveryone)
+						mentionedRoles.Add(Server.EveryoneRole);
 				}
 				Text = text;
 
 				//MentionedUsers = mentionedUsers;
 				MentionedChannels = mentionedChannels;
-				//MentionedRoles = mentionedRoles;
+				MentionedRoles = mentionedRoles;
 			}
         }
 

@@ -366,7 +366,7 @@ namespace Discord
         }
 
         /// <summary> Creates a new role. </summary>
-        public async Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false)
+        public async Task<Role> CreateRole(string name, ServerPermissions? permissions = null, Color color = null, bool isHoisted = false, bool isMentionable = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
@@ -380,7 +380,8 @@ namespace Discord
                 Name = name,
                 Permissions = (permissions ?? role.Permissions).RawValue,
                 Color = (color ?? Color.Default).RawValue,
-                IsHoisted = isHoisted
+                IsHoisted = isHoisted,
+                IsMentionable = isMentionable
             };
             var editResponse = await Client.ClientAPI.Send(editRequest).ConfigureAwait(false);
             role.Update(editResponse, true);

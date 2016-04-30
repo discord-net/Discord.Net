@@ -28,6 +28,8 @@ namespace Discord
         public int Position { get; private set; }
         /// <summary> Gets whether this role is managed by server (e.g. for Twitch integration) </summary>
         public bool IsManaged { get; private set; }
+        /// <summary> Gets whether this role is mentionable by anyone. </summary>
+        public bool IsMentionable { get; private set; }
         /// <summary> Gets the the permissions given to this role. </summary>
         public ServerPermissions Permissions { get; private set; }
         /// <summary> Gets the color of this role. </summary>
@@ -41,7 +43,7 @@ namespace Discord
         public IEnumerable<User> Members => IsEveryone ? Server.Users : Server.Users.Where(x => x.HasRole(this));
 
         /// <summary> Gets the string used to mention this role. </summary>
-        public string Mention => IsEveryone ? "@everyone" : "";
+        public string Mention => IsEveryone ? "@everyone" : IsMentionable ? $"<@&{Id}>" : "";
 
 		internal Role(ulong id, Server server)
 		{
@@ -60,6 +62,8 @@ namespace Discord
 				IsHoisted = model.Hoist.Value;
 			if (model.Managed != null)
 				IsManaged = model.Managed.Value;
+			if (model.Mentionable != null)
+				IsMentionable = model.Mentionable.Value;
 			if (model.Position != null && !IsEveryone)
 				Position = model.Position.Value;
 			if (model.Color != null)
@@ -75,14 +79,15 @@ namespace Discord
             }
 		}
         
-        public async Task Edit(string name = null, ServerPermissions? permissions = null, Color color = null, bool? isHoisted = null, int? position = null)
+        public async Task Edit(string name = null, ServerPermissions? permissions = null, Color color = null, bool? isHoisted = null, int? position = null, bool? isMentionable = null)
         {
             var updateRequest = new UpdateRoleRequest(Server.Id, Id)
             {
                 Name = name ?? Name,
                 Permissions = (permissions ?? Permissions).RawValue,
                 Color = (color ?? Color).RawValue,
-                IsHoisted = isHoisted ?? IsHoisted
+                IsHoisted = isHoisted ?? IsHoisted,
+                IsMentionable = isMentionable ?? IsMentionable
             };
 
             var updateResponse = await Client.ClientAPI.Send(updateRequest).ConfigureAwait(false);
