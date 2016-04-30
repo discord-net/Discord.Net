@@ -43,7 +43,7 @@ namespace Discord
         public IEnumerable<User> Members => IsEveryone ? Server.Users : Server.Users.Where(x => x.HasRole(this));
 
         /// <summary> Gets the string used to mention this role. </summary>
-        public string Mention => IsMentionable ? $"<@&{Id}>" : "";
+        public string Mention => IsEveryone ? "@everyone" : IsMentionable ? $"<@&{Id}>" : "";
 
 		internal Role(ulong id, Server server)
 		{
