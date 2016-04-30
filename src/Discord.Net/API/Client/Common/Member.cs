@@ -10,5 +10,7 @@ namespace Discord.API.Client
         public DateTime? JoinedAt { get; set; }
         [JsonProperty("roles"), JsonConverter(typeof(LongStringArrayConverter))]
         public ulong[] Roles { get; set; }
+        [JsonProperty("nick")]
+        public string Nick { get; set; } = "";
     }
 }

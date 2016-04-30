@@ -58,6 +58,8 @@ namespace Discord
         public string Name { get; private set; }
         /// <summary> Gets an id uniquely identifying from others with the same name. </summary>
         public ushort Discriminator { get; private set; }
+        /// <summary> Gets a user's nickname in a server </summary>
+        public string Nickname { get; internal set; }
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId { get; private set; }
         /// <summary> Gets the name of the game this user is currently playing. </summary>
@@ -175,6 +177,8 @@ namespace Discord
 				JoinedAt = model.JoinedAt.Value;
 			if (model.Roles != null)
 				UpdateRoles(model.Roles.Select(x => Server.GetRole(x)));
+            if (model.Nick != "")
+                Nickname = model.Nick;
         }
 		internal void Update(ExtendedMember model)
 		{
