@@ -1078,19 +1078,21 @@ namespace Discord
                     const short batchSize = 50;
                     ulong[] serverIds = new ulong[batchSize];
 
-                    while (true)
+                    while (!cancelToken.IsCancellationRequested && State == ConnectionState.Connecting)
+                        await Task.Delay(100).ConfigureAwait(false);
+
+                    while (!cancelToken.IsCancellationRequested && State == ConnectionState.Connected)
                     {
-                        if (!cancelToken.IsCancellationRequested && State == ConnectionState.Connected)
+                        if (_largeServers.Count > 0)
                         {
                             int count = 0;
-
                             while (count < batchSize && _largeServers.TryDequeue(out serverIds[count]))
                                 count++;
 
-                            if (count > 0 && !cancelToken.IsCancellationRequested)
+                            if (count > 0)
                                 GatewaySocket.SendRequestMembers(serverIds.Take(count), "", 0);
                         }
-                        await Task.Delay(1250);
+                        await Task.Delay(1250).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
