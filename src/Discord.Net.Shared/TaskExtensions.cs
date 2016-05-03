@@ -53,15 +53,15 @@ namespace Discord
             }
         }
 
-        public static async Task Wait(this CancellationTokenSource tokenSource)
+        public static async Task Wait(this CancellationTokenSource cancelTokenSource)
         {
-            var token = tokenSource.Token;
-            try { await Task.Delay(-1, token).ConfigureAwait(false); }
+            var cancelToken = cancelTokenSource.Token;
+            try { await Task.Delay(-1, cancelToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { } //Expected
         }
-        public static async Task Wait(this CancellationToken token)
+        public static async Task Wait(this CancellationToken cancelToken)
         {
-            try { await Task.Delay(-1, token).ConfigureAwait(false); }
+            try { await Task.Delay(-1, cancelToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { } //Expected
         }
     }

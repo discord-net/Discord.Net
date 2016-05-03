@@ -1079,7 +1079,7 @@ namespace Discord
                     ulong[] serverIds = new ulong[batchSize];
 
                     while (!cancelToken.IsCancellationRequested && State == ConnectionState.Connecting)
-                        await Task.Delay(100).ConfigureAwait(false);
+                        await Task.Delay(1000, cancelToken).ConfigureAwait(false);
 
                     while (!cancelToken.IsCancellationRequested && State == ConnectionState.Connected)
                     {
@@ -1092,7 +1092,7 @@ namespace Discord
                             if (count > 0)
                                 GatewaySocket.SendRequestMembers(serverIds.Take(count), "", 0);
                         }
-                        await Task.Delay(1250).ConfigureAwait(false);
+                        await Task.Delay(1250, cancelToken).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }
