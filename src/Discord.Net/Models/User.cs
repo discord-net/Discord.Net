@@ -247,7 +247,7 @@ namespace Discord
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
 
-        public Task Edit(bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null)
+        public Task Edit(bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null, string nickname = null)
         {
             if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
 
@@ -263,7 +263,8 @@ namespace Discord
                 IsMuted = isMuted ?? IsServerMuted,
                 IsDeafened = isDeafened ?? IsServerDeafened,
                 VoiceChannelId = voiceChannel?.Id,
-                RoleIds = roleIds
+                RoleIds = roleIds,
+                Nickname = nickname ?? Nickname
             };
             return Client.ClientAPI.Send(request);
         }
