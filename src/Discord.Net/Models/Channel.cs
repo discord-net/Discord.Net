@@ -398,7 +398,7 @@ namespace Discord
                 //Start with this user's server permissions
                 newPermissions = server.GetPermissions(user).RawValue;
 
-                if (IsPrivate || user == Server.Owner || newPermissions.HasBit((byte)PermissionBits.Administrator)
+                if (IsPrivate || user == Server.Owner || newPermissions.HasBit((byte)PermissionBits.Administrator))
                     newPermissions = mask; //Owners and Administrators always have all permissions
                 else
                 {
