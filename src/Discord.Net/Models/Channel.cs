@@ -74,7 +74,7 @@ namespace Discord
         public IEnumerable<Message> Messages => _messages?.Values ?? Enumerable.Empty<Message>();
         /// <summary> Gets a collection of all custom permissions used for this channel. </summary>
 		public IEnumerable<PermissionOverwrite> PermissionOverwrites => _permissionOverwrites.Select(x => x.Value);
-        
+
         /// <summary> Gets a collection of all users with read access to this channel. </summary>
         public IEnumerable<User> Users
         {
@@ -131,7 +131,7 @@ namespace Discord
             if (client.Config.MessageCacheSize > 0)
                 _messages = new ConcurrentDictionary<ulong, Message>(2, (int)(client.Config.MessageCacheSize * 1.05));
         }
-        
+
         internal void Update(APIChannel model)
         {
             if (!IsPrivate && model.Name != null)
@@ -199,7 +199,7 @@ namespace Discord
                 await Server.ReorderChannels(channels.Skip(minPos), after).ConfigureAwait(false);
             }
         }
-        
+
         public async Task Delete()
         {
             try { await Client.ClientAPI.Send(new DeleteChannelRequest(Id)).ConfigureAwait(false); }
@@ -278,12 +278,12 @@ namespace Discord
             return new Message(id, this, userId != null ? GetUserFast(userId.Value) : null);
         }
 
-        public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null, 
+        public async Task<Message[]> DownloadMessages(int limit = 100, ulong? relativeMessageId = null,
             Relative relativeDir = Relative.Before, bool useCache = true)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0 || Type != ChannelType.Text) return new Message[0];
-            
+
             try
             {
                 var request = new GetMessagesRequest(Id)
@@ -331,12 +331,12 @@ namespace Discord
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (text == "") throw new ArgumentException("Value cannot be blank", nameof(text));
             if (text.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");            
+                throw new ArgumentOutOfRangeException(nameof(text), $"Message must be {DiscordConfig.MaxMessageSize} characters or less.");
             return Task.FromResult(Client.MessageQueue.QueueSend(this, text, isTTS));
         }
 
         public async Task<Message> SendFile(string filePath)
-        { 
+        {
             using (var stream = File.OpenRead(filePath))
                 return await SendFile(System.IO.Path.GetFileName(filePath), stream).ConfigureAwait(false);
         }
@@ -381,7 +381,7 @@ namespace Discord
             if (_users.TryGetValue(user.Id, out member))
             {
                 var perms = member.Permissions;
-                if  (UpdatePermissions(member.User, ref perms))
+                if (UpdatePermissions(member.User, ref perms))
                     _users[user.Id] = new Member(member.User, perms);
             }
         }
@@ -398,8 +398,8 @@ namespace Discord
                 //Start with this user's server permissions
                 newPermissions = server.GetPermissions(user).RawValue;
 
-                if (IsPrivate || user == Server.Owner)
-                    newPermissions = mask; //Owners always have all permissions
+                if (IsPrivate || user == Server.Owner || newPermissions.HasBit((byte)PermissionBits.Administrator)
+                    newPermissions = mask; //Owners and Administrators always have all permissions
                 else
                 {
                     var channelOverwrites = PermissionOverwrites;
@@ -414,9 +414,7 @@ namespace Discord
                     foreach (var allowUser in channelOverwrites.Where(x => x.TargetType == PermissionTarget.User && x.TargetId == user.Id && x.Permissions.AllowValue != 0))
                         newPermissions |= allowUser.Permissions.AllowValue;
 
-                    if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
-                        newPermissions = mask; //ManageRolesOrPermissions gives all permisions
-                    else if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionBits.ReadMessages))
+                    if (Type == ChannelType.Text && !newPermissions.HasBit((byte)PermissionBits.ReadMessages))
                         newPermissions = 0; //No read permission on a text channel removes all other permissions
                     else if (Type == ChannelType.Voice && !newPermissions.HasBit((byte)PermissionBits.Connect))
                         newPermissions = 0; //No connect permissions on a voice channel removes all other permissions
@@ -451,7 +449,7 @@ namespace Discord
                 return perms;
             }
         }
-        
+
         public ChannelPermissionOverrides GetPermissionsRule(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -470,7 +468,7 @@ namespace Discord
                 .Select(x => x.Permissions)
                 .FirstOrDefault();
         }
-        
+
         public Task AddPermissionsRule(User user, ChannelPermissions allow, ChannelPermissions deny)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -506,7 +504,7 @@ namespace Discord
             };
             return Client.ClientAPI.Send(request);
         }
-        
+
         public Task RemovePermissionsRule(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));

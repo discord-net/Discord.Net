@@ -6,9 +6,13 @@
         CreateInstantInvite = 0,
         KickMembers = 1,
         BanMembers = 2,
-        ManageRolesOrPermissions = 3,
+        Administrator = 3,
         ManageChannel = 4,
         ManageServer = 5,
+
+        ChangeNickname = 26,
+        ManageNicknames = 27,
+        ManageRolesOrPermissions = 28,
 
         //Text
         ReadMessages = 10,
@@ -26,6 +30,6 @@
         MuteMembers = 22,
         DeafenMembers = 23,
         MoveMembers = 24,
-        UseVoiceActivation = 25
+        UseVoiceActivation = 25,
     }
 }

@@ -6,7 +6,7 @@ namespace Discord
     public struct ServerPermissions
     {
         public static ServerPermissions None { get; } = new ServerPermissions();
-        public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00000011111100111111110000111111", 2));
+        public static ServerPermissions All { get; } = new ServerPermissions(Convert.ToUInt32("00011111111100111111110000111111", 2));
 
         public uint RawValue { get; }
 
@@ -16,8 +16,8 @@ namespace Discord
         public bool BanMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.BanMembers);
         /// <summary> If True, a user may kick users from the server. </summary>
         public bool KickMembers => PermissionsHelper.GetValue(RawValue, PermissionBits.KickMembers);
-        /// <summary> If True, a user may adjust roles. This also implictly grants all other permissions. </summary>
-        public bool ManageRoles => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user has all permissions and cannot have them revoked. </summary>
+        public bool Administrator => PermissionsHelper.GetValue(RawValue, PermissionBits.Administrator);
         /// <summary> If True, a user may create, delete and modify channels. </summary>
         public bool ManageChannels => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageChannel);
         /// <summary> If True, a user may adjust server properties. </summary>
@@ -53,30 +53,37 @@ namespace Discord
         /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
         public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBits.UseVoiceActivation);
 
-        public ServerPermissions(bool? createInstantInvite = null, bool? manageRoles = null,
+        /// <summary> If True, a user may change their own nickname. </summary>
+        public bool ChangeNickname => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user may change the nickname of other users. </summary>
+        public bool ManageNicknames => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        /// <summary> If True, a user may adjust roles. </summary>
+        public bool ManageRoles => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+
+        public ServerPermissions(bool? createInstantInvite = null, bool? administrator = null,
             bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null)
-            : this(new ServerPermissions(), createInstantInvite, manageRoles, kickMembers, banMembers, manageChannel, manageServer, readMessages,
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null, bool? manageRoles = null)
+            : this(new ServerPermissions(), createInstantInvite, administrator, kickMembers, banMembers, manageChannel, manageServer, readMessages,
                   sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers,
-                  moveMembers, useVoiceActivation)
+                  moveMembers, useVoiceActivation, manageRoles)
         {
         }
-        public ServerPermissions(ServerPermissions basePerms, bool? createInstantInvite = null, bool? manageRoles = null,
+        public ServerPermissions(ServerPermissions basePerms, bool? createInstantInvite = null, bool? administrator = null,
             bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null)
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null, bool? manageRoles = null)
         {
             uint value = basePerms.RawValue;
 
             PermissionsHelper.SetValue(ref value, createInstantInvite, PermissionBits.CreateInstantInvite);
+            PermissionsHelper.SetValue(ref value, administrator, PermissionBits.Administrator);
             PermissionsHelper.SetValue(ref value, banMembers, PermissionBits.BanMembers);
             PermissionsHelper.SetValue(ref value, kickMembers, PermissionBits.KickMembers);
-            PermissionsHelper.SetValue(ref value, manageRoles, PermissionBits.ManageRolesOrPermissions);
             PermissionsHelper.SetValue(ref value, manageChannel, PermissionBits.ManageChannel);
             PermissionsHelper.SetValue(ref value, manageServer, PermissionBits.ManageServer);
             PermissionsHelper.SetValue(ref value, readMessages, PermissionBits.ReadMessages);
@@ -93,6 +100,9 @@ namespace Discord
             PermissionsHelper.SetValue(ref value, deafenMembers, PermissionBits.DeafenMembers);
             PermissionsHelper.SetValue(ref value, moveMembers, PermissionBits.MoveMembers);
             PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBits.UseVoiceActivation);
+            PermissionsHelper.SetValue(ref value, changeNickname, PermissionBits.ChangeNickname);
+            PermissionsHelper.SetValue(ref value, manageNicknames, PermissionBits.ManageNicknames);
+            PermissionsHelper.SetValue(ref value, manageRoles, PermissionBits.ManageRolesOrPermissions);
 
             RawValue = value;
         }
@@ -102,9 +112,9 @@ namespace Discord
     public struct ChannelPermissions
     {
         public static ChannelPermissions None { get; } = new ChannelPermissions();
-        public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000111111110000011001", 2));
+        public static ChannelPermissions TextOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00010000000000111111110000011001", 2));
         public static ChannelPermissions PrivateOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000000000000011100110000000000", 2));
-        public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00000011111100000000000000011001", 2));
+        public static ChannelPermissions VoiceOnly { get; } = new ChannelPermissions(Convert.ToUInt32("00010011111100000000000000011001", 2));
         public static ChannelPermissions All(Channel channel) => All(channel.Type, channel.IsPrivate);
         public static ChannelPermissions All(ChannelType channelType, bool isPrivate)
         {
@@ -118,8 +128,6 @@ namespace Discord
 
         /// <summary> If True, a user may create invites. </summary>
         public bool CreateInstantInvite => PermissionsHelper.GetValue(RawValue, PermissionBits.CreateInstantInvite);
-        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public bool ManagePermissions => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
         /// <summary> If True, a user may create, delete and modify this channel. </summary>
         public bool ManageChannel => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageChannel);
 
@@ -153,25 +161,27 @@ namespace Discord
         /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
         public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBits.UseVoiceActivation);
 
-        public ChannelPermissions(bool? createInstantInvite = null, bool? managePermissions = null,
+        /// <summary> If True, a user may adjust permissions. </summary>
+        public bool ManagePermissions => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+
+        public ChannelPermissions(bool? createInstantInvite = null,
             bool? manageChannel = null, bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,
             bool? manageMessages = null, bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,
             bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null)
-            : this(new ChannelPermissions(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
-                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation)
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
+            : this(new ChannelPermissions(), createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages,
+                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
         {
         }
-        public ChannelPermissions(ChannelPermissions basePerms, bool? createInstantInvite = null, bool? managePermissions = null,
+        public ChannelPermissions(ChannelPermissions basePerms, bool? createInstantInvite = null,
             bool? manageChannel = null, bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,
             bool? manageMessages = null, bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,
             bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null)
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
         {
             uint value = basePerms.RawValue;
 
             PermissionsHelper.SetValue(ref value, createInstantInvite, PermissionBits.CreateInstantInvite);
-            PermissionsHelper.SetValue(ref value, managePermissions, PermissionBits.ManageRolesOrPermissions);
             PermissionsHelper.SetValue(ref value, manageChannel, PermissionBits.ManageChannel);
             PermissionsHelper.SetValue(ref value, readMessages, PermissionBits.ReadMessages);
             PermissionsHelper.SetValue(ref value, sendMessages, PermissionBits.SendMessages);
@@ -187,6 +197,7 @@ namespace Discord
             PermissionsHelper.SetValue(ref value, deafenMembers, PermissionBits.DeafenMembers);
             PermissionsHelper.SetValue(ref value, moveMembers, PermissionBits.MoveMembers);
             PermissionsHelper.SetValue(ref value, useVoiceActivation, PermissionBits.UseVoiceActivation);
+            PermissionsHelper.SetValue(ref value, managePermissions, PermissionBits.ManageRolesOrPermissions);
 
             RawValue = value;
         }
@@ -202,8 +213,6 @@ namespace Discord
 
 		/// <summary> If True, a user may create invites. </summary>
 		public PermValue CreateInstantInvite => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.CreateInstantInvite);
-        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public PermValue ManagePermissions => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageRolesOrPermissions);
         /// <summary> If True, a user may create, delete and modify this channel. </summary>
         public PermValue ManageChannel => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageChannel);
         /// <summary> If True, a user may join channels. </summary>
@@ -223,8 +232,8 @@ namespace Discord
 		/// <summary> If True, a user may mention @everyone. </summary>
 		public PermValue MentionEveryone => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.MentionEveryone);
 
-		/// <summary> If True, a user may connect to a voice channel. </summary>
-		public PermValue Connect => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.Connect);
+        /// <summary> If True, a user may connect to a voice channel. </summary>
+        public PermValue Connect => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.Connect);
 		/// <summary> If True, a user may speak in a voice channel. </summary>
 		public PermValue Speak => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.Speak);
 		/// <summary> If True, a user may mute users. </summary>
@@ -236,25 +245,29 @@ namespace Discord
         /// <summary> If True, a user may use voice activation rather than push-to-talk. </summary>
         public PermValue UseVoiceActivation => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.UseVoiceActivation);
 
-        public ChannelPermissionOverrides(PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+        /// <summary> If True, a user may adjust permissions. </summary>
+        public PermValue ManagePermissions => PermissionsHelper.GetValue(AllowValue, DenyValue, PermissionBits.ManageRolesOrPermissions);
+
+        public ChannelPermissionOverrides(PermValue? createInstantInvite = null, 
             PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
             PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
             PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
-            PermValue? moveMembers = null, PermValue? useVoiceActivation = null)
-            : this(new ChannelPermissionOverrides(), createInstantInvite, managePermissions, manageChannel, readMessages, sendMessages, sendTTSMessages,
-                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation)
+            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? changeNickname = null, PermValue? manageNicknames = null,
+            PermValue? managePermissions = null)
+            : this(new ChannelPermissionOverrides(), createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages,
+                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
         {
         }
-        public ChannelPermissionOverrides(ChannelPermissionOverrides basePerms, PermValue? createInstantInvite = null, PermValue? managePermissions = null,
+        public ChannelPermissionOverrides(ChannelPermissionOverrides basePerms, PermValue? createInstantInvite = null, 
             PermValue? manageChannel = null, PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null,
             PermValue? manageMessages = null, PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null,
             PermValue? mentionEveryone = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
-            PermValue? moveMembers = null, PermValue? useVoiceActivation = null)
+            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? changeNickname = null, PermValue? manageNicknames = null, 
+            PermValue? managePermissions = null)
         {
             uint allow = basePerms.AllowValue, deny = basePerms.DenyValue;
 
             PermissionsHelper.SetValue(ref allow, ref deny, createInstantInvite, PermissionBits.CreateInstantInvite);
-            PermissionsHelper.SetValue(ref allow, ref deny, managePermissions, PermissionBits.ManageRolesOrPermissions);
             PermissionsHelper.SetValue(ref allow, ref deny, manageChannel, PermissionBits.ManageChannel);
             PermissionsHelper.SetValue(ref allow, ref deny, readMessages, PermissionBits.ReadMessages);
             PermissionsHelper.SetValue(ref allow, ref deny, sendMessages, PermissionBits.SendMessages);
@@ -270,6 +283,9 @@ namespace Discord
             PermissionsHelper.SetValue(ref allow, ref deny, deafenMembers, PermissionBits.DeafenMembers);
             PermissionsHelper.SetValue(ref allow, ref deny, moveMembers, PermissionBits.MoveMembers);
             PermissionsHelper.SetValue(ref allow, ref deny, useVoiceActivation, PermissionBits.UseVoiceActivation);
+            PermissionsHelper.SetValue(ref allow, ref deny, changeNickname, PermissionBits.ChangeNickname);
+            PermissionsHelper.SetValue(ref allow, ref deny, manageNicknames, PermissionBits.ManageNicknames);
+            PermissionsHelper.SetValue(ref allow, ref deny, managePermissions, PermissionBits.ManageRolesOrPermissions);
 
             AllowValue = allow;
             DenyValue = deny;
