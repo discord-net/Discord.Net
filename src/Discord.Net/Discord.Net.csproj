@@ -149,7 +149,7 @@
     <Compile Include="Entities\Rest\Guilds\GuildIntegration.cs" />
     <Compile Include="Entities\Rest\Guilds\IntegrationAccount.cs" />
     <Compile Include="Entities\Rest\Users\Connection.cs" />
-    <Compile Include="Entities\Rest\Helper\PermissionHelper.cs" />
+    <Compile Include="Entities\Shared\Helpers\PermissionHelper.cs" />
     <Compile Include="Entities\Rest\Invites\GuildInvite.cs" />
     <Compile Include="Entities\Rest\Invites\Invite.cs" />
     <Compile Include="Entities\Rest\Invites\PublicInvite.cs" />

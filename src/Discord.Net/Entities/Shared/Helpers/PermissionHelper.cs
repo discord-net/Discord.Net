@@ -1,4 +1,4 @@
-﻿namespace Discord.Rest
+﻿namespace Discord
 {
     public static class PermissionHelper
     {
@@ -44,11 +44,11 @@
 
                 switch (channel)
                 {
-                    case TextChannel _:
+                    case ITextChannel _:
                         if (!PermissionUtilities.GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
                             resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
                         break;
-                    case VoiceChannel _:
+                    case IVoiceChannel _:
                         if (!PermissionUtilities.GetValue(resolvedPermissions, ChannelPermission.Connect))
                             resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
                         break;
