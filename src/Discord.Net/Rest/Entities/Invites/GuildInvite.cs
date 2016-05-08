@@ -21,7 +21,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int Uses { get; private set; }
 
-        internal override DiscordRestClient Discord => Guild.Discord;
+        internal override DiscordClient Discord => Guild.Discord;
 
         internal GuildInvite(Guild guild, Model model)
             : base(model)

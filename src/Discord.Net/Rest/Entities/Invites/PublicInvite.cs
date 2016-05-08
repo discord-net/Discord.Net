@@ -15,9 +15,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong ChannelId => _channelId;
 
-        internal override DiscordRestClient Discord { get; }
+        internal override DiscordClient Discord { get; }
 
-        internal PublicInvite(DiscordRestClient discord, Model model)
+        internal PublicInvite(DiscordClient discord, Model model)
             : base(model)
         {
             Discord = discord;

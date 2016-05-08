@@ -17,7 +17,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
 
-        internal abstract DiscordRestClient Discord { get; }
+        internal abstract DiscordClient Discord { get; }
 
         internal Invite(Model model)
         {

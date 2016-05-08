@@ -4,9 +4,9 @@ namespace Discord.Rest
 {
     public class PublicUser : User
     {
-        internal override DiscordRestClient Discord { get; }
+        internal override DiscordClient Discord { get; }
 
-        internal PublicUser(DiscordRestClient discord, Model model)
+        internal PublicUser(DiscordClient discord, Model model)
             : base(model)
         {
             Discord = discord;

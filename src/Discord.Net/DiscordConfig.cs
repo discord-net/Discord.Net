@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Discord.Net.Rest;
+using System.Reflection;
 
 namespace Discord
 {
@@ -23,5 +24,8 @@ namespace Discord
 
         /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
+
+        /// <summary> Gets or sets the provider used to generate new REST connections. </summary>
+        public RestClientProvider RestClientProvider { get; set; } = (url, ct) => new DefaultRestClient(url, ct);
     }
 }

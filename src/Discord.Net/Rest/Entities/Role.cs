@@ -33,7 +33,7 @@ namespace Discord.Rest
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => MentionHelper.Mention(this);
-        internal DiscordRestClient Discord => Guild.Discord;
+        internal DiscordClient Discord => Guild.Discord;
 
         internal Role(Guild guild, Model model)
         {

@@ -1,7 +1,6 @@
 ﻿using Discord.API.Rest;
 using Discord.Logging;
 using Discord.Net.Rest;
-using Discord.Rest;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,9 +9,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.Rest
 {
-    public sealed class DiscordRestClient : IDiscordClient, IDisposable
+    public sealed class DiscordClient : IDiscordClient, IDisposable
     {
         public event EventHandler<LogMessageEventArgs> Log;
         public event EventHandler LoggedIn, LoggedOut;
@@ -28,12 +27,12 @@ namespace Discord
         internal API.DiscordRawClient BaseClient { get; private set; }
         internal SelfUser CurrentUser { get; private set; }
 
-        public DiscordRestClient(DiscordConfig config = null)
+        public DiscordClient(DiscordConfig config = null)
         {
             if (config == null)
                 config = new DiscordConfig();
 
-            _restClientProvider = (baseUrl, cancelToken) => new DefaultRestClient(baseUrl, cancelToken);
+            _restClientProvider = config.RestClientProvider;
 
             _connectionLock = new SemaphoreSlim(1, 1);
             _log = new LogManager(config.LogLevel);

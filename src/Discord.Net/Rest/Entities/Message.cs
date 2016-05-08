@@ -43,7 +43,7 @@ namespace Discord.Rest
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
         /// <inheritdoc />
         public bool IsAuthor => Discord.CurrentUser.Id == Author.Id;
-        internal DiscordRestClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
+        internal DiscordClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
 
         internal Message(IMessageChannel channel, Model model)
         {

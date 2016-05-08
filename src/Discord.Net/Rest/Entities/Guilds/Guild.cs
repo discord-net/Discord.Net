@@ -19,7 +19,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal DiscordRestClient Discord { get; }
+        internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -56,7 +56,7 @@ namespace Discord.Rest
         /// <summary> Gets a collection of all roles in this guild. </summary>
         public IEnumerable<Role> Roles => _roles?.Select(x => x.Value) ?? Enumerable.Empty<Role>();
 
-        internal Guild(DiscordRestClient discord, Model model)
+        internal Guild(DiscordClient discord, Model model)
         {
             Id = model.Id;
             Discord = discord;

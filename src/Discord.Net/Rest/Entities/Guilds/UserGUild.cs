@@ -10,7 +10,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal DiscordRestClient Discord { get; }
+        internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -22,7 +22,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
-        internal UserGuild(DiscordRestClient discord, Model model)
+        internal UserGuild(DiscordClient discord, Model model)
         {
             Discord = discord;
             Id = model.Id;

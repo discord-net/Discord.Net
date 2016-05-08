@@ -12,12 +12,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? ChannelId { get; private set; }
 
-        internal DiscordRestClient Discord { get; }
+        internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
 
-        internal GuildEmbed(DiscordRestClient discord, Model model)
+        internal GuildEmbed(DiscordClient discord, Model model)
         {
             Discord = discord;
             Update(model);

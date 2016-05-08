@@ -11,7 +11,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal abstract DiscordRestClient Discord { get; }
+        internal abstract DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public ushort Discriminator { get; private set; }

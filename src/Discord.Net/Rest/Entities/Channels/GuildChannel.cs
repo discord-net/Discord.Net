@@ -26,7 +26,7 @@ namespace Discord.Rest
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
         /// <inheritdoc />
         public IReadOnlyDictionary<ulong, Overwrite> PermissionOverwrites => _overwrites;
-        internal DiscordRestClient Discord => Guild.Discord;
+        internal DiscordClient Discord => Guild.Discord;
 
         internal GuildChannel(Guild guild, Model model)
         {

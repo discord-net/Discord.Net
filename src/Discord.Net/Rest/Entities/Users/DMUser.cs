@@ -7,7 +7,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DMChannel Channel { get; }
 
-        internal override DiscordRestClient Discord => Channel.Discord;
+        internal override DiscordClient Discord => Channel.Discord;
 
         internal DMUser(DMChannel channel, Model model)
             : base(model)

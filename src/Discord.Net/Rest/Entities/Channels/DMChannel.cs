@@ -13,7 +13,7 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public ulong Id { get; }
-        internal DiscordRestClient Discord { get; }
+        internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public DMUser Recipient { get; private set; }
@@ -23,7 +23,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
 
-        internal DMChannel(DiscordRestClient discord, Model model)
+        internal DMChannel(DiscordClient discord, Model model)
         {
             Id = model.Id;
             Discord = discord;

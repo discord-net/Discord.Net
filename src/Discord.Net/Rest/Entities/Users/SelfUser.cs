@@ -7,14 +7,14 @@ namespace Discord.Rest
 {
     public class SelfUser : User, ISelfUser
     {
-        internal override DiscordRestClient Discord { get; }
+        internal override DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public string Email { get; private set; }
         /// <inheritdoc />
         public bool IsVerified { get; private set; }
 
-        internal SelfUser(DiscordRestClient discord, Model model)
+        internal SelfUser(DiscordClient discord, Model model)
             : base(model)
         {
             Discord = discord;

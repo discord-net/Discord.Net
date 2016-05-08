@@ -24,7 +24,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public IReadOnlyList<Role> Roles => _roles;
-        internal override DiscordRestClient Discord => Guild.Discord;
+        internal override DiscordClient Discord => Guild.Discord;
 
         internal GuildUser(Guild guild, Model model)
             : base(model.User)

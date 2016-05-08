@@ -32,7 +32,7 @@ namespace Discord.Rest
         public User User { get; private set; }
         /// <inheritdoc />
         public IntegrationAccount Account { get; private set; }
-        internal DiscordRestClient Discord => Guild.Discord;
+        internal DiscordClient Discord => Guild.Discord;
         
         internal GuildIntegration(Guild guild, Model model)
         {
