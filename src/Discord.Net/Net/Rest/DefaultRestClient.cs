@@ -59,7 +59,7 @@ namespace Discord.Net.Rest
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (json != null)
-                    restRequest.Content = new StringContent(JsonConvert.SerializeObject(json), Encoding.UTF8, "application/json");
+                    restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 return await SendInternal(restRequest, _cancelToken).ConfigureAwait(false);
             }
         }
