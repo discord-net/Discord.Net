@@ -2,5 +2,5 @@
 
 namespace Discord.Net.Rest
 {
-    public delegate IRestEngine RestClientProvider(string baseUrl, CancellationToken cancelToken);
+    public delegate IRestClient RestClientProvider(string baseUrl, CancellationToken cancelToken);
 }

@@ -26,6 +26,8 @@ namespace Discord.API
         public ulong? EmbedChannelId { get; set; }
         [JsonProperty("verification_level")]
         public int VerificationLevel { get; set; }
+        [JsonProperty("voice_states")]
+        public VoiceState[] VoiceStates { get; set; }
         [JsonProperty("roles")]
         public Role[] Roles { get; set; }
         [JsonProperty("emojis")]

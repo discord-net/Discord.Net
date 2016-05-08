@@ -1,39 +1,14 @@
 {
-  "version": "1.0.0-alpha1",
-  "description": "An unofficial .Net API wrapper for the Discord client.",
-  "authors": [ "RogueException" ],
-  "tags": [ "discord", "discordapp" ],
-  "projectUrl": "https://github.com/RogueException/Discord.Net",
-  "licenseUrl": "http://opensource.org/licenses/MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/RogueException/Discord.Net"
-  },
-
-  "compilationOptions": {
-    "allowUnsafe": true
-  },
-
   "dependencies": {
     "Newtonsoft.Json": "8.0.3",
-    "System.Collections.Concurrent": "4.0.12-rc3-*",
-    "System.Collections.Immutable": "1.2.0-rc3-*",
-    "System.IO": "4.1.0-rc3-*",
-    "System.IO.FileSystem": "4.0.1-rc3-*",
-    "System.Reflection": "4.1.0-rc3-*",
-    "System.Runtime": "4.1.0-rc3-*",
-    "System.Net.Requests": "4.0.11-rc3-*",
-    "System.Net.Http": "4.0.1-rc3-*",
-    "System.Net.Sockets": "4.1.0-rc3-*",
-    "System.Net.WebSockets.Client": "4.0.0-rc3-*",
-    "System.Text.RegularExpressions": "4.0.12-rc3-*",
-    "System.Threading": "4.0.11-rc3-*",
-    "System.Threading.Tasks": "4.0.11-rc3-*"
+    "System.Collections.Immutable": "1.1.37"
   },
 
   "frameworks": {
-    "netstandard1.4": {
-      "imports": "dotnet5.5"
-    }
+    "net461": { }
+  },
+
+  "runtimes": {
+    "win": { }
   }
 }

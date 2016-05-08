@@ -34,7 +34,7 @@ namespace Discord
                 builder.Clear();
                 builder.EnsureCapacity(maxLength);
             }
-            
+
             if (sourceName != null)
             {
                 builder.Append('[');

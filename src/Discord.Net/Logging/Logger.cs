@@ -2,7 +2,7 @@
 
 namespace Discord.Logging
 {
-    public class Logger
+    internal class Logger
     {
         private readonly LogManager _manager;
 

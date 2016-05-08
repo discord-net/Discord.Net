@@ -12,5 +12,7 @@ namespace Discord.API
         public string Icon { get; set; }
         [JsonProperty("owner")]
         public bool Owner { get; set; }
+        [JsonProperty("permissions")]
+        public uint Permissions { get; set; }
     }
 }

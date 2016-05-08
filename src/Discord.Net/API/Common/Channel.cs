@@ -14,11 +14,11 @@ namespace Discord.API
 
         //GuildChannel
         [JsonProperty("guild_id")]
-        public ulong GuildId { get; set; }
+        public ulong? GuildId { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public ChannelType Type { get; set; }
         [JsonProperty("position")]
         public int Position { get; set; }
         [JsonProperty("permission_overwrites")]
