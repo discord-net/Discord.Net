@@ -41,14 +41,14 @@ namespace Discord.Rest
         public async Task Leave()
         {
             if (IsOwner)
-                throw new InvalidOperationException("Unable to leave a guild the current user owns, use Delete() instead.");
+                throw new InvalidOperationException("Unable to leave a guild the current user owns.");
             await Discord.BaseClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
             if (!IsOwner)
-                throw new InvalidOperationException("Unable to leave a guild the current user owns, use Delete() instead.");
+                throw new InvalidOperationException("Unable to delete a guild the current user does not own.");
             await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 

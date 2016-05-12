@@ -11,6 +11,8 @@ namespace Discord
         int AFKTimeout { get; }
         /// <summary> Returns true if this guild is embeddable (e.g. widget) </summary>
         bool IsEmbeddable { get; }
+        /// <summary> Returns true if the current user owns this guild. </summary>
+        bool IsOwner { get; }
         /// <summary> Gets the name of this guild. </summary>
         string Name { get; }
         int VerificationLevel { get; }
