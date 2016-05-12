@@ -81,11 +81,11 @@ namespace Discord.Rest
             {
                 var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis[i] = new Emoji(model.Emojis[i]);
+                    emojis.Add(new Emoji(model.Emojis[i]));
                 Emojis = emojis.ToArray();
             }
             else
-                Emojis = ImmutableArray<Emoji>.Empty;
+                Emojis = Array.Empty<Emoji>();
 
             var roles = new ConcurrentDictionary<ulong, Role>(1, model.Roles?.Length ?? 0);
             if (model.Roles != null)

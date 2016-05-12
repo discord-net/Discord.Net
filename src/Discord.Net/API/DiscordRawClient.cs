@@ -219,7 +219,7 @@ namespace Discord.API
             switch (channels.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args));
+                    return;
                 case 1:
                     await ModifyGuildChannel(channels[0].Id, new ModifyGuildChannelParams { Position = channels[0].Position }).ConfigureAwait(false);
                     break;
@@ -476,8 +476,10 @@ namespace Discord.API
 
             if (result.Count > 1)
                 return result.SelectMany(x => x);
-            else
+            else if (result.Count == 1)
                 return result[0];
+            else
+                return Array.Empty<GuildMember>();
         }
         public async Task RemoveGuildMember(ulong guildId, ulong userId)
         {
@@ -535,7 +537,7 @@ namespace Discord.API
             switch (roles.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args));
+                    return Array.Empty<Role>();
                 case 1:
                     return ImmutableArray.Create(await ModifyGuildRole(guildId, roles[0].Id, roles[0]).ConfigureAwait(false));
                 default:
@@ -580,10 +582,12 @@ namespace Discord.API
                 if (models.Length != DiscordConfig.MaxMessagesPerBatch) { i++; break; }
             }
 
-            if (runs > 1)
-                return result.Take(runs).SelectMany(x => x);
-            else
+            if (i > 1)
+                return result.Take(i).SelectMany(x => x);
+            else if (i == 1)
                 return result[0];
+            else
+                return Array.Empty<Message>();
         }
         public Task<Message> CreateMessage(ulong channelId, CreateMessageParams args)
             => CreateMessage(0, channelId, args);
@@ -636,7 +640,7 @@ namespace Discord.API
             switch (messageIds.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args.MessageIds));
+                    return;
                 case 1:
                     await DeleteMessage(guildId, channelId, messageIds[0]).ConfigureAwait(false);
                     break;

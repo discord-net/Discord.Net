@@ -68,7 +68,7 @@ namespace Discord.Rest
                 Attachments = ImmutableArray.Create(attachments);
             }
             else
-                Attachments = ImmutableArray<Attachment>.Empty;
+                Attachments = Array.Empty<Attachment>();
 
             if (model.Embeds.Length > 0)
             {
@@ -78,18 +78,18 @@ namespace Discord.Rest
                 Embeds = ImmutableArray.Create(embeds);
             }
             else
-                Embeds = ImmutableArray<Embed>.Empty;
+                Embeds = Array.Empty<Embed>();
 
             if (model.Mentions.Length > 0)
             {
                 var discord = Discord;
                 var builder = ImmutableArray.CreateBuilder<PublicUser>(model.Mentions.Length);
                 for (int i = 0; i < model.Mentions.Length; i++)
-                    builder[i] = new PublicUser(discord, model.Mentions[i]);
+                    builder.Add(new PublicUser(discord, model.Mentions[i]));
                 MentionedUsers = builder.ToArray();
             }
             else
-                MentionedUsers = ImmutableArray<PublicUser>.Empty;
+                MentionedUsers = Array.Empty<PublicUser>();
             MentionedChannelIds = MentionHelper.GetChannelMentions(model.Content);
             MentionedRoleIds = MentionHelper.GetRoleMentions(model.Content);
             if (model.IsMentioningEveryone)

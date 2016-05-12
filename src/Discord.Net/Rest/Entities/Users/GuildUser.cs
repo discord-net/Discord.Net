@@ -39,9 +39,9 @@ namespace Discord.Rest
             Nickname = model.Nick;
 
             var roles = ImmutableArray.CreateBuilder<Role>(model.Roles.Length + 1);
-            roles[0] = Guild.EveryoneRole;
+            roles.Add(Guild.EveryoneRole);
             for (int i = 0; i < model.Roles.Length; i++)
-                roles[i + 1] = Guild.GetRole(model.Roles[i]);
+                roles.Add(Guild.GetRole(model.Roles[i]));
             _roles = roles.ToImmutable();
         }
 
