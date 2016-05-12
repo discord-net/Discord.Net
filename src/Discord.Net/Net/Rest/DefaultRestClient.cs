@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -118,7 +119,11 @@ namespace Discord.Net.Rest
 
                 int statusCode = (int)response.StatusCode;
                 if (statusCode < 200 || statusCode >= 300) //2xx = Success
+                {
+                    if (statusCode == 429)
+                        throw new HttpRateLimitException(int.Parse(response.Headers.GetValues("retry-after").First()));
                     throw new HttpException(response.StatusCode);
+                }
 
                 return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             }

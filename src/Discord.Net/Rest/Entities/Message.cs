@@ -121,7 +121,13 @@ namespace Discord.Rest
 
             var args = new ModifyMessageParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
+            var guildChannel = Channel as GuildChannel;
+
+            Model model;
+            if (guildChannel != null)
+                model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+            else
+                model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model);
         }
 

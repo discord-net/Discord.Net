@@ -95,6 +95,13 @@
     <Compile Include="API\Rest\ModifyVoiceChannelParams.cs" />
     <Compile Include="DiscordConfig.cs" />
     <Compile Include="API\DiscordRawClient.cs" />
+    <Compile Include="Net\RateLimitException.cs" />
+    <Compile Include="Net\Rest\RequestQueue\BucketGroup.cs" />
+    <Compile Include="Net\Rest\RequestQueue\GlobalBucket.cs" />
+    <Compile Include="Net\Rest\RequestQueue\GuildBucket.cs" />
+    <Compile Include="Net\Rest\RequestQueue\RequestQueue.cs" />
+    <Compile Include="Net\Rest\RequestQueue\RequestQueueBucket.cs" />
+    <Compile Include="Net\Rest\RequestQueue\RestRequest.cs" />
     <Compile Include="Rest\DiscordClient.cs" />
     <Compile Include="Common\Entities\Guilds\IGuildEmbed.cs" />
     <Compile Include="Common\Entities\Guilds\IIntegrationAccount.cs" />
@@ -181,7 +188,7 @@
     <Compile Include="Net\Converters\UserStatusConverter.cs" />
     <Compile Include="Net\HttpException.cs" />
     <Compile Include="Net\Rest\DefaultRestClient.cs" />
-    <Compile Include="Net\Rest\IMessageQueue.cs" />
+    <Compile Include="Net\Rest\RequestQueue\IRequestQueue.cs" />
     <Compile Include="Net\Rest\IRestClient.cs" />
     <Compile Include="Net\Rest\MultipartFile.cs" />
     <Compile Include="Net\Rest\RestClientProvider.cs" />

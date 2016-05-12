@@ -60,7 +60,7 @@ namespace Discord.Rest
                 var cancelTokenSource = new CancellationTokenSource();
                 
                 BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token, tokenType, token);
-                BaseClient.SentRequest += (s, e) => _log.Verbose($"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+                BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
 
                 //MessageQueue = new MessageQueue(RestClient, _restLogger);
                 //await MessageQueue.Start(_cancelTokenSource.Token).ConfigureAwait(false);

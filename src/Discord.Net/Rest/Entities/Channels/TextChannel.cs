@@ -64,7 +64,7 @@ namespace Discord.Rest
         public async Task<Message> SendMessage(string text, bool isTTS = false)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.CreateMessage(Id, args).ConfigureAwait(false);
+            var model = await Discord.BaseClient.CreateMessage(Guild.Id, Id, args).ConfigureAwait(false);
             return new Message(this, model);
         }
         /// <inheritdoc />
@@ -74,7 +74,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.BaseClient.UploadFile(Id, file, args).ConfigureAwait(false);
+                var model = await Discord.BaseClient.UploadFile(Guild.Id, Id, file, args).ConfigureAwait(false);
                 return new Message(this, model);
             }
         }
@@ -82,14 +82,14 @@ namespace Discord.Rest
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.UploadFile(Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.BaseClient.UploadFile(Guild.Id, Id, stream, args).ConfigureAwait(false);
             return new Message(this, model);
         }
 
         /// <inheritdoc />
         public async Task DeleteMessages(IEnumerable<IMessage> messages)
         {
-            await Discord.BaseClient.DeleteMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.BaseClient.DeleteMessages(Guild.Id, Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
