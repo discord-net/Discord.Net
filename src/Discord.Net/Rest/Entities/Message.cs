@@ -137,6 +137,9 @@ namespace Discord.Rest
             await Discord.BaseClient.DeleteMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
+
+        public override string ToString() => $"{Author.ToString()}: {Text}";
+
         IUser IMessage.Author => Author;
         IReadOnlyList<Attachment> IMessage.Attachments => Attachments;
         IReadOnlyList<Embed> IMessage.Embeds => Embeds;

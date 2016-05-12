@@ -333,6 +333,8 @@ namespace Discord.Rest
             }
         }
 
+        public override string ToString() => Name ?? Id.ToString();
+
         IEnumerable<Emoji> IGuild.Emojis => Emojis;
         ulong IGuild.EveryoneRoleId => EveryoneRole.Id;
         IEnumerable<string> IGuild.Features => Features;

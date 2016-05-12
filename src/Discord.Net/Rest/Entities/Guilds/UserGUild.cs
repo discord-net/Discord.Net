@@ -51,5 +51,7 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to leave a guild the current user owns, use Delete() instead.");
             await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
         }
+
+        public override string ToString() => Name ?? Id.ToString();
     }
 }
