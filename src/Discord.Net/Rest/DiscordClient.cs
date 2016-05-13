@@ -1,11 +1,13 @@
 ﻿using Discord.API.Rest;
 using Discord.Logging;
+using Discord.Net;
 using Discord.Net.Rest;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,10 +24,14 @@ namespace Discord.Rest
         private CancellationTokenSource _cancelTokenSource;
         private bool _isDisposed;
         private string _userAgent;
-        
+        private SelfUser _currentUser;
+
         public bool IsLoggedIn { get; private set; }
-        internal API.DiscordRawClient BaseClient { get; private set; }
-        internal SelfUser CurrentUser { get; private set; }
+        public API.DiscordRawClient BaseClient { get; private set; }
+
+        public TokenType AuthTokenType => BaseClient.AuthTokenType;
+        public IRestClient RestClient => BaseClient.RestClient;
+        public IRequestQueue RequestQueue => BaseClient.RequestQueue;
 
         public DiscordClient(DiscordConfig config = null)
         {
@@ -64,9 +70,13 @@ namespace Discord.Rest
 
                 //MessageQueue = new MessageQueue(RestClient, _restLogger);
                 //await MessageQueue.Start(_cancelTokenSource.Token).ConfigureAwait(false);
-                
-                var currentUser = await BaseClient.GetCurrentUser().ConfigureAwait(false);
-                CurrentUser = new SelfUser(this, currentUser);
+
+                try
+                {
+                    var currentUser = await BaseClient.GetCurrentUser().ConfigureAwait(false);
+                    _currentUser = new SelfUser(this, currentUser);
+                }
+                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized && tokenType == TokenType.Bearer) { } //Ignore 401 if Bearer doesnt have identity
                 
                 _cancelTokenSource = cancelTokenSource;
                 IsLoggedIn = true;
@@ -173,25 +183,25 @@ namespace Discord.Rest
                 return new PublicUser(this, model);
             return null;
         }
-        public async Task<IUser> GetUser(string username, ushort discriminator)
+        public async Task<User> GetUser(string username, ushort discriminator)
         {
             var model = await BaseClient.GetUser(username, discriminator).ConfigureAwait(false);
             if (model != null)
                 return new PublicUser(this, model);
             return null;
         }
-        public async Task<ISelfUser> GetCurrentUser()
+        public async Task<SelfUser> GetCurrentUser()
         {
-            var currentUser = CurrentUser;
-            if (currentUser == null)
+            var user = _currentUser;
+            if (user == null)
             {
                 var model = await BaseClient.GetCurrentUser().ConfigureAwait(false);
-                currentUser = new SelfUser(this, model);
-                CurrentUser = currentUser;
+                user = new SelfUser(this, model);
+                _currentUser = user;
             }
-            return currentUser;
+            return user;
         }
-        public async Task<IEnumerable<IUser>> QueryUsers(string query, int limit)
+        public async Task<IEnumerable<User>> QueryUsers(string query, int limit)
         {
             var models = await BaseClient.QueryUsers(query, limit).ConfigureAwait(false);
             return models.Select(x => new PublicUser(this, x));
@@ -225,7 +235,6 @@ namespace Discord.Rest
         public void Dispose() => Dispose(true);
 
         API.DiscordRawClient IDiscordClient.BaseClient => BaseClient;
-        ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
         async Task<IChannel> IDiscordClient.GetChannel(ulong id)
             => await GetChannel(id).ConfigureAwait(false);
@@ -243,6 +252,10 @@ namespace Discord.Rest
             => await CreateGuild(name, region, jpegIcon).ConfigureAwait(false);
         async Task<IUser> IDiscordClient.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
+        async Task<IUser> IDiscordClient.GetUser(string username, ushort discriminator)
+            => await GetUser(username, discriminator).ConfigureAwait(false);
+        async Task<ISelfUser> IDiscordClient.GetCurrentUser()
+            => await GetCurrentUser().ConfigureAwait(false);
         async Task<IEnumerable<IUser>> IDiscordClient.QueryUsers(string query, int limit)
             => await QueryUsers(query, limit).ConfigureAwait(false);
         async Task<IEnumerable<IVoiceRegion>> IDiscordClient.GetVoiceRegions()

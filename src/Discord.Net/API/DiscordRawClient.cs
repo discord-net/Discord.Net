@@ -25,10 +25,15 @@ namespace Discord.API
         private readonly IRestClient _restClient;
         private readonly CancellationToken _cancelToken;
         private readonly JsonSerializer _serializer;
+       
+        public TokenType AuthTokenType { get; private set; }
+        public IRestClient RestClient { get; private set; }
+        public IRequestQueue RequestQueue { get; private set; }
 
         internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken, TokenType authTokenType, string authToken)
         {
             _cancelToken = cancelToken;
+            AuthTokenType = authTokenType;
 
             switch (authTokenType)
             {

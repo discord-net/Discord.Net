@@ -46,8 +46,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
         /// <inheritdoc />
-        public bool IsOwner => OwnerId == Discord.CurrentUser.Id;
-        /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
         /// <inheritdoc />
         public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, _splashId);
@@ -157,15 +155,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task Leave()
         {
-            if (IsOwner)
-                throw new InvalidOperationException("Unable to leave a guild the current user owns.");
             await Discord.BaseClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
-            if (!IsOwner)
-                throw new InvalidOperationException("Unable to delete a guild the current user does not own.");
             await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 
@@ -317,7 +311,8 @@ namespace Discord.Rest
         /// <summary> Gets a the current user. </summary>
         public async Task<GuildUser> GetCurrentUser()
         {
-            return await GetUser(Discord.CurrentUser.Id).ConfigureAwait(false);
+            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            return await GetUser(currentUser.Id).ConfigureAwait(false);
         }
         public async Task<int> PruneUsers(int days = 30, bool simulate = false)
         {
