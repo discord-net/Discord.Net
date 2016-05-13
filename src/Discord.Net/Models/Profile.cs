@@ -23,7 +23,7 @@ namespace Discord
         /// <summary> Gets an id uniquely identifying from others with the same name. </summary>
         public ushort Discriminator => Client.PrivateUser.Discriminator;
         /// <summary> Gets the name of the game this user is currently playing. </summary>
-        public string CurrentGame => Client.PrivateUser.CurrentGame;
+        public GameInfo CurrentGame => Client.PrivateUser.CurrentGame;
         /// <summary> Gets the current status for this user. </summary>
         public UserStatus Status => Client.PrivateUser.Status;
         /// <summary> Returns the string used to mention this user. </summary>

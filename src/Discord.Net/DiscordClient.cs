@@ -65,7 +65,7 @@ namespace Discord
         /// <summary> Gets the status of the current user. </summary>
         public UserStatus Status { get; private set; }
         /// <summary> Gets the game the current user is displayed as playing. </summary>
-        public string CurrentGame { get; private set; }
+        public GameInfo CurrentGame { get; private set; }
 
         /// <summary> Gets a collection of all extensions added to this DiscordClient. </summary>
         public IEnumerable<IService> Services => _services;
@@ -316,9 +316,18 @@ namespace Discord
             Status = status;
             SendStatus();
         }
-        public void SetGame(string game)
+        public void SetGame(GameInfo game)
         {
             CurrentGame = game;
+            SendStatus();
+        }
+        public void SetGame(string game, string url = null, GameType type = 0)
+        {
+            CurrentGame = new GameInfo() {
+                Name = game,
+                Url = url ?? CurrentGame.Url,
+                Type = type
+            };
             SendStatus();
         }
         private void SendStatus()
