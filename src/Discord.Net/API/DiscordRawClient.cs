@@ -473,7 +473,7 @@ namespace Discord.API
             if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
             if (args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
 
-            int limit = args.Limit.IsSpecified ? args.Limit.Value : int.MaxValue;
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             int offset = args.Offset;
 
             List<GuildMember[]> result;
