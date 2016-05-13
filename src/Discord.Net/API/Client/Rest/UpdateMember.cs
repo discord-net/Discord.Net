@@ -21,6 +21,8 @@ namespace Discord.API.Client.Rest
         public ulong? VoiceChannelId { get; set; }
         [JsonProperty("roles"), JsonConverter(typeof(LongStringArrayConverter))]
         public ulong[] RoleIds { get; set; }
+        [JsonProperty("nick")]
+        public string Nickname { get; set; }
 
         public UpdateMemberRequest(ulong guildId, ulong userId)
         {
