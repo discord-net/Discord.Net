@@ -12,6 +12,8 @@ namespace Discord
         ushort Discriminator { get; }
         /// <summary> Returns true if this user is a bot account. </summary>
         bool IsBot { get; }
+        /// <summary> Returns true is this user is the current logged-in account. </summary>
+        bool IsCurrentUser { get; }
         /// <summary> Gets the current status of this user. </summary>
         UserStatus Status { get; }
         /// <summary> Gets the username for this user. </summary>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 
@@ -82,8 +83,15 @@ namespace Discord.Rest
 
             var args = new ModifyGuildMemberParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
-            Update(model);
+            await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+            if (args.Deaf.IsSpecified)
+                IsDeaf = args.Deaf;
+            if (args.Mute.IsSpecified)
+                IsMute = args.Mute;
+            if (args.Nickname.IsSpecified)
+                Nickname = args.Nickname;
+            if (args.Roles.IsSpecified)
+                _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
         }
 
 

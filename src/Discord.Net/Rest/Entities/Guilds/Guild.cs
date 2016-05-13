@@ -306,7 +306,6 @@ namespace Discord.Rest
             var models = await Discord.BaseClient.GetGuildMembers(Id, args).ConfigureAwait(false);
             return models.Select(x => new GuildUser(this, x));
         }
-
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
         public async Task<GuildUser> GetUser(ulong id)
         {
@@ -315,7 +314,11 @@ namespace Discord.Rest
                 return new GuildUser(this, model);
             return null;
         }
-
+        /// <summary> Gets a the current user. </summary>
+        public async Task<GuildUser> GetCurrentUser()
+        {
+            return await GetUser(Discord.CurrentUser.Id).ConfigureAwait(false);
+        }
         public async Task<int> PruneUsers(int days = 30, bool simulate = false)
         {
             var args = new GuildPruneParams() { Days = days };
@@ -367,6 +370,8 @@ namespace Discord.Rest
             => Task.FromResult<IEnumerable<IRole>>(Roles);
         async Task<IGuildUser> IGuild.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
+        async Task<IGuildUser> IGuild.GetCurrentUser()
+            => await GetCurrentUser().ConfigureAwait(false);
         async Task<IEnumerable<IGuildUser>> IGuild.GetUsers()
             => await GetUsers().ConfigureAwait(false);
     }

@@ -45,11 +45,13 @@ namespace Discord.API
             }
 
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl, cancelToken);
+            _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("authorization", authToken);
             _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
             _requestQueue = new RequestQueue(_restClient);
 
             _serializer = new JsonSerializer();
+            _serializer.Converters.Add(new OptionalConverter());
             _serializer.Converters.Add(new ChannelTypeConverter());
             _serializer.Converters.Add(new ImageConverter());
             _serializer.Converters.Add(new NullableUInt64Converter());
@@ -59,58 +61,59 @@ namespace Discord.API
             _serializer.Converters.Add(new UInt64Converter());
             _serializer.Converters.Add(new UInt64EntityConverter());
             _serializer.Converters.Add(new UserStatusConverter());
+            _serializer.ContractResolver = new OptionalContractResolver();
         }
 
         //Core
         public Task Send(string method, string endpoint, GlobalBucket bucket = GlobalBucket.General)
-            => SendInternal(method, endpoint, null, bucket);
+            => SendInternal(method, endpoint, null, true, bucket);
         public Task Send(string method, string endpoint, object payload, GlobalBucket bucket = GlobalBucket.General)
-            => SendInternal(method, endpoint, payload, bucket);
+            => SendInternal(method, endpoint, payload, true, bucket);
         public Task Send(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GlobalBucket bucket = GlobalBucket.General)
-            => SendInternal(method, endpoint, multipartArgs, bucket);
+            => SendInternal(method, endpoint, multipartArgs, true, bucket);
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, bucket).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, false, bucket).ConfigureAwait(false));
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, object payload, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, bucket).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, false, bucket).ConfigureAwait(false));
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, bucket).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, false, bucket).ConfigureAwait(false));
 
         public Task Send(string method, string endpoint, GuildBucket bucket, ulong guildId)
-            => SendInternal(method, endpoint, null, bucket, guildId);
+            => SendInternal(method, endpoint, null, true, bucket, guildId);
         public Task Send(string method, string endpoint, object payload, GuildBucket bucket, ulong guildId)
-            => SendInternal(method, endpoint, payload, bucket, guildId);
+            => SendInternal(method, endpoint, payload, true, bucket, guildId);
         public Task Send(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GuildBucket bucket, ulong guildId)
-            => SendInternal(method, endpoint, multipartArgs, bucket, guildId);
+            => SendInternal(method, endpoint, multipartArgs, true, bucket, guildId);
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, GuildBucket bucket, ulong guildId)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, bucket, guildId).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, false, bucket, guildId).ConfigureAwait(false));
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, object payload, GuildBucket bucket, ulong guildId)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, bucket, guildId).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, false, bucket, guildId).ConfigureAwait(false));
         public async Task<TResponse> Send<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GuildBucket bucket, ulong guildId)
             where TResponse : class
-            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, bucket, guildId).ConfigureAwait(false));
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, false, bucket, guildId).ConfigureAwait(false));
 
-        private Task<Stream> SendInternal(string method, string endpoint, object payload, GlobalBucket bucket)
-            => SendInternal(method, endpoint, payload, BucketGroup.Global, (int)bucket, 0);
-        private Task<Stream> SendInternal(string method, string endpoint, object payload, GuildBucket bucket, ulong guildId)
-            => SendInternal(method, endpoint, payload, BucketGroup.Guild, (int)bucket, guildId);
-        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, GlobalBucket bucket)
-            => SendInternal(method, endpoint, multipartArgs, BucketGroup.Global, (int)bucket, 0);
-        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, GuildBucket bucket, ulong guildId)
-            => SendInternal(method, endpoint, multipartArgs, BucketGroup.Guild, (int)bucket, guildId);
+        private Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, GlobalBucket bucket)
+            => SendInternal(method, endpoint, payload, headerOnly, BucketGroup.Global, (int)bucket, 0);
+        private Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, payload, headerOnly, BucketGroup.Guild, (int)bucket, guildId);
+        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, GlobalBucket bucket)
+            => SendInternal(method, endpoint, multipartArgs, headerOnly, BucketGroup.Global, (int)bucket, 0);
+        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, multipartArgs, headerOnly, BucketGroup.Guild, (int)bucket, guildId);
 
-        private async Task<Stream> SendInternal(string method, string endpoint, object payload, BucketGroup group, int bucketId, ulong guildId)
+        private async Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
             var stopwatch = Stopwatch.StartNew();
             string json = null;
             if (payload != null)
                 json = Serialize(payload);
-            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, json), group, bucketId, guildId).ConfigureAwait(false);
-            int bytes = (int)responseStream.Length;
+            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, json, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
@@ -118,11 +121,11 @@ namespace Discord.API
 
             return responseStream;
         }
-        private async Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, BucketGroup group, int bucketId, ulong guildId)
+        private async Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
             var stopwatch = Stopwatch.StartNew();
-            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, multipartArgs), group, bucketId, guildId).ConfigureAwait(false);
-            int bytes = (int)responseStream.Length;
+            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, multipartArgs, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
@@ -448,11 +451,11 @@ namespace Discord.API
             if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
             if (args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
 
-            int limit = args.Limit ?? int.MaxValue;
+            int limit = args.Limit.IsSpecified ? args.Limit.Value : int.MaxValue;
             int offset = args.Offset;
 
             List<GuildMember[]> result;
-            if (args.Limit != null)
+            if (args.Limit.IsSpecified)
                 result = new List<GuildMember[]>((limit + DiscordConfig.MaxUsersPerBatch - 1) / DiscordConfig.MaxUsersPerBatch);
             else
                 result = new List<GuildMember[]>();
@@ -488,13 +491,13 @@ namespace Discord.API
 
             await Send("DELETE", $"guilds/{guildId}/members/{userId}").ConfigureAwait(false);
         }
-        public async Task<GuildMember> ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams args)
+        public async Task ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
             
-            return await Send<GuildMember>("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
+            await Send("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
         }
 
         //Guild Roles

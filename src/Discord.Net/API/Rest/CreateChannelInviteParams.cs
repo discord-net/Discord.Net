@@ -5,12 +5,12 @@ namespace Discord.API.Rest
     public class CreateChannelInviteParams
     {
         [JsonProperty("max_age")]
-        public int MaxAge { get; set; } = 86400; //24 Hours
+        public Optional<int> MaxAge { get; set; }
         [JsonProperty("max_uses")]
-        public int MaxUses { get; set; } = 0;
+        public Optional<int> MaxUses { get; set; }
         [JsonProperty("temporary")]
-        public bool Temporary { get; set; } = false;
+        public Optional<bool> Temporary { get; set; }
         [JsonProperty("xkcdpass")]
-        public bool XkcdPass { get; set; } = false;
+        public Optional<bool> XkcdPass { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Discord.Net.Rest
     {
         void SetHeader(string key, string value);
 
-        Task<Stream> Send(string method, string endpoint, string json = null);
-        Task<Stream> Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams);
+        Task<Stream> Send(string method, string endpoint, string json = null, bool headerOnly = false);
+        Task<Stream> Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false);
     }
 }

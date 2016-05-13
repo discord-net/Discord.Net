@@ -4,21 +4,22 @@ namespace Discord.API.Rest
 {
     public class UploadFileParams
     {
-        public string Content { get; set; } = "";
-        public string Nonce { get; set; } = null;
-        public bool IsTTS { get; set; } = false;
         public string Filename { get; set; } = "unknown.dat";
+
+        public Optional<string> Content { get; set; }
+        public Optional<string> Nonce { get; set; }
+        public Optional<bool> IsTTS { get; set; }
 
         public IReadOnlyDictionary<string, string> ToDictionary()
         {
-            var dic = new Dictionary<string, string>
-            {
-                ["content"] = Content,
-                ["tts"] = IsTTS.ToString()
-            };
-            if (Nonce != null)
-                dic.Add("nonce", Nonce);
-            return dic;
+            var d = new Dictionary<string, string>();
+            if (Content.IsSpecified)
+                d["content"] = Content.Value;
+            if (IsTTS.IsSpecified)
+                d["tts"] = IsTTS.Value.ToString();
+            if (Nonce.IsSpecified)
+                d["nonce"] = Nonce.Value;
+            return d;
         }
     }
 }

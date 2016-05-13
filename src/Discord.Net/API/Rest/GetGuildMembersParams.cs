@@ -2,7 +2,7 @@
 {
     public class GetGuildMembersParams
     {
-        public int? Limit { get; set; } = null;
-        public int Offset { get; set; } = 0;
+        public Optional<int> Limit { get; set; }
+        public Optional<int> Offset { get; set; }
     }
 }

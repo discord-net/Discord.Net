@@ -83,9 +83,9 @@ namespace Discord.Net.Rest
                     {
                         Stream stream;
                         if (request.IsMultipart)
-                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.MultipartParams).ConfigureAwait(false);
+                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.MultipartParams, request.HeaderOnly).ConfigureAwait(false);
                         else
-                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.Json).ConfigureAwait(false);
+                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.Json, request.HeaderOnly).ConfigureAwait(false);
                         request.Promise.SetResult(stream);
                     }
                     catch (HttpRateLimitException ex) //Preemptive check failed, use Discord's time instead of our own

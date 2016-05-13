@@ -5,6 +5,6 @@ namespace Discord.API.Rest
     public class CreateGuildBanParams
     {
         [JsonProperty("delete-message-days")]
-        public int PruneDays { get; set; } = 0;
+        public Optional<int> PruneDays { get; set; }
     }
 }

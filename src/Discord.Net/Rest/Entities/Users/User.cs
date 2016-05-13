@@ -28,6 +28,8 @@ namespace Discord.Rest
         public string Mention => MentionHelper.Mention(this, false);
         /// <inheritdoc />
         public string NicknameMention => MentionHelper.Mention(this, true);
+        /// <inheritdoc />
+        public bool IsCurrentUser => Id == Discord.CurrentUser.Id;
 
         internal User(Model model)
         {

@@ -66,6 +66,8 @@
     <Compile Include="API\Common\UserGuild.cs" />
     <Compile Include="API\Common\VoiceRegion.cs" />
     <Compile Include="API\Common\VoiceState.cs" />
+    <Compile Include="API\IOptional.cs" />
+    <Compile Include="API\Optional.cs" />
     <Compile Include="API\Rest\DeleteMessagesParam.cs" />
     <Compile Include="API\Rest\GetGuildMembersParams.cs" />
     <Compile Include="API\Rest\UploadFileParams.cs" />
@@ -95,6 +97,8 @@
     <Compile Include="API\Rest\ModifyVoiceChannelParams.cs" />
     <Compile Include="DiscordConfig.cs" />
     <Compile Include="API\DiscordRawClient.cs" />
+    <Compile Include="Net\Converters\OptionalContractResolver.cs" />
+    <Compile Include="Net\Converters\OptionalConverter.cs" />
     <Compile Include="Net\RateLimitException.cs" />
     <Compile Include="Net\Rest\RequestQueue\BucketGroup.cs" />
     <Compile Include="Net\Rest\RequestQueue\GlobalBucket.cs" />

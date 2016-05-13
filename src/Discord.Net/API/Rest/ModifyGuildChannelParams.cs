@@ -5,8 +5,8 @@ namespace Discord.API.Rest
     public class ModifyGuildChannelParams
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public Optional<string> Name { get; set; }
         [JsonProperty("position")]
-        public int Position { get; set; }
+        public Optional<int> Position { get; set; }
     }
 }

@@ -8,7 +8,8 @@ namespace Discord.API.Rest
         public string Name { get; set; }
         [JsonProperty("type")]
         public ChannelType Type { get; set; }
+
         [JsonProperty("bitrate")]
-        public int Bitrate { get; set; }
+        public Optional<int> Bitrate { get; set; }
     }
 }

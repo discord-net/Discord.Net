@@ -5,14 +5,14 @@ namespace Discord.API.Rest
     public class ModifyGuildRoleParams
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public Optional<string> Name { get; set; }
         [JsonProperty("permissions")]
-        public uint Permissions { get; set; }
+        public Optional<uint> Permissions { get; set; }
         [JsonProperty("position")]
-        public int Position { get; set; }
+        public Optional<int> Position { get; set; }
         [JsonProperty("color")]
-        public uint Color { get; set; }
+        public Optional<uint> Color { get; set; }
         [JsonProperty("hoist")]
-        public bool Hoist { get; set; }
+        public Optional<bool> Hoist { get; set; }
     }
 }

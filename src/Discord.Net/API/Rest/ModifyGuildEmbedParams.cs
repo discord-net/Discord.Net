@@ -6,8 +6,8 @@ namespace Discord.API.Rest
     public class ModifyGuildEmbedParams
     {        
         [JsonProperty("enabled")]
-        public bool Enabled { get; set; }
-        [JsonProperty("channel"), JsonConverter(typeof(UInt64EntityConverter))]
-        public IVoiceChannel Channel { get; set; }
+        public Optional<bool> Enabled { get; set; }
+        [JsonProperty("channel")]
+        public Optional<IVoiceChannel> Channel { get; set; }
     }
 }
