@@ -87,10 +87,7 @@ namespace Discord.Rest
             bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new ModifyCurrentUserNickParams
-                {
-                    Nickname = args.Nickname.Value
-                };
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
                 await Discord.BaseClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new API.Optional<string>(); //Remove
             }

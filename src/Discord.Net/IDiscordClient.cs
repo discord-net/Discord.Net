@@ -14,7 +14,8 @@ namespace Discord
         IRestClient RestClient { get; }
         IRequestQueue RequestQueue { get; }
 
-        Task Login(TokenType tokenType, string token);
+        Task Login(string email, string password);
+        Task Login(TokenType tokenType, string token, bool validateToken = true);
         Task Logout();
 
         Task<IChannel> GetChannel(ulong id);

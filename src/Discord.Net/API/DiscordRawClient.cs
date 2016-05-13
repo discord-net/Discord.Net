@@ -29,29 +29,13 @@ namespace Discord.API
         public TokenType AuthTokenType { get; private set; }
         public IRestClient RestClient { get; private set; }
         public IRequestQueue RequestQueue { get; private set; }
-
-        internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken, TokenType authTokenType, string authToken)
+        
+        internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken)
         {
             _cancelToken = cancelToken;
-            AuthTokenType = authTokenType;
-
-            switch (authTokenType)
-            {
-                case TokenType.Bot:
-                    authToken = $"Bot {authToken}";
-                    break;
-                case TokenType.Bearer:
-                    authToken = $"Bearer {authToken}";
-                    break;
-                case TokenType.User:
-                    break;
-                default:
-                    throw new ArgumentException("Unknown oauth token type", nameof(authTokenType));
-            }
 
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl, cancelToken);
             _restClient.SetHeader("accept", "*/*");
-            _restClient.SetHeader("authorization", authToken);
             _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
             _requestQueue = new RequestQueue(_restClient);
 
@@ -67,6 +51,27 @@ namespace Discord.API
             _serializer.Converters.Add(new UInt64EntityConverter());
             _serializer.Converters.Add(new UserStatusConverter());
             _serializer.ContractResolver = new OptionalContractResolver();
+        }
+
+        public void SetToken(TokenType tokenType, string token)
+        {
+            AuthTokenType = tokenType;
+
+            switch (tokenType)
+            {
+                case TokenType.Bot:
+                    token = $"Bot {token}";
+                    break;
+                case TokenType.Bearer:
+                    token = $"Bearer {token}";
+                    break;
+                case TokenType.User:
+                    break;
+                default:
+                    throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+            }
+
+            _restClient.SetHeader("authorization", token);
         }
 
         //Core
@@ -122,7 +127,7 @@ namespace Discord.API
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
+            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
 
             return responseStream;
         }
@@ -134,9 +139,21 @@ namespace Discord.API
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
+            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
 
             return responseStream;
+        }
+
+
+        //Auth
+        public async Task Login(LoginParams args)
+        {
+            var response = await Send<LoginResponse>("POST", "auth/login", args).ConfigureAwait(false);
+            SetToken(TokenType.User, response.Token);
+        }
+        public async Task ValidateToken()
+        {
+            await Send("GET", "auth/login").ConfigureAwait(false);
         }
 
         //Gateway

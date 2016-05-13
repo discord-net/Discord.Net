@@ -47,42 +47,63 @@ namespace Discord.Rest
             _log.Message += (s,e) => Log.Raise(this, e);
         }
 
-        public async Task Login(TokenType tokenType, string token)
+        public async Task Login(string email, string password)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternal(tokenType, token).ConfigureAwait(false);
+                await LoginInternal(email, password).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task LoginInternal(TokenType tokenType, string token)
+        public async Task Login(TokenType tokenType, string token, bool validateToken = true)
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await LoginInternal(tokenType, token, validateToken).ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task LoginInternal(string email, string password)
         {
             if (IsLoggedIn)
                 LogoutInternal();
-
             try
             {
                 var cancelTokenSource = new CancellationTokenSource();
-                
-                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token, tokenType, token);
-                BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token);
 
-                //MessageQueue = new MessageQueue(RestClient, _restLogger);
-                //await MessageQueue.Start(_cancelTokenSource.Token).ConfigureAwait(false);
-
-                try
-                {
-                    var currentUser = await BaseClient.GetCurrentUser().ConfigureAwait(false);
-                    _currentUser = new SelfUser(this, currentUser);
-                }
-                catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized && tokenType == TokenType.Bearer) { } //Ignore 401 if Bearer doesnt have identity
-                
-                _cancelTokenSource = cancelTokenSource;
-                IsLoggedIn = true;
-                LoggedIn.Raise(this);
+                var args = new LoginParams { Email = email, Password = password };
+                await BaseClient.Login(args).ConfigureAwait(false);
+                await CompleteLogin(cancelTokenSource, false).ConfigureAwait(false);
             }
             catch { LogoutInternal(); throw; }
+        }
+        private async Task LoginInternal(TokenType tokenType, string token, bool validateToken)
+        {
+            if (IsLoggedIn)
+                LogoutInternal();
+            try
+            {
+                var cancelTokenSource = new CancellationTokenSource();                
+                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token);
+
+                BaseClient.SetToken(tokenType, token);
+                await CompleteLogin(cancelTokenSource, validateToken).ConfigureAwait(false);
+            }
+            catch { LogoutInternal(); throw; }
+        }
+        private async Task CompleteLogin(CancellationTokenSource cancelTokenSource, bool validateToken)
+        {
+            BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+
+            if (validateToken)
+                await BaseClient.ValidateToken().ConfigureAwait(false);
+
+            _cancelTokenSource = cancelTokenSource;
+            IsLoggedIn = true;
+            LoggedIn.Raise(this);
         }
 
         public async Task Logout()
@@ -99,9 +120,14 @@ namespace Discord.Rest
         {
             bool wasLoggedIn = IsLoggedIn;
 
-            try { _cancelTokenSource.Cancel(false); } catch { }
+            if (_cancelTokenSource != null)
+            {
+                try { _cancelTokenSource.Cancel(false); }
+                catch { }
+            }
 
             BaseClient = null;
+            _currentUser = null;
 
             if (wasLoggedIn)
             {
