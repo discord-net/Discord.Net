@@ -738,6 +738,13 @@ namespace Discord.API
 
             return await Send<User>("PATCH", "users/@me", args).ConfigureAwait(false);
         }
+        public async Task ModifyCurrentUserNick(ulong guildId, ModifyCurrentUserNickParams args)
+        {
+            if (args == null) throw new ArgumentNullException(nameof(args));
+            if (args.Nickname == "") throw new ArgumentOutOfRangeException(nameof(args.Nickname));
+
+            await Send("PATCH", $"guilds/{guildId}/members/@me/nick", args).ConfigureAwait(false);
+        }
         public async Task<Channel> CreateDMChannel(CreateDMChannelParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));

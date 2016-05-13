@@ -83,15 +83,29 @@ namespace Discord.Rest
 
             var args = new ModifyGuildMemberParams();
             func(args);
-            await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
-            if (args.Deaf.IsSpecified)
-                IsDeaf = args.Deaf;
-            if (args.Mute.IsSpecified)
-                IsMute = args.Mute;
-            if (args.Nickname.IsSpecified)
-                Nickname = args.Nickname;
-            if (args.Roles.IsSpecified)
-                _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+
+            bool isCurrentUser = IsCurrentUser;
+            if (isCurrentUser && args.Nickname.IsSpecified)
+            {
+                var nickArgs = new ModifyCurrentUserNickParams
+                {
+                    Nickname = args.Nickname.Value
+                };
+                await Discord.BaseClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+            }
+
+            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
+            {
+                await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                if (args.Deaf.IsSpecified)
+                    IsDeaf = args.Deaf;
+                if (args.Mute.IsSpecified)
+                    IsMute = args.Mute;
+                if (args.Nickname.IsSpecified)
+                    Nickname = args.Nickname;
+                if (args.Roles.IsSpecified)
+                    _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+            }
         }
 
 
