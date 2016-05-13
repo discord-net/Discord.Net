@@ -337,6 +337,9 @@
     <Compile Include="..\Discord.Net\API\Client\Rest\UpdateMessage.cs">
       <Link>API\Client\Rest\UpdateMessage.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Rest\UpdateOwnNick.cs">
+      <Link>API\Client\Rest\UpdateOwnNick.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\UpdateProfile.cs">
       <Link>API\Client\Rest\UpdateProfile.cs</Link>
     </Compile>
@@ -601,7 +604,6 @@
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>
     </Compile>
-    <Compile Include="API\Client\Rest\UpdateOwnNick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

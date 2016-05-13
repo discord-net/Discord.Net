@@ -247,7 +247,7 @@ namespace Discord
 				LastActivityAt = activity ?? DateTime.UtcNow;
 		}
 
-        public Task Edit(bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null, string nickname = null)
+        public async Task Edit(bool? isMuted = null, bool? isDeafened = null, Channel voiceChannel = null, IEnumerable<Role> roles = null, string nickname = "")
         {
             if (Server == null) throw new InvalidOperationException("Unable to edit users in a private channel");
 
@@ -258,25 +258,25 @@ namespace Discord
                 .Distinct()
                 .ToArray();
 
-            var tasks = new List<Task>();
-            if (nickname != null && this == Server.CurrentUser)
+            bool isCurrentUser = Id == Server.CurrentUser.Id;
+            if (isCurrentUser && nickname != "")
             {
-                var task = Client.ClientAPI.Send(new UpdateOwnNick(Server.Id, nickname));
-                if (isMuted == null && isDeafened == null && voiceChannel == null && roles == null)
-                    return task;
-                tasks.Add(task);
-                nickname = null;
+                var request = new UpdateOwnNick(Server.Id, nickname);
+                await Client.ClientAPI.Send(request).ConfigureAwait(false);
+                nickname = "";
             }
-            var request = new UpdateMemberRequest(Server.Id, Id)
+            if (!isCurrentUser || isMuted != null || isDeafened != null | voiceChannel != null || roles != null)
             {
-                IsMuted = isMuted ?? IsServerMuted,
-                IsDeafened = isDeafened ?? IsServerDeafened,
-                VoiceChannelId = voiceChannel?.Id,
-                RoleIds = roleIds,
-                Nickname = nickname ?? Nickname
-            };
-            tasks.Add(Client.ClientAPI.Send(request));
-            return Task.WhenAll(tasks);
+                var request = new UpdateMemberRequest(Server.Id, Id)
+                {
+                    IsMuted = isMuted ?? IsServerMuted,
+                    IsDeafened = isDeafened ?? IsServerDeafened,
+                    VoiceChannelId = voiceChannel?.Id,
+                    RoleIds = roleIds,
+                    Nickname = nickname ?? Nickname
+                };
+                await Client.ClientAPI.Send(request).ConfigureAwait(false);
+            }
         }
         
         public Task Kick()
