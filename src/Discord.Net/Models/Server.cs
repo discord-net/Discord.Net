@@ -439,7 +439,7 @@ namespace Discord
                     newPermissions |= serverRole.Permissions.RawValue;
             }
 
-            if (newPermissions.HasBit((byte)PermissionBits.ManageRolesOrPermissions))
+            if (newPermissions.HasBit((byte)PermissionBits.Administrator))
                 newPermissions = ServerPermissions.All.RawValue;
 
             if (newPermissions != permissions.RawValue)

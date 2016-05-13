@@ -54,14 +54,14 @@ namespace Discord
         public bool UseVoiceActivation => PermissionsHelper.GetValue(RawValue, PermissionBits.UseVoiceActivation);
 
         /// <summary> If True, a user may change their own nickname. </summary>
-        public bool ChangeNickname => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        public bool ChangeNickname => PermissionsHelper.GetValue(RawValue, PermissionBits.ChangeNickname);
         /// <summary> If True, a user may change the nickname of other users. </summary>
-        public bool ManageNicknames => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
+        public bool ManageNicknames => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageNicknames);
         /// <summary> If True, a user may adjust roles. </summary>
         public bool ManageRoles => PermissionsHelper.GetValue(RawValue, PermissionBits.ManageRolesOrPermissions);
 
         public ServerPermissions(bool? createInstantInvite = null, bool? administrator = null,
-            bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
+            bool? banMembers = null, bool? kickMembers = null, bool? manageChannel = null, bool? manageServer = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
@@ -72,7 +72,7 @@ namespace Discord
         {
         }
         public ServerPermissions(ServerPermissions basePerms, bool? createInstantInvite = null, bool? administrator = null,
-            bool? kickMembers = null, bool? banMembers = null, bool? manageChannel = null, bool? manageServer = null,
+            bool? banMembers = null, bool? kickMembers = null, bool? manageChannel = null, bool? manageServer = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
