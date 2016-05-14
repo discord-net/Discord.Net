@@ -488,7 +488,7 @@ namespace Discord.API
             while (true)
             {
                 int runLimit = (limit >= DiscordConfig.MaxUsersPerBatch) ? DiscordConfig.MaxUsersPerBatch : limit;
-                string endpoint = $"guild/{guildId}/members?limit={runLimit}&offset={offset}";
+                string endpoint = $"guilds/{guildId}/members?limit={runLimit}&offset={offset}";
                 var models = await Send<GuildMember[]>("GET", endpoint).ConfigureAwait(false);
 
                 //Was this an empty batch?
