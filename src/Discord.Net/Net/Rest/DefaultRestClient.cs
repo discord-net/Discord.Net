@@ -52,7 +52,8 @@ namespace Discord.Net.Rest
         public void SetHeader(string key, string value)
         {
             _client.DefaultRequestHeaders.Remove(key);
-            _client.DefaultRequestHeaders.Add(key, value);
+            if (value != null)
+                _client.DefaultRequestHeaders.Add(key, value);
         }
 
         public async Task<Stream> Send(string method, string endpoint, string json = null, bool headerOnly = false)

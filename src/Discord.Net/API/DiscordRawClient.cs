@@ -57,18 +57,21 @@ namespace Discord.API
         {
             AuthTokenType = tokenType;
 
-            switch (tokenType)
+            if (token != null)
             {
-                case TokenType.Bot:
-                    token = $"Bot {token}";
-                    break;
-                case TokenType.Bearer:
-                    token = $"Bearer {token}";
-                    break;
-                case TokenType.User:
-                    break;
-                default:
-                    throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                switch (tokenType)
+                {
+                    case TokenType.Bot:
+                        token = $"Bot {token}";
+                        break;
+                    case TokenType.Bearer:
+                        token = $"Bearer {token}";
+                        break;
+                    case TokenType.User:
+                        break;
+                    default:
+                        throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                }
             }
 
             _restClient.SetHeader("authorization", token);
@@ -485,7 +488,7 @@ namespace Discord.API
             while (true)
             {
                 int runLimit = (limit >= DiscordConfig.MaxUsersPerBatch) ? DiscordConfig.MaxUsersPerBatch : limit;
-                string endpoint = $"guild/{guildId}/members?limit={limit}&offset={offset}";
+                string endpoint = $"guild/{guildId}/members?limit={runLimit}&offset={offset}";
                 var models = await Send<GuildMember[]>("GET", endpoint).ConfigureAwait(false);
 
                 //Was this an empty batch?

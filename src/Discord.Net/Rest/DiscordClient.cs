@@ -43,6 +43,7 @@ namespace Discord.Rest
             _connectionLock = new SemaphoreSlim(1, 1);
             _log = new LogManager(config.LogLevel);
             _userAgent = DiscordConfig.UserAgent;
+            BaseClient = new API.DiscordRawClient(_restClientProvider, _cancelTokenSource.Token);
 
             _log.Message += (s,e) => Log.Raise(this, e);
         }
@@ -72,7 +73,6 @@ namespace Discord.Rest
             try
             {
                 var cancelTokenSource = new CancellationTokenSource();
-                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token);
 
                 var args = new LoginParams { Email = email, Password = password };
                 await BaseClient.Login(args).ConfigureAwait(false);
@@ -87,7 +87,6 @@ namespace Discord.Rest
             try
             {
                 var cancelTokenSource = new CancellationTokenSource();                
-                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token);
 
                 BaseClient.SetToken(tokenType, token);
                 await CompleteLogin(cancelTokenSource, validateToken).ConfigureAwait(false);
@@ -126,7 +125,7 @@ namespace Discord.Rest
                 catch { }
             }
 
-            BaseClient = null;
+            BaseClient.SetToken(TokenType.User, null);
             _currentUser = null;
 
             if (wasLoggedIn)
@@ -186,7 +185,7 @@ namespace Discord.Rest
         {
             var model = await BaseClient.GetGuildEmbed(id).ConfigureAwait(false);
             if (model != null)
-                return new GuildEmbed(this, model);
+                return new GuildEmbed(model);
             return null;
         }
         public async Task<IEnumerable<UserGuild>> GetGuilds()
