@@ -20,6 +20,7 @@ namespace Discord.Tests.Rest
 
             // /users Endpoints
             Handlers.Add("users/@me", Responses.Users.UserHandlers.Me_Handler);
+            Handlers.Add("users/96642168176807936", Responses.Users.UserHandlers.Id_User_Valid);
         }
 
         public string HandleMessage(string method, string endpoint, string json)

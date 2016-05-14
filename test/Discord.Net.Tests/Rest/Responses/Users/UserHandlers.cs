@@ -36,6 +36,12 @@ namespace Discord.Tests.Rest.Responses.Users
             if (TestRestClient.Headers["authorization"] != "Bot UserToken_VoltanaBot") throw new HttpException((HttpStatusCode)401);
             return JsonConvert.SerializeObject(new Mock_Me_User_Valid());
         }
+
+        public static string Id_User_Valid(string method, string json)
+        {
+            Assert.AreEqual("GET", method, "Expected method to '/users/:id' is GET");
+            return JsonConvert.SerializeObject(new Mock_ID_PublicUser());
+        }
     }
 
     public enum TestMode
