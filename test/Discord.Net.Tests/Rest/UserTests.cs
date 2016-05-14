@@ -20,6 +20,7 @@ namespace Discord.Tests.Rest
             Context = context;
             _client = new DiscordClient(new DiscordConfig() { RestClientProvider = (url, ct) => new TestRestClient(url, ct) });
             if (EndpointHandler.Instance == null) EndpointHandler.Instance = new EndpointHandler();
+            if (Json.Serializer == null) new Json();
             Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.User;
             _client.Login(TokenType.User, "UserToken_Voltana").Wait();
         }
@@ -53,6 +54,13 @@ namespace Discord.Tests.Rest
             Assert.AreEqual(false, user.IsBot, "Expected IsBot 'false'");
             Assert.AreEqual("<@!96642168176807936>", user.NicknameMention, "Expected Mention '<@!96642168176807936>'");
             Assert.AreEqual(new DateTime(635787084884180000), user.CreatedAt, "Expected Created At '635787084884180000'");
+        }
+        [TestMethod]
+        [TestCategory("Users")]
+        public async Task Test_Get_Invalid_User()
+        {
+            var user = await _client.GetUser(1);
+            Assert.IsNull(user, "Expected Invalid User to be 'null'");
         }
     }
 }

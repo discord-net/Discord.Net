@@ -27,20 +27,32 @@ namespace Discord.Tests.Rest.Responses.Users
         {
             Assert.AreEqual("GET", method, "Expected method to '/users/@me' is GET.");
             if (TestRestClient.Headers["authorization"] != "UserToken_Voltana") throw new HttpException((HttpStatusCode)401);
-            return JsonConvert.SerializeObject(new Mock_Me_User_Valid());
+            return Json.SerializeObject(User_Mocks.Me_User);
         }
 
         public static string Me_Bot_Valid(string method, string json)
         {
             Assert.AreEqual("GET", method, "Expected method to '/users/@me' is GET.");
             if (TestRestClient.Headers["authorization"] != "Bot UserToken_VoltanaBot") throw new HttpException((HttpStatusCode)401);
-            return JsonConvert.SerializeObject(new Mock_Me_User_Valid());
+            return Json.SerializeObject(User_Mocks.Bot_User);
         }
 
         public static string Id_User_Valid(string method, string json)
         {
             Assert.AreEqual("GET", method, "Expected method to '/users/:id' is GET");
-            return JsonConvert.SerializeObject(new Mock_ID_PublicUser());
+            return Json.SerializeObject(User_Mocks.Public_User);
+        }
+
+        public static string Id_User_Invalid(string method, string json)
+        {
+            Assert.AreEqual("GET", method, "Expected method to '/users/:id' is GET");
+            throw new HttpException((HttpStatusCode)404);
+        }
+
+        public static string Me_Guilds(string method, string json)
+        {
+            Assert.AreEqual("GET", method, "Expected method to '/users/@me/guilds' is GET");
+            return Json.SerializeObject(Guilds.Guild_Mocks.UserGuildsList());
         }
     }
 

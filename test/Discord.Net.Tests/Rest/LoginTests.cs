@@ -20,6 +20,7 @@ namespace Discord.Tests.Rest
             Context = context;
             _client = new DiscordClient(new DiscordConfig() { RestClientProvider = (url, ct) => new TestRestClient(url, ct) });
             if (EndpointHandler.Instance == null) EndpointHandler.Instance = new EndpointHandler();
+            if (Json.Serializer == null) new Json();
         }
 
         [TestMethod]

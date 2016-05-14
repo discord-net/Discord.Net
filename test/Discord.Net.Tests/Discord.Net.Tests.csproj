@@ -55,12 +55,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Rest\Framework\Serializer.cs" />
+    <Compile Include="Rest\GuildTests.cs" />
     <Compile Include="Rest\LoginTests.cs" />
     <Compile Include="Rest\Framework\EndpointHandler.cs" />
-    <Compile Include="Rest\Responses\Users\Me_Mocks.cs" />
+    <Compile Include="Rest\Responses\Guilds\GuildHandlers.cs" />
+    <Compile Include="Rest\Responses\Guilds\Guild_Mocks.cs" />
+    <Compile Include="Rest\Responses\Roles\Role_Mocks.cs" />
+    <Compile Include="Rest\Responses\Guilds\Member_Mocks.cs" />
+    <Compile Include="Rest\Responses\Users\User_Mocks.cs" />
     <Compile Include="Rest\Responses\Users\UserHandlers.cs" />
     <Compile Include="Rest\Framework\TestRestClient.cs" />
-    <Compile Include="Rest\Responses\Users\User_Mocks.cs" />
     <Compile Include="Rest\UserTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
