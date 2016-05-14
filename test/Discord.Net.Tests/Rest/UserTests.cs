@@ -36,10 +36,8 @@ namespace Discord.Tests.Rest
             // Cannot Test Avatar URLs, Avatar ID not exposed publicly.
             Assert.AreEqual(true, currentUser.IsVerified, "Expected Verified 'true'");
             Assert.AreEqual("hello-i-am-not-real@foxbot.me", currentUser.Email, "Expected Email 'hello-i-am-not-real@foxbot.me'");
-            Assert.AreEqual(UserStatus.Unknown, currentUser.Status, "UserStatus should not be populated.");
             Assert.AreEqual(false, currentUser.IsBot, "Expected IsBot 'false'");
             Assert.AreEqual("<@66078337084162048>", currentUser.Mention, "Expected Mention '<@66078337084162048>'");
-            Assert.IsNull(currentUser.CurrentGame, "CurrentGame should not be populated.");
             Assert.AreEqual(new DateTime(635714215032370000), currentUser.CreatedAt, "Expected Created At '635714215032370000'");
         }
         [TestMethod]
