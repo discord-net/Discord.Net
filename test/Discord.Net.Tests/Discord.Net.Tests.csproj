@@ -55,6 +55,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Rest.cs" />
+    <Compile Include="Rest\EndpointHandler.cs" />
+    <Compile Include="Rest\Responses\Users\Me_Mocks.cs" />
+    <Compile Include="Rest\Responses\Users\UserHandlers.cs" />
+    <Compile Include="Rest\TestRestClient.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,11 +67,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Discord.Net\Discord.Net.Net45.csproj">
-      <Project>{c6a50d24-cbd3-4e76-852c-4dca60bbd608}</Project>
-      <Name>Discord.Net.Net45</Name>
+    <ProjectReference Include="..\..\src\Discord.Net\Discord.Net.csproj">
+      <Project>{18F6FE23-73F6-4CA6-BBD9-F0139DC3EE90}</Project>
+      <Name>Discord.Net</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

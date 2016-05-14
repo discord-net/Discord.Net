@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Discord.Rest;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,11 @@ using System.Threading.Tasks;
 
 namespace Discord.Tests
 {
-    //TODO: Tests are massively incomplete and out of date, needing a full rewrite
+    //  these tests are really bad
+    // we're never going to look at them again
+    // but in case i do decide to look at them again they are still here
 
+    /*
     [TestClass]
     public class Tests
     {
@@ -311,8 +315,9 @@ namespace Discord.Tests
                 async () => await _targetBot.CurrentUser.Modify(TargetPassword, name),
                 x => _obGuildBot.UserUpdated += x,
                 x => _obGuildBot.UserUpdated -= x,
-                (s, e) => e.After.Username == name);*/
-        }
+                (s, e) => e.After.Username == name);
+        }*/
+        /*
         [TestMethod]
         public void TestSetStatus()
         {
@@ -327,8 +332,9 @@ namespace Discord.Tests
         {
             throw new NotImplementedException();
             /*_client.SetStatus(status);
-            await Task.Delay(50);*/
-        }
+            await Task.Delay(50);
+        }*/
+        /*
         [TestMethod]
         public void TestSetGame()
         {
@@ -490,5 +496,5 @@ namespace Discord.Tests
         }
 
         #endregion
-    }
+    }*/
 }
