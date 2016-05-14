@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Model = Discord.API.InviteMetadata;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     public class GuildInvite : Invite, IGuildInvite
     {

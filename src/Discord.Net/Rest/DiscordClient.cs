@@ -1,13 +1,10 @@
 ﻿using Discord.API.Rest;
 using Discord.Logging;
-using Discord.Net;
 using Discord.Net.Rest;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,7 +40,7 @@ namespace Discord.Rest
             _connectionLock = new SemaphoreSlim(1, 1);
             _log = new LogManager(config.LogLevel);
             _userAgent = DiscordConfig.UserAgent;
-            BaseClient = new API.DiscordRawClient(_restClientProvider, _cancelTokenSource.Token);
+            BaseClient = new API.DiscordRawClient(_restClientProvider);
 
             _log.Message += (s,e) => Log.Raise(this, e);
         }
@@ -69,38 +66,43 @@ namespace Discord.Rest
         private async Task LoginInternal(string email, string password)
         {
             if (IsLoggedIn)
-                LogoutInternal();
+                await LogoutInternal().ConfigureAwait(false);
             try
             {
-                var cancelTokenSource = new CancellationTokenSource();
+                _cancelTokenSource = new CancellationTokenSource();
 
                 var args = new LoginParams { Email = email, Password = password };
-                await BaseClient.Login(args).ConfigureAwait(false);
-                await CompleteLogin(cancelTokenSource, false).ConfigureAwait(false);
+                await BaseClient.Login(args, _cancelTokenSource.Token).ConfigureAwait(false);
+                await CompleteLogin(false).ConfigureAwait(false);
             }
-            catch { LogoutInternal(); throw; }
+            catch { await LogoutInternal().ConfigureAwait(false); throw; }
         }
         private async Task LoginInternal(TokenType tokenType, string token, bool validateToken)
         {
             if (IsLoggedIn)
-                LogoutInternal();
+                await LogoutInternal().ConfigureAwait(false);
             try
             {
-                var cancelTokenSource = new CancellationTokenSource();                
+                _cancelTokenSource = new CancellationTokenSource();
 
-                BaseClient.SetToken(tokenType, token);
-                await CompleteLogin(cancelTokenSource, validateToken).ConfigureAwait(false);
+                await BaseClient.Login(tokenType, token, _cancelTokenSource.Token).ConfigureAwait(false);
+                await CompleteLogin(validateToken).ConfigureAwait(false);
             }
-            catch { LogoutInternal(); throw; }
+            catch { await LogoutInternal().ConfigureAwait(false); throw; }
         }
-        private async Task CompleteLogin(CancellationTokenSource cancelTokenSource, bool validateToken)
+        private async Task CompleteLogin(bool validateToken)
         {
             BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
 
             if (validateToken)
-                await BaseClient.ValidateToken().ConfigureAwait(false);
-
-            _cancelTokenSource = cancelTokenSource;
+            {
+                try
+                {
+                    await BaseClient.ValidateToken().ConfigureAwait(false);
+                }
+                catch { await BaseClient.Logout().ConfigureAwait(false); }
+            }
+            
             IsLoggedIn = true;
             LoggedIn.Raise(this);
         }
@@ -111,11 +113,11 @@ namespace Discord.Rest
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                LogoutInternal();
+                await LogoutInternal().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private void LogoutInternal()
+        private async Task LogoutInternal()
         {
             bool wasLoggedIn = IsLoggedIn;
 
@@ -125,7 +127,7 @@ namespace Discord.Rest
                 catch { }
             }
 
-            BaseClient.SetToken(TokenType.User, null);
+            await BaseClient.Logout().ConfigureAwait(false);
             _currentUser = null;
 
             if (wasLoggedIn)

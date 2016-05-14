@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace Discord.Net.Converters
 {
-    internal class UInt64ArrayConverter : JsonConverter
+    public class UInt64ArrayConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType == typeof(IEnumerable<ulong[]>);
         public override bool CanRead => true;

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
 
-namespace Discord.Rest
+namespace Discord
 {
     public class UserGuild : IUserGuild
     {
@@ -10,7 +10,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal DiscordClient Discord { get; }
+        internal IDiscordClient Discord { get; }
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -22,7 +22,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
-        internal UserGuild(DiscordClient discord, Model model)
+        internal UserGuild(IDiscordClient discord, Model model)
         {
             Discord = discord;
             Id = model.Id;
@@ -40,15 +40,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task Leave()
         {
-            if (IsOwner)
-                throw new InvalidOperationException("Unable to leave a guild the current user owns.");
             await Discord.BaseClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
-            if (!IsOwner)
-                throw new InvalidOperationException("Unable to delete a guild the current user does not own.");
             await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 

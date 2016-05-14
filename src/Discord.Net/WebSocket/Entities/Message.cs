@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     public class Message : IMessage
     {

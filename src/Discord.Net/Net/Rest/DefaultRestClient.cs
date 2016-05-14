@@ -17,13 +17,11 @@ namespace Discord.Net.Rest
 
         protected readonly HttpClient _client;
         protected readonly string _baseUrl;
-        protected readonly CancellationToken _cancelToken;
         protected bool _isDisposed;
 
-        public DefaultRestClient(string baseUrl, CancellationToken cancelToken)
+        public DefaultRestClient(string baseUrl)
         {
             _baseUrl = baseUrl;
-            _cancelToken = cancelToken;
 
             _client = new HttpClient(new HttpClientHandler
             {
@@ -56,18 +54,18 @@ namespace Discord.Net.Rest
                 _client.DefaultRequestHeaders.Add(key, value);
         }
 
-        public async Task<Stream> Send(string method, string endpoint, string json = null, bool headerOnly = false)
+        public async Task<Stream> Send(string method, string endpoint, CancellationToken cancelToken, string json = null, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (json != null)
                     restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                return await SendInternal(restRequest, _cancelToken, headerOnly).ConfigureAwait(false);
+                return await SendInternal(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
 
-        public async Task<Stream> Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
+        public async Task<Stream> Send(string method, string endpoint, CancellationToken cancelToken, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -97,7 +95,7 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                return await SendInternal(restRequest, _cancelToken, headerOnly).ConfigureAwait(false);
+                return await SendInternal(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
 

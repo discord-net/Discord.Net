@@ -16,7 +16,7 @@ namespace Discord.Net.Rest
         private readonly ConcurrentQueue<RestRequest> _queue;
         private readonly SemaphoreSlim _lock;
         private Task _resetTask;
-        private bool _waitingToProcess, _destroyed; //TODO: Remove _destroyed
+        private bool _waitingToProcess;
         private int _id;
 
         public int WindowMaxCount { get; }
@@ -49,11 +49,7 @@ namespace Discord.Net.Rest
 
         public void Queue(RestRequest request)
         {
-            if (_destroyed) throw new Exception();
-            //Assume this obj's parent is under lock
-
             _queue.Enqueue(request);
-            Debug($"Request queued ({WindowCount}/{WindowMaxCount} + {_queue.Count})");
         }
         public async Task ProcessQueue(bool acquireLock = false)
         {
@@ -81,12 +77,17 @@ namespace Discord.Net.Rest
 
                     try
                     {
-                        Stream stream;
-                        if (request.IsMultipart)
-                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.MultipartParams, request.HeaderOnly).ConfigureAwait(false);
+                        if (request.CancelToken.IsCancellationRequested)
+                            request.Promise.SetException(new OperationCanceledException(request.CancelToken));
                         else
-                            stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.Json, request.HeaderOnly).ConfigureAwait(false);
-                        request.Promise.SetResult(stream);
+                        {
+                            Stream stream;
+                            if (request.IsMultipart)
+                                stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.CancelToken, request.MultipartParams, request.HeaderOnly).ConfigureAwait(false);
+                            else
+                                stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.CancelToken, request.Json, request.HeaderOnly).ConfigureAwait(false);
+                            request.Promise.SetResult(stream);
+                        }
                     }
                     catch (HttpRateLimitException ex) //Preemptive check failed, use Discord's time instead of our own
                     {
@@ -94,17 +95,13 @@ namespace Discord.Net.Rest
                         var task = _resetTask;
                         if (task != null)
                         {
-                            Debug($"External rate limit: Extended to {ex.RetryAfterMilliseconds} ms");
                             var retryAfter = DateTime.UtcNow.AddMilliseconds(ex.RetryAfterMilliseconds);
                             await task.ConfigureAwait(false);
                             int millis = (int)Math.Ceiling((DateTime.UtcNow - retryAfter).TotalMilliseconds);
                             _resetTask = ResetAfter(millis);
                         }
                         else
-                        {
-                            Debug($"External rate limit: Reset in {ex.RetryAfterMilliseconds} ms");
                             _resetTask = ResetAfter(ex.RetryAfterMilliseconds);
-                        }
                         return;
                     }
                     catch (HttpException ex)
@@ -128,13 +125,11 @@ namespace Discord.Net.Rest
                     _queue.TryDequeue(out request);
                     WindowCount++;
                     nextRetry = 1000;
-                    Debug($"Request succeeded ({WindowCount}/{WindowMaxCount} + {_queue.Count})");
 
                     if (WindowCount == 1 && WindowSeconds > 0)
                     {
                         //First request for this window, schedule a reset
                         _resetTask = ResetAfter(WindowSeconds * 1000);
-                        Debug($"Internal rate limit: Reset in {WindowSeconds * 1000} ms");
                     }
                 }
 
@@ -145,11 +140,7 @@ namespace Discord.Net.Rest
                     {
                         await _parent.Lock().ConfigureAwait(false);
                         if (_queue.IsEmpty) //Double check, in case a request was queued before we got both locks
-                        {
-                            Debug($"Destroy");
                             _parent.DestroyGuildBucket((GuildBucket)_bucketId, _guildId);
-                            _destroyed = true;
-                        }
                     }
                     finally
                     {
@@ -179,8 +170,6 @@ namespace Discord.Net.Rest
             {
                 await Lock().ConfigureAwait(false);
 
-                Debug($"Reset");
-
                 //Reset the current window count and set our state back to normal
                 WindowCount = 0;
                 _resetTask = null;
@@ -188,10 +177,7 @@ namespace Discord.Net.Rest
                 //Wait is over, work through the current queue
                 await ProcessQueue().ConfigureAwait(false);
             }
-            finally
-            {
-                Unlock();
-            }
+            finally { Unlock(); }
         }
 
         public async Task Lock()
@@ -201,25 +187,6 @@ namespace Discord.Net.Rest
         public void Unlock()
         {
             _lock.Release();
-        }
-
-        //TODO: Remove
-        private void Debug(string text)
-        {
-            string name;
-            switch (_bucketGroup)
-            {
-                case BucketGroup.Global:
-                    name = ((GlobalBucket)_bucketId).ToString();
-                    break;
-                case BucketGroup.Guild:
-                    name = ((GuildBucket)_bucketId).ToString();
-                    break;
-                default:
-                    name = "Unknown";
-                    break;
-            }
-            System.Diagnostics.Debug.WriteLine($"[{name} {_id}] {text}");
         }
     }
 }

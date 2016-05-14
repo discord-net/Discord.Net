@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     public class GuildIntegration : IGuildIntegration
     {

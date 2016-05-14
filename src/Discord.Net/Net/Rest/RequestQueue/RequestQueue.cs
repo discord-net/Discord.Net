@@ -8,9 +8,12 @@ namespace Discord.Net.Rest
 {
     public class RequestQueue : IRequestQueue
     {
-        private SemaphoreSlim _lock;
-        private RequestQueueBucket[] _globalBuckets;
-        private Dictionary<ulong, RequestQueueBucket>[] _guildBuckets;
+        private readonly SemaphoreSlim _lock;
+        private readonly RequestQueueBucket[] _globalBuckets;
+        private readonly Dictionary<ulong, RequestQueueBucket>[] _guildBuckets;
+        private CancellationTokenSource _clearToken;
+        private CancellationToken? _parentToken;
+        private CancellationToken _cancelToken;
 
         public IRestClient RestClient { get; }
 
@@ -21,11 +24,25 @@ namespace Discord.Net.Rest
             _lock = new SemaphoreSlim(1, 1);
             _globalBuckets = new RequestQueueBucket[Enum.GetValues(typeof(GlobalBucket)).Length];
             _guildBuckets = new Dictionary<ulong, RequestQueueBucket>[Enum.GetValues(typeof(GuildBucket)).Length];
+            _clearToken = new CancellationTokenSource();
+            _cancelToken = _clearToken.Token;
+        }
+        internal async Task SetCancelToken(CancellationToken cancelToken)
+        {
+            await Lock().ConfigureAwait(false);
+            try
+            {
+                _parentToken = cancelToken;
+                _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token).Token;
+            }
+            finally { Unlock(); }
         }
         
         internal async Task<Stream> Send(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
         {
             RequestQueueBucket bucket;
+
+            request.CancelToken = _cancelToken;
 
             await Lock().ConfigureAwait(false);
             try
@@ -129,6 +146,20 @@ namespace Discord.Net.Rest
             _lock.Release();
         }
 
+        public async Task Clear()
+        {
+            await Lock().ConfigureAwait(false);
+            try
+            {
+                _clearToken?.Cancel();
+                _clearToken = new CancellationTokenSource();
+                if (_parentToken != null)
+                    _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken.Value).Token;
+                else
+                    _cancelToken = _clearToken.Token;
+            }
+            finally { Unlock(); }
+        }
         public async Task Clear(GlobalBucket type)
         {
             var bucket = _globalBuckets[(int)type];
@@ -136,7 +167,7 @@ namespace Discord.Net.Rest
             {
                 try
                 {
-                    await bucket.Lock();
+                    await bucket.Lock().ConfigureAwait(false);
                     bucket.Clear();
                 }
                 finally { bucket.Unlock(); }
@@ -152,7 +183,7 @@ namespace Discord.Net.Rest
                 {
                     try
                     {
-                        await bucket.Lock();
+                        await bucket.Lock().ConfigureAwait(false);
                         bucket.Clear();
                     }
                     finally { bucket.Unlock(); }

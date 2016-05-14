@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     public abstract class User : IUser
     {

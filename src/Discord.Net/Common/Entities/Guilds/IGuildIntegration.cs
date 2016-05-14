@@ -12,10 +12,10 @@ namespace Discord
         ulong ExpireBehavior { get; }
         ulong ExpireGracePeriod { get; }
         DateTime SyncedAt { get; }
+        IntegrationAccount Account { get; }
 
         IGuild Guild { get; }
         IUser User { get; }
         IRole Role { get; }
-        IIntegrationAccount Account { get; }
     }
 }

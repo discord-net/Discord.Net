@@ -18,7 +18,7 @@ namespace Discord
             {
                 case ITextChannel _: return _allText;
                 case IVoiceChannel _: return _allVoice;
-                case IDMChannel _:  return _allDM;
+                case IGuildChannel _:  return _allDM;
                 default:
                     throw new ArgumentException("Unknown channel type", nameof(channel));
             }

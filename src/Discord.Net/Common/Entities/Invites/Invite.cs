@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Model = Discord.API.Invite;
 
-namespace Discord.Rest
+namespace Discord
 {
     public abstract class Invite : IInvite
     {
@@ -17,7 +17,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
 
-        internal abstract DiscordClient Discord { get; }
+        internal abstract IDiscordClient Discord { get; }
 
         internal Invite(Model model)
         {

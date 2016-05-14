@@ -9,6 +9,6 @@ namespace Discord
         string Name { get; }
         bool IsRevoked { get; }
 
-        IEnumerable<ulong> Integrations { get; }
+        IEnumerable<ulong> IntegrationIds { get; }
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace Discord.Rest
+﻿namespace Discord
 {
-    public class IntegrationAccount : IIntegrationAccount
+    public struct IntegrationAccount
     {
         /// <inheritdoc />
         public string Id { get; }

@@ -20,23 +20,22 @@ namespace Discord.API
     public class DiscordRawClient
     {
         internal event EventHandler<SentRequestEventArgs> SentRequest;
-
+        
         private readonly RequestQueue _requestQueue;
-        private readonly IRestClient _restClient;
-        private readonly CancellationToken _cancelToken;
         private readonly JsonSerializer _serializer;
-       
+        private IRestClient _restClient;
+        private CancellationToken _cancelToken;
+
         public TokenType AuthTokenType { get; private set; }
         public IRestClient RestClient { get; private set; }
         public IRequestQueue RequestQueue { get; private set; }
         
-        internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken)
+        internal DiscordRawClient(RestClientProvider restClientProvider)
         {
-            _cancelToken = cancelToken;
-
-            _restClient = restClientProvider(DiscordConfig.ClientAPIUrl, cancelToken);
+            _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
             _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
+
             _requestQueue = new RequestQueue(_restClient);
 
             _serializer = new JsonSerializer();
@@ -53,28 +52,39 @@ namespace Discord.API
             _serializer.ContractResolver = new OptionalContractResolver();
         }
 
-        public void SetToken(TokenType tokenType, string token)
+        public async Task Login(TokenType tokenType, string token, CancellationToken cancelToken)
         {
             AuthTokenType = tokenType;
-
-            if (token != null)
+            _cancelToken = cancelToken;
+            await _requestQueue.SetCancelToken(cancelToken).ConfigureAwait(false);
+            
+            switch (tokenType)
             {
-                switch (tokenType)
-                {
-                    case TokenType.Bot:
-                        token = $"Bot {token}";
-                        break;
-                    case TokenType.Bearer:
-                        token = $"Bearer {token}";
-                        break;
-                    case TokenType.User:
-                        break;
-                    default:
-                        throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
-                }
+                case TokenType.Bot:
+                    token = $"Bot {token}";
+                    break;
+                case TokenType.Bearer:
+                    token = $"Bearer {token}";
+                    break;
+                case TokenType.User:
+                    break;
+                default:
+                    throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
             }
 
             _restClient.SetHeader("authorization", token);
+        }
+        public async Task Login(LoginParams args, CancellationToken cancelToken)
+        {
+            var response = await Send<LoginResponse>("POST", "auth/login", args).ConfigureAwait(false);
+
+            AuthTokenType = TokenType.User;
+            _restClient.SetHeader("authorization", response.Token);
+        }
+        public async Task Logout()
+        {
+            await _requestQueue.Clear().ConfigureAwait(false);
+            _restClient = null;
         }
 
         //Core
@@ -121,6 +131,8 @@ namespace Discord.API
 
         private async Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
+            _cancelToken.ThrowIfCancellationRequested();
+
             var stopwatch = Stopwatch.StartNew();
             string json = null;
             if (payload != null)
@@ -136,6 +148,8 @@ namespace Discord.API
         }
         private async Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
+            _cancelToken.ThrowIfCancellationRequested();
+
             var stopwatch = Stopwatch.StartNew();
             var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, multipartArgs, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
             int bytes = headerOnly ? 0 : (int)responseStream.Length;
@@ -149,11 +163,6 @@ namespace Discord.API
 
 
         //Auth
-        public async Task Login(LoginParams args)
-        {
-            var response = await Send<LoginResponse>("POST", "auth/login", args).ConfigureAwait(false);
-            SetToken(TokenType.User, response.Token);
-        }
         public async Task ValidateToken()
         {
             await Send("GET", "auth/login").ConfigureAwait(false);
