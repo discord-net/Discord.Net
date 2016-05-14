@@ -6,9 +6,10 @@ namespace Discord.API.Rest
     {
         [JsonProperty("content")]
         public string Content { get; set; } = "";
+
         [JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
-        public string Nonce { get; set; } = null;
+        public Optional<string> Nonce { get; set; }
         [JsonProperty("tts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool IsTTS { get; set; } = false;
+        public Optional<bool> IsTTS { get; set; }
     }
 }

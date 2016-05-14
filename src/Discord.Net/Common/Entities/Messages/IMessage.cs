@@ -9,8 +9,6 @@ namespace Discord
     {
         /// <summary> Gets the time of this message's last edit, if any. </summary>
         DateTime? EditedTimestamp { get; }
-        /// <summary> Returns true if this message originated from the logged-in account. </summary>
-        bool IsAuthor { get; }
         /// <summary> Returns true if this message was sent as a text-to-speech message. </summary>
         bool IsTTS { get; }
         /// <summary> Returns the original, unprocessed text for this message. </summary>

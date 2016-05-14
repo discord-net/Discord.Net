@@ -81,11 +81,11 @@ namespace Discord.Rest
             {
                 var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis[i] = new Emoji(model.Emojis[i]);
+                    emojis.Add(new Emoji(model.Emojis[i]));
                 Emojis = emojis.ToArray();
             }
             else
-                Emojis = ImmutableArray<Emoji>.Empty;
+                Emojis = Array.Empty<Emoji>();
 
             var roles = new ConcurrentDictionary<ulong, Role>(1, model.Roles?.Length ?? 0);
             if (model.Roles != null)
@@ -300,7 +300,6 @@ namespace Discord.Rest
             var models = await Discord.BaseClient.GetGuildMembers(Id, args).ConfigureAwait(false);
             return models.Select(x => new GuildUser(this, x));
         }
-
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
         public async Task<GuildUser> GetUser(ulong id)
         {
@@ -309,7 +308,12 @@ namespace Discord.Rest
                 return new GuildUser(this, model);
             return null;
         }
-
+        /// <summary> Gets a the current user. </summary>
+        public async Task<GuildUser> GetCurrentUser()
+        {
+            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            return await GetUser(currentUser.Id).ConfigureAwait(false);
+        }
         public async Task<int> PruneUsers(int days = 30, bool simulate = false)
         {
             var args = new GuildPruneParams() { Days = days };
@@ -332,6 +336,8 @@ namespace Discord.Rest
                     return new VoiceChannel(this, model);
             }
         }
+
+        public override string ToString() => Name ?? Id.ToString();
 
         IEnumerable<Emoji> IGuild.Emojis => Emojis;
         ulong IGuild.EveryoneRoleId => EveryoneRole.Id;
@@ -359,6 +365,8 @@ namespace Discord.Rest
             => Task.FromResult<IEnumerable<IRole>>(Roles);
         async Task<IGuildUser> IGuild.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
+        async Task<IGuildUser> IGuild.GetCurrentUser()
+            => await GetCurrentUser().ConfigureAwait(false);
         async Task<IEnumerable<IGuildUser>> IGuild.GetUsers()
             => await GetUsers().ConfigureAwait(false);
     }

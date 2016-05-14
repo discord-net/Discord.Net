@@ -21,33 +21,26 @@ namespace Discord.API
     {
         internal event EventHandler<SentRequestEventArgs> SentRequest;
 
+        private readonly RequestQueue _requestQueue;
         private readonly IRestClient _restClient;
         private readonly CancellationToken _cancelToken;
         private readonly JsonSerializer _serializer;
-
-        internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken, TokenType authTokenType, string authToken)
+       
+        public TokenType AuthTokenType { get; private set; }
+        public IRestClient RestClient { get; private set; }
+        public IRequestQueue RequestQueue { get; private set; }
+        
+        internal DiscordRawClient(RestClientProvider restClientProvider, CancellationToken cancelToken)
         {
             _cancelToken = cancelToken;
 
-            switch (authTokenType)
-            {
-                case TokenType.Bot:
-                    authToken = $"Bot {authToken}";
-                    break;
-                case TokenType.Bearer:
-                    authToken = $"Bearer {authToken}";
-                    break;
-                case TokenType.User:
-                    break;
-                default:
-                    throw new ArgumentException("Unknown oauth token type", nameof(authTokenType));
-            }
-
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl, cancelToken);
-            _restClient.SetHeader("authorization", authToken);
+            _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
+            _requestQueue = new RequestQueue(_restClient);
 
             _serializer = new JsonSerializer();
+            _serializer.Converters.Add(new OptionalConverter());
             _serializer.Converters.Add(new ChannelTypeConverter());
             _serializer.Converters.Add(new ImageConverter());
             _serializer.Converters.Add(new NullableUInt64Converter());
@@ -57,116 +50,113 @@ namespace Discord.API
             _serializer.Converters.Add(new UInt64Converter());
             _serializer.Converters.Add(new UInt64EntityConverter());
             _serializer.Converters.Add(new UserStatusConverter());
+            _serializer.ContractResolver = new OptionalContractResolver();
+        }
+
+        public void SetToken(TokenType tokenType, string token)
+        {
+            AuthTokenType = tokenType;
+
+            if (token != null)
+            {
+                switch (tokenType)
+                {
+                    case TokenType.Bot:
+                        token = $"Bot {token}";
+                        break;
+                    case TokenType.Bearer:
+                        token = $"Bearer {token}";
+                        break;
+                    case TokenType.User:
+                        break;
+                    default:
+                        throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                }
+            }
+
+            _restClient.SetHeader("authorization", token);
         }
 
         //Core
-        public async Task<TResponse> Send<TResponse>(string method, string endpoint)
+        public Task Send(string method, string endpoint, GlobalBucket bucket = GlobalBucket.General)
+            => SendInternal(method, endpoint, null, true, bucket);
+        public Task Send(string method, string endpoint, object payload, GlobalBucket bucket = GlobalBucket.General)
+            => SendInternal(method, endpoint, payload, true, bucket);
+        public Task Send(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GlobalBucket bucket = GlobalBucket.General)
+            => SendInternal(method, endpoint, multipartArgs, true, bucket);
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
-        {
-            var stopwatch = Stopwatch.StartNew();
-            Stream responseStream;
-            try
-            {
-                responseStream = await _restClient.Send(method, endpoint, (string)null).ConfigureAwait(false);
-            }
-            catch (HttpException ex)
-            {
-                if (!HandleException(ex))
-                    throw;
-                return null;
-            }
-            int bytes = (int)responseStream.Length;
-            stopwatch.Stop();
-            var response = Deserialize<TResponse>(responseStream);
-
-            double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
-
-            return response;
-        }
-        public async Task Send(string method, string endpoint)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            try
-            { 
-                await _restClient.Send(method, endpoint, (string)null).ConfigureAwait(false);
-            }
-            catch (HttpException ex)
-            {
-                if (!HandleException(ex))
-                    throw;
-                return;
-            }
-            stopwatch.Stop();
-
-            double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, 0, milliseconds));
-        }
-        public async Task<TResponse> Send<TResponse>(string method, string endpoint, object payload)
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, false, bucket).ConfigureAwait(false));
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, object payload, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
-        {
-            string requestStream = Serialize(payload);
-            var stopwatch = Stopwatch.StartNew();
-            Stream responseStream;
-            try
-            { 
-                responseStream = await _restClient.Send(method, endpoint, requestStream).ConfigureAwait(false);
-            }
-            catch (HttpException ex)
-            {
-                if (!HandleException(ex))
-                    throw;
-                return null;
-            }
-            int bytes = (int)responseStream.Length;
-            stopwatch.Stop();
-            var response = Deserialize<TResponse>(responseStream);
-
-            double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
-
-            return response;
-        }
-        public async Task Send(string method, string endpoint, object payload)
-        {
-            string requestStream = Serialize(payload);
-            var stopwatch = Stopwatch.StartNew();
-            try
-            { 
-                await _restClient.Send(method, endpoint, requestStream).ConfigureAwait(false);
-            }
-            catch (HttpException ex)
-            {
-                if (!HandleException(ex))
-                    throw;
-                return;
-            }
-            stopwatch.Stop();
-
-            double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, 0, milliseconds));
-        }
-        public async Task<TResponse> Send<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs)
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, false, bucket).ConfigureAwait(false));
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GlobalBucket bucket = GlobalBucket.General)
             where TResponse : class
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, false, bucket).ConfigureAwait(false));
+
+        public Task Send(string method, string endpoint, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, null, true, bucket, guildId);
+        public Task Send(string method, string endpoint, object payload, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, payload, true, bucket, guildId);
+        public Task Send(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, multipartArgs, true, bucket, guildId);
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, GuildBucket bucket, ulong guildId)
+            where TResponse : class
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, null, false, bucket, guildId).ConfigureAwait(false));
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, object payload, GuildBucket bucket, ulong guildId)
+            where TResponse : class
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, payload, false, bucket, guildId).ConfigureAwait(false));
+        public async Task<TResponse> Send<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, GuildBucket bucket, ulong guildId)
+            where TResponse : class
+            => Deserialize<TResponse>(await SendInternal(method, endpoint, multipartArgs, false, bucket, guildId).ConfigureAwait(false));
+
+        private Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, GlobalBucket bucket)
+            => SendInternal(method, endpoint, payload, headerOnly, BucketGroup.Global, (int)bucket, 0);
+        private Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, payload, headerOnly, BucketGroup.Guild, (int)bucket, guildId);
+        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, GlobalBucket bucket)
+            => SendInternal(method, endpoint, multipartArgs, headerOnly, BucketGroup.Global, (int)bucket, 0);
+        private Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, GuildBucket bucket, ulong guildId)
+            => SendInternal(method, endpoint, multipartArgs, headerOnly, BucketGroup.Guild, (int)bucket, guildId);
+
+        private async Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
             var stopwatch = Stopwatch.StartNew();
-            var responseStream = await _restClient.Send(method, endpoint).ConfigureAwait(false);
+            string json = null;
+            if (payload != null)
+                json = Serialize(payload);
+            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, json, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
-            var response = Deserialize<TResponse>(responseStream);
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, (int)responseStream.Length, milliseconds));
+            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
 
-            return response;
+            return responseStream;
         }
-        public async Task Send(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs)
+        private async Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
             var stopwatch = Stopwatch.StartNew();
-            await _restClient.Send(method, endpoint).ConfigureAwait(false);
+            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, multipartArgs, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest(this, new SentRequestEventArgs(method, endpoint, 0, milliseconds));
+            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
+
+            return responseStream;
+        }
+
+
+        //Auth
+        public async Task Login(LoginParams args)
+        {
+            var response = await Send<LoginResponse>("POST", "auth/login", args).ConfigureAwait(false);
+            SetToken(TokenType.User, response.Token);
+        }
+        public async Task ValidateToken()
+        {
+            await Send("GET", "auth/login").ConfigureAwait(false);
         }
 
         //Gateway
@@ -257,7 +247,7 @@ namespace Discord.API
             switch (channels.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args));
+                    return;
                 case 1:
                     await ModifyGuildChannel(channels[0].Id, new ModifyGuildChannelParams { Position = channels[0].Position }).ConfigureAwait(false);
                     break;
@@ -486,11 +476,11 @@ namespace Discord.API
             if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
             if (args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
 
-            int limit = args.Limit ?? int.MaxValue;
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             int offset = args.Offset;
 
             List<GuildMember[]> result;
-            if (args.Limit != null)
+            if (args.Limit.IsSpecified)
                 result = new List<GuildMember[]>((limit + DiscordConfig.MaxUsersPerBatch - 1) / DiscordConfig.MaxUsersPerBatch);
             else
                 result = new List<GuildMember[]>();
@@ -498,7 +488,7 @@ namespace Discord.API
             while (true)
             {
                 int runLimit = (limit >= DiscordConfig.MaxUsersPerBatch) ? DiscordConfig.MaxUsersPerBatch : limit;
-                string endpoint = $"guild/{guildId}/members?limit={limit}&offset={offset}";
+                string endpoint = $"guilds/{guildId}/members?limit={runLimit}&offset={offset}";
                 var models = await Send<GuildMember[]>("GET", endpoint).ConfigureAwait(false);
 
                 //Was this an empty batch?
@@ -514,8 +504,10 @@ namespace Discord.API
 
             if (result.Count > 1)
                 return result.SelectMany(x => x);
-            else
+            else if (result.Count == 1)
                 return result[0];
+            else
+                return Array.Empty<GuildMember>();
         }
         public async Task RemoveGuildMember(ulong guildId, ulong userId)
         {
@@ -524,13 +516,13 @@ namespace Discord.API
 
             await Send("DELETE", $"guilds/{guildId}/members/{userId}").ConfigureAwait(false);
         }
-        public async Task<GuildMember> ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams args)
+        public async Task ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
             
-            return await Send<GuildMember>("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
+            await Send("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
         }
 
         //Guild Roles
@@ -573,7 +565,7 @@ namespace Discord.API
             switch (roles.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args));
+                    return Array.Empty<Role>();
                 case 1:
                     return ImmutableArray.Create(await ModifyGuildRole(guildId, roles[0].Id, roles[0]).ConfigureAwait(false));
                 default:
@@ -618,34 +610,57 @@ namespace Discord.API
                 if (models.Length != DiscordConfig.MaxMessagesPerBatch) { i++; break; }
             }
 
-            if (runs > 1)
-                return result.Take(runs).SelectMany(x => x);
-            else
+            if (i > 1)
+                return result.Take(i).SelectMany(x => x);
+            else if (i == 1)
                 return result[0];
+            else
+                return Array.Empty<Message>();
         }
-        public async Task<Message> CreateMessage(ulong channelId, CreateMessageParams args)
+        public Task<Message> CreateMessage(ulong channelId, CreateMessageParams args)
+            => CreateMessage(0, channelId, args);
+        public async Task<Message> CreateMessage(ulong guildId, ulong channelId, CreateMessageParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
 
-            return await Send<Message>("POST", $"channels/{channelId}/messages", args).ConfigureAwait(false);
+            if (guildId != 0)
+                return await Send<Message>("POST", $"channels/{channelId}/messages", args, GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
+            else
+                return await Send<Message>("POST", $"channels/{channelId}/messages", args, GlobalBucket.DirectMessage).ConfigureAwait(false);
         }
-        public async Task<Message> UploadFile(ulong channelId, Stream file, UploadFileParams args)
+        public Task<Message> UploadFile(ulong channelId, Stream file, UploadFileParams args)
+            => UploadFile(0, channelId, file, args);
+        public async Task<Message> UploadFile(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
+            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
 
-            return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary()).ConfigureAwait(false);
+            if (guildId != 0)
+                return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
+            else
+                return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary()).ConfigureAwait(false);
         }
-        public async Task DeleteMessage(ulong channelId, ulong messageId)
+        public Task DeleteMessage(ulong channelId, ulong messageId)
+            => DeleteMessage(0, channelId, messageId);
+        public async Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId)
         {
+            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
 
-            await Send("DELETE", $"channels/{channelId}/messages/{messageId}").ConfigureAwait(false);
+            if (guildId != 0)
+                await Send("DELETE", $"channels/{channelId}/messages/{messageId}", GuildBucket.DeleteMessage, guildId).ConfigureAwait(false);
+            else
+                await Send("DELETE", $"channels/{channelId}/messages/{messageId}").ConfigureAwait(false);
         }
-        public async Task DeleteMessages(ulong channelId, DeleteMessagesParam args)
+        public Task DeleteMessages(ulong channelId, DeleteMessagesParam args)
+            => DeleteMessages(0, channelId, args);
+        public async Task DeleteMessages(ulong guildId, ulong channelId, DeleteMessagesParam args)
         {
+            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (args.MessageIds == null) throw new ArgumentNullException(nameof(args.MessageIds));
 
@@ -653,22 +668,31 @@ namespace Discord.API
             switch (messageIds.Length)
             {
                 case 0:
-                    throw new ArgumentOutOfRangeException(nameof(args.MessageIds));
+                    return;
                 case 1:
-                    await DeleteMessage(channelId, messageIds[0]).ConfigureAwait(false);
+                    await DeleteMessage(guildId, channelId, messageIds[0]).ConfigureAwait(false);
                     break;
                 default:
-                    await Send("POST", $"channels/{channelId}/messages/bulk_delete", args).ConfigureAwait(false);
+                    if (guildId != 0)
+                        await Send("POST", $"channels/{channelId}/messages/bulk_delete", args, GuildBucket.DeleteMessages, guildId).ConfigureAwait(false);
+                    else
+                        await Send("POST", $"channels/{channelId}/messages/bulk_delete", args).ConfigureAwait(false);
                     break;
             }
         }
-        public async Task<Message> ModifyMessage(ulong channelId, ulong messageId, ModifyMessageParams args)
+        public Task<Message> ModifyMessage(ulong channelId, ulong messageId, ModifyMessageParams args)
+            => ModifyMessage(0, channelId, messageId, args);
+        public async Task<Message> ModifyMessage(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
+            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
 
-            return await Send<Message>("PATCH", $"channels/{channelId}/messages/{messageId}", args).ConfigureAwait(false);
+            if (guildId != 0)
+                return await Send<Message>("PATCH", $"channels/{channelId}/messages/{messageId}", args, GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
+            else
+                return await Send<Message>("PATCH", $"channels/{channelId}/messages/{messageId}", args).ConfigureAwait(false);
         }
         public async Task AckMessage(ulong channelId, ulong messageId)
         {
@@ -739,6 +763,13 @@ namespace Discord.API
 
             return await Send<User>("PATCH", "users/@me", args).ConfigureAwait(false);
         }
+        public async Task ModifyCurrentUserNick(ulong guildId, ModifyCurrentUserNickParams args)
+        {
+            if (args == null) throw new ArgumentNullException(nameof(args));
+            if (args.Nickname == "") throw new ArgumentOutOfRangeException(nameof(args.Nickname));
+
+            await Send("PATCH", $"guilds/{guildId}/members/@me/nick", args).ConfigureAwait(false);
+        }
         public async Task<Channel> CreateDMChannel(CreateDMChannelParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -774,12 +805,6 @@ namespace Discord.API
             using (TextReader text = new StreamReader(jsonStream))
             using (JsonReader reader = new JsonTextReader(text))
                 return _serializer.Deserialize<T>(reader);
-        }
-
-        private bool HandleException(Exception ex)
-        {
-            //TODO: Implement... maybe via SentRequest? Need to bubble this up to DiscordClient or a MessageQueue
-            return false;
         }
     }
 }

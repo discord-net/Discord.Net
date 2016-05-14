@@ -77,6 +77,8 @@ namespace Discord.Rest
             await Discord.BaseClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
 
+        public override string ToString() => $"{Name ?? Id.ToString()} ({(IsEnabled ? "Enabled" : "Disabled")})";
+
         IGuild IGuildIntegration.Guild => Guild;
         IRole IGuildIntegration.Role => Role;
         IUser IGuildIntegration.User => User;

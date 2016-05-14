@@ -20,8 +20,6 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
-        /// <inheritdoc />
-        public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
 
         internal DMChannel(DiscordClient discord, Model model)
         {
@@ -39,20 +37,23 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public IUser GetUser(ulong id)
+        public async Task<IUser> GetUser(ulong id)
         {
+            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
             if (id == Recipient.Id)
                 return Recipient;
-            else if (id == Discord.CurrentUser.Id)
-                return Discord.CurrentUser;
+            else if (id == currentUser.Id)
+                return currentUser;
             else
                 return null;
         }
-        public IEnumerable<IUser> GetUsers()
+        /// <inheritdoc />
+        public async Task<IEnumerable<IUser>> GetUsers()
         {
-            return ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
+            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            return ImmutableArray.Create<IUser>(currentUser, Recipient);
         }
-        
+
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
@@ -124,10 +125,10 @@ namespace Discord.Rest
         
         IDMUser IDMChannel.Recipient => Recipient;
 
-        Task<IEnumerable<IUser>> IChannel.GetUsers()
-            => Task.FromResult(GetUsers());
-        Task<IUser> IChannel.GetUser(ulong id)
-            => Task.FromResult(GetUser(id));
+        async Task<IEnumerable<IUser>> IChannel.GetUsers()
+            => await GetUsers().ConfigureAwait(false);
+        async Task<IUser> IChannel.GetUser(ulong id)
+            => await GetUser(id).ConfigureAwait(false);
         Task<IMessage> IMessageChannel.GetMessage(ulong id)
             => throw new NotSupportedException();
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)

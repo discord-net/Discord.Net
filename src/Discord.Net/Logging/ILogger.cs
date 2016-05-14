@@ -8,6 +8,7 @@ namespace Discord.Logging
 
         void Log(LogSeverity severity, string message, Exception exception = null);
         void Log(LogSeverity severity, FormattableString message, Exception exception = null);
+        void Log(LogSeverity severity, Exception exception);
 
         void Error(string message, Exception exception = null);
         void Error(FormattableString message, Exception exception = null);

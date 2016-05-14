@@ -7,5 +7,7 @@
 
         /// <inheritdoc />
         public string Name { get; private set; }
+
+        public override string ToString() => Name ?? Id.ToString();
     }
 }

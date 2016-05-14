@@ -23,5 +23,7 @@ namespace Discord.Rest
 
             Integrations = model.Integrations;
         }
+
+        public override string ToString() => $"{Name ?? Id.ToString()} ({Type})";
     }
 }

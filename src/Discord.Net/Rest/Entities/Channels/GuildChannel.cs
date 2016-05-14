@@ -153,9 +153,6 @@ namespace Discord.Rest
             Update(model);
         }
 
-        /// <inheritdoc />
-        public override string ToString() => Name ?? Id.ToString();
-
         IGuild IGuildChannel.Guild => Guild;
         async Task<IGuildInvite> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);

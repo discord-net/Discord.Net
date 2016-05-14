@@ -28,5 +28,7 @@ namespace Discord.Rest
             ChannelId = model.ChannelId;
             IsEnabled = model.Enabled;
         }
+
+        public override string ToString() => $"{Id} ({(IsEnabled ? "Enabled" : "Disabled")})";
     }
 }

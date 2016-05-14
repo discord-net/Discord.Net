@@ -26,5 +26,7 @@ namespace Discord.Rest
             SampleHostname = model.SampleHostname;
             SamplePort = model.SamplePort;
         }
+
+        public override string ToString() => $"{Name ?? Id.ToString()}";
     }
 }

@@ -54,6 +54,8 @@ namespace Discord.Rest
             return new DMChannel(Discord, model);
         }
 
+        public override string ToString() => $"{Username ?? Id.ToString()}";
+
         /// <inheritdoc />
         string IUser.CurrentGame => null;
         /// <inheritdoc />

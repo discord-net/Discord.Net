@@ -41,8 +41,6 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
-        /// <inheritdoc />
-        public bool IsAuthor => Discord.CurrentUser.Id == Author.Id;
         internal DiscordClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
 
         internal Message(IMessageChannel channel, Model model)
@@ -68,7 +66,7 @@ namespace Discord.Rest
                 Attachments = ImmutableArray.Create(attachments);
             }
             else
-                Attachments = ImmutableArray<Attachment>.Empty;
+                Attachments = Array.Empty<Attachment>();
 
             if (model.Embeds.Length > 0)
             {
@@ -78,18 +76,18 @@ namespace Discord.Rest
                 Embeds = ImmutableArray.Create(embeds);
             }
             else
-                Embeds = ImmutableArray<Embed>.Empty;
+                Embeds = Array.Empty<Embed>();
 
             if (model.Mentions.Length > 0)
             {
                 var discord = Discord;
                 var builder = ImmutableArray.CreateBuilder<PublicUser>(model.Mentions.Length);
                 for (int i = 0; i < model.Mentions.Length; i++)
-                    builder[i] = new PublicUser(discord, model.Mentions[i]);
+                    builder.Add(new PublicUser(discord, model.Mentions[i]));
                 MentionedUsers = builder.ToArray();
             }
             else
-                MentionedUsers = ImmutableArray<PublicUser>.Empty;
+                MentionedUsers = Array.Empty<PublicUser>();
             MentionedChannelIds = MentionHelper.GetChannelMentions(model.Content);
             MentionedRoleIds = MentionHelper.GetRoleMentions(model.Content);
             if (model.IsMentioningEveryone)
@@ -121,7 +119,13 @@ namespace Discord.Rest
 
             var args = new ModifyMessageParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
+            var guildChannel = Channel as GuildChannel;
+
+            Model model;
+            if (guildChannel != null)
+                model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+            else
+                model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model);
         }
 
@@ -130,6 +134,9 @@ namespace Discord.Rest
         {
             await Discord.BaseClient.DeleteMessage(Channel.Id, Id).ConfigureAwait(false);
         }
+
+
+        public override string ToString() => $"{Author.ToString()}: {Text}";
 
         IUser IMessage.Author => Author;
         IReadOnlyList<Attachment> IMessage.Attachments => Attachments;

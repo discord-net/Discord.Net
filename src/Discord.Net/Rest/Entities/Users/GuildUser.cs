@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 
@@ -39,9 +40,9 @@ namespace Discord.Rest
             Nickname = model.Nick;
 
             var roles = ImmutableArray.CreateBuilder<Role>(model.Roles.Length + 1);
-            roles[0] = Guild.EveryoneRole;
+            roles.Add(Guild.EveryoneRole);
             for (int i = 0; i < model.Roles.Length; i++)
-                roles[i + 1] = Guild.GetRole(model.Roles[i]);
+                roles.Add(Guild.GetRole(model.Roles[i]));
             _roles = roles.ToImmutable();
         }
 
@@ -82,8 +83,27 @@ namespace Discord.Rest
 
             var args = new ModifyGuildMemberParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
-            Update(model);
+
+            bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
+            if (isCurrentUser && args.Nickname.IsSpecified)
+            {
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
+                await Discord.BaseClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                args.Nickname = new API.Optional<string>(); //Remove
+            }
+
+            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
+            {
+                await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                if (args.Deaf.IsSpecified)
+                    IsDeaf = args.Deaf;
+                if (args.Mute.IsSpecified)
+                    IsMute = args.Mute;
+                if (args.Nickname.IsSpecified)
+                    Nickname = args.Nickname;
+                if (args.Roles.IsSpecified)
+                    _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+            }
         }
 
 

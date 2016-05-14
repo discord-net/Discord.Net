@@ -1,11 +1,13 @@
 ﻿using Discord.API.Rest;
 using Discord.Logging;
+using Discord.Net;
 using Discord.Net.Rest;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,10 +24,14 @@ namespace Discord.Rest
         private CancellationTokenSource _cancelTokenSource;
         private bool _isDisposed;
         private string _userAgent;
-        
+        private SelfUser _currentUser;
+
         public bool IsLoggedIn { get; private set; }
-        internal API.DiscordRawClient BaseClient { get; private set; }
-        internal SelfUser CurrentUser { get; private set; }
+        public API.DiscordRawClient BaseClient { get; private set; }
+
+        public TokenType AuthTokenType => BaseClient.AuthTokenType;
+        public IRestClient RestClient => BaseClient.RestClient;
+        public IRequestQueue RequestQueue => BaseClient.RequestQueue;
 
         public DiscordClient(DiscordConfig config = null)
         {
@@ -37,42 +43,66 @@ namespace Discord.Rest
             _connectionLock = new SemaphoreSlim(1, 1);
             _log = new LogManager(config.LogLevel);
             _userAgent = DiscordConfig.UserAgent;
+            BaseClient = new API.DiscordRawClient(_restClientProvider, _cancelTokenSource.Token);
 
             _log.Message += (s,e) => Log.Raise(this, e);
         }
 
-        public async Task Login(TokenType tokenType, string token)
+        public async Task Login(string email, string password)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternal(tokenType, token).ConfigureAwait(false);
+                await LoginInternal(email, password).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task LoginInternal(TokenType tokenType, string token)
+        public async Task Login(TokenType tokenType, string token, bool validateToken = true)
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await LoginInternal(tokenType, token, validateToken).ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task LoginInternal(string email, string password)
         {
             if (IsLoggedIn)
                 LogoutInternal();
-
             try
             {
                 var cancelTokenSource = new CancellationTokenSource();
-                
-                BaseClient = new API.DiscordRawClient(_restClientProvider, cancelTokenSource.Token, tokenType, token);
-                BaseClient.SentRequest += (s, e) => _log.Verbose($"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
 
-                //MessageQueue = new MessageQueue(RestClient, _restLogger);
-                //await MessageQueue.Start(_cancelTokenSource.Token).ConfigureAwait(false);
-                
-                var currentUser = await BaseClient.GetCurrentUser().ConfigureAwait(false);
-                CurrentUser = new SelfUser(this, currentUser);
-                
-                _cancelTokenSource = cancelTokenSource;
-                IsLoggedIn = true;
-                LoggedIn.Raise(this);
+                var args = new LoginParams { Email = email, Password = password };
+                await BaseClient.Login(args).ConfigureAwait(false);
+                await CompleteLogin(cancelTokenSource, false).ConfigureAwait(false);
             }
             catch { LogoutInternal(); throw; }
+        }
+        private async Task LoginInternal(TokenType tokenType, string token, bool validateToken)
+        {
+            if (IsLoggedIn)
+                LogoutInternal();
+            try
+            {
+                var cancelTokenSource = new CancellationTokenSource();                
+
+                BaseClient.SetToken(tokenType, token);
+                await CompleteLogin(cancelTokenSource, validateToken).ConfigureAwait(false);
+            }
+            catch { LogoutInternal(); throw; }
+        }
+        private async Task CompleteLogin(CancellationTokenSource cancelTokenSource, bool validateToken)
+        {
+            BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+
+            if (validateToken)
+                await BaseClient.ValidateToken().ConfigureAwait(false);
+
+            _cancelTokenSource = cancelTokenSource;
+            IsLoggedIn = true;
+            LoggedIn.Raise(this);
         }
 
         public async Task Logout()
@@ -89,9 +119,14 @@ namespace Discord.Rest
         {
             bool wasLoggedIn = IsLoggedIn;
 
-            try { _cancelTokenSource.Cancel(false); } catch { }
+            if (_cancelTokenSource != null)
+            {
+                try { _cancelTokenSource.Cancel(false); }
+                catch { }
+            }
 
-            BaseClient = null;
+            BaseClient.SetToken(TokenType.User, null);
+            _currentUser = null;
 
             if (wasLoggedIn)
             {
@@ -150,7 +185,7 @@ namespace Discord.Rest
         {
             var model = await BaseClient.GetGuildEmbed(id).ConfigureAwait(false);
             if (model != null)
-                return new GuildEmbed(this, model);
+                return new GuildEmbed(model);
             return null;
         }
         public async Task<IEnumerable<UserGuild>> GetGuilds()
@@ -173,25 +208,25 @@ namespace Discord.Rest
                 return new PublicUser(this, model);
             return null;
         }
-        public async Task<IUser> GetUser(string username, ushort discriminator)
+        public async Task<User> GetUser(string username, ushort discriminator)
         {
             var model = await BaseClient.GetUser(username, discriminator).ConfigureAwait(false);
             if (model != null)
                 return new PublicUser(this, model);
             return null;
         }
-        public async Task<ISelfUser> GetCurrentUser()
+        public async Task<SelfUser> GetCurrentUser()
         {
-            var currentUser = CurrentUser;
-            if (currentUser == null)
+            var user = _currentUser;
+            if (user == null)
             {
                 var model = await BaseClient.GetCurrentUser().ConfigureAwait(false);
-                currentUser = new SelfUser(this, model);
-                CurrentUser = currentUser;
+                user = new SelfUser(this, model);
+                _currentUser = user;
             }
-            return currentUser;
+            return user;
         }
-        public async Task<IEnumerable<IUser>> QueryUsers(string query, int limit)
+        public async Task<IEnumerable<User>> QueryUsers(string query, int limit)
         {
             var models = await BaseClient.QueryUsers(query, limit).ConfigureAwait(false);
             return models.Select(x => new PublicUser(this, x));
@@ -225,7 +260,6 @@ namespace Discord.Rest
         public void Dispose() => Dispose(true);
 
         API.DiscordRawClient IDiscordClient.BaseClient => BaseClient;
-        ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
         async Task<IChannel> IDiscordClient.GetChannel(ulong id)
             => await GetChannel(id).ConfigureAwait(false);
@@ -243,6 +277,10 @@ namespace Discord.Rest
             => await CreateGuild(name, region, jpegIcon).ConfigureAwait(false);
         async Task<IUser> IDiscordClient.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
+        async Task<IUser> IDiscordClient.GetUser(string username, ushort discriminator)
+            => await GetUser(username, discriminator).ConfigureAwait(false);
+        async Task<ISelfUser> IDiscordClient.GetCurrentUser()
+            => await GetCurrentUser().ConfigureAwait(false);
         async Task<IEnumerable<IUser>> IDiscordClient.QueryUsers(string query, int limit)
             => await QueryUsers(query, limit).ConfigureAwait(false);
         async Task<IEnumerable<IVoiceRegion>> IDiscordClient.GetVoiceRegions()

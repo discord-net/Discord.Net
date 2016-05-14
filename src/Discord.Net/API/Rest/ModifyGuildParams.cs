@@ -7,20 +7,20 @@ namespace Discord.API.Rest
     public class ModifyGuildParams
     {        
         [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("region"), JsonConverterAttribute(typeof(StringEntityConverter))]
-        public IVoiceRegion Region { get; set; }
+        public Optional<string> Name { get; set; }
+        [JsonProperty("region")]
+        public Optional<IVoiceRegion> Region { get; set; }
         [JsonProperty("verification_level")]
-        public int VerificationLevel { get; set; }
+        public Optional<int> VerificationLevel { get; set; }
         [JsonProperty("afk_channel_id")]
-        public ulong? AFKChannelId { get; set; }
+        public Optional<ulong?> AFKChannelId { get; set; }
         [JsonProperty("afk_timeout")]
-        public int AFKTimeout { get; set; }
+        public Optional<int> AFKTimeout { get; set; }
         [JsonProperty("icon"), JsonConverter(typeof(ImageConverter))]
-        public Stream Icon { get; set; }
+        public Optional<Stream> Icon { get; set; }
         [JsonProperty("owner_id")]
-        public GuildMember Owner { get; set; }
+        public Optional<GuildMember> Owner { get; set; }
         [JsonProperty("splash"), JsonConverter(typeof(ImageConverter))]
-        public Stream Splash { get; set; }
+        public Optional<Stream> Splash { get; set; }
     }
 }

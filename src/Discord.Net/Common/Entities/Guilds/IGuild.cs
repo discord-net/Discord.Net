@@ -88,7 +88,9 @@ namespace Discord
         /// <summary> Gets a collection of all users in this guild. </summary>
         Task<IEnumerable<IGuildUser>> GetUsers();
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildUser> GetUser(ulong id);     
+        Task<IGuildUser> GetUser(ulong id);
+        /// <summary> Gets the current user for this guild. </summary>
+        Task<IGuildUser> GetCurrentUser();
         Task<int> PruneUsers(int days = 30, bool simulate = false);
     }
 }

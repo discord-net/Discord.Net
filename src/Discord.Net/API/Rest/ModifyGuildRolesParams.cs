@@ -5,6 +5,6 @@ namespace Discord.API.Rest
     public class ModifyGuildRolesParams : ModifyGuildRoleParams
     {
         [JsonProperty("id")]
-        public ulong Id { get; set; }
+        public Optional<ulong> Id { get; set; }
     }
 }
