@@ -134,7 +134,6 @@ namespace Discord.Rest
             var args = new ModifyGuildEmbedParams();
             func(args);
             var model = await Discord.BaseClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
-
             Update(model);
         }
         /// <inheritdoc />

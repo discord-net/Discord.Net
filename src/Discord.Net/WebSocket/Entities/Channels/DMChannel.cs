@@ -24,6 +24,7 @@ namespace Discord.WebSocket
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
         /// <inheritdoc />
         public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
+        public IEnumerable<Message> CachedMessages => _messages.Messages;
 
         internal DMChannel(DiscordClient discord, Model model)
         {
@@ -52,15 +53,20 @@ namespace Discord.WebSocket
                 return null;
         }
 
-        /// <inheritdoc />
+        /// <summary> Gets the message from this channel's cache with the given id, or null if none was found. </summary>
+        public Message GetCachedMessage(ulong id)
+        {
+            return _messages.Get(id);
+        }
+        /// <summary> Gets the last N messages from this message channel. </summary>
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            return await _messages.GetMany(null, Direction.Before, limit).ConfigureAwait(false);
+            return await _messages.Download(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        /// <inheritdoc />
+        /// <summary> Gets a collection of messages in this channel. </summary>
         public async Task<IEnumerable<Message>> GetMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            return await _messages.GetMany(fromMessageId, dir, limit).ConfigureAwait(false);
+            return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -111,13 +117,14 @@ namespace Discord.WebSocket
         public override string ToString() => $"@{Recipient} [DM]";
         
         IDMUser IDMChannel.Recipient => Recipient;
+        IEnumerable<IMessage> IMessageChannel.CachedMessages => CachedMessages;
 
         Task<IEnumerable<IUser>> IChannel.GetUsers()
             => Task.FromResult(Users);
         Task<IUser> IChannel.GetUser(ulong id)
             => Task.FromResult(GetUser(id));
-        Task<IMessage> IMessageChannel.GetMessage(ulong id)
-            => throw new NotSupportedException();
+        Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
+            => Task.FromResult<IMessage>(GetCachedMessage(id));
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)
             => await GetMessages(limit).ConfigureAwait(false);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(ulong fromMessageId, Direction dir, int limit)

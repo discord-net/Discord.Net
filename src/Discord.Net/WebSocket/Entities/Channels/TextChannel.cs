@@ -1,6 +1,7 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string Mention => MentionHelper.Mention(this);
+        public override IEnumerable<GuildUser> Users
+            => _permissions.Members.Where(x => x.Permissions.ReadMessages).Select(x => x.User).ToImmutableArray();
+        public IEnumerable<Message> CachedMessages => _messages.Messages;
 
         internal TextChannel(Guild guild, Model model)
             : base(guild, model)
@@ -39,27 +43,28 @@ namespace Discord.WebSocket
             await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
-        protected override async Task<IEnumerable<GuildUser>> GetUsers()
+        /// <summary> Gets the message from this channel's cache with the given id, or null if none was found. </summary>
+        public Message GetCachedMessage(ulong id)
         {
-            var users = await Guild.GetUsers().ConfigureAwait(false);
-            return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.ReadMessages));
+            return _messages.Get(id);
         }
-
-        /// <inheritdoc />
-        public Task<Message> GetMessage(ulong id) { throw new NotSupportedException(); } //Not implemented
-        /// <inheritdoc />
+        /// <summary> Gets the last N messages from this message channel. </summary>
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
-            return models.Select(x => new Message(this, x));
+            return await _messages.Download(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        /// <inheritdoc />
+        /// <summary> Gets a collection of messages in this channel. </summary>
         public async Task<IEnumerable<Message>> GetMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
-            return models.Select(x => new Message(this, x));
+            return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
+        }
+
+        public override GuildUser GetUser(ulong id)
+        {
+            var member = _permissions.Get(id);
+            if (member != null && member.Value.Permissions.ReadMessages)
+                return member.Value.User;
+            return null;
         }
 
         /// <inheritdoc />
@@ -103,8 +108,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string ToString() => $"{base.ToString()} [Text]";
 
-        async Task<IMessage> IMessageChannel.GetMessage(ulong id)
-            => await GetMessage(id).ConfigureAwait(false);
+        IEnumerable<IMessage> IMessageChannel.CachedMessages => CachedMessages;
+
+        Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
+            => Task.FromResult<IMessage>(GetCachedMessage(id));
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)
             => await GetMessages(limit).ConfigureAwait(false);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(ulong fromMessageId, Direction dir, int limit)

@@ -22,6 +22,8 @@ namespace Discord.WebSocket
         public DateTime JoinedAt { get; private set; }
         /// <inheritdoc />
         public string Nickname { get; private set; }
+        /// <inheritdoc />
+        public VoiceChannel VoiceChannel { get; private set; }
 
         /// <inheritdoc />
         public IReadOnlyList<Role> Roles => _roles;
@@ -103,7 +105,7 @@ namespace Discord.WebSocket
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyList<IRole> IGuildUser.Roles => Roles;
-        ulong? IGuildUser.VoiceChannelId => null;
+        IVoiceChannel IGuildUser.VoiceChannel => VoiceChannel;
 
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);

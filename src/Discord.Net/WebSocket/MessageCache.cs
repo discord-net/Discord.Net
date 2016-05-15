@@ -16,6 +16,8 @@ namespace Discord.WebSocket
         private readonly ConcurrentQueue<ulong> _orderedMessages;
         private readonly int _size;
 
+        public IEnumerable<Message> Messages => _messages.Select(x => x.Value);
+
         public MessageCache(DiscordClient discord, IMessageChannel channel)
         {
             _discord = discord;
@@ -51,13 +53,11 @@ namespace Discord.WebSocket
                 return result;
             return null;
         }
-        public async Task<IEnumerable<Message>> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public IImmutableList<Message> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            //TODO: Test heavily
-
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0) return ImmutableArray<Message>.Empty;
-            
+
             IEnumerable<ulong> cachedMessageIds;
             if (fromMessageId == null)
                 cachedMessageIds = _orderedMessages;
@@ -66,7 +66,7 @@ namespace Discord.WebSocket
             else
                 cachedMessageIds = _orderedMessages.Where(x => x > fromMessageId.Value);
 
-            var cachedMessages = cachedMessageIds
+            return cachedMessageIds
                 .Take(limit)
                 .Select(x =>
                 {
@@ -76,19 +76,28 @@ namespace Discord.WebSocket
                     return null;
                 })
                 .Where(x => x != null)
-                .ToArray();
+                .ToImmutableArray();
+        }
 
-            if (cachedMessages.Length == limit)
+        public async Task<IEnumerable<Message>> Download(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        {
+            //TODO: Test heavily
+
+            if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
+            if (limit == 0) return ImmutableArray<Message>.Empty;
+
+            var cachedMessages = GetMany(fromMessageId, dir, limit);
+            if (cachedMessages.Count == limit)
                 return cachedMessages;
-            else if (cachedMessages.Length > limit)
-                return cachedMessages.Skip(cachedMessages.Length - limit);
+            else if (cachedMessages.Count > limit)
+                return cachedMessages.Skip(cachedMessages.Count - limit);
             else
             {
                 var args = new GetChannelMessagesParams
                 {
-                    Limit = limit - cachedMessages.Length,
+                    Limit = limit - cachedMessages.Count,
                     RelativeDirection = dir,
-                    RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Length - 1].Id
+                    RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id
                 };
                 var downloadedMessages = await _discord.BaseClient.GetChannelMessages(_channel.Id, args).ConfigureAwait(false);
                 return cachedMessages.AsEnumerable().Concat(downloadedMessages.Select(x => new Message(_channel, x))).ToImmutableArray();

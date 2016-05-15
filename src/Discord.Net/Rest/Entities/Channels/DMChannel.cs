@@ -124,13 +124,14 @@ namespace Discord.Rest
         public override string ToString() => $"@{Recipient} [DM]";
         
         IDMUser IDMChannel.Recipient => Recipient;
+        IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
 
         async Task<IEnumerable<IUser>> IChannel.GetUsers()
             => await GetUsers().ConfigureAwait(false);
         async Task<IUser> IChannel.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
-        Task<IMessage> IMessageChannel.GetMessage(ulong id)
-            => throw new NotSupportedException();
+        Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
+            => Task.FromResult<IMessage>(null);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)
             => await GetMessages(limit).ConfigureAwait(false);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(ulong fromMessageId, Direction dir, int limit)

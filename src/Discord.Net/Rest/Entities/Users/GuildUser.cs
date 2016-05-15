@@ -109,7 +109,7 @@ namespace Discord.Rest
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyList<IRole> IGuildUser.Roles => Roles;
-        ulong? IGuildUser.VoiceChannelId => null;
+        IVoiceChannel IGuildUser.VoiceChannel => null;
 
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);

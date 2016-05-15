@@ -1,7 +1,6 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
@@ -33,11 +32,8 @@ namespace Discord.Rest
             Update(model);
         }
 
-        protected override async Task<IEnumerable<GuildUser>> GetUsers()
-        {
-            var users = await Guild.GetUsers().ConfigureAwait(false);
-            return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.Connect));
-        }
+        public override Task<GuildUser> GetUser(ulong id) { throw new NotSupportedException(); }
+        public override Task<IEnumerable<GuildUser>> GetUsers() { throw new NotSupportedException(); }
 
         /// <inheritdoc />
         public override string ToString() => $"{base.ToString()} [Voice]";

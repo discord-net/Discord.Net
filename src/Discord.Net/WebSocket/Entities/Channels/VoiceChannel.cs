@@ -12,6 +12,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public int Bitrate { get; private set; }
 
+        public override IEnumerable<GuildUser> Users
+            => Guild.Users.Where(x => x.VoiceChannel == this);
+
         internal VoiceChannel(Guild guild, Model model)
             : base(guild, model)
         {
@@ -32,10 +35,12 @@ namespace Discord.WebSocket
             await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
-        protected override async Task<IEnumerable<GuildUser>> GetUsers()
+        public override GuildUser GetUser(ulong id)
         {
-            var users = await Guild.GetUsers().ConfigureAwait(false);
-            return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.Connect));
+            var member = _permissions.Get(id);
+            if (member != null && member.Value.Permissions.ReadMessages)
+                return member.Value.User;
+            return null;
         }
 
         /// <inheritdoc />

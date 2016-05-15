@@ -56,6 +56,7 @@ namespace Discord.WebSocket
         public Role EveryoneRole => GetRole(Id);
         /// <summary> Gets a collection of all roles in this guild. </summary>
         public IEnumerable<Role> Roles => _roles?.Select(x => x.Value) ?? Enumerable.Empty<Role>();
+        public IEnumerable<GuildUser> Users => Array.Empty<GuildUser>();
 
         internal Guild(DiscordClient discord, Model model)
         {

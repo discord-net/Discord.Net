@@ -6,8 +6,12 @@ namespace Discord
 {
     public interface IMessageChannel : IChannel
     {
-        /// <summary> Gets the message in this message channel with the given id, or null if none was found. </summary>
-        Task<IMessage> GetMessage(ulong id);
+        /// <summary> Gets all messages in this channel's cache. </summary>
+        IEnumerable<IMessage> CachedMessages { get; }
+
+        /// <summary> Gets the message from this channel's cache with the given id, or null if none was found. </summary>
+        Task<IMessage> GetCachedMessage(ulong id);
+
         /// <summary> Gets the last N messages from this message channel. </summary>
         Task<IEnumerable<IMessage>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch);
         /// <summary> Gets a collection of messages in this channel. </summary>

@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     public abstract class GuildChannel : IGuildChannel
     {
         private ConcurrentDictionary<ulong, Overwrite> _overwrites;
-        private ChannelPermissionsCache _permissions;
+        internal ChannelPermissionsCache _permissions;
 
         /// <inheritdoc />
         public ulong Id { get; }
@@ -22,6 +22,7 @@ namespace Discord.WebSocket
         public string Name { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
+        public abstract IEnumerable<GuildUser> Users { get; }
 
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
@@ -56,20 +57,13 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
         /// <summary> Gets a user in this channel with the given id. </summary>
-        public async Task<GuildUser> GetUser(ulong id)
-        {
-            var model = await Discord.BaseClient.GetGuildMember(Guild.Id, id).ConfigureAwait(false);
-            if (model != null)
-                return new GuildUser(Guild, model);
-            return null;
-        }
-        protected abstract Task<IEnumerable<GuildUser>> GetUsers();
+        public abstract GuildUser GetUser(ulong id);
 
-        /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             Overwrite value;
@@ -77,7 +71,7 @@ namespace Discord.WebSocket
                 return value.Permissions;
             return null;
         }
-        /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             Overwrite value;
@@ -92,35 +86,27 @@ namespace Discord.WebSocket
             return models.Select(x => new GuildInvite(Guild, x));
         }
 
-        /// <summary> Adds or updates the permission overwrite for the given user. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IUser user, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
             await Discord.BaseClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
-            _overwrites[user.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User });
         }
-        /// <summary> Adds or updates the permission overwrite for the given role. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IRole role, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
             await Discord.BaseClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
-            _overwrites[role.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role });
         }
-        /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IUser user)
         {
             await Discord.BaseClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
-
-            Overwrite value;
-            _overwrites.TryRemove(user.Id, out value);
         }
-        /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IRole role)
         {
             await Discord.BaseClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
-
-            Overwrite value;
-            _overwrites.TryRemove(role.Id, out value);
         }
 
         /// <summary> Creates a new invite to this channel. </summary>
@@ -152,14 +138,14 @@ namespace Discord.WebSocket
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
         async Task<IEnumerable<IGuildInvite>> IGuildChannel.GetInvites()
             => await GetInvites().ConfigureAwait(false);
-        async Task<IEnumerable<IGuildUser>> IGuildChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
-        async Task<IGuildUser> IGuildChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
-        async Task<IEnumerable<IUser>> IChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
-        async Task<IUser> IChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
+        Task<IEnumerable<IGuildUser>> IGuildChannel.GetUsers()
+            => Task.FromResult<IEnumerable<IGuildUser>>(Users);
+        Task<IGuildUser> IGuildChannel.GetUser(ulong id)
+            => Task.FromResult<IGuildUser>(GetUser(id));
+        Task<IEnumerable<IUser>> IChannel.GetUsers()
+            => Task.FromResult<IEnumerable<IUser>>(Users);
+        Task<IUser> IChannel.GetUser(ulong id)
+            => Task.FromResult<IUser>(GetUser(id));
         Task IUpdateable.Update() 
             => Task.CompletedTask;
     }

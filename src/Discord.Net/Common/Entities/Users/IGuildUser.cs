@@ -21,8 +21,8 @@ namespace Discord
         IGuild Guild { get; }
         /// <summary> Returns a collection of the roles this user is a member of in this guild, including the guild's @everyone role. </summary>
         IReadOnlyList<IRole> Roles { get; }
-        /// <summary> Gets the id of the voice channel this user is  currently in, if any. </summary>
-        ulong? VoiceChannelId { get; }
+        /// <summary> Gets the voice channel this user is currently in, if any. </summary>
+        IVoiceChannel VoiceChannel { get; }
 
         /// <summary> Gets the guild-level permissions granted to this user by their roles. </summary>
         GuildPermissions GetGuildPermissions();

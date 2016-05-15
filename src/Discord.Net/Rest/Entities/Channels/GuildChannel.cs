@@ -60,16 +60,11 @@ namespace Discord.Rest
         }
 
         /// <summary> Gets a user in this channel with the given id. </summary>
-        public async Task<GuildUser> GetUser(ulong id)
-        {
-            var model = await Discord.BaseClient.GetGuildMember(Guild.Id, id).ConfigureAwait(false);
-            if (model != null)
-                return new GuildUser(Guild, model);
-            return null;
-        }
-        protected abstract Task<IEnumerable<GuildUser>> GetUsers();
+        public abstract Task<GuildUser> GetUser(ulong id);
+        /// <summary> Gets all users in this channel. </summary>
+        public abstract Task<IEnumerable<GuildUser>> GetUsers();
 
-        /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             Overwrite value;
@@ -77,7 +72,7 @@ namespace Discord.Rest
                 return value.Permissions;
             return null;
         }
-        /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             Overwrite value;
@@ -92,21 +87,21 @@ namespace Discord.Rest
             return models.Select(x => new GuildInvite(Guild, x));
         }
 
-        /// <summary> Adds or updates the permission overwrite for the given user. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IUser user, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
             await Discord.BaseClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
             _overwrites[user.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User });
         }
-        /// <summary> Adds or updates the permission overwrite for the given role. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IRole role, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
             await Discord.BaseClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
             _overwrites[role.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role });
         }
-        /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IUser user)
         {
             await Discord.BaseClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
@@ -114,7 +109,7 @@ namespace Discord.Rest
             Overwrite value;
             _overwrites.TryRemove(user.Id, out value);
         }
-        /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IRole role)
         {
             await Discord.BaseClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);

@@ -37,14 +37,19 @@ namespace Discord.Rest
             Update(model);
         }
 
-        protected override async Task<IEnumerable<GuildUser>> GetUsers()
+        public override async Task<GuildUser> GetUser(ulong id)
+        {
+            var user = await Guild.GetUser(id).ConfigureAwait(false);
+            if (user != null && PermissionUtilities.GetValue(PermissionHelper.Resolve(user, this), ChannelPermission.ReadMessages))
+                return user;
+            return null;
+        }
+        public override async Task<IEnumerable<GuildUser>> GetUsers()
         {
             var users = await Guild.GetUsers().ConfigureAwait(false);
             return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.ReadMessages));
         }
-
-        /// <inheritdoc />
-        public Task<Message> GetMessage(ulong id) { throw new NotSupportedException(); } //Not implemented
+        
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
@@ -101,8 +106,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override string ToString() => $"{base.ToString()} [Text]";
 
-        async Task<IMessage> IMessageChannel.GetMessage(ulong id)
-            => await GetMessage(id).ConfigureAwait(false);
+        IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
+
+        Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
+            => Task.FromResult<IMessage>(null);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)
             => await GetMessages(limit).ConfigureAwait(false);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(ulong fromMessageId, Direction dir, int limit)
