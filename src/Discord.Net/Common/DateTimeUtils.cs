@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    internal static class DateTimeHelper
+    internal static class DateTimeUtils
     {
         private const ulong EpochTicks = 621355968000000000UL;
 

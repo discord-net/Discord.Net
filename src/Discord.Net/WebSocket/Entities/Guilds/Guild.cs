@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         public IReadOnlyList<string> Features { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
         /// <inheritdoc />

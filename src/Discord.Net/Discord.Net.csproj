@@ -150,7 +150,7 @@
     <Compile Include="Common\Entities\Permissions\GuildPermissions.cs" />
     <Compile Include="Common\Entities\Permissions\Overwrite.cs" />
     <Compile Include="Common\Entities\Permissions\OverwritePermissions.cs" />
-    <Compile Include="Common\Entities\Permissions\PermissionUtilities.cs" />
+    <Compile Include="Common\Entities\Permissions\Permissions.cs" />
     <Compile Include="Common\Entities\Permissions\PermissionTarget.cs" />
     <Compile Include="Common\Entities\Permissions\PermValue.cs" />
     <Compile Include="Common\Entities\Users\UserStatus.cs" />
@@ -166,7 +166,6 @@
     <Compile Include="Rest\Entities\Guilds\GuildIntegration.cs" />
     <Compile Include="Common\Entities\Guilds\IntegrationAccount.cs" />
     <Compile Include="Common\Entities\Users\Connection.cs" />
-    <Compile Include="Common\Helpers\PermissionHelper.cs" />
     <Compile Include="Common\Entities\Invites\Invite.cs" />
     <Compile Include="Rest\Entities\Message.cs" />
     <Compile Include="Rest\Entities\Role.cs" />
@@ -177,9 +176,9 @@
     <Compile Include="Common\Entities\Guilds\VoiceRegion.cs" />
     <Compile Include="Common\Events\LogMessageEventArgs.cs" />
     <Compile Include="Common\Events\SentRequestEventArgs.cs" />
-    <Compile Include="Common\Helpers\DateTimeHelper.cs" />
-    <Compile Include="Common\Helpers\EventExtensions.cs" />
-    <Compile Include="Common\Helpers\MentionHelper.cs" />
+    <Compile Include="Common\DateTimeUtils.cs" />
+    <Compile Include="Common\EventExtensions.cs" />
+    <Compile Include="Common\MentionUtils.cs" />
     <Compile Include="IDiscordClient.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />

@@ -19,7 +19,7 @@ namespace Discord.Rest
         public DMUser Recipient { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
 
         internal DMChannel(DiscordClient discord, Model model)
         {

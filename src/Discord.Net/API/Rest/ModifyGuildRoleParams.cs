@@ -7,7 +7,7 @@ namespace Discord.API.Rest
         [JsonProperty("name")]
         public Optional<string> Name { get; set; }
         [JsonProperty("permissions")]
-        public Optional<uint> Permissions { get; set; }
+        public Optional<ulong> Permissions { get; set; }
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
         [JsonProperty("color")]

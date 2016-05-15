@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         }
         public void Add(GuildUser user)
         {
-            _users[user.Id] = new ChannelMember(user, new ChannelPermissions(PermissionHelper.Resolve(user, _channel)));
+            _users[user.Id] = new ChannelMember(user, new ChannelPermissions(Permissions.ResolveChannel(user, _channel, user.GuildPermissions.RawValue)));
         }
         public void Remove(GuildUser user)
         {
@@ -52,7 +52,7 @@ namespace Discord.WebSocket
             foreach (var pair in _users)
             {
                 var member = pair.Value;
-                var newPerms = PermissionHelper.Resolve(member.User, _channel);
+                var newPerms = Permissions.ResolveChannel(member.User, _channel, member.User.GuildPermissions.RawValue);
                 if (newPerms != member.Permissions.RawValue)
                     _users[pair.Key] = new ChannelMember(member.User, new ChannelPermissions(newPerms));
             }
@@ -62,7 +62,7 @@ namespace Discord.WebSocket
             ChannelMember member;
             if (_users.TryGetValue(user.Id, out member))
             {
-                var newPerms = PermissionHelper.Resolve(user, _channel);
+                var newPerms = Permissions.ResolveChannel(user, _channel, user.GuildPermissions.RawValue);
                 if (newPerms != member.Permissions.RawValue)
                     _users[user.Id] = new ChannelMember(user, new ChannelPermissions(newPerms));
             }

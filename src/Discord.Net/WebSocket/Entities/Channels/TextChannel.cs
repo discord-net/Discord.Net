@@ -17,7 +17,7 @@ namespace Discord.WebSocket
         public string Topic { get; private set; }
 
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this);
+        public string Mention => MentionUtils.Mention(this);
         public override IEnumerable<GuildUser> Users
             => _permissions.Members.Where(x => x.Permissions.ReadMessages).Select(x => x.User).ToImmutableArray();
         public IEnumerable<Message> CachedMessages => _messages.Messages;

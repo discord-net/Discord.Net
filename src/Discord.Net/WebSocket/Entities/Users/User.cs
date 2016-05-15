@@ -23,11 +23,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this, false);
+        public string Mention => MentionUtils.Mention(this, false);
         /// <inheritdoc />
-        public string NicknameMention => MentionHelper.Mention(this, true);
+        public string NicknameMention => MentionUtils.Mention(this, true);
 
         internal User(Model model)
         {

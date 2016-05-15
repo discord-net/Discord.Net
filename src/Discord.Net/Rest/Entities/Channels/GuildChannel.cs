@@ -23,7 +23,7 @@ namespace Discord.Rest
         public int Position { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public IReadOnlyDictionary<ulong, Overwrite> PermissionOverwrites => _overwrites;
         internal DiscordClient Discord => Guild.Discord;

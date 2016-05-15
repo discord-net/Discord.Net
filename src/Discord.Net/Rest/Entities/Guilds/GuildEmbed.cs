@@ -13,7 +13,7 @@ namespace Discord
         public ulong? ChannelId { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
 
         internal GuildEmbed(Model model)
         {

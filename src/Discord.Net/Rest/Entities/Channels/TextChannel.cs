@@ -14,7 +14,7 @@ namespace Discord.Rest
         public string Topic { get; private set; }
 
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this);
+        public string Mention => MentionUtils.Mention(this);
 
         internal TextChannel(Guild guild, Model model)
             : base(guild, model)
@@ -40,14 +40,14 @@ namespace Discord.Rest
         public override async Task<GuildUser> GetUser(ulong id)
         {
             var user = await Guild.GetUser(id).ConfigureAwait(false);
-            if (user != null && PermissionUtilities.GetValue(PermissionHelper.Resolve(user, this), ChannelPermission.ReadMessages))
+            if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
                 return user;
             return null;
         }
         public override async Task<IEnumerable<GuildUser>> GetUsers()
         {
             var users = await Guild.GetUsers().ConfigureAwait(false);
-            return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.ReadMessages));
+            return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages));
         }
         
         /// <inheritdoc />

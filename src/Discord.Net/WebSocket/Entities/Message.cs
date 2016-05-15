@@ -40,7 +40,7 @@ namespace Discord.WebSocket
         public IReadOnlyList<ulong> MentionedRoleIds { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         internal DiscordClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
 
         internal Message(IMessageChannel channel, Model model)
@@ -88,8 +88,8 @@ namespace Discord.WebSocket
             }
             else
                 MentionedUsers = Array.Empty<PublicUser>();
-            MentionedChannelIds = MentionHelper.GetChannelMentions(model.Content);
-            MentionedRoleIds = MentionHelper.GetRoleMentions(model.Content);
+            MentionedChannelIds = MentionUtils.GetChannelMentions(model.Content);
+            MentionedRoleIds = MentionUtils.GetRoleMentions(model.Content);
             if (model.IsMentioningEveryone)
             {
                 ulong? guildId = (Channel as IGuildChannel)?.Guild.Id;
@@ -107,7 +107,7 @@ namespace Discord.WebSocket
                 }
             }
             
-            Text = MentionHelper.CleanUserMentions(model.Content, model.Mentions);
+            Text = MentionUtils.CleanUserMentions(model.Content, model.Mentions);
 
             Author.Update(model.Author);
         }

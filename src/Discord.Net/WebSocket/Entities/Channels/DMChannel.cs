@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         public DMUser Recipient { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
         public IEnumerable<Message> CachedMessages => _messages.Messages;

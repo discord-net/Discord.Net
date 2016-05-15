@@ -24,6 +24,9 @@ namespace Discord.Rest
         public string Nickname { get; private set; }
 
         /// <inheritdoc />
+        public GuildPermissions GuildPermissions { get; private set; }
+
+        /// <inheritdoc />
         public IReadOnlyList<Role> Roles => _roles;
         internal override DiscordClient Discord => Guild.Discord;
 
@@ -44,6 +47,8 @@ namespace Discord.Rest
             for (int i = 0; i < model.Roles.Length; i++)
                 roles.Add(Guild.GetRole(model.Roles[i]));
             _roles = roles.ToImmutable();
+
+            GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
         }
 
         public async Task Update()
@@ -67,14 +72,10 @@ namespace Discord.Rest
             await Discord.BaseClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
         }
 
-        public GuildPermissions GetGuildPermissions()
-        {
-            return new GuildPermissions(PermissionHelper.Resolve(this));
-        }
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
-            return new ChannelPermissions(PermissionHelper.Resolve(this, channel));
+            return new ChannelPermissions(Permissions.ResolveChannel(this, channel, GuildPermissions.RawValue));
         }
 
         public async Task Modify(Action<ModifyGuildMemberParams> func)
@@ -111,6 +112,8 @@ namespace Discord.Rest
         IReadOnlyList<IRole> IGuildUser.Roles => Roles;
         IVoiceChannel IGuildUser.VoiceChannel => null;
 
+        GuildPermissions IGuildUser.GetGuildPermissions()
+            => GuildPermissions;
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);
     }

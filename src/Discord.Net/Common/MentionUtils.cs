@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Discord
 {
-    public static class MentionHelper
+    public static class MentionUtils
     {
         private static readonly Regex _userRegex = new Regex(@"<@!?([0-9]+)>", RegexOptions.Compiled);
         private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);

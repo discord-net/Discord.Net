@@ -28,11 +28,11 @@ namespace Discord.Rest
         public int Position { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this);
+        public string Mention => MentionUtils.Mention(this);
         internal DiscordClient Discord => Guild.Discord;
 
         internal Role(Guild guild, Model model)
