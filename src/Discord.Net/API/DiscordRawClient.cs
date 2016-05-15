@@ -29,7 +29,7 @@ namespace Discord.API
         public TokenType AuthTokenType { get; private set; }
         public IRestClient RestClient { get; private set; }
         public IRequestQueue RequestQueue { get; private set; }
-        
+
         internal DiscordRawClient(RestClientProvider restClientProvider)
         {
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
@@ -38,18 +38,10 @@ namespace Discord.API
 
             _requestQueue = new RequestQueue(_restClient);
 
-            _serializer = new JsonSerializer();
-            _serializer.Converters.Add(new OptionalConverter());
-            _serializer.Converters.Add(new ChannelTypeConverter());
-            _serializer.Converters.Add(new ImageConverter());
-            _serializer.Converters.Add(new NullableUInt64Converter());
-            _serializer.Converters.Add(new PermissionTargetConverter());
-            _serializer.Converters.Add(new StringEntityConverter());
-            _serializer.Converters.Add(new UInt64ArrayConverter());
-            _serializer.Converters.Add(new UInt64Converter());
-            _serializer.Converters.Add(new UInt64EntityConverter());
-            _serializer.Converters.Add(new UserStatusConverter());
-            _serializer.ContractResolver = new OptionalContractResolver();
+            _serializer = new JsonSerializer()
+            {
+                ContractResolver = new DiscordContractResolver()
+            };
         }
 
         public async Task Login(TokenType tokenType, string token, CancellationToken cancelToken)
@@ -202,7 +194,7 @@ namespace Discord.API
         {
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             
-            return await Send<IEnumerable<Channel>>("GET", $"guild/{guildId}/channels").ConfigureAwait(false);
+            return await Send<IEnumerable<Channel>>("GET", $"guilds/{guildId}/channels").ConfigureAwait(false);
         }
         public async Task<Channel> CreateGuildChannel(ulong guildId, CreateGuildChannelParams args)
         {
@@ -539,7 +531,7 @@ namespace Discord.API
         {
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
 
-            return await Send<IEnumerable<Role>>("GET", $"guild/{guildId}/roles").ConfigureAwait(false);
+            return await Send<IEnumerable<Role>>("GET", $"guilds/{guildId}/roles").ConfigureAwait(false);
         }
         public async Task<Role> CreateGuildRole(ulong guildId)
         {

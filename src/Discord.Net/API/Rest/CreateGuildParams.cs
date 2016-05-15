@@ -11,7 +11,7 @@ namespace Discord.API.Rest
         [JsonProperty("region")]
         public string Region { get; set; }
 
-        [JsonProperty("icon"), JsonConverter(typeof(ImageConverter))]
+        [JsonProperty("icon"), Image]
         public Optional<Stream> Icon { get; set; }
     }
 }

@@ -7,7 +7,9 @@ namespace Discord.Net.Converters
 {
     public class ImageConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(Stream) || objectType == typeof(Optional<Stream>);
+        public static readonly ImageConverter Instance = new ImageConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => true;
         public override bool CanWrite => true;
 

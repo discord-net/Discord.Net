@@ -5,7 +5,9 @@ namespace Discord.Net.Converters
 {
     public class ChannelTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(ChannelType);
+        public static readonly ChannelTypeConverter Instance = new ChannelTypeConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => true;
         public override bool CanWrite => true;
 

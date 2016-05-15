@@ -67,6 +67,7 @@
     <Compile Include="API\Common\UserGuild.cs" />
     <Compile Include="API\Common\VoiceRegion.cs" />
     <Compile Include="API\Common\VoiceState.cs" />
+    <Compile Include="API\ImageAttribute.cs" />
     <Compile Include="API\IOptional.cs" />
     <Compile Include="API\IWebSocketMessage.cs" />
     <Compile Include="API\Optional.cs" />
@@ -105,7 +106,8 @@
     <Compile Include="Common\Entities\Users\StreamType.cs" />
     <Compile Include="DiscordConfig.cs" />
     <Compile Include="API\DiscordRawClient.cs" />
-    <Compile Include="Net\Converters\OptionalContractResolver.cs" />
+    <Compile Include="API\Int53Attribute.cs" />
+    <Compile Include="Net\Converters\DiscordContractResolver.cs" />
     <Compile Include="Net\Converters\OptionalConverter.cs" />
     <Compile Include="Net\RateLimitException.cs" />
     <Compile Include="Net\Rest\RequestQueue\BucketGroup.cs" />

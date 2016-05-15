@@ -5,7 +5,9 @@ namespace Discord.Net.Converters
 {
     public class UserStatusConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(UserStatus);
+        public static readonly UserStatusConverter Instance = new UserStatusConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => true;
         public override bool CanWrite => true;
 

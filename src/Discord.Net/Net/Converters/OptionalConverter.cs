@@ -1,12 +1,16 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
 using System;
+using System.Reflection;
 
 namespace Discord.Net.Converters
 {
     public class OptionalConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(Optional<>);
+        public static readonly OptionalConverter Instance = new OptionalConverter();
+        internal static readonly PropertyInfo IsSpecifiedProperty = typeof(IOptional).GetProperty(nameof(IOptional.IsSpecified));
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => false;
         public override bool CanWrite => true;
 

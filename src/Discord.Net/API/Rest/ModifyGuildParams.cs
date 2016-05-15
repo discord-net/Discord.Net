@@ -16,11 +16,11 @@ namespace Discord.API.Rest
         public Optional<ulong?> AFKChannelId { get; set; }
         [JsonProperty("afk_timeout")]
         public Optional<int> AFKTimeout { get; set; }
-        [JsonProperty("icon"), JsonConverter(typeof(ImageConverter))]
+        [JsonProperty("icon"), Image]
         public Optional<Stream> Icon { get; set; }
         [JsonProperty("owner_id")]
         public Optional<GuildMember> Owner { get; set; }
-        [JsonProperty("splash"), JsonConverter(typeof(ImageConverter))]
+        [JsonProperty("splash"), Image]
         public Optional<Stream> Splash { get; set; }
     }
 }

@@ -7,7 +7,9 @@ namespace Discord.Net.Converters
 {
     public class UInt64ArrayConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(IEnumerable<ulong[]>);
+        public static readonly UInt64ArrayConverter Instance = new UInt64ArrayConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => true;
         public override bool CanWrite => true;
 
