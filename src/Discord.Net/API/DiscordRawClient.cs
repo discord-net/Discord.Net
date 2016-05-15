@@ -628,6 +628,9 @@ namespace Discord.API
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            if (string.IsNullOrEmpty(args.Content)) throw new ArgumentNullException(nameof(args.Content));
+            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
 
             if (guildId != 0)
                 return await Send<Message>("POST", $"channels/{channelId}/messages", args, GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
@@ -641,6 +644,12 @@ namespace Discord.API
             if (args == null) throw new ArgumentNullException(nameof(args));
             //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            if (args.Content.IsSpecified)
+            {
+                if (string.IsNullOrEmpty(args.Content.Value)) throw new ArgumentNullException(nameof(args.Content));
+                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            }
 
             if (guildId != 0)
                 return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
