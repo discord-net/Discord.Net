@@ -582,29 +582,28 @@ namespace Discord.API
             if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
 
             int limit = args.Limit;
-            ulong? relativeId = args.RelativeMessageId;
+            ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
             string relativeDir = args.RelativeDirection == Direction.After ? "after" : "before";
             
             int runs = limit / DiscordConfig.MaxMessagesPerBatch;
-            int lastRunCount = limit - runs * DiscordConfig.MaxMessagesPerBatch;
+            int lastRunCount = limit - (runs - 1) * DiscordConfig.MaxMessagesPerBatch;
             var result = new API.Message[runs][];
 
             int i = 0;
             for (; i < runs; i++)
             {
+                int runCount = i == (runs - 1) ? lastRunCount : DiscordConfig.MaxMessagesPerBatch;
                 string endpoint;
                 if (relativeId != null)
-                    endpoint = $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
+                    endpoint = $"channels/{channelId}/messages?limit={runCount}&{relativeDir}={relativeId}";
                 else
-                    endpoint = $"channels/{channelId}/messages?limit={limit}";
+                    endpoint = $"channels/{channelId}/messages?limit={runCount}";
                 var models = await Send<Message[]>("GET", endpoint).ConfigureAwait(false);
 
                 //Was this an empty batch?
                 if (models.Length == 0) break;
 
-                result[i] = models;
-
-                limit = (i == runs - 1) ? lastRunCount : DiscordConfig.MaxMessagesPerBatch;
+                result[i] = models;                
                 relativeId = args.RelativeDirection == Direction.Before ? models[0].Id : models[models.Length - 1].Id;
 
                 //Was this an incomplete (the last) batch?
@@ -612,7 +611,12 @@ namespace Discord.API
             }
 
             if (i > 1)
-                return result.Take(i).SelectMany(x => x);
+            {
+                if (args.RelativeDirection == Direction.Before)
+                    return result.Take(i).SelectMany(x => x);
+                else
+                    return result.Take(i).Reverse().SelectMany(x => x);
+            }
             else if (i == 1)
                 return result[0];
             else
