@@ -10,7 +10,7 @@ namespace Discord.API
         [JsonProperty("is_private")]
         public bool IsPrivate { get; set; }
         [JsonProperty("last_message_id")]
-        public ulong LastMessageId { get; set; }
+        public ulong? LastMessageId { get; set; }
 
         //GuildChannel
         [JsonProperty("guild_id")]

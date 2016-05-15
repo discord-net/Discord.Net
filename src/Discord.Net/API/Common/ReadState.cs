@@ -9,6 +9,6 @@ namespace Discord.API
         [JsonProperty("mention_count")]
         public int MentionCount { get; set; }
         [JsonProperty("last_message_id")]
-        public ulong LastMentionId { get; set; }
+        public ulong? LastMessageId { get; set; }
     }
 }
