@@ -321,11 +321,11 @@ namespace Discord
             CurrentGame = game;
             SendStatus();
         }
-        public void SetGame(string game, string url = null, GameType type = 0)
+        public void SetGame(string game, string url = null, GameType type = GameType.Default)
         {
             CurrentGame = new GameInfo() {
                 Name = game,
-                Url = url ?? CurrentGame.Url,
+                Url = url ?? CurrentGame?.Url,
                 Type = type
             };
             SendStatus();
