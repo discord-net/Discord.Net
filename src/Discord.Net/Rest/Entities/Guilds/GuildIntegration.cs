@@ -1,10 +1,12 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class GuildIntegration : IGuildIntegration
     {
         /// <inheritdoc />
@@ -77,7 +79,8 @@ namespace Discord.Rest
             await Discord.BaseClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
 
-        public override string ToString() => $"{Name ?? Id.ToString()} ({(IsEnabled ? "Enabled" : "Disabled")})";
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}{(IsEnabled ? ", Enabled" : "")})";
 
         IGuild IGuildIntegration.Guild => Guild;
         IRole IGuildIntegration.Role => Role;

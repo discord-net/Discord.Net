@@ -1,12 +1,14 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class VoiceChannel : GuildChannel, IVoiceChannel
     {
         /// <inheritdoc />
@@ -43,7 +45,6 @@ namespace Discord.WebSocket
             return null;
         }
 
-        /// <inheritdoc />
-        public override string ToString() => $"{base.ToString()} [Voice]";
+        private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
     }
 }

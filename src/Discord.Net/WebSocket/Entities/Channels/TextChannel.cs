@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class TextChannel : GuildChannel, ITextChannel
     {
         private readonly MessageCache _messages;
@@ -105,8 +107,7 @@ namespace Discord.WebSocket
             await Discord.BaseClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
-        public override string ToString() => $"{base.ToString()} [Text]";
+        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
         IEnumerable<IMessage> IMessageChannel.CachedMessages => CachedMessages;
 

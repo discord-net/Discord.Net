@@ -1,10 +1,12 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public abstract class User : IUser
     {
         private string _avatarId;
@@ -51,7 +53,8 @@ namespace Discord.Rest
             return new DMChannel(Discord, model);
         }
 
-        public override string ToString() => $"{Username ?? Id.ToString()}";
+        public override string ToString() => $"{Username}#{Discriminator}";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";
 
         /// <inheritdoc />
         Game? IUser.CurrentGame => null;

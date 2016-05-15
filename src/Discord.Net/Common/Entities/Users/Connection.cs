@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Model = Discord.API.Connection;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Connection : IConnection
     {
         public string Id { get; }
@@ -23,6 +25,7 @@ namespace Discord.Rest
             IntegrationIds = model.Integrations;
         }
 
-        public override string ToString() => $"{Name ?? Id.ToString()} ({Type})";
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, Type = {Type}{(IsRevoked ? ", Revoked" : "")})";
     }
 }

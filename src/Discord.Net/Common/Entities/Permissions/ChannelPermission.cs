@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    internal enum ChannelPermission : byte
+    public enum ChannelPermission : byte
     {
         //General
         CreateInstantInvite = 0,

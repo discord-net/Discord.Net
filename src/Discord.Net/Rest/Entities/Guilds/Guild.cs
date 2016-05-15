@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using Model = Discord.API.Guild;
 using EmbedModel = Discord.API.GuildEmbed;
 using RoleModel = Discord.API.Role;
+using System.Diagnostics;
 
 namespace Discord.Rest
 {
     /// <summary> Represents a Discord guild (called a server in the official client). </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Guild : IGuild
     {
         private ConcurrentDictionary<ulong, Role> _roles;
@@ -332,7 +334,8 @@ namespace Discord.Rest
             }
         }
 
-        public override string ToString() => Name ?? Id.ToString();
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
 
         IEnumerable<Emoji> IGuild.Emojis => Emojis;
         ulong IGuild.EveryoneRoleId => EveryoneRole.Id;

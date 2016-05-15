@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Discord.API
 {
     //Based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Nullable.cs
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Optional<T> : IOptional
     {
         private readonly T _value;
@@ -40,7 +42,8 @@ namespace Discord.API
         }
 
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;
-        public override string ToString() => IsSpecified ? _value.ToString() : "";
+        public override string ToString() => IsSpecified ? _value?.ToString() : null;
+        private string DebuggerDisplay => IsSpecified ? _value.ToString() : "<unspecified>";
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
         public static implicit operator T(Optional<T> value) => value.Value;

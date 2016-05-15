@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Model = Discord.API.Invite;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Invite : IInvite
     {
         /// <inheritdoc />
@@ -56,6 +58,7 @@ namespace Discord
 
         /// <inheritdoc />
         public override string ToString() => XkcdUrl ?? Url;
+        private string DebuggerDisplay => $"{XkcdUrl ?? Url} ({GuildName} / {ChannelName})";
 
         string IEntity<string>.Id => Code;
     }

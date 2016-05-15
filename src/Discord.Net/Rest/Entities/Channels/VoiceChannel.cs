@@ -1,11 +1,13 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class VoiceChannel : GuildChannel, IVoiceChannel
     {
         /// <inheritdoc />
@@ -35,7 +37,6 @@ namespace Discord.Rest
         public override Task<GuildUser> GetUser(ulong id) { throw new NotSupportedException(); }
         public override Task<IEnumerable<GuildUser>> GetUsers() { throw new NotSupportedException(); }
 
-        /// <inheritdoc />
-        public override string ToString() => $"{base.ToString()} [Voice]";
+        private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
     }
 }

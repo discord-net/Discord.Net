@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using Model = Discord.API.GuildEmbed;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class GuildEmbed : IGuildEmbed
     {
         /// <inheritdoc />
@@ -26,6 +28,7 @@ namespace Discord
             IsEnabled = model.Enabled;
         }
 
-        public override string ToString() => $"{Id} ({(IsEnabled ? "Enabled" : "Disabled")})";
+        public override string ToString() => Id.ToString();
+        private string DebuggerDisplay => $"{Id}{(IsEnabled ? " (Enabled)" : "")}";
     }
 }

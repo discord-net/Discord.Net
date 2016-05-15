@@ -1,12 +1,14 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Role : IRole, IMentionable
     {
         /// <inheritdoc />
@@ -65,8 +67,9 @@ namespace Discord.WebSocket
             => await Discord.BaseClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
 
         /// <inheritdoc />
-        public override string ToString() => Name ?? Id.ToString();
-        
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
+
         ulong IRole.GuildId => Guild.Id;
                 
         async Task<IEnumerable<IGuildUser>> IRole.GetUsers()

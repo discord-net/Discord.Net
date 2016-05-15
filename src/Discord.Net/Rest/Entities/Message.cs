@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Message : IMessage
     {
         /// <inheritdoc />
@@ -135,7 +137,8 @@ namespace Discord.Rest
             await Discord.BaseClient.DeleteMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
-        public override string ToString() => $"{Author.ToString()}: {Text}";
+        public override string ToString() => Text;
+        private string DebuggerDisplay => $"{Author}: {Text}";
 
         IUser IMessage.Author => Author;
         IReadOnlyList<Attachment> IMessage.Attachments => Attachments;

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class UserGuild : IUserGuild
     {
         private string _iconId;
@@ -48,6 +50,7 @@ namespace Discord
             await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 
-        public override string ToString() => Name ?? Id.ToString();
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}{(IsOwner ? ", Owned" : "")})";
     }
 }

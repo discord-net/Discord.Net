@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class DMChannel : IDMChannel
     {
         private readonly MessageCache _messages;
@@ -114,8 +116,9 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"@{Recipient} [DM]";
-        
+        public override string ToString() => '@' + Recipient.ToString();
+        private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
+
         IDMUser IDMChannel.Recipient => Recipient;
         IEnumerable<IMessage> IMessageChannel.CachedMessages => CachedMessages;
 

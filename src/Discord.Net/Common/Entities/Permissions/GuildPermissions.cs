@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct GuildPermissions
     {
         /// <summary> Gets a blank GuildPermissions that grants no permissions. </summary>
@@ -125,21 +128,20 @@ namespace Discord
             => new GuildPermissions(RawValue, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, readMessages,
                   sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers,
                   moveMembers, useVoiceActivation, changeNickname, manageNicknames, manageRoles);
-
-        /// <inheritdoc />
-        public override string ToString()
+        
+        public List<GuildPermission> ToList()
         {
-            var perms = new List<string>();
+            var perms = new List<GuildPermission>();
             ulong x = 1;
             for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
             {
                 if ((RawValue & x) != 0)
-                {
-                    if (System.Enum.IsDefined(typeof(GuildPermission), i))
-                        perms.Add($"{(GuildPermission)i}");
-                }
+                    perms.Add((GuildPermission)i);
             }
-            return string.Join(", ", perms);
+            return perms;
         }
+        /// <inheritdoc />
+        public override string ToString() => RawValue.ToString();
+        private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
     }
 }

@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.VoiceRegion;
+﻿using System.Diagnostics;
+using Model = Discord.API.VoiceRegion;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class VoiceRegion : IVoiceRegion
     {
         /// <inheritdoc />
@@ -27,6 +29,7 @@ namespace Discord.Rest
             SamplePort = model.SamplePort;
         }
 
-        public override string ToString() => $"{Name ?? Id.ToString()}";
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}{(IsVip ? ", VIP" : "")}{(IsOptimal ? ", Optimal" : "")})";
     }
 }

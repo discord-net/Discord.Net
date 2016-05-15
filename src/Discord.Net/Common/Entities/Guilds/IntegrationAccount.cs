@@ -1,5 +1,8 @@
-﻿namespace Discord
+﻿using System.Diagnostics;
+
+namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct IntegrationAccount
     {
         /// <inheritdoc />
@@ -8,6 +11,7 @@
         /// <inheritdoc />
         public string Name { get; private set; }
 
-        public override string ToString() => Name ?? Id.ToString();
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

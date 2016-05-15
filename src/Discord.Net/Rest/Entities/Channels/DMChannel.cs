@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class DMChannel : IDMChannel
     {
         /// <inheritdoc />
@@ -121,8 +123,9 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"@{Recipient} [DM]";
-        
+        public override string ToString() => '@' + Recipient.ToString();
+        private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
+
         IDMUser IDMChannel.Recipient => Recipient;
         IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
 

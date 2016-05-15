@@ -1,6 +1,7 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class TextChannel : GuildChannel, ITextChannel
     {
         /// <inheritdoc />
@@ -103,8 +105,7 @@ namespace Discord.Rest
             await Discord.BaseClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
-        public override string ToString() => $"{base.ToString()} [Text]";
+        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
         IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct ChannelPermissions
     {
         private static ChannelPermissions _allDM { get; } = new ChannelPermissions(0b000100_000000_0011111111_0000011001);
@@ -117,20 +119,19 @@ namespace Discord
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, managePermissions);
         
-        /// <inheritdoc />
-        public override string ToString()
+        public List<ChannelPermission> ToList()
         {
-            var perms = new List<string>();
+            var perms = new List<ChannelPermission>();
             ulong x = 1;
             for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
             {
                 if ((RawValue & x) != 0)
-                {
-                    if (Enum.IsDefined(typeof(ChannelPermission), i))
-                        perms.Add($"{(ChannelPermission)i}");
-                }
+                    perms.Add((ChannelPermission)i);
             }
-            return string.Join(", ", perms);
+            return perms;
         }
+        /// <inheritdoc />
+        public override string ToString() => RawValue.ToString();
+        private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
     }
 }

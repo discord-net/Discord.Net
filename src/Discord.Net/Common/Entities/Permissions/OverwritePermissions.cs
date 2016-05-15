@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct OverwritePermissions
     {
         /// <summary> Gets a blank OverwritePermissions that inherits all permissions. </summary>
@@ -111,25 +113,32 @@ namespace Discord
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, managePermissions);
 
-        /// <inheritdoc />
-        public override string ToString()
+        public List<ChannelPermission> ToAllowList()
         {
-            var perms = new List<string>();
+            var perms = new List<ChannelPermission>();
             ulong x = 1;
             for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
             {
                 if ((AllowValue & x) != 0)
-                {
-                    if (Enum.IsDefined(typeof(GuildPermission), i))
-                        perms.Add($"+{(GuildPermission)i}");
-                }
-                else if ((DenyValue & x) != 0)
-                {
-                    if (Enum.IsDefined(typeof(GuildPermission), i))
-                        perms.Add($"-{(GuildPermission)i}");
-                }
+                    perms.Add((ChannelPermission)i);
             }
-            return string.Join(", ", perms);
+            return perms;
         }
+        public List<ChannelPermission> ToDenyList()
+        {
+            var perms = new List<ChannelPermission>();
+            ulong x = 1;
+            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            {
+                if ((DenyValue & x) != 0)
+                    perms.Add((ChannelPermission)i);
+            }
+            return perms;
+        }
+        /// <inheritdoc />
+        public override string ToString() => $"Allow {AllowValue}, Deny {DenyValue}";
+        private string DebuggerDisplay => 
+            $"Allow {AllowValue} ({string.Join(", ", ToAllowList())})\n" +
+            $"Deny {DenyValue} ({string.Join(", ", ToDenyList())})";
     }
 }
