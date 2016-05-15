@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public interface IInvite : IEntity<string>
+    public interface IInvite : IEntity<string>, IDeletable
     {
         /// <summary> Gets the unique identifier for this invite. </summary>
         string Code { get; }

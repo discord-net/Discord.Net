@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public interface IInviteMetadata : IDeletable, IInvite
+    public interface IInviteMetadata : IInvite
     {
         /// <summary> Returns true if this invite was revoked. </summary>
         bool IsRevoked { get; }
