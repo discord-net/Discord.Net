@@ -80,10 +80,10 @@ namespace Discord.WebSocket
             return null;
         }
         /// <summary> Downloads a collection of all invites to this channel. </summary>
-        public async Task<IEnumerable<GuildInvite>> GetInvites()
+        public async Task<IEnumerable<InviteMetadata>> GetInvites()
         {
             var models = await Discord.BaseClient.GetChannelInvites(Id).ConfigureAwait(false);
-            return models.Select(x => new GuildInvite(Guild, x));
+            return models.Select(x => new InviteMetadata(Discord, x));
         }
 
         /// <inheritdoc />
@@ -114,7 +114,7 @@ namespace Discord.WebSocket
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        public async Task<GuildInvite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
+        public async Task<InviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
         {
             var args = new CreateChannelInviteParams
             {
@@ -124,7 +124,7 @@ namespace Discord.WebSocket
                 XkcdPass = withXkcd
             };
             var model = await Discord.BaseClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
-            return new GuildInvite(Guild, model);
+            return new InviteMetadata(Discord, model);
         }
 
         /// <inheritdoc />
@@ -134,9 +134,9 @@ namespace Discord.WebSocket
         }
 
         IGuild IGuildChannel.Guild => Guild;
-        async Task<IGuildInvite> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
+        async Task<IInviteMetadata> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
-        async Task<IEnumerable<IGuildInvite>> IGuildChannel.GetInvites()
+        async Task<IEnumerable<IInviteMetadata>> IGuildChannel.GetInvites()
             => await GetInvites().ConfigureAwait(false);
         Task<IEnumerable<IGuildUser>> IGuildChannel.GetUsers()
             => Task.FromResult<IEnumerable<IGuildUser>>(Users);

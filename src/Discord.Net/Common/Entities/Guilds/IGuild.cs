@@ -70,13 +70,13 @@ namespace Discord
         Task<IVoiceChannel> CreateVoiceChannel(string name);
 
         /// <summary> Gets a collection of all invites to this guild. </summary>
-        Task<IEnumerable<IGuildInvite>> GetInvites();
+        Task<IEnumerable<IInviteMetadata>> GetInvites();
         /// <summary> Creates a new invite to this guild. </summary>
         /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        Task<IGuildInvite> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
+        Task<IInviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
 
         /// <summary> Gets a collection of all roles in this guild. </summary>
         Task<IEnumerable<IRole>> GetRoles();

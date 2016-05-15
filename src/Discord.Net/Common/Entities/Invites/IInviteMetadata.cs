@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public interface IGuildInvite : IDeletable, IInvite
+    public interface IInviteMetadata : IDeletable, IInvite
     {
         /// <summary> Returns true if this invite was revoked. </summary>
         bool IsRevoked { get; }
@@ -12,8 +12,5 @@
         int? MaxUses { get; }
         /// <summary> Gets the amount of times this invite has been used. </summary>
         int Uses { get; }
-
-        /// <summary> Gets the guild this invite is linked to. </summary>
-        IGuild Guild { get; }
     }
 }

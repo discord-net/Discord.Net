@@ -86,7 +86,7 @@ namespace Discord.WebSocket
             throw new NotImplementedException();
         }
 
-        public Task<IPublicInvite> GetInvite(string inviteIdOrXkcd)
+        public Task<IInvite> GetInvite(string inviteIdOrXkcd)
         {
             throw new NotImplementedException();
         }

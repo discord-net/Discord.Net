@@ -118,7 +118,6 @@
     <Compile Include="Common\Entities\Guilds\IGuildEmbed.cs" />
     <Compile Include="Common\Entities\Users\IConnection.cs" />
     <Compile Include="Common\Entities\Guilds\IGuildIntegration.cs" />
-    <Compile Include="Common\Entities\Invites\IPublicInvite.cs" />
     <Compile Include="Common\Entities\Messages\Attachment.cs" />
     <Compile Include="Common\Entities\Channels\IChannel.cs" />
     <Compile Include="Common\Entities\Channels\IDMChannel.cs" />
@@ -139,7 +138,7 @@
     <Compile Include="Common\Entities\Guilds\IGuild.cs" />
     <Compile Include="Common\Entities\IMentionable.cs" />
     <Compile Include="Common\Entities\Messages\IMessage.cs" />
-    <Compile Include="Common\Entities\Invites\IGuildInvite.cs" />
+    <Compile Include="Common\Entities\Invites\IInviteMetadata.cs" />
     <Compile Include="Common\Entities\Invites\IInvite.cs" />
     <Compile Include="Common\Entities\Roles\IRole.cs" />
     <Compile Include="Common\Entities\ISnowflakeEntity.cs" />
@@ -168,9 +167,7 @@
     <Compile Include="Common\Entities\Guilds\IntegrationAccount.cs" />
     <Compile Include="Common\Entities\Users\Connection.cs" />
     <Compile Include="Common\Helpers\PermissionHelper.cs" />
-    <Compile Include="Rest\Entities\Invites\GuildInvite.cs" />
     <Compile Include="Common\Entities\Invites\Invite.cs" />
-    <Compile Include="Common\Entities\Invites\PublicInvite.cs" />
     <Compile Include="Rest\Entities\Message.cs" />
     <Compile Include="Rest\Entities\Role.cs" />
     <Compile Include="Rest\Entities\Guilds\UserGuild.cs" />
@@ -217,7 +214,7 @@
     <Compile Include="WebSocket\Entities\Channels\VoiceChannel.cs" />
     <Compile Include="WebSocket\Entities\Guilds\Guild.cs" />
     <Compile Include="WebSocket\Entities\Guilds\GuildIntegration.cs" />
-    <Compile Include="WebSocket\Entities\Invites\GuildInvite.cs" />
+    <Compile Include="Common\Entities\Invites\InviteMetadata.cs" />
     <Compile Include="WebSocket\Entities\Users\DMUser.cs" />
     <Compile Include="WebSocket\Entities\Users\GuildUser.cs" />
     <Compile Include="WebSocket\Entities\Users\PublicUser.cs" />

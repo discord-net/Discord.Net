@@ -27,7 +27,7 @@ namespace Discord
         Task<IEnumerable<IUserGuild>> GetGuilds();
         Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null);
         
-        Task<IPublicInvite> GetInvite(string inviteIdOrXkcd);
+        Task<IInvite> GetInvite(string inviteIdOrXkcd);
 
         Task<IUser> GetUser(ulong id);
         Task<IUser> GetUser(string username, ushort discriminator);

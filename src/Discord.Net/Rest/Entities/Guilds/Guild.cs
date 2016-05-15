@@ -231,13 +231,13 @@ namespace Discord.Rest
         }
 
         /// <summary> Gets a collection of all invites to this guild. </summary>
-        public async Task<IEnumerable<GuildInvite>> GetInvites()
+        public async Task<IEnumerable<InviteMetadata>> GetInvites()
         {
             var models = await Discord.BaseClient.GetGuildInvites(Id).ConfigureAwait(false);
-            return models.Select(x => new GuildInvite(this, x));
+            return models.Select(x => new InviteMetadata(Discord, x));
         }
         /// <summary> Creates a new invite to this guild. </summary>
-        public async Task<GuildInvite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
+        public async Task<InviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
         {
             if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
             if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
@@ -250,7 +250,7 @@ namespace Discord.Rest
                 XkcdPass = withXkcd
             };
             var model = await Discord.BaseClient.CreateChannelInvite(DefaultChannelId, args).ConfigureAwait(false);
-            return new GuildInvite(this, model);
+            return new InviteMetadata(Discord, model);
         }
 
         /// <summary> Gets the role in this guild with the provided id, or null if not found. </summary>
@@ -344,7 +344,7 @@ namespace Discord.Rest
             => await GetChannel(id).ConfigureAwait(false);
         async Task<IEnumerable<IGuildChannel>> IGuild.GetChannels()
             => await GetChannels().ConfigureAwait(false);
-        async Task<IGuildInvite> IGuild.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
+        async Task<IInviteMetadata> IGuild.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
         async Task<IRole> IGuild.CreateRole(string name, GuildPermissions? permissions, Color? color, bool isHoisted)
             => await CreateRole(name, permissions, color, isHoisted).ConfigureAwait(false);
@@ -352,7 +352,7 @@ namespace Discord.Rest
             => await CreateTextChannel(name).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannel(string name)
             => await CreateVoiceChannel(name).ConfigureAwait(false);
-        async Task<IEnumerable<IGuildInvite>> IGuild.GetInvites()
+        async Task<IEnumerable<IInviteMetadata>> IGuild.GetInvites()
             => await GetInvites().ConfigureAwait(false);
         Task<IRole> IGuild.GetRole(ulong id)
             => Task.FromResult<IRole>(GetRole(id));

@@ -3,33 +3,43 @@ using Model = Discord.API.Invite;
 
 namespace Discord
 {
-    public abstract class Invite : IInvite
+    public class Invite : IInvite
     {
-        protected ulong _guildId, _channelId;
-
         /// <inheritdoc />
         public string Code { get; }
+        internal IDiscordClient Discord { get; }
+
         /// <inheritdoc />
-        public string XkcdCode { get; }
+        public ulong GuildId { get; private set; }
+        /// <inheritdoc />
+        public ulong ChannelId { get; private set; }
+        /// <inheritdoc />
+        public string XkcdCode { get; private set; }
+        /// <inheritdoc />
+        public string GuildName { get; private set; }
+        /// <inheritdoc />
+        public string ChannelName { get; private set; }
 
         /// <inheritdoc />
         public string Url => $"{DiscordConfig.InviteUrl}/{XkcdCode ?? Code}";
         /// <inheritdoc />
         public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
 
-        internal abstract IDiscordClient Discord { get; }
 
-        internal Invite(Model model)
+        internal Invite(IDiscordClient discord, Model model)
         {
+            Discord = discord;
             Code = model.Code;
-            XkcdCode = model.XkcdPass;
 
             Update(model);
         }
         protected virtual void Update(Model model)
         {
-            _guildId = model.Guild.Id;
-            _channelId = model.Channel.Id;
+            XkcdCode = model.XkcdPass;
+            GuildId = model.Guild.Id;
+            ChannelId = model.Channel.Id;
+            GuildName = model.Guild.Name;
+            ChannelName = model.Channel.Name;
         }
 
         /// <inheritdoc />
@@ -39,10 +49,14 @@ namespace Discord
         }
 
         /// <inheritdoc />
+        public async Task Delete()
+        {
+            await Discord.BaseClient.DeleteInvite(Code).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
         public override string ToString() => XkcdUrl ?? Url;
 
         string IEntity<string>.Id => Code;
-        ulong IInvite.GuildId => _guildId;
-        ulong IInvite.ChannelId => _channelId;
     }
 }

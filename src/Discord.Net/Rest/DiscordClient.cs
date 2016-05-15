@@ -168,11 +168,11 @@ namespace Discord.Rest
             return models.Select(x => new DMChannel(this, x));
         }
 
-        public async Task<PublicInvite> GetInvite(string inviteIdOrXkcd)
+        public async Task<Invite> GetInvite(string inviteIdOrXkcd)
         {
             var model = await BaseClient.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
             if (model != null)
-                return new PublicInvite(this, model);
+                return new Invite(this, model);
             return null;
         }
 
@@ -269,7 +269,7 @@ namespace Discord.Rest
             => await GetDMChannels().ConfigureAwait(false);
         async Task<IEnumerable<IConnection>> IDiscordClient.GetConnections()
             => await GetConnections().ConfigureAwait(false);
-        async Task<IPublicInvite> IDiscordClient.GetInvite(string inviteIdOrXkcd)
+        async Task<IInvite> IDiscordClient.GetInvite(string inviteIdOrXkcd)
             => await GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
         async Task<IGuild> IDiscordClient.GetGuild(ulong id)
             => await GetGuild(id).ConfigureAwait(false);
