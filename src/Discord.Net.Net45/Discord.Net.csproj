@@ -604,6 +604,8 @@
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>
     </Compile>
+    <Compile Include="Enums\GameType.cs" />
+    <Compile Include="Models\Game.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

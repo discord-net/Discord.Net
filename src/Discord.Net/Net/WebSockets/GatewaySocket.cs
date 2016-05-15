@@ -167,11 +167,11 @@ namespace Discord.Net.WebSockets
             => QueueMessage(new ResumeCommand { SessionId = SessionId, Sequence = _lastSequence });
 		public override void SendHeartbeat() 
             => QueueMessage(new HeartbeatCommand());
-		public void SendUpdateStatus(long? idleSince, string gameName) 
+		public void SendUpdateStatus(long? idleSince, GameInfo game) 
             => QueueMessage(new UpdateStatusCommand
             {
                 IdleSince = idleSince,
-                Game = gameName != null ? new UpdateStatusCommand.GameInfo { Name = gameName } : null
+                Game = game != null ? new GameInfo { Name = game.Name, Url = game.Url, Type = game.Type } : null
             });
 		public void SendUpdateVoice(ulong? serverId, ulong? channelId, bool isSelfMuted, bool isSelfDeafened)
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });
