@@ -108,13 +108,6 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task Update()
-        {
-            var model = await Discord.BaseClient.GetChannel(Id).ConfigureAwait(false);
-            Update(model);
-        }
-
-        /// <inheritdoc />
         public override string ToString() => $"@{Recipient} [DM]";
         
         IDMUser IDMChannel.Recipient => Recipient;
@@ -137,5 +130,7 @@ namespace Discord.WebSocket
             => await SendFile(stream, filename, text, isTTS).ConfigureAwait(false);
         async Task IMessageChannel.TriggerTyping()
             => await TriggerTyping().ConfigureAwait(false);
+        Task IUpdateable.Update() 
+            => Task.CompletedTask;
     }
 }

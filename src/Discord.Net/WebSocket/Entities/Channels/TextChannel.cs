@@ -36,8 +36,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyTextChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
-            Update(model);
+            await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
         protected override async Task<IEnumerable<GuildUser>> GetUsers()

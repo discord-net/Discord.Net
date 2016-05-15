@@ -140,15 +140,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task ModifyChannels(IEnumerable<ModifyGuildChannelsParams> args)
         {
-            if (args == null) throw new NullReferenceException(nameof(args));
-
             await Discord.BaseClient.ModifyGuildChannels(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyRoles(IEnumerable<ModifyGuildRolesParams> args)
-        {
-            if (args == null) throw new NullReferenceException(nameof(args));
-            
+        {            
             var models = await Discord.BaseClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
             Update(models);
         }

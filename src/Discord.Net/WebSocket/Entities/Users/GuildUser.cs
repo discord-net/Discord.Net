@@ -46,12 +46,6 @@ namespace Discord.WebSocket
             _roles = roles.ToImmutable();
         }
 
-        public async Task Update()
-        {
-            var model = await Discord.BaseClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
-            Update(model);
-        }
-
         public bool HasRole(IRole role)
         {
             for (int i = 0; i < _roles.Length; i++)
@@ -113,5 +107,7 @@ namespace Discord.WebSocket
 
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);
+        Task IUpdateable.Update() 
+            => Task.CompletedTask;
     }
 }

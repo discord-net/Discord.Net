@@ -110,13 +110,7 @@ namespace Discord.WebSocket
                     role.Update(model);
             }
         }
-
-        /// <inheritdoc />
-        public async Task Update()
-        {
-            var response = await Discord.BaseClient.GetGuild(Id).ConfigureAwait(false);
-            Update(response);
-        }
+        
         /// <inheritdoc />
         public async Task Modify(Action<ModifyGuildParams> func)
         {
@@ -124,8 +118,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuild(Id, args).ConfigureAwait(false);
-            Update(model);
+            await Discord.BaseClient.ModifyGuild(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyEmbed(Action<ModifyGuildEmbedParams> func)
@@ -134,24 +127,17 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildEmbedParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
-
-            Update(model);
+            await Discord.BaseClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyChannels(IEnumerable<ModifyGuildChannelsParams> args)
         {
-            if (args == null) throw new NullReferenceException(nameof(args));
-
             await Discord.BaseClient.ModifyGuildChannels(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyRoles(IEnumerable<ModifyGuildRolesParams> args)
-        {
-            if (args == null) throw new NullReferenceException(nameof(args));
-            
-            var models = await Discord.BaseClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
-            Update(models);
+        {            
+            await Discord.BaseClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Leave()
@@ -370,5 +356,7 @@ namespace Discord.WebSocket
             => await GetCurrentUser().ConfigureAwait(false);
         async Task<IEnumerable<IGuildUser>> IGuild.GetUsers()
             => await GetUsers().ConfigureAwait(false);
+        Task IUpdateable.Update() 
+            => Task.CompletedTask;
     }
 }

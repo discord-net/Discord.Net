@@ -57,7 +57,6 @@ namespace Discord.WebSocket
             var args = new ModifyGuildChannelParams();
             func(args);
             var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
-            Update(model);
         }
 
         /// <summary> Gets a user in this channel with the given id. </summary>
@@ -147,12 +146,6 @@ namespace Discord.WebSocket
         {
             await Discord.BaseClient.DeleteChannel(Id).ConfigureAwait(false);
         }
-        /// <inheritdoc />
-        public async Task Update()
-        {
-            var model = await Discord.BaseClient.GetChannel(Id).ConfigureAwait(false);
-            Update(model);
-        }
 
         IGuild IGuildChannel.Guild => Guild;
         async Task<IGuildInvite> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
@@ -167,5 +160,7 @@ namespace Discord.WebSocket
             => await GetUsers().ConfigureAwait(false);
         async Task<IUser> IChannel.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
+        Task IUpdateable.Update() 
+            => Task.CompletedTask;
     }
 }

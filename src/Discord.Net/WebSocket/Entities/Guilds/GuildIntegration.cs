@@ -67,9 +67,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
-
-            Update(model);
+            await Discord.BaseClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Sync()

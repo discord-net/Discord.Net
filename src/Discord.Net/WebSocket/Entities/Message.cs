@@ -120,13 +120,11 @@ namespace Discord.WebSocket
             var args = new ModifyMessageParams();
             func(args);
             var guildChannel = Channel as GuildChannel;
-
-            Model model;
+            
             if (guildChannel != null)
-                model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
-            Update(model);
+                await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
         }
 
         /// <inheritdoc />

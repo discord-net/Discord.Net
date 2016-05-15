@@ -58,8 +58,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildRoleParams();
             func(args);
-            var response = await Discord.BaseClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
-            Update(response);
+            await Discord.BaseClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
         }
         /// <summary> Deletes this message. </summary>
         public async Task Delete()

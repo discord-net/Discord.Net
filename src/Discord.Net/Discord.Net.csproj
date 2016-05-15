@@ -208,8 +208,8 @@
     <Compile Include="Rest\Entities\Users\SelfUser.cs" />
     <Compile Include="Rest\Entities\Users\User.cs" />
     <Compile Include="TokenType.cs" />
-    <Compile Include="WebSocket\Caches\MessageCache.cs" />
-    <Compile Include="WebSocket\Caches\ChannelPermissionsCache.cs" />
+    <Compile Include="WebSocket\MessageCache.cs" />
+    <Compile Include="WebSocket\ChannelPermissionsCache.cs" />
     <Compile Include="WebSocket\DiscordClient.cs" />
     <Compile Include="WebSocket\Entities\Channels\DMChannel.cs" />
     <Compile Include="WebSocket\Entities\Channels\GuildChannel.cs" />

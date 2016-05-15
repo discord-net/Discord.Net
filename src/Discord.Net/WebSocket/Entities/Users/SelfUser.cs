@@ -26,14 +26,7 @@ namespace Discord.WebSocket
             Email = model.Email;
             IsVerified = model.IsVerified;
         }
-
-        /// <inheritdoc />
-        public async Task Update()
-        {
-            var model = await Discord.BaseClient.GetCurrentUser().ConfigureAwait(false);
-            Update(model);
-        }
-
+        
         /// <inheritdoc />
         public async Task Modify(Action<ModifyCurrentUserParams> func)
         {
@@ -41,8 +34,10 @@ namespace Discord.WebSocket
 
             var args = new ModifyCurrentUserParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyCurrentUser(args).ConfigureAwait(false);
-            Update(model);
+            await Discord.BaseClient.ModifyCurrentUser(args).ConfigureAwait(false);
         }
+
+        Task IUpdateable.Update() 
+            => Task.CompletedTask;
     }
 }
