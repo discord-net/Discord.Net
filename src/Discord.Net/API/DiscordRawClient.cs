@@ -585,7 +585,7 @@ namespace Discord.API
             ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
             string relativeDir = args.RelativeDirection == Direction.After ? "after" : "before";
             
-            int runs = limit / DiscordConfig.MaxMessagesPerBatch;
+            int runs = (limit + DiscordConfig.MaxMessagesPerBatch - 1) / DiscordConfig.MaxMessagesPerBatch;
             int lastRunCount = limit - (runs - 1) * DiscordConfig.MaxMessagesPerBatch;
             var result = new API.Message[runs][];
 
