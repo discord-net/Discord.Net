@@ -54,7 +54,7 @@ namespace Discord.Rest
         public override string ToString() => $"{Username ?? Id.ToString()}";
 
         /// <inheritdoc />
-        string IUser.CurrentGame => null;
+        Game? IUser.CurrentGame => null;
         /// <inheritdoc />
         UserStatus IUser.Status => UserStatus.Unknown;
 

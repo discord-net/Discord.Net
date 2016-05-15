@@ -49,6 +49,7 @@
     <Compile Include="API\Common\EmbedProvider.cs" />
     <Compile Include="API\Common\EmbedThumbnail.cs" />
     <Compile Include="API\Common\Emoji.cs" />
+    <Compile Include="API\Common\Game.cs" />
     <Compile Include="API\Common\Guild.cs" />
     <Compile Include="API\Common\GuildEmbed.cs" />
     <Compile Include="API\Common\GuildMember.cs" />
@@ -100,6 +101,8 @@
     <Compile Include="API\Rest\ModifyTextChannelParams.cs" />
     <Compile Include="API\Rest\ModifyVoiceChannelParams.cs" />
     <Compile Include="API\WebSocketMessage.cs" />
+    <Compile Include="Common\Entities\Users\Game.cs" />
+    <Compile Include="Common\Entities\Users\StreamType.cs" />
     <Compile Include="DiscordConfig.cs" />
     <Compile Include="API\DiscordRawClient.cs" />
     <Compile Include="Net\Converters\OptionalContractResolver.cs" />

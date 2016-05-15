@@ -7,7 +7,7 @@ namespace Discord
         /// <summary> Gets the url to this user's avatar. </summary>
         string AvatarUrl { get; }
         /// <summary> Gets the game this user is currently playing, if any. </summary>
-        string CurrentGame { get; }
+        Game? CurrentGame { get; }
         /// <summary> Gets the per-username unique id for this user. </summary>
         ushort Discriminator { get; }
         /// <summary> Returns true if this user is a bot account. </summary>
