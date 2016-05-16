@@ -34,6 +34,8 @@ namespace Discord.Rest
             : base(model.User)
         {
             Guild = guild;
+
+            Update(model);
         }
         internal void Update(Model model)
         {
