@@ -32,7 +32,7 @@ namespace Discord.API
         }
         
         public T GetValueOrDefault() => _value;
-        public T GetValueOrDefault(T defaultValue) => IsSpecified ? _value : default(T);
+        public T GetValueOrDefault(T defaultValue) => IsSpecified ? _value : defaultValue;
 
         public override bool Equals(object other)
         {
