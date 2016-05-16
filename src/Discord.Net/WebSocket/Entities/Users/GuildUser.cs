@@ -99,11 +99,11 @@ namespace Discord.WebSocket
             {
                 await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
-                    IsDeaf = args.Deaf;
+                    IsDeaf = args.Deaf.Value;
                 if (args.Mute.IsSpecified)
-                    IsMute = args.Mute;
+                    IsMute = args.Mute.Value;
                 if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname;
+                    Nickname = args.Nickname.Value;
                 if (args.Roles.IsSpecified)
                     _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }

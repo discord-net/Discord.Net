@@ -169,7 +169,7 @@ namespace Discord.API
         //Channels
         public async Task<Channel> GetChannel(ulong channelId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             try
             {
@@ -179,7 +179,8 @@ namespace Discord.API
         }
         public async Task<Channel> GetChannel(ulong guildId, ulong channelId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             try
             {
@@ -192,57 +193,57 @@ namespace Discord.API
         }
         public async Task<IEnumerable<Channel>> GetGuildChannels(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return await Send<IEnumerable<Channel>>("GET", $"guilds/{guildId}/channels").ConfigureAwait(false);
         }
         public async Task<Channel> CreateGuildChannel(ulong guildId, CreateGuildChannelParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Bitrate <= 0) throw new ArgumentOutOfRangeException(nameof(args.Bitrate));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             return await Send<Channel>("POST", $"guilds/{guildId}/channels", args).ConfigureAwait(false);
         }
         public async Task<Channel> DeleteChannel(ulong channelId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             return await Send<Channel>("DELETE", $"channels/{channelId}").ConfigureAwait(false);
         }
         public async Task<Channel> ModifyGuildChannel(ulong channelId, ModifyGuildChannelParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
-            if (args.Position < 0) throw new ArgumentOutOfRangeException(nameof(args.Position));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
         public async Task<Channel> ModifyGuildChannel(ulong channelId, ModifyTextChannelParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
-            if (args.Position < 0) throw new ArgumentOutOfRangeException(nameof(args.Position));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
         public async Task<Channel> ModifyGuildChannel(ulong channelId, ModifyVoiceChannelParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args.Bitrate <= 0) throw new ArgumentOutOfRangeException(nameof(args.Bitrate));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
-            if (args.Position < 0) throw new ArgumentOutOfRangeException(nameof(args.Position));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
+            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
         public async Task ModifyGuildChannels(ulong guildId, IEnumerable<ModifyGuildChannelsParams> args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
 
             var channels = args.ToArray();
             switch (channels.Length)
@@ -261,7 +262,8 @@ namespace Discord.API
         //Channel Permissions
         public async Task ModifyChannelPermissions(ulong channelId, ulong targetId, ModifyChannelPermissionsParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
+            Preconditions.NotNull(args, nameof(args));
+
             await Send("PUT", $"channels/{channelId}/permissions/{targetId}", args).ConfigureAwait(false);
         }
         public async Task DeleteChannelPermission(ulong channelId, ulong targetId)
@@ -272,7 +274,7 @@ namespace Discord.API
         //Guilds
         public async Task<Guild> GetGuild(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             try
             {
@@ -282,50 +284,50 @@ namespace Discord.API
         }
         public async Task<Guild> CreateGuild(CreateGuildParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (string.IsNullOrEmpty(args.Name)) throw new ArgumentNullException(nameof(args.Name));
-            if (string.IsNullOrEmpty(args.Region)) throw new ArgumentNullException(nameof(args.Region));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrWhitespace(args.Region, nameof(args.Region));
 
             return await Send<Guild>("POST", "guilds", args).ConfigureAwait(false);
         }
         public async Task<Guild> DeleteGuild(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<Guild>("DELETE", $"guilds/{guildId}").ConfigureAwait(false);
         }
         public async Task<Guild> LeaveGuild(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<Guild>("DELETE", $"users/@me/guilds/{guildId}").ConfigureAwait(false);
         }
         public async Task<Guild> ModifyGuild(ulong guildId, ModifyGuildParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.AFKChannelId == 0) throw new ArgumentOutOfRangeException(nameof(args.AFKChannelId));
-            if (args.AFKTimeout < 0) throw new ArgumentOutOfRangeException(nameof(args.AFKTimeout));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
-            //if (args.OwnerId == 0) throw new ArgumentOutOfRangeException(nameof(args.OwnerId));
-            //if (args.Region == "") throw new ArgumentOutOfRangeException(nameof(args.Region));
-            if (args.VerificationLevel < 0) throw new ArgumentOutOfRangeException(nameof(args.VerificationLevel));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(args.AFKChannelId, 0, nameof(args.AFKChannelId));
+            Preconditions.AtLeast(args.AFKTimeout, 0, nameof(args.AFKTimeout));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNull(args.Owner, nameof(args.Owner));
+            Preconditions.NotNull(args.Region, nameof(args.Region));
+            Preconditions.AtLeast(args.VerificationLevel, 0, nameof(args.VerificationLevel));
 
             return await Send<Guild>("PATCH", $"guilds/{guildId}", args).ConfigureAwait(false);
         }
         public async Task<GetGuildPruneCountResponse> BeginGuildPrune(ulong guildId, GuildPruneParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Days < 0) throw new ArgumentOutOfRangeException(nameof(args.Days));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Days, 0, nameof(args.Days));
 
             return await Send<GetGuildPruneCountResponse>("POST", $"guilds/{guildId}/prune", args).ConfigureAwait(false);
         }
         public async Task<GetGuildPruneCountResponse> GetGuildPruneCount(ulong guildId, GuildPruneParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Days < 0) throw new ArgumentOutOfRangeException(nameof(args.Days));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Days, 0, nameof(args.Days));
 
             return await Send<GetGuildPruneCountResponse>("GET", $"guilds/{guildId}/prune", args).ConfigureAwait(false);
         }
@@ -333,23 +335,23 @@ namespace Discord.API
         //Guild Bans
         public async Task<IEnumerable<User>> GetGuildBans(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return await Send<IEnumerable<User>>("GET", $"guilds/{guildId}/bans").ConfigureAwait(false);
         }
         public async Task CreateGuildBan(ulong guildId, ulong userId, CreateGuildBanParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
-            if (args.PruneDays < 0) throw new ArgumentOutOfRangeException(nameof(args.PruneDays));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.PruneDays, 0, nameof(args.PruneDays));
 
             await Send("PUT", $"guilds/{guildId}/bans/{userId}", args).ConfigureAwait(false);
         }
         public async Task RemoveGuildBan(ulong guildId, ulong userId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
 
             await Send("DELETE", $"guilds/{guildId}/bans/{userId}").ConfigureAwait(false);
         }
@@ -357,7 +359,7 @@ namespace Discord.API
         //Guild Embeds
         public async Task<GuildEmbed> GetGuildEmbed(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             try
             {
@@ -367,8 +369,8 @@ namespace Discord.API
         }
         public async Task<GuildEmbed> ModifyGuildEmbed(ulong guildId, ModifyGuildEmbedParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<GuildEmbed>("PATCH", $"guilds/{guildId}/embed", args).ConfigureAwait(false);
         }
@@ -376,39 +378,39 @@ namespace Discord.API
         //Guild Integrations
         public async Task<IEnumerable<Integration>> GetGuildIntegrations(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<IEnumerable<Integration>>("GET", $"guilds/{guildId}/integrations").ConfigureAwait(false);
         }
         public async Task<Integration> CreateGuildIntegration(ulong guildId, CreateGuildIntegrationParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Id == 0) throw new ArgumentOutOfRangeException(nameof(args.Id));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(args.Id, 0, nameof(args.Id));
 
             return await Send<Integration>("POST", $"guilds/{guildId}/integrations").ConfigureAwait(false);
         }
         public async Task<Integration> DeleteGuildIntegration(ulong guildId, ulong integrationId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (integrationId == 0) throw new ArgumentOutOfRangeException(nameof(integrationId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
 
             return await Send<Integration>("DELETE", $"guilds/{guildId}/integrations/{integrationId}").ConfigureAwait(false);
         }
         public async Task<Integration> ModifyGuildIntegration(ulong guildId, ulong integrationId, ModifyGuildIntegrationParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (integrationId == 0) throw new ArgumentOutOfRangeException(nameof(integrationId));
-            if (args.ExpireBehavior < 0) throw new ArgumentOutOfRangeException(nameof(args.ExpireBehavior));
-            if (args.ExpireGracePeriod < 0) throw new ArgumentOutOfRangeException(nameof(args.ExpireGracePeriod));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.ExpireBehavior, 0, nameof(args.ExpireBehavior));
+            Preconditions.AtLeast(args.ExpireGracePeriod, 0, nameof(args.ExpireGracePeriod));
 
             return await Send<Integration>("PATCH", $"guilds/{guildId}/integrations/{integrationId}", args).ConfigureAwait(false);
         }
         public async Task<Integration> SyncGuildIntegration(ulong guildId, ulong integrationId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (integrationId == 0) throw new ArgumentOutOfRangeException(nameof(integrationId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
 
             return await Send<Integration>("POST", $"guilds/{guildId}/integrations/{integrationId}/sync").ConfigureAwait(false);
         }
@@ -416,7 +418,7 @@ namespace Discord.API
         //Guild Invites
         public async Task<Invite> GetInvite(string inviteIdOrXkcd)
         {
-            if (string.IsNullOrEmpty(inviteIdOrXkcd)) throw new ArgumentOutOfRangeException(nameof(inviteIdOrXkcd));
+            Preconditions.NotNullOrEmpty(inviteIdOrXkcd, nameof(inviteIdOrXkcd));
 
             try
             {
@@ -426,34 +428,34 @@ namespace Discord.API
         }
         public async Task<IEnumerable<InviteMetadata>> GetGuildInvites(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<IEnumerable<InviteMetadata>>("GET", $"guilds/{guildId}/invites").ConfigureAwait(false);
         }
         public async Task<InviteMetadata[]> GetChannelInvites(ulong channelId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             return await Send<InviteMetadata[]>("GET", $"channels/{channelId}/invites").ConfigureAwait(false);
         }
         public async Task<InviteMetadata> CreateChannelInvite(ulong channelId, CreateChannelInviteParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args.MaxAge < 0) throw new ArgumentOutOfRangeException(nameof(args.MaxAge));
-            if (args.MaxUses < 0) throw new ArgumentOutOfRangeException(nameof(args.MaxUses));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.MaxAge, 0, nameof(args.MaxAge));
+            Preconditions.AtLeast(args.MaxUses, 0, nameof(args.MaxUses));
 
             return await Send<InviteMetadata>("POST", $"channels/{channelId}/invites", args).ConfigureAwait(false);
         }
         public async Task<Invite> DeleteInvite(string inviteCode)
         {
-            if (string.IsNullOrEmpty(inviteCode)) throw new ArgumentOutOfRangeException(nameof(inviteCode));
+            Preconditions.NotNullOrEmpty(inviteCode, nameof(inviteCode));
 
             return await Send<Invite>("DELETE", $"invites/{inviteCode}").ConfigureAwait(false);
         }
         public async Task AcceptInvite(string inviteCode)
         {
-            if (string.IsNullOrEmpty(inviteCode)) throw new ArgumentOutOfRangeException(nameof(inviteCode));
+            Preconditions.NotNullOrEmpty(inviteCode, nameof(inviteCode));
 
             await Send("POST", $"invites/{inviteCode}").ConfigureAwait(false);
         }
@@ -461,8 +463,8 @@ namespace Discord.API
         //Guild Members
         public async Task<GuildMember> GetGuildMember(ulong guildId, ulong userId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
 
             try
             {
@@ -472,10 +474,10 @@ namespace Discord.API
         }
         public async Task<IEnumerable<GuildMember>> GetGuildMembers(ulong guildId, GetGuildMembersParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Limit.IsSpecified && args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
-            if (args.Offset.IsSpecified && args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtLeast(args.Offset, 0, nameof(args.Offset));
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             int offset = args.Offset.GetValueOrDefault(0);
@@ -513,55 +515,55 @@ namespace Discord.API
         }
         public async Task RemoveGuildMember(ulong guildId, ulong userId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
 
             await Send("DELETE", $"guilds/{guildId}/members/{userId}").ConfigureAwait(false);
         }
         public async Task ModifyGuildMember(ulong guildId, ulong userId, ModifyGuildMemberParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
-            
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.NotNull(args, nameof(args));
+
             await Send("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
         }
 
         //Guild Roles
         public async Task<IEnumerable<Role>> GetGuildRoles(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<IEnumerable<Role>>("GET", $"guilds/{guildId}/roles").ConfigureAwait(false);
         }
         public async Task<Role> CreateGuildRole(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<Role>("POST", $"guilds/{guildId}/roles").ConfigureAwait(false);
         }
         public async Task DeleteGuildRole(ulong guildId, ulong roleId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (roleId == 0) throw new ArgumentOutOfRangeException(nameof(roleId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(roleId, 0, nameof(roleId));
 
             await Send("DELETE", $"guilds/{guildId}/roles/{roleId}").ConfigureAwait(false);
         }
         public async Task<Role> ModifyGuildRole(ulong guildId, ulong roleId, ModifyGuildRoleParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (roleId == 0) throw new ArgumentOutOfRangeException(nameof(roleId));
-            if (args.Color < 0) throw new ArgumentOutOfRangeException(nameof(args.Color));
-            if (args.Name == "") throw new ArgumentOutOfRangeException(nameof(args.Name));
-            if (args.Position < 0) throw new ArgumentOutOfRangeException(nameof(args.Position));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Color, 0, nameof(args.Color));
+            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
 
             return await Send<Role>("PATCH", $"guilds/{guildId}/roles/{roleId}", args).ConfigureAwait(false);
         }
         public async Task<IEnumerable<Role>> ModifyGuildRoles(ulong guildId, IEnumerable<ModifyGuildRolesParams> args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
 
             var roles = args.ToArray();
             switch (roles.Length)
@@ -578,9 +580,9 @@ namespace Discord.API
         //Messages
         public async Task<IEnumerable<Message>> GetChannelMessages(ulong channelId, GetChannelMessagesParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Limit, 0, nameof(args.Limit));
 
             int limit = args.Limit;
             ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
@@ -625,7 +627,8 @@ namespace Discord.API
         }
         public Task<Message> CreateMessage(ulong guildId, ulong channelId, CreateMessageParams args)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return CreateMessageInternal(guildId, channelId, args);
         }
         public Task<Message> CreateDMMessage(ulong channelId, CreateMessageParams args)
@@ -634,11 +637,11 @@ namespace Discord.API
         }
         public async Task<Message> CreateMessageInternal(ulong guildId, ulong channelId, CreateMessageParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (string.IsNullOrEmpty(args.Content)) throw new ArgumentNullException(nameof(args.Content));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
             if (args.Content.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
 
             if (guildId != 0)
                 return await Send<Message>("POST", $"channels/{channelId}/messages", args, GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
@@ -647,7 +650,8 @@ namespace Discord.API
         }
         public Task<Message> UploadFile(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return UploadFileInternal(guildId, channelId, file, args);
         }
         public Task<Message> UploadDMFile(ulong channelId, Stream file, UploadFileParams args)
@@ -656,11 +660,11 @@ namespace Discord.API
         }
         private async Task<Message> UploadFileInternal(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
             if (args.Content.IsSpecified)
             {
-                if (string.IsNullOrEmpty(args.Content.Value)) throw new ArgumentNullException(nameof(args.Content));
+                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
                 if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
@@ -672,7 +676,8 @@ namespace Discord.API
         }
         public Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return DeleteMessageInternal(guildId, channelId, messageId);
         }
         public Task DeleteDMMessage(ulong channelId, ulong messageId)
@@ -681,8 +686,8 @@ namespace Discord.API
         }
         private async Task DeleteMessageInternal(ulong guildId, ulong channelId, ulong messageId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
 
             if (guildId != 0)
                 await Send("DELETE", $"channels/{channelId}/messages/{messageId}", GuildBucket.DeleteMessage, guildId).ConfigureAwait(false);
@@ -691,7 +696,8 @@ namespace Discord.API
         }
         public Task DeleteMessages(ulong guildId, ulong channelId, DeleteMessagesParam args)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return DeleteMessagesInternal(guildId, channelId, args);
         }
         public Task DeleteDMMessages(ulong channelId, DeleteMessagesParam args)
@@ -700,9 +706,9 @@ namespace Discord.API
         }
         private async Task DeleteMessagesInternal(ulong guildId, ulong channelId, DeleteMessagesParam args)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (args.MessageIds == null) throw new ArgumentNullException(nameof(args.MessageIds));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNull(args.MessageIds, nameof(args.MessageIds));
 
             var messageIds = args.MessageIds.ToArray();
             switch (messageIds.Length)
@@ -722,7 +728,8 @@ namespace Discord.API
         }
         public Task<Message> ModifyMessage(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
             return ModifyMessageInternal(guildId, channelId, messageId, args);
         }
         public Task<Message> ModifyDMMessage(ulong channelId, ulong messageId, ModifyMessageParams args)
@@ -731,9 +738,15 @@ namespace Discord.API
         }
         private async Task<Message> ModifyMessageInternal(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNull(args, nameof(args));
+            if (args.Content.IsSpecified)
+            {
+                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            }
 
             if (guildId != 0)
                 return await Send<Message>("PATCH", $"channels/{channelId}/messages/{messageId}", args, GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
@@ -742,14 +755,14 @@ namespace Discord.API
         }
         public async Task AckMessage(ulong channelId, ulong messageId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
-            if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
 
             await Send("POST", $"channels/{channelId}/messages/{messageId}/ack").ConfigureAwait(false);
         }
         public async Task TriggerTypingIndicator(ulong channelId)
         {
-            if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
 
             await Send("POST", $"channels/{channelId}/typing").ConfigureAwait(false);
         }
@@ -757,7 +770,7 @@ namespace Discord.API
         //Users
         public async Task<User> GetUser(ulong userId)
         {
-            if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
 
             try
             {
@@ -767,7 +780,7 @@ namespace Discord.API
         }
         public async Task<User> GetUser(string username, ushort discriminator)
         {
-            if (string.IsNullOrEmpty(username)) throw new ArgumentOutOfRangeException(nameof(username));
+            Preconditions.NotNullOrEmpty(username, nameof(username));
 
             try
             {
@@ -778,8 +791,8 @@ namespace Discord.API
         }
         public async Task<IEnumerable<User>> QueryUsers(string query, int limit)
         {
-            if (string.IsNullOrEmpty(query)) throw new ArgumentOutOfRangeException(nameof(query));
-            if (limit <= 0) throw new ArgumentOutOfRangeException(nameof(limit));
+            Preconditions.NotNullOrEmpty(query, nameof(query));
+            Preconditions.AtLeast(limit, 0, nameof(limit));
 
             return await Send<IEnumerable<User>>("GET", $"users?q={Uri.EscapeDataString(query)}&limit={limit}").ConfigureAwait(false);
         }
@@ -803,23 +816,23 @@ namespace Discord.API
         }
         public async Task<User> ModifyCurrentUser(ModifyCurrentUserParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (args.Email == "") throw new ArgumentOutOfRangeException(nameof(args.Email));
-            if (args.Username == "") throw new ArgumentOutOfRangeException(nameof(args.Username));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrEmpty(args.Email, nameof(args.Email));
+            Preconditions.NotNullOrEmpty(args.Username, nameof(args.Username));
 
             return await Send<User>("PATCH", "users/@me", args).ConfigureAwait(false);
         }
         public async Task ModifyCurrentUserNick(ulong guildId, ModifyCurrentUserNickParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (args.Nickname == "") throw new ArgumentOutOfRangeException(nameof(args.Nickname));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEmpty(args.Nickname, nameof(args.Nickname));
 
             await Send("PATCH", $"guilds/{guildId}/members/@me/nick", args).ConfigureAwait(false);
         }
         public async Task<Channel> CreateDMChannel(CreateDMChannelParams args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            if (args.RecipientId == 0) throw new ArgumentOutOfRangeException(nameof(args.RecipientId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(args.RecipientId, 0, nameof(args.RecipientId));
 
             return await Send<Channel>("POST", $"users/@me/channels", args).ConfigureAwait(false);
         }
@@ -831,7 +844,7 @@ namespace Discord.API
         }
         public async Task<IEnumerable<VoiceRegion>> GetGuildVoiceRegions(ulong guildId)
         {
-            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
             return await Send<IEnumerable<VoiceRegion>>("GET", $"guilds/{guildId}/regions").ConfigureAwait(false);
         }

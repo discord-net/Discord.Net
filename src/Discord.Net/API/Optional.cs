@@ -46,6 +46,6 @@ namespace Discord.API
         private string DebuggerDisplay => IsSpecified ? _value.ToString() : "<unspecified>";
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
-        public static implicit operator T(Optional<T> value) => value.Value;
+        public static explicit operator T(Optional<T> value) => value.Value;
     }
 }

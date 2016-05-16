@@ -107,6 +107,7 @@
     <Compile Include="DiscordConfig.cs" />
     <Compile Include="API\DiscordRawClient.cs" />
     <Compile Include="API\Int53Attribute.cs" />
+    <Compile Include="Preconditions.cs" />
     <Compile Include="Net\Converters\DiscordContractResolver.cs" />
     <Compile Include="Net\Converters\OptionalConverter.cs" />
     <Compile Include="Net\RateLimitException.cs" />
