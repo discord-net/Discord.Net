@@ -131,6 +131,8 @@ namespace Discord.Rest
 
         async Task<IEnumerable<IUser>> IChannel.GetUsers()
             => await GetUsers().ConfigureAwait(false);
+        async Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => (await GetUsers().ConfigureAwait(false)).Skip(offset).Take(limit);
         async Task<IUser> IChannel.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
         Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)

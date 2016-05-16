@@ -58,12 +58,7 @@ namespace Discord.Rest
             var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
             Update(model);
         }
-
-        /// <summary> Gets a user in this channel with the given id. </summary>
-        public abstract Task<GuildUser> GetUser(ulong id);
-        /// <summary> Gets all users in this channel. </summary>
-        public abstract Task<IEnumerable<GuildUser>> GetUsers();
-
+        
         /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -151,18 +146,24 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override string ToString() => Name;
 
+        protected abstract Task<GuildUser> GetUserInternal(ulong id);
+        protected abstract Task<IEnumerable<GuildUser>> GetUsersInternal();
+        protected abstract Task<IEnumerable<GuildUser>> GetUsersInternal(int limit, int offset);
+
         IGuild IGuildChannel.Guild => Guild;
         async Task<IInviteMetadata> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
         async Task<IEnumerable<IInviteMetadata>> IGuildChannel.GetInvites()
             => await GetInvites().ConfigureAwait(false);
         async Task<IEnumerable<IGuildUser>> IGuildChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
-        async Task<IGuildUser> IGuildChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
+            => await GetUsersInternal().ConfigureAwait(false);
         async Task<IEnumerable<IUser>> IChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
+            => await GetUsersInternal().ConfigureAwait(false);
+        async Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => await GetUsersInternal(limit, offset).ConfigureAwait(false);
+        async Task<IGuildUser> IGuildChannel.GetUser(ulong id)
+            => await GetUserInternal(id).ConfigureAwait(false);
         async Task<IUser> IChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
+            => await GetUserInternal(id).ConfigureAwait(false);
     }
 }

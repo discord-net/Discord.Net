@@ -147,6 +147,8 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(GetUser(id));
         Task<IEnumerable<IUser>> IChannel.GetUsers()
             => Task.FromResult<IEnumerable<IUser>>(Users);
+        Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => Task.FromResult<IEnumerable<IUser>>(Users.Skip(offset).Take(limit));
         Task<IUser> IChannel.GetUser(ulong id)
             => Task.FromResult<IUser>(GetUser(id));
         Task IUpdateable.Update() 

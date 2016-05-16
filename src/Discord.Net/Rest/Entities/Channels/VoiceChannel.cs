@@ -34,8 +34,9 @@ namespace Discord.Rest
             Update(model);
         }
 
-        public override Task<GuildUser> GetUser(ulong id) { throw new NotSupportedException(); }
-        public override Task<IEnumerable<GuildUser>> GetUsers() { throw new NotSupportedException(); }
+        protected override Task<GuildUser> GetUserInternal(ulong id) { throw new NotSupportedException(); }
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal() { throw new NotSupportedException(); }
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal(int limit, int offset) { throw new NotSupportedException(); }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
     }

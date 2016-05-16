@@ -124,6 +124,8 @@ namespace Discord.WebSocket
 
         Task<IEnumerable<IUser>> IChannel.GetUsers()
             => Task.FromResult(Users);
+        Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => Task.FromResult(Users.Skip(offset).Take(limit));
         Task<IUser> IChannel.GetUser(ulong id)
             => Task.FromResult(GetUser(id));
         Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)

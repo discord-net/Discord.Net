@@ -39,19 +39,27 @@ namespace Discord.Rest
             Update(model);
         }
 
-        public override async Task<GuildUser> GetUser(ulong id)
+        /// <summary> Gets a user in this channel with the given id. </summary>
+        public async Task<GuildUser> GetUser(ulong id)
         {
             var user = await Guild.GetUser(id).ConfigureAwait(false);
             if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
                 return user;
             return null;
         }
-        public override async Task<IEnumerable<GuildUser>> GetUsers()
+        /// <summary> Gets all users in this channel. </summary>
+        public async Task<IEnumerable<GuildUser>> GetUsers()
         {
             var users = await Guild.GetUsers().ConfigureAwait(false);
             return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages));
         }
-        
+        /// <summary> Gets a paginated collection of users in this channel. </summary>
+        public async Task<IEnumerable<GuildUser>> GetUsers(int limit, int offset)
+        {
+            var users = await Guild.GetUsers(limit, offset).ConfigureAwait(false);
+            return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages));
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
@@ -106,6 +114,11 @@ namespace Discord.Rest
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
+
+
+        protected override Task<GuildUser> GetUserInternal(ulong id) => GetUser(id);
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal() => GetUsers();
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal(int limit, int offset) => GetUsers(limit, offset);
 
         IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
 
