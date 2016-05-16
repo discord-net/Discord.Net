@@ -30,7 +30,7 @@ namespace Discord.API
         public IRestClient RestClient { get; private set; }
         public IRequestQueue RequestQueue { get; private set; }
 
-        internal DiscordRawClient(RestClientProvider restClientProvider)
+        public DiscordRawClient(RestClientProvider restClientProvider)
         {
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
             _restClient.SetHeader("accept", "*/*");
@@ -474,11 +474,11 @@ namespace Discord.API
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            if (args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
-            if (args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
+            if (args.Limit.IsSpecified && args.Limit <= 0) throw new ArgumentOutOfRangeException(nameof(args.Limit));
+            if (args.Offset.IsSpecified && args.Offset < 0) throw new ArgumentOutOfRangeException(nameof(args.Offset));
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            int offset = args.Offset;
+            int offset = args.Offset.GetValueOrDefault(0);
 
             List<GuildMember[]> result;
             if (args.Limit.IsSpecified)
@@ -498,6 +498,7 @@ namespace Discord.API
                 result.Add(models);
 
                 limit -= DiscordConfig.MaxUsersPerBatch;
+                offset += models.Length;
 
                 //Was this an incomplete (the last) batch?
                 if (models.Length != DiscordConfig.MaxUsersPerBatch) break;
