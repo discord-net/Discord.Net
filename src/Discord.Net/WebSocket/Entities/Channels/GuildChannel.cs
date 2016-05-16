@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     public abstract class GuildChannel : IGuildChannel
     {
         private ConcurrentDictionary<ulong, Overwrite> _overwrites;
-        internal ChannelPermissionsCache _permissions;
+        internal PermissionsCache _permissions;
 
         /// <inheritdoc />
         public ulong Id { get; }

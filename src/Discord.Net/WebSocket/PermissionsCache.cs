@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,14 +16,14 @@ namespace Discord.WebSocket
         }
     }
 
-    internal class ChannelPermissionsCache
+    internal class PermissionsCache
     {
         private readonly GuildChannel _channel;
         private readonly ConcurrentDictionary<ulong, ChannelMember> _users;
 
         public IEnumerable<ChannelMember> Members => _users.Select(x => x.Value);
 
-        public ChannelPermissionsCache(GuildChannel channel)
+        public PermissionsCache(GuildChannel channel)
         {
             _channel = channel;
             _users = new ConcurrentDictionary<ulong, ChannelMember>(1, (int)(_channel.Guild.UserCount * 1.05));
