@@ -36,7 +36,6 @@ namespace Discord.Net.Rest
 
         private readonly DiscordConfig _config;
 		private readonly IRestEngine _engine;
-        private readonly ETFWriter _serializer;
         private readonly ILogger _logger;
         private string _token;
 
@@ -57,7 +56,7 @@ namespace Discord.Net.Rest
 			_config = config;
             _logger = logger;
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_3
             _engine = new RestSharpEngine(config, baseUrl, logger);
 #else
 			_engine = new BuiltInEngine(config, baseUrl, logger);

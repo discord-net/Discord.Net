@@ -2,26 +2,36 @@
   "version": "0.9.1",
   "description": "A Discord.Net extension adding voice support.",
   "authors": [ "RogueException" ],
-  "tags": [ "discord", "discordapp" ],
-  "projectUrl": "https://github.com/RogueException/Discord.Net",
-  "licenseUrl": "http://opensource.org/licenses/MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/RogueException/Discord.Net"
+  
+  "packOptions": {
+    "tags": [ "discord", "discordapp" ],
+    "projectUrl": "https://github.com/RogueException/Discord.Net",
+    "licenseUrl": "http://opensource.org/licenses/MIT",
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/RogueException/Discord.Net"
+    },
+    "contentFiles": [ "libsodium.dll", "opus.dll" ]
   },
-  "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
-  "contentFiles": [ "libsodium.dll", "opus.dll" ],
 
-  "compilationOptions": {
+  "buildOptions": {
+    "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
+    "preserveCompilationContext": true,
     "allowUnsafe": true,
     "warningsAsErrors": true
   },
 
   "dependencies": {
+    "NETStandard.Library": "1.5.0-rc2-24027",
     "Discord.Net": "0.9.1"
   },
   "frameworks": {
-    "net45": { },
-    "dotnet5.4": { }
+    "netstandard1.3": {
+      "imports": [
+        "dotnet5.4",
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    }
   }
 }

@@ -25,7 +25,7 @@ namespace Discord.Logging
             }
         }
 
-#if DOTNET5_4
+#if NETSTANDARD1_3
         public void Log(LogSeverity severity, string source, FormattableString message, Exception exception = null)
         {
             if (severity <= Level)
@@ -57,7 +57,7 @@ namespace Discord.Logging
         public void Debug(string source, Exception ex)
             => Log(LogSeverity.Debug, source, (string)null, ex);
 
-#if DOTNET5_4
+#if NETSTANDARD1_3
         public void Error(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Error, source, message, ex);
         public void Warning(string source, FormattableString message, Exception ex = null)

@@ -120,7 +120,7 @@ namespace Discord.Net.WebSockets
 
             SendIdentify(_userId.Value, _sessionId);
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_3
             tasks.Add(WatcherAsync());
 #endif
             tasks.AddRange(_engine.GetTasks(CancelToken));
@@ -178,7 +178,7 @@ namespace Discord.Net.WebSockets
                     await Task.Delay(1).ConfigureAwait(false);
                     if (_udp.Available > 0)
                     {
-#if !DOTNET5_4
+#if !NETSTANDARD1_3
                         packet = _udp.Receive(ref endpoint);
 #else
 						//TODO: Is this really the only way to end a Receive call in DOTNET5_4?
@@ -346,7 +346,7 @@ namespace Discord.Net.WebSockets
                         {
                             try
                             {
-                                _udp.Send(voicePacket, rtpPacketLength);
+                                await _udp.SendAsync(voicePacket, rtpPacketLength, _endpoint).ConfigureAwait(false);
                             }
                             catch (SocketException ex)
                             {
@@ -371,7 +371,7 @@ namespace Discord.Net.WebSockets
                                     break;
                                 }
                             }
-                            await _udp.SendAsync(pingPacket, pingPacket.Length).ConfigureAwait(false);
+                            await _udp.SendAsync(pingPacket, pingPacket.Length, _endpoint).ConfigureAwait(false);
                             nextPingTicks = currentTicks + 5 * ticksPerSeconds;
                         }
                     }
@@ -391,7 +391,7 @@ namespace Discord.Net.WebSockets
             catch (OperationCanceledException) { }
             catch (InvalidOperationException) { } //Includes ObjectDisposedException
         }
-#if !DOTNET5_4
+#if !NETSTANDARD1_3
         //Closes the UDP socket when _disconnectToken is triggered, since UDPClient doesn't allow passing a canceltoken
         private async Task WatcherAsync()
         {
@@ -437,7 +437,6 @@ namespace Discord.Net.WebSockets
                                 _encryptionMode = UnencryptedMode;
                                 _isEncrypted = false;
                             }
-                            _udp.Connect(_endpoint);
 
                             _sequence = 0;// (ushort)_rand.Next(0, ushort.MaxValue);
                                           //No thread issue here because SendAsync doesn't start until _isReady is true
@@ -446,7 +445,7 @@ namespace Discord.Net.WebSockets
                             packet[1] = (byte)(_ssrc >> 16);
                             packet[2] = (byte)(_ssrc >> 8);
                             packet[3] = (byte)(_ssrc >> 0);
-                            await _udp.SendAsync(packet, 70).ConfigureAwait(false);
+                            await _udp.SendAsync(packet, 70, _endpoint).ConfigureAwait(false);
                         }
                     }
                     break;

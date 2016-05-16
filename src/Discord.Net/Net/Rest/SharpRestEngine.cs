@@ -1,4 +1,4 @@
-﻿#if !DOTNET5_4
+﻿#if !NETSTANDARD1_3
 using Discord.Logging;
 using Nito.AsyncEx;
 using RestSharp;

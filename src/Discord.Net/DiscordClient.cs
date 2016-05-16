@@ -243,12 +243,15 @@ namespace Discord
             }
 
             ClientAPI.Token = token;
-            var request = new LoginRequest() { Email = email, Password = password };
-            var response = await ClientAPI.Send(request).ConfigureAwait(false);
-            token = response.Token;
-            if (Config.CacheDir != null && token != oldToken && tokenPath != null)
-                SaveToken(tokenPath, cacheKey, token);
-            ClientAPI.Token = token;
+            if (email != null && password != null)
+            {
+                var request = new LoginRequest() { Email = email, Password = password };
+                var response = await ClientAPI.Send(request).ConfigureAwait(false);
+                token = response.Token;
+                if (Config.CacheDir != null && token != oldToken && tokenPath != null)
+                    SaveToken(tokenPath, cacheKey, token);
+                ClientAPI.Token = token;
+            }
 
             //Cache other stuff
             var regionsResponse = (await ClientAPI.Send(new GetVoiceRegionsRequest()).ConfigureAwait(false));

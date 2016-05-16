@@ -38,7 +38,7 @@ namespace Discord.Logging
         public void Debug(Exception exception)
             => _manager.Debug(Name, exception);
 
-#if DOTNET5_4
+#if NETSTANDARD1_3
         public void Log(LogSeverity severity, FormattableString message, Exception exception = null)
             => _manager.Log(severity, Name, message, exception);
         public void Error(FormattableString message, Exception exception = null)

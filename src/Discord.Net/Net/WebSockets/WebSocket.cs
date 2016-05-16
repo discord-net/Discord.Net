@@ -49,7 +49,7 @@ namespace Discord.Net.WebSockets
             CancelToken = new CancellationToken(true);
             _connectedEvent = new ManualResetEventSlim(false);
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_3
             _engine = new WS4NetEngine(config, _taskManager);
 #else
             _engine = new BuiltInEngine(config);

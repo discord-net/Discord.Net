@@ -334,7 +334,7 @@ namespace Discord.Tests
                 async () => await SetGame(_targetBot, "test game"),
                 x => _observerBot.UserUpdated += x,
                 x => _observerBot.UserUpdated -= x,
-                (s, e) => _targetBot.CurrentGame == "test game");
+                (s, e) => _targetBot.CurrentGame.Name == "test game");
 
         }
         private async Task SetGame(DiscordClient _client, string game)
