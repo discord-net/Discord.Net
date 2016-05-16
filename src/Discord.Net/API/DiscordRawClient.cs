@@ -217,7 +217,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
@@ -226,7 +226,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
@@ -236,7 +236,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
 
             return await Send<Channel>("PATCH", $"channels/{channelId}", args).ConfigureAwait(false);
         }
@@ -308,7 +308,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(args.AFKChannelId, 0, nameof(args.AFKChannelId));
             Preconditions.AtLeast(args.AFKTimeout, 0, nameof(args.AFKTimeout));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             Preconditions.NotNull(args.Owner, nameof(args.Owner));
             Preconditions.NotNull(args.Region, nameof(args.Region));
             Preconditions.AtLeast(args.VerificationLevel, 0, nameof(args.VerificationLevel));
@@ -555,7 +555,7 @@ namespace Discord.API
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Color, 0, nameof(args.Color));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
 
             return await Send<Role>("PATCH", $"guilds/{guildId}/roles/{roleId}", args).ConfigureAwait(false);
