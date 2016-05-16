@@ -672,15 +672,14 @@ namespace Discord.API
         public Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId)
         {
             if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
-            return DeleteInternalMessage(guildId, channelId, messageId);
+            return DeleteMessageInternal(guildId, channelId, messageId);
         }
         public Task DeleteDMMessage(ulong channelId, ulong messageId)
         {
-            return DeleteInternalMessage(0, channelId, messageId);
+            return DeleteMessageInternal(0, channelId, messageId);
         }
-        private async Task DeleteInternalMessage(ulong guildId, ulong channelId, ulong messageId)
+        private async Task DeleteMessageInternal(ulong guildId, ulong channelId, ulong messageId)
         {
-            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
 
@@ -710,7 +709,7 @@ namespace Discord.API
                 case 0:
                     return;
                 case 1:
-                    await DeleteMessage(guildId, channelId, messageIds[0]).ConfigureAwait(false);
+                    await DeleteMessageInternal(guildId, channelId, messageIds[0]).ConfigureAwait(false);
                     break;
                 default:
                     if (guildId != 0)
