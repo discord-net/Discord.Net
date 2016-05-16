@@ -127,14 +127,18 @@ namespace Discord.Rest
             if (guildChannel != null)
                 model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.BaseClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model);
         }
 
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteMessage(Channel.Id, Id).ConfigureAwait(false);
+            var guildChannel = Channel as GuildChannel;
+            if (guildChannel != null)
+                await Discord.BaseClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+            else
+                await Discord.BaseClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;

@@ -622,9 +622,16 @@ namespace Discord.API
             else
                 return Array.Empty<Message>();
         }
-        public Task<Message> CreateMessage(ulong channelId, CreateMessageParams args)
-            => CreateMessage(0, channelId, args);
-        public async Task<Message> CreateMessage(ulong guildId, ulong channelId, CreateMessageParams args)
+        public Task<Message> CreateMessage(ulong guildId, ulong channelId, CreateMessageParams args)
+        {
+            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            return CreateMessageInternal(guildId, channelId, args);
+        }
+        public Task<Message> CreateDMMessage(ulong channelId, CreateMessageParams args)
+        {
+            return CreateMessageInternal(0, channelId, args);
+        }
+        public async Task<Message> CreateMessageInternal(ulong guildId, ulong channelId, CreateMessageParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
@@ -637,12 +644,18 @@ namespace Discord.API
             else
                 return await Send<Message>("POST", $"channels/{channelId}/messages", args, GlobalBucket.DirectMessage).ConfigureAwait(false);
         }
-        public Task<Message> UploadFile(ulong channelId, Stream file, UploadFileParams args)
-            => UploadFile(0, channelId, file, args);
-        public async Task<Message> UploadFile(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
+        public Task<Message> UploadFile(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
+        {
+            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            return UploadFileInternal(guildId, channelId, file, args);
+        }
+        public Task<Message> UploadDMFile(ulong channelId, Stream file, UploadFileParams args)
+        {
+            return UploadFileInternal(0, channelId, file, args);
+        }
+        private async Task<Message> UploadFileInternal(ulong guildId, ulong channelId, Stream file, UploadFileParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
-            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (args.Content.IsSpecified)
             {
@@ -654,11 +667,18 @@ namespace Discord.API
             if (guildId != 0)
                 return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GuildBucket.SendEditMessage, guildId).ConfigureAwait(false);
             else
-                return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary()).ConfigureAwait(false);
+                return await Send<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GlobalBucket.DirectMessage).ConfigureAwait(false);
         }
-        public Task DeleteMessage(ulong channelId, ulong messageId)
-            => DeleteMessage(0, channelId, messageId);
-        public async Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId)
+        public Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId)
+        {
+            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            return DeleteInternalMessage(guildId, channelId, messageId);
+        }
+        public Task DeleteDMMessage(ulong channelId, ulong messageId)
+        {
+            return DeleteInternalMessage(0, channelId, messageId);
+        }
+        private async Task DeleteInternalMessage(ulong guildId, ulong channelId, ulong messageId)
         {
             //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
@@ -669,11 +689,17 @@ namespace Discord.API
             else
                 await Send("DELETE", $"channels/{channelId}/messages/{messageId}").ConfigureAwait(false);
         }
-        public Task DeleteMessages(ulong channelId, DeleteMessagesParam args)
-            => DeleteMessages(0, channelId, args);
-        public async Task DeleteMessages(ulong guildId, ulong channelId, DeleteMessagesParam args)
+        public Task DeleteMessages(ulong guildId, ulong channelId, DeleteMessagesParam args)
         {
-            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            return DeleteMessagesInternal(guildId, channelId, args);
+        }
+        public Task DeleteDMMessages(ulong channelId, DeleteMessagesParam args)
+        {
+            return DeleteMessagesInternal(0, channelId, args);
+        }
+        private async Task DeleteMessagesInternal(ulong guildId, ulong channelId, DeleteMessagesParam args)
+        {
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (args.MessageIds == null) throw new ArgumentNullException(nameof(args.MessageIds));
@@ -694,12 +720,18 @@ namespace Discord.API
                     break;
             }
         }
-        public Task<Message> ModifyMessage(ulong channelId, ulong messageId, ModifyMessageParams args)
-            => ModifyMessage(0, channelId, messageId, args);
-        public async Task<Message> ModifyMessage(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
+        public Task<Message> ModifyMessage(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
+        {
+            if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
+            return ModifyMessageInternal(guildId, channelId, messageId, args);
+        }
+        public Task<Message> ModifyDMMessage(ulong channelId, ulong messageId, ModifyMessageParams args)
+        {
+            return ModifyMessageInternal(0, channelId, messageId, args);
+        }
+        private async Task<Message> ModifyMessageInternal(ulong guildId, ulong channelId, ulong messageId, ModifyMessageParams args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
-            //if (guildId == 0) throw new ArgumentOutOfRangeException(nameof(guildId));
             if (channelId == 0) throw new ArgumentOutOfRangeException(nameof(channelId));
             if (messageId == 0) throw new ArgumentOutOfRangeException(nameof(messageId));
 
