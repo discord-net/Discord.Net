@@ -34,7 +34,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyCurrentUserParams();
             func(args);
-            await Discord.BaseClient.ModifyCurrentUser(args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyCurrentUser(args).ConfigureAwait(false);
         }
 
         Task IUpdateable.Update() 

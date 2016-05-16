@@ -10,7 +10,7 @@ namespace Discord
     public interface IDiscordClient
     {
         TokenType AuthTokenType { get; }
-        DiscordRawClient BaseClient { get; }
+        DiscordAPIClient APIClient { get; }
         IRestClient RestClient { get; }
         IRequestQueue RequestQueue { get; }
 

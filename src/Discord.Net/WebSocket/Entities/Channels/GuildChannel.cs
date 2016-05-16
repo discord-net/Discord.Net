@@ -57,7 +57,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildChannelParams();
             func(args);
-            await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
         /// <summary> Gets a user in this channel with the given id. </summary>
@@ -82,7 +82,7 @@ namespace Discord.WebSocket
         /// <summary> Downloads a collection of all invites to this channel. </summary>
         public async Task<IEnumerable<InviteMetadata>> GetInvites()
         {
-            var models = await Discord.BaseClient.GetChannelInvites(Id).ConfigureAwait(false);
+            var models = await Discord.APIClient.GetChannelInvites(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x));
         }
 
@@ -90,23 +90,23 @@ namespace Discord.WebSocket
         public async Task AddPermissionOverwrite(IUser user, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.BaseClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task AddPermissionOverwrite(IRole role, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.BaseClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IUser user)
         {
-            await Discord.BaseClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IRole role)
         {
-            await Discord.BaseClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
         }
 
         /// <summary> Creates a new invite to this channel. </summary>
@@ -123,14 +123,14 @@ namespace Discord.WebSocket
                 Temporary = isTemporary,
                 XkcdPass = withXkcd
             };
-            var model = await Discord.BaseClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);
         }
 
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteChannel(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />

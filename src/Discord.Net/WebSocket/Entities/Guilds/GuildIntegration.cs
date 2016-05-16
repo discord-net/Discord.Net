@@ -60,7 +60,7 @@ namespace Discord.WebSocket
         /// <summary>  </summary>
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Modify(Action<ModifyGuildIntegrationParams> func)
@@ -69,12 +69,12 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            await Discord.BaseClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Sync()
         {
-            await Discord.BaseClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.APIClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

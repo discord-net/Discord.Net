@@ -69,7 +69,7 @@ namespace Discord.WebSocket
 
         public async Task Kick()
         {
-            await Discord.BaseClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.APIClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public GuildPermissions GetGuildPermissions()
@@ -93,13 +93,13 @@ namespace Discord.WebSocket
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
-                await Discord.BaseClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                await Discord.APIClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new API.Optional<string>(); //Remove
             }
 
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
             {
-                await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                await Discord.APIClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
                     IsDeaf = args.Deaf.Value;
                 if (args.Mute.IsSpecified)

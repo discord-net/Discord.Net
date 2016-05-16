@@ -35,7 +35,7 @@ namespace Discord.Rest
 
             var args = new ModifyTextChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
             Update(model);
         }
 
@@ -64,14 +64,14 @@ namespace Discord.Rest
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.APIClient.GetChannelMessages(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, x));
         }
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.APIClient.GetChannelMessages(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, x));
         }
 
@@ -79,7 +79,7 @@ namespace Discord.Rest
         public async Task<Message> SendMessage(string text, bool isTTS = false)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.CreateMessage(Guild.Id, Id, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.CreateMessage(Guild.Id, Id, args).ConfigureAwait(false);
             return new Message(this, model);
         }
         /// <inheritdoc />
@@ -89,7 +89,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.BaseClient.UploadFile(Guild.Id, Id, file, args).ConfigureAwait(false);
+                var model = await Discord.APIClient.UploadFile(Guild.Id, Id, file, args).ConfigureAwait(false);
                 return new Message(this, model);
             }
         }
@@ -97,20 +97,20 @@ namespace Discord.Rest
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.UploadFile(Guild.Id, Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.UploadFile(Guild.Id, Id, stream, args).ConfigureAwait(false);
             return new Message(this, model);
         }
 
         /// <inheritdoc />
         public async Task DeleteMessages(IEnumerable<IMessage> messages)
         {
-            await Discord.BaseClient.DeleteMessages(Guild.Id, Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.APIClient.DeleteMessages(Guild.Id, Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task TriggerTyping()
         {
-            await Discord.BaseClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.APIClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";

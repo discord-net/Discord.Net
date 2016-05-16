@@ -30,7 +30,7 @@ namespace Discord.Rest
 
             var args = new ModifyVoiceChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
             Update(model);
         }
 

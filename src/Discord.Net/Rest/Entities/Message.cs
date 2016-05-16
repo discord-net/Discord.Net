@@ -125,9 +125,9 @@ namespace Discord.Rest
 
             Model model;
             if (guildChannel != null)
-                model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.APIClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                model = await Discord.BaseClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.APIClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model);
         }
 
@@ -136,9 +136,9 @@ namespace Discord.Rest
         {
             var guildChannel = Channel as GuildChannel;
             if (guildChannel != null)
-                await Discord.BaseClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+                await Discord.APIClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
             else
-                await Discord.BaseClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
+                await Discord.APIClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;

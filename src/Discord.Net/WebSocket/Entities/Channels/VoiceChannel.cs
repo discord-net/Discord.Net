@@ -34,7 +34,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyVoiceChannelParams();
             func(args);
-            await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            await Discord.APIClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
         }
 
         public override GuildUser GetUser(ulong id)

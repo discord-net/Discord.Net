@@ -60,12 +60,12 @@ namespace Discord.Rest
 
             var args = new ModifyGuildRoleParams();
             func(args);
-            var response = await Discord.BaseClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
+            var response = await Discord.APIClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
             Update(response);
         }
         /// <summary> Deletes this message. </summary>
         public async Task Delete()
-            => await Discord.BaseClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
+            => await Discord.APIClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
 
         /// <inheritdoc />
         public override string ToString() => Name;
@@ -76,7 +76,7 @@ namespace Discord.Rest
         async Task<IEnumerable<IGuildUser>> IRole.GetUsers()
         {
             //A tad hacky, but it works
-            var models = await Discord.BaseClient.GetGuildMembers(Guild.Id, new GetGuildMembersParams()).ConfigureAwait(false);
+            var models = await Discord.APIClient.GetGuildMembers(Guild.Id, new GetGuildMembersParams()).ConfigureAwait(false);
             return models.Where(x => x.Roles.Contains(Id)).Select(x => new GuildUser(Guild, x));
         }
     }

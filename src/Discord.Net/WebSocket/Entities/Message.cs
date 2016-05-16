@@ -124,9 +124,9 @@ namespace Discord.WebSocket
             var guildChannel = Channel as GuildChannel;
             
             if (guildChannel != null)
-                await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                await Discord.APIClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                await Discord.BaseClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                await Discord.APIClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -134,9 +134,9 @@ namespace Discord.WebSocket
         {
             var guildChannel = Channel as GuildChannel;
             if (guildChannel != null)
-                await Discord.BaseClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+                await Discord.APIClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
             else
-                await Discord.BaseClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
+                await Discord.APIClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;

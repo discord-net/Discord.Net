@@ -105,7 +105,7 @@
     <Compile Include="Common\Entities\Users\Game.cs" />
     <Compile Include="Common\Entities\Users\StreamType.cs" />
     <Compile Include="DiscordConfig.cs" />
-    <Compile Include="API\DiscordRawClient.cs" />
+    <Compile Include="API\DiscordAPIClient.cs" />
     <Compile Include="API\Int53Attribute.cs" />
     <Compile Include="Preconditions.cs" />
     <Compile Include="Net\Converters\DiscordContractResolver.cs" />

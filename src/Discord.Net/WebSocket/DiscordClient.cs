@@ -27,7 +27,7 @@ namespace Discord.WebSocket
             }
         }
 
-        public DiscordRawClient BaseClient
+        public DiscordAPIClient APIClient
         {
             get
             {

@@ -30,7 +30,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task Update()
         {
-            var model = await Discord.BaseClient.GetCurrentUser().ConfigureAwait(false);
+            var model = await Discord.APIClient.GetCurrentUser().ConfigureAwait(false);
             Update(model);
         }
 
@@ -41,7 +41,7 @@ namespace Discord.Rest
 
             var args = new ModifyCurrentUserParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyCurrentUser(args).ConfigureAwait(false);
+            var model = await Discord.APIClient.ModifyCurrentUser(args).ConfigureAwait(false);
             Update(model);
         }
     }

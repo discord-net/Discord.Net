@@ -75,7 +75,7 @@ namespace Discord.WebSocket
         public async Task<Message> SendMessage(string text, bool isTTS = false)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.CreateDMMessage(Id, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.CreateDMMessage(Id, args).ConfigureAwait(false);
             return new Message(this, model);
         }
         /// <inheritdoc />
@@ -85,7 +85,7 @@ namespace Discord.WebSocket
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.BaseClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
+                var model = await Discord.APIClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
                 return new Message(this, model);
             }
         }
@@ -93,26 +93,26 @@ namespace Discord.WebSocket
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.APIClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
             return new Message(this, model);
         }
 
         /// <inheritdoc />
         public async Task DeleteMessages(IEnumerable<IMessage> messages)
         {
-            await Discord.BaseClient.DeleteDMMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.APIClient.DeleteDMMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task TriggerTyping()
         {
-            await Discord.BaseClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.APIClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task Close()
         {
-            await Discord.BaseClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteChannel(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />

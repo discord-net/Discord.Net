@@ -48,7 +48,7 @@ namespace Discord.Rest
         public async Task<DMChannel> CreateDMChannel()
         {
             var args = new CreateDMChannelParams { RecipientId = Id };
-            var model = await Discord.BaseClient.CreateDMChannel(args).ConfigureAwait(false);
+            var model = await Discord.APIClient.CreateDMChannel(args).ConfigureAwait(false);
 
             return new DMChannel(Discord, model);
         }

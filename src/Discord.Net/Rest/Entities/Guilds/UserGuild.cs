@@ -42,12 +42,12 @@ namespace Discord
         /// <inheritdoc />
         public async Task Leave()
         {
-            await Discord.BaseClient.LeaveGuild(Id).ConfigureAwait(false);
+            await Discord.APIClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
+            await Discord.APIClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

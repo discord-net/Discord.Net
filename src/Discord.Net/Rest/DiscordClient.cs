@@ -24,11 +24,11 @@ namespace Discord.Rest
         private SelfUser _currentUser;
 
         public bool IsLoggedIn { get; private set; }
-        public API.DiscordRawClient BaseClient { get; private set; }
+        public API.DiscordAPIClient APIClient { get; private set; }
 
-        public TokenType AuthTokenType => BaseClient.AuthTokenType;
-        public IRestClient RestClient => BaseClient.RestClient;
-        public IRequestQueue RequestQueue => BaseClient.RequestQueue;
+        public TokenType AuthTokenType => APIClient.AuthTokenType;
+        public IRestClient RestClient => APIClient.RestClient;
+        public IRequestQueue RequestQueue => APIClient.RequestQueue;
 
         public DiscordClient(DiscordConfig config = null)
         {
@@ -40,7 +40,7 @@ namespace Discord.Rest
             _connectionLock = new SemaphoreSlim(1, 1);
             _log = new LogManager(config.LogLevel);
             _userAgent = DiscordConfig.UserAgent;
-            BaseClient = new API.DiscordRawClient(_restClientProvider);
+            APIClient = new API.DiscordAPIClient(_restClientProvider);
 
             _log.Message += (s,e) => Log.Raise(this, e);
         }
@@ -72,7 +72,7 @@ namespace Discord.Rest
                 _cancelTokenSource = new CancellationTokenSource();
 
                 var args = new LoginParams { Email = email, Password = password };
-                await BaseClient.Login(args, _cancelTokenSource.Token).ConfigureAwait(false);
+                await APIClient.Login(args, _cancelTokenSource.Token).ConfigureAwait(false);
                 await CompleteLogin(false).ConfigureAwait(false);
             }
             catch { await LogoutInternal().ConfigureAwait(false); throw; }
@@ -85,22 +85,22 @@ namespace Discord.Rest
             {
                 _cancelTokenSource = new CancellationTokenSource();
 
-                await BaseClient.Login(tokenType, token, _cancelTokenSource.Token).ConfigureAwait(false);
+                await APIClient.Login(tokenType, token, _cancelTokenSource.Token).ConfigureAwait(false);
                 await CompleteLogin(validateToken).ConfigureAwait(false);
             }
             catch { await LogoutInternal().ConfigureAwait(false); throw; }
         }
         private async Task CompleteLogin(bool validateToken)
         {
-            BaseClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+            APIClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
 
             if (validateToken)
             {
                 try
                 {
-                    await BaseClient.ValidateToken().ConfigureAwait(false);
+                    await APIClient.ValidateToken().ConfigureAwait(false);
                 }
-                catch { await BaseClient.Logout().ConfigureAwait(false); }
+                catch { await APIClient.Logout().ConfigureAwait(false); }
             }
             
             IsLoggedIn = true;
@@ -127,7 +127,7 @@ namespace Discord.Rest
                 catch { }
             }
 
-            await BaseClient.Logout().ConfigureAwait(false);
+            await APIClient.Logout().ConfigureAwait(false);
             _currentUser = null;
 
             if (wasLoggedIn)
@@ -139,18 +139,18 @@ namespace Discord.Rest
 
         public async Task<IEnumerable<Connection>> GetConnections()
         {
-            var models = await BaseClient.GetCurrentUserConnections().ConfigureAwait(false);
+            var models = await APIClient.GetCurrentUserConnections().ConfigureAwait(false);
             return models.Select(x => new Connection(x));
         }
 
         public async Task<IChannel> GetChannel(ulong id)
         {
-            var model = await BaseClient.GetChannel(id).ConfigureAwait(false);
+            var model = await APIClient.GetChannel(id).ConfigureAwait(false);
             if (model != null)
             {
                 if (model.GuildId != null)
                 {
-                    var guildModel = await BaseClient.GetGuild(model.GuildId.Value).ConfigureAwait(false);
+                    var guildModel = await APIClient.GetGuild(model.GuildId.Value).ConfigureAwait(false);
                     if (guildModel != null)
                     {
                         var guild = new Guild(this, guildModel);
@@ -164,13 +164,13 @@ namespace Discord.Rest
         }
         public async Task<IEnumerable<DMChannel>> GetDMChannels()
         {
-            var models = await BaseClient.GetCurrentUserDMs().ConfigureAwait(false);
+            var models = await APIClient.GetCurrentUserDMs().ConfigureAwait(false);
             return models.Select(x => new DMChannel(this, x));
         }
 
         public async Task<Invite> GetInvite(string inviteIdOrXkcd)
         {
-            var model = await BaseClient.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
+            var model = await APIClient.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
             if (model != null)
                 return new Invite(this, model);
             return null;
@@ -178,41 +178,41 @@ namespace Discord.Rest
 
         public async Task<Guild> GetGuild(ulong id)
         {
-            var model = await BaseClient.GetGuild(id).ConfigureAwait(false);
+            var model = await APIClient.GetGuild(id).ConfigureAwait(false);
             if (model != null)
                 return new Guild(this, model);
             return null;
         }
         public async Task<GuildEmbed> GetGuildEmbed(ulong id)
         {
-            var model = await BaseClient.GetGuildEmbed(id).ConfigureAwait(false);
+            var model = await APIClient.GetGuildEmbed(id).ConfigureAwait(false);
             if (model != null)
                 return new GuildEmbed(model);
             return null;
         }
         public async Task<IEnumerable<UserGuild>> GetGuilds()
         {
-            var models = await BaseClient.GetCurrentUserGuilds().ConfigureAwait(false);
+            var models = await APIClient.GetCurrentUserGuilds().ConfigureAwait(false);
             return models.Select(x => new UserGuild(this, x));
 
         }
         public async Task<Guild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null)
         {
             var args = new CreateGuildParams();
-            var model = await BaseClient.CreateGuild(args).ConfigureAwait(false);
+            var model = await APIClient.CreateGuild(args).ConfigureAwait(false);
             return new Guild(this, model);
         }
 
         public async Task<User> GetUser(ulong id)
         {
-            var model = await BaseClient.GetUser(id).ConfigureAwait(false);
+            var model = await APIClient.GetUser(id).ConfigureAwait(false);
             if (model != null)
                 return new PublicUser(this, model);
             return null;
         }
         public async Task<User> GetUser(string username, ushort discriminator)
         {
-            var model = await BaseClient.GetUser(username, discriminator).ConfigureAwait(false);
+            var model = await APIClient.GetUser(username, discriminator).ConfigureAwait(false);
             if (model != null)
                 return new PublicUser(this, model);
             return null;
@@ -222,7 +222,7 @@ namespace Discord.Rest
             var user = _currentUser;
             if (user == null)
             {
-                var model = await BaseClient.GetCurrentUser().ConfigureAwait(false);
+                var model = await APIClient.GetCurrentUser().ConfigureAwait(false);
                 user = new SelfUser(this, model);
                 _currentUser = user;
             }
@@ -230,23 +230,23 @@ namespace Discord.Rest
         }
         public async Task<IEnumerable<User>> QueryUsers(string query, int limit)
         {
-            var models = await BaseClient.QueryUsers(query, limit).ConfigureAwait(false);
+            var models = await APIClient.QueryUsers(query, limit).ConfigureAwait(false);
             return models.Select(x => new PublicUser(this, x));
         }
 
         public async Task<IEnumerable<VoiceRegion>> GetVoiceRegions()
         {
-            var models = await BaseClient.GetVoiceRegions().ConfigureAwait(false);
+            var models = await APIClient.GetVoiceRegions().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x));
         }
         public async Task<VoiceRegion> GetVoiceRegion(string id)
         {
-            var models = await BaseClient.GetVoiceRegions().ConfigureAwait(false);
+            var models = await APIClient.GetVoiceRegions().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x)).Where(x => x.Id == id).FirstOrDefault();
         }
         public async Task<VoiceRegion> GetOptimalVoiceRegion()
         {
-            var models = await BaseClient.GetVoiceRegions().ConfigureAwait(false);
+            var models = await APIClient.GetVoiceRegions().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x)).Where(x => x.IsOptimal).FirstOrDefault();
         }
 
@@ -261,7 +261,7 @@ namespace Discord.Rest
         }
         public void Dispose() => Dispose(true);
 
-        API.DiscordRawClient IDiscordClient.BaseClient => BaseClient;
+        API.DiscordAPIClient IDiscordClient.APIClient => APIClient;
 
         async Task<IChannel> IDiscordClient.GetChannel(ulong id)
             => await GetChannel(id).ConfigureAwait(false);
