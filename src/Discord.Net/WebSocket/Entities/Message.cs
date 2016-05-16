@@ -140,7 +140,7 @@ namespace Discord.WebSocket
         }
 
         public override string ToString() => Text;
-        private string DebuggerDisplay => $"{Author}: {Text}";
+        private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
 
         IUser IMessage.Author => Author;
         IReadOnlyList<Attachment> IMessage.Attachments => Attachments;
