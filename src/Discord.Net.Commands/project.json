@@ -15,7 +15,6 @@
 
   "buildOptions": {
     "compile": [ "**/*.cs", "../Discord.Net.Shared/*.cs" ],
-    "preserveCompilationContext": true,
     "warningsAsErrors": true
   },
 
