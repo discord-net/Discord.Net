@@ -21,6 +21,3 @@ In order to compile Discord.Net, you require at least the following:
 - [Visual Studio 2015 Update 2](https://www.visualstudio.com/en-us/news/vs2015-update2-vs.aspx)
 - [Visual Studio .Net Core Plugin](https://dot.net)
 - NuGet 3.3+ (available through Visual Studio)
-
-### Known Issues
-- .Net Core support is incomplete on non-Windows systems
