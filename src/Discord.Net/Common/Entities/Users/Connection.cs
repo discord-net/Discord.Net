@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Model = Discord.API.Connection;
 
-namespace Discord.Rest
+namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Connection : IConnection

@@ -75,6 +75,7 @@ namespace Discord.Net.Rest
                 {
                     foreach (var p in multipartParams)
                     {
+#if CSHARP7
                         switch (p.Value)
                         {
                             case string value:
@@ -92,6 +93,22 @@ namespace Discord.Net.Rest
                             default:
                                 throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
                         }
+#else
+                        var stringValue = p.Value as string;
+                        if (stringValue != null) { content.Add(new StringContent(stringValue), p.Key); continue; }
+                        var byteArrayValue = p.Value as byte[];
+                        if (byteArrayValue != null) { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
+                        var streamValue = p.Value as Stream;
+                        if (streamValue != null) { content.Add(new StreamContent(streamValue), p.Key); continue; }
+                        if (p.Value is MultipartFile)
+                        {
+                            var fileValue = (MultipartFile)p.Value;
+                            content.Add(new StreamContent(fileValue.Stream), fileValue.Filename, p.Key);
+                            continue;
+                        }
+
+                        throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
+#endif
                     }
                 }
                 restRequest.Content = content;
@@ -101,21 +118,9 @@ namespace Discord.Net.Rest
 
         private async Task<Stream> SendInternal(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
-            int retryCount = 0;
             while (true)
             {
-                HttpResponseMessage response;
-                try
-                {
-                    response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
-                }
-                catch (WebException ex)
-                {
-                    //The request was aborted: Could not create SSL/TLS secure channel.
-                    if (ex.HResult == HR_SECURECHANNELFAILED && retryCount++ < 5)
-                        continue; //Retrying seems to fix this somehow?
-                    throw;
-                }
+                HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
 
                 int statusCode = (int)response.StatusCode;
                 if (statusCode < 200 || statusCode >= 300) //2xx = Success

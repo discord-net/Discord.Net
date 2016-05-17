@@ -7,17 +7,14 @@ namespace Discord.WebSocket
 {
     public class SelfUser : User, ISelfUser
     {
-        internal override DiscordClient Discord { get; }
-
         /// <inheritdoc />
         public string Email { get; private set; }
         /// <inheritdoc />
         public bool IsVerified { get; private set; }
 
         internal SelfUser(DiscordClient discord, Model model)
-            : base(model)
+            : base(discord, model)
         {
-            Discord = discord;
         }
         internal override void Update(Model model)
         {
@@ -34,7 +31,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyCurrentUserParams();
             func(args);
-            await Discord.APIClient.ModifyCurrentUser(args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyCurrentUser(args).ConfigureAwait(false);
         }
 
         Task IUpdateable.Update() 

@@ -47,13 +47,13 @@ namespace Discord
         /// <inheritdoc />
         public async Task Accept()
         {
-            await Discord.APIClient.AcceptInvite(Code).ConfigureAwait(false);
+            await Discord.ApiClient.AcceptInvite(Code).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.APIClient.DeleteInvite(Code).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteInvite(Code).ConfigureAwait(false);
         }
 
         /// <inheritdoc />

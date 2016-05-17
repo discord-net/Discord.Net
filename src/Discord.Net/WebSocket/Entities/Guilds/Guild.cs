@@ -6,18 +6,21 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Guild;
-using EmbedModel = Discord.API.GuildEmbed;
-using RoleModel = Discord.API.Role;
 using System.Diagnostics;
 
 namespace Discord.WebSocket
 {
     /// <summary> Represents a Discord guild (called a server in the official client). </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Guild : IGuild
+    public class Guild : IGuild, IUserGuild
     {
+        private ConcurrentDictionary<ulong, GuildChannel> _channels;
+        private ConcurrentDictionary<ulong, GuildUser> _members;
         private ConcurrentDictionary<ulong, Role> _roles;
+        private ulong _ownerId;
+        private ulong? _afkChannelId, _embedChannelId;
         private string _iconId, _splashId;
+        private int _userCount;
 
         /// <inheritdoc />
         public ulong Id { get; }
@@ -31,34 +34,52 @@ namespace Discord.WebSocket
         public bool IsEmbeddable { get; private set; }
         /// <inheritdoc />
         public int VerificationLevel { get; private set; }
-        public int UserCount { get; private set; }
-
+        
         /// <inheritdoc />
-        public ulong? AFKChannelId { get; private set; }
-        /// <inheritdoc />
-        public ulong? EmbedChannelId { get; private set; }
-        /// <inheritdoc />
-        public ulong OwnerId { get; private set; }
-        /// <inheritdoc />
-        public string VoiceRegionId { get; private set; }
+        public VoiceRegion VoiceRegion { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<Emoji> Emojis { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<string> Features { get; private set; }
-
+        
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
+
         /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
         /// <inheritdoc />
         public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, _splashId);
-        /// <inheritdoc />
-        public ulong DefaultChannelId => Id;
-        /// <inheritdoc />
+
+        /// <summary> Gets the number of channels in this guild. </summary>
+        public int ChannelCount => _channels.Count;
+        /// <summary> Gets the number of roles in this guild. </summary>
+        public int RoleCount => _roles.Count;
+        /// <summary> Gets the number of users in this guild. </summary>
+        public int UserCount => _userCount;
+        /// <summary> Gets the number of users downloaded for this guild so far. </summary>
+        internal int CurrentUserCount => _members.Count;
+
+        /// <summary> Gets the the role representing all users in a guild. </summary>
         public Role EveryoneRole => GetRole(Id);
+        public GuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
+        /// <summary> Gets the user that created this guild. </summary>
+        public GuildUser Owner => GetUser(_ownerId);
+        /// <summary> Gets the default channel for this guild. </summary>
+        public TextChannel DefaultChannel => GetChannel(Id) as TextChannel;
+        /// <summary> Gets the AFK voice channel for this guild. </summary>
+        public VoiceChannel AFKChannel => GetChannel(_afkChannelId.GetValueOrDefault(0)) as VoiceChannel;
+        /// <summary> Gets the embed channel for this guild. </summary>
+        public IChannel EmbedChannel => GetChannel(_embedChannelId.GetValueOrDefault(0)); //TODO: Is this text or voice?
+        /// <summary> Gets a collection of all channels in this guild. </summary>
+        public IEnumerable<GuildChannel> Channels => _channels.Select(x => x.Value);
+        /// <summary> Gets a collection of text channels in this guild. </summary>
+        public IEnumerable<TextChannel> TextChannels => _channels.Select(x => x.Value).OfType<TextChannel>();
+        /// <summary> Gets a collection of voice channels in this guild. </summary>
+        public IEnumerable<VoiceChannel> VoiceChannels => _channels.Select(x => x.Value).OfType<VoiceChannel>();
         /// <summary> Gets a collection of all roles in this guild. </summary>
         public IEnumerable<Role> Roles => _roles?.Select(x => x.Value) ?? Enumerable.Empty<Role>();
-        public IEnumerable<GuildUser> Users => Array.Empty<GuildUser>();
+        /// <summary> Gets a collection of all users in this guild. </summary>
+        public IEnumerable<GuildUser> Users => _members.Select(x => x.Value);
 
         internal Guild(DiscordClient discord, Model model)
         {
@@ -69,15 +90,15 @@ namespace Discord.WebSocket
         }
         private void Update(Model model)
         {
-            AFKChannelId = model.AFKChannelId;
+            _afkChannelId = model.AFKChannelId;
             AFKTimeout = model.AFKTimeout;
-            EmbedChannelId = model.EmbedChannelId;
+            _embedChannelId = model.EmbedChannelId;
             IsEmbeddable = model.EmbedEnabled;
             Features = model.Features;
             _iconId = model.Icon;
             Name = model.Name;
-            OwnerId = model.OwnerId;
-            VoiceRegionId = model.Region;
+            _ownerId = model.OwnerId;
+            VoiceRegion = Discord.GetVoiceRegion(model.Region);
             _splashId = model.Splash;
             VerificationLevel = model.VerificationLevel;
 
@@ -99,20 +120,6 @@ namespace Discord.WebSocket
             }
             _roles = roles;
         }
-        private void Update(EmbedModel model)
-        {
-            IsEmbeddable = model.Enabled;
-            EmbedChannelId = model.ChannelId;
-        }
-        private void Update(IEnumerable<RoleModel> models)
-        {
-            Role role;
-            foreach (var model in models)
-            {
-                if (_roles.TryGetValue(model.Id, out role))
-                    role.Update(model);
-            }
-        }
         
         /// <inheritdoc />
         public async Task Modify(Action<ModifyGuildParams> func)
@@ -121,7 +128,7 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildParams();
             func(args);
-            await Discord.APIClient.ModifyGuild(Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuild(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyEmbed(Action<ModifyGuildEmbedParams> func)
@@ -130,67 +137,58 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildEmbedParams();
             func(args);
-            await Discord.APIClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyChannels(IEnumerable<ModifyGuildChannelsParams> args)
         {
-            await Discord.APIClient.ModifyGuildChannels(Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildChannels(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task ModifyRoles(IEnumerable<ModifyGuildRolesParams> args)
         {            
-            await Discord.APIClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Leave()
         {
-            await Discord.APIClient.LeaveGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.APIClient.DeleteGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<User>> GetBans()
         {
-            var models = await Discord.APIClient.GetGuildBans(Id).ConfigureAwait(false);
-            return models.Select(x => new PublicUser(Discord, x));
+            var models = await Discord.ApiClient.GetGuildBans(Id).ConfigureAwait(false);
+            return models.Select(x => new User(Discord, x));
         }
         /// <inheritdoc />
         public Task AddBan(IUser user, int pruneDays = 0) => AddBan(user, pruneDays);
         /// <inheritdoc />
         public async Task AddBan(ulong userId, int pruneDays = 0)
         {
-            var args = new CreateGuildBanParams()
-            {
-                PruneDays = pruneDays
-            };
-            await Discord.APIClient.CreateGuildBan(Id, userId, args).ConfigureAwait(false);
+            var args = new CreateGuildBanParams() { PruneDays = pruneDays };
+            await Discord.ApiClient.CreateGuildBan(Id, userId, args).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public Task RemoveBan(IUser user) => RemoveBan(user.Id);
         /// <inheritdoc />
         public async Task RemoveBan(ulong userId)
         {
-            await Discord.APIClient.RemoveGuildBan(Id, userId).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildBan(Id, userId).ConfigureAwait(false);
         }
 
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
-        public async Task<GuildChannel> GetChannel(ulong id)
+        public GuildChannel GetChannel(ulong id)
         {
-            var model = await Discord.APIClient.GetChannel(Id, id).ConfigureAwait(false);
-            if (model != null)
-                return ToChannel(model);
+            GuildChannel channel;
+            if (_channels.TryGetValue(id, out channel))
+                return channel;
             return null;
-        }
-        /// <summary> Gets a collection of all channels in this guild. </summary>
-        public async Task<IEnumerable<GuildChannel>> GetChannels()
-        {
-            var models = await Discord.APIClient.GetGuildChannels(Id).ConfigureAwait(false);
-            return models.Select(x => ToChannel(x));
         }
         /// <summary> Creates a new text channel. </summary>
         public async Task<TextChannel> CreateTextChannel(string name)
@@ -198,7 +196,7 @@ namespace Discord.WebSocket
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams() { Name = name, Type = ChannelType.Text };
-            var model = await Discord.APIClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
             return new TextChannel(this, model);
         }
         /// <summary> Creates a new voice channel. </summary>
@@ -207,28 +205,22 @@ namespace Discord.WebSocket
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams { Name = name, Type = ChannelType.Voice };
-            var model = await Discord.APIClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
             return new VoiceChannel(this, model);
         }
-
-        /// <summary> Gets a collection of all integrations attached to this guild. </summary>
-        public async Task<IEnumerable<GuildIntegration>> GetIntegrations()
-        {
-            var models = await Discord.APIClient.GetGuildIntegrations(Id).ConfigureAwait(false);
-            return models.Select(x => new GuildIntegration(this, x));
-        }
+        
         /// <summary> Creates a new integration for this guild. </summary>
         public async Task<GuildIntegration> CreateIntegration(ulong id, string type)
         {
             var args = new CreateGuildIntegrationParams { Id = id, Type = type };
-            var model = await Discord.APIClient.CreateGuildIntegration(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildIntegration(Id, args).ConfigureAwait(false);
             return new GuildIntegration(this, model);
         }
 
         /// <summary> Gets a collection of all invites to this guild. </summary>
         public async Task<IEnumerable<InviteMetadata>> GetInvites()
         {
-            var models = await Discord.APIClient.GetGuildInvites(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildInvites(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x));
         }
         /// <summary> Creates a new invite to this guild. </summary>
@@ -244,7 +236,7 @@ namespace Discord.WebSocket
                 Temporary = isTemporary,
                 XkcdPass = withXkcd
             };
-            var model = await Discord.APIClient.CreateChannelInvite(DefaultChannelId, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);
         }
 
@@ -262,7 +254,7 @@ namespace Discord.WebSocket
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             
-            var model = await Discord.APIClient.CreateGuildRole(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildRole(Id).ConfigureAwait(false);
             var role = new Role(this, model);
 
             await role.Modify(x =>
@@ -275,43 +267,23 @@ namespace Discord.WebSocket
 
             return role;
         }
-
-        /// <summary> Gets a collection of all users in this guild. </summary>
-        public async Task<IEnumerable<GuildUser>> GetUsers()
-        {
-            var args = new GetGuildMembersParams();
-            var models = await Discord.APIClient.GetGuildMembers(Id, args).ConfigureAwait(false);
-            return models.Select(x => new GuildUser(this, x));
-        }
-        /// <summary> Gets a paged collection of all users in this guild. </summary>
-        public async Task<IEnumerable<GuildUser>> GetUsers(int limit, int offset)
-        {
-            var args = new GetGuildMembersParams { Limit = limit, Offset = offset };
-            var models = await Discord.APIClient.GetGuildMembers(Id, args).ConfigureAwait(false);
-            return models.Select(x => new GuildUser(this, x));
-        }
+        
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
-        public async Task<GuildUser> GetUser(ulong id)
+        public GuildUser GetUser(ulong id)
         {
-            var model = await Discord.APIClient.GetGuildMember(Id, id).ConfigureAwait(false);
-            if (model != null)
-                return new GuildUser(this, model);
+            GuildUser user;
+            if (_members.TryGetValue(id, out user))
+                return user;
             return null;
-        }
-        /// <summary> Gets a the current user. </summary>
-        public async Task<GuildUser> GetCurrentUser()
-        {
-            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
-            return await GetUser(currentUser.Id).ConfigureAwait(false);
         }
         public async Task<int> PruneUsers(int days = 30, bool simulate = false)
         {
             var args = new GuildPruneParams() { Days = days };
             GetGuildPruneCountResponse model;
             if (simulate)
-                model = await Discord.APIClient.GetGuildPruneCount(Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.GetGuildPruneCount(Id, args).ConfigureAwait(false);
             else
-                model = await Discord.APIClient.BeginGuildPrune(Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.BeginGuildPrune(Id, args).ConfigureAwait(false);
             return model.Pruned;
         }
 
@@ -331,15 +303,22 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Name} ({Id})";
 
         IEnumerable<Emoji> IGuild.Emojis => Emojis;
-        ulong IGuild.EveryoneRoleId => EveryoneRole.Id;
         IEnumerable<string> IGuild.Features => Features;
+        ulong? IGuild.AFKChannelId => _afkChannelId;
+        ulong IGuild.DefaultChannelId => Id;
+        ulong? IGuild.EmbedChannelId => _embedChannelId;
+        ulong IGuild.EveryoneRoleId => EveryoneRole.Id;
+        ulong IGuild.OwnerId => _ownerId;
+        string IGuild.VoiceRegionId => VoiceRegion.Id;
+        bool IUserGuild.IsOwner => CurrentUser.Id == _ownerId;
+        GuildPermissions IUserGuild.Permissions => CurrentUser.GuildPermissions;
 
         async Task<IEnumerable<IUser>> IGuild.GetBans()
             => await GetBans().ConfigureAwait(false);
-        async Task<IGuildChannel> IGuild.GetChannel(ulong id)
-            => await GetChannel(id).ConfigureAwait(false);
-        async Task<IEnumerable<IGuildChannel>> IGuild.GetChannels()
-            => await GetChannels().ConfigureAwait(false);
+        Task<IGuildChannel> IGuild.GetChannel(ulong id)
+            => Task.FromResult<IGuildChannel>(GetChannel(id));
+        Task<IEnumerable<IGuildChannel>> IGuild.GetChannels()
+            => Task.FromResult<IEnumerable<IGuildChannel>>(Channels);
         async Task<IInviteMetadata> IGuild.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
         async Task<IRole> IGuild.CreateRole(string name, GuildPermissions? permissions, Color? color, bool isHoisted)
@@ -354,12 +333,12 @@ namespace Discord.WebSocket
             => Task.FromResult<IRole>(GetRole(id));
         Task<IEnumerable<IRole>> IGuild.GetRoles()
             => Task.FromResult<IEnumerable<IRole>>(Roles);
-        async Task<IGuildUser> IGuild.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
-        async Task<IGuildUser> IGuild.GetCurrentUser()
-            => await GetCurrentUser().ConfigureAwait(false);
-        async Task<IEnumerable<IGuildUser>> IGuild.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
+        Task<IGuildUser> IGuild.GetUser(ulong id)
+            => Task.FromResult<IGuildUser>(GetUser(id));
+        Task<IGuildUser> IGuild.GetCurrentUser()
+            => Task.FromResult<IGuildUser>(CurrentUser);
+        Task<IEnumerable<IGuildUser>> IGuild.GetUsers()
+            => Task.FromResult<IEnumerable<IGuildUser>>(Users);
         Task IUpdateable.Update() 
             => Task.CompletedTask;
     }

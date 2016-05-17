@@ -55,23 +55,13 @@ namespace Discord.Rest
 
         public async Task Update()
         {
-            var model = await Discord.APIClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
             Update(model);
-        }
-
-        public bool HasRole(IRole role)
-        {
-            for (int i = 0; i < _roles.Length; i++)
-            {
-                if (_roles[i].Id == role.Id)
-                    return true;
-            }
-            return false;
         }
 
         public async Task Kick()
         {
-            await Discord.APIClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
@@ -91,13 +81,13 @@ namespace Discord.Rest
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
-                await Discord.APIClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new API.Optional<string>(); //Remove
             }
 
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
             {
-                await Discord.APIClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
                     IsDeaf = args.Deaf.Value;
                 if (args.Mute.IsSpecified)

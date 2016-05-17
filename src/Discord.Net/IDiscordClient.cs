@@ -10,7 +10,7 @@ namespace Discord
     public interface IDiscordClient
     {
         TokenType AuthTokenType { get; }
-        DiscordAPIClient APIClient { get; }
+        DiscordApiClient ApiClient { get; }
         IRestClient RestClient { get; }
         IRequestQueue RequestQueue { get; }
 
@@ -36,6 +36,5 @@ namespace Discord
 
         Task<IEnumerable<IVoiceRegion>> GetVoiceRegions();
         Task<IVoiceRegion> GetVoiceRegion(string id);
-        Task<IVoiceRegion> GetOptimalVoiceRegion();
     }
 }

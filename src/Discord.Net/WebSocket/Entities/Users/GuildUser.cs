@@ -8,11 +8,12 @@ using Model = Discord.API.GuildMember;
 
 namespace Discord.WebSocket
 {
-    public class GuildUser : User, IGuildUser
+    public class GuildUser : IGuildUser
     {
         private ImmutableArray<Role> _roles;
 
         public Guild Guild { get; }
+        public User GlobalUser { get; }
 
         /// <inheritdoc />
         public bool IsDeaf { get; private set; }
@@ -23,18 +24,38 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Nickname { get; private set; }
         /// <inheritdoc />
+        public UserStatus Status { get; private set; }
+        /// <inheritdoc />
+        public Game? CurrentGame { get; private set; }
+        /// <inheritdoc />
         public VoiceChannel VoiceChannel { get; private set; }
+        /// <inheritdoc />
         public GuildPermissions GuildPermissions { get; private set; }
 
         /// <inheritdoc />
         public IReadOnlyList<Role> Roles => _roles;
-        internal override DiscordClient Discord => Guild.Discord;
+        /// <inheritdoc />
+        public string AvatarUrl => GlobalUser.AvatarUrl;
+        /// <inheritdoc />
+        public ushort Discriminator => GlobalUser.Discriminator;
+        /// <inheritdoc />
+        public bool IsBot => GlobalUser.IsBot;
+        /// <inheritdoc />
+        public string Username => GlobalUser.Username;
+        /// <inheritdoc />
+        public DateTime CreatedAt => GlobalUser.CreatedAt;
+        /// <inheritdoc />
+        public ulong Id => GlobalUser.Id;
+        /// <inheritdoc />
+        public string Mention => GlobalUser.Mention;
+        internal DiscordClient Discord => Guild.Discord;
 
-        internal GuildUser(Guild guild, Model model)
-            : base(model.User)
+        internal GuildUser(User globalUser, Guild guild, Model model)
         {
+            GlobalUser = globalUser;
             Guild = guild;
 
+            globalUser.Update(model.User);
             Update(model);
         }
         internal void Update(Model model)
@@ -57,19 +78,38 @@ namespace Discord.WebSocket
             GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
         }
 
-        public bool HasRole(IRole role)
+        public async Task Modify(Action<ModifyGuildMemberParams> func)
         {
-            for (int i = 0; i < _roles.Length; i++)
+            if (func == null) throw new NullReferenceException(nameof(func));
+
+            var args = new ModifyGuildMemberParams();
+            func(args);
+
+            bool isCurrentUser = Discord.CurrentUser.Id == Id;
+            if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                if (_roles[i].Id == role.Id)
-                    return true;
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
+                await Discord.ApiClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                args.Nickname = new API.Optional<string>(); //Remove
             }
-            return false;
+
+            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
+            {
+                await Discord.ApiClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                if (args.Deaf.IsSpecified)
+                    IsDeaf = args.Deaf.Value;
+                if (args.Mute.IsSpecified)
+                    IsMute = args.Mute.Value;
+                if (args.Nickname.IsSpecified)
+                    Nickname = args.Nickname.Value;
+                if (args.Roles.IsSpecified)
+                    _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+            }
         }
 
         public async Task Kick()
         {
-            await Discord.APIClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public GuildPermissions GetGuildPermissions()
@@ -82,33 +122,9 @@ namespace Discord.WebSocket
             return new ChannelPermissions(Permissions.ResolveChannel(this, channel, GuildPermissions.RawValue));
         }
 
-        public async Task Modify(Action<ModifyGuildMemberParams> func)
+        public async Task<DMChannel> CreateDMChannel()
         {
-            if (func == null) throw new NullReferenceException(nameof(func));
-
-            var args = new ModifyGuildMemberParams();
-            func(args);
-
-            bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
-            if (isCurrentUser && args.Nickname.IsSpecified)
-            {
-                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
-                await Discord.APIClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
-                args.Nickname = new API.Optional<string>(); //Remove
-            }
-
-            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
-            {
-                await Discord.APIClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
-                if (args.Deaf.IsSpecified)
-                    IsDeaf = args.Deaf.Value;
-                if (args.Mute.IsSpecified)
-                    IsMute = args.Mute.Value;
-                if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname.Value;
-                if (args.Roles.IsSpecified)
-                    _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
-            }
+            return await GlobalUser.CreateDMChannel().ConfigureAwait(false);
         }
 
 
@@ -118,7 +134,10 @@ namespace Discord.WebSocket
 
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);
+        async Task<IDMChannel> IUser.CreateDMChannel()
+            => await CreateDMChannel().ConfigureAwait(false);
         Task IUpdateable.Update() 
             => Task.CompletedTask;
+
     }
 }

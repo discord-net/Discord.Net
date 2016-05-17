@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordAPIClient
+    public class DiscordApiClient
     {
         internal event EventHandler<SentRequestEventArgs> SentRequest;
         
@@ -30,7 +30,7 @@ namespace Discord.API
         public IRestClient RestClient { get; private set; }
         public IRequestQueue RequestQueue { get; private set; }
 
-        public DiscordAPIClient(RestClientProvider restClientProvider)
+        public DiscordApiClient(RestClientProvider restClientProvider)
         {
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
             _restClient.SetHeader("accept", "*/*");

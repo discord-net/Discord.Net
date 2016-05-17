@@ -99,8 +99,9 @@ namespace Discord.WebSocket
                     RelativeDirection = dir,
                     RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id
                 };
-                var downloadedMessages = await _discord.APIClient.GetChannelMessages(_channel.Id, args).ConfigureAwait(false);
-                return cachedMessages.AsEnumerable().Concat(downloadedMessages.Select(x => new Message(_channel, x))).ToImmutableArray();
+                var downloadedMessages = await _discord.ApiClient.GetChannelMessages(_channel.Id, args).ConfigureAwait(false);
+                //TODO: Ugly channel cast
+                return cachedMessages.AsEnumerable().Concat(downloadedMessages.Select(x => new Message(_channel, (_channel as Channel).GetUser(x.Id), x))).ToImmutableArray();
             }
         }
     }

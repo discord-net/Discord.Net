@@ -6,14 +6,15 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    //TODO: Unload when there are no more references via DMUser or GuildUser
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public abstract class User : IUser
+    public class User : IUser
     {
         private string _avatarId;
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal abstract DiscordClient Discord { get; }
+        internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
         public ushort Discriminator { get; private set; }
@@ -21,6 +22,8 @@ namespace Discord.WebSocket
         public bool IsBot { get; private set; }
         /// <inheritdoc />
         public string Username { get; private set; }
+        /// <inheritdoc />
+        public DMChannel DMChannel { get; private set; }
 
         /// <inheritdoc />
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
@@ -31,8 +34,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string NicknameMention => MentionUtils.Mention(this, true);
 
-        internal User(Model model)
+        internal User(DiscordClient discord, Model model)
         {
+            Discord = discord;
             Id = model.Id;
 
             Update(model);
@@ -47,10 +51,16 @@ namespace Discord.WebSocket
 
         public async Task<DMChannel> CreateDMChannel()
         {
-            var args = new CreateDMChannelParams { RecipientId = Id };
-            var model = await Discord.APIClient.CreateDMChannel(args).ConfigureAwait(false);
+            var channel = DMChannel;
+            if (channel == null)
+            {
+                var args = new CreateDMChannelParams { RecipientId = Id };
+                var model = await Discord.ApiClient.CreateDMChannel(args).ConfigureAwait(false);
 
-            return new DMChannel(Discord, model);
+                channel = new DMChannel(Discord, this, model);
+                DMChannel = channel;
+            }
+            return channel;
         }
 
         public override string ToString() => $"{Username}#{Discriminator}";

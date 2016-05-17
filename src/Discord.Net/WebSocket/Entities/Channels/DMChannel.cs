@@ -1,5 +1,4 @@
 ﻿using Discord.API.Rest;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -11,41 +10,34 @@ using Model = Discord.API.Channel;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class DMChannel : IDMChannel
+    public class DMChannel : Channel, IDMChannel
     {
         private readonly MessageCache _messages;
-
-        /// <inheritdoc />
-        public ulong Id { get; }
+        
         internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
-        public DMUser Recipient { get; private set; }
-
+        public User Recipient { get; private set; }
+        
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
-        /// <inheritdoc />
-        public IEnumerable<IUser> Users => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
+        public new IEnumerable<User> Users => ImmutableArray.Create(Discord.CurrentUser, Recipient);
         public IEnumerable<Message> CachedMessages => _messages.Messages;
 
-        internal DMChannel(DiscordClient discord, Model model)
+        internal DMChannel(DiscordClient discord, User recipient, Model model)
+            : base(model.Id)
         {
-            Id = model.Id;
             Discord = discord;
+            Recipient = recipient;
             _messages = new MessageCache(Discord, this);
 
             Update(model);
         }
         private void Update(Model model)
         {
-            if (Recipient == null)
-                Recipient = new DMUser(this, model.Recipient);
-            else
-                Recipient.Update(model.Recipient);
+            Recipient.Update(model.Recipient);
         }
 
-        /// <inheritdoc />
-        public IUser GetUser(ulong id)
+        protected override User GetUserInternal(ulong id)
         {
             if (id == Recipient.Id)
                 return Recipient;
@@ -53,6 +45,10 @@ namespace Discord.WebSocket
                 return Discord.CurrentUser;
             else
                 return null;
+        }
+        protected override IEnumerable<User> GetUsersInternal()
+        {
+            return Users;
         }
 
         /// <summary> Gets the message from this channel's cache with the given id, or null if none was found. </summary>
@@ -75,8 +71,8 @@ namespace Discord.WebSocket
         public async Task<Message> SendMessage(string text, bool isTTS = false)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.APIClient.CreateDMMessage(Id, args).ConfigureAwait(false);
-            return new Message(this, model);
+            var model = await Discord.ApiClient.CreateDMMessage(Id, args).ConfigureAwait(false);
+            return new Message(this, GetUser(model.Id), model);
         }
         /// <inheritdoc />
         public async Task<Message> SendFile(string filePath, string text = null, bool isTTS = false)
@@ -85,49 +81,49 @@ namespace Discord.WebSocket
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.APIClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
-                return new Message(this, model);
+                var model = await Discord.ApiClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
+                return new Message(this, GetUser(model.Id), model);
             }
         }
         /// <inheritdoc />
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.APIClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
-            return new Message(this, model);
+            var model = await Discord.ApiClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
+            return new Message(this, GetUser(model.Id), model);
         }
 
         /// <inheritdoc />
         public async Task DeleteMessages(IEnumerable<IMessage> messages)
         {
-            await Discord.APIClient.DeleteDMMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteDMMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task TriggerTyping()
         {
-            await Discord.APIClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.ApiClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task Close()
         {
-            await Discord.APIClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannel(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public override string ToString() => '@' + Recipient.ToString();
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
 
-        IDMUser IDMChannel.Recipient => Recipient;
+        IUser IDMChannel.Recipient => Recipient;
         IEnumerable<IMessage> IMessageChannel.CachedMessages => CachedMessages;
 
         Task<IEnumerable<IUser>> IChannel.GetUsers()
-            => Task.FromResult(Users);
+            => Task.FromResult<IEnumerable<IUser>>(Users);
         Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
-            => Task.FromResult(Users.Skip(offset).Take(limit));
+            => Task.FromResult<IEnumerable<IUser>>(Users.Skip(offset).Take(limit));
         Task<IUser> IChannel.GetUser(ulong id)
-            => Task.FromResult(GetUser(id));
+            => Task.FromResult<IUser>(GetUser(id));
         Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
             => Task.FromResult<IMessage>(GetCachedMessage(id));
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)

@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    //TODO: Support mention_roles
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Message : IMessage
     {
@@ -28,33 +30,36 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IMessageChannel Channel { get; }
         /// <inheritdoc />
-        public User Author { get; }
+        public IUser Author { get; }
 
         /// <inheritdoc />
         public IReadOnlyList<Attachment> Attachments { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<Embed> Embeds { get; private set; }
         /// <inheritdoc />
-        public IReadOnlyList<PublicUser> MentionedUsers { get; private set; }
+        public IReadOnlyList<GuildUser> MentionedUsers { get; private set; }
         /// <inheritdoc />
-        public IReadOnlyList<ulong> MentionedChannelIds { get; private set; }
+        public IReadOnlyList<GuildChannel> MentionedChannels { get; private set; }
         /// <inheritdoc />
-        public IReadOnlyList<ulong> MentionedRoleIds { get; private set; }
+        public IReadOnlyList<Role> MentionedRoles { get; private set; }
 
         /// <inheritdoc />
         public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         internal DiscordClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
 
-        internal Message(IMessageChannel channel, Model model)
+        internal Message(IMessageChannel channel, IUser author, Model model)
         {
             Id = model.Id;
             Channel = channel;
-            Author = new PublicUser(Discord, model.Author);
+            Author = author;
 
             Update(model);
         }
         private void Update(Model model)
         {
+            var guildChannel = Channel as GuildChannel;
+            var guild = guildChannel?.Guild;
+
             IsTTS = model.IsTextToSpeech;
             Timestamp = model.Timestamp;
             EditedTimestamp = model.EditedTimestamp;
@@ -80,38 +85,38 @@ namespace Discord.WebSocket
             else
                 Embeds = Array.Empty<Embed>();
 
-            if (model.Mentions.Length > 0)
+            if (guildChannel != null && model.Mentions.Length > 0)
             {
-                var discord = Discord;
-                var builder = ImmutableArray.CreateBuilder<PublicUser>(model.Mentions.Length);
+                var builder = ImmutableArray.CreateBuilder<GuildUser>(model.Mentions.Length);
                 for (int i = 0; i < model.Mentions.Length; i++)
-                    builder.Add(new PublicUser(discord, model.Mentions[i]));
+                {
+                    var user = guild.GetUser(model.Mentions[i].Id);
+                    if (user != null)
+                        builder.Add(user);
+                }
                 MentionedUsers = builder.ToArray();
             }
             else
-                MentionedUsers = Array.Empty<PublicUser>();
-            MentionedChannelIds = MentionUtils.GetChannelMentions(model.Content);
-            MentionedRoleIds = MentionUtils.GetRoleMentions(model.Content);
-            if (model.IsMentioningEveryone)
+                MentionedUsers = Array.Empty<GuildUser>();
+
+            if (guildChannel != null/* && model.Content != null*/)
             {
-                ulong? guildId = (Channel as IGuildChannel)?.Guild.Id;
-                if (guildId != null)
-                {
-                    if (MentionedRoleIds.Count == 0)
-                        MentionedRoleIds = ImmutableArray.Create(guildId.Value);
-                    else
-                    {
-                        var builder = ImmutableArray.CreateBuilder<ulong>(MentionedRoleIds.Count + 1);
-                        builder.AddRange(MentionedRoleIds);
-                        builder.Add(guildId.Value);
-                        MentionedRoleIds = builder.ToImmutable();
-                    }
-                }
+                MentionedChannels = MentionUtils.GetChannelMentions(model.Content).Select(x => guild.GetChannel(x)).Where(x => x != null).ToImmutableArray();
+
+                var mentionedRoles = MentionUtils.GetRoleMentions(model.Content).Select(x => guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+                if (model.IsMentioningEveryone)
+                    mentionedRoles = mentionedRoles.Add(guild.EveryoneRole);
+                MentionedRoles = mentionedRoles;
+            }
+            else
+            {
+                MentionedChannels = Array.Empty<GuildChannel>();
+                MentionedRoles = Array.Empty<Role>();
             }
             
             Text = MentionUtils.CleanUserMentions(model.Content, model.Mentions);
 
-            Author.Update(model.Author);
+            //Author.Update(model.Author); //TODO: Uncomment this somehow
         }
 
         /// <inheritdoc />
@@ -124,9 +129,9 @@ namespace Discord.WebSocket
             var guildChannel = Channel as GuildChannel;
             
             if (guildChannel != null)
-                await Discord.APIClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                await Discord.APIClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -134,18 +139,17 @@ namespace Discord.WebSocket
         {
             var guildChannel = Channel as GuildChannel;
             if (guildChannel != null)
-                await Discord.APIClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+                await Discord.ApiClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
             else
-                await Discord.APIClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
+                await Discord.ApiClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;
         private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
 
         IUser IMessage.Author => Author;
-        IReadOnlyList<Attachment> IMessage.Attachments => Attachments;
-        IReadOnlyList<Embed> IMessage.Embeds => Embeds;
-        IReadOnlyList<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
         IReadOnlyList<IUser> IMessage.MentionedUsers => MentionedUsers;
+        IReadOnlyList<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
+        IReadOnlyList<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
     }
 }

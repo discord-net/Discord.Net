@@ -130,6 +130,7 @@ namespace Discord
                 if (overwrites.TryGetValue(user.Id, out entry))
                     resolvedPermissions = (resolvedPermissions & ~entry.Permissions.DenyValue) | entry.Permissions.AllowValue;
 
+#if CSHARP7
                 switch (channel)
                 {
                     case ITextChannel _:
@@ -140,10 +141,16 @@ namespace Discord
                         if (!GetValue(resolvedPermissions, ChannelPermission.Connect))
                             resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
                         break;
-                    default:
-                        resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
-                        break;
                 }
+#else
+                var textChannel = channel as ITextChannel;
+                var voiceChannel = channel as IVoiceChannel;
+                if (textChannel != null && !GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
+                    resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
+                else if (voiceChannel != null && !GetValue(resolvedPermissions, ChannelPermission.Connect))
+                    resolvedPermissions = 0; //No connect permission on a voice channel removes all other permissions
+#endif
+                resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
             }
 
             return resolvedPermissions;

@@ -64,11 +64,11 @@ namespace Discord
         }
 
         /// <summary> Gets the ids of all users mentioned in a provided text.</summary>
-        public static IReadOnlyList<ulong> GetUserMentions(string text) => GetMentions(text, _userRegex).ToArray();
+        public static IImmutableList<ulong> GetUserMentions(string text) => GetMentions(text, _userRegex).ToImmutableArray();
         /// <summary> Gets the ids of all channels mentioned in a provided text.</summary>
-        public static IReadOnlyList<ulong> GetChannelMentions(string text) => GetMentions(text, _channelRegex).ToArray();
+        public static IImmutableList<ulong> GetChannelMentions(string text) => GetMentions(text, _channelRegex).ToImmutableArray();
         /// <summary> Gets the ids of all roles mentioned in a provided text.</summary>
-        public static IReadOnlyList<ulong> GetRoleMentions(string text) => GetMentions(text, _roleRegex).ToArray();
+        public static IImmutableList<ulong> GetRoleMentions(string text) => GetMentions(text, _roleRegex).ToImmutableArray();
         private static ImmutableArray<ulong>.Builder GetMentions(string text, Regex regex)
         {
             var matches = regex.Matches(text);

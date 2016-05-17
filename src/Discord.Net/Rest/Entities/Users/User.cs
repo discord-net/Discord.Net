@@ -45,10 +45,10 @@ namespace Discord.Rest
             Username = model.Username;
         }
 
-        public async Task<DMChannel> CreateDMChannel()
+        protected virtual async Task<DMChannel> CreateDMChannelInternal()
         {
             var args = new CreateDMChannelParams { RecipientId = Id };
-            var model = await Discord.APIClient.CreateDMChannel(args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateDMChannel(args).ConfigureAwait(false);
 
             return new DMChannel(Discord, model);
         }
@@ -63,6 +63,6 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         async Task<IDMChannel> IUser.CreateDMChannel()
-            => await CreateDMChannel().ConfigureAwait(false);
+            => await CreateDMChannelInternal().ConfigureAwait(false);
     }
 }

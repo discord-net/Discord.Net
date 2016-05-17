@@ -10,7 +10,11 @@ namespace Discord
         /// <summary> Gets a blank GuildPermissions that grants no permissions. </summary>
         public static readonly GuildPermissions None = new GuildPermissions();
         /// <summary> Gets a GuildPermissions that grants all permissions. </summary>
+#if CSHARP7
         public static readonly GuildPermissions All = new GuildPermissions(0b000111_111111_0011111111_0000111111);
+#else
+        public static readonly GuildPermissions All = new GuildPermissions(Convert.ToUInt64("00011111111100111111110000111111", 2));
+#endif
 
         /// <summary> Gets a packed value representing all the permissions in this GuildPermissions. </summary>
         public ulong RawValue { get; }

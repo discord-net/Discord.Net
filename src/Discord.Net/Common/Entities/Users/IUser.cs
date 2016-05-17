@@ -17,6 +17,7 @@ namespace Discord
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
 
+        //TODO: CreateDMChannel is a candidate to move to IGuildUser, and User made a common class, depending on next friends list update
         /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
         Task<IDMChannel> CreateDMChannel();
     }

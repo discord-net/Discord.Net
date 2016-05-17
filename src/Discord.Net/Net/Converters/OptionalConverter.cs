@@ -8,7 +8,7 @@ namespace Discord.Net.Converters
     public class OptionalConverter : JsonConverter
     {
         public static readonly OptionalConverter Instance = new OptionalConverter();
-        internal static readonly PropertyInfo IsSpecifiedProperty = typeof(IOptional).GetProperty(nameof(IOptional.IsSpecified));
+        internal static readonly PropertyInfo IsSpecifiedProperty = typeof(IOptional).GetTypeInfo().GetDeclaredProperty(nameof(IOptional.IsSpecified));
 
         public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => false;

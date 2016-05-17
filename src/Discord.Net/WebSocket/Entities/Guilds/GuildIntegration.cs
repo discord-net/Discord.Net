@@ -31,7 +31,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Role Role { get; private set; }
         /// <inheritdoc />
-        public User User { get; private set; }
+        public GuildUser User { get; private set; }
         /// <inheritdoc />
         public IntegrationAccount Account { get; private set; }
         internal DiscordClient Discord => Guild.Discord;
@@ -54,13 +54,13 @@ namespace Discord.WebSocket
             SyncedAt = model.SyncedAt;
 
             Role = Guild.GetRole(model.RoleId);
-            User = new PublicUser(Discord, model.User);
+            User = Guild.GetUser(model.User.Id);
         }
 
         /// <summary>  </summary>
         public async Task Delete()
         {
-            await Discord.APIClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Modify(Action<ModifyGuildIntegrationParams> func)
@@ -69,12 +69,12 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            await Discord.APIClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Sync()
         {
-            await Discord.APIClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

@@ -29,9 +29,6 @@ namespace Discord
         /// <summary> Gets the channel-level permissions granted to this user for a given channel. </summary>
         ChannelPermissions GetPermissions(IGuildChannel channel);
 
-        /// <summary> Return true if this user has the provided role. </summary>
-        bool HasRole(IRole role);
-
         /// <summary> Kicks this user from this guild. </summary>
         Task Kick();
         /// <summary> Modifies this user's properties in this guild. </summary>

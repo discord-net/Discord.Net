@@ -35,6 +35,7 @@ namespace Discord.WebSocket
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => MentionUtils.Mention(this);
+        public IEnumerable<GuildUser> Users => Guild.Users.Where(x => x.Roles.Any(y => y.Id == Id));
         internal DiscordClient Discord => Guild.Discord;
 
         internal Role(Guild guild, Model model)
@@ -60,23 +61,19 @@ namespace Discord.WebSocket
 
             var args = new ModifyGuildRoleParams();
             func(args);
-            await Discord.APIClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
         }
         /// <summary> Deletes this message. </summary>
         public async Task Delete()
-            => await Discord.APIClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
+            => await Discord.ApiClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
 
         /// <inheritdoc />
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
         ulong IRole.GuildId => Guild.Id;
-                
-        async Task<IEnumerable<IGuildUser>> IRole.GetUsers()
-        {
-            //A tad hacky, but it works
-            var models = await Discord.APIClient.GetGuildMembers(Guild.Id, new GetGuildMembersParams()).ConfigureAwait(false);
-            return models.Where(x => x.Roles.Contains(Id)).Select(x => new GuildUser(Guild, x));
-        }
+
+        Task<IEnumerable<IGuildUser>> IRole.GetUsers()
+            => Task.FromResult<IEnumerable<IGuildUser>>(Users);
     }
 }
