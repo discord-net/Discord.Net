@@ -10,10 +10,6 @@
         ManageChannel = 4,
         ManageServer = 5,
 
-        ChangeNickname = 26,
-        ManageNicknames = 27,
-        ManageRolesOrPermissions = 28,
-
         //Text
         ReadMessages = 10,
         SendMessages = 11,
@@ -31,5 +27,9 @@
         DeafenMembers = 23,
         MoveMembers = 24,
         UseVoiceActivation = 25,
+
+        ChangeNickname = 26,
+        ManageNicknames = 27,
+        ManageRolesOrPermissions = 28,
     }
 }

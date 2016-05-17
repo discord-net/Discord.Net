@@ -66,7 +66,7 @@ namespace Discord
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null, bool? manageRoles = null)
-            : this(new ServerPermissions(), createInstantInvite, administrator, kickMembers, banMembers, manageChannel, manageServer, readMessages,
+            : this(new ServerPermissions(), createInstantInvite, administrator, banMembers, kickMembers, manageChannel, manageServer, readMessages,
                   sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers,
                   moveMembers, useVoiceActivation, manageRoles)
         {
@@ -170,7 +170,8 @@ namespace Discord
             bool? mentionEveryone = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
             : this(new ChannelPermissions(), createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages,
-                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
+                  manageMessages, embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
+                  moveMembers, useVoiceActivation, managePermissions)
         {
         }
         public ChannelPermissions(ChannelPermissions basePerms, bool? createInstantInvite = null,
@@ -255,7 +256,8 @@ namespace Discord
             PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? changeNickname = null, PermValue? manageNicknames = null,
             PermValue? managePermissions = null)
             : this(new ChannelPermissionOverrides(), createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages,
-                  manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
+                  manageMessages, embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
+                  moveMembers, useVoiceActivation, managePermissions)
         {
         }
         public ChannelPermissionOverrides(ChannelPermissionOverrides basePerms, PermValue? createInstantInvite = null, 
