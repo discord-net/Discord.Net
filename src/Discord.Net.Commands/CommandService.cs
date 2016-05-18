@@ -112,6 +112,19 @@ namespace Discord.Commands
                         if (msg.StartsWith(mention) && msg.Length > mention.Length)
                             cmdMsg = msg.Substring(mention.Length + 1);
                     }
+
+                    string mention2 = client.CurrentUser.NicknameMention;
+                    if (mention2 != null)
+                    {
+                        if (msg.StartsWith(mention2) && msg.Length > mention2.Length)
+                            cmdMsg = msg.Substring(mention2.Length + 1);
+                        else
+                        {
+                            mention2 = $"@{client.CurrentUser.Name}";
+                            if (msg.StartsWith(mention2) && msg.Length > mention2.Length)
+                                cmdMsg = msg.Substring(mention2.Length + 1);
+                        }
+                    }
                 }
                 
                 //Check using custom activator
