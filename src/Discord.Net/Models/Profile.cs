@@ -28,7 +28,9 @@ namespace Discord
         public UserStatus Status => Client.PrivateUser.Status;
         /// <summary> Returns the string used to mention this user. </summary>
         public string Mention => $"<@{Id}>";
-        
+        /// <summary> Returns the string used to mention this user. </summary>
+        public string NicknameMention => $"<@!{Id}>";
+
         /// <summary> Gets the email for this user. </summary>
         public string Email { get; private set; }
 		/// <summary> Gets if the email for this user has been verified. </summary>
