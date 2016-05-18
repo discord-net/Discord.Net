@@ -70,6 +70,9 @@
     <Compile Include="..\Discord.Net\API\Client\Common\ExtendedMember.cs">
       <Link>API\Client\Common\ExtendedMember.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Common\Game.cs">
+      <Link>API\Client\Common\Game.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Common\Guild.cs">
       <Link>API\Client\Common\Guild.cs</Link>
     </Compile>
@@ -520,6 +523,9 @@
     <Compile Include="..\Discord.Net\Models\Color.cs">
       <Link>Models\Color.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Models\Game.cs">
+      <Link>Models\Game.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Models\Invite.cs">
       <Link>Models\Invite.cs</Link>
     </Compile>
@@ -602,7 +608,6 @@
       <Link>TaskManager.cs</Link>
     </Compile>
     <Compile Include="Enums\GameType.cs" />
-    <Compile Include="Models\Game.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

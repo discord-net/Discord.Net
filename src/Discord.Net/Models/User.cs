@@ -63,7 +63,7 @@ namespace Discord
         /// <summary> Gets the unique identifier for this user's current avatar. </summary>
         public string AvatarId { get; private set; }
         /// <summary> Gets the name of the game this user is currently playing. </summary>
-        public GameInfo CurrentGame { get; internal set; }
+        public Game? CurrentGame { get; internal set; }
         /// <summary> Determines whether this user is a Bot account. </summary>
         public bool IsBot { get; internal set; }
         /// <summary> Gets the current status for this user. </summary>
@@ -207,8 +207,11 @@ namespace Discord
 				if (Status == UserStatus.Offline)
 					_lastOnline = DateTime.UtcNow;
 			}
-			
-			CurrentGame = model.Game; //Allows null
+
+            if (model.Game != null)
+                CurrentGame = new Game(model.Game.Name, model.Game.Type, model.Game.Url);
+            else
+                CurrentGame = null;
 		}
 		internal void Update(MemberVoiceState model)
         {

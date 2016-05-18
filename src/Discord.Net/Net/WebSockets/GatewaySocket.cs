@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using APIGame = Discord.API.Client.Game;
 
 namespace Discord.Net.WebSockets
 {
@@ -167,11 +168,11 @@ namespace Discord.Net.WebSockets
             => QueueMessage(new ResumeCommand { SessionId = SessionId, Sequence = _lastSequence });
 		public override void SendHeartbeat() 
             => QueueMessage(new HeartbeatCommand());
-		public void SendUpdateStatus(long? idleSince, GameInfo game) 
+		public void SendUpdateStatus(long? idleSince, Game? game) 
             => QueueMessage(new UpdateStatusCommand
             {
                 IdleSince = idleSince,
-                Game = game != null ? new GameInfo { Name = game.Name, Url = game.Url, Type = game.Type } : null
+                Game = game != null ? new APIGame { Name = game.Value.Name, Type = game.Value.Type, Url = game.Value.Url } : null
             });
 		public void SendUpdateVoice(ulong? serverId, ulong? channelId, bool isSelfMuted, bool isSelfDeafened)
             => QueueMessage(new UpdateVoiceCommand { GuildId = serverId, ChannelId = channelId, IsSelfMuted = isSelfMuted, IsSelfDeafened = isSelfDeafened });

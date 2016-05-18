@@ -12,6 +12,6 @@ namespace Discord.API.Client.GatewaySocket
         [JsonProperty("idle_since")]
         public long? IdleSince { get; set; }
         [JsonProperty("game")]
-        public GameInfo Game { get; set; }
+        public Game Game { get; set; }
     }
 }

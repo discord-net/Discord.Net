@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord
+namespace Discord.API.Client
 {
-    public class GameInfo
+    public class Game
     {
         [JsonProperty("game")]
         public string Name { get; set; }
