@@ -270,13 +270,14 @@ namespace Discord
             }
             if (!isCurrentUser || isMuted != null || isDeafened != null | voiceChannel != null || roles != null)
             {
+                if (nickname == "") nickname = Nickname;
                 var request = new UpdateMemberRequest(Server.Id, Id)
                 {
                     IsMuted = isMuted ?? IsServerMuted,
                     IsDeafened = isDeafened ?? IsServerDeafened,
                     VoiceChannelId = voiceChannel?.Id,
                     RoleIds = roleIds,
-                    Nickname = (nickname == "") ? Nickname : nickname
+                    Nickname = nickname ?? ""
                 };
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
             }
