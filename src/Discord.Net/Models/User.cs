@@ -264,7 +264,7 @@ namespace Discord
             bool isCurrentUser = Id == Server.CurrentUser.Id;
             if (isCurrentUser && nickname != "")
             {
-                var request = new UpdateOwnNick(Server.Id, nickname);
+                var request = new UpdateOwnNick(Server.Id, nickname ?? "");
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
                 nickname = "";
             }
@@ -276,7 +276,7 @@ namespace Discord
                     IsDeafened = isDeafened ?? IsServerDeafened,
                     VoiceChannelId = voiceChannel?.Id,
                     RoleIds = roleIds,
-                    Nickname = nickname ?? Nickname
+                    Nickname = (nickname == "") ? Nickname : nickname
                 };
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
             }
