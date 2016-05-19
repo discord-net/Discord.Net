@@ -23,17 +23,32 @@ namespace Discord
     {
         private readonly static Action<Message, Message> _cloner = DynamicIL.CreateCopyMethod<Message>();
 
-        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>");
-        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>");
-        private static readonly Regex _roleRegex = new Regex(@"<@&[0-9]+>");
+        private static readonly Regex _userRegex = new Regex(@"<@[0-9]+>", RegexOptions.Compiled);
+        private static readonly Regex _userNicknameRegex = new Regex(@"<@![0-9]+>", RegexOptions.Compiled);
+        private static readonly Regex _channelRegex = new Regex(@"<#[0-9]+>", RegexOptions.Compiled);
+        private static readonly Regex _roleRegex = new Regex(@"<@&[0-9]+>", RegexOptions.Compiled);
         private static readonly Attachment[] _initialAttachments = new Attachment[0];
         private static readonly Embed[] _initialEmbeds = new Embed[0];
 
         internal static string CleanUserMentions(Channel channel, string text, List<User> users = null)
         {
+            ulong id;
+            text = _userNicknameRegex.Replace(text, new MatchEvaluator(e =>
+            {
+                if (e.Value.Substring(3, e.Value.Length - 4).TryToId(out id))
+                {
+                    var user = channel.GetUserFast(id);
+                    if (user != null)
+                    {
+                        if (users != null)
+                            users.Add(user);
+                        return '@' + user.Nickname;
+                    }
+                }
+                return e.Value; //User not found or parse failed
+            }));
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
-                ulong id;
                 if (e.Value.Substring(2, e.Value.Length - 3).TryToId(out id))
                 {
                     var user = channel.GetUserFast(id);
@@ -43,7 +58,7 @@ namespace Discord
                             users.Add(user);
                         return '@' + user.Name;
                     }
-                }                
+                }
                 return e.Value; //User not found or parse failed
             }));
         }

@@ -83,6 +83,8 @@ namespace Discord
         public Channel PrivateChannel => Client.GetPrivateChannel(Id);
         /// <summary> Returns the string used to mention this user. </summary>
         public string Mention => $"<@{Id}>";
+        /// <summary> Returns the string used to mention this user by nickname. </summary>
+        public string NicknameMention => $"<@!{Id}>";
         /// <summary> Returns true if this user has marked themselves as muted. </summary>
         public bool IsSelfMuted => (_voiceState & VoiceState.SelfMuted) != 0;
         /// <summary> Returns true if this user has marked themselves as deafened. </summary>
