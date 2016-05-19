@@ -23,10 +23,16 @@ namespace Discord.API
         public int Position { get; set; }
         [JsonProperty("permission_overwrites")]
         public Overwrite[] PermissionOverwrites { get; set; }
+
+        //TextChannel
         [JsonProperty("topic")]
         public string Topic { get; set; }
+
+        //VoiceChannel
         [JsonProperty("bitrate")]
         public int Bitrate { get; set; }
+        [JsonProperty("user_limit")]
+        public int UserLimit { get; set; }
 
         //DMChannel
         [JsonProperty("recipient")]

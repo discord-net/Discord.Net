@@ -12,6 +12,8 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public int Bitrate { get; private set; }
+        /// <inheritdoc />
+        public int UserLimit { get; private set; }
 
         internal VoiceChannel(Guild guild, Model model)
             : base(guild, model)
@@ -21,6 +23,7 @@ namespace Discord.Rest
         {
             base.Update(model);
             Bitrate = model.Bitrate;
+            UserLimit = model.UserLimit;
         }
 
         /// <inheritdoc />

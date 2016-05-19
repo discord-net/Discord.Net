@@ -235,6 +235,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
+            Preconditions.AtLeast(args.UserLimit, 0, nameof(args.Bitrate));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
 
