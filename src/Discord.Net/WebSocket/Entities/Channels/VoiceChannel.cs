@@ -13,6 +13,8 @@ namespace Discord.WebSocket
     {
         /// <inheritdoc />
         public int Bitrate { get; private set; }
+        /// <inheritdoc />
+        public int UserLimit { get; private set; }
 
         public override IEnumerable<GuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel == this);
@@ -25,6 +27,7 @@ namespace Discord.WebSocket
         {
             base.Update(model);
             Bitrate = model.Bitrate;
+            UserLimit = model.UserLimit;
         }
 
         /// <inheritdoc />
