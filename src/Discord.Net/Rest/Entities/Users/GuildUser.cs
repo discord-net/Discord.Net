@@ -80,7 +80,7 @@ namespace Discord.Rest
             bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value ?? "" };
                 await Discord.ApiClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new API.Optional<string>(); //Remove
             }
@@ -93,7 +93,7 @@ namespace Discord.Rest
                 if (args.Mute.IsSpecified)
                     IsMute = args.Mute.Value;
                 if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname.Value;
+                    Nickname = args.Nickname.Value ?? "";
                 if (args.Roles.IsSpecified)
                     _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }
