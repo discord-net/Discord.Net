@@ -3,11 +3,6 @@
   "description": "A Discord.Net extension adding voice support.",
   "authors": [ "RogueException" ],
 
-  "buildOptions": {
-    "allowUnsafe": true,
-    "warningsAsErrors": false
-  },
-
   "packOptions": {
     "tags": [ "discord", "discordapp" ],
     "licenseUrl": "http://opensource.org/licenses/MIT",
@@ -16,6 +11,11 @@
       "type": "git",
       "url": "git://github.com/RogueException/Discord.Net"
     }
+  },
+
+  "buildOptions": {
+    "allowUnsafe": true,
+    "warningsAsErrors": false
   },
 
   "dependencies": {
