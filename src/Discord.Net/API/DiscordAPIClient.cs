@@ -23,7 +23,7 @@ namespace Discord.API
         
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
-        private IRestClient _restClient;
+        private readonly IRestClient _restClient;
         private CancellationToken _cancelToken;
 
         public TokenType AuthTokenType { get; private set; }
@@ -68,15 +68,26 @@ namespace Discord.API
         }
         public async Task Login(LoginParams args, CancellationToken cancelToken)
         {
-            var response = await Send<LoginResponse>("POST", "auth/login", args).ConfigureAwait(false);
-
             AuthTokenType = TokenType.User;
+            _restClient.SetHeader("authorization", null);
+            _cancelToken = cancelToken;
+
+            LoginResponse response;
+            try
+            {
+                response = await Send<LoginResponse>("POST", "auth/login", args, GlobalBucket.Login).ConfigureAwait(false);
+            }
+            catch
+            {
+                _cancelToken = CancellationToken.None;
+                throw;
+            }
+
             _restClient.SetHeader("authorization", response.Token);
         }
         public async Task Logout()
         {
             await _requestQueue.Clear().ConfigureAwait(false);
-            _restClient = null;
         }
 
         //Core
@@ -527,7 +538,7 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(userId));
             Preconditions.NotNull(args, nameof(args));
 
-            await Send("PATCH", $"guilds/{guildId}/members/{userId}", args).ConfigureAwait(false);
+            await Send("PATCH", $"guilds/{guildId}/members/{userId}", args, GuildBucket.ModifyMember, guildId).ConfigureAwait(false);
         }
 
         //Guild Roles

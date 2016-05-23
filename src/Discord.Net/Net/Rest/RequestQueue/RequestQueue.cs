@@ -64,6 +64,7 @@ namespace Discord.Net.Rest
             {
                 //Globals
                 case GlobalBucket.General: return new RequestQueueBucket(this, bucket, int.MaxValue, 0); //Catch-all
+                case GlobalBucket.Login: return new RequestQueueBucket(this, bucket, 1, 1); //TODO: Is this actual logins or token validations too?
                 case GlobalBucket.DirectMessage: return new RequestQueueBucket(this, bucket, 5, 5);
 
                 default: throw new ArgumentException($"Unknown global bucket: {bucket}", nameof(bucket));
@@ -77,6 +78,7 @@ namespace Discord.Net.Rest
                 case GuildBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 5);
                 case GuildBucket.DeleteMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 1);
                 case GuildBucket.DeleteMessages: return new RequestQueueBucket(this, bucket, guildId, 1, 1);
+                case GuildBucket.ModifyMember: return new RequestQueueBucket(this, bucket, guildId, 10, 10); //TODO: Is this all users or just roles?
                 case GuildBucket.Nickname: return new RequestQueueBucket(this, bucket, guildId, 1, 1);
 
                 default: throw new ArgumentException($"Unknown guild bucket: {bucket}", nameof(bucket));

@@ -5,6 +5,7 @@
         SendEditMessage,
         DeleteMessage,
         DeleteMessages,
+        ModifyMember,
         Nickname
     }
 }

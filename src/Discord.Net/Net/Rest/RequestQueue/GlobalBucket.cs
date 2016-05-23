@@ -3,6 +3,7 @@
     public enum GlobalBucket
     {
         General,
+        Login,
         DirectMessage
     }
 }
