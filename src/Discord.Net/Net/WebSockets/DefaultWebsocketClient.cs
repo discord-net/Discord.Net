@@ -28,6 +28,9 @@ namespace Discord.Net.WebSockets
             _client = new ClientWebSocket();
             _client.Options.Proxy = null;
             _client.Options.KeepAliveInterval = TimeSpan.Zero;
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
         }
         private void Dispose(bool disposing)
@@ -46,6 +49,7 @@ namespace Discord.Net.WebSockets
 
         public async Task Connect(string host)
         {
+            //Assume locked
             await Disconnect().ConfigureAwait(false);
 
             _cancelTokenSource = new CancellationTokenSource();
@@ -56,9 +60,11 @@ namespace Discord.Net.WebSockets
         }
         public async Task Disconnect()
         {
+            //Assume locked
             _cancelTokenSource.Cancel();
 
-            _client.Abort();
+            if (_client.State == WebSocketState.Open)
+                try { await _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None); } catch { }
             
             await (_task ?? Task.CompletedTask).ConfigureAwait(false);
         }
@@ -75,6 +81,7 @@ namespace Discord.Net.WebSockets
 
         public async Task Send(byte[] data, int offset, int count, bool isText)
         {
+            //TODO: If connection is temporarily down, retry?
             int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
             
             for (int i = 0; i < frameCount; i++, offset += SendChunkSize)

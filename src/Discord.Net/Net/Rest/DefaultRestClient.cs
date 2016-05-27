@@ -32,8 +32,10 @@ namespace Discord.Net.Rest
                 UseProxy = false,
                 PreAuthenticate = false
             });
-
             SetHeader("accept-encoding", "gzip, deflate");
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
         }
         protected virtual void Dispose(bool disposing)

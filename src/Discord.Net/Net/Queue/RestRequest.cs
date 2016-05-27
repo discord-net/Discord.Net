@@ -46,8 +46,10 @@ namespace Discord.Net.Queue
         {
             if (IsMultipart)
                 return await Client.Send(Method, Endpoint, MultipartParams, HeaderOnly).ConfigureAwait(false);
-            else
+            else if (Json != null)
                 return await Client.Send(Method, Endpoint, Json, HeaderOnly).ConfigureAwait(false);
+            else
+                return await Client.Send(Method, Endpoint, HeaderOnly).ConfigureAwait(false);
         }
     }
 }

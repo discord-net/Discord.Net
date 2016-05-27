@@ -279,7 +279,7 @@ namespace Discord.WebSocket
             return models.Select(x => new Connection(x));
         }
 
-        public async Task<Channel> GetChannel(ulong id)
+        public Channel GetChannel(ulong id)
         {
             return DataStore.GetChannel(id);
         }
@@ -292,7 +292,7 @@ namespace Discord.WebSocket
             return null;
         }
 
-        public async Task<Guild> GetGuild(ulong id)
+        public Guild GetGuild(ulong id)
         {
             return DataStore.GetGuild(id);
         }
@@ -303,11 +303,11 @@ namespace Discord.WebSocket
             return new Guild(this, model);
         }
 
-        public async Task<User> GetUser(ulong id)
+        public User GetUser(ulong id)
         {
             return DataStore.GetUser(id);
         }
-        public async Task<User> GetUser(string username, ushort discriminator)
+        public User GetUser(string username, ushort discriminator)
         {
             return DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault();
         }
@@ -317,7 +317,7 @@ namespace Discord.WebSocket
             return models.Select(x => new User(this, x));
         }
 
-        public async Task<VoiceRegion> GetVoiceRegion(string id)
+        public VoiceRegion GetVoiceRegion(string id)
         {
             VoiceRegion region;
             if (_voiceRegions.TryGetValue(id, out region))
@@ -335,7 +335,6 @@ namespace Discord.WebSocket
                     //Global
                     case "READY":
                         {
-                            //TODO: None of this is really threadsafe - should only replace the cache collections when they have been fully populated
                             //TODO: Store guilds even if they're unavailable
                             //TODO: Make downloading large guilds optional
 
@@ -866,31 +865,31 @@ namespace Discord.WebSocket
             }
         }
 
-        async Task<IChannel> IDiscordClient.GetChannel(ulong id)
-            => await GetChannel(id).ConfigureAwait(false);
+        Task<IChannel> IDiscordClient.GetChannel(ulong id)
+            => Task.FromResult<IChannel>(GetChannel(id));
         Task<IEnumerable<IDMChannel>> IDiscordClient.GetDMChannels()
             => Task.FromResult<IEnumerable<IDMChannel>>(DMChannels.ToImmutableArray());
         async Task<IEnumerable<IConnection>> IDiscordClient.GetConnections()
             => await GetConnections().ConfigureAwait(false);
         async Task<IInvite> IDiscordClient.GetInvite(string inviteIdOrXkcd)
             => await GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
-        async Task<IGuild> IDiscordClient.GetGuild(ulong id)
-            => await GetGuild(id).ConfigureAwait(false);
+        Task<IGuild> IDiscordClient.GetGuild(ulong id)
+            => Task.FromResult<IGuild>(GetGuild(id));
         Task<IEnumerable<IUserGuild>> IDiscordClient.GetGuilds()
             => Task.FromResult<IEnumerable<IUserGuild>>(Guilds.ToImmutableArray());
         async Task<IGuild> IDiscordClient.CreateGuild(string name, IVoiceRegion region, Stream jpegIcon)
             => await CreateGuild(name, region, jpegIcon).ConfigureAwait(false);
-        async Task<IUser> IDiscordClient.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
-        async Task<IUser> IDiscordClient.GetUser(string username, ushort discriminator)
-            => await GetUser(username, discriminator).ConfigureAwait(false);
+        Task<IUser> IDiscordClient.GetUser(ulong id)
+            => Task.FromResult<IUser>(GetUser(id));
+        Task<IUser> IDiscordClient.GetUser(string username, ushort discriminator)
+            => Task.FromResult<IUser>(GetUser(username, discriminator));
         Task<ISelfUser> IDiscordClient.GetCurrentUser()
             => Task.FromResult<ISelfUser>(CurrentUser);
         async Task<IEnumerable<IUser>> IDiscordClient.QueryUsers(string query, int limit)
             => await QueryUsers(query, limit).ConfigureAwait(false);
         Task<IEnumerable<IVoiceRegion>> IDiscordClient.GetVoiceRegions()
             => Task.FromResult<IEnumerable<IVoiceRegion>>(VoiceRegions.ToImmutableArray());
-        async Task<IVoiceRegion> IDiscordClient.GetVoiceRegion(string id)
-            => await GetVoiceRegion(id).ConfigureAwait(false);
+        Task<IVoiceRegion> IDiscordClient.GetVoiceRegion(string id)
+            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
     }
 }

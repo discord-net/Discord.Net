@@ -88,7 +88,7 @@ namespace Discord.WebSocket
 
             Update(model);
         }
-        private void Update(Model model)
+        private async void Update(Model model)
         {
             _afkChannelId = model.AFKChannelId;
             AFKTimeout = model.AFKTimeout;
