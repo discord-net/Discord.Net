@@ -160,14 +160,15 @@ namespace Discord.WebSocket
                     try
                     {
                         await ApiClient.ValidateToken().ConfigureAwait(false);
-                        var voiceRegions = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
-                        _voiceRegions = voiceRegions.Select(x => new VoiceRegion(x)).ToImmutableDictionary(x => x.Id);
                     }
                     catch (HttpException ex)
                     {
                         throw new ArgumentException("Token validation failed", nameof(token), ex);
                     }
                 }
+
+                var voiceRegions = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
+                _voiceRegions = voiceRegions.Select(x => new VoiceRegion(x)).ToImmutableDictionary(x => x.Id);
 
                 LoginState = LoginState.LoggedIn;
             }
