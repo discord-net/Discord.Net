@@ -1,14 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord.WebSocket.Data
 {
     public class DefaultDataStore : IDataStore
     {
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
-        private const double AverageRolesPerGuild = 5; //Source: Googie2149 //TODO: Get a real value
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
         private const double CollectionMultiplier = 1.05; //Add buffer to handle growth
         private const double CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
@@ -27,7 +25,6 @@ namespace Discord.WebSocket.Data
         {
             _channels = new ConcurrentDictionary<ulong, Channel>(1, (int)((guildCount * AverageChannelsPerGuild + dmChannelCount) * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, Guild>(1, (int)(guildCount * CollectionMultiplier));
-            _roles = new ConcurrentDictionary<ulong, Role>(1, (int)(guildCount * AverageRolesPerGuild * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, User>(1, (int)(guildCount * AverageUsersPerGuild * CollectionMultiplier));
         }
 

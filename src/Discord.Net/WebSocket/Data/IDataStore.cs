@@ -6,7 +6,6 @@ namespace Discord.WebSocket.Data
     {
         IEnumerable<Channel> Channels { get; }
         IEnumerable<Guild> Guilds { get; }
-        IEnumerable<Role> Roles { get; }
         IEnumerable<User> Users { get; }
 
         Channel GetChannel(ulong id);
@@ -16,10 +15,6 @@ namespace Discord.WebSocket.Data
         Guild GetGuild(ulong id);
         void AddGuild(Guild guild);
         Guild RemoveGuild(ulong id);
-
-        Role GetRole(ulong id);
-        void AddRole(Role role);
-        Role RemoveRole(ulong id);
 
         User GetUser(ulong id);
         void AddUser(User user);
