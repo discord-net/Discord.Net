@@ -3,14 +3,14 @@ using System.Text;
 
 namespace Discord
 {
-    public class LogMessageEventArgs : EventArgs
+    public struct LogMessage
     {
         public LogSeverity Severity { get; }
         public string Source { get; }
         public string Message { get; }
         public Exception Exception { get; }
 
-        public LogMessageEventArgs(LogSeverity severity, string source, string message, Exception exception = null)
+        public LogMessage(LogSeverity severity, string source, string message, Exception exception = null)
         {
             Severity = severity;
             Source = source;

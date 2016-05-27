@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Gateway
 {
-    public class IdentifyCommand
+    public class IdentifyParams
     {
         [JsonProperty("token")]
         public string Token { get; set; }

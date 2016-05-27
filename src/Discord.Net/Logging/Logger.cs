@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Discord.Logging
 {
@@ -15,44 +16,44 @@ namespace Discord.Logging
             Name = name;
         }
 
-        public void Log(LogSeverity severity, string message, Exception exception = null)
+        public Task Log(LogSeverity severity, string message, Exception exception = null)
             => _manager.Log(severity, Name, message, exception);
-        public void Log(LogSeverity severity, FormattableString message, Exception exception = null)
+        public Task Log(LogSeverity severity, FormattableString message, Exception exception = null)
             => _manager.Log(severity, Name, message, exception);
 
-        public void Error(string message, Exception exception = null)
+        public Task Error(string message, Exception exception = null)
             => _manager.Error(Name, message, exception);
-        public void Error(FormattableString message, Exception exception = null)
+        public Task Error(FormattableString message, Exception exception = null)
             => _manager.Error(Name, message, exception);
-        public void Error(Exception exception)
+        public Task Error(Exception exception)
             => _manager.Error(Name, exception);
 
-        public void Warning(string message, Exception exception = null)
+        public Task Warning(string message, Exception exception = null)
             => _manager.Warning(Name, message, exception);
-        public void Warning(FormattableString message, Exception exception = null)
+        public Task Warning(FormattableString message, Exception exception = null)
             => _manager.Warning(Name, message, exception);
-        public void Warning(Exception exception)
+        public Task Warning(Exception exception)
             => _manager.Warning(Name, exception);
 
-        public void Info(string message, Exception exception = null)
+        public Task Info(string message, Exception exception = null)
             => _manager.Info(Name, message, exception);
-        public void Info(FormattableString message, Exception exception = null)
+        public Task Info(FormattableString message, Exception exception = null)
             => _manager.Info(Name, message, exception);
-        public void Info(Exception exception)
+        public Task Info(Exception exception)
             => _manager.Info(Name, exception);
 
-        public void Verbose(string message, Exception exception = null)
+        public Task Verbose(string message, Exception exception = null)
             => _manager.Verbose(Name, message, exception);
-        public void Verbose(FormattableString message, Exception exception = null)
+        public Task Verbose(FormattableString message, Exception exception = null)
             => _manager.Verbose(Name, message, exception);
-        public void Verbose(Exception exception)
+        public Task Verbose(Exception exception)
             => _manager.Verbose(Name, exception);
 
-        public void Debug(string message, Exception exception = null)
+        public Task Debug(string message, Exception exception = null)
             => _manager.Debug(Name, message, exception);
-        public void Debug(FormattableString message, Exception exception = null)
+        public Task Debug(FormattableString message, Exception exception = null)
             => _manager.Debug(Name, message, exception);
-        public void Debug(Exception exception)
+        public Task Debug(Exception exception)
             => _manager.Debug(Name, exception);
     }
 }

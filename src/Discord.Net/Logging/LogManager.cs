@@ -7,7 +7,7 @@ namespace Discord.Logging
     {
         public LogSeverity Level { get; }
 
-        public event Func<LogMessageEventArgs, Task> Message;
+        public event Func<LogMessage, Task> Message;
 
         internal LogManager(LogSeverity minSeverity)
         {
@@ -17,32 +17,32 @@ namespace Discord.Logging
         public async Task Log(LogSeverity severity, string source, string message, Exception ex = null)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, source, message, ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
         }
         public async Task Log(LogSeverity severity, string source, FormattableString message, Exception ex = null)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, source, message.ToString(), ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, source, message.ToString(), ex)).ConfigureAwait(false);
         }
         public async Task Log(LogSeverity severity, string source, Exception ex)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, source, null, ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, source, null, ex)).ConfigureAwait(false);
         }
         async Task ILogger.Log(LogSeverity severity, string message, Exception ex)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, "Discord", message, ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, "Discord", message, ex)).ConfigureAwait(false);
         }
         async Task ILogger.Log(LogSeverity severity, FormattableString message, Exception ex)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, "Discord", message.ToString(), ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, "Discord", message.ToString(), ex)).ConfigureAwait(false);
         }
         async Task ILogger.Log(LogSeverity severity, Exception ex)
         {
             if (severity <= Level)
-                await Message.Raise(new LogMessageEventArgs(severity, "Discord", null, ex)).ConfigureAwait(false);
+                await Message.Raise(new LogMessage(severity, "Discord", null, ex)).ConfigureAwait(false);
         }
 
         public Task Error(string source, string message, Exception ex = null)

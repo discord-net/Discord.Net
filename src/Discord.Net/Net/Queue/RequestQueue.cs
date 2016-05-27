@@ -12,7 +12,7 @@ namespace Discord.Net.Queue
         private readonly RequestQueueBucket[] _globalBuckets;
         private readonly Dictionary<ulong, RequestQueueBucket>[] _guildBuckets;
         private CancellationTokenSource _clearToken;
-        private CancellationToken? _parentToken;
+        private CancellationToken _parentToken;
         private CancellationToken _cancelToken;
 
         public RequestQueue()
@@ -20,10 +20,12 @@ namespace Discord.Net.Queue
             _lock = new SemaphoreSlim(1, 1);
             _globalBuckets = new RequestQueueBucket[Enum.GetValues(typeof(GlobalBucket)).Length];
             _guildBuckets = new Dictionary<ulong, RequestQueueBucket>[Enum.GetValues(typeof(GuildBucket)).Length];
+
             _clearToken = new CancellationTokenSource();
-            _cancelToken = _clearToken.Token;
+            _cancelToken = CancellationToken.None;
+            _parentToken = CancellationToken.None;
         }
-        internal async Task SetCancelToken(CancellationToken cancelToken)
+        public async Task SetCancelToken(CancellationToken cancelToken)
         {
             await Lock().ConfigureAwait(false);
             try
@@ -33,8 +35,18 @@ namespace Discord.Net.Queue
             }
             finally { Unlock(); }
         }
-        
-        internal async Task<Stream> Send(IQueuedRequest request, BucketGroup group, int bucketId, ulong guildId)
+
+        internal Task<Stream> Send(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
+        {
+            request.CancelToken = _cancelToken;
+            return Send(request as IQueuedRequest, group, bucketId, guildId);
+        }
+        internal Task<Stream> Send(WebSocketRequest request, BucketGroup group, int bucketId, ulong guildId)
+        {
+            request.CancelToken = _cancelToken;
+            return Send(request as IQueuedRequest, group, bucketId, guildId);
+        }
+        private async Task<Stream> Send(IQueuedRequest request, BucketGroup group, int bucketId, ulong guildId)
         {
             RequestQueueBucket bucket;
 
@@ -121,13 +133,13 @@ namespace Discord.Net.Queue
             return bucket;
         }
 
-        internal void DestroyGlobalBucket(GlobalBucket type)
+        public void DestroyGlobalBucket(GlobalBucket type)
         {
             //Assume this object is locked
 
             _globalBuckets[(int)type] = null;
         }
-        internal void DestroyGuildBucket(GuildBucket type, ulong guildId)
+        public void DestroyGuildBucket(GuildBucket type, ulong guildId)
         {
             //Assume this object is locked
 
@@ -153,7 +165,7 @@ namespace Discord.Net.Queue
                 _clearToken?.Cancel();
                 _clearToken = new CancellationTokenSource();
                 if (_parentToken != null)
-                    _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken.Value).Token;
+                    _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken).Token;
                 else
                     _cancelToken = _clearToken.Token;
             }

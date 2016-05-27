@@ -2,7 +2,7 @@
 
 namespace Discord.API.Gateway
 {
-    public class UpdateVoiceCommand
+    public class UpdateVoiceParams
     {
         [JsonProperty("guild_id")]
         public ulong? GuildId { get; set; }

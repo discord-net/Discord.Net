@@ -15,7 +15,7 @@ namespace Discord.Net.Queue
         public bool HeaderOnly { get; }
         public IReadOnlyDictionary<string, object> MultipartParams { get; }
         public TaskCompletionSource<Stream> Promise { get; }
-        public CancellationToken CancelToken { get; internal set; }
+        public CancellationToken CancelToken { get; set; }
 
         public bool IsMultipart => MultipartParams != null;
 

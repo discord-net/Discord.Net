@@ -2,7 +2,7 @@
 
 namespace Discord.API.Gateway
 {
-    public class UpdateStatusCommand
+    public class UpdateStatusParams
     {
         [JsonProperty("idle_since")]
         public long? IdleSince { get; set; }

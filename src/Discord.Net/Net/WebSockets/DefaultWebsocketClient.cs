@@ -14,8 +14,8 @@ namespace Discord.Net.WebSockets
         public const int SendChunkSize = 4 * 1024; //4KB
         private const int HR_TIMEOUT = -2147012894;
 
-        public event Func<BinaryMessageEventArgs, Task> BinaryMessage;
-        public event Func<TextMessageEventArgs, Task> TextMessage;
+        public event Func<byte[], int, int, Task> BinaryMessage;
+        public event Func<string, Task> TextMessage;
         
         private readonly ClientWebSocket _client;
         private Task _task;
@@ -79,12 +79,12 @@ namespace Discord.Net.WebSockets
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task Send(byte[] data, int offset, int count, bool isText)
+        public async Task Send(byte[] data, int index, int count, bool isText)
         {
             //TODO: If connection is temporarily down, retry?
             int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
             
-            for (int i = 0; i < frameCount; i++, offset += SendChunkSize)
+            for (int i = 0; i < frameCount; i++, index += SendChunkSize)
             {
                 bool isLast = i == (frameCount - 1);
 
@@ -96,7 +96,7 @@ namespace Discord.Net.WebSockets
 
                 try
                 {
-                    await _client.SendAsync(new ArraySegment<byte>(data, offset, count), isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary, isLast, _cancelToken).ConfigureAwait(false);
+                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary, isLast, _cancelToken).ConfigureAwait(false);
                 }
                 catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
                 {
@@ -139,11 +139,11 @@ namespace Discord.Net.WebSockets
 
                     var array = stream.ToArray();
                     if (result.MessageType == WebSocketMessageType.Binary)
-                        await BinaryMessage.Raise(new BinaryMessageEventArgs(array)).ConfigureAwait(false);
+                        await BinaryMessage.Raise(array, 0, array.Length).ConfigureAwait(false);
                     else if (result.MessageType == WebSocketMessageType.Text)
                     {
                         string text = Encoding.UTF8.GetString(array, 0, array.Length);
-                        await TextMessage.Raise(new TextMessageEventArgs(text)).ConfigureAwait(false);
+                        await TextMessage.Raise(text).ConfigureAwait(false);
                     }
 
                     stream.Position = 0;

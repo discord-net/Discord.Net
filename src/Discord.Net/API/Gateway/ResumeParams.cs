@@ -2,7 +2,7 @@
 
 namespace Discord.API.Gateway
 {
-    public class ResumeCommand
+    public class ResumeParams
     {
         [JsonProperty("session_id")]
         public string SessionId { get; set; }

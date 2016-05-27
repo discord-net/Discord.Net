@@ -2,7 +2,7 @@
 
 namespace Discord.API.Gateway
 {
-    public class RequestMembersCommand
+    public class RequestMembersParams
     {
         [JsonProperty("guild_id")]
         public ulong[] GuildId { get; set; }

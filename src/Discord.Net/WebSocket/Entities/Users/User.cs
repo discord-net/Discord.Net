@@ -24,6 +24,10 @@ namespace Discord.WebSocket
         public string Username { get; private set; }
         /// <inheritdoc />
         public DMChannel DMChannel { get; internal set; }
+        /// <inheritdoc />
+        public Game? CurrentGame { get; internal set; }
+        /// <inheritdoc />
+        public UserStatus Status { get; internal set; }
 
         /// <inheritdoc />
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
@@ -64,11 +68,6 @@ namespace Discord.WebSocket
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";
-
-        /// <inheritdoc />
-        Game? IUser.CurrentGame => null;
-        /// <inheritdoc />
-        UserStatus IUser.Status => UserStatus.Unknown;
 
         /// <inheritdoc />
         async Task<IDMChannel> IUser.CreateDMChannel()

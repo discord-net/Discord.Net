@@ -5,6 +5,7 @@ namespace Discord
 {
     internal static class EventExtensions
     {
+        //TODO: Optimize these for if there is only 1 subscriber (can we do this?)
         public static async Task Raise(this Func<Task> eventHandler)
         {
             var subscriptions = eventHandler?.GetInvocationList();
@@ -32,7 +33,7 @@ namespace Discord
                     await (subscriptions[i] as Func<T1, T2, Task>).Invoke(arg1, arg2).ConfigureAwait(false);
             }
         }
-        public static async Task Raise<T1, T2, T3>(this Func<T1, T2, Task> eventHandler, T1 arg1, T2 arg2, T3 arg3)
+        public static async Task Raise<T1, T2, T3>(this Func<T1, T2, T3, Task> eventHandler, T1 arg1, T2 arg2, T3 arg3)
         {
             var subscriptions = eventHandler?.GetInvocationList();
             if (subscriptions != null)

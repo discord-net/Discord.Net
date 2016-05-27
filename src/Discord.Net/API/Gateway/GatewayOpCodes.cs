@@ -1,6 +1,6 @@
 ﻿namespace Discord.API.Gateway
 {
-    public enum OpCodes : byte
+    public enum GatewayOpCodes : byte
     {
         /// <summary> C←S - Used to send most events. </summary>
         Dispatch = 0,

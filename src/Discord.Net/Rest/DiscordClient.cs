@@ -17,7 +17,7 @@ namespace Discord.Rest
     //TODO: Log Logins/Logouts
     public sealed class DiscordClient : IDiscordClient, IDisposable
     {
-        public event Func<LogMessageEventArgs, Task> Log;
+        public event Func<LogMessage, Task> Log;
         public event Func<Task> LoggedIn, LoggedOut;
 
         private readonly Logger _discordLogger, _restLogger;
@@ -39,7 +39,7 @@ namespace Discord.Rest
                 config = new DiscordConfig();
             
             _log = new LogManager(config.LogLevel);
-            _log.Message += async e => await Log.Raise(e).ConfigureAwait(false);
+            _log.Message += async msg => await Log.Raise(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
             _restLogger = _log.CreateLogger("Rest");
 
@@ -47,7 +47,7 @@ namespace Discord.Rest
             _requestQueue = new RequestQueue();
 
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, requestQueue: _requestQueue);
-            ApiClient.SentRequest += async e => await _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += async (method, endpoint, millis) => await _log.Verbose("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
         public async Task Login(string email, string password)

@@ -8,6 +8,7 @@ using Discord.Net.Queue;
 using Discord.Net.WebSockets;
 using Discord.WebSocket.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Discord.WebSocket
     //TODO: Do a final namespace and file structure review
     public sealed class DiscordClient : IDiscordClient, IDisposable
     {
-        public event Func<LogMessageEventArgs, Task> Log;
+        public event Func<LogMessage, Task> Log;
         public event Func<Task> LoggedIn, LoggedOut;
         public event Func<Task> Connected, Disconnected;
         //public event Func<Channel> VoiceConnected, VoiceDisconnected;
@@ -42,7 +43,7 @@ namespace Discord.WebSocket
         public event Func<Channel, User, Task> UserIsTyping;
 
         private readonly ConcurrentQueue<ulong> _largeGuilds;
-        private readonly Logger _discordLogger, _gatewayLogger;
+        private readonly Logger _discordLogger, _restLogger, _gatewayLogger;
         private readonly SemaphoreSlim _connectionLock;
         private readonly DataStoreProvider _dataStoreProvider;
         private readonly LogManager _log;
@@ -90,8 +91,9 @@ namespace Discord.WebSocket
             _largeThreshold = config.LargeThreshold;
 
             _log = new LogManager(config.LogLevel);
-            _log.Message += async e => await Log.Raise(e).ConfigureAwait(false);
+            _log.Message += async msg => await Log.Raise(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
+            _restLogger = _log.CreateLogger("Rest");
             _gatewayLogger = _log.CreateLogger("Gateway");
 
             _connectionLock = new SemaphoreSlim(1, 1);
@@ -99,21 +101,10 @@ namespace Discord.WebSocket
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, config.WebSocketProvider, _serializer, _requestQueue);
-            ApiClient.SentRequest += async e => await _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+            ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.Verbose($"{method} {endpoint}: {millis} ms");
+            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Verbose($"Sent Op {opCode}");
+            ApiClient.ReceivedGatewayEvent += ProcessMessage;
             GatewaySocket = config.WebSocketProvider();
-            GatewaySocket.BinaryMessage += async e =>
-            {
-                using (var compressed = new MemoryStream(e.Data, 2, e.Data.Length - 2))
-                using (var decompressed = new MemoryStream())
-                {
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(decompressed);
-                    decompressed.Position = 0;
-                    using (var reader = new StreamReader(decompressed))
-                        await ProcessMessage(reader.ReadToEnd()).ConfigureAwait(false);
-                }
-            };
-            GatewaySocket.TextMessage += async  e => await ProcessMessage(e.Message).ConfigureAwait(false);
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
@@ -169,11 +160,8 @@ namespace Discord.WebSocket
                     try
                     {
                         await ApiClient.ValidateToken().ConfigureAwait(false);
-                        var gateway = await ApiClient.GetGateway();
                         var voiceRegions = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
                         _voiceRegions = voiceRegions.Select(x => new VoiceRegion(x)).ToImmutableDictionary(x => x.Id);
-
-                        await GatewaySocket.Connect(gateway.Url).ConfigureAwait(false);
                     }
                     catch (HttpException ex)
                     {
@@ -325,543 +313,548 @@ namespace Discord.WebSocket
             return null;
         }
 
-        private async Task ProcessMessage(string json)
+        private async Task ProcessMessage(GatewayOpCodes opCode, string type, JToken payload)
         {
-            var msg = JsonConvert.DeserializeObject<WebSocketMessage>(json);
             try
             {
-                switch (msg.Type)
+                switch (opCode)
                 {
-                    //Global
-                    case "READY":
+                    case GatewayOpCodes.Dispatch:
+                        switch (type)
                         {
-                            //TODO: Store guilds even if they're unavailable
-                            //TODO: Make downloading large guilds optional
-
-                            var data = msg.Payload.ToObject<ReadyEvent>(_serializer);
-                            var store = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
-
-                            _sessionId = data.SessionId;
-                            var currentUser = new SelfUser(this, data.User);
-                            store.AddUser(currentUser);
-
-                            for (int i = 0; i < data.Guilds.Length; i++)
-                            {
-                                var model = data.Guilds[i];
-                                var guild = new Guild(this, model);
-                                store.AddGuild(guild);
-
-                                foreach (var channel in guild.Channels)
-                                    store.AddChannel(channel);
-
-                                /*if (model.IsLarge)
-                                    _largeGuilds.Enqueue(model.Id);*/
-                            }
-
-                            for (int i = 0; i < data.PrivateChannels.Length; i++)
-                            {
-                                var model = data.PrivateChannels[i];
-                                var recipient = new User(this, model.Recipient);
-                                var channel = new DMChannel(this, recipient, model);
-
-                                recipient.DMChannel = channel;
-                                store.AddChannel(channel);
-                            }
-
-                            CurrentUser = currentUser;
-                            DataStore = store;
-                        }
-                        break;
-
-                    //Servers
-                    case "GUILD_CREATE":
-                        {
-                            /*var data = msg.Payload.ToObject<ExtendedGuild>(Serializer);
-                            if (data.Unavailable != true)
-                            {
-                                var server = AddServer(data.Id);
-                                server.Update(data);
-
-                                if (data.Unavailable != false)
+                            //Global
+                            case "READY":
                                 {
-                                    _gatewayLogger.Info($"GUILD_CREATE: {server.Path}");
-                                    JoinedServer.Raise(server);
-                                }
-                                else
-                                    _gatewayLogger.Info($"GUILD_AVAILABLE: {server.Path}");
+                                    //TODO: Store guilds even if they're unavailable
+                                    //TODO: Make downloading large guilds optional
+                                    //TODO: Add support for unavailable guilds
 
-                                if (!data.IsLarge)
-                                    await GuildAvailable.Raise(server);
-                                else
-                                    _largeServers.Enqueue(data.Id);
-                            }*/
-                        }
-                        break;
-                    case "GUILD_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<Guild>(Serializer);
-                            var server = GetServer(data.Id);
-                            if (server != null)
-                            {
-                                var before = Config.EnablePreUpdateEvents ? server.Clone() : null;
-                                server.Update(data);
-                                _gatewayLogger.Info($"GUILD_UPDATE: {server.Path}");
-                                await GuildUpdated.Raise(before, server);
-                            }
-                            else
-                                _gatewayLogger.Warning("GUILD_UPDATE referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_DELETE":
-                        {
-                            /*var data = msg.Payload.ToObject<ExtendedGuild>(Serializer);
-                            Server server = RemoveServer(data.Id);
-                            if (server != null)
-                            {
-                                if (data.Unavailable != true)
-                                    _gatewayLogger.Info($"GUILD_DELETE: {server.Path}");
-                                else
-                                    _gatewayLogger.Info($"GUILD_UNAVAILABLE: {server.Path}");
+                                    var data = payload.ToObject<ReadyEvent>(_serializer);
+                                    var store = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
 
-                                OnServerUnavailable(server);
-                                if (data.Unavailable != true)
-                                    OnLeftServer(server);
-                            }
-                            else
-                                _gatewayLogger.Warning("GUILD_DELETE referenced an unknown guild.");*/
-                        }
-                        break;
+                                    _sessionId = data.SessionId;
+                                    var currentUser = new SelfUser(this, data.User);
+                                    store.AddUser(currentUser);
 
-                    //Channels
-                    case "CHANNEL_CREATE":
-                        {
-                            /*var data = msg.Payload.ToObject<ChannelCreateEvent>(Serializer);
-
-                            Channel channel = null;
-                            if (data.GuildId != null)
-                            {
-                                var server = GetServer(data.GuildId.Value);
-                                if (server != null)
-                                    channel = server.AddChannel(data.Id, true);
-                                else
-                                    _gatewayLogger.Warning("CHANNEL_CREATE referenced an unknown guild.");
-                            }
-                            else
-                                channel = AddPrivateChannel(data.Id, data.Recipient.Id);
-                            if (channel != null)
-                            {
-                                channel.Update(data);
-                                _gatewayLogger.Info($"CHANNEL_CREATE: {channel.Path}");
-                                ChannelCreated.Raise(new ChannelEventArgs(channel));
-                            }*/
-                        }
-                        break;
-                    case "CHANNEL_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<ChannelUpdateEvent>(Serializer);
-                            var channel = GetChannel(data.Id);
-                            if (channel != null)
-                            {
-                                var before = Config.EnablePreUpdateEvents ? channel.Clone() : null;
-                                channel.Update(data);
-                                _gateway_gatewayLogger.Info($"CHANNEL_UPDATE: {channel.Path}");
-                                OnChannelUpdated(before, channel);
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("CHANNEL_UPDATE referenced an unknown channel.");*/
-                        }
-                        break;
-                    case "CHANNEL_DELETE":
-                        {
-                            /*var data = msg.Payload.ToObject<ChannelDeleteEvent>(Serializer);
-                            var channel = RemoveChannel(data.Id);
-                            if (channel != null)
-                            {
-                                _gateway_gatewayLogger.Info($"CHANNEL_DELETE: {channel.Path}");
-                                OnChannelDestroyed(channel);
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("CHANNEL_DELETE referenced an unknown channel.");*/
-                        }
-                        break;
-
-                    //Members
-                    case "GUILD_MEMBER_ADD":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildMemberAddEvent>(Serializer);
-                            var server = GetServer(data.GuildId.Value);
-                            if (server != null)
-                            {
-                                var user = server.AddUser(data.User.Id, true, true);
-                                user.Update(data);
-                                user.UpdateActivity();
-                                _gatewayLogger.Info($"GUILD_MEMBER_ADD: {user.Path}");
-                                OnUserJoined(user);
-                            }
-                            else
-                                _gatewayLogger.Warning("GUILD_MEMBER_ADD referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_MEMBER_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildMemberUpdateEvent>(Serializer);
-                            var server = GetServer(data.GuildId.Value);
-                            if (server != null)
-                            {
-                                var user = server.GetUser(data.User.Id);
-                                if (user != null)
-                                {
-                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
-                                    user.Update(data);
-                                    _gatewayLogger.Info($"GUILD_MEMBER_UPDATE: {user.Path}");
-                                    OnUserUpdated(before, user);
-                                }
-                                else
-                                    _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
-                            }
-                            else
-                                _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_MEMBER_REMOVE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildMemberRemoveEvent>(Serializer);
-                            var server = GetServer(data.GuildId.Value);
-                            if (server != null)
-                            {
-                                var user = server.RemoveUser(data.User.Id);
-                                if (user != null)
-                                {
-                                    _gatewayLogger.Info($"GUILD_MEMBER_REMOVE: {user.Path}");
-                                    OnUserLeft(user);
-                                }
-                                else
-                                    _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown user.");
-                            }
-                            else
-                                _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_MEMBERS_CHUNK":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildMembersChunkEvent>(Serializer);
-                            var server = GetServer(data.GuildId);
-                            if (server != null)
-                            {
-                                foreach (var memberData in data.Members)
-                                {
-                                    var user = server.AddUser(memberData.User.Id, true, false);
-                                    user.Update(memberData);
-                                }
-                                _gateway_gatewayLogger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
-
-                                if (server.CurrentUserCount >= server.UserCount) //Finished downloading for there
-                                    OnServerAvailable(server);
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");*/
-                        }
-                        break;
-
-                    //Roles
-                    case "GUILD_ROLE_CREATE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildRoleCreateEvent>(Serializer);
-                            var server = GetServer(data.GuildId);
-                            if (server != null)
-                            {
-                                var role = server.AddRole(data.Data.Id);
-                                role.Update(data.Data, false);
-                                _gateway_gatewayLogger.Info($"GUILD_ROLE_CREATE: {role.Path}");
-                                OnRoleCreated(role);
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_ROLE_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildRoleUpdateEvent>(Serializer);
-                            var server = GetServer(data.GuildId);
-                            if (server != null)
-                            {
-                                var role = server.GetRole(data.Data.Id);
-                                if (role != null)
-                                {
-                                    var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
-                                    role.Update(data.Data, true);
-                                    _gateway_gatewayLogger.Info($"GUILD_ROLE_UPDATE: {role.Path}");
-                                    OnRoleUpdated(before, role);
-                                }
-                                else
-                                    _gateway_gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_ROLE_DELETE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildRoleDeleteEvent>(Serializer);
-                            var server = GetServer(data.GuildId);
-                            if (server != null)
-                            {
-                                var role = server.RemoveRole(data.RoleId);
-                                if (role != null)
-                                {
-                                    _gateway_gatewayLogger.Info($"GUILD_ROLE_DELETE: {role.Path}");
-                                    OnRoleDeleted(role);
-                                }
-                                else
-                                    _gateway_gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown role.");
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown guild.");*/
-                        }
-                        break;
-
-                    //Bans
-                    case "GUILD_BAN_ADD":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildBanAddEvent>(Serializer);
-                            var server = GetServer(data.GuildId.Value);
-                            if (server != null)
-                            {
-                                var user = server.GetUser(data.User.Id);
-                                if (user != null)
-                                {
-                                    _gateway_gatewayLogger.Info($"GUILD_BAN_ADD: {user.Path}");
-                                    OnUserBanned(user);
-                                }
-                                else
-                                    _gateway_gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown user.");
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown guild.");*/
-                        }
-                        break;
-                    case "GUILD_BAN_REMOVE":
-                        {
-                            /*var data = msg.Payload.ToObject<GuildBanRemoveEvent>(Serializer);
-                            var server = GetServer(data.GuildId.Value);
-                            if (server != null)
-                            {
-                                var user = new User(this, data.User.Id, server);
-                                user.Update(data.User);
-                                _gateway_gatewayLogger.Info($"GUILD_BAN_REMOVE: {user.Path}");
-                                OnUserUnbanned(user);
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("GUILD_BAN_REMOVE referenced an unknown guild.");*/
-                        }
-                        break;
-
-                    //Messages
-                    case "MESSAGE_CREATE":
-                        {
-                            /*var data = msg.Payload.ToObject<MessageCreateEvent>(Serializer);
-
-                            Channel channel = GetChannel(data.ChannelId);
-                            if (channel != null)
-                            {
-                                var user = channel.GetUserFast(data.Author.Id);
-
-                                if (user != null)
-                                {
-                                    Message msg = null;
-                                    bool isAuthor = data.Author.Id == CurrentUser.Id;
-                                    //ulong nonce = 0;
-
-                                    //if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
-                                    //{
-                                    //    if (data.Nonce != null && ulong.TryParse(data.Nonce, out nonce))
-                                    //        msg = _messages[nonce];
-                                    //}
-                                    if (msg == null)
+                                    for (int i = 0; i < data.Guilds.Length; i++)
                                     {
-                                        msg = channel.AddMessage(data.Id, user, data.Timestamp.Value);
-                                        //nonce = 0;
+                                        var model = data.Guilds[i];
+                                        var guild = new Guild(this, model);
+                                        store.AddGuild(guild);
+
+                                        foreach (var channel in guild.Channels)
+                                            store.AddChannel(channel);
+
+                                        /*if (model.IsLarge)
+                                            _largeGuilds.Enqueue(model.Id);*/
                                     }
 
-                                    //Remapped queued message
-                                    //if (nonce != 0)
-                                    //{
-                                    //    msg = _messages.Remap(nonce, data.Id);
-                                    //    msg.Id = data.Id;
-                                    //    RaiseMessageSent(msg);
-                                    //}
+                                    for (int i = 0; i < data.PrivateChannels.Length; i++)
+                                    {
+                                        var model = data.PrivateChannels[i];
+                                        var recipient = new User(this, model.Recipient);
+                                        var channel = new DMChannel(this, recipient, model);
 
-                                    msg.Update(data);
-                                    user.UpdateActivity();
+                                        recipient.DMChannel = channel;
+                                        store.AddChannel(channel);
+                                    }
 
-                                    _gateway_gatewayLogger.Verbose($"MESSAGE_CREATE: {channel.Path} ({user.Name ?? "Unknown"})");
-                                    OnMessageReceived(msg);
+                                    CurrentUser = currentUser;
+                                    DataStore = store;
                                 }
-                                else
-                                    _gateway_gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown user.");
-                            }
-                            else
-                                _gateway_gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown channel.");*/
-                        }
-                        break;
-                    case "MESSAGE_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<MessageUpdateEvent>(Serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
-                            {
-                                var msg = channel.GetMessage(data.Id, data.Author?.Id);
-                                var before = Config.EnablePreUpdateEvents ? msg.Clone() : null;
-                                msg.Update(data);
-                                _gatewayLogger.Verbose($"MESSAGE_UPDATE: {channel.Path} ({data.Author?.Username ?? "Unknown"})");
-                                OnMessageUpdated(before, msg);
-                            }
-                            else
-                                _gatewayLogger.Warning("MESSAGE_UPDATE referenced an unknown channel.");*/
-                        }
-                        break;
-                    case "MESSAGE_DELETE":
-                        {
-                            /*var data = msg.Payload.ToObject<MessageDeleteEvent>(Serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
-                            {
-                                var msg = channel.RemoveMessage(data.Id);
-                                _gatewayLogger.Verbose($"MESSAGE_DELETE: {channel.Path} ({msg.User?.Name ?? "Unknown"})");
-                                OnMessageDeleted(msg);
-                            }
-                            else
-                                _gatewayLogger.Warning("MESSAGE_DELETE referenced an unknown channel.");*/
-                        }
-                        break;
+                                break;
 
-                    //Statuses
-                    case "PRESENCE_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<PresenceUpdateEvent>(Serializer);
-                            User user;
-                            Server server;
-                            if (data.GuildId == null)
-                            {
-                                server = null;
-                                user = GetPrivateChannel(data.User.Id)?.Recipient;
-                            }
-                            else
-                            {
-                                server = GetServer(data.GuildId.Value);
-                                if (server == null)
+                            //Servers
+                            case "GUILD_CREATE":
                                 {
-                                    _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown server.");
-                                    break;
+                                    /*var data = msg.Payload.ToObject<ExtendedGuild>(Serializer);
+                                    if (data.Unavailable != true)
+                                    {
+                                        var server = AddServer(data.Id);
+                                        server.Update(data);
+
+                                        if (data.Unavailable != false)
+                                        {
+                                            _gatewayLogger.Info($"GUILD_CREATE: {server.Path}");
+                                            JoinedServer.Raise(server);
+                                        }
+                                        else
+                                            _gatewayLogger.Info($"GUILD_AVAILABLE: {server.Path}");
+
+                                        if (!data.IsLarge)
+                                            await GuildAvailable.Raise(server);
+                                        else
+                                            _largeServers.Enqueue(data.Id);
+                                    }*/
                                 }
-                                else
-                                    user = server.GetUser(data.User.Id);
-                            }
-
-                            if (user != null)
-                            {
-                                if (Config.LogLevel == LogSeverity.Debug)
-                                    _gatewayLogger.Debug($"PRESENCE_UPDATE: {user.Path}");
-                                var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
-                                user.Update(data);
-                                OnUserUpdated(before, user);
-                            }
-                            //else //Occurs when a user leaves a server
-                            //    _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
-                        }
-                        break;
-                    case "TYPING_START":
-                        {
-                            /*var data = msg.Payload.ToObject<TypingStartEvent>(Serializer);
-                            var channel = GetChannel(data.ChannelId);
-                            if (channel != null)
-                            {
-                                User user;
-                                if (channel.IsPrivate)
+                                break;
+                            case "GUILD_UPDATE":
                                 {
-                                    if (channel.Recipient.Id == data.UserId)
-                                        user = channel.Recipient;
+                                    /*var data = msg.Payload.ToObject<Guild>(Serializer);
+                                    var server = GetServer(data.Id);
+                                    if (server != null)
+                                    {
+                                        var before = Config.EnablePreUpdateEvents ? server.Clone() : null;
+                                        server.Update(data);
+                                        _gatewayLogger.Info($"GUILD_UPDATE: {server.Path}");
+                                        await GuildUpdated.Raise(before, server);
+                                    }
                                     else
-                                        break;
+                                        _gatewayLogger.Warning("GUILD_UPDATE referenced an unknown guild.");*/
                                 }
-                                else
-                                    user = channel.Server.GetUser(data.UserId);
-                                if (user != null)
+                                break;
+                            case "GUILD_DELETE":
                                 {
-                                    if (Config.LogLevel == LogSeverity.Debug)
-                                        _gatewayLogger.Debug($"TYPING_START: {channel.Path} ({user.Name})");
-                                    OnUserIsTypingUpdated(channel, user);
-                                    user.UpdateActivity();
-                                }
-                            }
-                            else
-                                _gatewayLogger.Warning("TYPING_START referenced an unknown channel.");*/
-                        }
-                        break;
+                                    /*var data = msg.Payload.ToObject<ExtendedGuild>(Serializer);
+                                    Server server = RemoveServer(data.Id);
+                                    if (server != null)
+                                    {
+                                        if (data.Unavailable != true)
+                                            _gatewayLogger.Info($"GUILD_DELETE: {server.Path}");
+                                        else
+                                            _gatewayLogger.Info($"GUILD_UNAVAILABLE: {server.Path}");
 
-                    //Voice
-                    case "VOICE_STATE_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<VoiceStateUpdateEvent>(Serializer);
-                            var server = GetServer(data.GuildId);
-                            if (server != null)
-                            {
-                                var user = server.GetUser(data.UserId);
-                                if (user != null)
+                                        OnServerUnavailable(server);
+                                        if (data.Unavailable != true)
+                                            OnLeftServer(server);
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("GUILD_DELETE referenced an unknown guild.");*/
+                                }
+                                break;
+
+                            //Channels
+                            case "CHANNEL_CREATE":
                                 {
-                                    if (Config.LogLevel == LogSeverity.Debug)
-                                        _gatewayLogger.Debug($"VOICE_STATE_UPDATE: {user.Path}");
-                                    var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
-                                    user.Update(data);
-                                    //_gatewayLogger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
-                                    OnUserUpdated(before, user);
+                                    /*var data = msg.Payload.ToObject<ChannelCreateEvent>(Serializer);
+
+                                    Channel channel = null;
+                                    if (data.GuildId != null)
+                                    {
+                                        var server = GetServer(data.GuildId.Value);
+                                        if (server != null)
+                                            channel = server.AddChannel(data.Id, true);
+                                        else
+                                            _gatewayLogger.Warning("CHANNEL_CREATE referenced an unknown guild.");
+                                    }
+                                    else
+                                        channel = AddPrivateChannel(data.Id, data.Recipient.Id);
+                                    if (channel != null)
+                                    {
+                                        channel.Update(data);
+                                        _gatewayLogger.Info($"CHANNEL_CREATE: {channel.Path}");
+                                        ChannelCreated.Raise(channel);
+                                    }*/
                                 }
-                                //else //Occurs when a user leaves a server
-                                //    _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");
-                            }
-                            else
-                                _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown server.");*/
+                                break;
+                            case "CHANNEL_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<ChannelUpdateEvent>(Serializer);
+                                    var channel = GetChannel(data.Id);
+                                    if (channel != null)
+                                    {
+                                        var before = Config.EnablePreUpdateEvents ? channel.Clone() : null;
+                                        channel.Update(data);
+                                        _gateway_gatewayLogger.Info($"CHANNEL_UPDATE: {channel.Path}");
+                                        OnChannelUpdated(before, channel);
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("CHANNEL_UPDATE referenced an unknown channel.");*/
+                                }
+                                break;
+                            case "CHANNEL_DELETE":
+                                {
+                                    /*var data = msg.Payload.ToObject<ChannelDeleteEvent>(Serializer);
+                                    var channel = RemoveChannel(data.Id);
+                                    if (channel != null)
+                                    {
+                                        _gateway_gatewayLogger.Info($"CHANNEL_DELETE: {channel.Path}");
+                                        OnChannelDestroyed(channel);
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("CHANNEL_DELETE referenced an unknown channel.");*/
+                                }
+                                break;
+
+                            //Members
+                            case "GUILD_MEMBER_ADD":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildMemberAddEvent>(Serializer);
+                                    var server = GetServer(data.GuildId.Value);
+                                    if (server != null)
+                                    {
+                                        var user = server.AddUser(data.User.Id, true, true);
+                                        user.Update(data);
+                                        user.UpdateActivity();
+                                        _gatewayLogger.Info($"GUILD_MEMBER_ADD: {user.Path}");
+                                        OnUserJoined(user);
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("GUILD_MEMBER_ADD referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_MEMBER_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildMemberUpdateEvent>(Serializer);
+                                    var server = GetServer(data.GuildId.Value);
+                                    if (server != null)
+                                    {
+                                        var user = server.GetUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
+                                            user.Update(data);
+                                            _gatewayLogger.Info($"GUILD_MEMBER_UPDATE: {user.Path}");
+                                            OnUserUpdated(before, user);
+                                        }
+                                        else
+                                            _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_MEMBER_REMOVE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildMemberRemoveEvent>(Serializer);
+                                    var server = GetServer(data.GuildId.Value);
+                                    if (server != null)
+                                    {
+                                        var user = server.RemoveUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            _gatewayLogger.Info($"GUILD_MEMBER_REMOVE: {user.Path}");
+                                            OnUserLeft(user);
+                                        }
+                                        else
+                                            _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown user.");
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_MEMBERS_CHUNK":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildMembersChunkEvent>(Serializer);
+                                    var server = GetServer(data.GuildId);
+                                    if (server != null)
+                                    {
+                                        foreach (var memberData in data.Members)
+                                        {
+                                            var user = server.AddUser(memberData.User.Id, true, false);
+                                            user.Update(memberData);
+                                        }
+                                        _gateway_gatewayLogger.Verbose($"GUILD_MEMBERS_CHUNK: {data.Members.Length} users");
+
+                                        if (server.CurrentUserCount >= server.UserCount) //Finished downloading for there
+                                            OnServerAvailable(server);
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");*/
+                                }
+                                break;
+
+                            //Roles
+                            case "GUILD_ROLE_CREATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildRoleCreateEvent>(Serializer);
+                                    var server = GetServer(data.GuildId);
+                                    if (server != null)
+                                    {
+                                        var role = server.AddRole(data.Data.Id);
+                                        role.Update(data.Data, false);
+                                        _gateway_gatewayLogger.Info($"GUILD_ROLE_CREATE: {role.Path}");
+                                        OnRoleCreated(role);
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_ROLE_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildRoleUpdateEvent>(Serializer);
+                                    var server = GetServer(data.GuildId);
+                                    if (server != null)
+                                    {
+                                        var role = server.GetRole(data.Data.Id);
+                                        if (role != null)
+                                        {
+                                            var before = Config.EnablePreUpdateEvents ? role.Clone() : null;
+                                            role.Update(data.Data, true);
+                                            _gateway_gatewayLogger.Info($"GUILD_ROLE_UPDATE: {role.Path}");
+                                            OnRoleUpdated(before, role);
+                                        }
+                                        else
+                                            _gateway_gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_ROLE_DELETE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildRoleDeleteEvent>(Serializer);
+                                    var server = GetServer(data.GuildId);
+                                    if (server != null)
+                                    {
+                                        var role = server.RemoveRole(data.RoleId);
+                                        if (role != null)
+                                        {
+                                            _gateway_gatewayLogger.Info($"GUILD_ROLE_DELETE: {role.Path}");
+                                            OnRoleDeleted(role);
+                                        }
+                                        else
+                                            _gateway_gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown role.");
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown guild.");*/
+                                }
+                                break;
+
+                            //Bans
+                            case "GUILD_BAN_ADD":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildBanAddEvent>(Serializer);
+                                    var server = GetServer(data.GuildId.Value);
+                                    if (server != null)
+                                    {
+                                        var user = server.GetUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            _gateway_gatewayLogger.Info($"GUILD_BAN_ADD: {user.Path}");
+                                            OnUserBanned(user);
+                                        }
+                                        else
+                                            _gateway_gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown user.");
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown guild.");*/
+                                }
+                                break;
+                            case "GUILD_BAN_REMOVE":
+                                {
+                                    /*var data = msg.Payload.ToObject<GuildBanRemoveEvent>(Serializer);
+                                    var server = GetServer(data.GuildId.Value);
+                                    if (server != null)
+                                    {
+                                        var user = new User(this, data.User.Id, server);
+                                        user.Update(data.User);
+                                        _gateway_gatewayLogger.Info($"GUILD_BAN_REMOVE: {user.Path}");
+                                        OnUserUnbanned(user);
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("GUILD_BAN_REMOVE referenced an unknown guild.");*/
+                                }
+                                break;
+
+                            //Messages
+                            case "MESSAGE_CREATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<MessageCreateEvent>(Serializer);
+
+                                    Channel channel = GetChannel(data.ChannelId);
+                                    if (channel != null)
+                                    {
+                                        var user = channel.GetUserFast(data.Author.Id);
+
+                                        if (user != null)
+                                        {
+                                            Message msg = null;
+                                            bool isAuthor = data.Author.Id == CurrentUser.Id;
+                                            //ulong nonce = 0;
+
+                                            //if (data.Author.Id == _privateUser.Id && Config.UseMessageQueue)
+                                            //{
+                                            //    if (data.Nonce != null && ulong.TryParse(data.Nonce, out nonce))
+                                            //        msg = _messages[nonce];
+                                            //}
+                                            if (msg == null)
+                                            {
+                                                msg = channel.AddMessage(data.Id, user, data.Timestamp.Value);
+                                                //nonce = 0;
+                                            }
+
+                                            //Remapped queued message
+                                            //if (nonce != 0)
+                                            //{
+                                            //    msg = _messages.Remap(nonce, data.Id);
+                                            //    msg.Id = data.Id;
+                                            //    RaiseMessageSent(msg);
+                                            //}
+
+                                            msg.Update(data);
+                                            user.UpdateActivity();
+
+                                            _gateway_gatewayLogger.Verbose($"MESSAGE_CREATE: {channel.Path} ({user.Name ?? "Unknown"})");
+                                            OnMessageReceived(msg);
+                                        }
+                                        else
+                                            _gateway_gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown user.");
+                                    }
+                                    else
+                                        _gateway_gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown channel.");*/
+                                }
+                                break;
+                            case "MESSAGE_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<MessageUpdateEvent>(Serializer);
+                                    var channel = GetChannel(data.ChannelId);
+                                    if (channel != null)
+                                    {
+                                        var msg = channel.GetMessage(data.Id, data.Author?.Id);
+                                        var before = Config.EnablePreUpdateEvents ? msg.Clone() : null;
+                                        msg.Update(data);
+                                        _gatewayLogger.Verbose($"MESSAGE_UPDATE: {channel.Path} ({data.Author?.Username ?? "Unknown"})");
+                                        OnMessageUpdated(before, msg);
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("MESSAGE_UPDATE referenced an unknown channel.");*/
+                                }
+                                break;
+                            case "MESSAGE_DELETE":
+                                {
+                                    /*var data = msg.Payload.ToObject<MessageDeleteEvent>(Serializer);
+                                    var channel = GetChannel(data.ChannelId);
+                                    if (channel != null)
+                                    {
+                                        var msg = channel.RemoveMessage(data.Id);
+                                        _gatewayLogger.Verbose($"MESSAGE_DELETE: {channel.Path} ({msg.User?.Name ?? "Unknown"})");
+                                        OnMessageDeleted(msg);
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("MESSAGE_DELETE referenced an unknown channel.");*/
+                                }
+                                break;
+
+                            //Statuses
+                            case "PRESENCE_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<PresenceUpdateEvent>(Serializer);
+                                    User user;
+                                    Server server;
+                                    if (data.GuildId == null)
+                                    {
+                                        server = null;
+                                        user = GetPrivateChannel(data.User.Id)?.Recipient;
+                                    }
+                                    else
+                                    {
+                                        server = GetServer(data.GuildId.Value);
+                                        if (server == null)
+                                        {
+                                            _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown server.");
+                                            break;
+                                        }
+                                        else
+                                            user = server.GetUser(data.User.Id);
+                                    }
+
+                                    if (user != null)
+                                    {
+                                        if (Config.LogLevel == LogSeverity.Debug)
+                                            _gatewayLogger.Debug($"PRESENCE_UPDATE: {user.Path}");
+                                        var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
+                                        user.Update(data);
+                                        OnUserUpdated(before, user);
+                                    }
+                                    //else //Occurs when a user leaves a server
+                                    //    _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown user.");*/
+                                }
+                                break;
+                            case "TYPING_START":
+                                {
+                                    /*var data = msg.Payload.ToObject<TypingStartEvent>(Serializer);
+                                    var channel = GetChannel(data.ChannelId);
+                                    if (channel != null)
+                                    {
+                                        User user;
+                                        if (channel.IsPrivate)
+                                        {
+                                            if (channel.Recipient.Id == data.UserId)
+                                                user = channel.Recipient;
+                                            else
+                                                break;
+                                        }
+                                        else
+                                            user = channel.Server.GetUser(data.UserId);
+                                        if (user != null)
+                                        {
+                                            if (Config.LogLevel == LogSeverity.Debug)
+                                                _gatewayLogger.Debug($"TYPING_START: {channel.Path} ({user.Name})");
+                                            OnUserIsTypingUpdated(channel, user);
+                                            user.UpdateActivity();
+                                        }
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("TYPING_START referenced an unknown channel.");*/
+                                }
+                                break;
+
+                            //Voice
+                            case "VOICE_STATE_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<VoiceStateUpdateEvent>(Serializer);
+                                    var server = GetServer(data.GuildId);
+                                    if (server != null)
+                                    {
+                                        var user = server.GetUser(data.UserId);
+                                        if (user != null)
+                                        {
+                                            if (Config.LogLevel == LogSeverity.Debug)
+                                                _gatewayLogger.Debug($"VOICE_STATE_UPDATE: {user.Path}");
+                                            var before = Config.EnablePreUpdateEvents ? user.Clone() : null;
+                                            user.Update(data);
+                                            //_gatewayLogger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
+                                            OnUserUpdated(before, user);
+                                        }
+                                        //else //Occurs when a user leaves a server
+                                        //    _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");
+                                    }
+                                    else
+                                        _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown server.");*/
+                                }
+                                break;
+
+                            //Settings
+                            case "USER_UPDATE":
+                                {
+                                    /*var data = msg.Payload.ToObject<UserUpdateEvent>(Serializer);
+                                    if (data.Id == CurrentUser.Id)
+                                    {
+                                        var before = Config.EnablePreUpdateEvents ? CurrentUser.Clone() : null;
+                                        CurrentUser.Update(data);
+                                        foreach (var server in _servers)
+                                            server.Value.CurrentUser.Update(data);
+                                        _gatewayLogger.Info($"USER_UPDATE");
+                                        OnProfileUpdated(before, CurrentUser);
+                                    }*/
+                                }
+                                break;
+
+                            //Handled in GatewaySocket
+                            case "RESUMED":
+                                break;
+
+                            //Ignored
+                            case "USER_SETTINGS_UPDATE":
+                            case "MESSAGE_ACK": //TODO: Add (User only)
+                            case "GUILD_EMOJIS_UPDATE": //TODO: Add
+                            case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
+                            case "VOICE_SERVER_UPDATE": //TODO: Add
+                                _gatewayLogger.Debug($"Ignored message {opCode}{(type != null ? $" ({type})" : "")}");
+                                break;
+
+                            //Others
+                            default:
+                                _gatewayLogger.Warning($"Unknown message {opCode}{(type != null ? $" ({type})" : "")}");
+                                break;
                         }
-                        break;
-
-                    //Settings
-                    case "USER_UPDATE":
-                        {
-                            /*var data = msg.Payload.ToObject<UserUpdateEvent>(Serializer);
-                            if (data.Id == CurrentUser.Id)
-                            {
-                                var before = Config.EnablePreUpdateEvents ? CurrentUser.Clone() : null;
-                                CurrentUser.Update(data);
-                                foreach (var server in _servers)
-                                    server.Value.CurrentUser.Update(data);
-                                _gatewayLogger.Info($"USER_UPDATE");
-                                OnProfileUpdated(before, CurrentUser);
-                            }*/
-                        }
-                        break;
-
-                    //Handled in GatewaySocket
-                    case "RESUMED":
-                        break;
-
-                    //Ignored
-                    case "USER_SETTINGS_UPDATE":
-                    case "MESSAGE_ACK": //TODO: Add (User only)
-                    case "GUILD_EMOJIS_UPDATE": //TODO: Add
-                    case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
-                    case "VOICE_SERVER_UPDATE": //TODO: Add
-                        _gatewayLogger.Debug($"{msg.Type} [Ignored]");
-                        break;
-
-                    //Others
-                    default:
-                        _gatewayLogger.Warning($"Unknown message type: {msg.Type}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                _gatewayLogger.Error($"Error handling {msg.Type} event", ex);
+                _gatewayLogger.Error($"Error handling msg {opCode}{(type != null ? $" ({type})" : "")}", ex);
             }
         }
 
