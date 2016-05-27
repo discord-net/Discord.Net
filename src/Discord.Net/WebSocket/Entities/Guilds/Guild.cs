@@ -14,7 +14,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Guild : IGuild, IUserGuild
     {
-        private ConcurrentDictionary<ulong, GuildChannel> _channels;
+        private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, GuildUser> _members;
         private ConcurrentDictionary<ulong, Role> _roles;
         private ulong _ownerId;
@@ -71,11 +71,11 @@ namespace Discord.WebSocket
         /// <summary> Gets the embed channel for this guild. </summary>
         public IChannel EmbedChannel => GetChannel(_embedChannelId.GetValueOrDefault(0)); //TODO: Is this text or voice?
         /// <summary> Gets a collection of all channels in this guild. </summary>
-        public IEnumerable<GuildChannel> Channels => _channels.Select(x => x.Value);
+        public IEnumerable<GuildChannel> Channels => _channels.Select(x => Discord.GetChannel(x) as GuildChannel);
         /// <summary> Gets a collection of text channels in this guild. </summary>
-        public IEnumerable<TextChannel> TextChannels => _channels.Select(x => x.Value).OfType<TextChannel>();
+        public IEnumerable<TextChannel> TextChannels => _channels.Select(x => Discord.GetChannel(x) as TextChannel);
         /// <summary> Gets a collection of voice channels in this guild. </summary>
-        public IEnumerable<VoiceChannel> VoiceChannels => _channels.Select(x => x.Value).OfType<VoiceChannel>();
+        public IEnumerable<VoiceChannel> VoiceChannels => _channels.Select(x => Discord.GetChannel(x) as VoiceChannel);
         /// <summary> Gets a collection of all roles in this guild. </summary>
         public IEnumerable<Role> Roles => _roles?.Select(x => x.Value) ?? Enumerable.Empty<Role>();
         /// <summary> Gets a collection of all users in this guild. </summary>
@@ -185,9 +185,8 @@ namespace Discord.WebSocket
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
         public GuildChannel GetChannel(ulong id)
         {
-            GuildChannel channel;
-            if (_channels.TryGetValue(id, out channel))
-                return channel;
+            if (_channels.ContainsKey(id))
+                return Discord.GetChannel(id) as GuildChannel;
             return null;
         }
         /// <summary> Creates a new text channel. </summary>
