@@ -5,15 +5,17 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Rest
+namespace Discord.Net.Queue
 {
+    //TODO: Implement bucket chaining
     internal class RequestQueueBucket
     {
         private readonly RequestQueue _parent;
         private readonly BucketGroup _bucketGroup;
+        private readonly GlobalBucket? _chainedBucket;
         private readonly int _bucketId;
         private readonly ulong _guildId;
-        private readonly ConcurrentQueue<RestRequest> _queue;
+        private readonly ConcurrentQueue<IQueuedRequest> _queue;
         private readonly SemaphoreSlim _lock;
         private Task _resetTask;
         private bool _waitingToProcess;
@@ -23,31 +25,32 @@ namespace Discord.Net.Rest
         public int WindowSeconds { get; }
         public int WindowCount { get; private set; }
 
-        public RequestQueueBucket(RequestQueue parent, GlobalBucket bucket, int windowMaxCount, int windowSeconds)
-            : this(parent, windowMaxCount, windowSeconds)
+        public RequestQueueBucket(RequestQueue parent, GlobalBucket bucket, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
+            : this(parent, windowMaxCount, windowSeconds, chainedBucket)
         {
             _bucketGroup = BucketGroup.Global;
             _bucketId = (int)bucket;
             _guildId = 0;
         }
-        public RequestQueueBucket(RequestQueue parent, GuildBucket bucket, ulong guildId, int windowMaxCount, int windowSeconds)
-            : this(parent, windowMaxCount, windowSeconds)
+        public RequestQueueBucket(RequestQueue parent, GuildBucket bucket, ulong guildId, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
+            : this(parent, windowMaxCount, windowSeconds, chainedBucket)
         {
             _bucketGroup = BucketGroup.Guild;
             _bucketId = (int)bucket;
             _guildId = guildId;
         }
-        private RequestQueueBucket(RequestQueue parent, int windowMaxCount, int windowSeconds)
+        private RequestQueueBucket(RequestQueue parent, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
         {
             _parent = parent;
             WindowMaxCount = windowMaxCount;
             WindowSeconds = windowSeconds;
-            _queue = new ConcurrentQueue<RestRequest>();
+            _chainedBucket = chainedBucket;
+            _queue = new ConcurrentQueue<IQueuedRequest>();
             _lock = new SemaphoreSlim(1, 1);
             _id = new System.Random().Next(0, int.MaxValue);
         }
 
-        public void Queue(RestRequest request)
+        public void Queue(IQueuedRequest request)
         {
             _queue.Enqueue(request);
         }
@@ -68,7 +71,7 @@ namespace Discord.Net.Rest
                 _waitingToProcess = false;
                 while (true)
                 {
-                    RestRequest request;
+                    IQueuedRequest request;
 
                     //If we're waiting to reset (due to a rate limit exception, or preemptive check), abort
                     if (WindowCount == WindowMaxCount) return;
@@ -81,11 +84,7 @@ namespace Discord.Net.Rest
                             request.Promise.SetException(new OperationCanceledException(request.CancelToken));
                         else
                         {
-                            Stream stream;
-                            if (request.IsMultipart)
-                                stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.CancelToken, request.MultipartParams, request.HeaderOnly).ConfigureAwait(false);
-                            else
-                                stream = await _parent.RestClient.Send(request.Method, request.Endpoint, request.CancelToken, request.Json, request.HeaderOnly).ConfigureAwait(false);
+                            Stream stream = await request.Send().ConfigureAwait(false);
                             request.Promise.SetResult(stream);
                         }
                     }
@@ -157,7 +156,7 @@ namespace Discord.Net.Rest
         public void Clear()
         {
             //Assume this obj is under lock
-            RestRequest request;
+            IQueuedRequest request;
 
             while (_queue.TryDequeue(out request)) { }
         }

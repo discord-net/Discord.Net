@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Username { get; private set; }
         /// <inheritdoc />
-        public DMChannel DMChannel { get; private set; }
+        public DMChannel DMChannel { get; internal set; }
 
         /// <inheritdoc />
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
@@ -58,7 +58,6 @@ namespace Discord.WebSocket
                 var model = await Discord.ApiClient.CreateDMChannel(args).ConfigureAwait(false);
 
                 channel = new DMChannel(Discord, this, model);
-                DMChannel = channel;
             }
             return channel;
         }

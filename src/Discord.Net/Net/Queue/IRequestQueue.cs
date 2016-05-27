@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Discord.Net.Rest
+namespace Discord.Net.Queue
 {
     //TODO: Add docstrings
     public interface IRequestQueue

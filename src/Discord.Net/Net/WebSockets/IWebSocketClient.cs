@@ -7,13 +7,15 @@ namespace Discord.Net.WebSockets
     //TODO: Add ETF
     public interface IWebSocketClient
     {
-        event EventHandler<BinaryMessageEventArgs> BinaryMessage;
-        event EventHandler<TextMessageEventArgs> TextMessage;
+        event Func<BinaryMessageEventArgs, Task> BinaryMessage;
+        event Func<TextMessageEventArgs, Task> TextMessage;
 
         void SetHeader(string key, string value);
+        void SetCancelToken(CancellationToken cancelToken);
 
-        Task Connect(string host, CancellationToken cancelToken);
+        Task Connect(string host);
         Task Disconnect();
-        void QueueMessage(string message);
+
+        Task Send(byte[] data, int offset, int length, bool isText);
     }
 }

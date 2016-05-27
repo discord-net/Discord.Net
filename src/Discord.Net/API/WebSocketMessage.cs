@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Discord.API
 {
@@ -11,13 +12,6 @@ namespace Discord.API
         [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
         public uint? Sequence { get; set; }
         [JsonProperty("d")]
-        public object Payload { get; set; }
-
-        public WebSocketMessage() { }
-        public WebSocketMessage(IWebSocketMessage msg)
-        {
-            Operation = msg.OpCode;
-            Payload = msg.Payload;
-        }
+        public JToken Payload { get; set; }
     }
 }

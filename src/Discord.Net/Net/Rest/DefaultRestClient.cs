@@ -17,6 +17,8 @@ namespace Discord.Net.Rest
 
         protected readonly HttpClient _client;
         protected readonly string _baseUrl;
+        private CancellationTokenSource _cancelTokenSource;
+        private CancellationToken _cancelToken, _parentToken;
         protected bool _isDisposed;
 
         public DefaultRestClient(string baseUrl)
@@ -32,6 +34,7 @@ namespace Discord.Net.Rest
             });
 
             SetHeader("accept-encoding", "gzip, deflate");
+            _parentToken = CancellationToken.None;
         }
         protected virtual void Dispose(bool disposing)
         {
@@ -53,19 +56,28 @@ namespace Discord.Net.Rest
             if (value != null)
                 _client.DefaultRequestHeaders.Add(key, value);
         }
+        public void SetCancelToken(CancellationToken cancelToken)
+        {
+            _parentToken = cancelToken;
+            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+        }
 
-        public async Task<Stream> Send(string method, string endpoint, CancellationToken cancelToken, string json = null, bool headerOnly = false)
+        public async Task<Stream> Send(string method, string endpoint, bool headerOnly = false)
+        {
+            string uri = Path.Combine(_baseUrl, endpoint);
+            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
+        }
+        public async Task<Stream> Send(string method, string endpoint, string json, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
-                if (json != null)
-                    restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                return await SendInternal(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+                restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
-
-        public async Task<Stream> Send(string method, string endpoint, CancellationToken cancelToken, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
+        public async Task<Stream> Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -112,14 +124,15 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                return await SendInternal(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
 
-        private async Task<Stream> SendInternal(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
+        private async Task<Stream> SendInternal(HttpRequestMessage request, bool headerOnly)
         {
             while (true)
             {
+                var cancelToken = _cancelToken; //It's okay if another thread changes this, causes a retry to abort
                 HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
 
                 int statusCode = (int)response.StatusCode;

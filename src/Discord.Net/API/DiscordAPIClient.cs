@@ -1,7 +1,9 @@
 ﻿using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
+using Discord.Net.Queue;
 using Discord.Net.Rest;
+using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,77 +19,202 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordApiClient
+    public class DiscordApiClient : IDisposable
     {
-        internal event EventHandler<SentRequestEventArgs> SentRequest;
+        internal event Func<SentRequestEventArgs, Task> SentRequest;
         
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
         private readonly IRestClient _restClient;
-        private CancellationToken _cancelToken;
+        private readonly IWebSocketClient _gatewayClient;
+        private readonly SemaphoreSlim _connectionLock;
+        private CancellationTokenSource _loginCancelToken, _connectCancelToken;
+        private bool _isDisposed;
 
+        public LoginState LoginState { get; private set; }
+        public ConnectionState ConnectionState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
-        public IRestClient RestClient { get; private set; }
-        public IRequestQueue RequestQueue { get; private set; }
 
-        public DiscordApiClient(RestClientProvider restClientProvider)
+        public DiscordApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider = null, JsonSerializer serializer = null, RequestQueue requestQueue = null)
         {
+            _connectionLock = new SemaphoreSlim(1, 1);
+
+            _requestQueue = requestQueue ?? new RequestQueue();
+
             _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
             _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
-
-            _requestQueue = new RequestQueue(_restClient);
-
-            _serializer = new JsonSerializer()
+            if (webSocketProvider != null)
             {
-                ContractResolver = new DiscordContractResolver()
-            };
-        }
-
-        public async Task Login(TokenType tokenType, string token, CancellationToken cancelToken)
-        {
-            AuthTokenType = tokenType;
-            _cancelToken = cancelToken;
-            await _requestQueue.SetCancelToken(cancelToken).ConfigureAwait(false);
-            
-            switch (tokenType)
-            {
-                case TokenType.Bot:
-                    token = $"Bot {token}";
-                    break;
-                case TokenType.Bearer:
-                    token = $"Bearer {token}";
-                    break;
-                case TokenType.User:
-                    break;
-                default:
-                    throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                _gatewayClient = webSocketProvider();
+                _gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent);
             }
 
-            _restClient.SetHeader("authorization", token);
+            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
-        public async Task Login(LoginParams args, CancellationToken cancelToken)
+        void Dispose(bool disposing)
         {
-            AuthTokenType = TokenType.User;
-            _restClient.SetHeader("authorization", null);
-            _cancelToken = cancelToken;
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _loginCancelToken?.Dispose();
+                    _connectCancelToken?.Dispose();
+                }
+                _isDisposed = true;
+            }
+        }
+        public void Dispose() => Dispose(true);
 
-            LoginResponse response;
+        public async Task Login(LoginParams args)
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                response = await Send<LoginResponse>("POST", "auth/login", args, GlobalBucket.Login).ConfigureAwait(false);
+                await LoginInternal(TokenType.User, null, args, true).ConfigureAwait(false);
             }
-            catch
+            finally { _connectionLock.Release(); }
+        }
+        public async Task Login(TokenType tokenType, string token)
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
             {
-                _cancelToken = CancellationToken.None;
+                await LoginInternal(tokenType, token, null, false).ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task LoginInternal(TokenType tokenType, string token, LoginParams args, bool doLogin)
+        {
+            if (LoginState != LoginState.LoggedOut)
+                await LogoutInternal().ConfigureAwait(false);
+            LoginState = LoginState.LoggingIn;
+            
+            try
+            {
+                _loginCancelToken = new CancellationTokenSource();
+
+                AuthTokenType = TokenType.User;
+                _restClient.SetHeader("authorization", null);
+                await _requestQueue.SetCancelToken(_loginCancelToken.Token).ConfigureAwait(false);
+                _restClient.SetCancelToken(_loginCancelToken.Token);
+
+                if (doLogin)
+                {
+                    var response = await Send<LoginResponse>("POST", "auth/login", args, GlobalBucket.Login).ConfigureAwait(false);
+                    token = response.Token;
+                }
+
+                AuthTokenType = tokenType;
+                switch (tokenType)
+                {
+                    case TokenType.Bot:
+                        token = $"Bot {token}";
+                        break;
+                    case TokenType.Bearer:
+                        token = $"Bearer {token}";
+                        break;
+                    case TokenType.User:
+                        break;
+                    default:
+                        throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                }
+                _restClient.SetHeader("authorization", token);
+
+                LoginState = LoginState.LoggedIn;
+            }
+            catch (Exception)
+            {
+                await LogoutInternal().ConfigureAwait(false);
                 throw;
             }
-
-            _restClient.SetHeader("authorization", response.Token);
         }
+
         public async Task Logout()
         {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await LogoutInternal().ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task LogoutInternal()
+        {
+            //TODO: An exception here will lock the client into the unusable LoggingOut state. How should we handle? (Add same solution to both DiscordClients too)
+            if (LoginState == LoginState.LoggedOut) return;
+            LoginState = LoginState.LoggingOut;
+            
+            try { _loginCancelToken?.Cancel(false); }
+            catch { }
+
+            await DisconnectInternal().ConfigureAwait(false);
             await _requestQueue.Clear().ConfigureAwait(false);
+
+            await _requestQueue.SetCancelToken(CancellationToken.None).ConfigureAwait(false);
+            _restClient.SetCancelToken(CancellationToken.None);
+
+            LoginState = LoginState.LoggedOut;
+        }
+
+        public async Task Connect()
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await ConnectInternal().ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task ConnectInternal()
+        {
+            if (LoginState != LoginState.LoggedIn)
+                throw new InvalidOperationException("You must log in before connecting.");
+            if (_gatewayClient == null)
+                throw new NotSupportedException("This client is not configured with websocket support.");
+
+            ConnectionState = ConnectionState.Connecting;
+            try
+            {
+                _connectCancelToken = new CancellationTokenSource();
+                if (_gatewayClient != null)
+                    _gatewayClient.SetCancelToken(_connectCancelToken.Token);
+
+                var gatewayResponse = await GetGateway().ConfigureAwait(false);
+                await _gatewayClient.Connect(gatewayResponse.Url).ConfigureAwait(false);
+
+                ConnectionState = ConnectionState.Connected;
+            }
+            catch (Exception)
+            {
+                await DisconnectInternal().ConfigureAwait(false);
+                throw;
+            }
+        }
+
+        public async Task Disconnect()
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectInternal().ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task DisconnectInternal()
+        {
+            if (_gatewayClient == null)
+                throw new NotSupportedException("This client is not configured with websocket support.");
+
+            if (ConnectionState == ConnectionState.Disconnected) return;
+            ConnectionState = ConnectionState.Disconnecting;
+            
+            try { _connectCancelToken?.Cancel(false); }
+            catch { }
+
+            await _gatewayClient.Disconnect().ConfigureAwait(false);
+
+            ConnectionState = ConnectionState.Disconnected;
         }
 
         //Core
@@ -134,32 +261,28 @@ namespace Discord.API
 
         private async Task<Stream> SendInternal(string method, string endpoint, object payload, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
-            _cancelToken.ThrowIfCancellationRequested();
-
             var stopwatch = Stopwatch.StartNew();
             string json = null;
             if (payload != null)
                 json = Serialize(payload);
-            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, json, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            var responseStream = await _requestQueue.Send(new RestRequest(_restClient, method, endpoint, json, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
             int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
+            await SentRequest.Raise(new SentRequestEventArgs(method, endpoint, bytes, milliseconds)).ConfigureAwait(false);
 
             return responseStream;
         }
         private async Task<Stream> SendInternal(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, BucketGroup group, int bucketId, ulong guildId)
         {
-            _cancelToken.ThrowIfCancellationRequested();
-
             var stopwatch = Stopwatch.StartNew();
-            var responseStream = await _requestQueue.Send(new RestRequest(method, endpoint, multipartArgs, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
+            var responseStream = await _requestQueue.Send(new RestRequest(_restClient, method, endpoint, multipartArgs, headerOnly), group, bucketId, guildId).ConfigureAwait(false);
             int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            SentRequest?.Invoke(this, new SentRequestEventArgs(method, endpoint, bytes, milliseconds));
+            await SentRequest.Raise(new SentRequestEventArgs(method, endpoint, bytes, milliseconds)).ConfigureAwait(false);
 
             return responseStream;
         }

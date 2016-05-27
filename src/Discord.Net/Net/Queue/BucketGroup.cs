@@ -1,4 +1,4 @@
-﻿namespace Discord.Net.Rest
+﻿namespace Discord.Net.Queue
 {
     internal enum BucketGroup
     {

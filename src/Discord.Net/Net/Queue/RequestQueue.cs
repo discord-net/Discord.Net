@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Rest
+namespace Discord.Net.Queue
 {
     public class RequestQueue : IRequestQueue
     {
@@ -15,12 +15,8 @@ namespace Discord.Net.Rest
         private CancellationToken? _parentToken;
         private CancellationToken _cancelToken;
 
-        public IRestClient RestClient { get; }
-
-        public RequestQueue(IRestClient restClient)
+        public RequestQueue()
         {
-            RestClient = restClient;
-
             _lock = new SemaphoreSlim(1, 1);
             _globalBuckets = new RequestQueueBucket[Enum.GetValues(typeof(GlobalBucket)).Length];
             _guildBuckets = new Dictionary<ulong, RequestQueueBucket>[Enum.GetValues(typeof(GuildBucket)).Length];
@@ -38,11 +34,9 @@ namespace Discord.Net.Rest
             finally { Unlock(); }
         }
         
-        internal async Task<Stream> Send(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
+        internal async Task<Stream> Send(IQueuedRequest request, BucketGroup group, int bucketId, ulong guildId)
         {
             RequestQueueBucket bucket;
-
-            request.CancelToken = _cancelToken;
 
             await Lock().ConfigureAwait(false);
             try
@@ -66,6 +60,9 @@ namespace Discord.Net.Rest
                 case GlobalBucket.General: return new RequestQueueBucket(this, bucket, int.MaxValue, 0); //Catch-all
                 case GlobalBucket.Login: return new RequestQueueBucket(this, bucket, 1, 1); //TODO: Is this actual logins or token validations too?
                 case GlobalBucket.DirectMessage: return new RequestQueueBucket(this, bucket, 5, 5);
+                case GlobalBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, 50, 10);
+                case GlobalBucket.Gateway: return new RequestQueueBucket(this, bucket, 120, 60);
+                case GlobalBucket.UpdateStatus: return new RequestQueueBucket(this, bucket, 5, 1, GlobalBucket.Gateway);
 
                 default: throw new ArgumentException($"Unknown global bucket: {bucket}", nameof(bucket));
             }
@@ -75,7 +72,7 @@ namespace Discord.Net.Rest
             switch (bucket)
             {
                 //Per Guild
-                case GuildBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 5);
+                case GuildBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 5, GlobalBucket.SendEditMessage);
                 case GuildBucket.DeleteMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 1);
                 case GuildBucket.DeleteMessages: return new RequestQueueBucket(this, bucket, guildId, 1, 1);
                 case GuildBucket.ModifyMember: return new RequestQueueBucket(this, bucket, guildId, 10, 10); //TODO: Is this all users or just roles?

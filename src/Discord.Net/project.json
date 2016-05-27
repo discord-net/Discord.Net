@@ -1,6 +1,6 @@
-﻿{
+{
   "version": "1.0.0-dev",
-  "description": "A Discord.Net extension adding voice support.",
+  "description": "An unofficial .Net API wrapper for the Discord service.",
   "authors": [ "RogueException" ],
 
   "packOptions": {

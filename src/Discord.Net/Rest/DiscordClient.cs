@@ -1,5 +1,7 @@
 ﻿using Discord.API.Rest;
 using Discord.Logging;
+using Discord.Net;
+using Discord.Net.Queue;
 using Discord.Net.Rest;
 using System;
 using System.Collections.Generic;
@@ -15,39 +17,37 @@ namespace Discord.Rest
     //TODO: Log Logins/Logouts
     public sealed class DiscordClient : IDiscordClient, IDisposable
     {
-        public event EventHandler<LogMessageEventArgs> Log;
-        public event EventHandler LoggedIn, LoggedOut;
+        public event Func<LogMessageEventArgs, Task> Log;
+        public event Func<Task> LoggedIn, LoggedOut;
 
         private readonly Logger _discordLogger, _restLogger;
         private readonly SemaphoreSlim _connectionLock;
         private readonly RestClientProvider _restClientProvider;
         private readonly LogManager _log;
-        private CancellationTokenSource _cancelTokenSource;
+        private readonly RequestQueue _requestQueue;
         private bool _isDisposed;
         private SelfUser _currentUser;
 
-        public bool IsLoggedIn { get; private set; }
+        public LoginState LoginState { get; private set; }
         public API.DiscordApiClient ApiClient { get; private set; }
-
-        public TokenType AuthTokenType => ApiClient.AuthTokenType;
-        public IRestClient RestClient => ApiClient.RestClient;
-        public IRequestQueue RequestQueue => ApiClient.RequestQueue;
+        
+        public IRequestQueue RequestQueue => _requestQueue;
 
         public DiscordClient(DiscordConfig config = null)
         {
             if (config == null)
                 config = new DiscordConfig();
-
-            _restClientProvider = config.RestClientProvider;
-
+            
             _log = new LogManager(config.LogLevel);
-            _log.Message += (s, e) => Log.Raise(this, e);
+            _log.Message += async e => await Log.Raise(e).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
             _restLogger = _log.CreateLogger("Rest");
 
             _connectionLock = new SemaphoreSlim(1, 1);
-            ApiClient = new API.DiscordApiClient(_restClientProvider);
-            ApiClient.SentRequest += (s, e) => _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms");
+            _requestQueue = new RequestQueue();
+
+            ApiClient = new API.DiscordApiClient(config.RestClientProvider, requestQueue: _requestQueue);
+            ApiClient.SentRequest += async e => await _log.Verbose("Rest", $"{e.Method} {e.Endpoint}: {e.Milliseconds} ms").ConfigureAwait(false);
         }
 
         public async Task Login(string email, string password)
@@ -55,7 +55,7 @@ namespace Discord.Rest
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternal(email, password).ConfigureAwait(false);
+                await LoginInternal(TokenType.User, null, email, password, true, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -64,55 +64,51 @@ namespace Discord.Rest
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternal(tokenType, token, validateToken).ConfigureAwait(false);
+                await LoginInternal(tokenType, token, null, null, false, validateToken).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task LoginInternal(string email, string password)
+        private async Task LoginInternal(TokenType tokenType, string token, string email, string password, bool useEmail, bool validateToken)
         {
-            if (IsLoggedIn)
+            if (LoginState != LoginState.LoggedOut)
                 await LogoutInternal().ConfigureAwait(false);
+            LoginState = LoginState.LoggingIn;
+
             try
             {
-                _cancelTokenSource = new CancellationTokenSource();
-
-                var args = new LoginParams { Email = email, Password = password };
-                await ApiClient.Login(args, _cancelTokenSource.Token).ConfigureAwait(false);
-                await CompleteLogin(false).ConfigureAwait(false);
-            }
-            catch { await LogoutInternal().ConfigureAwait(false); throw; }
-        }
-        private async Task LoginInternal(TokenType tokenType, string token, bool validateToken)
-        {
-            if (IsLoggedIn)
-                await LogoutInternal().ConfigureAwait(false);
-            try
-            {
-                _cancelTokenSource = new CancellationTokenSource();
-
-                await ApiClient.Login(tokenType, token, _cancelTokenSource.Token).ConfigureAwait(false);
-                await CompleteLogin(validateToken).ConfigureAwait(false);
-            }
-            catch { await LogoutInternal().ConfigureAwait(false); throw; }
-        }
-        private async Task CompleteLogin(bool validateToken)
-        {
-            if (validateToken)
-            {
-                try
+                if (useEmail)
                 {
-                    await ApiClient.ValidateToken().ConfigureAwait(false);
+                    var args = new LoginParams { Email = email, Password = password };
+                    await ApiClient.Login(args).ConfigureAwait(false);
                 }
-                catch { await ApiClient.Logout().ConfigureAwait(false); }
+                else
+                    await ApiClient.Login(tokenType, token).ConfigureAwait(false);
+
+                if (validateToken)
+                {
+                    try
+                    {
+                        await ApiClient.ValidateToken().ConfigureAwait(false);
+                    }
+                    catch (HttpException ex)
+                    {
+                        throw new ArgumentException("Token validation failed", nameof(token), ex);
+                    }
+                }
+
+                LoginState = LoginState.LoggedIn;
             }
-            
-            IsLoggedIn = true;
-            LoggedIn.Raise(this);
+            catch (Exception)
+            {
+                await LogoutInternal().ConfigureAwait(false);
+                throw;
+            }
+
+            await LoggedIn.Raise().ConfigureAwait(false);
         }
 
         public async Task Logout()
         {
-            _cancelTokenSource?.Cancel();
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -122,22 +118,16 @@ namespace Discord.Rest
         }
         private async Task LogoutInternal()
         {
-            bool wasLoggedIn = IsLoggedIn;
-
-            if (_cancelTokenSource != null)
-            {
-                try { _cancelTokenSource.Cancel(false); }
-                catch { }
-            }
+            if (LoginState == LoginState.LoggedOut) return;
+            LoginState = LoginState.LoggingOut;
 
             await ApiClient.Logout().ConfigureAwait(false);
+
             _currentUser = null;
 
-            if (wasLoggedIn)
-            {
-                IsLoggedIn = false;
-                LoggedOut.Raise(this);
-            }
+            LoginState = LoginState.LoggedOut;
+
+            await LoggedOut.Raise().ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<Connection>> GetConnections()
@@ -251,16 +241,15 @@ namespace Discord.Rest
         void Dispose(bool disposing)
         {
             if (!_isDisposed)
-            {
-                if (disposing)
-                    _cancelTokenSource.Dispose();
                 _isDisposed = true;
-            }
         }
         public void Dispose() => Dispose(true);
 
-        API.DiscordApiClient IDiscordClient.ApiClient => ApiClient;
+        ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
+        WebSocket.Data.IDataStore IDiscordClient.DataStore => null;
 
+        Task IDiscordClient.Connect() { return Task.FromException(new NotSupportedException("This client does not support websocket connections.")); }
+        Task IDiscordClient.Disconnect() { return Task.FromException(new NotSupportedException("This client does not support websocket connections.")); }
         async Task<IChannel> IDiscordClient.GetChannel(ulong id)
             => await GetChannel(id).ConfigureAwait(false);
         async Task<IEnumerable<IDMChannel>> IDiscordClient.GetDMChannels()

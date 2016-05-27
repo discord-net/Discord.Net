@@ -1,5 +1,6 @@
 using Discord.API;
-using Discord.Net.Rest;
+using Discord.Net.Queue;
+using Discord.WebSocket.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,14 +10,19 @@ namespace Discord
     //TODO: Add docstrings
     public interface IDiscordClient
     {
-        TokenType AuthTokenType { get; }
+        LoginState LoginState { get; }
+        ConnectionState ConnectionState { get; }
+
         DiscordApiClient ApiClient { get; }
-        IRestClient RestClient { get; }
         IRequestQueue RequestQueue { get; }
+        IDataStore DataStore { get; }
 
         Task Login(string email, string password);
         Task Login(TokenType tokenType, string token, bool validateToken = true);
         Task Logout();
+
+        Task Connect();
+        Task Disconnect();
 
         Task<IChannel> GetChannel(ulong id);
         Task<IEnumerable<IDMChannel>> GetDMChannels();

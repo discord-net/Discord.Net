@@ -1,4 +1,5 @@
 ﻿using Discord.Net.WebSockets;
+using Discord.WebSocket.Data;
 
 namespace Discord.WebSocket
 {
@@ -32,8 +33,10 @@ namespace Discord.WebSocket
         public int LargeThreshold { get; set; } = 250;
 
         //Engines
-        
+
+        /// <summary> Gets or sets the provider used to generate datastores. </summary>
+        public DataStoreProvider DataStoreProvider { get; set; } = (shardId, totalShards, guildCount, dmCount) => new DefaultDataStore(guildCount, dmCount);
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
-        public WebSocketProvider WebSocketProvider { get; set; } = null;
+        public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
     }
 }
