@@ -211,7 +211,7 @@ namespace Discord
 			}
 
             if (model.Game != null)
-                CurrentGame = new Game(model.Game.Name, model.Game.Type, model.Game.Url);
+                CurrentGame = new Game(model.Game.Name, model.Game.Type ?? GameType.Default, model.Game.Url);
             else
                 CurrentGame = null;
 		}

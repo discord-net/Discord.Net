@@ -9,6 +9,6 @@ namespace Discord.API.Client
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("type")]
-        public GameType Type { get; set; }
+        public GameType? Type { get; set; }
     }
 }

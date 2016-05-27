@@ -51,8 +51,7 @@ namespace Discord.Net.WebSockets
         {
             string ignored;
             while (_sendQueue.TryDequeue(out ignored)) { }
-
-            var socket = _webSocket;
+            
             _webSocket = null;
 
             return TaskHelper.CompletedTask;
