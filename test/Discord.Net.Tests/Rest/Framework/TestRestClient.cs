@@ -19,13 +19,15 @@ namespace Discord.Tests.Rest
 
         }
 
-        Task<Stream> IRestClient.Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams)
+        Task<Stream> IRestClient.Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
+            if (headerOnly) return null;
             throw new NotImplementedException("method only used for SendFile, not concerned with that yet.");
         }
 
-        Task<Stream> IRestClient.Send(string method, string endpoint, string json)
+        Task<Stream> IRestClient.Send(string method, string endpoint, string json, bool headerOnly = false)
         {
+            if (headerOnly) return null;
             return Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes(EndpointHandler.Instance.HandleMessage(method, endpoint, json))));
         }
 
