@@ -1,14 +1,16 @@
 # Discord.Net v1.0.0-dev
-[![Build status](https://ci.appveyor.com/api/projects/status/p0n69xhqgmoobycf/branch/master?svg=true)](https://ci.appveyor.com/project/foxbot/discord-net/branch/master)
 
-An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net) [![AppVeyor](https://img.shields.io/appveyor/ci/foxbot/discord-net.svg?maxAge=2592000?style=plastic)](https://ci.appveyor.com/project/foxbot/discord-net/) [![Discord](https://discordapp.com/api/servers/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
 
-Check out the [documentation](http://rtd.discord.foxbot.me/en/docs-dev/index.html) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
+Discord.Net is an API wrapper for [Discord](http://discordapp.com) written in C#.
 
-##### Warning: Some of the documentation is outdated.
-It's current being rewritten. Until that's done, feel free to use my [DiscordBot](https://github.com/RogueException/DiscordBot) repo for reference.
+Check out the [documentation](https://discordnet.readthedocs.org/en/latest/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
 
-### Installation
+
+## Installing
+
+**NuGet is not up to date with 1.0.0-dev.**
+
 You can download Discord.Net and its extensions from NuGet:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
@@ -21,4 +23,3 @@ In order to compile Discord.Net, you require at least the following:
 - [Visual Studio 2015 Update 2](https://www.visualstudio.com/en-us/news/vs2015-update2-vs.aspx)
 - [Visual Studio .Net Core Plugin](https://www.microsoft.com/net/core#windows)
 - NuGet 3.3+ (available through Visual Studio)
-
