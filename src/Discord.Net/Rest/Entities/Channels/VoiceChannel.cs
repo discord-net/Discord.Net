@@ -1,16 +1,19 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class VoiceChannel : GuildChannel, IVoiceChannel
     {
         /// <inheritdoc />
         public int Bitrate { get; private set; }
+        /// <inheritdoc />
+        public int UserLimit { get; private set; }
 
         internal VoiceChannel(Guild guild, Model model)
             : base(guild, model)
@@ -20,6 +23,7 @@ namespace Discord.Rest
         {
             base.Update(model);
             Bitrate = model.Bitrate;
+            UserLimit = model.UserLimit;
         }
 
         /// <inheritdoc />
@@ -29,17 +33,14 @@ namespace Discord.Rest
 
             var args = new ModifyVoiceChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
             Update(model);
         }
 
-        protected override async Task<IEnumerable<GuildUser>> GetUsers()
-        {
-            var users = await Guild.GetUsers().ConfigureAwait(false);
-            return users.Where(x => PermissionUtilities.GetValue(PermissionHelper.Resolve(x, this), ChannelPermission.Connect));
-        }
+        protected override Task<GuildUser> GetUserInternal(ulong id) { throw new NotSupportedException(); }
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal() { throw new NotSupportedException(); }
+        protected override Task<IEnumerable<GuildUser>> GetUsersInternal(int limit, int offset) { throw new NotSupportedException(); }
 
-        /// <inheritdoc />
-        public override string ToString() => $"{base.ToString()} [Voice]";
+        private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
     }
 }

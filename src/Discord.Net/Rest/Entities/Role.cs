@@ -1,12 +1,14 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Role : IRole, IMentionable
     {
         /// <inheritdoc />
@@ -28,11 +30,11 @@ namespace Discord.Rest
         public int Position { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this);
+        public string Mention => MentionUtils.Mention(this);
         internal DiscordClient Discord => Guild.Discord;
 
         internal Role(Guild guild, Model model)
@@ -58,22 +60,23 @@ namespace Discord.Rest
 
             var args = new ModifyGuildRoleParams();
             func(args);
-            var response = await Discord.BaseClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
+            var response = await Discord.ApiClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
             Update(response);
         }
         /// <summary> Deletes this message. </summary>
         public async Task Delete()
-            => await Discord.BaseClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
+            => await Discord.ApiClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
 
         /// <inheritdoc />
-        public override string ToString() => Name ?? Id.ToString();
-        
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
+
         ulong IRole.GuildId => Guild.Id;
                 
         async Task<IEnumerable<IGuildUser>> IRole.GetUsers()
         {
-            //A tad hacky, but it works
-            var models = await Discord.BaseClient.GetGuildMembers(Guild.Id, new GetGuildMembersParams()).ConfigureAwait(false);
+            //TODO: Rethink this, it isn't paginated or anything...
+            var models = await Discord.ApiClient.GetGuildMembers(Guild.Id, new GetGuildMembersParams()).ConfigureAwait(false);
             return models.Where(x => x.Roles.Contains(Id)).Select(x => new GuildUser(Guild, x));
         }
     }

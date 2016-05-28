@@ -14,7 +14,7 @@ namespace Discord.API.Rest
         public Optional<string> Password { get; set; }
         [JsonProperty("new_password")]
         public Optional<string> NewPassword { get; set; }
-        [JsonProperty("avatar"), JsonConverter(typeof(ImageConverter))]
+        [JsonProperty("avatar"), Image]
         public Optional<Stream> Avatar { get; set; }
     }
 }

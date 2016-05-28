@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Discord.Net.Converters
 {
     public class UInt64EntityConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(IEntity<ulong>);
+        public static readonly UInt64EntityConverter Instance = new UInt64EntityConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => false;
         public override bool CanWrite => true;
 
@@ -17,7 +20,7 @@ namespace Discord.Net.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value != null)
-                writer.WriteValue((value as IEntity<ulong>).Id);
+                writer.WriteValue((value as IEntity<ulong>).Id.ToString(CultureInfo.InvariantCulture));
             else
                 writer.WriteNull();
         }

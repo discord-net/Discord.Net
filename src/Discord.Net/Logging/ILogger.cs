@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Discord.Logging
 {
@@ -6,28 +7,28 @@ namespace Discord.Logging
     {
         LogSeverity Level { get; }
 
-        void Log(LogSeverity severity, string message, Exception exception = null);
-        void Log(LogSeverity severity, FormattableString message, Exception exception = null);
-        void Log(LogSeverity severity, Exception exception);
+        Task Log(LogSeverity severity, string message, Exception exception = null);
+        Task Log(LogSeverity severity, FormattableString message, Exception exception = null);
+        Task Log(LogSeverity severity, Exception exception);
 
-        void Error(string message, Exception exception = null);
-        void Error(FormattableString message, Exception exception = null);
-        void Error(Exception exception);
+        Task Error(string message, Exception exception = null);
+        Task Error(FormattableString message, Exception exception = null);
+        Task Error(Exception exception);
 
-        void Warning(string message, Exception exception = null);
-        void Warning(FormattableString message, Exception exception = null);
-        void Warning(Exception exception);
+        Task Warning(string message, Exception exception = null);
+        Task Warning(FormattableString message, Exception exception = null);
+        Task Warning(Exception exception);
 
-        void Info(string message, Exception exception = null);
-        void Info(FormattableString message, Exception exception = null);
-        void Info(Exception exception);
+        Task Info(string message, Exception exception = null);
+        Task Info(FormattableString message, Exception exception = null);
+        Task Info(Exception exception);
 
-        void Verbose(string message, Exception exception = null);
-        void Verbose(FormattableString message, Exception exception = null);
-        void Verbose(Exception exception);
+        Task Verbose(string message, Exception exception = null);
+        Task Verbose(FormattableString message, Exception exception = null);
+        Task Verbose(Exception exception);
 
-        void Debug(string message, Exception exception = null);
-        void Debug(FormattableString message, Exception exception = null);
-        void Debug(Exception exception);
+        Task Debug(string message, Exception exception = null);
+        Task Debug(FormattableString message, Exception exception = null);
+        Task Debug(Exception exception);
     }
 }

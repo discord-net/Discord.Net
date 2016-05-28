@@ -5,7 +5,9 @@ namespace Discord.Net.Converters
 {
     public class StringEntityConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType) => objectType == typeof(IEntity<string>);
+        public static readonly StringEntityConverter Instance = new StringEntityConverter();
+
+        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => false;
         public override bool CanWrite => true;
 

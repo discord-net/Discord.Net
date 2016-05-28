@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using Model = Discord.API.GuildEmbed;
 
-namespace Discord.Rest
+namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class GuildEmbed : IGuildEmbed
     {
         /// <inheritdoc />
@@ -12,14 +14,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? ChannelId { get; private set; }
 
-        internal DiscordClient Discord { get; }
-
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
 
-        internal GuildEmbed(DiscordClient discord, Model model)
+        internal GuildEmbed(Model model)
         {
-            Discord = discord;
             Update(model);
         }
 
@@ -29,6 +28,7 @@ namespace Discord.Rest
             IsEnabled = model.Enabled;
         }
 
-        public override string ToString() => $"{Id} ({(IsEnabled ? "Enabled" : "Disabled")})";
+        public override string ToString() => Id.ToString();
+        private string DebuggerDisplay => $"{Id}{(IsEnabled ? " (Enabled)" : "")}";
     }
 }

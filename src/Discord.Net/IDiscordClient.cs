@@ -1,5 +1,6 @@
 using Discord.API;
-using Discord.Net.Rest;
+using Discord.Net.Queue;
+using Discord.WebSocket.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,14 +10,19 @@ namespace Discord
     //TODO: Add docstrings
     public interface IDiscordClient
     {
-        TokenType AuthTokenType { get; }
-        DiscordRawClient BaseClient { get; }
-        IRestClient RestClient { get; }
+        LoginState LoginState { get; }
+        ConnectionState ConnectionState { get; }
+
+        DiscordApiClient ApiClient { get; }
         IRequestQueue RequestQueue { get; }
+        IDataStore DataStore { get; }
 
         Task Login(string email, string password);
         Task Login(TokenType tokenType, string token, bool validateToken = true);
         Task Logout();
+
+        Task Connect();
+        Task Disconnect();
 
         Task<IChannel> GetChannel(ulong id);
         Task<IEnumerable<IDMChannel>> GetDMChannels();
@@ -27,7 +33,7 @@ namespace Discord
         Task<IEnumerable<IUserGuild>> GetGuilds();
         Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null);
         
-        Task<IPublicInvite> GetInvite(string inviteIdOrXkcd);
+        Task<IInvite> GetInvite(string inviteIdOrXkcd);
 
         Task<IUser> GetUser(ulong id);
         Task<IUser> GetUser(string username, ushort discriminator);
@@ -36,6 +42,5 @@ namespace Discord
 
         Task<IEnumerable<IVoiceRegion>> GetVoiceRegions();
         Task<IVoiceRegion> GetVoiceRegion(string id);
-        Task<IVoiceRegion> GetOptimalVoiceRegion();
     }
 }

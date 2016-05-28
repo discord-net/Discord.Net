@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Message : IMessage
     {
         /// <inheritdoc />
@@ -26,21 +28,21 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IMessageChannel Channel { get; }
         /// <inheritdoc />
-        public User Author { get; }
+        public IUser Author { get; }
 
         /// <inheritdoc />
         public IReadOnlyList<Attachment> Attachments { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<Embed> Embeds { get; private set; }
         /// <inheritdoc />
-        public IReadOnlyList<PublicUser> MentionedUsers { get; private set; }
+        public IReadOnlyList<IUser> MentionedUsers { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<ulong> MentionedChannelIds { get; private set; }
         /// <inheritdoc />
         public IReadOnlyList<ulong> MentionedRoleIds { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         internal DiscordClient Discord => (Channel as TextChannel)?.Discord ?? (Channel as DMChannel).Discord;
 
         internal Message(IMessageChannel channel, Model model)
@@ -53,6 +55,10 @@ namespace Discord.Rest
         }
         private void Update(Model model)
         {
+            var guildChannel = Channel as GuildChannel;
+            var guild = guildChannel?.Guild;
+            var discord = Discord;
+
             IsTTS = model.IsTextToSpeech;
             Timestamp = model.Timestamp;
             EditedTimestamp = model.EditedTimestamp;
@@ -78,38 +84,32 @@ namespace Discord.Rest
             else
                 Embeds = Array.Empty<Embed>();
 
-            if (model.Mentions.Length > 0)
+            if (guildChannel != null && model.Mentions.Length > 0)
             {
-                var discord = Discord;
-                var builder = ImmutableArray.CreateBuilder<PublicUser>(model.Mentions.Length);
+                var mentions = new PublicUser[model.Mentions.Length];
                 for (int i = 0; i < model.Mentions.Length; i++)
-                    builder.Add(new PublicUser(discord, model.Mentions[i]));
-                MentionedUsers = builder.ToArray();
+                    mentions[i] = new PublicUser(discord, model.Mentions[i]);
+                MentionedUsers = ImmutableArray.Create(mentions);
             }
             else
                 MentionedUsers = Array.Empty<PublicUser>();
-            MentionedChannelIds = MentionHelper.GetChannelMentions(model.Content);
-            MentionedRoleIds = MentionHelper.GetRoleMentions(model.Content);
-            if (model.IsMentioningEveryone)
+
+            if (guildChannel != null)
             {
-                ulong? guildId = (Channel as IGuildChannel)?.Guild.Id;
-                if (guildId != null)
-                {
-                    if (MentionedRoleIds.Count == 0)
-                        MentionedRoleIds = ImmutableArray.Create(guildId.Value);
-                    else
-                    {
-                        var builder = ImmutableArray.CreateBuilder<ulong>(MentionedRoleIds.Count + 1);
-                        builder.AddRange(MentionedRoleIds);
-                        builder.Add(guildId.Value);
-                        MentionedRoleIds = builder.ToImmutable();
-                    }
-                }
+                MentionedChannelIds = MentionUtils.GetChannelMentions(model.Content);
+
+                var mentionedRoleIds = MentionUtils.GetRoleMentions(model.Content);
+                if (model.IsMentioningEveryone)
+                    mentionedRoleIds = mentionedRoleIds.Add(guildChannel.Guild.EveryoneRole.Id);
+                MentionedRoleIds = mentionedRoleIds;
+            }
+            else
+            {
+                MentionedChannelIds = Array.Empty<ulong>();
+                MentionedRoleIds = Array.Empty<ulong>();
             }
             
-            Text = MentionHelper.CleanUserMentions(model.Content, model.Mentions);
-
-            Author.Update(model.Author);
+            Text = MentionUtils.CleanUserMentions(model.Content, model.Mentions);
         }
 
         /// <inheritdoc />
@@ -123,25 +123,26 @@ namespace Discord.Rest
 
             Model model;
             if (guildChannel != null)
-                model = await Discord.BaseClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                model = await Discord.BaseClient.ModifyMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model);
         }
 
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteMessage(Channel.Id, Id).ConfigureAwait(false);
+            var guildChannel = Channel as GuildChannel;
+            if (guildChannel != null)
+                await Discord.ApiClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+            else
+                await Discord.ApiClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
         }
 
-
-        public override string ToString() => $"{Author.ToString()}: {Text}";
+        public override string ToString() => Text;
+        private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
 
         IUser IMessage.Author => Author;
-        IReadOnlyList<Attachment> IMessage.Attachments => Attachments;
-        IReadOnlyList<Embed> IMessage.Embeds => Embeds;
-        IReadOnlyList<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
         IReadOnlyList<IUser> IMessage.MentionedUsers => MentionedUsers;
     }
 }

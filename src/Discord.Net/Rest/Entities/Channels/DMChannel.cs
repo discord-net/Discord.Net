@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class DMChannel : IDMChannel
     {
         /// <inheritdoc />
@@ -16,10 +18,10 @@ namespace Discord.Rest
         internal DiscordClient Discord { get; }
 
         /// <inheritdoc />
-        public DMUser Recipient { get; private set; }
+        public User Recipient { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
 
         internal DMChannel(DiscordClient discord, Model model)
         {
@@ -31,13 +33,13 @@ namespace Discord.Rest
         private void Update(Model model)
         {
             if (Recipient == null)
-                Recipient = new DMUser(this, model.Recipient);
+                Recipient = new PublicUser(Discord, model.Recipient);
             else
                 Recipient.Update(model.Recipient);
         }
 
         /// <inheritdoc />
-        public async Task<IUser> GetUser(ulong id)
+        public async Task<User> GetUser(ulong id)
         {
             var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
             if (id == Recipient.Id)
@@ -48,24 +50,24 @@ namespace Discord.Rest
                 return null;
         }
         /// <inheritdoc />
-        public async Task<IEnumerable<IUser>> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
             var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
-            return ImmutableArray.Create<IUser>(currentUser, Recipient);
+            return ImmutableArray.Create(currentUser, Recipient);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, x));
         }
         /// <inheritdoc />
         public async Task<IEnumerable<Message>> GetMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.BaseClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, x));
         }
 
@@ -73,7 +75,7 @@ namespace Discord.Rest
         public async Task<Message> SendMessage(string text, bool isTTS = false)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.CreateMessage(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateDMMessage(Id, args).ConfigureAwait(false);
             return new Message(this, model);
         }
         /// <inheritdoc />
@@ -83,7 +85,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.BaseClient.UploadFile(Id, file, args).ConfigureAwait(false);
+                var model = await Discord.ApiClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
                 return new Message(this, model);
             }
         }
@@ -91,46 +93,50 @@ namespace Discord.Rest
         public async Task<Message> SendFile(Stream stream, string filename, string text = null, bool isTTS = false)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.BaseClient.UploadFile(Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
             return new Message(this, model);
         }
 
         /// <inheritdoc />
         public async Task DeleteMessages(IEnumerable<IMessage> messages)
         {
-            await Discord.BaseClient.DeleteMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteDMMessages(Id, new DeleteMessagesParam { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task TriggerTyping()
         {
-            await Discord.BaseClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.ApiClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task Close()
         {
-            await Discord.BaseClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannel(Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task Update()
         {
-            var model = await Discord.BaseClient.GetChannel(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannel(Id).ConfigureAwait(false);
             Update(model);
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"@{Recipient} [DM]";
-        
-        IDMUser IDMChannel.Recipient => Recipient;
+        public override string ToString() => '@' + Recipient.ToString();
+        private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
+
+        IUser IDMChannel.Recipient => Recipient;
+        IEnumerable<IMessage> IMessageChannel.CachedMessages => Array.Empty<Message>();
 
         async Task<IEnumerable<IUser>> IChannel.GetUsers()
             => await GetUsers().ConfigureAwait(false);
+        async Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => (await GetUsers().ConfigureAwait(false)).Skip(offset).Take(limit);
         async Task<IUser> IChannel.GetUser(ulong id)
             => await GetUser(id).ConfigureAwait(false);
-        Task<IMessage> IMessageChannel.GetMessage(ulong id)
-            => throw new NotSupportedException();
+        Task<IMessage> IMessageChannel.GetCachedMessage(ulong id)
+            => Task.FromResult<IMessage>(null);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(int limit)
             => await GetMessages(limit).ConfigureAwait(false);
         async Task<IEnumerable<IMessage>> IMessageChannel.GetMessages(ulong fromMessageId, Direction dir, int limit)

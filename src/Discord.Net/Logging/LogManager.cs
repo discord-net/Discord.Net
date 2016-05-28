@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Discord.Logging
 {
@@ -6,107 +7,107 @@ namespace Discord.Logging
     {
         public LogSeverity Level { get; }
 
-        public event EventHandler<LogMessageEventArgs> Message = delegate { };
+        public event Func<LogMessage, Task> Message;
 
         internal LogManager(LogSeverity minSeverity)
         {
             Level = minSeverity;
         }
 
-        public void Log(LogSeverity severity, string source, string message, Exception ex = null)
+        public async Task Log(LogSeverity severity, string source, string message, Exception ex = null)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, source, message, ex));
+                await Message.Raise(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
         }
-        public void Log(LogSeverity severity, string source, FormattableString message, Exception ex = null)
+        public async Task Log(LogSeverity severity, string source, FormattableString message, Exception ex = null)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, source, message.ToString(), ex));
+                await Message.Raise(new LogMessage(severity, source, message.ToString(), ex)).ConfigureAwait(false);
         }
-        public void Log(LogSeverity severity, string source, Exception ex)
+        public async Task Log(LogSeverity severity, string source, Exception ex)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, source, null, ex));
+                await Message.Raise(new LogMessage(severity, source, null, ex)).ConfigureAwait(false);
         }
-        void ILogger.Log(LogSeverity severity, string message, Exception ex)
+        async Task ILogger.Log(LogSeverity severity, string message, Exception ex)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, "Discord", message, ex));
+                await Message.Raise(new LogMessage(severity, "Discord", message, ex)).ConfigureAwait(false);
         }
-        void ILogger.Log(LogSeverity severity, FormattableString message, Exception ex)
+        async Task ILogger.Log(LogSeverity severity, FormattableString message, Exception ex)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, "Discord", message.ToString(), ex));
+                await Message.Raise(new LogMessage(severity, "Discord", message.ToString(), ex)).ConfigureAwait(false);
         }
-        void ILogger.Log(LogSeverity severity, Exception ex)
+        async Task ILogger.Log(LogSeverity severity, Exception ex)
         {
             if (severity <= Level)
-                Message(this, new LogMessageEventArgs(severity, "Discord", null, ex));
+                await Message.Raise(new LogMessage(severity, "Discord", null, ex)).ConfigureAwait(false);
         }
 
-        public void Error(string source, string message, Exception ex = null)
+        public Task Error(string source, string message, Exception ex = null)
             => Log(LogSeverity.Error, source, message, ex);
-        public void Error(string source, FormattableString message, Exception ex = null)
+        public Task Error(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Error, source, message, ex);
-        public void Error(string source, Exception ex)
+        public Task Error(string source, Exception ex)
             => Log(LogSeverity.Error, source, ex);
-        void ILogger.Error(string message, Exception ex)
+        Task ILogger.Error(string message, Exception ex)
             => Log(LogSeverity.Error, "Discord", message, ex);
-        void ILogger.Error(FormattableString message, Exception ex)
+        Task ILogger.Error(FormattableString message, Exception ex)
             => Log(LogSeverity.Error, "Discord", message, ex);
-        void ILogger.Error(Exception ex)
+        Task ILogger.Error(Exception ex)
             => Log(LogSeverity.Error, "Discord", ex);
 
-        public void Warning(string source, string message, Exception ex = null)
+        public Task Warning(string source, string message, Exception ex = null)
             => Log(LogSeverity.Warning, source, message, ex);
-        public void Warning(string source, FormattableString message, Exception ex = null)
+        public Task Warning(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Warning, source, message, ex);
-        public void Warning(string source, Exception ex)
+        public Task Warning(string source, Exception ex)
             => Log(LogSeverity.Warning, source, ex);
-        void ILogger.Warning(string message, Exception ex)
+        Task ILogger.Warning(string message, Exception ex)
             => Log(LogSeverity.Warning, "Discord", message, ex);
-        void ILogger.Warning(FormattableString message, Exception ex)
+        Task ILogger.Warning(FormattableString message, Exception ex)
             => Log(LogSeverity.Warning, "Discord", message, ex);
-        void ILogger.Warning(Exception ex)
+        Task ILogger.Warning(Exception ex)
             => Log(LogSeverity.Warning, "Discord", ex);
 
-        public void Info(string source, string message, Exception ex = null)
+        public Task Info(string source, string message, Exception ex = null)
             => Log(LogSeverity.Info, source, message, ex);
-        public void Info(string source, FormattableString message, Exception ex = null)
+        public Task Info(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Info, source, message, ex);
-        public void Info(string source, Exception ex)
+        public Task Info(string source, Exception ex)
             => Log(LogSeverity.Info, source, ex);
-        void ILogger.Info(string message, Exception ex)
+        Task ILogger.Info(string message, Exception ex)
             => Log(LogSeverity.Info, "Discord", message, ex);
-        void ILogger.Info(FormattableString message, Exception ex)
+        Task ILogger.Info(FormattableString message, Exception ex)
             => Log(LogSeverity.Info, "Discord", message, ex);
-        void ILogger.Info(Exception ex)
+        Task ILogger.Info(Exception ex)
             => Log(LogSeverity.Info, "Discord", ex);
 
-        public void Verbose(string source, string message, Exception ex = null)
+        public Task Verbose(string source, string message, Exception ex = null)
             => Log(LogSeverity.Verbose, source, message, ex);
-        public void Verbose(string source, FormattableString message, Exception ex = null)
+        public Task Verbose(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Verbose, source, message, ex);
-        public void Verbose(string source, Exception ex)
+        public Task Verbose(string source, Exception ex)
             => Log(LogSeverity.Verbose, source, ex);
-        void ILogger.Verbose(string message, Exception ex)
+        Task ILogger.Verbose(string message, Exception ex)
             => Log(LogSeverity.Verbose, "Discord", message, ex);
-        void ILogger.Verbose(FormattableString message, Exception ex)
+        Task ILogger.Verbose(FormattableString message, Exception ex)
             => Log(LogSeverity.Verbose, "Discord", message, ex);
-        void ILogger.Verbose(Exception ex)
+        Task ILogger.Verbose(Exception ex)
             => Log(LogSeverity.Verbose, "Discord", ex);
 
-        public void Debug(string source, string message, Exception ex = null)
+        public Task Debug(string source, string message, Exception ex = null)
             => Log(LogSeverity.Debug, source, message, ex);
-        public void Debug(string source, FormattableString message, Exception ex = null)
+        public Task Debug(string source, FormattableString message, Exception ex = null)
             => Log(LogSeverity.Debug, source, message, ex);
-        public void Debug(string source, Exception ex)
+        public Task Debug(string source, Exception ex)
             => Log(LogSeverity.Debug, source, ex);
-        void ILogger.Debug(string message, Exception ex)
+        Task ILogger.Debug(string message, Exception ex)
             => Log(LogSeverity.Debug, "Discord", message, ex);
-        void ILogger.Debug(FormattableString message, Exception ex)
+        Task ILogger.Debug(FormattableString message, Exception ex)
             => Log(LogSeverity.Debug, "Discord", message, ex);
-        void ILogger.Debug(Exception ex)
+        Task ILogger.Debug(Exception ex)
             => Log(LogSeverity.Debug, "Discord", ex);
 
         internal Logger CreateLogger(string name) => new Logger(this, name);

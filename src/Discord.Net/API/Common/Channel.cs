@@ -10,7 +10,7 @@ namespace Discord.API
         [JsonProperty("is_private")]
         public bool IsPrivate { get; set; }
         [JsonProperty("last_message_id")]
-        public ulong LastMessageId { get; set; }
+        public ulong? LastMessageId { get; set; }
 
         //GuildChannel
         [JsonProperty("guild_id")]
@@ -23,10 +23,16 @@ namespace Discord.API
         public int Position { get; set; }
         [JsonProperty("permission_overwrites")]
         public Overwrite[] PermissionOverwrites { get; set; }
+
+        //TextChannel
         [JsonProperty("topic")]
         public string Topic { get; set; }
+
+        //VoiceChannel
         [JsonProperty("bitrate")]
         public int Bitrate { get; set; }
+        [JsonProperty("user_limit")]
+        public int UserLimit { get; set; }
 
         //DMChannel
         [JsonProperty("recipient")]

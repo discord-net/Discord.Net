@@ -5,8 +5,8 @@ namespace Discord.API.Rest
     public class ModifyChannelPermissionsParams
     {
         [JsonProperty("allow")]
-        public Optional<uint> Allow { get; set; }
+        public Optional<ulong> Allow { get; set; }
         [JsonProperty("deny")]
-        public Optional<uint> Deny { get; set; }
+        public Optional<ulong> Deny { get; set; }
     }
 }

@@ -8,9 +8,9 @@ namespace Discord.API
         public ulong TargetId { get; set; }
         [JsonProperty("type")]
         public PermissionTarget TargetType { get; set; }
-        [JsonProperty("deny")]
-        public uint Deny { get; set; }
-        [JsonProperty("allow")]
-        public uint Allow { get; set; }
+        [JsonProperty("deny"), Int53]
+        public ulong Deny { get; set; }
+        [JsonProperty("allow"), Int53]
+        public ulong Allow { get; set; }
     }
 }

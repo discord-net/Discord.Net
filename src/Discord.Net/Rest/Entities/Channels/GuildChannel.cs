@@ -23,7 +23,7 @@ namespace Discord.Rest
         public int Position { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public IReadOnlyDictionary<ulong, Overwrite> PermissionOverwrites => _overwrites;
         internal DiscordClient Discord => Guild.Discord;
@@ -55,21 +55,11 @@ namespace Discord.Rest
 
             var args = new ModifyGuildChannelParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
             Update(model);
         }
-
-        /// <summary> Gets a user in this channel with the given id. </summary>
-        public async Task<GuildUser> GetUser(ulong id)
-        {
-            var model = await Discord.BaseClient.GetGuildMember(Guild.Id, id).ConfigureAwait(false);
-            if (model != null)
-                return new GuildUser(Guild, model);
-            return null;
-        }
-        protected abstract Task<IEnumerable<GuildUser>> GetUsers();
-
-        /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
+        
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             Overwrite value;
@@ -77,7 +67,7 @@ namespace Discord.Rest
                 return value.Permissions;
             return null;
         }
-        /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
+        /// <inheritdoc />
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             Overwrite value;
@@ -86,38 +76,38 @@ namespace Discord.Rest
             return null;
         }
         /// <summary> Downloads a collection of all invites to this channel. </summary>
-        public async Task<IEnumerable<GuildInvite>> GetInvites()
+        public async Task<IEnumerable<InviteMetadata>> GetInvites()
         {
-            var models = await Discord.BaseClient.GetChannelInvites(Id).ConfigureAwait(false);
-            return models.Select(x => new GuildInvite(Guild, x));
+            var models = await Discord.ApiClient.GetChannelInvites(Id).ConfigureAwait(false);
+            return models.Select(x => new InviteMetadata(Discord, x));
         }
 
-        /// <summary> Adds or updates the permission overwrite for the given user. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IUser user, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.BaseClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
             _overwrites[user.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User });
         }
-        /// <summary> Adds or updates the permission overwrite for the given role. </summary>
+        /// <inheritdoc />
         public async Task AddPermissionOverwrite(IRole role, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.BaseClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
             _overwrites[role.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role });
         }
-        /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IUser user)
         {
-            await Discord.BaseClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
 
             Overwrite value;
             _overwrites.TryRemove(user.Id, out value);
         }
-        /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
+        /// <inheritdoc />
         public async Task RemovePermissionOverwrite(IRole role)
         {
-            await Discord.BaseClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
 
             Overwrite value;
             _overwrites.TryRemove(role.Id, out value);
@@ -128,7 +118,7 @@ namespace Discord.Rest
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        public async Task<GuildInvite> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
+        public async Task<InviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
         {
             var args = new CreateChannelInviteParams
             {
@@ -137,34 +127,43 @@ namespace Discord.Rest
                 Temporary = isTemporary,
                 XkcdPass = withXkcd
             };
-            var model = await Discord.BaseClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
-            return new GuildInvite(Guild, model);
+            var model = await Discord.ApiClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
+            return new InviteMetadata(Discord, model);
         }
 
         /// <inheritdoc />
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannel(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Update()
         {
-            var model = await Discord.BaseClient.GetChannel(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannel(Id).ConfigureAwait(false);
             Update(model);
         }
 
+        /// <inheritdoc />
+        public override string ToString() => Name;
+
+        protected abstract Task<GuildUser> GetUserInternal(ulong id);
+        protected abstract Task<IEnumerable<GuildUser>> GetUsersInternal();
+        protected abstract Task<IEnumerable<GuildUser>> GetUsersInternal(int limit, int offset);
+
         IGuild IGuildChannel.Guild => Guild;
-        async Task<IGuildInvite> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
+        async Task<IInviteMetadata> IGuildChannel.CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
             => await CreateInvite(maxAge, maxUses, isTemporary, withXkcd).ConfigureAwait(false);
-        async Task<IEnumerable<IGuildInvite>> IGuildChannel.GetInvites()
+        async Task<IEnumerable<IInviteMetadata>> IGuildChannel.GetInvites()
             => await GetInvites().ConfigureAwait(false);
         async Task<IEnumerable<IGuildUser>> IGuildChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
-        async Task<IGuildUser> IGuildChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
+            => await GetUsersInternal().ConfigureAwait(false);
         async Task<IEnumerable<IUser>> IChannel.GetUsers()
-            => await GetUsers().ConfigureAwait(false);
+            => await GetUsersInternal().ConfigureAwait(false);
+        async Task<IEnumerable<IUser>> IChannel.GetUsers(int limit, int offset)
+            => await GetUsersInternal(limit, offset).ConfigureAwait(false);
+        async Task<IGuildUser> IGuildChannel.GetUser(ulong id)
+            => await GetUserInternal(id).ConfigureAwait(false);
         async Task<IUser> IChannel.GetUser(ulong id)
-            => await GetUser(id).ConfigureAwait(false);
+            => await GetUserInternal(id).ConfigureAwait(false);
     }
 }

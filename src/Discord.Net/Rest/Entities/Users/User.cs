@@ -1,10 +1,12 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public abstract class User : IUser
     {
         private string _avatarId;
@@ -23,11 +25,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string Mention => MentionHelper.Mention(this, false);
+        public string Mention => MentionUtils.Mention(this, false);
         /// <inheritdoc />
-        public string NicknameMention => MentionHelper.Mention(this, true);
+        public string NicknameMention => MentionUtils.Mention(this, true);
 
         internal User(Model model)
         {
@@ -43,26 +45,24 @@ namespace Discord.Rest
             Username = model.Username;
         }
 
-        public async Task<DMChannel> CreateDMChannel()
+        protected virtual async Task<DMChannel> CreateDMChannelInternal()
         {
-            var args = new CreateDMChannelParams
-            {
-                RecipientId = Id
-            };
-            var model = await Discord.BaseClient.CreateDMChannel(args).ConfigureAwait(false);
+            var args = new CreateDMChannelParams { RecipientId = Id };
+            var model = await Discord.ApiClient.CreateDMChannel(args).ConfigureAwait(false);
 
             return new DMChannel(Discord, model);
         }
 
-        public override string ToString() => $"{Username ?? Id.ToString()}";
+        public override string ToString() => $"{Username}#{Discriminator}";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";
 
         /// <inheritdoc />
-        string IUser.CurrentGame => null;
+        Game? IUser.CurrentGame => null;
         /// <inheritdoc />
         UserStatus IUser.Status => UserStatus.Unknown;
 
         /// <inheritdoc />
         async Task<IDMChannel> IUser.CreateDMChannel()
-            => await CreateDMChannel().ConfigureAwait(false);
+            => await CreateDMChannelInternal().ConfigureAwait(false);
     }
 }

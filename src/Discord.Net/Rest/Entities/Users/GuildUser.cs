@@ -24,6 +24,9 @@ namespace Discord.Rest
         public string Nickname { get; private set; }
 
         /// <inheritdoc />
+        public GuildPermissions GuildPermissions { get; private set; }
+
+        /// <inheritdoc />
         public IReadOnlyList<Role> Roles => _roles;
         internal override DiscordClient Discord => Guild.Discord;
 
@@ -31,6 +34,8 @@ namespace Discord.Rest
             : base(model.User)
         {
             Guild = guild;
+
+            Update(model);
         }
         internal void Update(Model model)
         {
@@ -44,37 +49,25 @@ namespace Discord.Rest
             for (int i = 0; i < model.Roles.Length; i++)
                 roles.Add(Guild.GetRole(model.Roles[i]));
             _roles = roles.ToImmutable();
+
+            GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
         }
 
         public async Task Update()
         {
-            var model = await Discord.BaseClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
             Update(model);
-        }
-
-        public bool HasRole(IRole role)
-        {
-            for (int i = 0; i < _roles.Length; i++)
-            {
-                if (_roles[i].Id == role.Id)
-                    return true;
-            }
-            return false;
         }
 
         public async Task Kick()
         {
-            await Discord.BaseClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
         }
 
-        public GuildPermissions GetGuildPermissions()
-        {
-            return new GuildPermissions(PermissionHelper.Resolve(this));
-        }
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
-            return new ChannelPermissions(PermissionHelper.Resolve(this, channel));
+            return new ChannelPermissions(Permissions.ResolveChannel(this, channel, GuildPermissions.RawValue));
         }
 
         public async Task Modify(Action<ModifyGuildMemberParams> func)
@@ -87,20 +80,20 @@ namespace Discord.Rest
             bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value };
-                await Discord.BaseClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value ?? "" };
+                await Discord.ApiClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new API.Optional<string>(); //Remove
             }
 
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
             {
-                await Discord.BaseClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
-                    IsDeaf = args.Deaf;
+                    IsDeaf = args.Deaf.Value;
                 if (args.Mute.IsSpecified)
-                    IsMute = args.Mute;
+                    IsMute = args.Mute.Value;
                 if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname;
+                    Nickname = args.Nickname.Value ?? "";
                 if (args.Roles.IsSpecified)
                     _roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }
@@ -109,8 +102,10 @@ namespace Discord.Rest
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyList<IRole> IGuildUser.Roles => Roles;
-        ulong? IGuildUser.VoiceChannelId => null;
+        IVoiceChannel IGuildUser.VoiceChannel => null;
 
+        GuildPermissions IGuildUser.GetGuildPermissions()
+            => GuildPermissions;
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel)
             => GetPermissions(channel);
     }

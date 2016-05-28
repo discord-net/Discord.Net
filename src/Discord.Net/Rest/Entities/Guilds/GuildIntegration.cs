@@ -1,10 +1,12 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class GuildIntegration : IGuildIntegration
     {
         /// <inheritdoc />
@@ -58,7 +60,7 @@ namespace Discord.Rest
         /// <summary>  </summary>
         public async Task Delete()
         {
-            await Discord.BaseClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
         /// <summary>  </summary>
         public async Task Modify(Action<ModifyGuildIntegrationParams> func)
@@ -67,21 +69,22 @@ namespace Discord.Rest
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            var model = await Discord.BaseClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
 
             Update(model);
         }
         /// <summary>  </summary>
         public async Task Sync()
         {
-            await Discord.BaseClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
         }
 
-        public override string ToString() => $"{Name ?? Id.ToString()} ({(IsEnabled ? "Enabled" : "Disabled")})";
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}{(IsEnabled ? ", Enabled" : "")})";
 
         IGuild IGuildIntegration.Guild => Guild;
         IRole IGuildIntegration.Role => Role;
         IUser IGuildIntegration.User => User;
-        IIntegrationAccount IGuildIntegration.Account => Account;
+        IntegrationAccount IGuildIntegration.Account => Account;
     }
 }

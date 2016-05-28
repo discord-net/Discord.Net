@@ -3,12 +3,15 @@ using System.Reflection;
 
 namespace Discord
 {
+    //TODO: Add socket config items in their own class
+
     public class DiscordConfig
     {
         public static string Version { get; } = typeof(DiscordConfig).GetTypeInfo().Assembly?.GetName().Version.ToString(3) ?? "Unknown";
         public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
 
-        public const int GatewayAPIVersion = 3;
+        public const int GatewayAPIVersion = 3; //TODO: Upgrade to 4
+        public const string GatewayEncoding = "json";
 
         public const string ClientAPIUrl = "https://discordapp.com/api/";
         public const string CDNUrl = "https://cdn.discordapp.com/";
@@ -26,6 +29,6 @@ namespace Discord
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
 
         /// <summary> Gets or sets the provider used to generate new REST connections. </summary>
-        public RestClientProvider RestClientProvider { get; set; } = (url, ct) => new DefaultRestClient(url, ct);
+        public RestClientProvider RestClientProvider { get; set; } = url => new DefaultRestClient(url);
     }
 }

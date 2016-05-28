@@ -1,0 +1,151 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace Discord
+{
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public struct ChannelPermissions
+    {
+#if CSHARP7
+        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(0b000100_000000_0011111111_0000011001);
+        private static ChannelPermissions _allText { get; } = new ChannelPermissions(0b000000_000000_0001110011_0000000000);
+        private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(0b000100_111111_0000000000_0000011001);
+#else
+        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000000111111110000011001", 2));
+        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000000011100110000000000", 2));
+        private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000011001", 2));
+#endif
+
+        /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
+        public static ChannelPermissions None { get; } = new ChannelPermissions();
+        /// <summary> Gets a ChannelPermissions that grants all permissions for a given channelType. </summary>
+        public static ChannelPermissions All(IChannel channel)
+        {
+#if CSHARP7
+            switch (channel)
+            {
+                case ITextChannel _: return _allText;
+                case IVoiceChannel _: return _allVoice;
+                case IDMChannel _: return _allDM;
+                default:
+                    throw new ArgumentException("Unknown channel type", nameof(channel));
+            }
+#else
+            if (channel is ITextChannel) return _allText;
+            if (channel is IVoiceChannel) return _allVoice;
+            if (channel is IDMChannel) return _allDM;
+
+            throw new ArgumentException("Unknown channel type", nameof(channel));
+#endif
+        }
+
+        /// <summary> Gets a packed value representing all the permissions in this ChannelPermissions. </summary>
+        public ulong RawValue { get; }
+
+        /// <summary> If True, a user may create invites. </summary>
+        public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CreateInstantInvite);
+        /// <summary> If True, a user may create, delete and modify this channel. </summary>
+        public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannel);
+
+        /// <summary> If True, a user may join channels. </summary>
+        public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
+        /// <summary> If True, a user may send messages. </summary>
+        public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
+        /// <summary> If True, a user may send text-to-speech messages. </summary>
+        public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SendTTSMessages);
+        /// <summary> If True, a user may delete messages. </summary>
+        public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.ManageMessages);
+        /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
+        public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EmbedLinks);
+        /// <summary> If True, a user may send files. </summary>
+        public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.AttachFiles);
+        /// <summary> If True, a user may read previous messages. </summary>
+        public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
+        /// <summary> If True, a user may mention @everyone. </summary>
+        public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
+
+        /// <summary> If True, a user may connect to a voice channel. </summary>
+        public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
+        /// <summary> If True, a user may speak in a voice channel. </summary>
+        public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.Speak);
+        /// <summary> If True, a user may mute users. </summary>
+        public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MuteMembers);
+        /// <summary> If True, a user may deafen users. </summary>
+        public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DeafenMembers);
+        /// <summary> If True, a user may move other users between voice channels. </summary>
+        public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
+        /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
+
+        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+        public bool ManagePermissions => Permissions.GetValue(RawValue, ChannelPermission.ManagePermissions);
+
+        /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
+        public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
+
+        private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null,
+            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
+            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
+            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
+        {
+            ulong value = initialValue;
+
+            Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
+            Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannel);
+            Permissions.SetValue(ref value, readMessages, ChannelPermission.ReadMessages);
+            Permissions.SetValue(ref value, sendMessages, ChannelPermission.SendMessages);
+            Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SendTTSMessages);
+            Permissions.SetValue(ref value, manageMessages, ChannelPermission.ManageMessages);
+            Permissions.SetValue(ref value, embedLinks, ChannelPermission.EmbedLinks);
+            Permissions.SetValue(ref value, attachFiles, ChannelPermission.AttachFiles);
+            Permissions.SetValue(ref value, readMessageHistory, ChannelPermission.ReadMessageHistory);
+            Permissions.SetValue(ref value, mentionEveryone, ChannelPermission.MentionEveryone);
+            Permissions.SetValue(ref value, connect, ChannelPermission.Connect);
+            Permissions.SetValue(ref value, speak, ChannelPermission.Speak);
+            Permissions.SetValue(ref value, muteMembers, ChannelPermission.MuteMembers);
+            Permissions.SetValue(ref value, deafenMembers, ChannelPermission.DeafenMembers);
+            Permissions.SetValue(ref value, moveMembers, ChannelPermission.MoveMembers);
+            Permissions.SetValue(ref value, useVoiceActivation, ChannelPermission.UseVAD);
+            Permissions.SetValue(ref value, managePermissions, ChannelPermission.ManagePermissions);
+
+            RawValue = value;
+        }
+
+        /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
+        public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false,
+            bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
+            bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
+            bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
+            bool moveMembers = false, bool useVoiceActivation = false, bool managePermissions = false)
+            : this(0, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
+                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers,
+                  moveMembers, useVoiceActivation, managePermissions) { }
+
+        /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
+        public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null,
+            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
+            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
+            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
+            => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
+                embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers,
+                moveMembers, useVoiceActivation, managePermissions);
+
+        public List<ChannelPermission> ToList()
+        {
+            var perms = new List<ChannelPermission>();
+            ulong x = 1;
+            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            {
+                if ((RawValue & x) != 0)
+                    perms.Add((ChannelPermission)i);
+            }
+            return perms;
+        }
+        /// <inheritdoc />
+        public override string ToString() => RawValue.ToString();
+        private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
+    }
+}

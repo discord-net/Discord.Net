@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
 
-namespace Discord.Rest
+namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class UserGuild : IUserGuild
     {
         private string _iconId;
 
         /// <inheritdoc />
         public ulong Id { get; }
-        internal DiscordClient Discord { get; }
+        internal IDiscordClient Discord { get; }
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -18,11 +20,11 @@ namespace Discord.Rest
         public GuildPermissions Permissions { get; private set; }
 
         /// <inheritdoc />
-        public DateTime CreatedAt => DateTimeHelper.FromSnowflake(Id);
+        public DateTime CreatedAt => DateTimeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
-        internal UserGuild(DiscordClient discord, Model model)
+        internal UserGuild(IDiscordClient discord, Model model)
         {
             Discord = discord;
             Id = model.Id;
@@ -40,18 +42,15 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task Leave()
         {
-            if (IsOwner)
-                throw new InvalidOperationException("Unable to leave a guild the current user owns.");
-            await Discord.BaseClient.LeaveGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.LeaveGuild(Id).ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task Delete()
         {
-            if (!IsOwner)
-                throw new InvalidOperationException("Unable to delete a guild the current user does not own.");
-            await Discord.BaseClient.DeleteGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuild(Id).ConfigureAwait(false);
         }
 
-        public override string ToString() => Name ?? Id.ToString();
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}{(IsOwner ? ", Owned" : "")})";
     }
 }
