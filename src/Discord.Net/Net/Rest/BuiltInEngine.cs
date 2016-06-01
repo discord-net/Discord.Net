@@ -37,8 +37,7 @@ namespace Discord.Net.Rest
             {
                 AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
                 UseCookies = false,
-                UseProxy = false,
-                PreAuthenticate = false //We do auth ourselves
+                UseProxy = false
             });
             _client.DefaultRequestHeaders.Add("accept", "*/*");
             _client.DefaultRequestHeaders.Add("accept-encoding", "gzip,deflate");
