@@ -200,6 +200,13 @@ namespace Discord
             }
         }
 
+        public async Task DeleteMessages(Message[] messages) => await DeleteMessages(messages.Select(m => m.Id).ToArray());
+
+        public async Task DeleteMessages(ulong[] messageIds)
+        {
+            await Client.ClientAPI.Send(new BulkMessageDelete(Id, messageIds));
+        }
+
         public async Task Delete()
         {
             try { await Client.ClientAPI.Send(new DeleteChannelRequest(Id)).ConfigureAwait(false); }

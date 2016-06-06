@@ -607,6 +607,7 @@
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>
     </Compile>
+    <Compile Include="API\Client\Rest\BulkMessageDelete.cs" />
     <Compile Include="Enums\GameType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
