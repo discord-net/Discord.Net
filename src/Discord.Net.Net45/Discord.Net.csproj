@@ -241,6 +241,9 @@
     <Compile Include="..\Discord.Net\API\Client\Rest\AddGuildBan.cs">
       <Link>API\Client\Rest\AddGuildBan.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\API\Client\Rest\BulkMessageDelete.cs">
+      <Link>API\Client\Rest\BulkMessageDelete.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\API\Client\Rest\CreateChannel.cs">
       <Link>API\Client\Rest\CreateChannel.cs</Link>
     </Compile>
