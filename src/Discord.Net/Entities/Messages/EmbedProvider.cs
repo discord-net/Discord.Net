@@ -7,10 +7,12 @@ namespace Discord
         public string Name { get; }
         public string Url { get; }
 
-        internal EmbedProvider(Model model)
+        public EmbedProvider(string name, string url)
         {
-            Name = model.Name;
-            Url = model.Url;
+            Name = name;
+            Url = url;
         }
+        internal EmbedProvider(Model model)
+            : this(model.Name, model.Url) { }
     }
 }

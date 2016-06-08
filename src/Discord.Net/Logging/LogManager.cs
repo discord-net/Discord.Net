@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Extensions;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Logging
@@ -9,7 +10,7 @@ namespace Discord.Logging
 
         public event Func<LogMessage, Task> Message;
 
-        internal LogManager(LogSeverity minSeverity)
+        public LogManager(LogSeverity minSeverity)
         {
             Level = minSeverity;
         }
@@ -110,6 +111,6 @@ namespace Discord.Logging
         Task ILogger.Debug(Exception ex)
             => Log(LogSeverity.Debug, "Discord", ex);
 
-        internal Logger CreateLogger(string name) => new Logger(this, name);
+        public Logger CreateLogger(string name) => new Logger(this, name);
     }
 }

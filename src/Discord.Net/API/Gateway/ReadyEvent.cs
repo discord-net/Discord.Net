@@ -23,11 +23,13 @@ namespace Discord.API.Gateway
         [JsonProperty("read_state")]
         public ReadState[] ReadStates { get; set; }
         [JsonProperty("guilds")]
-        public Guild[] Guilds { get; set; }
+        public ExtendedGuild[] Guilds { get; set; }
         [JsonProperty("private_channels")]
         public Channel[] PrivateChannels { get; set; }
         [JsonProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }
+        [JsonProperty("relationships")]
+        public Relationship[] Relationships { get; set; }
 
         //Ignored
         [JsonProperty("user_settings")]

@@ -10,7 +10,7 @@ namespace Discord.Logging
         public string Name { get; }
         public LogSeverity Level => _manager.Level;
 
-        internal Logger(LogManager manager, string name)
+        public Logger(LogManager manager, string name)
         {
             _manager = manager;
             Name = name;

@@ -16,16 +16,16 @@ namespace Discord
         DateTime JoinedAt { get; }
         /// <summary> Gets the nickname for this user. </summary>
         string Nickname { get; }
+        /// <summary> Gets the guild-level permissions granted to this user by their roles. </summary>
+        GuildPermissions GuildPermissions { get; }
 
         /// <summary> Gets the guild for this guild-user pair. </summary>
         IGuild Guild { get; }
         /// <summary> Returns a collection of the roles this user is a member of in this guild, including the guild's @everyone role. </summary>
-        IReadOnlyList<IRole> Roles { get; }
+        IReadOnlyCollection<IRole> Roles { get; }
         /// <summary> Gets the voice channel this user is currently in, if any. </summary>
         IVoiceChannel VoiceChannel { get; }
 
-        /// <summary> Gets the guild-level permissions granted to this user by their roles. </summary>
-        GuildPermissions GetGuildPermissions();
         /// <summary> Gets the channel-level permissions granted to this user for a given channel. </summary>
         ChannelPermissions GetPermissions(IGuildChannel channel);
 

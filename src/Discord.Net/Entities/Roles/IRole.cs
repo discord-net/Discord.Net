@@ -11,7 +11,7 @@ namespace Discord
         Color Color { get; }
         /// <summary> Returns true if users of this role are separated in the user list. </summary>
         bool IsHoisted { get; }
-        /// <summary> Returns true if this role is automatically managed by the Discord server. </summary>
+        /// <summary> Returns true if this role is automatically managed by Discord. </summary>
         bool IsManaged { get; }
         /// <summary> Gets the name of this role. </summary>
         string Name { get; }
@@ -25,8 +25,5 @@ namespace Discord
 
         /// <summary> Modifies this role. </summary>
         Task Modify(Action<ModifyGuildRoleParams> func);
-
-        /// <summary> Returns a collection of all users that have been assigned this role. </summary>
-        Task<IEnumerable<IGuildUser>> GetUsers();
     }
 }

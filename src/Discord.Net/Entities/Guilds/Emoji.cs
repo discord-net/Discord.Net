@@ -11,7 +11,7 @@ namespace Discord
         public bool RequireColons { get; }
         public IImmutableList<ulong> RoleIds { get; }
 
-        internal Emoji(Model model)
+        public Emoji(Model model)
         {
             Id = model.Id;
             Name = model.Name;

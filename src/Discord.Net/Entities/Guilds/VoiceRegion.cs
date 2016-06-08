@@ -4,22 +4,16 @@ using Model = Discord.API.VoiceRegion;
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class VoiceRegion : IVoiceRegion
+    internal class VoiceRegion : IVoiceRegion
     {
-        /// <inheritdoc />
         public string Id { get; }
-        /// <inheritdoc />
         public string Name { get; }
-        /// <inheritdoc />
         public bool IsVip { get; }
-        /// <inheritdoc />
         public bool IsOptimal { get; }
-        /// <inheritdoc />
         public string SampleHostname { get; }
-        /// <inheritdoc />
         public int SamplePort { get; }
 
-        internal VoiceRegion(Model model)
+        public VoiceRegion(Model model)
         {
             Id = model.Id;
             Name = model.Name;

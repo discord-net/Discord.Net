@@ -9,6 +9,6 @@ namespace Discord.API
         [JsonProperty("url")]
         public string StreamUrl { get; set; }
         [JsonProperty("type")]
-        public StreamType StreamType { get; set; }
+        public StreamType? StreamType { get; set; }
     }
 }

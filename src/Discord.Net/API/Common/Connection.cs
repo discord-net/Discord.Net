@@ -15,6 +15,6 @@ namespace Discord.API
         public bool Revoked { get; set; }
 
         [JsonProperty("integrations")]
-        public IEnumerable<ulong> Integrations { get; set; }
+        public IReadOnlyCollection<ulong> Integrations { get; set; }
     }
 }

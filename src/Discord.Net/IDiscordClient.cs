@@ -1,6 +1,4 @@
 using Discord.API;
-using Discord.Net.Queue;
-using Discord.WebSocket.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,10 +12,7 @@ namespace Discord
         ConnectionState ConnectionState { get; }
 
         DiscordApiClient ApiClient { get; }
-        IRequestQueue RequestQueue { get; }
-        IDataStore DataStore { get; }
-
-        Task Login(string email, string password);
+        
         Task Login(TokenType tokenType, string token, bool validateToken = true);
         Task Logout();
 
@@ -25,12 +20,12 @@ namespace Discord
         Task Disconnect();
 
         Task<IChannel> GetChannel(ulong id);
-        Task<IEnumerable<IDMChannel>> GetDMChannels();
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannels();
 
-        Task<IEnumerable<IConnection>> GetConnections();
+        Task<IReadOnlyCollection<IConnection>> GetConnections();
 
         Task<IGuild> GetGuild(ulong id);
-        Task<IEnumerable<IUserGuild>> GetGuilds();
+        Task<IReadOnlyCollection<IUserGuild>> GetGuilds();
         Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null);
         
         Task<IInvite> GetInvite(string inviteIdOrXkcd);
@@ -38,9 +33,9 @@ namespace Discord
         Task<IUser> GetUser(ulong id);
         Task<IUser> GetUser(string username, ushort discriminator);
         Task<ISelfUser> GetCurrentUser();
-        Task<IEnumerable<IUser>> QueryUsers(string query, int limit);
+        Task<IReadOnlyCollection<IUser>> QueryUsers(string query, int limit);
 
-        Task<IEnumerable<IVoiceRegion>> GetVoiceRegions();
+        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegions();
         Task<IVoiceRegion> GetVoiceRegion(string id);
     }
 }

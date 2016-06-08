@@ -5,38 +5,31 @@ using Model = Discord.API.Invite;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Invite : IInvite
+    internal class Invite : Entity<string>, IInvite
     {
-        /// <inheritdoc />
-        public string Code { get; }
-        internal IDiscordClient Discord { get; }
-
-        /// <inheritdoc />
-        public ulong GuildId { get; private set; }
-        /// <inheritdoc />
-        public ulong ChannelId { get; private set; }
-        /// <inheritdoc />
-        public string XkcdCode { get; private set; }
-        /// <inheritdoc />
-        public string GuildName { get; private set; }
-        /// <inheritdoc />
         public string ChannelName { get; private set; }
+        public string GuildName { get; private set; }
+        public string XkcdCode { get; private set; }
 
-        /// <inheritdoc />
+        public ulong ChannelId { get; private set; }
+        public ulong GuildId { get; private set; }
+        public override DiscordClient Discord { get; }
+
+        public string Code => Id;
         public string Url => $"{DiscordConfig.InviteUrl}/{XkcdCode ?? Code}";
-        /// <inheritdoc />
         public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
 
-
-        internal Invite(IDiscordClient discord, Model model)
+        public Invite(DiscordClient discord, Model model)
+            : base(model.Code)
         {
             Discord = discord;
-            Code = model.Code;
 
-            Update(model);
+            Update(model, UpdateSource.Creation);
         }
-        protected virtual void Update(Model model)
+        protected void Update(Model model, UpdateSource source)
         {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
             XkcdCode = model.XkcdPass;
             GuildId = model.Guild.Id;
             ChannelId = model.Channel.Id;
@@ -44,22 +37,16 @@ namespace Discord
             ChannelName = model.Channel.Name;
         }
 
-        /// <inheritdoc />
         public async Task Accept()
         {
             await Discord.ApiClient.AcceptInvite(Code).ConfigureAwait(false);
         }
-
-        /// <inheritdoc />
         public async Task Delete()
         {
             await Discord.ApiClient.DeleteInvite(Code).ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
         public override string ToString() => XkcdUrl ?? Url;
         private string DebuggerDisplay => $"{XkcdUrl ?? Url} ({GuildName} / {ChannelName})";
-
-        string IEntity<string>.Id => Code;
     }
 }

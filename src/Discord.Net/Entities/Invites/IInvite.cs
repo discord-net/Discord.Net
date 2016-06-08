@@ -18,7 +18,7 @@ namespace Discord
         /// <summary> Gets the id of the guild this invite is linked to. </summary>
         ulong GuildId { get; }
 
-        /// <summary> Accepts this invite and joins the target server. This will fail on bot accounts. </summary>
+        /// <summary> Accepts this invite and joins the target guild. This will fail on bot accounts. </summary>
         Task Accept();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Discord.Net.Queue
 {
-    internal enum BucketGroup
+    public enum BucketGroup
     {
         Global,
         Guild

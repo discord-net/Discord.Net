@@ -2,11 +2,10 @@
 {
     public enum GlobalBucket
     {
-        General,
-        Login,
+        GeneralRest,
         DirectMessage,
         SendEditMessage,
-        Gateway,
+        GeneralGateway,
         UpdateStatus
     }
 }

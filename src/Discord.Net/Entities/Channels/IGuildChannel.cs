@@ -22,11 +22,11 @@ namespace Discord
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
         Task<IInviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
         /// <summary> Returns a collection of all invites to this channel. </summary>
-        Task<IEnumerable<IInviteMetadata>> GetInvites();
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvites();
 
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
-        IReadOnlyDictionary<ulong, Overwrite> PermissionOverwrites { get; }
-
+        IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
+        
         /// <summary> Modifies this guild channel. </summary>
         Task Modify(Action<ModifyGuildChannelParams> func);
 
@@ -44,7 +44,7 @@ namespace Discord
         Task AddPermissionOverwrite(IUser user, OverwritePermissions permissions);
 
         /// <summary> Gets a collection of all users in this channel. </summary>
-        new Task<IEnumerable<IGuildUser>> GetUsers();
+        new Task<IReadOnlyCollection<IGuildUser>> GetUsers();
         /// <summary> Gets a user in this channel with the provided id.</summary>
         new Task<IGuildUser> GetUser(ulong id);
     }

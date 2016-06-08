@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -11,15 +13,16 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    public class DefaultRestClient : IRestClient
+    public sealed class DefaultRestClient : IRestClient
     {
         private const int HR_SECURECHANNELFAILED = -2146233079;
 
-        protected readonly HttpClient _client;
-        protected readonly string _baseUrl;
+        private readonly HttpClient _client;
+        private readonly string _baseUrl;
+        private readonly JsonSerializer _errorDeserializer;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
-        protected bool _isDisposed;
+        private bool _isDisposed;
 
         public DefaultRestClient(string baseUrl)
         {
@@ -29,16 +32,16 @@ namespace Discord.Net.Rest
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 UseCookies = false,
-                UseProxy = false,
-                PreAuthenticate = false
+                UseProxy = false
             });
             SetHeader("accept-encoding", "gzip, deflate");
 
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
+            _errorDeserializer = new JsonSerializer();
         }
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
@@ -141,8 +144,23 @@ namespace Discord.Net.Rest
                 if (statusCode < 200 || statusCode >= 300) //2xx = Success
                 {
                     if (statusCode == 429)
+                    {
+                        //TODO: Include bucket info
                         throw new HttpRateLimitException(int.Parse(response.Headers.GetValues("retry-after").First()));
-                    throw new HttpException(response.StatusCode);
+                    }
+
+                    string reason = null;
+                    try
+                    {
+                        using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                        using (var reader = new StreamReader(stream))
+                        using (var json = new JsonTextReader(reader))
+                        {
+                            reason = (_errorDeserializer.Deserialize(json) as JToken).Value<string>("message");
+                        }
+                    }
+                    catch { } //Might have been HTML
+                    throw new HttpException(response.StatusCode, reason);
                 }
 
                 if (headerOnly)

@@ -144,7 +144,7 @@ namespace Discord
             }
             return perms;
         }
-        /// <inheritdoc />
+
         public override string ToString() => RawValue.ToString();
         private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
     }

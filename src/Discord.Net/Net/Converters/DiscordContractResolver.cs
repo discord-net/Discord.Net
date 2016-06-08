@@ -11,7 +11,8 @@ namespace Discord.Net.Converters
     public class DiscordContractResolver : DefaultContractResolver
     {
         private static readonly TypeInfo _ienumerable = typeof(IEnumerable<ulong[]>).GetTypeInfo();
-
+        private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");    
+        
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
@@ -54,12 +55,15 @@ namespace Discord.Net.Converters
                         converter = ImageConverter.Instance;
                     else if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
                     {
-                        var lambda = (Func<object, bool>)propInfo.GetMethod.CreateDelegate(typeof(Func<object, bool>));
-                        /*var parentArg = Expression.Parameter(typeof(object));
-                        var optional = Expression.Property(Expression.Convert(parentArg, property.DeclaringType), member as PropertyInfo);
-                        var isSpecified = Expression.Property(optional, OptionalConverter.IsSpecifiedProperty);
-                        var lambda = Expression.Lambda<Func<object, bool>>(isSpecified, parentArg).Compile();*/
-                        property.ShouldSerialize = x => lambda(x);
+                        var typeInput = propInfo.DeclaringType;
+                        var typeOutput = propInfo.PropertyType;
+
+                        var getter = typeof(Func<,>).MakeGenericType(typeInput, typeOutput);
+                        var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
+                        var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, typeOutput);
+                        var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
+                        
+                        property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
                         converter = OptionalConverter.Instance;
                     }
                 }
@@ -72,6 +76,12 @@ namespace Discord.Net.Converters
             }
 
             return property;
+        }
+
+        private static bool ShouldSerialize<TOwner, TValue>(object owner, Delegate getter)
+            where TValue : IOptional
+        {
+            return (getter as Func<TOwner, TValue>)((TOwner)owner).IsSpecified;
         }
     }
 }

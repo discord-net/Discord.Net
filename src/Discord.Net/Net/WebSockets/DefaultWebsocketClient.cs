@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Extensions;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net.WebSockets;

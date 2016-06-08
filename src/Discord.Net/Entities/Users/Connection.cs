@@ -5,19 +5,18 @@ using Model = Discord.API.Connection;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Connection : IConnection
+    internal class Connection : IConnection
     {
         public string Id { get; }
         public string Type { get; }
         public string Name { get; }
         public bool IsRevoked { get; }
 
-        public IEnumerable<ulong> IntegrationIds { get; }
+        public IReadOnlyCollection<ulong> IntegrationIds { get; }
 
         public Connection(Model model)
         {
             Id = model.Id;
-
             Type = model.Type;
             Name = model.Name;
             IsRevoked = model.Revoked;

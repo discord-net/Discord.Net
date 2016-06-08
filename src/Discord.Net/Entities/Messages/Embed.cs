@@ -2,16 +2,16 @@
 
 namespace Discord
 {
-    public struct Embed
+    internal class Embed : IEmbed
     {
-        public string Url { get; }
-        public string Type { get; }
-        public string Title { get; }
         public string Description { get; }
+        public string Url { get; }
+        public string Title { get; }
+        public string Type { get; }
         public EmbedProvider Provider { get; }
         public EmbedThumbnail Thumbnail { get; }
 
-        internal Embed(Model model)
+        public Embed(Model model)
         {
             Url = model.Url;
             Type = model.Type;

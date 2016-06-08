@@ -90,8 +90,8 @@ namespace Discord
         {
             var roles = user.Roles;
             ulong newPermissions = 0;
-            for (int i = 0; i < roles.Count; i++)
-                newPermissions |= roles[i].Permissions.RawValue;
+            foreach (var role in roles)
+                newPermissions |= role.Permissions.RawValue;
             return newPermissions;
         }
 
@@ -110,25 +110,26 @@ namespace Discord
             {
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
-                var overwrites = channel.PermissionOverwrites;
 
-                Overwrite entry;
+                OverwritePermissions? perms;
                 var roles = user.Roles;
                 if (roles.Count > 0)
                 {
-                    for (int i = 0; i < roles.Count; i++)
+                    ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
+                    foreach (var role in roles)
                     {
-                        if (overwrites.TryGetValue(roles[i].Id, out entry))
-                            resolvedPermissions &= ~entry.Permissions.DenyValue;
+                        perms = channel.GetPermissionOverwrite(role);
+                        if (perms != null)
+                        {
+                            deniedPermissions |= perms.Value.DenyValue;
+                            allowedPermissions |= perms.Value.AllowValue;
+                        }
                     }
-                    for (int i = 0; i < roles.Count; i++)
-                    {
-                        if (overwrites.TryGetValue(roles[i].Id, out entry))
-                            resolvedPermissions |= entry.Permissions.AllowValue;
-                    }
+                    resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
                 }
-                if (overwrites.TryGetValue(user.Id, out entry))
-                    resolvedPermissions = (resolvedPermissions & ~entry.Permissions.DenyValue) | entry.Permissions.AllowValue;
+                perms = channel.GetPermissionOverwrite(user);
+                if (perms != null)
+                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
 #if CSHARP7
                 switch (channel)
