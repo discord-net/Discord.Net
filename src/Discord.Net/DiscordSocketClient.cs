@@ -186,27 +186,30 @@ namespace Discord
         }
         internal CachedGuild AddCachedGuild(API.Gateway.ExtendedGuild model, DataStore dataStore = null)
         {
+            dataStore = dataStore ?? DataStore;
+
             var guild = new CachedGuild(this, model);
             if (model.Unavailable != true)
             {
                 for (int i = 0; i < model.Channels.Length; i++)
                     AddCachedChannel(model.Channels[i], dataStore);
             }
-            (dataStore ?? DataStore).AddGuild(guild);
+            dataStore.AddGuild(guild);
             if (model.Large)
                 _largeGuilds.Enqueue(model.Id);
             return guild;
         }
         internal CachedGuild RemoveCachedGuild(ulong id, DataStore dataStore = null)
         {
-            var guild = (dataStore ?? DataStore).RemoveGuild(id) as CachedGuild;
+            dataStore = dataStore ?? DataStore;
+
+            var guild = dataStore.RemoveGuild(id) as CachedGuild;
             foreach (var channel in guild.Channels)
                 guild.RemoveCachedChannel(channel.Id);
             foreach (var user in guild.Members)
                 guild.RemoveCachedUser(user.Id);
             return guild;
         }
-        internal CachedGuild GetCachedGuild(ulong id) => DataStore.GetGuild(id);
 
         public override Task<IChannel> GetChannel(ulong id)
         {
@@ -214,22 +217,26 @@ namespace Discord
         }
         internal ICachedChannel AddCachedChannel(API.Channel model, DataStore dataStore = null)
         {
+            dataStore = dataStore ?? DataStore;
+
             ICachedChannel channel;
             if (model.IsPrivate)
             {
-                var recipient = AddCachedUser(model.Recipient);
+                var recipient = AddCachedUser(model.Recipient, dataStore);
                 channel = recipient.SetDMChannel(model);
             }
             else
             {
-                var guild = GetCachedGuild(model.GuildId.Value);
+                var guild = dataStore.GetGuild(model.GuildId.Value);
                 channel = guild.AddCachedChannel(model);
             }
-            (dataStore ?? DataStore).AddChannel(channel);
+            dataStore.AddChannel(channel);
             return channel;
         }
         internal ICachedChannel RemoveCachedChannel(ulong id, DataStore dataStore = null)
         {
+            dataStore = dataStore ?? DataStore;
+
             //TODO: C#7
             var channel = DataStore.RemoveChannel(id) as ICachedChannel;
 
@@ -250,7 +257,6 @@ namespace Discord
 
             return null;
         }
-        internal ICachedChannel GetCachedChannel(ulong id) => DataStore.GetChannel(id);
 
         public override Task<IUser> GetUser(ulong id)
         {
@@ -262,13 +268,17 @@ namespace Discord
         }
         internal CachedPublicUser AddCachedUser(API.User model, DataStore dataStore = null)
         {
-            var user = (dataStore ?? DataStore).GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model)) as CachedPublicUser;
+            dataStore = dataStore ?? DataStore;
+
+            var user = dataStore.GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model)) as CachedPublicUser;
             user.AddRef();
             return user;
         }
         internal CachedPublicUser RemoveCachedUser(ulong id, DataStore dataStore = null)
         {
-            var user = (dataStore ?? DataStore).GetUser(id) as CachedPublicUser;
+            dataStore = dataStore ?? DataStore;
+
+            var user = dataStore.GetUser(id) as CachedPublicUser;
             user.RemoveRef();
             return user;
         }
@@ -306,7 +316,7 @@ namespace Discord
                                     _sessionId = data.SessionId;
                                     DataStore = dataStore;
 
-                                    await Ready().ConfigureAwait(false);
+                                    await Ready.Raise().ConfigureAwait(false);
 
                                     _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
                                 }
