@@ -153,6 +153,8 @@ namespace Discord
             return null;
         }
 
+        public CachedGuild Clone() => MemberwiseClone() as CachedGuild;
+
         new internal ICachedGuildChannel ToChannel(ChannelModel model)
         {
             switch (model.Type)

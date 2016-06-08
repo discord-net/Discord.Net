@@ -31,7 +31,7 @@ namespace Discord
             Update(model, UpdateSource.Creation);
         }
 
-        private void Update(Model model, UpdateSource source)
+        public void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
@@ -43,7 +43,7 @@ namespace Discord
             ExpireGracePeriod = model.ExpireGracePeriod;
             SyncedAt = model.SyncedAt;
 
-            Role = Guild.GetRole(model.RoleId) as Role;
+            Role = Guild.GetRole(model.RoleId);
             User = new User(Discord, model.User);
         }
         

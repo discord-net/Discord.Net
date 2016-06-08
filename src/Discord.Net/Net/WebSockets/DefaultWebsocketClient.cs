@@ -19,6 +19,7 @@ namespace Discord.Net.WebSockets
         public event Func<string, Task> TextMessage;
         
         private readonly ClientWebSocket _client;
+        private readonly SemaphoreSlim _sendLock;
         private Task _task;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
@@ -30,6 +31,7 @@ namespace Discord.Net.WebSockets
             _client.Options.Proxy = null;
             _client.Options.KeepAliveInterval = TimeSpan.Zero;
 
+            _sendLock = new SemaphoreSlim(1, 1);
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
@@ -82,27 +84,36 @@ namespace Discord.Net.WebSockets
 
         public async Task Send(byte[] data, int index, int count, bool isText)
         {
-            //TODO: If connection is temporarily down, retry?
-            int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
-            
-            for (int i = 0; i < frameCount; i++, index += SendChunkSize)
+            await _sendLock.WaitAsync(_cancelToken);
+            try
             {
-                bool isLast = i == (frameCount - 1);
+                //TODO: If connection is temporarily down, retry?
+                int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
 
-                int frameSize;
-                if (isLast)
-                    frameSize = count - (i * SendChunkSize);
-                else
-                    frameSize = SendChunkSize;
+                for (int i = 0; i < frameCount; i++, index += SendChunkSize)
+                {
+                    bool isLast = i == (frameCount - 1);
 
-                try
-                {
-                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary, isLast, _cancelToken).ConfigureAwait(false);
+                    int frameSize;
+                    if (isLast)
+                        frameSize = count - (i * SendChunkSize);
+                    else
+                        frameSize = SendChunkSize;
+
+                    try
+                    {
+                        var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
+                        await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
+                    }
+                    catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
+                    {
+                        return;
+                    }
                 }
-                catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
-                {
-                    return;
-                }
+            }
+            finally
+            {
+                _sendLock.Release();
             }
         }
 

@@ -74,7 +74,7 @@ namespace Discord
                 {
                     CachedMessage msg;
                     if (_messages.TryGetValue(x, out msg))
-                        return msg as CachedMessage;
+                        return msg;
                     return null;
                 })
                 .Where(x => x != null)

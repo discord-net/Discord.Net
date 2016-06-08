@@ -17,7 +17,7 @@ namespace Discord
             : base(guild, model)
         {
         }
-        protected override void Update(Model model, UpdateSource source)
+        public override void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 

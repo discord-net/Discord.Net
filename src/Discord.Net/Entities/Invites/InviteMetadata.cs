@@ -15,7 +15,7 @@ namespace Discord
         {
             Update(model, UpdateSource.Creation);
         }
-        private void Update(Model model, UpdateSource source)
+        public void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 

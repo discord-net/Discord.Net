@@ -12,5 +12,7 @@ namespace Discord
             : base(guild, user, model)
         {
         }
+
+        public CachedGuildUser Clone() => MemberwiseClone() as CachedGuildUser;
     }
 }

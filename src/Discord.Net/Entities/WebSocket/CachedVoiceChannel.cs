@@ -34,5 +34,7 @@ namespace Discord
         }
 
         public CachedVoiceChannel Clone() => MemberwiseClone() as CachedVoiceChannel;
+
+        ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }

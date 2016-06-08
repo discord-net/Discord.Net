@@ -30,7 +30,7 @@ namespace Discord
 
             Update(model, UpdateSource.Creation);
         }
-        protected virtual void Update(Model model, UpdateSource source)
+        public virtual void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 

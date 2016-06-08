@@ -28,8 +28,10 @@ namespace Discord
         public LoginState LoginState { get; private set; }
         public API.DiscordApiClient ApiClient { get; private set; }
 
+        /// <summary> Creates a new discord client using only the REST API. </summary>
         public DiscordClient()
             : this(new DiscordConfig()) { }
+        /// <summary> Creates a new discord client using only the REST API. </summary>
         public DiscordClient(DiscordConfig config)
         {
             _log = new LogManager(config.LogLevel);
@@ -40,10 +42,12 @@ namespace Discord
             _connectionLock = new SemaphoreSlim(1, 1);
             _requestQueue = new RequestQueue();
 
+            //TODO: Is there any better way to do this WebSocketProvider access?
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _log.Verbose("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task Login(TokenType tokenType, string token, bool validateToken = true)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
@@ -89,6 +93,7 @@ namespace Discord
         }
         protected virtual Task OnLogin() => Task.CompletedTask;
 
+        /// <inheritdoc />
         public async Task Logout()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
@@ -115,12 +120,14 @@ namespace Discord
         }
         protected virtual Task OnLogout() => Task.CompletedTask;
 
+        /// <inheritdoc />
         public async Task<IReadOnlyCollection<IConnection>> GetConnections()
         {
             var models = await ApiClient.GetCurrentUserConnections().ConfigureAwait(false);
             return models.Select(x => new Connection(x)).ToImmutableArray();
         }
 
+        /// <inheritdoc />
         public virtual async Task<IChannel> GetChannel(ulong id)
         {
             var model = await ApiClient.GetChannel(id).ConfigureAwait(false);
@@ -140,12 +147,14 @@ namespace Discord
             }
             return null;
         }
+        /// <inheritdoc />
         public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannels()
         {
             var models = await ApiClient.GetCurrentUserDMs().ConfigureAwait(false);
             return models.Select(x => new DMChannel(this, new User(this, x.Recipient), x)).ToImmutableArray();
         }
 
+        /// <inheritdoc />
         public virtual async Task<IInvite> GetInvite(string inviteIdOrXkcd)
         {
             var model = await ApiClient.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
@@ -154,6 +163,7 @@ namespace Discord
             return null;
         }
 
+        /// <inheritdoc />
         public virtual async Task<IGuild> GetGuild(ulong id)
         {
             var model = await ApiClient.GetGuild(id).ConfigureAwait(false);
@@ -161,6 +171,7 @@ namespace Discord
                 return new Guild(this, model);
             return null;
         }
+        /// <inheritdoc />
         public virtual async Task<GuildEmbed?> GetGuildEmbed(ulong id)
         {
             var model = await ApiClient.GetGuildEmbed(id).ConfigureAwait(false);
@@ -168,12 +179,14 @@ namespace Discord
                 return new GuildEmbed(model);
             return null;
         }
+        /// <inheritdoc />
         public virtual async Task<IReadOnlyCollection<IUserGuild>> GetGuilds()
         {
             var models = await ApiClient.GetCurrentUserGuilds().ConfigureAwait(false);
             return models.Select(x => new UserGuild(this, x)).ToImmutableArray();
 
         }
+        /// <inheritdoc />
         public virtual async Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null)
         {
             var args = new CreateGuildParams();
@@ -181,6 +194,7 @@ namespace Discord
             return new Guild(this, model);
         }
 
+        /// <inheritdoc />
         public virtual async Task<IUser> GetUser(ulong id)
         {
             var model = await ApiClient.GetUser(id).ConfigureAwait(false);
@@ -188,6 +202,7 @@ namespace Discord
                 return new User(this, model);
             return null;
         }
+        /// <inheritdoc />
         public virtual async Task<IUser> GetUser(string username, string discriminator)
         {
             var model = await ApiClient.GetUser(username, discriminator).ConfigureAwait(false);
@@ -195,6 +210,7 @@ namespace Discord
                 return new User(this, model);
             return null;
         }
+        /// <inheritdoc />
         public virtual async Task<ISelfUser> GetCurrentUser()
         {
             var user = _currentUser;
@@ -206,17 +222,20 @@ namespace Discord
             }
             return user;
         }
+        /// <inheritdoc />
         public virtual async Task<IReadOnlyCollection<IUser>> QueryUsers(string query, int limit)
         {
             var models = await ApiClient.QueryUsers(query, limit).ConfigureAwait(false);
             return models.Select(x => new User(this, x)).ToImmutableArray();
         }
 
+        /// <inheritdoc />
         public virtual async Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegions()
         {
             var models = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x)).ToImmutableArray();
         }
+        /// <inheritdoc />
         public virtual async Task<IVoiceRegion> GetVoiceRegion(string id)
         {
             var models = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
@@ -228,6 +247,7 @@ namespace Discord
             if (!_isDisposed)
                 _isDisposed = true;
         }
+        /// <inheritdoc />
         public void Dispose() => Dispose(true);
         
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;

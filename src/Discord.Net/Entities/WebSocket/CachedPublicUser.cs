@@ -16,7 +16,7 @@ namespace Discord
         {
         }
 
-        public CachedDMChannel SetDMChannel(ChannelModel model)
+        public CachedDMChannel AddDMChannel(ChannelModel model)
         {
             lock (this)
             {

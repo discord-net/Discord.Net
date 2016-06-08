@@ -39,7 +39,7 @@ namespace Discord
 
             Update(model, UpdateSource.Creation);
         }
-        private void Update(Model model, UpdateSource source)
+        public void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
@@ -49,9 +49,9 @@ namespace Discord
             Nickname = model.Nick;
 
             var roles = ImmutableArray.CreateBuilder<Role>(model.Roles.Length + 1);
-            roles.Add(Guild.EveryoneRole as Role);
+            roles.Add(Guild.EveryoneRole);
             for (int i = 0; i < model.Roles.Length; i++)
-                roles.Add(Guild.GetRole(model.Roles[i]) as Role);
+                roles.Add(Guild.GetRole(model.Roles[i]));
             Roles = roles.ToImmutable();
 
             GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
@@ -89,7 +89,7 @@ namespace Discord
                 if (args.Nickname.IsSpecified)
                     Nickname = args.Nickname.Value ?? "";
                 if (args.Roles.IsSpecified)
-                    Roles = args.Roles.Value.Select(x => Guild.GetRole(x) as Role).Where(x => x != null).ToImmutableArray();
+                    Roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }
         }
         public async Task Kick()

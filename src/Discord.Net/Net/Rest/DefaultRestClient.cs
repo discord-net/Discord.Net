@@ -92,25 +92,7 @@ namespace Discord.Net.Rest
                 {
                     foreach (var p in multipartParams)
                     {
-#if CSHARP7
-                        switch (p.Value)
-                        {
-                            case string value:
-                                content.Add(new StringContent(value), p.Key);
-                                break;
-                            case byte[] value:
-                                content.Add(new ByteArrayContent(value), p.Key);
-                                break;
-                            case Stream value:
-                                content.Add(new StreamContent(value), p.Key);
-                                break;
-                            case MultipartFile value:
-                                content.Add(new StreamContent(value.Stream), value.Filename, p.Key);
-                                break;
-                            default:
-                                throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
-                        }
-#else
+                        //TODO: C# Typeswitch candidate
                         var stringValue = p.Value as string;
                         if (stringValue != null) { content.Add(new StringContent(stringValue), p.Key); continue; }
                         var byteArrayValue = p.Value as byte[];
@@ -125,7 +107,6 @@ namespace Discord.Net.Rest
                         }
 
                         throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
-#endif
                     }
                 }
                 restRequest.Content = content;

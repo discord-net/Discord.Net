@@ -130,27 +130,14 @@ namespace Discord
                 perms = channel.GetPermissionOverwrite(user);
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
-
-#if CSHARP7
-                switch (channel)
-                {
-                    case ITextChannel _:
-                        if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
-                            resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
-                        break;
-                    case IVoiceChannel _:
-                        if (!GetValue(resolvedPermissions, ChannelPermission.Connect))
-                            resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
-                        break;
-                }
-#else
+                
+                //TODO: C# Typeswitch candidate
                 var textChannel = channel as ITextChannel;
                 var voiceChannel = channel as IVoiceChannel;
                 if (textChannel != null && !GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
                     resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
                 else if (voiceChannel != null && !GetValue(resolvedPermissions, ChannelPermission.Connect))
                     resolvedPermissions = 0; //No connect permission on a voice channel removes all other permissions
-#endif
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
             }
 

@@ -27,7 +27,7 @@ namespace Discord.API
     {
         public event Func<string, string, double, Task> SentRequest;
         public event Func<int, Task> SentGatewayMessage;
-        public event Func<GatewayOpCode, string, JToken, Task> ReceivedGatewayEvent;
+        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent;
 
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
@@ -66,14 +66,14 @@ namespace Discord.API
                         using (var reader = new StreamReader(decompressed))
                         {
                             var msg = JsonConvert.DeserializeObject<WebSocketMessage>(reader.ReadToEnd());
-                            await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
+                            await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                         }
                     }
                 };
                 _gatewayClient.TextMessage += async text =>
                 {
                     var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
-                    await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
+                    await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 };
             }
 
@@ -362,6 +362,10 @@ namespace Discord.API
                 UseCompression = useCompression
             };
             await SendGateway(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
+        }
+        public async Task SendHeartbeat(int lastSeq, RequestOptions options = null)
+        {
+            await SendGateway(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
 
         //Channels
