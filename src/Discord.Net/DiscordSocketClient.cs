@@ -46,6 +46,7 @@ namespace Discord
         private readonly int _totalShards;
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
         private string _sessionId;
+        private TaskCompletionSource<bool> _connectTask;
 
         public int ShardId { get; }
         public ConnectionState ConnectionState { get; private set; }
@@ -95,7 +96,7 @@ namespace Discord
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             
-            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Verbose($"Sent Op {opCode}");
+            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Verbose($"Sent Op {(GatewayOpCode)opCode}");
             ApiClient.ReceivedGatewayEvent += ProcessMessage;
             GatewaySocket = config.WebSocketProvider();
 
@@ -133,8 +134,10 @@ namespace Discord
             ConnectionState = ConnectionState.Connecting;
             try
             {
+                _connectTask = new TaskCompletionSource<bool>();
                 await ApiClient.Connect().ConfigureAwait(false);
 
+                await _connectTask.Task.ConfigureAwait(false);
                 ConnectionState = ConnectionState.Connected;
             }
             catch (Exception)
@@ -184,9 +187,12 @@ namespace Discord
         internal CachedGuild AddCachedGuild(API.Gateway.ExtendedGuild model, DataStore dataStore = null)
         {
             var guild = new CachedGuild(this, model);
-            for (int i = 0; i < model.Channels.Length; i++)
-                AddCachedChannel(model.Channels[i], dataStore);
-            DataStore.AddGuild(guild);
+            if (model.Unavailable != true)
+            {
+                for (int i = 0; i < model.Channels.Length; i++)
+                    AddCachedChannel(model.Channels[i], dataStore);
+            }
+            (dataStore ?? DataStore).AddGuild(guild);
             if (model.Large)
                 _largeGuilds.Enqueue(model.Id);
             return guild;
@@ -253,13 +259,20 @@ namespace Discord
             return user;
         }
 
-        private async Task ProcessMessage(GatewayOpCodes opCode, string type, JToken payload)
+        private async Task ProcessMessage(GatewayOpCode opCode, string type, JToken payload)
         {
             try
             {
                 switch (opCode)
                 {
-                    case GatewayOpCodes.Dispatch:
+                    case GatewayOpCode.Hello:
+                        {
+                            var data = payload.ToObject<HelloEvent>(_serializer);
+
+                            await ApiClient.SendIdentify().ConfigureAwait(false);
+                        }
+                        break;
+                    case GatewayOpCode.Dispatch:
                         switch (type)
                         {
                             //Global
@@ -280,6 +293,8 @@ namespace Discord
                                     DataStore = dataStore;
 
                                     await Ready().ConfigureAwait(false);
+
+                                    _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
                                 }
                                 break;
 

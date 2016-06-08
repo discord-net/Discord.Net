@@ -26,17 +26,12 @@ namespace Discord.API.Gateway
         public ExtendedGuild[] Guilds { get; set; }
         [JsonProperty("private_channels")]
         public Channel[] PrivateChannels { get; set; }
-        [JsonProperty("heartbeat_interval")]
-        public int HeartbeatInterval { get; set; }
         [JsonProperty("relationships")]
         public Relationship[] Relationships { get; set; }
 
         //Ignored
-        [JsonProperty("user_settings")]
-        public object UserSettings { get; set; }
+        /*[JsonProperty("user_settings")]
         [JsonProperty("user_guild_settings")]
-        public object UserGuildSettings { get; set; }
-        [JsonProperty("tutorial")]
-        public object Tutorial { get; set; }
+        [JsonProperty("tutorial")]*/
     }
 }
