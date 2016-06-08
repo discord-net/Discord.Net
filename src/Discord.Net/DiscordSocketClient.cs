@@ -60,7 +60,7 @@ namespace Discord
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
         public ConnectionState ConnectionState { get; private set; }
-        /// <summary> Gets the estimated round-trip latency to the gateway server. </summary>
+        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
         internal IWebSocketClient GatewaySocket { get; private set; }
         internal int MessageCacheSize { get; private set; }
