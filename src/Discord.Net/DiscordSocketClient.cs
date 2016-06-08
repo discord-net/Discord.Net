@@ -73,11 +73,11 @@ namespace Discord
         }
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
-        public DiscordSocketClient(DiscordSocketConfig config = null)
+        public DiscordSocketClient()
+            : this(new DiscordSocketConfig()) { }
+        public DiscordSocketClient(DiscordSocketConfig config)
+            : base(config)
         {
-            if (config == null)
-                config = new DiscordSocketConfig();
-
             ShardId = config.ShardId;
             _totalShards = config.TotalShards;
 

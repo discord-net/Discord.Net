@@ -3,6 +3,8 @@ using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net;
 using Discord.Net.Queue;
+using Discord.Net.Rest;
+using Discord.Net.WebSockets;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -28,11 +30,10 @@ namespace Discord
         public LoginState LoginState { get; private set; }
         public API.DiscordApiClient ApiClient { get; private set; }
 
-        public DiscordClient(DiscordConfig config = null)
+        public DiscordClient()
+            : this(new DiscordConfig()) { }
+        public DiscordClient(DiscordConfig config)
         {
-            if (config == null)
-                config = new DiscordConfig();
-
             _log = new LogManager(config.LogLevel);
             _log.Message += async msg => await Log.Raise(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
@@ -41,10 +42,10 @@ namespace Discord
             _connectionLock = new SemaphoreSlim(1, 1);
             _requestQueue = new RequestQueue();
 
-            ApiClient = new API.DiscordApiClient(config.RestClientProvider, requestQueue: _requestQueue);
+            ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _log.Verbose("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
-        
+
         public async Task Login(TokenType tokenType, string token, bool validateToken = true)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
