@@ -35,13 +35,15 @@ namespace Discord.Net.Queue
 
         private RestRequest(IRestClient client, string method, string endpoint, bool headerOnly, RequestOptions options)
         {
+            var timeout = options?.Timeout;
+
             Client = client;
             Method = method;
             Endpoint = endpoint;
             Json = null;
             MultipartParams = null;
             HeaderOnly = headerOnly;
-            TimeoutTick = options.Timeout.HasValue ? (int?)unchecked(Environment.TickCount + options.Timeout.Value) : null;
+            TimeoutTick = timeout.HasValue ? (int?)unchecked(Environment.TickCount + timeout.Value) : null;
             Promise = new TaskCompletionSource<Stream>();
         }
 
