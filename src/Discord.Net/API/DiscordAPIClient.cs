@@ -367,6 +367,10 @@ namespace Discord.API
         {
             await SendGateway(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
+        public async Task SendRequestMembers(IEnumerable<ulong> guildIds, RequestOptions options = null)
+        {
+            await SendGateway(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
+        }
 
         //Channels
         public async Task<Channel> GetChannel(ulong channelId, RequestOptions options = null)

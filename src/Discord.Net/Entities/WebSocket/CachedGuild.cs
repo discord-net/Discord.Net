@@ -16,12 +16,16 @@ namespace Discord
 {
     internal class CachedGuild : Guild, ICachedEntity<ulong>
     {
+        private TaskCompletionSource<bool> _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, CachedGuildUser> _members;
         private ConcurrentDictionary<ulong, Presence> _presences;
         private int _userCount;
 
         public bool Available { get; private set; } //TODO: Add to IGuild
+
+        public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
+        public Task DownloaderPromise => _downloaderPromise.Task;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public CachedGuildUser CurrentUser => GetCachedUser(Discord.CurrentUser.Id);
@@ -30,6 +34,7 @@ namespace Discord
 
         public CachedGuild(DiscordSocketClient discord, Model model) : base(discord, model)
         {
+            _downloaderPromise = new TaskCompletionSource<bool>();
         }
 
         public void Update(ExtendedModel model, UpdateSource source, DataStore dataStore)
@@ -79,6 +84,9 @@ namespace Discord
             {
                 for (int i = 0; i < model.Members.Length; i++)
                     AddCachedUser(model.Members[i], members, dataStore);
+                _downloaderPromise = new TaskCompletionSource<bool>();
+                if (!model.Large)
+                    _downloaderPromise.SetResult(true);
             }
             _members = members;
         }
@@ -151,6 +159,17 @@ namespace Discord
             if (_members.TryRemove(id, out member))
                 return member;
             return null;
+        }
+
+        public async Task DownloadMembers()
+        {
+            if (!HasAllMembers)
+                await Discord.ApiClient.SendRequestMembers(new ulong[] { Id }).ConfigureAwait(false);
+            await _downloaderPromise.Task.ConfigureAwait(false);
+        }
+        public void CompleteDownloadMembers()
+        {
+            _downloaderPromise.SetResult(true);
         }
 
         public CachedGuild Clone() => MemberwiseClone() as CachedGuild;

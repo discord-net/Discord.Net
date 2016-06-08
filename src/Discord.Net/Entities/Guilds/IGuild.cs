@@ -90,6 +90,9 @@ namespace Discord
         Task<IGuildUser> GetUser(ulong id);
         /// <summary> Gets the current user for this guild. </summary>
         Task<IGuildUser> GetCurrentUser();
+        /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
+        Task DownloadUsers();
+        /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsers(int days = 30, bool simulate = false);
     }
 }

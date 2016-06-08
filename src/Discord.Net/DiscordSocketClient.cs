@@ -17,9 +17,8 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    //TODO: Remove unnecessary `as` casts
     //TODO: Add event docstrings
-    //TODO: Add reconnect logic (+ensure the heartbeat task shuts down)
+    //TODO: Add reconnect logic (+ensure the heartbeat task to shut down)
     //TODO: Add resume logic
     public class DiscordSocketClient : DiscordClient, IDiscordClient
     {
@@ -32,7 +31,7 @@ namespace Discord
         public event Func<IMessage, IMessage, Task> MessageUpdated;
         public event Func<IRole, Task> RoleCreated, RoleDeleted;
         public event Func<IRole, IRole, Task> RoleUpdated;
-        public event Func<IGuild, Task> JoinedGuild, LeftGuild, GuildAvailable, GuildUnavailable;
+        public event Func<IGuild, Task> JoinedGuild, LeftGuild, GuildAvailable, GuildUnavailable, GuildDownloadedMembers;
         public event Func<IGuild, IGuild, Task> GuildUpdated;
         public event Func<IUser, Task> UserJoined, UserLeft, UserBanned, UserUnbanned;
         public event Func<IUser, IUser, Task> UserUpdated;
@@ -305,6 +304,47 @@ namespace Discord
             return user;
         }
 
+        /// <summary> Downloads the members list for all large guilds. </summary>
+        public Task DownloadAllMembers()
+            => DownloadMembers(DataStore.Guilds.Where(x => !x.HasAllMembers));
+        /// <summary> Downloads the members list for the provided guilds, if they don't have a complete list. </summary>
+        public async Task DownloadMembers(IEnumerable<IGuild> guilds)
+        {
+            const short batchSize = 50;
+            var cachedGuilds = guilds.Select(x => x as CachedGuild).ToArray();
+            if (cachedGuilds.Length == 0)
+                return;
+            else if (cachedGuilds.Length == 1)
+            {
+                await cachedGuilds[0].DownloadMembers().ConfigureAwait(false);
+                return;
+            }
+
+            ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
+            Task[] batchTasks = new Task[batchIds.Length];
+            int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
+
+            for (int i = 0, k = 0; i < batchCount; i++)
+            {
+                bool isLast = i == batchCount - 1;
+                int count = isLast ? (batchIds.Length - (batchCount - 1) * batchSize) : batchSize;
+
+                for (int j = 0; j < count; j++, k++)
+                {
+                    var guild = cachedGuilds[k];
+                    batchIds[j] = guild.Id;
+                    batchTasks[j] = guild.DownloaderPromise;
+                }
+
+                ApiClient.SendRequestMembers(batchIds);
+
+                if (isLast && batchCount > 1)
+                    await Task.WhenAll(batchTasks.Take(count)).ConfigureAwait(false);
+                else
+                    await Task.WhenAll(batchTasks).ConfigureAwait(false);
+            }
+        }
+
         private async Task ProcessMessage(GatewayOpCode opCode, int? seq, string type, object payload)
         {
             if (seq != null)
@@ -367,11 +407,8 @@ namespace Discord
                                         type = "GUILD_AVAILABLE";
                                     else
                                         await JoinedGuild.Raise(guild).ConfigureAwait(false);
-
-                                    if (!data.Large)
-                                        await GuildAvailable.Raise(guild);
-                                    else
-                                        _largeGuilds.Enqueue(data.Id);
+                                    
+                                    await GuildAvailable.Raise(guild);
                                 }
                                 break;
                             case "GUILD_UPDATE":
@@ -781,15 +818,19 @@ namespace Discord
         }
         private async Task RunHeartbeat(int intervalMillis, CancellationToken cancelToken)
         {
-            var state = ConnectionState;
-            while (state == ConnectionState.Connecting || state == ConnectionState.Connected)
+            try
             {
-                //if (_heartbeatTime != 0) //TODO: Connection lost, reconnect
+                var state = ConnectionState;
+                while (state == ConnectionState.Connecting || state == ConnectionState.Connected)
+                {
+                    //if (_heartbeatTime != 0) //TODO: Connection lost, reconnect
 
-                _heartbeatTime = Environment.TickCount;
-                await ApiClient.SendHeartbeat(_lastSeq).ConfigureAwait(false);
-                await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
+                    _heartbeatTime = Environment.TickCount;
+                    await ApiClient.SendHeartbeat(_lastSeq).ConfigureAwait(false);
+                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
+                }
             }
+            catch (OperationCanceledException) { }
         }
     }
 }

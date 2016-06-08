@@ -306,6 +306,7 @@ namespace Discord
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<Emoji> IGuild.Emojis => Emojis;
         IReadOnlyCollection<string> IGuild.Features => Features;
+        Task IGuild.DownloadUsers() { throw new NotSupportedException(); }
 
         IRole IGuild.GetRole(ulong id) => GetRole(id);
     }
