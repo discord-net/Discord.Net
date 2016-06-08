@@ -199,14 +199,14 @@ namespace Discord
         }
         internal CachedGuild RemoveCachedGuild(ulong id, DataStore dataStore = null)
         {
-            var guild = DataStore.RemoveGuild(id) as CachedGuild;
+            var guild = (dataStore ?? DataStore).RemoveGuild(id) as CachedGuild;
             foreach (var channel in guild.Channels)
                 guild.RemoveCachedChannel(channel.Id);
             foreach (var user in guild.Members)
                 guild.RemoveCachedUser(user.Id);
             return guild;
         }
-        internal CachedGuild GetCachedGuild(ulong id) => DataStore.GetGuild(id) as CachedGuild;
+        internal CachedGuild GetCachedGuild(ulong id) => DataStore.GetGuild(id);
 
         public override Task<IChannel> GetChannel(ulong id)
         {
@@ -214,29 +214,43 @@ namespace Discord
         }
         internal ICachedChannel AddCachedChannel(API.Channel model, DataStore dataStore = null)
         {
+            ICachedChannel channel;
             if (model.IsPrivate)
             {
                 var recipient = AddCachedUser(model.Recipient);
-                return recipient.SetDMChannel(model);
+                channel = recipient.SetDMChannel(model);
             }
             else
             {
                 var guild = GetCachedGuild(model.GuildId.Value);
-                return guild.AddCachedChannel(model);
+                channel = guild.AddCachedChannel(model);
             }
+            (dataStore ?? DataStore).AddChannel(channel);
+            return channel;
         }
         internal ICachedChannel RemoveCachedChannel(ulong id, DataStore dataStore = null)
         {
+            //TODO: C#7
             var channel = DataStore.RemoveChannel(id) as ICachedChannel;
+
+            var guildChannel = channel as ICachedGuildChannel;
+            if (guildChannel != null)
+            {
+                guildChannel.Guild.RemoveCachedChannel(guildChannel.Id);
+                return channel;
+            }
+
             var dmChannel = channel as CachedDMChannel;
             if (dmChannel != null)
             {
                 var recipient = dmChannel.Recipient;
                 recipient.RemoveDMChannel(id);
+                return channel;
             }
-            return channel;
+
+            return null;
         }
-        internal ICachedChannel GetCachedChannel(ulong id) => DataStore.GetChannel(id) as ICachedChannel;
+        internal ICachedChannel GetCachedChannel(ulong id) => DataStore.GetChannel(id);
 
         public override Task<IUser> GetUser(ulong id)
         {
@@ -248,13 +262,13 @@ namespace Discord
         }
         internal CachedPublicUser AddCachedUser(API.User model, DataStore dataStore = null)
         {
-            var user = DataStore.GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model)) as CachedPublicUser;
+            var user = (dataStore ?? DataStore).GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model)) as CachedPublicUser;
             user.AddRef();
             return user;
         }
         internal CachedPublicUser RemoveCachedUser(ulong id, DataStore dataStore = null)
         {
-            var user = DataStore.GetUser(id) as CachedPublicUser;
+            var user = (dataStore ?? DataStore).GetUser(id) as CachedPublicUser;
             user.RemoveRef();
             return user;
         }
