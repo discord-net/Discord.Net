@@ -397,6 +397,6 @@ namespace Discord
         }
         private User() { } //Used for cloning
 
-        public override string ToString() => Name != null ? $"{Name}#{Discriminator}" : Id.ToIdString();
+        public override string ToString() => Name != null ? $"{Name}#{Discriminator.ToString("D4")}" : Id.ToIdString();
 	}
 }
