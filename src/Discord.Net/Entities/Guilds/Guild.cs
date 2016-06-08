@@ -54,14 +54,13 @@ namespace Discord
             EmbedChannelId = model.EmbedChannelId;
             AFKTimeout = model.AFKTimeout;
             IsEmbeddable = model.EmbedEnabled;
-            Features = model.Features.ToImmutableArray();
             _iconId = model.Icon;
             Name = model.Name;
             OwnerId = model.OwnerId;
             VoiceRegionId = model.Region;
             _splashId = model.Splash;
             VerificationLevel = model.VerificationLevel;
-
+            
             if (model.Emojis != null)
             {
                 var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
@@ -71,6 +70,11 @@ namespace Discord
             }
             else
                 Emojis = ImmutableArray.Create<Emoji>();
+
+            if (model.Features != null)
+                Features = model.Features.ToImmutableArray();
+            else
+                Features = ImmutableArray.Create<string>();
 
             var roles = new ConcurrentDictionary<ulong, Role>(1, model.Roles?.Length ?? 0);
             if (model.Roles != null)
