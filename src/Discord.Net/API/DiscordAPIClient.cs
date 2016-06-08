@@ -994,10 +994,11 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<User> GetUser(string username, ushort discriminator, RequestOptions options = null)
+        public async Task<User> GetUser(string username, string discriminator, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(username, nameof(username));
-
+            Preconditions.NotNullOrEmpty(discriminator, nameof(discriminator));
+            
             try
             {
                 var models = await QueryUsers($"{username}#{discriminator}", 1, options: options).ConfigureAwait(false);

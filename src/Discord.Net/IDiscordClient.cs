@@ -31,7 +31,7 @@ namespace Discord
         Task<IInvite> GetInvite(string inviteIdOrXkcd);
 
         Task<IUser> GetUser(ulong id);
-        Task<IUser> GetUser(string username, ushort discriminator);
+        Task<IUser> GetUser(string username, string discriminator);
         Task<ISelfUser> GetCurrentUser();
         Task<IReadOnlyCollection<IUser>> QueryUsers(string query, int limit);
 

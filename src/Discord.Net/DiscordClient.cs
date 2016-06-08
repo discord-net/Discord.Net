@@ -3,8 +3,6 @@ using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net;
 using Discord.Net.Queue;
-using Discord.Net.Rest;
-using Discord.Net.WebSockets;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -190,7 +188,7 @@ namespace Discord
                 return new User(this, model);
             return null;
         }
-        public virtual async Task<IUser> GetUser(string username, ushort discriminator)
+        public virtual async Task<IUser> GetUser(string username, string discriminator)
         {
             var model = await ApiClient.GetUser(username, discriminator).ConfigureAwait(false);
             if (model != null)

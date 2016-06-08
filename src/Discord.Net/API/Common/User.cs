@@ -9,7 +9,7 @@ namespace Discord.API
         [JsonProperty("username")]
         public string Username { get; set; }
         [JsonProperty("discriminator")]
-        public ushort Discriminator { get; set; }
+        public string Discriminator { get; set; }
         [JsonProperty("avatar")]
         public string Avatar { get; set; }
         [JsonProperty("verified")]

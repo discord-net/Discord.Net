@@ -23,7 +23,7 @@ namespace Discord
         public ulong Id => User.Id;
         public string AvatarUrl => User.AvatarUrl;
         public DateTime CreatedAt => User.CreatedAt;
-        public ushort Discriminator => User.Discriminator;
+        public string Discriminator => User.Discriminator;
         public Game? Game => User.Game;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;

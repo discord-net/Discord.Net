@@ -95,7 +95,7 @@ namespace Discord
             _gatewayLogger = _log.CreateLogger("Gateway");
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
-            
+
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Verbose($"Sent Op {(GatewayOpCode)opCode}");
             ApiClient.ReceivedGatewayEvent += ProcessMessage;
             GatewaySocket = config.WebSocketProvider();
@@ -262,7 +262,7 @@ namespace Discord
         {
             return Task.FromResult<IUser>(DataStore.GetUser(id));
         }
-        public override Task<IUser> GetUser(string username, ushort discriminator)
+        public override Task<IUser> GetUser(string username, string discriminator)
         {
             return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
         }

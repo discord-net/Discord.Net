@@ -10,7 +10,7 @@ namespace Discord
     {
         private string _avatarId;
         
-        public ushort Discriminator { get; private set; }
+        public string Discriminator { get; private set; }
         public bool IsBot { get; private set; }
         public string Username { get; private set; }
 
