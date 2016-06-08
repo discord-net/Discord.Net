@@ -1,6 +1,6 @@
-﻿namespace Discord.API.Gateway
+﻿namespace Discord.API.Voice
 {
-    public enum VoiceOpCodes : byte
+    public enum VoiceOpCode : byte
     {
         /// <summary> C→S - Used to associate a connection with a token. </summary>
         Identify = 0,

@@ -27,7 +27,7 @@ namespace Discord.API
     {
         public event Func<string, string, double, Task> SentRequest;
         public event Func<int, Task> SentGatewayMessage;
-        public event Func<GatewayOpCodes, string, JToken, Task> ReceivedGatewayEvent;
+        public event Func<GatewayOpCode, string, JToken, Task> ReceivedGatewayEvent;
 
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
@@ -66,14 +66,14 @@ namespace Discord.API
                         using (var reader = new StreamReader(decompressed))
                         {
                             var msg = JsonConvert.DeserializeObject<WebSocketMessage>(reader.ReadToEnd());
-                            await ReceivedGatewayEvent.Raise((GatewayOpCodes)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
+                            await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
                         }
                     }
                 };
                 _gatewayClient.TextMessage += async text =>
                 {
                     var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
-                    await ReceivedGatewayEvent.Raise((GatewayOpCodes)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
+                    await ReceivedGatewayEvent.Raise((GatewayOpCode)msg.Operation, msg.Type, msg.Payload as JToken).ConfigureAwait(false);
                 };
             }
 
@@ -198,8 +198,6 @@ namespace Discord.API
                 var url = $"{gatewayResponse.Url}?v={DiscordConfig.GatewayAPIVersion}&encoding={DiscordConfig.GatewayEncoding}";
                 await _gatewayClient.Connect(url).ConfigureAwait(false);
 
-                await SendIdentify().ConfigureAwait(false);
-
                 ConnectionState = ConnectionState.Connected;
             }
             catch (Exception)
@@ -321,13 +319,13 @@ namespace Discord.API
             return responseStream;
         }
 
-        public Task SendGateway(GatewayOpCodes opCode, object payload, 
+        public Task SendGateway(GatewayOpCode opCode, object payload, 
             GlobalBucket bucket = GlobalBucket.GeneralGateway, RequestOptions options = null)
             => SendGateway(opCode, payload, BucketGroup.Global, (int)bucket, 0, options);
-        public Task SendGateway(GatewayOpCodes opCode, object payload, 
+        public Task SendGateway(GatewayOpCode opCode, object payload, 
             GuildBucket bucket, ulong guildId, RequestOptions options = null)
             => SendGateway(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
-        private async Task SendGateway(GatewayOpCodes opCode, object payload, 
+        private async Task SendGateway(GatewayOpCode opCode, object payload, 
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
         {
             //TODO: Add ETF
@@ -363,7 +361,7 @@ namespace Discord.API
                 LargeThreshold = largeThreshold,
                 UseCompression = useCompression
             };
-            await SendGateway(GatewayOpCodes.Identify, msg, options: options).ConfigureAwait(false);
+            await SendGateway(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
 
         //Channels
