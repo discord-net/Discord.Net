@@ -95,8 +95,8 @@ namespace Discord
             _gatewayLogger = _log.CreateLogger("Gateway");
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
-
-            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Verbose($"Sent Op {(GatewayOpCode)opCode}");
+            
+            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Debug($"Sent {(GatewayOpCode)opCode}");
             ApiClient.ReceivedGatewayEvent += ProcessMessage;
             GatewaySocket = config.WebSocketProvider();
 
@@ -725,20 +725,23 @@ namespace Discord
                             case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
                             case "VOICE_SERVER_UPDATE": //TODO: Add
                             case "RESUMED": //TODO: Add
-                                await _gatewayLogger.Debug($"Ignored message {opCode}{(type != null ? $" ({type})" : "")}").ConfigureAwait(false);
+                                await _gatewayLogger.Debug($"Ignored Dispatch ({type})").ConfigureAwait(false);
                                 return;
 
                             //Others
                             default:
-                                await _gatewayLogger.Warning($"Unknown message {opCode}{(type != null ? $" ({type})" : "")}").ConfigureAwait(false);
+                                await _gatewayLogger.Warning($"Unknown Dispatch ({type})").ConfigureAwait(false);
                                 return;
                         }
                         break;
+                    default:
+                        await _gatewayLogger.Warning($"Unknown OpCode ({opCode})").ConfigureAwait(false);
+                        return;
                 }
             }
             catch (Exception ex)
             {
-                await _gatewayLogger.Error($"Error handling msg {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
+                await _gatewayLogger.Error($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
                 return;
             }
             await _gatewayLogger.Debug($"Received {opCode}{(type != null ? $" ({type})" : "")}").ConfigureAwait(false);
