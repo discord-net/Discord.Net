@@ -62,7 +62,7 @@ namespace Discord
             if (model.Channels != null)
             {
                 for (int i = 0; i < model.Channels.Length; i++)
-                    AddCachedChannel(model.Channels[i], channels, dataStore);
+                    AddCachedChannel(model.Channels[i], channels);
             }
             _channels = channels;
 
@@ -85,10 +85,9 @@ namespace Discord
 
         public override Task<IGuildChannel> GetChannel(ulong id) => Task.FromResult<IGuildChannel>(GetCachedChannel(id));
         public override Task<IReadOnlyCollection<IGuildChannel>> GetChannels() => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
-        public ICachedGuildChannel AddCachedChannel(ChannelModel model, ConcurrentHashSet<ulong> channels = null, DataStore dataStore = null)
+        public ICachedGuildChannel AddCachedChannel(ChannelModel model, ConcurrentHashSet<ulong> channels = null)
         {
             var channel = ToChannel(model);
-            (dataStore ?? Discord.DataStore).AddChannel(channel);
             (channels ?? _channels).TryAdd(model.Id);
             return channel;
         }
@@ -96,10 +95,9 @@ namespace Discord
         {
             return Discord.DataStore.GetChannel(id) as ICachedGuildChannel;
         }
-        public ICachedGuildChannel RemoveCachedChannel(ulong id, ConcurrentHashSet<ulong> channels = null, DataStore dataStore = null)
+        public void RemoveCachedChannel(ulong id, ConcurrentHashSet<ulong> channels = null)
         {
             (channels ?? _channels).TryRemove(id);
-            return (dataStore ?? Discord.DataStore).RemoveChannel(id) as ICachedGuildChannel;
         }
 
         public Presence AddCachedPresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
