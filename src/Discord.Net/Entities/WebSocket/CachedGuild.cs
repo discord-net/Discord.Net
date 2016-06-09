@@ -24,7 +24,7 @@ namespace Discord
         private ConcurrentDictionary<ulong, Presence> _presences;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
 
-        public bool Available { get; private set; } //TODO: Add to IGuild
+        public bool Available { get; private set; }
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
 
@@ -102,7 +102,7 @@ namespace Discord
             if (model.VoiceStates != null)
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
-                    AddOrUpdateCachedVoiceState(model.VoiceStates[i], _voiceStates);
+                    AddOrUpdateCachedVoiceState(model.VoiceStates[i], voiceStates);
             }
             _voiceStates = voiceStates;
         }

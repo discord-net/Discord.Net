@@ -18,6 +18,8 @@ namespace Discord
         string IconUrl { get; }
         /// <summary> Returns the url to this guild's splash image, or null if one is not set. </summary>
         string SplashUrl { get; }
+        /// <summary> Returns true if this guild is currently connected and ready to be used. Only applies to the WebSocket client. </summary>
+        bool Available { get; }
 
         /// <summary> Gets the id of the AFK voice channel for this guild if set, or null if not. </summary>
         ulong? AFKChannelId { get; }
@@ -90,7 +92,7 @@ namespace Discord
         Task<IGuildUser> GetUserAsync(ulong id);
         /// <summary> Gets the current user for this guild. </summary>
         Task<IGuildUser> GetCurrentUserAsync();
-        /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
+        /// <summary> Downloads all users for this guild if the current list is incomplete. Only applies to the WebSocket client. </summary>
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false);

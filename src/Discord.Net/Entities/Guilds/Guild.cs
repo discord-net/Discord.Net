@@ -303,6 +303,7 @@ namespace Discord
 
         private string DebuggerDisplay => $"{Name} ({Id})";
 
+        bool IGuild.Available => false;
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<Emoji> IGuild.Emojis => Emojis;
         IReadOnlyCollection<string> IGuild.Features => Features;
