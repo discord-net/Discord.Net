@@ -16,6 +16,8 @@ namespace Discord.Logging
             Name = name;
         }
 
+        public Task LogAsync(LogSeverity severity, Exception exception = null)
+            => _manager.LogAsync(severity, Name, exception);
         public Task LogAsync(LogSeverity severity, string message, Exception exception = null)
             => _manager.LogAsync(severity, Name, message, exception);
         public Task LogAsync(LogSeverity severity, FormattableString message, Exception exception = null)
