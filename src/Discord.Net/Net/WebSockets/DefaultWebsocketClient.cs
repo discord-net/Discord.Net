@@ -65,9 +65,17 @@ namespace Discord.Net.WebSockets
         {
             //Assume locked
             _cancelTokenSource.Cancel();
-
+            
             if (_client.State == WebSocketState.Open)
-                try { await _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None); } catch { }
+            {
+                try
+                {
+                    var task = _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                    if (task != null)
+                        await task.ConfigureAwait(false);
+                }
+                catch { }
+            }
             
             await (_task ?? Task.CompletedTask).ConfigureAwait(false);
         }
@@ -84,7 +92,7 @@ namespace Discord.Net.WebSockets
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
         {
-            await _sendLock.WaitAsync(_cancelToken);
+            await _sendLock.WaitAsync(_cancelToken).ConfigureAwait(false);
             try
             {
                 //TODO: If connection is temporarily down, retry?

@@ -115,7 +115,7 @@ namespace Discord
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             
-            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {(GatewayOpCode)opCode}");
+            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {(GatewayOpCode)opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
             GatewaySocket = config.WebSocketProvider();
 
@@ -415,15 +415,26 @@ namespace Discord
                                 case "GUILD_CREATE":
                                     {
                                         var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
-                                        var guild = new CachedGuild(this, data, DataStore);
-                                        DataStore.AddGuild(guild);
 
                                         if (data.Unavailable == false)
                                             type = "GUILD_AVAILABLE";
                                         await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
 
+                                        CachedGuild guild;
                                         if (data.Unavailable != false)
+                                        {
+                                            guild = new CachedGuild(this, data, DataStore);
+                                            DataStore.AddGuild(guild);
                                             await JoinedGuild.RaiseAsync(guild).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            guild = DataStore.GetGuild(data.Id);
+                                            if (guild != null)
+                                                guild.Update(data, UpdateSource.WebSocket);
+                                            else
+                                                await _gatewayLogger.WarningAsync($"{type} referenced an unknown guild.").ConfigureAwait(false);
+                                        }
 
                                         await GuildAvailable.RaiseAsync(guild).ConfigureAwait(false);
                                     }
@@ -481,12 +492,12 @@ namespace Discord
                                                 DataStore.AddChannel(channel);
                                             }
                                             else
-                                                await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.");
+                                                await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.").ConfigureAwait(false);
                                         }
                                         else
                                             channel = AddCachedDMChannel(data);
                                         if (channel != null)
-                                            await ChannelCreated.RaiseAsync(channel);
+                                            await ChannelCreated.RaiseAsync(channel).ConfigureAwait(false);
                                     }
                                     break;
                                 case "CHANNEL_UPDATE":
@@ -499,10 +510,10 @@ namespace Discord
                                         {
                                             var before = _enablePreUpdateEvents ? channel.Clone() : null;
                                             channel.Update(data, UpdateSource.WebSocket);
-                                            await ChannelUpdated.RaiseAsync(before, channel);
+                                            await ChannelUpdated.RaiseAsync(before, channel).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("CHANNEL_UPDATE referenced an unknown channel.");
+                                            await _gatewayLogger.WarningAsync("CHANNEL_UPDATE referenced an unknown channel.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "CHANNEL_DELETE":
@@ -512,9 +523,9 @@ namespace Discord
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                         var channel = RemoveCachedChannel(data.Id);
                                         if (channel != null)
-                                            await ChannelDestroyed.RaiseAsync(channel);
+                                            await ChannelDestroyed.RaiseAsync(channel).ConfigureAwait(false);
                                         else
-                                            await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown channel.");
+                                            await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown channel.").ConfigureAwait(false);
                                     }
                                     break;
 
@@ -531,7 +542,7 @@ namespace Discord
                                             await UserJoined.RaiseAsync(user).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_ADD referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_ADD referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_MEMBER_UPDATE":
@@ -547,13 +558,13 @@ namespace Discord
                                             {
                                                 var before = _enablePreUpdateEvents ? user.Clone() : null;
                                                 user.Update(data, UpdateSource.WebSocket);
-                                                await UserUpdated.RaiseAsync(before, user);
+                                                await UserUpdated.RaiseAsync(before, user).ConfigureAwait(false);
                                             }
                                             else
-                                                await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown user.");
+                                                await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown user.").ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_MEMBER_REMOVE":
@@ -568,13 +579,13 @@ namespace Discord
                                             if (user != null)
                                             {
                                                 user.User.RemoveRef();
-                                                await UserLeft.RaiseAsync(user);
+                                                await UserLeft.RaiseAsync(user).ConfigureAwait(false);
                                             }
                                             else
-                                                await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown user.");
+                                                await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown user.").ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_MEMBERS_CHUNK":
@@ -595,7 +606,7 @@ namespace Discord
                                             }
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_MEMBERS_CHUNK referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
 
@@ -612,7 +623,7 @@ namespace Discord
                                             await RoleCreated.RaiseAsync(role).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_CREATE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_CREATE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_ROLE_UPDATE":
@@ -631,10 +642,10 @@ namespace Discord
                                                 await RoleUpdated.RaiseAsync(before, role).ConfigureAwait(false);
                                             }
                                             else
-                                                await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown role.");
+                                                await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown role.").ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_ROLE_DELETE":
@@ -649,10 +660,10 @@ namespace Discord
                                             if (role != null)
                                                 await RoleDeleted.RaiseAsync(role).ConfigureAwait(false);
                                             else
-                                                await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.");
+                                                await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
 
@@ -664,9 +675,9 @@ namespace Discord
                                         var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
-                                            await UserBanned.RaiseAsync(new User(this, data));
+                                            await UserBanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "GUILD_BAN_REMOVE":
@@ -676,9 +687,9 @@ namespace Discord
                                         var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
-                                            await UserUnbanned.RaiseAsync(new User(this, data));
+                                            await UserUnbanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
                                         else
-                                            await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.");
+                                            await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
                                     }
                                     break;
 
@@ -696,13 +707,13 @@ namespace Discord
                                             if (author != null)
                                             {
                                                 var msg = channel.AddCachedMessage(author, data);
-                                                await MessageReceived.RaiseAsync(msg).ConfigureAwait(false);
+                                                await MessageReceived.RaiseAsync(msg).ConfigureAwait(false).ConfigureAwait(false);
                                             }
                                             else
-                                                await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown user.");
+                                                await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown user.").ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown channel.");
+                                            await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown channel.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "MESSAGE_UPDATE":
@@ -719,7 +730,7 @@ namespace Discord
                                             await MessageUpdated.RaiseAsync(before, msg).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.");
+                                            await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
                                     }
                                     break;
                                 case "MESSAGE_DELETE":
@@ -734,7 +745,7 @@ namespace Discord
                                             await MessageDeleted.RaiseAsync(msg).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.WarningAsync("MESSAGE_DELETE referenced an unknown channel.");
+                                            await _gatewayLogger.WarningAsync("MESSAGE_DELETE referenced an unknown channel.").ConfigureAwait(false);
                                     }
                                     break;
 
@@ -755,7 +766,7 @@ namespace Discord
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
                                             if (guild == null)
                                             {
-                                                await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.");
+                                                await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                                 break;
                                             }
                                             if (data.Status == UserStatus.Offline)
