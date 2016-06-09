@@ -30,7 +30,7 @@ namespace Discord
 
             var model = await Discord.ApiClient.GetCurrentUser().ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
-        }        
+        }
         public async Task Modify(Action<ModifyCurrentUserParams> func)
         {
             if (func != null) throw new NullReferenceException(nameof(func));

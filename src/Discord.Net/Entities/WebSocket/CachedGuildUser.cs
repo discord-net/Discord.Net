@@ -2,11 +2,21 @@
 
 namespace Discord
 {
-    internal class CachedGuildUser : GuildUser, ICachedEntity<ulong>
+    internal class CachedGuildUser : GuildUser, ICachedUser
     {
-        public VoiceChannel VoiceChannel { get; private set; }
-
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
+        public new CachedGuild Guild => base.Guild as CachedGuild;
+        public new CachedPublicUser User => base.User as CachedPublicUser;
+
+        public Presence? Presence => Guild.GetCachedPresence(Id);
+        public override Game? Game => Presence?.Game;
+        public override UserStatus Status => Presence?.Status ?? UserStatus.Offline;
+
+        public VoiceState? VoiceState => Guild.GetCachedVoiceState(Id);
+        public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
+        public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
+        public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
+        public CachedVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
 
         public CachedGuildUser(CachedGuild guild, CachedPublicUser user, Model model) 
             : base(guild, user, model)
@@ -14,5 +24,6 @@ namespace Discord
         }
 
         public CachedGuildUser Clone() => MemberwiseClone() as CachedGuildUser;
+        ICachedUser ICachedUser.Clone() => Clone();
     }
 }

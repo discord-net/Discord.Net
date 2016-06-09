@@ -4,8 +4,10 @@ namespace Discord.API
 {
     public class VoiceState
     {
+        [JsonProperty("guild_id")]
+        public ulong? GuildId { get; set; }
         [JsonProperty("channel_id")]
-        public ulong ChannelId { get; set; }
+        public ulong? ChannelId { get; set; }
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }
         [JsonProperty("session_id")]

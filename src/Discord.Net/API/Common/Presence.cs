@@ -6,6 +6,8 @@ namespace Discord.API
     {
         [JsonProperty("user")]
         public User User { get; set; }
+        [JsonProperty("guild_id")]
+        public ulong? GuildId { get; set; }
         [JsonProperty("status")]
         public UserStatus Status { get; set; }
         [JsonProperty("game")]

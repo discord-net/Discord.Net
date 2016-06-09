@@ -5,12 +5,12 @@ namespace Discord
 {
     internal interface ICachedMessageChannel : ICachedChannel, IMessageChannel
     {
-        IReadOnlyCollection<IUser> Members { get; }
+        IReadOnlyCollection<ICachedUser> Members { get; }
 
-        CachedMessage AddCachedMessage(IUser author, MessageModel model);
+        CachedMessage AddCachedMessage(ICachedUser author, MessageModel model);
         new CachedMessage GetCachedMessage(ulong id);
         CachedMessage RemoveCachedMessage(ulong id);
 
-        IUser GetCachedUser(ulong id);
+        ICachedUser GetCachedUser(ulong id);
     }
 }

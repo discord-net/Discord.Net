@@ -14,8 +14,8 @@ namespace Discord.API
         [JsonProperty("joined_at")]
         public DateTime?JoinedAt { get; set; }
         [JsonProperty("deaf")]
-        public bool Deaf { get; set; }
+        public bool? Deaf { get; set; }
         [JsonProperty("mute")]
-        public bool Mute { get; set; }
+        public bool? Mute { get; set; }
     }
 }

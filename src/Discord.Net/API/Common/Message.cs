@@ -27,7 +27,7 @@ namespace Discord.API
         public Attachment[] Attachments { get; set; }
         [JsonProperty("embeds")]
         public Embed[] Embeds { get; set; }
-        [JsonProperty("nonce")]
-        public uint? Nonce { get; set; }
+        /*[JsonProperty("nonce")]
+        public object Nonce { get; set; }*/
     }
 }

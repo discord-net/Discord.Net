@@ -17,9 +17,9 @@ namespace Discord
         public override DiscordClient Discord { get; }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
-        public virtual Game? Game => null;
         public string Mention => MentionUtils.Mention(this, false);
         public string NicknameMention => MentionUtils.Mention(this, true);
+        public virtual Game? Game => null;
         public virtual UserStatus Status => UserStatus.Unknown;
 
         public User(DiscordClient discord, Model model)

@@ -11,6 +11,8 @@ using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
 using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
+using RoleModel = Discord.API.Role;
+using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
@@ -20,9 +22,11 @@ namespace Discord
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, CachedGuildUser> _members;
         private ConcurrentDictionary<ulong, Presence> _presences;
-        private int _userCount;
+        private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
 
         public bool Available { get; private set; } //TODO: Add to IGuild
+        public int MemberCount { get; private set; }
+        public int DownloadedMemberCount { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
         public Task DownloaderPromise => _downloaderPromise.Task;
@@ -32,9 +36,10 @@ namespace Discord
         public IReadOnlyCollection<ICachedGuildChannel> Channels => _channels.Select(x => GetCachedChannel(x)).ToReadOnlyCollection(_channels);
         public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
 
-        public CachedGuild(DiscordSocketClient discord, Model model) : base(discord, model)
+        public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {
             _downloaderPromise = new TaskCompletionSource<bool>();
+            Update(model, UpdateSource.Creation, dataStore);
         }
 
         public void Update(ExtendedModel model, UpdateSource source, DataStore dataStore)
@@ -52,6 +57,8 @@ namespace Discord
                     _presences = new ConcurrentDictionary<ulong, Presence>();
                 if (_roles == null)
                     _roles = new ConcurrentDictionary<ulong, Role>();
+                if (_voiceStates == null)
+                    _voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
                 if (Emojis == null)
                     Emojis = ImmutableArray.Create<Emoji>();
                 if (Features == null)
@@ -61,7 +68,7 @@ namespace Discord
 
             base.Update(model as Model, source);
 
-            _userCount = model.MemberCount;
+            MemberCount = model.MemberCount;
 
             var channels = new ConcurrentHashSet<ulong>();
             if (model.Channels != null)
@@ -75,7 +82,7 @@ namespace Discord
             if (model.Presences != null)
             {
                 for (int i = 0; i < model.Presences.Length; i++)
-                    AddCachedPresence(model.Presences[i], presences);
+                    AddOrUpdateCachedPresence(model.Presences[i], presences);
             }
             _presences = presences;
 
@@ -85,10 +92,19 @@ namespace Discord
                 for (int i = 0; i < model.Members.Length; i++)
                     AddCachedUser(model.Members[i], members, dataStore);
                 _downloaderPromise = new TaskCompletionSource<bool>();
+                DownloadedMemberCount = model.Members.Length;
                 if (!model.Large)
                     _downloaderPromise.SetResult(true);
             }
             _members = members;
+
+            var voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
+            if (model.VoiceStates != null)
+            {
+                for (int i = 0; i < model.VoiceStates.Length; i++)
+                    AddOrUpdateCachedVoiceState(model.VoiceStates[i], _voiceStates);
+            }
+            _voiceStates = voiceStates;
         }
 
         public override Task<IGuildChannel> GetChannel(ulong id) => Task.FromResult<IGuildChannel>(GetCachedChannel(id));
@@ -108,7 +124,7 @@ namespace Discord
             (channels ?? _channels).TryRemove(id);
         }
 
-        public Presence AddCachedPresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
+        public Presence AddOrUpdateCachedPresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
         {
             var game = model.Game != null ? new Game(model.Game) : (Game?)null;
             var presence = new Presence(model.Status, game);
@@ -130,6 +146,42 @@ namespace Discord
             return null;
         }
 
+        public Role AddCachedRole(RoleModel model, ConcurrentDictionary<ulong, Role> roles = null)
+        {
+            var role = new Role(this, model);
+            (roles ?? _roles)[model.Id] = role;
+            return role;
+        }
+        public Role RemoveCachedRole(ulong id)
+        {
+            Role role;
+            if (_roles.TryRemove(id, out role))
+                return role;
+            return null;
+        }
+
+        public VoiceState AddOrUpdateCachedVoiceState(VoiceStateModel model, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
+        {
+            var voiceChannel = GetCachedChannel(model.ChannelId.Value) as CachedVoiceChannel;
+            var voiceState = new VoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
+            (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
+            return voiceState;
+        }
+        public VoiceState? GetCachedVoiceState(ulong id)
+        {
+            VoiceState voiceState;
+            if (_voiceStates.TryGetValue(id, out voiceState))
+                return voiceState;
+            return null;
+        }
+        public VoiceState? RemoveCachedVoiceState(ulong id)
+        {
+            VoiceState voiceState;
+            if (_voiceStates.TryRemove(id, out voiceState))
+                return voiceState;
+            return null;
+        }
+
         public override Task<IGuildUser> GetUser(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
         public override Task<IGuildUser> GetCurrentUser() 
             => Task.FromResult<IGuildUser>(CurrentUser);
@@ -140,10 +192,11 @@ namespace Discord
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.OrderBy(x => x.Id).Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser AddCachedUser(MemberModel model, ConcurrentDictionary<ulong, CachedGuildUser> members = null, DataStore dataStore = null)
         {
-            var user = Discord.AddCachedUser(model.User);
+            var user = Discord.GetOrAddCachedUser(model.User);
             var member = new CachedGuildUser(this, user, model);
             (members ?? _members)[user.Id] = member;
             user.AddRef();
+            DownloadedMemberCount++;
             return member;
         }
         public CachedGuildUser GetCachedUser(ulong id)
@@ -160,7 +213,6 @@ namespace Discord
                 return member;
             return null;
         }
-
         public async Task DownloadMembers()
         {
             if (!HasAllMembers)
@@ -169,7 +221,7 @@ namespace Discord
         }
         public void CompleteDownloadMembers()
         {
-            _downloaderPromise.SetResult(true);
+            _downloaderPromise.TrySetResult(true);
         }
 
         public CachedGuild Clone() => MemberwiseClone() as CachedGuild;

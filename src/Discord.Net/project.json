@@ -15,6 +15,7 @@
 
   "buildOptions": {
     "allowUnsafe": true,
+    "define": [ "BENCHMARK" ],
     "warningsAsErrors": false
   },
 

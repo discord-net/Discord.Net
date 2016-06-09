@@ -41,6 +41,9 @@ namespace Discord
 
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly Logger _gatewayLogger;
+#if BENCHMARK
+        private readonly Logger _benchmarkLogger;
+#endif
         private readonly DataStoreProvider _dataStoreProvider;
         private readonly JsonSerializer _serializer;
         private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
@@ -106,7 +109,10 @@ namespace Discord
             _largeThreshold = config.LargeThreshold;
             
             _gatewayLogger = _log.CreateLogger("Gateway");
-            
+#if BENCHMARK
+            _benchmarkLogger = _log.CreateLogger("Benchmark");
+#endif
+
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.Debug($"Sent {(GatewayOpCode)opCode}");
@@ -207,7 +213,7 @@ namespace Discord
         {
             dataStore = dataStore ?? DataStore;
 
-            var guild = new CachedGuild(this, model);
+            var guild = new CachedGuild(this, model, dataStore);
             if (model.Unavailable != true)
             {
                 for (int i = 0; i < model.Channels.Length; i++)
@@ -247,7 +253,7 @@ namespace Discord
         {
             dataStore = dataStore ?? DataStore;
 
-            var recipient = AddCachedUser(model.Recipient, dataStore);
+            var recipient = GetOrAddCachedUser(model.Recipient, dataStore);
             var channel = recipient.AddDMChannel(model);
             dataStore.AddChannel(channel);
             return channel;
@@ -287,7 +293,7 @@ namespace Discord
         {
             return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
         }
-        internal CachedPublicUser AddCachedUser(API.User model, DataStore dataStore = null)
+        internal CachedPublicUser GetOrAddCachedUser(API.User model, DataStore dataStore = null)
         {
             dataStore = dataStore ?? DataStore;
 
@@ -299,8 +305,7 @@ namespace Discord
         {
             dataStore = dataStore ?? DataStore;
 
-            var user = dataStore.GetUser(id);
-            user.RemoveRef();
+            var user = dataStore.RemoveUser(id);
             return user;
         }
 
@@ -336,7 +341,7 @@ namespace Discord
                     batchTasks[j] = guild.DownloaderPromise;
                 }
 
-                ApiClient.SendRequestMembers(batchIds);
+                await ApiClient.SendRequestMembers(batchIds).ConfigureAwait(false);
 
                 if (isLast && batchCount > 1)
                     await Task.WhenAll(batchTasks.Take(count)).ConfigureAwait(false);
@@ -347,474 +352,511 @@ namespace Discord
 
         private async Task ProcessMessage(GatewayOpCode opCode, int? seq, string type, object payload)
         {
-            if (seq != null)
-                _lastSeq = seq.Value;
+#if BENCHMARK
+            Stopwatch stopwatch = Stopwatch.StartNew();
             try
             {
-                switch (opCode)
+#endif
+                if (seq != null)
+                    _lastSeq = seq.Value;
+                try
                 {
-                    case GatewayOpCode.Hello:
-                        {
-                            var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
+                    switch (opCode)
+                    {
+                        case GatewayOpCode.Hello:
+                            {
+                                await _gatewayLogger.Debug($"Received Hello").ConfigureAwait(false);
+                                var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
-                            await ApiClient.SendIdentify().ConfigureAwait(false);
-                            _heartbeatTask = RunHeartbeat(data.HeartbeatInterval, _heartbeatCancelToken.Token);
-                        }
-                        break;
-                    case GatewayOpCode.HeartbeatAck:
-                        {
-                            var latency = (int)(Environment.TickCount - _heartbeatTime);
-                            await _gatewayLogger.Debug($"Latency: {latency} ms").ConfigureAwait(false);
-                            Latency = latency;
+                                await ApiClient.SendIdentify().ConfigureAwait(false);
+                                _heartbeatTask = RunHeartbeat(data.HeartbeatInterval, _heartbeatCancelToken.Token);
+                            }
+                            break;
+                        case GatewayOpCode.HeartbeatAck:
+                            {
+                                await _gatewayLogger.Debug($"Received HeartbeatAck").ConfigureAwait(false);
 
-                            await LatencyUpdated.Raise(latency).ConfigureAwait(false);
-                        }
-                        break;
-                    case GatewayOpCode.Dispatch:
-                        switch (type)
-                        {
-                            //Global
-                            case "READY":
-                                {
-                                    //TODO: Make downloading large guilds optional
-                                    var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
+                                var latency = (int)(Environment.TickCount - _heartbeatTime);
+                                await _gatewayLogger.Debug($"Latency = {latency} ms").ConfigureAwait(false);
+                                Latency = latency;
 
-                                    _currentUser = new CachedSelfUser(this, data.User);
-
-                                    for (int i = 0; i < data.Guilds.Length; i++)
-                                        AddCachedGuild(data.Guilds[i], dataStore);
-                                    for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddCachedDMChannel(data.PrivateChannels[i], dataStore);
-
-                                    _sessionId = data.SessionId;
-                                    DataStore = dataStore;
-
-                                    await Ready.Raise().ConfigureAwait(false);
-
-                                    _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
-                                }
-                                break;
-
-                            //Guilds
-                            case "GUILD_CREATE":
-                                {
-                                    var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
-                                    var guild = new CachedGuild(this, data);
-                                    DataStore.AddGuild(guild);
-
-                                    if (data.Unavailable == false)
-                                        type = "GUILD_AVAILABLE";
-                                    else
-                                        await JoinedGuild.Raise(guild).ConfigureAwait(false);
-                                    
-                                    await GuildAvailable.Raise(guild);
-                                }
-                                break;
-                            case "GUILD_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Guild>(_serializer);
-                                    var guild = DataStore.GetGuild(data.Id);
-                                    if (guild != null)
+                                await LatencyUpdated.Raise(latency).ConfigureAwait(false);
+                            }
+                            break;
+                        case GatewayOpCode.Dispatch:
+                            switch (type)
+                            {
+                                //Global
+                                case "READY":
                                     {
-                                        var before = _enablePreUpdateEvents ? guild.Clone() : null;
-                                        guild.Update(data, UpdateSource.WebSocket);
-                                        await GuildUpdated.Raise(before, guild);
+                                        await _gatewayLogger.Debug($"Received Dispatch (READY)").ConfigureAwait(false);
+
+                                        //TODO: Make downloading large guilds optional
+                                        var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                                        var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
+
+                                        _currentUser = new CachedSelfUser(this, data.User);
+
+                                        for (int i = 0; i < data.Guilds.Length; i++)
+                                            AddCachedGuild(data.Guilds[i], dataStore);
+                                        for (int i = 0; i < data.PrivateChannels.Length; i++)
+                                            AddCachedDMChannel(data.PrivateChannels[i], dataStore);
+
+                                        _sessionId = data.SessionId;
+                                        DataStore = dataStore;
+
+                                        await Ready.Raise().ConfigureAwait(false);
+
+                                        _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_UPDATE referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_DELETE":
-                                {
-                                    var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
-                                    var guild = DataStore.RemoveGuild(data.Id);
-                                    if (guild != null)
-                                    {
-                                        if (data.Unavailable == true)
-                                            type = "GUILD_UNAVAILABLE";
+                                    break;
 
-                                        await GuildUnavailable.Raise(guild);
-                                        if (data.Unavailable != true)
-                                            await LeftGuild.Raise(guild);
+                                //Guilds
+                                case "GUILD_CREATE":
+                                    {
+                                        var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
+                                        var guild = new CachedGuild(this, data, DataStore);
+                                        DataStore.AddGuild(guild);
+
+                                        if (data.Unavailable == false)
+                                            type = "GUILD_AVAILABLE";
+                                        await _gatewayLogger.Debug($"Received Dispatch ({type})").ConfigureAwait(false);
+
+                                        if (data.Unavailable != false)
+                                            await JoinedGuild.Raise(guild).ConfigureAwait(false);
+
+                                        await GuildAvailable.Raise(guild).ConfigureAwait(false);
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_DELETE referenced an unknown guild.");
-                                }
-                                break;
-
-                            //Channels
-                            case "CHANNEL_CREATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-
-                                    ICachedChannel channel = null;
-                                    if (data.GuildId != null)
+                                    break;
+                                case "GUILD_UPDATE":
                                     {
-                                        var guild = DataStore.GetGuild(data.GuildId.Value);
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Guild>(_serializer);
+                                        var guild = DataStore.GetGuild(data.Id);
                                         if (guild != null)
                                         {
-                                            channel = guild.AddCachedChannel(data);
-                                            DataStore.AddChannel(channel);
+                                            var before = _enablePreUpdateEvents ? guild.Clone() : null;
+                                            guild.Update(data, UpdateSource.WebSocket);
+                                            await GuildUpdated.Raise(before, guild).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.Warning("CHANNEL_CREATE referenced an unknown guild.");
+                                            await _gatewayLogger.Warning("GUILD_UPDATE referenced an unknown guild.");
                                     }
-                                    else
-                                        channel = AddCachedDMChannel(data);
-                                    if (channel != null)
-                                        await ChannelCreated.Raise(channel);
-                                }
-                                break;
-                            case "CHANNEL_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    var channel = DataStore.GetChannel(data.Id);
-                                    if (channel != null)
+                                    break;
+                                case "GUILD_DELETE":
                                     {
-                                        var before = _enablePreUpdateEvents ? channel.Clone() : null;
-                                        channel.Update(data, UpdateSource.WebSocket);
-                                        await ChannelUpdated.Raise(before, channel);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("CHANNEL_UPDATE referenced an unknown channel.");
-                                }
-                                break;
-                            case "CHANNEL_DELETE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    var channel = RemoveCachedChannel(data.Id);
-                                    if (channel != null)
-                                        await ChannelDestroyed.Raise(channel);
-                                    else
-                                        await _gatewayLogger.Warning("CHANNEL_DELETE referenced an unknown channel.");
-                                }
-                                break;
+                                        var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
+                                        if (data.Unavailable == true)
+                                            type = "GUILD_UNAVAILABLE";
+                                        await _gatewayLogger.Debug($"Received Dispatch ({type})").ConfigureAwait(false);
 
-                            //Members
-                            /*case "GUILD_MEMBER_ADD":
-                                {
-                                    var data = (payload as JToken).ToObject<API.GuildMember>(_serializer);
-                                    var guild = GetGuild(data.GuildId.Value);
-                                    if (guild != null)
-                                    {
-                                        var user = guild.AddCachedUser(data.User.Id, true, true);
-                                        user.Update(data);
-                                        user.UpdateActivity();
-                                        UserJoined.Raise(user);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_MEMBER_ADD referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_MEMBER_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.GuildMember>(_serializer);
-                                    var guild = GetGuild(data.GuildId.Value);
-                                    if (guild != null)
-                                    {
-                                        var user = guild.GetCachedUser(data.User.Id);
-                                        if (user != null)
+                                        var guild = DataStore.RemoveGuild(data.Id);
+                                        if (guild != null)
                                         {
-                                            var before = _enablePreUpdateEvents ? user.Clone() : null;
-                                            user.Update(data);
-                                            await UserUpdated.Raise(before, user);
+                                            await GuildUnavailable.Raise(guild).ConfigureAwait(false);
+                                            if (data.Unavailable != true)
+                                                await LeftGuild.Raise(guild).ConfigureAwait(false);
+                                            foreach (var member in guild.Members)
+                                                member.User.RemoveRef();
                                         }
                                         else
-                                            await _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
+                                            await _gatewayLogger.Warning($"{type} referenced an unknown guild.").ConfigureAwait(false);
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_MEMBER_REMOVE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.GuildMember>(_serializer);
-                                    var guild = GetGuild(data.GuildId.Value);
-                                    if (guild != null)
+                                    break;
+
+                                //Channels
+                                case "CHANNEL_CREATE":
                                     {
-                                        var user = guild.RemoveCachedUser(data.User.Id);
-                                        if (user != null)
+                                        await _gatewayLogger.Debug($"Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Channel>(_serializer);
+                                        ICachedChannel channel = null;
+                                        if (data.GuildId != null)
                                         {
-                                            user.GlobalUser.RemoveGuild();
-                                            if (user.GuildCount == 0 && user.DMChannel == null)
-                                                DataStore.RemoveUser(user.Id);
-                                            await UserLeft.Raise(user);
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild != null)
+                                            {
+                                                channel = guild.AddCachedChannel(data);
+                                                DataStore.AddChannel(channel);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("CHANNEL_CREATE referenced an unknown guild.");
                                         }
                                         else
-                                            await _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown user.");
+                                            channel = AddCachedDMChannel(data);
+                                        if (channel != null)
+                                            await ChannelCreated.Raise(channel);
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_MEMBERS_CHUNK":
-                                {
-                                    var data = (payload as JToken).ToObject<GuildMembersChunkEvent>(_serializer);
-                                    var guild = GetCachedGuild(data.GuildId);
-                                    if (guild != null)
+                                    break;
+                                case "CHANNEL_UPDATE":
                                     {
-                                        foreach (var memberData in data.Members)
-                                        {
-                                            var user = guild.AddCachedUser(memberData.User.Id, true, false);
-                                            user.Update(memberData);
-                                        }
+                                        await _gatewayLogger.Debug($"Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
 
-                                        if (guild.CurrentUserCount >= guild.UserCount) //Finished downloading for there
-                                            await GuildAvailable.Raise(guild);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
-                                }
-                                break;
-
-                            //Roles
-                            /*case "GUILD_ROLE_CREATE":
-                                {
-                                    var data = (payload as JToken).ToObject<GuildRoleCreateEvent>(_serializer);
-                                    var guild = GetCachedGuild(data.GuildId);
-                                    if (guild != null)
-                                    {
-                                        var role = guild.AddCachedRole(data.Data.Id);
-                                        role.Update(data.Data, false);
-                                        RoleCreated.Raise(role);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_ROLE_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<GuildRoleUpdateEvent>(_serializer);
-                                    var guild = GetCachedGuild(data.GuildId);
-                                    if (guild != null)
-                                    {
-                                        var role = guild.GetRole(data.Data.Id);
-                                        if (role != null)
+                                        var data = (payload as JToken).ToObject<API.Channel>(_serializer);
+                                        var channel = DataStore.GetChannel(data.Id);
+                                        if (channel != null)
                                         {
-                                            var before = _enablePreUpdateEvents ? role.Clone() : null;
-                                            role.Update(data.Data, true);
-                                            RoleUpdated.Raise(before, role);
+                                            var before = _enablePreUpdateEvents ? channel.Clone() : null;
+                                            channel.Update(data, UpdateSource.WebSocket);
+                                            await ChannelUpdated.Raise(before, channel);
                                         }
                                         else
-                                            await _gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
+                                            await _gatewayLogger.Warning("CHANNEL_UPDATE referenced an unknown channel.");
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_ROLE_DELETE":
-                                {
-                                    var data = (payload as JToken).ToObject<GuildRoleDeleteEvent>(_serializer);
-                                    var guild = DataStore.GetGuild(data.GuildId);
-                                    if (guild != null)
+                                    break;
+                                case "CHANNEL_DELETE":
                                     {
-                                        var role = guild.RemoveRole(data.RoleId);
-                                        if (role != null)
-                                            RoleDeleted.Raise(role);
+                                        await _gatewayLogger.Debug($"Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Channel>(_serializer);
+                                        var channel = RemoveCachedChannel(data.Id);
+                                        if (channel != null)
+                                            await ChannelDestroyed.Raise(channel);
                                         else
-                                            await _gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown role.");
+                                            await _gatewayLogger.Warning("CHANNEL_DELETE referenced an unknown channel.");
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown guild.");
-                                }
-                                break;
+                                    break;
 
-                            //Bans
-                            case "GUILD_BAN_ADD":
-                                {
-                                    var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
-                                    var guild = GetCachedGuild(data.GuildId);
-                                    if (guild != null)
-                                        await UserBanned.Raise(new User(this, data));
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown guild.");
-                                }
-                                break;
-                            case "GUILD_BAN_REMOVE":
-                                {
-                                    var data = payload.ToObject<GuildBanEvent>(_serializer);
-                                    var guild = GetCachedGuild(data.GuildId);
-                                    if (guild != null)
-                                        await UserUnbanned.Raise(new User(this, data));
-                                    else
-                                        await _gatewayLogger.Warning("GUILD_BAN_REMOVE referenced an unknown guild.");
-                                }
-                                break;
-
-                            //Messages
-                            case "MESSAGE_CREATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId);
-                                    if (channel != null)
+                                //Members
+                                case "GUILD_MEMBER_ADD":
                                     {
-                                        var user = channel.GetUser(data.Author.Id);
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_MEMBER_ADD)").ConfigureAwait(false);
 
-                                        if (user != null)
+                                        var data = (payload as JToken).ToObject<GuildMemberAddEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
                                         {
-                                            bool isAuthor = data.Author.Id == CurrentUser.Id;
-                                            var msg = channel.AddMessage(data.Id, user, data.Timestamp.Value);
-
-                                            msg.Update(data);
-
-                                            MessageReceived.Raise(msg);
+                                            var user = guild.AddCachedUser(data);
+                                            await UserJoined.Raise(user).ConfigureAwait(false);
                                         }
                                         else
-                                            await _gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown user.");
+                                            await _gatewayLogger.Warning("GUILD_MEMBER_ADD referenced an unknown guild.");
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown channel.");
-                                }
-                                break;
-                            case "MESSAGE_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = GetCachedChannel(data.ChannelId);
-                                    if (channel != null)
+                                    break;
+                                case "GUILD_MEMBER_UPDATE":
                                     {
-                                        var msg = channel.GetMessage(data.Id, data.Author?.Id);
-                                        var before = _enablePreUpdateEvents ? msg.Clone() : null;
-                                        msg.Update(data);
-                                        MessageUpdated.Raise(before, msg);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
-                                }
-                                break;
-                            case "MESSAGE_DELETE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = GetCachedChannel(data.ChannelId);
-                                    if (channel != null)
-                                    {
-                                        var msg = channel.RemoveMessage(data.Id);
-                                        MessageDeleted.Raise(msg);
-                                    }
-                                    else
-                                        await _gatewayLogger.Warning("MESSAGE_DELETE referenced an unknown channel.");
-                                }
-                                break;
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
 
-                            //Statuses
-                            case "PRESENCE_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.Presence>(_serializer);
-                                    User user;
-                                    Guild guild;
-                                    if (data.GuildId == null)
-                                    {
-                                        guild = null;
-                                        user = GetPrivateChannel(data.User.Id)?.Recipient;
-                                    }
-                                    else
-                                    {
-                                        guild = GetGuild(data.GuildId.Value);
-                                        if (guild == null)
+                                        var data = (payload as JToken).ToObject<GuildMemberUpdateEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
                                         {
-                                            await _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown guild.");
-                                            break;
+                                            var user = guild.GetCachedUser(data.User.Id);
+                                            if (user != null)
+                                            {
+                                                var before = _enablePreUpdateEvents ? user.Clone() : null;
+                                                user.Update(data, UpdateSource.WebSocket);
+                                                await UserUpdated.Raise(before, user);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown user.");
                                         }
                                         else
-                                            user = guild.GetUser(data.User.Id);
+                                            await _gatewayLogger.Warning("GUILD_MEMBER_UPDATE referenced an unknown guild.");
                                     }
+                                    break;
+                                case "GUILD_MEMBER_REMOVE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
 
-                                    if (user != null)
-                                    {
-                                        var before = _enablePreUpdateEvents ? user.Clone() : null;
-                                        user.Update(data);
-                                        UserUpdated.Raise(before, user);
-                                    }
-                                    else
-                                    {
-                                        //Occurs when a user leaves a guild
-                                        //await _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown user.");
-                                    }
-                                }
-                                break;
-                            case "TYPING_START":
-                                {
-                                    var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
-                                    var channel = GetCachedChannel(data.ChannelId);
-                                    if (channel != null)
-                                    {
-                                        var user = channel.GetUser(data.UserId);
-                                        if (user != null)
+                                        var data = (payload as JToken).ToObject<GuildMemberRemoveEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
                                         {
-                                            await UserIsTyping.Raise(channel, user);
-                                            user.UpdateActivity();
+                                            var user = guild.RemoveCachedUser(data.User.Id);
+                                            if (user != null)
+                                            {
+                                                user.User.RemoveRef();
+                                                await UserLeft.Raise(user);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown user.");
                                         }
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_MEMBER_REMOVE referenced an unknown guild.");
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("TYPING_START referenced an unknown channel.");
-                                }
-                                break;
-
-                            //Voice
-                            case "VOICE_STATE_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
-                                    var guild = GetGuild(data.GuildId);
-                                    if (guild != null)
+                                    break;
+                                case "GUILD_MEMBERS_CHUNK":
                                     {
-                                        var user = guild.GetUser(data.UserId);
-                                        if (user != null)
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildMembersChunkEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
                                         {
-                                            var before = _enablePreUpdateEvents ? user.Clone() : null;
-                                            user.Update(data);
-                                            UserUpdated.Raise(before, user);
+                                            foreach (var memberModel in data.Members)
+                                                guild.AddCachedUser(memberModel);
+
+                                            if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
+                                            {
+                                                guild.CompleteDownloadMembers();
+                                                await GuildDownloadedMembers.Raise(guild).ConfigureAwait(false);
+                                            }
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_MEMBERS_CHUNK referenced an unknown guild.");
+                                    }
+                                    break;
+
+                                //Roles
+                                case "GUILD_ROLE_CREATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_ROLE_CREATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildRoleCreateEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
+                                        {
+                                            var role = guild.AddCachedRole(data.Role);
+                                            await RoleCreated.Raise(role).ConfigureAwait(false);
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_ROLE_CREATE referenced an unknown guild.");
+                                    }
+                                    break;
+                                case "GUILD_ROLE_UPDATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildRoleUpdateEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
+                                        {
+                                            var role = guild.GetRole(data.Role.Id);
+                                            if (role != null)
+                                            {
+                                                var before = _enablePreUpdateEvents ? role.Clone() : null;
+                                                role.Update(data.Role, UpdateSource.WebSocket);
+                                                await RoleUpdated.Raise(before, role).ConfigureAwait(false);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown role.");
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_ROLE_UPDATE referenced an unknown guild.");
+                                    }
+                                    break;
+                                case "GUILD_ROLE_DELETE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildRoleDeleteEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
+                                        {
+                                            var role = guild.RemoveCachedRole(data.RoleId);
+                                            if (role != null)
+                                                await RoleDeleted.Raise(role).ConfigureAwait(false);
+                                            else
+                                                await _gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown role.");
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_ROLE_DELETE referenced an unknown guild.");
+                                    }
+                                    break;
+
+                                //Bans
+                                case "GUILD_BAN_ADD":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_BAN_ADD)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
+                                            await UserBanned.Raise(new User(this, data));
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_BAN_ADD referenced an unknown guild.");
+                                    }
+                                    break;
+                                case "GUILD_BAN_REMOVE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
+                                        var guild = DataStore.GetGuild(data.GuildId);
+                                        if (guild != null)
+                                            await UserUnbanned.Raise(new User(this, data));
+                                        else
+                                            await _gatewayLogger.Warning("GUILD_BAN_REMOVE referenced an unknown guild.");
+                                    }
+                                    break;
+
+                                //Messages
+                                case "MESSAGE_CREATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Message>(_serializer);
+                                        var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                        if (channel != null)
+                                        {
+                                            var author = channel.GetCachedUser(data.Author.Id);
+
+                                            if (author != null)
+                                            {
+                                                var msg = channel.AddCachedMessage(author, data);
+                                                await MessageReceived.Raise(msg).ConfigureAwait(false);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown user.");
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("MESSAGE_CREATE referenced an unknown channel.");
+                                    }
+                                    break;
+                                case "MESSAGE_UPDATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Message>(_serializer);
+                                        var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                        if (channel != null)
+                                        {
+                                            var msg = channel.GetCachedMessage(data.Id);
+                                            var before = _enablePreUpdateEvents ? msg.Clone() : null;
+                                            msg.Update(data, UpdateSource.WebSocket);
+                                            await MessageUpdated.Raise(before, msg).ConfigureAwait(false);
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("MESSAGE_UPDATE referenced an unknown channel.");
+                                    }
+                                    break;
+                                case "MESSAGE_DELETE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Message>(_serializer);
+                                        var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                        if (channel != null)
+                                        {
+                                            var msg = channel.RemoveCachedMessage(data.Id);
+                                            await MessageDeleted.Raise(msg).ConfigureAwait(false);
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("MESSAGE_DELETE referenced an unknown channel.");
+                                    }
+                                    break;
+
+                                //Statuses
+                                case "PRESENCE_UPDATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.Presence>(_serializer);
+                                        if (data.GuildId == null)
+                                        {
+                                            var user = DataStore.GetUser(data.User.Id);
+                                            if (user == null)
+                                                user.Update(data, UpdateSource.WebSocket);
                                         }
                                         else
                                         {
-                                            //Occurs when a user leaves a guild
-                                            //await _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild == null)
+                                            {
+                                                await _gatewayLogger.Warning("PRESENCE_UPDATE referenced an unknown guild.");
+                                                break;
+                                            }
+                                            if (data.Status == UserStatus.Offline)
+                                                guild.RemoveCachedPresence(data.User.Id);
+                                            else
+                                                guild.AddOrUpdateCachedPresence(data);
                                         }
                                     }
-                                    else
-                                        await _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown guild.");
-                                }
-                                break;
-
-                            //Settings
-                            case "USER_UPDATE":
-                                {
-                                    var data = (payload as JToken).ToObject<SelfUser>(_serializer);
-                                    if (data.Id == CurrentUser.Id)
+                                    break;
+                                case "TYPING_START":
                                     {
-                                        var before = _enablePreUpdateEvents ? CurrentUser.Clone() : null;
-                                        CurrentUser.Update(data);
-                                        await CurrentUserUpdated.Raise(before, CurrentUser).ConfigureAwait(false);
+                                        await _gatewayLogger.Debug($"Received Dispatch (TYPING_START)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
+                                        var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                        if (channel != null)
+                                        {
+                                            var user = channel.GetCachedUser(data.UserId);
+                                            if (user != null)
+                                                await UserIsTyping.Raise(channel, user).ConfigureAwait(false);
+                                        }
+                                        else
+                                            await _gatewayLogger.Warning("TYPING_START referenced an unknown channel.").ConfigureAwait(false);
                                     }
-                                }
-                                break;*/
+                                    break;
 
-                            //Ignored
-                            case "USER_SETTINGS_UPDATE":
-                            case "MESSAGE_ACK": //TODO: Add (User only)
-                            case "GUILD_EMOJIS_UPDATE": //TODO: Add
-                            case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
-                            case "VOICE_SERVER_UPDATE": //TODO: Add
-                            case "RESUMED": //TODO: Add
-                                await _gatewayLogger.Debug($"Ignored Dispatch ({type})").ConfigureAwait(false);
-                                return;
+                                //Voice
+                                case "VOICE_STATE_UPDATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
 
-                            //Others
-                            default:
-                                await _gatewayLogger.Warning($"Unknown Dispatch ({type})").ConfigureAwait(false);
-                                return;
-                        }
-                        break;
-                    default:
-                        await _gatewayLogger.Warning($"Unknown OpCode ({opCode})").ConfigureAwait(false);
-                        return;
+                                        var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
+                                        if (data.GuildId.HasValue)
+                                        {
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild != null)
+                                            {
+                                                if (data.ChannelId == null)
+                                                    guild.RemoveCachedVoiceState(data.UserId);
+                                                else
+                                                    guild.AddOrUpdateCachedVoiceState(data);
+
+                                                var user = guild.GetCachedUser(data.UserId);
+                                                user.Update(data, UpdateSource.WebSocket);
+                                            }
+                                            else
+                                                await _gatewayLogger.Warning("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        }
+                                    }
+                                    break;
+
+                                //Settings
+                                case "USER_UPDATE":
+                                    {
+                                        await _gatewayLogger.Debug($"Received Dispatch (USER_UPDATE)").ConfigureAwait(false);
+
+                                        var data = (payload as JToken).ToObject<API.User>(_serializer);
+                                        if (data.Id == CurrentUser.Id)
+                                        {
+                                            var before = _enablePreUpdateEvents ? CurrentUser.Clone() : null;
+                                            CurrentUser.Update(data, UpdateSource.WebSocket);
+                                            await CurrentUserUpdated.Raise(before, CurrentUser).ConfigureAwait(false);
+                                        }
+                                    }
+                                    break;
+
+                                //Ignored
+                                case "USER_SETTINGS_UPDATE":
+                                case "MESSAGE_ACK": //TODO: Add (User only)
+                                case "GUILD_EMOJIS_UPDATE": //TODO: Add
+                                case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
+                                case "VOICE_SERVER_UPDATE": //TODO: Add
+                                case "RESUMED": //TODO: Add
+                                    await _gatewayLogger.Debug($"Ignored Dispatch ({type})").ConfigureAwait(false);
+                                    return;
+
+                                //Others
+                                default:
+                                    await _gatewayLogger.Warning($"Unknown Dispatch ({type})").ConfigureAwait(false);
+                                    return;
+                            }
+                            break;
+                        default:
+                            await _gatewayLogger.Warning($"Unknown OpCode ({opCode})").ConfigureAwait(false);
+                            return;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    await _gatewayLogger.Error($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
+                    return;
+                }
+#if BENCHMARK
             }
-            catch (Exception ex)
+            finally
             {
-                await _gatewayLogger.Error($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                return;
+                stopwatch.Stop();
+                double millis = Math.Round(stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
+                await _benchmarkLogger.Debug($"{millis} ms").ConfigureAwait(false);
             }
-            await _gatewayLogger.Debug($"Received {opCode}{(type != null ? $" ({type})" : "")}").ConfigureAwait(false);
+#endif
         }
         private async Task RunHeartbeat(int intervalMillis, CancellationToken cancelToken)
         {

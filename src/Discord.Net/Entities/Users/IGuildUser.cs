@@ -6,7 +6,7 @@ using Discord.API.Rest;
 namespace Discord
 {
     /// <summary> A Guild-User pairing. </summary>
-    public interface IGuildUser : IUpdateable, IUser
+    public interface IGuildUser : IUpdateable, IUser, IVoiceState
     {
         /// <summary> Returns true if the guild has deafened this user. </summary>
         bool IsDeaf { get; }
@@ -23,8 +23,6 @@ namespace Discord
         IGuild Guild { get; }
         /// <summary> Returns a collection of the roles this user is a member of in this guild, including the guild's @everyone role. </summary>
         IReadOnlyCollection<IRole> Roles { get; }
-        /// <summary> Gets the voice channel this user is currently in, if any. </summary>
-        IVoiceChannel VoiceChannel { get; }
 
         /// <summary> Gets the channel-level permissions granted to this user for a given channel. </summary>
         ChannelPermissions GetPermissions(IGuildChannel channel);

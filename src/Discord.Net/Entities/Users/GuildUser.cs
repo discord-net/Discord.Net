@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
+using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
@@ -24,12 +25,12 @@ namespace Discord
         public string AvatarUrl => User.AvatarUrl;
         public DateTime CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
-        public Game? Game => User.Game;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => User.Mention;
-        public UserStatus Status => User.Status;
         public string Username => User.Username;
+        public virtual UserStatus Status => User.Status;
+        public virtual Game? Game => User.Game;
 
         public DiscordClient Discord => Guild.Discord;
 
@@ -43,8 +44,10 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            IsDeaf = model.Deaf;
-            IsMute = model.Mute;
+            if (model.Deaf.HasValue)
+                IsDeaf = model.Deaf.Value;
+            if (model.Mute.HasValue)
+                IsMute = model.Mute.Value;
             JoinedAt = model.JoinedAt.Value;
             Nickname = model.Nick;
 
@@ -55,6 +58,13 @@ namespace Discord
             Roles = roles.ToImmutable();
 
             GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
+        }
+        public void Update(VoiceStateModel model, UpdateSource source)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
+            IsDeaf = model.Deaf;
+            IsMute = model.Mute;
         }
 
         public async Task Update()
@@ -107,6 +117,10 @@ namespace Discord
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyCollection<IRole> IGuildUser.Roles => Roles;
-        IVoiceChannel IGuildUser.VoiceChannel => null;
+        bool IVoiceState.IsSelfDeafened => false;
+        bool IVoiceState.IsSelfMuted => false;
+        bool IVoiceState.IsSuppressed => false;
+        IVoiceChannel IVoiceState.VoiceChannel => null;
+        string IVoiceState.VoiceSessionId => null;
     }
 }

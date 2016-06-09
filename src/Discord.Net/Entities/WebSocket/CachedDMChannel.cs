@@ -13,7 +13,7 @@ namespace Discord
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedPublicUser Recipient => base.Recipient as CachedPublicUser;
-        public IReadOnlyCollection<IUser> Members => ImmutableArray.Create<IUser>(Discord.CurrentUser, Recipient);
+        public IReadOnlyCollection<ICachedUser> Members => ImmutableArray.Create<ICachedUser>(Discord.CurrentUser, Recipient);
 
         public CachedDMChannel(DiscordSocketClient discord, CachedPublicUser recipient, Model model)
             : base(discord, recipient, model)
@@ -21,11 +21,11 @@ namespace Discord
             _messages = new MessageCache(Discord, this);
         }
 
-        public override Task<IUser> GetUser(ulong id) => Task.FromResult(GetCachedUser(id));
-        public override Task<IReadOnlyCollection<IUser>> GetUsers() => Task.FromResult(Members);
+        public override Task<IUser> GetUser(ulong id) => Task.FromResult<IUser>(GetCachedUser(id));
+        public override Task<IReadOnlyCollection<IUser>> GetUsers() => Task.FromResult<IReadOnlyCollection<IUser>>(Members);
         public override Task<IReadOnlyCollection<IUser>> GetUsers(int limit, int offset) 
             => Task.FromResult<IReadOnlyCollection<IUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
-        public IUser GetCachedUser(ulong id)
+        public ICachedUser GetCachedUser(ulong id)
         {
             var currentUser = Discord.CurrentUser;
             if (id == Recipient.Id)
@@ -48,7 +48,7 @@ namespace Discord
         {
             return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
         }
-        public CachedMessage AddCachedMessage(IUser author, MessageModel model)
+        public CachedMessage AddCachedMessage(ICachedUser author, MessageModel model)
         {
             var msg = new CachedMessage(this, author, model);
             _messages.Add(msg);

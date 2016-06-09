@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    internal class CachedSelfUser : SelfUser, ICachedEntity<ulong>
+    internal class CachedSelfUser : SelfUser, ICachedUser
     {
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
 
@@ -12,5 +12,6 @@ namespace Discord
         }
 
         public CachedSelfUser Clone() => MemberwiseClone() as CachedSelfUser;
+        ICachedUser ICachedUser.Clone() => Clone();
     }
 }

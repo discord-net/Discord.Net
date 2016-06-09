@@ -14,7 +14,7 @@ namespace Discord
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
 
-        public IReadOnlyCollection<IGuildUser> Members
+        public IReadOnlyCollection<CachedGuildUser> Members
             => Guild.Members.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
 
         public CachedTextChannel(CachedGuild guild, Model model)
@@ -23,11 +23,11 @@ namespace Discord
             _messages = new MessageCache(Discord, this);
         }
 
-        public override Task<IGuildUser> GetUser(ulong id) => Task.FromResult(GetCachedUser(id));
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers() => Task.FromResult(Members);
+        public override Task<IGuildUser> GetUser(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
-        public IGuildUser GetCachedUser(ulong id)
+        public CachedGuildUser GetCachedUser(ulong id)
         {
             var user = Guild.GetCachedUser(id);
             if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
@@ -48,7 +48,7 @@ namespace Discord
             return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
         }
 
-        public CachedMessage AddCachedMessage(IUser author, MessageModel model)
+        public CachedMessage AddCachedMessage(ICachedUser author, MessageModel model)
         {
             var msg = new CachedMessage(this, author, model);
             _messages.Add(msg);
@@ -65,10 +65,10 @@ namespace Discord
 
         public CachedTextChannel Clone() => MemberwiseClone() as CachedTextChannel;
 
-        IReadOnlyCollection<IUser> ICachedMessageChannel.Members => Members;
+        IReadOnlyCollection<ICachedUser> ICachedMessageChannel.Members => Members;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetCachedMessage(id);
-        IUser ICachedMessageChannel.GetCachedUser(ulong id) => GetCachedUser(id);
+        ICachedUser ICachedMessageChannel.GetCachedUser(ulong id) => GetCachedUser(id);
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }
