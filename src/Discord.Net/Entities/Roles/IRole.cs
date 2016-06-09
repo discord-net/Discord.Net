@@ -24,6 +24,6 @@ namespace Discord
         ulong GuildId { get; }
 
         /// <summary> Modifies this role. </summary>
-        Task Modify(Action<ModifyGuildRoleParams> func);
+        Task ModifyAsync(Action<ModifyGuildRoleParams> func);
     }
 }

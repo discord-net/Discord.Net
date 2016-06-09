@@ -13,29 +13,29 @@ namespace Discord
 
         DiscordApiClient ApiClient { get; }
         
-        Task Login(TokenType tokenType, string token, bool validateToken = true);
-        Task Logout();
+        Task LoginAsync(TokenType tokenType, string token, bool validateToken = true);
+        Task LogoutAsync();
 
-        Task Connect();
-        Task Disconnect();
+        Task ConnectAsync();
+        Task DisconnectAsync();
 
-        Task<IChannel> GetChannel(ulong id);
-        Task<IReadOnlyCollection<IDMChannel>> GetDMChannels();
+        Task<IChannel> GetChannelAsync(ulong id);
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync();
 
-        Task<IReadOnlyCollection<IConnection>> GetConnections();
+        Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 
-        Task<IGuild> GetGuild(ulong id);
-        Task<IReadOnlyCollection<IUserGuild>> GetGuilds();
-        Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null);
+        Task<IGuild> GetGuildAsync(ulong id);
+        Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync();
+        Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
         
-        Task<IInvite> GetInvite(string inviteIdOrXkcd);
+        Task<IInvite> GetInviteAsync(string inviteIdOrXkcd);
 
-        Task<IUser> GetUser(ulong id);
-        Task<IUser> GetUser(string username, string discriminator);
-        Task<ISelfUser> GetCurrentUser();
-        Task<IReadOnlyCollection<IUser>> QueryUsers(string query, int limit);
+        Task<IUser> GetUserAsync(ulong id);
+        Task<IUser> GetUserAsync(string username, string discriminator);
+        Task<ISelfUser> GetCurrentUserAsync();
+        Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit);
 
-        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegions();
-        Task<IVoiceRegion> GetVoiceRegion(string id);
+        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync();
+        Task<IVoiceRegion> GetVoiceRegionAsync(string id);
     }
 }

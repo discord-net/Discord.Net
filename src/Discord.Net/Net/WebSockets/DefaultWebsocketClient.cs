@@ -50,18 +50,18 @@ namespace Discord.Net.WebSockets
             Dispose(true);
         }
 
-        public async Task Connect(string host)
+        public async Task ConnectAsync(string host)
         {
             //Assume locked
-            await Disconnect().ConfigureAwait(false);
+            await DisconnectAsync().ConfigureAwait(false);
 
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
 
             await _client.ConnectAsync(new Uri(host), _cancelToken).ConfigureAwait(false);
-            _task = Run(_cancelToken);
+            _task = RunAsync(_cancelToken);
         }
-        public async Task Disconnect()
+        public async Task DisconnectAsync()
         {
             //Assume locked
             _cancelTokenSource.Cancel();
@@ -82,7 +82,7 @@ namespace Discord.Net.WebSockets
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task Send(byte[] data, int index, int count, bool isText)
+        public async Task SendAsync(byte[] data, int index, int count, bool isText)
         {
             await _sendLock.WaitAsync(_cancelToken);
             try
@@ -118,7 +118,7 @@ namespace Discord.Net.WebSockets
         }
 
         //TODO: Check this code
-        private async Task Run(CancellationToken cancelToken)
+        private async Task RunAsync(CancellationToken cancelToken)
         {
             var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
             var stream = new MemoryStream();
@@ -151,11 +151,11 @@ namespace Discord.Net.WebSockets
 
                     var array = stream.ToArray();
                     if (result.MessageType == WebSocketMessageType.Binary)
-                        await BinaryMessage.Raise(array, 0, array.Length).ConfigureAwait(false);
+                        await BinaryMessage.RaiseAsync(array, 0, array.Length).ConfigureAwait(false);
                     else if (result.MessageType == WebSocketMessageType.Text)
                     {
                         string text = Encoding.UTF8.GetString(array, 0, array.Length);
-                        await TextMessage.Raise(text).ConfigureAwait(false);
+                        await TextMessage.RaiseAsync(text).ConfigureAwait(false);
                     }
 
                     stream.Position = 0;

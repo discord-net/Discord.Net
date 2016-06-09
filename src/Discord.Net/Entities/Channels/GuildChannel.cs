@@ -46,37 +46,37 @@ namespace Discord
             _overwrites = newOverwrites;
         }
 
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetChannel(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelAsync(Id).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Modify(Action<ModifyGuildChannelParams> func)
+        public async Task ModifyAsync(Action<ModifyGuildChannelParams> func)
         {
             if (func != null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildChannelParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelAsync(Id).ConfigureAwait(false);
         }
 
-        public abstract Task<IGuildUser> GetUser(ulong id);
-        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsers();
-        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset);
+        public abstract Task<IGuildUser> GetUserAsync(ulong id);
+        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
+        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset);
 
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvites()
+        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync()
         {
-            var models = await Discord.ApiClient.GetChannelInvites(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelInvitesAsync(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x)).ToImmutableArray();
         }
-        public async Task<IInviteMetadata> CreateInvite(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
+        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
         {
             var args = new CreateChannelInviteParams
             {
@@ -85,7 +85,7 @@ namespace Discord
                 Temporary = isTemporary,
                 XkcdPass = withXkcd
             };
-            var model = await Discord.ApiClient.CreateChannelInvite(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateChannelInviteAsync(Id, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);
         }
 
@@ -104,28 +104,28 @@ namespace Discord
             return null;
         }
         
-        public async Task AddPermissionOverwrite(IUser user, OverwritePermissions perms)
+        public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.ApiClient.ModifyChannelPermissions(Id, user.Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, user.Id, args).ConfigureAwait(false);
             _overwrites[user.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User });
         }
-        public async Task AddPermissionOverwrite(IRole role, OverwritePermissions perms)
+        public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms)
         {
             var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
-            await Discord.ApiClient.ModifyChannelPermissions(Id, role.Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, role.Id, args).ConfigureAwait(false);
             _overwrites[role.Id] = new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role });
         }
-        public async Task RemovePermissionOverwrite(IUser user)
+        public async Task RemovePermissionOverwriteAsync(IUser user)
         {
-            await Discord.ApiClient.DeleteChannelPermission(Id, user.Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelPermissionAsync(Id, user.Id).ConfigureAwait(false);
 
             Overwrite value;
             _overwrites.TryRemove(user.Id, out value);
         }
-        public async Task RemovePermissionOverwrite(IRole role)
+        public async Task RemovePermissionOverwriteAsync(IRole role)
         {
-            await Discord.ApiClient.DeleteChannelPermission(Id, role.Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelPermissionAsync(Id, role.Id).ConfigureAwait(false);
 
             Overwrite value;
             _overwrites.TryRemove(role.Id, out value);
@@ -137,8 +137,8 @@ namespace Discord
         IGuild IGuildChannel.Guild => Guild;
         IReadOnlyCollection<Overwrite> IGuildChannel.PermissionOverwrites => _overwrites.ToReadOnlyCollection();
 
-        async Task<IUser> IChannel.GetUser(ulong id) => await GetUser(id).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsers() => await GetUsers().ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsers(int limit, int offset) => await GetUsers(limit, offset).ConfigureAwait(false);
+        async Task<IUser> IChannel.GetUserAsync(ulong id) => await GetUserAsync(id).ConfigureAwait(false);
+        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync() => await GetUsersAsync().ConfigureAwait(false);
+        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(int limit, int offset) => await GetUsersAsync(limit, offset).ConfigureAwait(false);
     }
 }

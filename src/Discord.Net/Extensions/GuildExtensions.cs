@@ -4,9 +4,9 @@ namespace Discord.Extensions
 {
     public static class GuildExtensions
     {
-        public static async Task<ITextChannel> GetTextChannel(this IGuild guild, ulong id)
-            => await guild.GetChannel(id).ConfigureAwait(false) as ITextChannel;
-        public static async Task<IVoiceChannel> GetVoiceChannel(this IGuild guild, ulong id)
-            => await guild.GetChannel(id).ConfigureAwait(false) as IVoiceChannel;
+        public static async Task<ITextChannel> GetTextChannelAsync(this IGuild guild, ulong id)
+            => await guild.GetChannelAsync(id).ConfigureAwait(false) as ITextChannel;
+        public static async Task<IVoiceChannel> GetVoiceChannelAsync(this IGuild guild, ulong id)
+            => await guild.GetChannelAsync(id).ConfigureAwait(false) as IVoiceChannel;
     }
 }

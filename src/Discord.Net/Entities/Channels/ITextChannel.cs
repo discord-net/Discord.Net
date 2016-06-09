@@ -10,6 +10,6 @@ namespace Discord
         string Topic { get; }
 
         /// <summary> Modifies this text channel. </summary>
-        Task Modify(Action<ModifyTextChannelParams> func);
+        Task ModifyAsync(Action<ModifyTextChannelParams> func);
     }
 }

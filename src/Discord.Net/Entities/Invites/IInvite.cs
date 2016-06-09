@@ -19,6 +19,6 @@ namespace Discord
         ulong GuildId { get; }
 
         /// <summary> Accepts this invite and joins the target guild. This will fail on bot accounts. </summary>
-        Task Accept();
+        Task AcceptAsync();
     }
 }

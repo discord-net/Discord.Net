@@ -23,9 +23,9 @@ namespace Discord
             _messages = new MessageCache(Discord, this);
         }
 
-        public override Task<IGuildUser> GetUser(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset)
+        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser GetCachedUser(ulong id)
         {
@@ -35,17 +35,17 @@ namespace Discord
             return null;
         }
 
-        public override async Task<IMessage> GetMessage(ulong id)
+        public override async Task<IMessage> GetMessageAsync(ulong id)
         {
-            return await _messages.Download(id).ConfigureAwait(false);
+            return await _messages.DownloadAsync(id).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            return await _messages.Download(null, Direction.Before, limit).ConfigureAwait(false);
+            return await _messages.DownloadAsync(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
+            return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
 
         public CachedMessage AddCachedMessage(ICachedUser author, MessageModel model)

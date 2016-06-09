@@ -37,13 +37,13 @@ namespace Discord
             ChannelName = model.Channel.Name;
         }
 
-        public async Task Accept()
+        public async Task AcceptAsync()
         {
-            await Discord.ApiClient.AcceptInvite(Code).ConfigureAwait(false);
+            await Discord.ApiClient.AcceptInviteAsync(Code).ConfigureAwait(false);
         }
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteInvite(Code).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteInviteAsync(Code).ConfigureAwait(false);
         }
 
         public override string ToString() => XkcdUrl ?? Url;

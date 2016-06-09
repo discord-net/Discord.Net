@@ -28,13 +28,13 @@ namespace Discord.Net.Queue
             Parent = parent;
         }
 
-        public async Task<Stream> Send(IQueuedRequest request)
+        public async Task<Stream> SendAsync(IQueuedRequest request)
         {
             var endTick = request.TimeoutTick;
 
             //Wait until a spot is open in our bucket
             if (_semaphore != null)
-                await Enter(endTick).ConfigureAwait(false);
+                await EnterAsync(endTick).ConfigureAwait(false);
             try
             {
                 while (true)
@@ -63,10 +63,10 @@ namespace Discord.Net.Queue
                     {
                         //If there's a parent bucket, pass this request to them
                         if (Parent != null)
-                            return await Parent.Send(request).ConfigureAwait(false);
+                            return await Parent.SendAsync(request).ConfigureAwait(false);
 
                         //We have all our semaphores, send the request
-                        return await request.Send().ConfigureAwait(false);
+                        return await request.SendAsync().ConfigureAwait(false);
                     }
                     catch (HttpRateLimitException ex)
                     {
@@ -79,7 +79,7 @@ namespace Discord.Net.Queue
             {
                 //Make sure we put this entry back after WindowMilliseconds
                 if (_semaphore != null)
-                    QueueExit();
+                    QueueExitAsync();
             }
         }
 
@@ -92,17 +92,17 @@ namespace Discord.Net.Queue
                 {
                     _resumeNotifier = new TaskCompletionSource<byte>();
                     _pauseEndTick = unchecked(Environment.TickCount + milliseconds);
-                    QueueResume(milliseconds);
+                    QueueResumeAsync(milliseconds);
                 }
             }
         }
-        private async Task QueueResume(int millis)
+        private async Task QueueResumeAsync(int millis)
         {
             await Task.Delay(millis).ConfigureAwait(false);
             _resumeNotifier.SetResult(0);
         }
 
-        private async Task Enter(int? endTick)
+        private async Task EnterAsync(int? endTick)
         {
             if (endTick.HasValue)
             {
@@ -113,7 +113,7 @@ namespace Discord.Net.Queue
             else
                 await _semaphore.WaitAsync().ConfigureAwait(false);
         }
-        private async Task QueueExit()
+        private async Task QueueExitAsync()
         {
             await Task.Delay(_windowMilliseconds).ConfigureAwait(false);
             _semaphore.Release();

@@ -44,18 +44,18 @@ namespace Discord
             Permissions = new GuildPermissions(model.Permissions.Value);
         }
 
-        public async Task Modify(Action<ModifyGuildRoleParams> func)
+        public async Task ModifyAsync(Action<ModifyGuildRoleParams> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildRoleParams();
             func(args);
-            var response = await Discord.ApiClient.ModifyGuildRole(Guild.Id, Id, args).ConfigureAwait(false);
+            var response = await Discord.ApiClient.ModifyGuildRoleAsync(Guild.Id, Id, args).ConfigureAwait(false);
             Update(response, UpdateSource.Rest);
         }
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteGuildRole(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildRoleAsync(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public Role Clone() => MemberwiseClone() as Role;

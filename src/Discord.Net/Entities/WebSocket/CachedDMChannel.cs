@@ -21,9 +21,9 @@ namespace Discord
             _messages = new MessageCache(Discord, this);
         }
 
-        public override Task<IUser> GetUser(ulong id) => Task.FromResult<IUser>(GetCachedUser(id));
-        public override Task<IReadOnlyCollection<IUser>> GetUsers() => Task.FromResult<IReadOnlyCollection<IUser>>(Members);
-        public override Task<IReadOnlyCollection<IUser>> GetUsers(int limit, int offset) 
+        public override Task<IUser> GetUserAsync(ulong id) => Task.FromResult<IUser>(GetCachedUser(id));
+        public override Task<IReadOnlyCollection<IUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IUser>>(Members);
+        public override Task<IReadOnlyCollection<IUser>> GetUsersAsync(int limit, int offset) 
             => Task.FromResult<IReadOnlyCollection<IUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
         public ICachedUser GetCachedUser(ulong id)
         {
@@ -36,17 +36,17 @@ namespace Discord
                 return null;
         }
 
-        public override async Task<IMessage> GetMessage(ulong id)
+        public override async Task<IMessage> GetMessageAsync(ulong id)
         {
-            return await _messages.Download(id).ConfigureAwait(false);
+            return await _messages.DownloadAsync(id).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessages(int limit)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit)
         {
-            return await _messages.Download(null, Direction.Before, limit).ConfigureAwait(false);
+            return await _messages.DownloadAsync(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessages(ulong fromMessageId, Direction dir, int limit)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
         {
-            return await _messages.Download(fromMessageId, dir, limit).ConfigureAwait(false);
+            return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
         public CachedMessage AddCachedMessage(ICachedUser author, MessageModel model)
         {

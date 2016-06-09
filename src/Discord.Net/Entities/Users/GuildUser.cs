@@ -67,31 +67,31 @@ namespace Discord
             IsMute = model.Mute;
         }
 
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildMemberAsync(Guild.Id, Id).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Modify(Action<ModifyGuildMemberParams> func)
+        public async Task ModifyAsync(Action<ModifyGuildMemberParams> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildMemberParams();
             func(args);
 
-            bool isCurrentUser = (await Discord.GetCurrentUser().ConfigureAwait(false)).Id == Id;
+            bool isCurrentUser = (await Discord.GetCurrentUserAsync().ConfigureAwait(false)).Id == Id;
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value ?? "" };
-                await Discord.ApiClient.ModifyCurrentUserNick(Guild.Id, nickArgs).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyMyNickAsync(Guild.Id, nickArgs).ConfigureAwait(false);
                 args.Nickname = new Optional<string>(); //Remove
             }
 
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
             {
-                await Discord.ApiClient.ModifyGuildMember(Guild.Id, Id, args).ConfigureAwait(false);
+                await Discord.ApiClient.ModifyGuildMemberAsync(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
                     IsDeaf = args.Deaf.Value;
                 if (args.Mute.IsSpecified)
@@ -102,9 +102,9 @@ namespace Discord
                     Roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }
         }
-        public async Task Kick()
+        public async Task KickAsync()
         {
-            await Discord.ApiClient.RemoveGuildMember(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildMemberAsync(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
@@ -113,7 +113,7 @@ namespace Discord
             return new ChannelPermissions(Permissions.ResolveChannel(this, channel, GuildPermissions.RawValue));
         }
 
-        public Task<IDMChannel> CreateDMChannel() => User.CreateDMChannel();
+        public Task<IDMChannel> CreateDMChannelAsync() => User.CreateDMChannelAsync();
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyCollection<IRole> IGuildUser.Roles => Roles;

@@ -47,23 +47,23 @@ namespace Discord
             User = new User(Discord, model.User);
         }
         
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildIntegrationAsync(Guild.Id, Id).ConfigureAwait(false);
         }
-        public async Task Modify(Action<ModifyGuildIntegrationParams> func)
+        public async Task ModifyAsync(Action<ModifyGuildIntegrationParams> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildIntegration(Guild.Id, Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(Guild.Id, Id, args).ConfigureAwait(false);
 
             Update(model, UpdateSource.Rest);
         }
-        public async Task Sync()
+        public async Task SyncAsync()
         {
-            await Discord.ApiClient.SyncGuildIntegration(Guild.Id, Id).ConfigureAwait(false);
+            await Discord.ApiClient.SyncGuildIntegrationAsync(Guild.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

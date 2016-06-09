@@ -67,22 +67,22 @@ namespace Discord.Net.Rest
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task<Stream> Send(string method, string endpoint, bool headerOnly = false)
+        public async Task<Stream> SendAsync(string method, string endpoint, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
-                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
         }
-        public async Task<Stream> Send(string method, string endpoint, string json, bool headerOnly = false)
+        public async Task<Stream> SendAsync(string method, string endpoint, string json, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
-        public async Task<Stream> Send(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
+        public async Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -110,11 +110,11 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                return await SendInternal(restRequest, headerOnly).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
 
-        private async Task<Stream> SendInternal(HttpRequestMessage request, bool headerOnly)
+        private async Task<Stream> SendInternalAsync(HttpRequestMessage request, bool headerOnly)
         {
             while (true)
             {

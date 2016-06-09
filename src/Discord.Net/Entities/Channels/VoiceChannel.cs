@@ -26,25 +26,25 @@ namespace Discord
             UserLimit = model.UserLimit;
         }
         
-        public async Task Modify(Action<ModifyVoiceChannelParams> func)
+        public async Task ModifyAsync(Action<ModifyVoiceChannelParams> func)
         {
             if (func != null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyVoiceChannelParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
 
-        public override Task<IGuildUser> GetUser(ulong id)
+        public override Task<IGuildUser> GetUserAsync(ulong id)
         {
             throw new NotSupportedException();
         }
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers()
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync()
         {
             throw new NotSupportedException();
         }
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset)
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
         {
             throw new NotSupportedException();
         }

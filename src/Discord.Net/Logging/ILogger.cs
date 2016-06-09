@@ -7,28 +7,28 @@ namespace Discord.Logging
     {
         LogSeverity Level { get; }
 
-        Task Log(LogSeverity severity, string message, Exception exception = null);
-        Task Log(LogSeverity severity, FormattableString message, Exception exception = null);
-        Task Log(LogSeverity severity, Exception exception);
+        Task LogAsync(LogSeverity severity, string message, Exception exception = null);
+        Task LogAsync(LogSeverity severity, FormattableString message, Exception exception = null);
+        Task LogAsync(LogSeverity severity, Exception exception);
 
-        Task Error(string message, Exception exception = null);
-        Task Error(FormattableString message, Exception exception = null);
-        Task Error(Exception exception);
+        Task ErrorAsync(string message, Exception exception = null);
+        Task ErrorAsync(FormattableString message, Exception exception = null);
+        Task ErrorAsync(Exception exception);
 
-        Task Warning(string message, Exception exception = null);
-        Task Warning(FormattableString message, Exception exception = null);
-        Task Warning(Exception exception);
+        Task WarningAsync(string message, Exception exception = null);
+        Task WarningAsync(FormattableString message, Exception exception = null);
+        Task WarningAsync(Exception exception);
 
-        Task Info(string message, Exception exception = null);
-        Task Info(FormattableString message, Exception exception = null);
-        Task Info(Exception exception);
+        Task InfoAsync(string message, Exception exception = null);
+        Task InfoAsync(FormattableString message, Exception exception = null);
+        Task InfoAsync(Exception exception);
 
-        Task Verbose(string message, Exception exception = null);
-        Task Verbose(FormattableString message, Exception exception = null);
-        Task Verbose(Exception exception);
+        Task VerboseAsync(string message, Exception exception = null);
+        Task VerboseAsync(FormattableString message, Exception exception = null);
+        Task VerboseAsync(Exception exception);
 
-        Task Debug(string message, Exception exception = null);
-        Task Debug(FormattableString message, Exception exception = null);
-        Task Debug(Exception exception);
+        Task DebugAsync(string message, Exception exception = null);
+        Task DebugAsync(FormattableString message, Exception exception = null);
+        Task DebugAsync(Exception exception);
     }
 }

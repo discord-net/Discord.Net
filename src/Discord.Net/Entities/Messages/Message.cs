@@ -97,14 +97,14 @@ namespace Discord
             Text = MentionUtils.CleanUserMentions(model.Content, model.Mentions);
         }
 
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetChannelMessage(Channel.Id, Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelMessageAsync(Channel.Id, Id).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Modify(Action<ModifyMessageParams> func)
+        public async Task ModifyAsync(Action<ModifyMessageParams> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
@@ -114,18 +114,18 @@ namespace Discord
 
             Model model;
             if (guildChannel != null)
-                model = await Discord.ApiClient.ModifyMessage(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.ModifyMessageAsync(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
-                model = await Discord.ApiClient.ModifyDMMessage(Channel.Id, Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.ModifyDMMessageAsync(Channel.Id, Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }        
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
             var guildChannel = Channel as GuildChannel;
             if (guildChannel != null)
-                await Discord.ApiClient.DeleteMessage(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
+                await Discord.ApiClient.DeleteMessageAsync(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
             else
-                await Discord.ApiClient.DeleteDMMessage(Channel.Id, Id).ConfigureAwait(false);
+                await Discord.ApiClient.DeleteDMMessageAsync(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;

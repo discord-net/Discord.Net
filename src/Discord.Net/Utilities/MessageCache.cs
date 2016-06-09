@@ -81,17 +81,17 @@ namespace Discord
                 .ToImmutableArray();
         }
 
-        public async Task<CachedMessage> Download(ulong id)
+        public async Task<CachedMessage> DownloadAsync(ulong id)
         {
             var msg = Get(id);
             if (msg != null)
                 return msg;
-            var model = await _discord.ApiClient.GetChannelMessage(_channel.Id, id).ConfigureAwait(false);
+            var model = await _discord.ApiClient.GetChannelMessageAsync(_channel.Id, id).ConfigureAwait(false);
             if (model != null)
                 return new CachedMessage(_channel, new User(_discord, model.Author), model);
             return null;
         }
-        public async Task<IReadOnlyCollection<CachedMessage>> Download(ulong? fromId, Direction dir, int limit)
+        public async Task<IReadOnlyCollection<CachedMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
         {
             //TODO: Test heavily, especially the ordering of messages
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
@@ -110,7 +110,7 @@ namespace Discord
                     RelativeDirection = dir,
                     RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id
                 };
-                var downloadedMessages = await _discord.ApiClient.GetChannelMessages(_channel.Id, args).ConfigureAwait(false);
+                var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
                 return cachedMessages.Concat(downloadedMessages.Select(x => new CachedMessage(_channel, _channel.GetCachedUser(x.Id), x))).ToImmutableArray();
             }
         }

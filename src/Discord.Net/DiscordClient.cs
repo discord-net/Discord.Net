@@ -35,7 +35,7 @@ namespace Discord
         public DiscordClient(DiscordConfig config)
         {
             _log = new LogManager(config.LogLevel);
-            _log.Message += async msg => await Log.Raise(msg).ConfigureAwait(false);
+            _log.Message += async msg => await Log.RaiseAsync(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
             _restLogger = _log.CreateLogger("Rest");
 
@@ -44,34 +44,34 @@ namespace Discord
 
             //TODO: Is there any better way to do this WebSocketProvider access?
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
-            ApiClient.SentRequest += async (method, endpoint, millis) => await _log.Verbose("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += async (method, endpoint, millis) => await _log.VerboseAsync("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task Login(TokenType tokenType, string token, bool validateToken = true)
+        public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LoginInternal(tokenType, token, validateToken).ConfigureAwait(false);
+                await LoginInternalAsync(tokenType, token, validateToken).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task LoginInternal(TokenType tokenType, string token, bool validateToken)
+        private async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
         {
             if (LoginState != LoginState.LoggedOut)
-                await LogoutInternal().ConfigureAwait(false);
+                await LogoutInternalAsync().ConfigureAwait(false);
             LoginState = LoginState.LoggingIn;
 
             try
             {
-                await ApiClient.Login(tokenType, token).ConfigureAwait(false);
+                await ApiClient.LoginAsync(tokenType, token).ConfigureAwait(false);
 
                 if (validateToken)
                 {
                     try
                     {
-                        await ApiClient.ValidateToken().ConfigureAwait(false);
+                        await ApiClient.ValidateTokenAsync().ConfigureAwait(false);
                     }
                     catch (HttpException ex)
                     {
@@ -79,63 +79,63 @@ namespace Discord
                     }
                 }
 
-                await OnLogin().ConfigureAwait(false);
+                await OnLoginAsync().ConfigureAwait(false);
 
                 LoginState = LoginState.LoggedIn;
             }
             catch (Exception)
             {
-                await LogoutInternal().ConfigureAwait(false);
+                await LogoutInternalAsync().ConfigureAwait(false);
                 throw;
             }
 
-            await LoggedIn.Raise().ConfigureAwait(false);
+            await LoggedIn.RaiseAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLogin() => Task.CompletedTask;
+        protected virtual Task OnLoginAsync() => Task.CompletedTask;
 
         /// <inheritdoc />
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await LogoutInternal().ConfigureAwait(false);
+                await LogoutInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task LogoutInternal()
+        private async Task LogoutInternalAsync()
         {
             if (LoginState == LoginState.LoggedOut) return;
             LoginState = LoginState.LoggingOut;
 
-            await ApiClient.Logout().ConfigureAwait(false);
+            await ApiClient.LogoutAsync().ConfigureAwait(false);
             
-            await OnLogout().ConfigureAwait(false);
+            await OnLogoutAsync().ConfigureAwait(false);
 
             _currentUser = null;
 
             LoginState = LoginState.LoggedOut;
 
-            await LoggedOut.Raise().ConfigureAwait(false);
+            await LoggedOut.RaiseAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLogout() => Task.CompletedTask;
+        protected virtual Task OnLogoutAsync() => Task.CompletedTask;
 
         /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IConnection>> GetConnections()
+        public async Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync()
         {
-            var models = await ApiClient.GetCurrentUserConnections().ConfigureAwait(false);
+            var models = await ApiClient.GetMyConnectionsAsync().ConfigureAwait(false);
             return models.Select(x => new Connection(x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
-        public virtual async Task<IChannel> GetChannel(ulong id)
+        public virtual async Task<IChannel> GetChannelAsync(ulong id)
         {
-            var model = await ApiClient.GetChannel(id).ConfigureAwait(false);
+            var model = await ApiClient.GetChannelAsync(id).ConfigureAwait(false);
             if (model != null)
             {
                 if (model.GuildId != null)
                 {
-                    var guildModel = await ApiClient.GetGuild(model.GuildId.Value).ConfigureAwait(false);
+                    var guildModel = await ApiClient.GetGuildAsync(model.GuildId.Value).ConfigureAwait(false);
                     if (guildModel != null)
                     {
                         var guild = new Guild(this, guildModel);
@@ -148,97 +148,97 @@ namespace Discord
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannels()
+        public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
         {
-            var models = await ApiClient.GetCurrentUserDMs().ConfigureAwait(false);
+            var models = await ApiClient.GetMyDMsAsync().ConfigureAwait(false);
             return models.Select(x => new DMChannel(this, new User(this, x.Recipient), x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
-        public virtual async Task<IInvite> GetInvite(string inviteIdOrXkcd)
+        public virtual async Task<IInvite> GetInviteAsync(string inviteIdOrXkcd)
         {
-            var model = await ApiClient.GetInvite(inviteIdOrXkcd).ConfigureAwait(false);
+            var model = await ApiClient.GetInviteAsync(inviteIdOrXkcd).ConfigureAwait(false);
             if (model != null)
                 return new Invite(this, model);
             return null;
         }
 
         /// <inheritdoc />
-        public virtual async Task<IGuild> GetGuild(ulong id)
+        public virtual async Task<IGuild> GetGuildAsync(ulong id)
         {
-            var model = await ApiClient.GetGuild(id).ConfigureAwait(false);
+            var model = await ApiClient.GetGuildAsync(id).ConfigureAwait(false);
             if (model != null)
                 return new Guild(this, model);
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<GuildEmbed?> GetGuildEmbed(ulong id)
+        public virtual async Task<GuildEmbed?> GetGuildEmbedAsync(ulong id)
         {
-            var model = await ApiClient.GetGuildEmbed(id).ConfigureAwait(false);
+            var model = await ApiClient.GetGuildEmbedAsync(id).ConfigureAwait(false);
             if (model != null)
                 return new GuildEmbed(model);
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IUserGuild>> GetGuilds()
+        public virtual async Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync()
         {
-            var models = await ApiClient.GetCurrentUserGuilds().ConfigureAwait(false);
+            var models = await ApiClient.GetMyGuildsAsync().ConfigureAwait(false);
             return models.Select(x => new UserGuild(this, x)).ToImmutableArray();
 
         }
         /// <inheritdoc />
-        public virtual async Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null)
+        public virtual async Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
         {
             var args = new CreateGuildParams();
-            var model = await ApiClient.CreateGuild(args).ConfigureAwait(false);
+            var model = await ApiClient.CreateGuildAsync(args).ConfigureAwait(false);
             return new Guild(this, model);
         }
 
         /// <inheritdoc />
-        public virtual async Task<IUser> GetUser(ulong id)
+        public virtual async Task<IUser> GetUserAsync(ulong id)
         {
-            var model = await ApiClient.GetUser(id).ConfigureAwait(false);
+            var model = await ApiClient.GetUserAsync(id).ConfigureAwait(false);
             if (model != null)
                 return new User(this, model);
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<IUser> GetUser(string username, string discriminator)
+        public virtual async Task<IUser> GetUserAsync(string username, string discriminator)
         {
-            var model = await ApiClient.GetUser(username, discriminator).ConfigureAwait(false);
+            var model = await ApiClient.GetUserAsync(username, discriminator).ConfigureAwait(false);
             if (model != null)
                 return new User(this, model);
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<ISelfUser> GetCurrentUser()
+        public virtual async Task<ISelfUser> GetCurrentUserAsync()
         {
             var user = _currentUser;
             if (user == null)
             {
-                var model = await ApiClient.GetCurrentUser().ConfigureAwait(false);
+                var model = await ApiClient.GetSelfAsync().ConfigureAwait(false);
                 user = new SelfUser(this, model);
                 _currentUser = user;
             }
             return user;
         }
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IUser>> QueryUsers(string query, int limit)
+        public virtual async Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit)
         {
-            var models = await ApiClient.QueryUsers(query, limit).ConfigureAwait(false);
+            var models = await ApiClient.QueryUsersAsync(query, limit).ConfigureAwait(false);
             return models.Select(x => new User(this, x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegions()
+        public virtual async Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync()
         {
-            var models = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
+            var models = await ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x)).ToImmutableArray();
         }
         /// <inheritdoc />
-        public virtual async Task<IVoiceRegion> GetVoiceRegion(string id)
+        public virtual async Task<IVoiceRegion> GetVoiceRegionAsync(string id)
         {
-            var models = await ApiClient.GetVoiceRegions().ConfigureAwait(false);
+            var models = await ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
             return models.Select(x => new VoiceRegion(x)).Where(x => x.Id == id).FirstOrDefault();
         }
 
@@ -251,7 +251,7 @@ namespace Discord
         public void Dispose() => Dispose(true);
         
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
-        Task IDiscordClient.Connect() { throw new NotSupportedException(); }
-        Task IDiscordClient.Disconnect() { throw new NotSupportedException(); }
+        Task IDiscordClient.ConnectAsync() { throw new NotSupportedException(); }
+        Task IDiscordClient.DisconnectAsync() { throw new NotSupportedException(); }
     }
 }

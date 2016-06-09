@@ -47,14 +47,14 @@ namespace Discord.Net.Queue
             Promise = new TaskCompletionSource<Stream>();
         }
 
-        public async Task<Stream> Send()
+        public async Task<Stream> SendAsync()
         {
             if (IsMultipart)
-                return await Client.Send(Method, Endpoint, MultipartParams, HeaderOnly).ConfigureAwait(false);
+                return await Client.SendAsync(Method, Endpoint, MultipartParams, HeaderOnly).ConfigureAwait(false);
             else if (Json != null)
-                return await Client.Send(Method, Endpoint, Json, HeaderOnly).ConfigureAwait(false);
+                return await Client.SendAsync(Method, Endpoint, Json, HeaderOnly).ConfigureAwait(false);
             else
-                return await Client.Send(Method, Endpoint, HeaderOnly).ConfigureAwait(false);
+                return await Client.SendAsync(Method, Endpoint, HeaderOnly).ConfigureAwait(false);
         }
     }
 }

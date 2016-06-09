@@ -61,7 +61,7 @@ namespace Discord.Net.Queue
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
         }
-        public async Task SetCancelToken(CancellationToken cancelToken)
+        public async Task SetCancelTokenAsync(CancellationToken cancelToken)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try
@@ -72,17 +72,17 @@ namespace Discord.Net.Queue
             finally { _lock.Release(); }
         }
 
-        internal async Task<Stream> Send(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
+        internal async Task<Stream> SendAsync(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
         {
             request.CancelToken = _cancelToken;
             var bucket = GetBucket(group, bucketId, guildId);
-            return await bucket.Send(request).ConfigureAwait(false);
+            return await bucket.SendAsync(request).ConfigureAwait(false);
         }
-        internal async Task<Stream> Send(WebSocketRequest request, BucketGroup group, int bucketId, ulong guildId)
+        internal async Task<Stream> SendAsync(WebSocketRequest request, BucketGroup group, int bucketId, ulong guildId)
         {
             request.CancelToken = _cancelToken;
             var bucket = GetBucket(group, bucketId, guildId);
-            return await bucket.Send(request).ConfigureAwait(false);
+            return await bucket.SendAsync(request).ConfigureAwait(false);
         }
         
         private RequestQueueBucket CreateBucket(BucketDefinition def)
@@ -119,7 +119,7 @@ namespace Discord.Net.Queue
             return _guildBuckets[(int)type].GetOrAdd(guildId, _ => CreateBucket(_guildLimits[type]));
         }
 
-        public async Task Clear()
+        public async Task ClearAsync()
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try

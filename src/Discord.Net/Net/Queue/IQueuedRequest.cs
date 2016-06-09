@@ -11,6 +11,6 @@ namespace Discord.Net.Queue
         CancellationToken CancelToken { get; }
         int? TimeoutTick { get; }
 
-        Task<Stream> Send();
+        Task<Stream> SendAsync();
     }
 }

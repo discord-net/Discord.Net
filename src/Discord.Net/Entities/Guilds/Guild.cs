@@ -103,114 +103,114 @@ namespace Discord
             }
         }
         
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var response = await Discord.ApiClient.GetGuild(Id).ConfigureAwait(false);
+            var response = await Discord.ApiClient.GetGuildAsync(Id).ConfigureAwait(false);
             Update(response, UpdateSource.Rest);
         }
-        public async Task Modify(Action<ModifyGuildParams> func)
+        public async Task ModifyAsync(Action<ModifyGuildParams> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuild(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task ModifyEmbed(Action<ModifyGuildEmbedParams> func)
+        public async Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func)
         { 
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildEmbedParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildEmbed(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildEmbedAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task ModifyChannels(IEnumerable<ModifyGuildChannelsParams> args)
+        public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args)
         {
             //TODO: Update channels
-            await Discord.ApiClient.ModifyGuildChannels(Id, args).ConfigureAwait(false);
+            await Discord.ApiClient.ModifyGuildChannelsAsync(Id, args).ConfigureAwait(false);
         }
-        public async Task ModifyRoles(IEnumerable<ModifyGuildRolesParams> args)
+        public async Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args)
         {            
-            var models = await Discord.ApiClient.ModifyGuildRoles(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.ModifyGuildRolesAsync(Id, args).ConfigureAwait(false);
             Update(models, UpdateSource.Rest);
         }
-        public async Task Leave()
+        public async Task LeaveAsync()
         {
-            await Discord.ApiClient.LeaveGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.LeaveGuildAsync(Id).ConfigureAwait(false);
         }
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
-            await Discord.ApiClient.DeleteGuild(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildAsync(Id).ConfigureAwait(false);
         }
         
-        public async Task<IReadOnlyCollection<IUser>> GetBans()
+        public async Task<IReadOnlyCollection<IUser>> GetBansAsync()
         {
-            var models = await Discord.ApiClient.GetGuildBans(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildBansAsync(Id).ConfigureAwait(false);
             return models.Select(x => new User(Discord, x)).ToImmutableArray();
         }
-        public Task AddBan(IUser user, int pruneDays = 0) => AddBan(user, pruneDays);
-        public async Task AddBan(ulong userId, int pruneDays = 0)
+        public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user, pruneDays);
+        public async Task AddBanAsync(ulong userId, int pruneDays = 0)
         {
             var args = new CreateGuildBanParams() { PruneDays = pruneDays };
-            await Discord.ApiClient.CreateGuildBan(Id, userId, args).ConfigureAwait(false);
+            await Discord.ApiClient.CreateGuildBanAsync(Id, userId, args).ConfigureAwait(false);
         }
-        public Task RemoveBan(IUser user) => RemoveBan(user.Id);
-        public async Task RemoveBan(ulong userId)
+        public Task RemoveBanAsync(IUser user) => RemoveBanAsync(user.Id);
+        public async Task RemoveBanAsync(ulong userId)
         {
-            await Discord.ApiClient.RemoveGuildBan(Id, userId).ConfigureAwait(false);
+            await Discord.ApiClient.RemoveGuildBanAsync(Id, userId).ConfigureAwait(false);
         }
         
-        public virtual async Task<IGuildChannel> GetChannel(ulong id)
+        public virtual async Task<IGuildChannel> GetChannelAsync(ulong id)
         {
-            var model = await Discord.ApiClient.GetChannel(Id, id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelAsync(Id, id).ConfigureAwait(false);
             if (model != null)
                 return ToChannel(model);
             return null;
         }
-        public virtual async Task<IReadOnlyCollection<IGuildChannel>> GetChannels()
+        public virtual async Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync()
         {
-            var models = await Discord.ApiClient.GetGuildChannels(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildChannelsAsync(Id).ConfigureAwait(false);
             return models.Select(x => ToChannel(x)).ToImmutableArray();
         }
-        public async Task<ITextChannel> CreateTextChannel(string name)
+        public async Task<ITextChannel> CreateTextChannelAsync(string name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams() { Name = name, Type = ChannelType.Text };
-            var model = await Discord.ApiClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildChannelAsync(Id, args).ConfigureAwait(false);
             return new TextChannel(this, model);
         }
-        public async Task<IVoiceChannel> CreateVoiceChannel(string name)
+        public async Task<IVoiceChannel> CreateVoiceChannelAsync(string name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams { Name = name, Type = ChannelType.Voice };
-            var model = await Discord.ApiClient.CreateGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildChannelAsync(Id, args).ConfigureAwait(false);
             return new VoiceChannel(this, model);
         }
         
-        public async Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrations()
+        public async Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync()
         {
-            var models = await Discord.ApiClient.GetGuildIntegrations(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildIntegrationsAsync(Id).ConfigureAwait(false);
             return models.Select(x => new GuildIntegration(this, x)).ToImmutableArray();
         }
-        public async Task<IGuildIntegration> CreateIntegration(ulong id, string type)
+        public async Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type)
         {
             var args = new CreateGuildIntegrationParams { Id = id, Type = type };
-            var model = await Discord.ApiClient.CreateGuildIntegration(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildIntegrationAsync(Id, args).ConfigureAwait(false);
             return new GuildIntegration(this, model);
         }
         
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvites()
+        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync()
         {
-            var models = await Discord.ApiClient.GetGuildInvites(Id).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildInvitesAsync(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x)).ToImmutableArray();
         }
-        public async Task<IInviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
+        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
         {
             if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
             if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
@@ -222,7 +222,7 @@ namespace Discord
                 Temporary = isTemporary,
                 XkcdPass = withXkcd
             };
-            var model = await Discord.ApiClient.CreateChannelInvite(DefaultChannelId, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateChannelInviteAsync(DefaultChannelId, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);
         }
         
@@ -233,14 +233,14 @@ namespace Discord
                 return result;
             return null;
         }        
-        public async Task<IRole> CreateRole(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false)
+        public async Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             
-            var model = await Discord.ApiClient.CreateGuildRole(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateGuildRoleAsync(Id).ConfigureAwait(false);
             var role = new Role(this, model);
 
-            await role.Modify(x =>
+            await role.ModifyAsync(x =>
             {
                 x.Name = name;
                 x.Permissions = (permissions ?? role.Permissions).RawValue;
@@ -251,38 +251,38 @@ namespace Discord
             return role;
         }
 
-        public virtual async Task<IGuildUser> GetUser(ulong id)
+        public virtual async Task<IGuildUser> GetUserAsync(ulong id)
         {
-            var model = await Discord.ApiClient.GetGuildMember(Id, id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildMemberAsync(Id, id).ConfigureAwait(false);
             if (model != null)
                 return new GuildUser(this, new User(Discord, model.User), model);
             return null;
         }
-        public virtual async Task<IGuildUser> GetCurrentUser()
+        public virtual async Task<IGuildUser> GetCurrentUserAsync()
         {
-            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
-            return await GetUser(currentUser.Id).ConfigureAwait(false);
+            var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
+            return await GetUserAsync(currentUser.Id).ConfigureAwait(false);
         }
-        public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsers()
+        public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync()
         {
             var args = new GetGuildMembersParams();
-            var models = await Discord.ApiClient.GetGuildMembers(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new GuildUser(this, new User(Discord, x.User), x)).ToImmutableArray();
         }
-        public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset)
+        public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
         {
             var args = new GetGuildMembersParams { Limit = limit, Offset = offset };
-            var models = await Discord.ApiClient.GetGuildMembers(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new GuildUser(this, new User(Discord, x.User), x)).ToImmutableArray();
         }
-        public async Task<int> PruneUsers(int days = 30, bool simulate = false)
+        public async Task<int> PruneUsersAsync(int days = 30, bool simulate = false)
         {
             var args = new GuildPruneParams() { Days = days };
             GetGuildPruneCountResponse model;
             if (simulate)
-                model = await Discord.ApiClient.GetGuildPruneCount(Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.GetGuildPruneCountAsync(Id, args).ConfigureAwait(false);
             else
-                model = await Discord.ApiClient.BeginGuildPrune(Id, args).ConfigureAwait(false);
+                model = await Discord.ApiClient.BeginGuildPruneAsync(Id, args).ConfigureAwait(false);
             return model.Pruned;
         }
 
@@ -306,7 +306,7 @@ namespace Discord
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<Emoji> IGuild.Emojis => Emojis;
         IReadOnlyCollection<string> IGuild.Features => Features;
-        Task IGuild.DownloadUsers() { throw new NotSupportedException(); }
+        Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
 
         IRole IGuild.GetRole(ulong id) => GetRole(id);
     }

@@ -12,9 +12,9 @@ namespace Discord.Net.WebSockets
         void SetHeader(string key, string value);
         void SetCancelToken(CancellationToken cancelToken);
 
-        Task Connect(string host);
-        Task Disconnect();
+        Task ConnectAsync(string host);
+        Task DisconnectAsync();
 
-        Task Send(byte[] data, int index, int count, bool isText);
+        Task SendAsync(byte[] data, int index, int count, bool isText);
     }
 }

@@ -34,6 +34,6 @@ namespace Discord
         IReadOnlyCollection<IUser> MentionedUsers { get; }
 
         /// <summary> Modifies this message. </summary>
-        Task Modify(Action<ModifyMessageParams> func);
+        Task ModifyAsync(Action<ModifyMessageParams> func);
     }
 }

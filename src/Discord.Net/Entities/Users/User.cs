@@ -38,10 +38,10 @@ namespace Discord
             Username = model.Username;
         }
 
-        public async Task<IDMChannel> CreateDMChannel()
+        public async Task<IDMChannel> CreateDMChannelAsync()
         {
             var args = new CreateDMChannelParams { RecipientId = Id };
-            var model = await Discord.ApiClient.CreateDMChannel(args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateDMChannelAsync(args).ConfigureAwait(false);
 
             return new DMChannel(Discord, this, model);
         }

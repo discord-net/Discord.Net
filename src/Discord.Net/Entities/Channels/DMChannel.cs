@@ -33,21 +33,21 @@ namespace Discord
             Recipient.Update(model.Recipient, UpdateSource.Rest);
         }
 
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetChannel(Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelAsync(Id).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Close()
+        public async Task CloseAsync()
         {
-            await Discord.ApiClient.DeleteChannel(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteChannelAsync(Id).ConfigureAwait(false);
         }
 
-        public virtual async Task<IUser> GetUser(ulong id)
+        public virtual async Task<IUser> GetUserAsync(ulong id)
         {
-            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
             if (id == Recipient.Id)
                 return Recipient;
             else if (id == currentUser.Id)
@@ -55,66 +55,66 @@ namespace Discord
             else
                 return null;
         }
-        public virtual async Task<IReadOnlyCollection<IUser>> GetUsers()
+        public virtual async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
         {
-            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
             return ImmutableArray.Create<IUser>(currentUser, Recipient);
         }
-        public virtual async Task<IReadOnlyCollection<IUser>> GetUsers(int limit, int offset)
+        public virtual async Task<IReadOnlyCollection<IUser>> GetUsersAsync(int limit, int offset)
         {
-            var currentUser = await Discord.GetCurrentUser().ConfigureAwait(false);
+            var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
             return new IUser[] { currentUser, Recipient }.Skip(offset).Take(limit).ToImmutableArray();
         }
 
-        public async Task<IMessage> SendMessage(string text, bool isTTS)
+        public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.ApiClient.CreateDMMessage(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateDMMessageAsync(Id, args).ConfigureAwait(false);
             return new Message(this, new User(Discord, model.Author), model);
         }
-        public async Task<IMessage> SendFile(string filePath, string text, bool isTTS)
+        public async Task<IMessage> SendFileAsync(string filePath, string text, bool isTTS)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.ApiClient.UploadDMFile(Id, file, args).ConfigureAwait(false);
+                var model = await Discord.ApiClient.UploadDMFileAsync(Id, file, args).ConfigureAwait(false);
                 return new Message(this, new User(Discord, model.Author), model);
             }
         }
-        public async Task<IMessage> SendFile(Stream stream, string filename, string text, bool isTTS)
+        public async Task<IMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.ApiClient.UploadDMFile(Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.UploadDMFileAsync(Id, stream, args).ConfigureAwait(false);
             return new Message(this, new User(Discord, model.Author), model);
         }
-        public virtual async Task<IMessage> GetMessage(ulong id)
+        public virtual async Task<IMessage> GetMessageAsync(ulong id)
         {
-            var model = await Discord.ApiClient.GetChannelMessage(Id, id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelMessageAsync(Id, id).ConfigureAwait(false);
             if (model != null)
                 return new Message(this, new User(Discord, model.Author), model);
             return null;
         }
-        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessages(int limit)
+        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, new User(Discord, x.Author), x)).ToImmutableArray();
         }
-        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessages(ulong fromMessageId, Direction dir, int limit)
+        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, new User(Discord, x.Author), x)).ToImmutableArray();
         }
-        public async Task DeleteMessages(IEnumerable<IMessage> messages)
+        public async Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
         {
-            await Discord.ApiClient.DeleteDMMessages(Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteDMMessagesAsync(Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }   
 
-        public async Task TriggerTyping()
+        public async Task TriggerTypingAsync()
         {
-            await Discord.ApiClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.ApiClient.TriggerTypingIndicatorAsync(Id).ConfigureAwait(false);
         }        
         
         public override string ToString() => '@' + Recipient.ToString();

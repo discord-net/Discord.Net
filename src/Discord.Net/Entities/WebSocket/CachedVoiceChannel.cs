@@ -19,11 +19,11 @@ namespace Discord
         {
         }
 
-        public override Task<IGuildUser> GetUser(ulong id) 
+        public override Task<IGuildUser> GetUserAsync(ulong id) 
             => Task.FromResult(GetCachedUser(id));
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers() 
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
             => Task.FromResult(Members);
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset) 
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset) 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.OrderBy(x => x.Id).Skip(offset).Take(limit).ToImmutableArray());
         public IGuildUser GetCachedUser(ulong id)
         {

@@ -24,20 +24,20 @@ namespace Discord
             IsVerified = model.IsVerified;
         }
         
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetCurrentUser().ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetSelfAsync().ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task Modify(Action<ModifyCurrentUserParams> func)
+        public async Task ModifyAsync(Action<ModifyCurrentUserParams> func)
         {
             if (func != null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyCurrentUserParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyCurrentUser(args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifySelfAsync(args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
     }

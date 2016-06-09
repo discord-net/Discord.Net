@@ -107,8 +107,8 @@ namespace Discord
             _voiceStates = voiceStates;
         }
 
-        public override Task<IGuildChannel> GetChannel(ulong id) => Task.FromResult<IGuildChannel>(GetCachedChannel(id));
-        public override Task<IReadOnlyCollection<IGuildChannel>> GetChannels() => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
+        public override Task<IGuildChannel> GetChannelAsync(ulong id) => Task.FromResult<IGuildChannel>(GetCachedChannel(id));
+        public override Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync() => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
         public ICachedGuildChannel AddCachedChannel(ChannelModel model, ConcurrentHashSet<ulong> channels = null)
         {
             var channel = ToChannel(model);
@@ -182,13 +182,13 @@ namespace Discord
             return null;
         }
 
-        public override Task<IGuildUser> GetUser(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
-        public override Task<IGuildUser> GetCurrentUser() 
+        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
+        public override Task<IGuildUser> GetCurrentUserAsync() 
             => Task.FromResult<IGuildUser>(CurrentUser);
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers() 
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
         //TODO: Is there a better way of exposing pagination?
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset) 
+        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset) 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.OrderBy(x => x.Id).Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser AddCachedUser(MemberModel model, ConcurrentDictionary<ulong, CachedGuildUser> members = null, DataStore dataStore = null)
         {
@@ -213,10 +213,10 @@ namespace Discord
                 return member;
             return null;
         }
-        public async Task DownloadMembers()
+        public async Task DownloadMembersAsync()
         {
             if (!HasAllMembers)
-                await Discord.ApiClient.SendRequestMembers(new ulong[] { Id }).ConfigureAwait(false);
+                await Discord.ApiClient.SendRequestMembersAsync(new ulong[] { Id }).ConfigureAwait(false);
             await _downloaderPromise.Task.ConfigureAwait(false);
         }
         public void CompleteDownloadMembers()

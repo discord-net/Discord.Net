@@ -30,83 +30,83 @@ namespace Discord
             base.Update(model, UpdateSource.Rest);
         }
 
-        public async Task Modify(Action<ModifyTextChannelParams> func)
+        public async Task ModifyAsync(Action<ModifyTextChannelParams> func)
         {
             if (func != null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyTextChannelParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildChannel(Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
         
-        public override async Task<IGuildUser> GetUser(ulong id)
+        public override async Task<IGuildUser> GetUserAsync(ulong id)
         {
-            var user = await Guild.GetUser(id).ConfigureAwait(false);
+            var user = await Guild.GetUserAsync(id).ConfigureAwait(false);
             if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
                 return user;
             return null;
         }
-        public override async Task<IReadOnlyCollection<IGuildUser>> GetUsers()
+        public override async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync()
         {
-            var users = await Guild.GetUsers().ConfigureAwait(false);
+            var users = await Guild.GetUsersAsync().ConfigureAwait(false);
             return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
         }
-        public override async Task<IReadOnlyCollection<IGuildUser>> GetUsers(int limit, int offset)
+        public override async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
         {
-            var users = await Guild.GetUsers(limit, offset).ConfigureAwait(false);
+            var users = await Guild.GetUsersAsync(limit, offset).ConfigureAwait(false);
             return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
         }
 
-        public async Task<IMessage> SendMessage(string text, bool isTTS)
+        public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
-            var model = await Discord.ApiClient.CreateMessage(Guild.Id, Id, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.CreateMessageAsync(Guild.Id, Id, args).ConfigureAwait(false);
             return new Message(this, new User(Discord, model.Author), model);
         }
-        public async Task<IMessage> SendFile(string filePath, string text, bool isTTS)
+        public async Task<IMessage> SendFileAsync(string filePath, string text, bool isTTS)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.ApiClient.UploadFile(Guild.Id, Id, file, args).ConfigureAwait(false);
+                var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, file, args).ConfigureAwait(false);
                 return new Message(this, new User(Discord, model.Author), model);
             }
         }
-        public async Task<IMessage> SendFile(Stream stream, string filename, string text, bool isTTS)
+        public async Task<IMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.ApiClient.UploadFile(Guild.Id, Id, stream, args).ConfigureAwait(false);
+            var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, stream, args).ConfigureAwait(false);
             return new Message(this, new User(Discord, model.Author), model);
         }
-        public virtual async Task<IMessage> GetMessage(ulong id)
+        public virtual async Task<IMessage> GetMessageAsync(ulong id)
         {
-            var model = await Discord.ApiClient.GetChannelMessage(Id, id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelMessageAsync(Id, id).ConfigureAwait(false);
             if (model != null)
                 return new Message(this, new User(Discord, model.Author), model);
             return null;
         }
-        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessages(int limit)
+        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, new User(Discord, x.Author), x)).ToImmutableArray();
         }
-        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessages(ulong fromMessageId, Direction dir, int limit)
+        public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
-            var models = await Discord.ApiClient.GetChannelMessages(Id, args).ConfigureAwait(false);
+            var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, new User(Discord, x.Author), x)).ToImmutableArray();
         }
-        public async Task DeleteMessages(IEnumerable<IMessage> messages)
+        public async Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
         {
-            await Discord.ApiClient.DeleteMessages(Guild.Id, Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteMessagesAsync(Guild.Id, Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
         
-        public async Task TriggerTyping()
+        public async Task TriggerTypingAsync()
         {
-            await Discord.ApiClient.TriggerTypingIndicator(Id).ConfigureAwait(false);
+            await Discord.ApiClient.TriggerTypingIndicatorAsync(Id).ConfigureAwait(false);
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";

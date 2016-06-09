@@ -40,59 +40,59 @@ namespace Discord
         IReadOnlyCollection<IRole> Roles { get; }
 
         /// <summary> Modifies this guild. </summary>
-        Task Modify(Action<ModifyGuildParams> func);
+        Task ModifyAsync(Action<ModifyGuildParams> func);
         /// <summary> Modifies this guild's embed. </summary>
-        Task ModifyEmbed(Action<ModifyGuildEmbedParams> func);
+        Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func);
         /// <summary> Bulk modifies the channels of this guild. </summary>
-        Task ModifyChannels(IEnumerable<ModifyGuildChannelsParams> args);
+        Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args);
         /// <summary> Bulk modifies the roles of this guild. </summary>
-        Task ModifyRoles(IEnumerable<ModifyGuildRolesParams> args);
+        Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args);
         /// <summary> Leaves this guild. If you are the owner, use Delete instead. </summary>
-        Task Leave();
+        Task LeaveAsync();
 
         /// <summary> Gets a collection of all users banned on this guild. </summary>
-        Task<IReadOnlyCollection<IUser>> GetBans();
+        Task<IReadOnlyCollection<IUser>> GetBansAsync();
         /// <summary> Bans the provided user from this guild and optionally prunes their recent messages. </summary>
-        Task AddBan(IUser user, int pruneDays = 0);
+        Task AddBanAsync(IUser user, int pruneDays = 0);
         /// <summary> Bans the provided user id from this guild and optionally prunes their recent messages. </summary>
-        Task AddBan(ulong userId, int pruneDays = 0);
+        Task AddBanAsync(ulong userId, int pruneDays = 0);
         /// <summary> Unbans the provided user if it is currently banned. </summary>
-        Task RemoveBan(IUser user);
+        Task RemoveBanAsync(IUser user);
         /// <summary> Unbans the provided user id if it is currently banned. </summary>
-        Task RemoveBan(ulong userId);
+        Task RemoveBanAsync(ulong userId);
 
         /// <summary> Gets a collection of all channels in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildChannel>> GetChannels();
+        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync();
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildChannel> GetChannel(ulong id);
+        Task<IGuildChannel> GetChannelAsync(ulong id);
         /// <summary> Creates a new text channel. </summary>
-        Task<ITextChannel> CreateTextChannel(string name);
+        Task<ITextChannel> CreateTextChannelAsync(string name);
         /// <summary> Creates a new voice channel. </summary>
-        Task<IVoiceChannel> CreateVoiceChannel(string name);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name);
 
         /// <summary> Gets a collection of all invites to this guild. </summary>
-        Task<IReadOnlyCollection<IInviteMetadata>> GetInvites();
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync();
         /// <summary> Creates a new invite to this guild. </summary>
         /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        Task<IInviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
 
         /// <summary> Gets the role in this guild with the provided id, or null if not found. </summary>
         IRole GetRole(ulong id);
         /// <summary> Creates a new role. </summary>
-        Task<IRole> CreateRole(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false);
 
         /// <summary> Gets a collection of all users in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildUser>> GetUsers();
+        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildUser> GetUser(ulong id);
+        Task<IGuildUser> GetUserAsync(ulong id);
         /// <summary> Gets the current user for this guild. </summary>
-        Task<IGuildUser> GetCurrentUser();
+        Task<IGuildUser> GetCurrentUserAsync();
         /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
-        Task DownloadUsers();
+        Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
-        Task<int> PruneUsers(int days = 30, bool simulate = false);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false);
     }
 }

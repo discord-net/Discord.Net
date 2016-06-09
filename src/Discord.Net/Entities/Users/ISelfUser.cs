@@ -11,6 +11,6 @@ namespace Discord
         /// <summary> Returns true if this user's email has been verified. </summary>
         bool IsVerified { get; }
 
-        Task Modify(Action<ModifyCurrentUserParams> func);
+        Task ModifyAsync(Action<ModifyCurrentUserParams> func);
     }
 }
