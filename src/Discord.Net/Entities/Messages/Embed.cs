@@ -18,8 +18,10 @@ namespace Discord
             Title = model.Title;
             Description = model.Description;
             
-            Provider = new EmbedProvider(model.Provider);
-            Thumbnail = new EmbedThumbnail(model.Thumbnail);
+            if (model.Provider.IsSpecified)
+                Provider = new EmbedProvider(model.Provider.Value);
+            if (model.Thumbnail.IsSpecified)
+                Thumbnail = new EmbedThumbnail(model.Thumbnail.Value);
         }
     }
 }

@@ -55,6 +55,7 @@ namespace Discord.Net.Converters
                         converter = ImageConverter.Instance;
                     else if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
                     {
+                        var innerType = type.GenericTypeArguments[0];
                         var typeInput = propInfo.DeclaringType;
                         var typeOutput = propInfo.PropertyType;
 
@@ -62,9 +63,10 @@ namespace Discord.Net.Converters
                         var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
                         var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, typeOutput);
                         var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
-                        
                         property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
-                        converter = OptionalConverter.Instance;
+
+                        var converterType = typeof(OptionalConverter<>).MakeGenericType(innerType);
+                        converter = converterType.GetTypeInfo().GetDeclaredField("Instance").GetValue(null) as JsonConverter;
                     }
                 }
 

@@ -729,7 +729,7 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var author = channel.GetUser(data.Author.Id);
+                                            var author = channel.GetUser(data.Author.Value.Id);
 
                                             if (author != null)
                                             {

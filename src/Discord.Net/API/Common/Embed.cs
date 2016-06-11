@@ -13,8 +13,8 @@ namespace Discord.API
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("thumbnail")]
-        public EmbedThumbnail Thumbnail { get; set; }
+        public Optional<EmbedThumbnail> Thumbnail { get; set; }
         [JsonProperty("provider")]
-        public EmbedProvider Provider { get; set; }
+        public Optional<EmbedProvider> Provider { get; set; }
     }
 }

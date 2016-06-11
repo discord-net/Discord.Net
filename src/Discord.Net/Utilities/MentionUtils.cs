@@ -82,7 +82,7 @@ namespace Discord
             return builder;
         }
 
-        internal static string CleanUserMentions(string text, API.User[] mentions)
+        internal static string CleanUserMentions(string text, ImmutableArray<User> mentions)
         {
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {

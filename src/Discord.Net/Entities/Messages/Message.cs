@@ -10,7 +10,9 @@ namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class Message : SnowflakeEntity, IMessage
-    {        
+    {
+        private bool _isMentioningEveryone;
+
         public DateTime? EditedTimestamp { get; private set; }
         public bool IsTTS { get; private set; }
         public string RawText { get; private set; }
@@ -34,6 +36,13 @@ namespace Discord
             Channel = channel;
             Author = author;
 
+            if (channel is IGuildChannel)
+            {
+                MentionedUsers = ImmutableArray.Create<User>();
+                MentionedChannelIds = ImmutableArray.Create<ulong>();
+                MentionedRoleIds = ImmutableArray.Create<ulong>();
+            }
+
             Update(model, UpdateSource.Creation);
         }
         public void Update(Model model, UpdateSource source)
@@ -44,57 +53,73 @@ namespace Discord
             var guild = guildChannel?.Guild;
             var discord = Discord;
 
-            IsTTS = model.IsTextToSpeech;
-            Timestamp = model.Timestamp;
-            EditedTimestamp = model.EditedTimestamp;
-            RawText = model.Content;
-
-            if (model.Attachments.Length > 0)
-            {
-                var attachments = new Attachment[model.Attachments.Length];
-                for (int i = 0; i < attachments.Length; i++)
-                    attachments[i] = new Attachment(model.Attachments[i]);
-                Attachments = ImmutableArray.Create(attachments);
-            }
-            else
-                Attachments = ImmutableArray.Create<Attachment>();
-
-            if (model.Embeds.Length > 0)
-            {
-                var embeds = new Embed[model.Attachments.Length];
-                for (int i = 0; i < embeds.Length; i++)
-                    embeds[i] = new Embed(model.Embeds[i]);
-                Embeds = ImmutableArray.Create(embeds);
-            }
-            else
-                Embeds = ImmutableArray.Create<Embed>();
-
-            if (guildChannel != null && model.Mentions.Length > 0)
-            {
-                var mentions = new User[model.Mentions.Length];
-                for (int i = 0; i < model.Mentions.Length; i++)
-                    mentions[i] = new User(discord, model.Mentions[i]);
-                MentionedUsers = ImmutableArray.Create(mentions);
-            }
-            else
-                MentionedUsers = ImmutableArray.Create<User>();
-
-            if (guildChannel != null)
-            {
-                MentionedChannelIds = MentionUtils.GetChannelMentions(model.Content);
-
-                var mentionedRoleIds = MentionUtils.GetRoleMentions(model.Content);
-                if (model.IsMentioningEveryone)
-                    mentionedRoleIds = mentionedRoleIds.Add(guildChannel.Guild.EveryoneRole.Id);
-                MentionedRoleIds = mentionedRoleIds;
-            }
-            else
-            {
-                MentionedChannelIds = ImmutableArray.Create<ulong>();
-                MentionedRoleIds = ImmutableArray.Create<ulong>();
-            }
+            if (model.IsTextToSpeech.IsSpecified)
+                IsTTS = model.IsTextToSpeech.Value;
+            if (model.Timestamp.IsSpecified)
+                Timestamp = model.Timestamp.Value;
+            if (model.EditedTimestamp.IsSpecified)
+                EditedTimestamp = model.EditedTimestamp.Value;
+            if (model.IsMentioningEveryone.IsSpecified)
+                _isMentioningEveryone = model.IsMentioningEveryone.Value;
             
-            Text = MentionUtils.CleanUserMentions(model.Content, model.Mentions);
+            if (model.Attachments.IsSpecified)
+            {
+                var value = model.Attachments.Value;
+                if (value.Length > 0)
+                {
+                    var attachments = new Attachment[value.Length];
+                    for (int i = 0; i < attachments.Length; i++)
+                        attachments[i] = new Attachment(value[i]);
+                    Attachments = ImmutableArray.Create(attachments);
+                }
+                else
+                    Attachments = ImmutableArray.Create<Attachment>();
+            }
+
+            if (model.Embeds.IsSpecified)
+            {
+                var value = model.Embeds.Value;
+                if (value.Length > 0)
+                {
+                    var embeds = new Embed[value.Length];
+                    for (int i = 0; i < embeds.Length; i++)
+                        embeds[i] = new Embed(value[i]);
+                    Embeds = ImmutableArray.Create(embeds);
+                }
+                else
+                    Embeds = ImmutableArray.Create<Embed>();
+            }
+
+            if (model.Mentions.IsSpecified)
+            {
+                var value = model.Mentions.Value;
+                if (value.Length > 0)
+                {
+                    var mentions = new User[value.Length];
+                    for (int i = 0; i < value.Length; i++)
+                        mentions[i] = new User(discord, value[i]);
+                    MentionedUsers = ImmutableArray.Create(mentions);
+                }
+                else
+                    MentionedUsers = ImmutableArray.Create<User>();
+            }
+
+            if (model.Content.IsSpecified)
+            {
+                RawText = model.Content.Value;
+
+                if (Channel is IGuildChannel)
+                {
+                    Text = MentionUtils.CleanUserMentions(RawText, MentionedUsers);
+                    MentionedChannelIds = MentionUtils.GetChannelMentions(RawText);
+                    var mentionedRoleIds = MentionUtils.GetRoleMentions(RawText);
+                    if (_isMentioningEveryone)
+                        mentionedRoleIds = mentionedRoleIds.Add(guildChannel.Guild.EveryoneRole.Id);
+                    MentionedRoleIds = mentionedRoleIds;
+                }
+                else
+                    Text = RawText;
+            }
         }
 
         public async Task UpdateAsync()

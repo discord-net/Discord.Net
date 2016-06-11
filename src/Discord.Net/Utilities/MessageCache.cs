@@ -88,7 +88,7 @@ namespace Discord
                 return msg;
             var model = await _discord.ApiClient.GetChannelMessageAsync(_channel.Id, id).ConfigureAwait(false);
             if (model != null)
-                return new CachedMessage(_channel, new User(_discord, model.Author), model);
+                return new CachedMessage(_channel, new User(_discord, model.Author.Value), model);
             return null;
         }
         public async Task<IReadOnlyCollection<CachedMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
