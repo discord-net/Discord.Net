@@ -336,7 +336,7 @@ namespace Discord
                                 await _gatewayLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
 
                                 var latency = (int)(Environment.TickCount - _heartbeatTime);
-                                await _gatewayLogger.DebugAsync("Latency = {latency} ms").ConfigureAwait(false);
+                                await _gatewayLogger.DebugAsync($"Latency = {latency} ms").ConfigureAwait(false);
                                 Latency = latency;
 
                                 await LatencyUpdated.RaiseAsync(latency).ConfigureAwait(false);
