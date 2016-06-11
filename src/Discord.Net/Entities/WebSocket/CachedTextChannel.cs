@@ -29,6 +29,7 @@ namespace Discord
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser GetUser(ulong id)
         {
+            //TODO: It's slow to do a perms check here... Maybe only do it on external calls?
             var user = Guild.GetUser(id);
             if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
                 return user;
