@@ -37,6 +37,7 @@ namespace Discord
         public GuildUser(Guild guild, User user, Model model)
         {
             Guild = guild;
+            User = user;
 
             Update(model, UpdateSource.Creation);
         }
