@@ -88,10 +88,10 @@ namespace Discord
         }
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
-        /// <summary> Creates a new discord client using the REST and WebSocket APIs. </summary>
+        /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient()
             : this(new DiscordSocketConfig()) { }
-        /// <summary> Creates a new discord client using the REST and WebSocket APIs. </summary>
+        /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient(DiscordSocketConfig config)
             : base(config)
         {
@@ -365,7 +365,7 @@ namespace Discord
                     {
                         case GatewayOpCode.Hello:
                             {
-                                await _gatewayLogger.DebugAsync($"Received Hello").ConfigureAwait(false);
+                                await _gatewayLogger.DebugAsync("Received Hello").ConfigureAwait(false);
                                 var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
                                 await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
@@ -374,10 +374,10 @@ namespace Discord
                             break;
                         case GatewayOpCode.HeartbeatAck:
                             {
-                                await _gatewayLogger.DebugAsync($"Received HeartbeatAck").ConfigureAwait(false);
+                                await _gatewayLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
 
                                 var latency = (int)(Environment.TickCount - _heartbeatTime);
-                                await _gatewayLogger.DebugAsync($"Latency = {latency} ms").ConfigureAwait(false);
+                                await _gatewayLogger.DebugAsync("Latency = {latency} ms").ConfigureAwait(false);
                                 Latency = latency;
 
                                 await LatencyUpdated.RaiseAsync(latency).ConfigureAwait(false);
@@ -389,7 +389,7 @@ namespace Discord
                                 //Global
                                 case "READY":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (READY)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
 
                                         //TODO: Make downloading large guilds optional
                                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
@@ -441,7 +441,7 @@ namespace Discord
                                     break;
                                 case "GUILD_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Guild>(_serializer);
                                         var guild = DataStore.GetGuild(data.Id);
@@ -479,7 +479,7 @@ namespace Discord
                                 //Channels
                                 case "CHANNEL_CREATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                         ICachedChannel channel = null;
@@ -502,7 +502,7 @@ namespace Discord
                                     break;
                                 case "CHANNEL_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                         var channel = DataStore.GetChannel(data.Id);
@@ -518,7 +518,7 @@ namespace Discord
                                     break;
                                 case "CHANNEL_DELETE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                         var channel = RemoveCachedChannel(data.Id);
@@ -532,7 +532,7 @@ namespace Discord
                                 //Members
                                 case "GUILD_MEMBER_ADD":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_MEMBER_ADD)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_ADD)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildMemberAddEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -547,7 +547,7 @@ namespace Discord
                                     break;
                                 case "GUILD_MEMBER_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildMemberUpdateEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -569,7 +569,7 @@ namespace Discord
                                     break;
                                 case "GUILD_MEMBER_REMOVE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildMemberRemoveEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -590,7 +590,7 @@ namespace Discord
                                     break;
                                 case "GUILD_MEMBERS_CHUNK":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildMembersChunkEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -613,7 +613,7 @@ namespace Discord
                                 //Roles
                                 case "GUILD_ROLE_CREATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_ROLE_CREATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_CREATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildRoleCreateEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -628,7 +628,7 @@ namespace Discord
                                     break;
                                 case "GUILD_ROLE_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildRoleUpdateEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -650,7 +650,7 @@ namespace Discord
                                     break;
                                 case "GUILD_ROLE_DELETE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildRoleDeleteEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -670,7 +670,7 @@ namespace Discord
                                 //Bans
                                 case "GUILD_BAN_ADD":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_BAN_ADD)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_ADD)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -682,7 +682,7 @@ namespace Discord
                                     break;
                                 case "GUILD_BAN_REMOVE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                         var guild = DataStore.GetGuild(data.GuildId);
@@ -696,7 +696,7 @@ namespace Discord
                                 //Messages
                                 case "MESSAGE_CREATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
@@ -707,7 +707,7 @@ namespace Discord
                                             if (author != null)
                                             {
                                                 var msg = channel.AddCachedMessage(author, data);
-                                                await MessageReceived.RaiseAsync(msg).ConfigureAwait(false).ConfigureAwait(false);
+                                                await MessageReceived.RaiseAsync(msg).ConfigureAwait(false);
                                             }
                                             else
                                                 await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown user.").ConfigureAwait(false);
@@ -718,7 +718,7 @@ namespace Discord
                                     break;
                                 case "MESSAGE_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
@@ -735,7 +735,7 @@ namespace Discord
                                     break;
                                 case "MESSAGE_DELETE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
@@ -752,7 +752,7 @@ namespace Discord
                                 //Statuses
                                 case "PRESENCE_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Presence>(_serializer);
                                         if (data.GuildId == null)
@@ -778,7 +778,7 @@ namespace Discord
                                     break;
                                 case "TYPING_START":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (TYPING_START)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
@@ -796,7 +796,7 @@ namespace Discord
                                 //Voice
                                 case "VOICE_STATE_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
                                         if (data.GuildId.HasValue)
@@ -821,7 +821,7 @@ namespace Discord
                                 //Settings
                                 case "USER_UPDATE":
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (USER_UPDATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (USER_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.User>(_serializer);
                                         if (data.Id == CurrentUser.Id)
@@ -835,12 +835,22 @@ namespace Discord
 
                                 //Ignored
                                 case "USER_SETTINGS_UPDATE":
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
+                                    return;
                                 case "MESSAGE_ACK": //TODO: Add (User only)
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
+                                    return;
                                 case "GUILD_EMOJIS_UPDATE": //TODO: Add
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
+                                    return;
                                 case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
+                                    return;
                                 case "VOICE_SERVER_UPDATE": //TODO: Add
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
+                                    return;
                                 case "RESUMED": //TODO: Add
-                                    await _gatewayLogger.DebugAsync($"Ignored Dispatch ({type})").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (RESUMED)").ConfigureAwait(false);
                                     return;
 
                                 //Others

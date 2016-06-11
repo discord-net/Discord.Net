@@ -28,10 +28,10 @@ namespace Discord
         public LoginState LoginState { get; private set; }
         public API.DiscordApiClient ApiClient { get; private set; }
 
-        /// <summary> Creates a new discord client using only the REST API. </summary>
+        /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordClient()
             : this(new DiscordConfig()) { }
-        /// <summary> Creates a new discord client using only the REST API. </summary>
+        /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordClient(DiscordConfig config)
         {
             _log = new LogManager(config.LogLevel);
