@@ -391,7 +391,7 @@ namespace Discord
                                         {
                                             guild = DataStore.GetGuild(data.Id);
                                             if (guild != null)
-                                                guild.Update(data, UpdateSource.WebSocket);
+                                                guild.Update(data, UpdateSource.WebSocket, DataStore);
                                             else
                                             {
                                                 await _gatewayLogger.WarningAsync($"{type} referenced an unknown guild.").ConfigureAwait(false);
