@@ -27,7 +27,7 @@ namespace Discord
             if (source == UpdateSource.Rest && IsAttached) return;
 
             Topic = model.Topic;
-            base.Update(model, UpdateSource.Rest);
+            base.Update(model, source);
         }
 
         public async Task ModifyAsync(Action<ModifyTextChannelParams> func)
