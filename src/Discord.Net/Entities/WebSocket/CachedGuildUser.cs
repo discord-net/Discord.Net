@@ -8,11 +8,11 @@ namespace Discord
         public new CachedGuild Guild => base.Guild as CachedGuild;
         public new CachedPublicUser User => base.User as CachedPublicUser;
 
-        public Presence? Presence => Guild.GetCachedPresence(Id);
+        public Presence? Presence => Guild.GetPresence(Id);
         public override Game? Game => Presence?.Game;
         public override UserStatus Status => Presence?.Status ?? UserStatus.Offline;
 
-        public VoiceState? VoiceState => Guild.GetCachedVoiceState(Id);
+        public VoiceState? VoiceState => Guild.GetVoiceState(Id);
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;

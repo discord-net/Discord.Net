@@ -32,8 +32,8 @@ namespace Discord
         public Task DownloaderPromise => _downloaderPromise.Task;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public CachedGuildUser CurrentUser => GetCachedUser(Discord.CurrentUser.Id);
-        public IReadOnlyCollection<ICachedGuildChannel> Channels => _channels.Select(x => GetCachedChannel(x)).ToReadOnlyCollection(_channels);
+        public CachedGuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
+        public IReadOnlyCollection<ICachedGuildChannel> Channels => _channels.Select(x => GetChannel(x)).ToReadOnlyCollection(_channels);
         public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
 
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
@@ -74,7 +74,7 @@ namespace Discord
             if (model.Channels != null)
             {
                 for (int i = 0; i < model.Channels.Length; i++)
-                    AddCachedChannel(model.Channels[i], channels);
+                    AddChannel(model.Channels[i], dataStore, channels);
             }
             _channels = channels;
 
@@ -82,7 +82,7 @@ namespace Discord
             if (model.Presences != null)
             {
                 for (int i = 0; i < model.Presences.Length; i++)
-                    AddOrUpdateCachedPresence(model.Presences[i], presences);
+                    AddOrUpdatePresence(model.Presences[i], presences);
             }
             _presences = presences;
 
@@ -90,7 +90,7 @@ namespace Discord
             if (model.Members != null)
             {
                 for (int i = 0; i < model.Members.Length; i++)
-                    AddCachedUser(model.Members[i], members, dataStore);
+                    AddUser(model.Members[i], dataStore, members);
                 _downloaderPromise = new TaskCompletionSource<bool>();
                 DownloadedMemberCount = model.Members.Length;
                 if (!model.Large)
@@ -102,43 +102,44 @@ namespace Discord
             if (model.VoiceStates != null)
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
-                    AddOrUpdateCachedVoiceState(model.VoiceStates[i], voiceStates);
+                    AddOrUpdateVoiceState(model.VoiceStates[i], voiceStates);
             }
             _voiceStates = voiceStates;
         }
 
-        public override Task<IGuildChannel> GetChannelAsync(ulong id) => Task.FromResult<IGuildChannel>(GetCachedChannel(id));
+        public override Task<IGuildChannel> GetChannelAsync(ulong id) => Task.FromResult<IGuildChannel>(GetChannel(id));
         public override Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync() => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
-        public ICachedGuildChannel AddCachedChannel(ChannelModel model, ConcurrentHashSet<ulong> channels = null)
+        public void AddChannel(ChannelModel model, DataStore dataStore, ConcurrentHashSet<ulong> channels = null)
         {
             var channel = ToChannel(model);
             (channels ?? _channels).TryAdd(model.Id);
-            return channel;
+            dataStore.AddChannel(channel);
         }
-        public ICachedGuildChannel GetCachedChannel(ulong id)
+        public ICachedGuildChannel GetChannel(ulong id)
         {
             return Discord.DataStore.GetChannel(id) as ICachedGuildChannel;
         }
-        public void RemoveCachedChannel(ulong id, ConcurrentHashSet<ulong> channels = null)
+        public ICachedGuildChannel RemoveChannel(ulong id)
         {
-            (channels ?? _channels).TryRemove(id);
+            _channels.TryRemove(id);
+            return Discord.DataStore.RemoveChannel(id) as ICachedGuildChannel;
         }
 
-        public Presence AddOrUpdateCachedPresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
+        public Presence AddOrUpdatePresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
         {
             var game = model.Game != null ? new Game(model.Game) : (Game?)null;
             var presence = new Presence(model.Status, game);
             (presences ?? _presences)[model.User.Id] = presence;
             return presence;
         }
-        public Presence? GetCachedPresence(ulong id)
+        public Presence? GetPresence(ulong id)
         {
             Presence presence;
             if (_presences.TryGetValue(id, out presence))
                 return presence;
             return null;
         }
-        public Presence? RemoveCachedPresence(ulong id)
+        public Presence? RemovePresence(ulong id)
         {
             Presence presence;
             if (_presences.TryRemove(id, out presence))
@@ -146,13 +147,13 @@ namespace Discord
             return null;
         }
 
-        public Role AddCachedRole(RoleModel model, ConcurrentDictionary<ulong, Role> roles = null)
+        public Role AddRole(RoleModel model, ConcurrentDictionary<ulong, Role> roles = null)
         {
             var role = new Role(this, model);
             (roles ?? _roles)[model.Id] = role;
             return role;
         }
-        public Role RemoveCachedRole(ulong id)
+        public Role RemoveRole(ulong id)
         {
             Role role;
             if (_roles.TryRemove(id, out role))
@@ -160,21 +161,21 @@ namespace Discord
             return null;
         }
 
-        public VoiceState AddOrUpdateCachedVoiceState(VoiceStateModel model, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
+        public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
         {
-            var voiceChannel = GetCachedChannel(model.ChannelId.Value) as CachedVoiceChannel;
+            var voiceChannel = GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
             var voiceState = new VoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
             (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
             return voiceState;
         }
-        public VoiceState? GetCachedVoiceState(ulong id)
+        public VoiceState? GetVoiceState(ulong id)
         {
             VoiceState voiceState;
             if (_voiceStates.TryGetValue(id, out voiceState))
                 return voiceState;
             return null;
         }
-        public VoiceState? RemoveCachedVoiceState(ulong id)
+        public VoiceState? RemoveVoiceState(ulong id)
         {
             VoiceState voiceState;
             if (_voiceStates.TryRemove(id, out voiceState))
@@ -182,7 +183,7 @@ namespace Discord
             return null;
         }
 
-        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
+        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetUser(id));
         public override Task<IGuildUser> GetCurrentUserAsync() 
             => Task.FromResult<IGuildUser>(CurrentUser);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
@@ -190,23 +191,23 @@ namespace Discord
         //TODO: Is there a better way of exposing pagination?
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset) 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.OrderBy(x => x.Id).Skip(offset).Take(limit).ToImmutableArray());
-        public CachedGuildUser AddCachedUser(MemberModel model, ConcurrentDictionary<ulong, CachedGuildUser> members = null, DataStore dataStore = null)
+        public CachedGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
-            var user = Discord.GetOrAddCachedUser(model.User);
+            var user = Discord.GetOrAddUser(model.User, dataStore);
             var member = new CachedGuildUser(this, user, model);
             (members ?? _members)[user.Id] = member;
             user.AddRef();
             DownloadedMemberCount++;
             return member;
         }
-        public CachedGuildUser GetCachedUser(ulong id)
+        public CachedGuildUser GetUser(ulong id)
         {
             CachedGuildUser member;
             if (_members.TryGetValue(id, out member))
                 return member;
             return null;
         }
-        public CachedGuildUser RemoveCachedUser(ulong id)
+        public CachedGuildUser RemoveUser(ulong id)
         {
             CachedGuildUser member;
             if (_members.TryRemove(id, out member))

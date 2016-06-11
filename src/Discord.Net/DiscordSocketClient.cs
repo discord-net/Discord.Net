@@ -209,30 +209,21 @@ namespace Discord
         {
             return Task.FromResult<IGuild>(DataStore.GetGuild(id));
         }
-        internal CachedGuild AddCachedGuild(API.Gateway.ExtendedGuild model, DataStore dataStore = null)
+        internal CachedGuild AddGuild(API.Gateway.ExtendedGuild model, DataStore dataStore)
         {
-            dataStore = dataStore ?? DataStore;
-
             var guild = new CachedGuild(this, model, dataStore);
-            if (model.Unavailable != true)
-            {
-                for (int i = 0; i < model.Channels.Length; i++)
-                    AddCachedChannel(guild, model.Channels[i], dataStore);
-            }
             dataStore.AddGuild(guild);
             if (model.Large)
                 _largeGuilds.Enqueue(model.Id);
             return guild;
         }
-        internal CachedGuild RemoveCachedGuild(ulong id, DataStore dataStore = null)
+        internal CachedGuild RemoveGuild(ulong id)
         {
-            dataStore = dataStore ?? DataStore;
-
-            var guild = dataStore.RemoveGuild(id);
+            var guild = DataStore.RemoveGuild(id);
             foreach (var channel in guild.Channels)
-                guild.RemoveCachedChannel(channel.Id);
+                guild.RemoveChannel(channel.Id);
             foreach (var user in guild.Members)
-                guild.RemoveCachedUser(user.Id);
+                guild.RemoveUser(user.Id);
             return guild;
         }
 
@@ -241,46 +232,19 @@ namespace Discord
         {
             return Task.FromResult<IChannel>(DataStore.GetChannel(id));
         }
-        internal ICachedGuildChannel AddCachedChannel(CachedGuild guild, API.Channel model, DataStore dataStore = null)
+        internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
         {
-            dataStore = dataStore ?? DataStore;
-
-            var channel = guild.AddCachedChannel(model);
-            dataStore.AddChannel(channel);
-            return channel;
-        }
-        internal CachedDMChannel AddCachedDMChannel(API.Channel model, DataStore dataStore = null)
-        {
-            dataStore = dataStore ?? DataStore;
-
-            var recipient = GetOrAddCachedUser(model.Recipient, dataStore);
+            var recipient = GetOrAddUser(model.Recipient, dataStore);
             var channel = recipient.AddDMChannel(model);
             dataStore.AddChannel(channel);
             return channel;
         }
-        internal ICachedChannel RemoveCachedChannel(ulong id, DataStore dataStore = null)
-        {
-            dataStore = dataStore ?? DataStore;
-
-            //TODO: C#7 Typeswitch Candidate
-            var channel = DataStore.RemoveChannel(id);
-
-            var guildChannel = channel as ICachedGuildChannel;
-            if (guildChannel != null)
-            {
-                guildChannel.Guild.RemoveCachedChannel(guildChannel.Id);
-                return channel;
-            }
-
-            var dmChannel = channel as CachedDMChannel;
-            if (dmChannel != null)
-            {
-                var recipient = dmChannel.Recipient;
-                recipient.RemoveDMChannel(id);
-                return channel;
-            }
-
-            return null;
+        internal CachedDMChannel RemoveDMChannel(ulong id)
+        {            
+            var dmChannel = DataStore.RemoveChannel(id) as CachedDMChannel;            
+            var recipient = dmChannel.Recipient;
+            recipient.RemoveDMChannel(id);
+            return dmChannel;
         }
 
         /// <inheritdoc />
@@ -293,20 +257,15 @@ namespace Discord
         {
             return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
         }
-        internal CachedPublicUser GetOrAddCachedUser(API.User model, DataStore dataStore = null)
+        internal CachedPublicUser GetOrAddUser(API.User model, DataStore dataStore)
         {
-            dataStore = dataStore ?? DataStore;
-
             var user = dataStore.GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model));
             user.AddRef();
             return user;
         }
-        internal CachedPublicUser RemoveCachedUser(ulong id, DataStore dataStore = null)
+        internal CachedPublicUser RemoveUser(ulong id)
         {
-            dataStore = dataStore ?? DataStore;
-
-            var user = dataStore.RemoveUser(id);
-            return user;
+            return DataStore.RemoveUser(id);
         }
 
         /// <summary> Downloads the members list for all large guilds. </summary>
@@ -395,14 +354,16 @@ namespace Discord
                                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
                                         var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
 
-                                        _currentUser = new CachedSelfUser(this, data.User);
+                                        var currentUser = new CachedSelfUser(this, data.User);
+                                        //dataStore.GetOrAddUser(data.User.Id, _ => currentUser);
 
                                         for (int i = 0; i < data.Guilds.Length; i++)
-                                            AddCachedGuild(data.Guilds[i], dataStore);
+                                            AddGuild(data.Guilds[i], dataStore);
                                         for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                            AddCachedDMChannel(data.PrivateChannels[i], dataStore);
+                                            AddDMChannel(data.PrivateChannels[i], dataStore);
 
                                         _sessionId = data.SessionId;
+                                        _currentUser = currentUser;
                                         DataStore = dataStore;
 
                                         await Ready.RaiseAsync().ConfigureAwait(false);
@@ -423,8 +384,7 @@ namespace Discord
                                         CachedGuild guild;
                                         if (data.Unavailable != false)
                                         {
-                                            guild = new CachedGuild(this, data, DataStore);
-                                            DataStore.AddGuild(guild);
+                                            guild = AddGuild(data, DataStore);
                                             await JoinedGuild.RaiseAsync(guild).ConfigureAwait(false);
                                         }
                                         else
@@ -433,7 +393,10 @@ namespace Discord
                                             if (guild != null)
                                                 guild.Update(data, UpdateSource.WebSocket);
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync($"{type} referenced an unknown guild.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
 
                                         await GuildAvailable.RaiseAsync(guild).ConfigureAwait(false);
@@ -452,7 +415,10 @@ namespace Discord
                                             await GuildUpdated.RaiseAsync(before, guild).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_UPDATE referenced an unknown guild.");
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_DELETE":
@@ -462,7 +428,7 @@ namespace Discord
                                             type = "GUILD_UNAVAILABLE";
                                         await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
 
-                                        var guild = DataStore.RemoveGuild(data.Id);
+                                        var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
                                             await GuildUnavailable.RaiseAsync(guild).ConfigureAwait(false);
@@ -472,7 +438,10 @@ namespace Discord
                                                 member.User.RemoveRef();
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync($"{type} referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -487,15 +456,15 @@ namespace Discord
                                         {
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
                                             if (guild != null)
-                                            {
-                                                channel = guild.AddCachedChannel(data);
-                                                DataStore.AddChannel(channel);
-                                            }
+                                                guild.AddChannel(data, DataStore);
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
-                                            channel = AddCachedDMChannel(data);
+                                            channel = AddDMChannel(data, DataStore);
                                         if (channel != null)
                                             await ChannelCreated.RaiseAsync(channel).ConfigureAwait(false);
                                     }
@@ -513,19 +482,38 @@ namespace Discord
                                             await ChannelUpdated.RaiseAsync(before, channel).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("CHANNEL_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "CHANNEL_DELETE":
                                     {
                                         await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
+                                        ICachedChannel channel = null;
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                        var channel = RemoveCachedChannel(data.Id);
+                                        if (data.GuildId != null)
+                                        {
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild != null)
+                                                channel = guild.RemoveChannel(data.Id);
+                                            else
+                                            {
+                                                await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+                                        else
+                                            channel = RemoveDMChannel(data.Id);
                                         if (channel != null)
                                             await ChannelDestroyed.RaiseAsync(channel).ConfigureAwait(false);
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -538,11 +526,14 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
                                         {
-                                            var user = guild.AddCachedUser(data);
+                                            var user = guild.AddUser(data, DataStore);
                                             await UserJoined.RaiseAsync(user).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBER_ADD referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_MEMBER_UPDATE":
@@ -553,7 +544,7 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
                                         {
-                                            var user = guild.GetCachedUser(data.User.Id);
+                                            var user = guild.GetUser(data.User.Id);
                                             if (user != null)
                                             {
                                                 var before = _enablePreUpdateEvents ? user.Clone() : null;
@@ -561,10 +552,16 @@ namespace Discord
                                                 await UserUpdated.RaiseAsync(before, user).ConfigureAwait(false);
                                             }
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_MEMBER_REMOVE":
@@ -575,17 +572,23 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
                                         {
-                                            var user = guild.RemoveCachedUser(data.User.Id);
+                                            var user = guild.RemoveUser(data.User.Id);
                                             if (user != null)
                                             {
                                                 user.User.RemoveRef();
                                                 await UserLeft.RaiseAsync(user).ConfigureAwait(false);
                                             }
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown user.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_MEMBERS_CHUNK":
@@ -597,7 +600,7 @@ namespace Discord
                                         if (guild != null)
                                         {
                                             foreach (var memberModel in data.Members)
-                                                guild.AddCachedUser(memberModel);
+                                                guild.AddUser(memberModel, DataStore);
 
                                             if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
                                             {
@@ -606,7 +609,10 @@ namespace Discord
                                             }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBERS_CHUNK referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -619,11 +625,14 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
                                         {
-                                            var role = guild.AddCachedRole(data.Role);
+                                            var role = guild.AddRole(data.Role);
                                             await RoleCreated.RaiseAsync(role).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_ROLE_UPDATE":
@@ -642,10 +651,16 @@ namespace Discord
                                                 await RoleUpdated.RaiseAsync(before, role).ConfigureAwait(false);
                                             }
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown role.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_ROLE_DELETE":
@@ -656,14 +671,20 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId);
                                         if (guild != null)
                                         {
-                                            var role = guild.RemoveCachedRole(data.RoleId);
+                                            var role = guild.RemoveRole(data.RoleId);
                                             if (role != null)
                                                 await RoleDeleted.RaiseAsync(role).ConfigureAwait(false);
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -677,7 +698,10 @@ namespace Discord
                                         if (guild != null)
                                             await UserBanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "GUILD_BAN_REMOVE":
@@ -689,7 +713,10 @@ namespace Discord
                                         if (guild != null)
                                             await UserUnbanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -702,18 +729,24 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var author = channel.GetCachedUser(data.Author.Id);
+                                            var author = channel.GetUser(data.Author.Id);
 
                                             if (author != null)
                                             {
-                                                var msg = channel.AddCachedMessage(author, data);
+                                                var msg = channel.AddMessage(author, data);
                                                 await MessageReceived.RaiseAsync(msg).ConfigureAwait(false);
                                             }
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown user.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "MESSAGE_UPDATE":
@@ -724,13 +757,16 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var msg = channel.GetCachedMessage(data.Id);
+                                            var msg = channel.GetMessage(data.Id);
                                             var before = _enablePreUpdateEvents ? msg.Clone() : null;
                                             msg.Update(data, UpdateSource.WebSocket);
                                             await MessageUpdated.RaiseAsync(before, msg).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
                                 case "MESSAGE_DELETE":
@@ -741,11 +777,14 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var msg = channel.RemoveCachedMessage(data.Id);
+                                            var msg = channel.RemoveMessage(data.Id);
                                             await MessageDeleted.RaiseAsync(msg).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("MESSAGE_DELETE referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -770,9 +809,9 @@ namespace Discord
                                                 break;
                                             }
                                             if (data.Status == UserStatus.Offline)
-                                                guild.RemoveCachedPresence(data.User.Id);
+                                                guild.RemovePresence(data.User.Id);
                                             else
-                                                guild.AddOrUpdateCachedPresence(data);
+                                                guild.AddOrUpdatePresence(data);
                                         }
                                     }
                                     break;
@@ -784,12 +823,15 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var user = channel.GetCachedUser(data.UserId);
+                                            var user = channel.GetUser(data.UserId);
                                             if (user != null)
                                                 await UserIsTyping.RaiseAsync(channel, user).ConfigureAwait(false);
                                         }
                                         else
+                                        {
                                             await _gatewayLogger.WarningAsync("TYPING_START referenced an unknown channel.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     break;
 
@@ -805,15 +847,18 @@ namespace Discord
                                             if (guild != null)
                                             {
                                                 if (data.ChannelId == null)
-                                                    guild.RemoveCachedVoiceState(data.UserId);
+                                                    guild.RemoveVoiceState(data.UserId);
                                                 else
-                                                    guild.AddOrUpdateCachedVoiceState(data);
+                                                    guild.AddOrUpdateVoiceState(data);
 
-                                                var user = guild.GetCachedUser(data.UserId);
+                                                var user = guild.GetUser(data.UserId);
                                                 user.Update(data, UpdateSource.WebSocket);
                                             }
                                             else
+                                            {
                                                 await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                                return;
+                                            }
                                         }
                                     }
                                     break;
@@ -829,6 +874,11 @@ namespace Discord
                                             var before = _enablePreUpdateEvents ? CurrentUser.Clone() : null;
                                             CurrentUser.Update(data, UpdateSource.WebSocket);
                                             await CurrentUserUpdated.RaiseAsync(before, CurrentUser).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("Received USER_UPDATE for wrong user.").ConfigureAwait(false);
+                                            return;
                                         }
                                     }
                                     break;

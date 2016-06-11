@@ -23,13 +23,13 @@ namespace Discord
             _messages = new MessageCache(Discord, this);
         }
 
-        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetCachedUser(id));
+        public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetUser(id));
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
-        public CachedGuildUser GetCachedUser(ulong id)
+        public CachedGuildUser GetUser(ulong id)
         {
-            var user = Guild.GetCachedUser(id);
+            var user = Guild.GetUser(id);
             if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
                 return user;
             return null;
@@ -48,17 +48,17 @@ namespace Discord
             return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
 
-        public CachedMessage AddCachedMessage(ICachedUser author, MessageModel model)
+        public CachedMessage AddMessage(ICachedUser author, MessageModel model)
         {
             var msg = new CachedMessage(this, author, model);
             _messages.Add(msg);
             return msg;
         }
-        public CachedMessage GetCachedMessage(ulong id)
+        public CachedMessage GetMessage(ulong id)
         {
             return _messages.Get(id);
         }
-        public CachedMessage RemoveCachedMessage(ulong id)
+        public CachedMessage RemoveMessage(ulong id)
         {
             return _messages.Remove(id);
         }
@@ -67,8 +67,8 @@ namespace Discord
 
         IReadOnlyCollection<ICachedUser> ICachedMessageChannel.Members => Members;
 
-        IMessage IMessageChannel.GetCachedMessage(ulong id) => GetCachedMessage(id);
-        ICachedUser ICachedMessageChannel.GetCachedUser(ulong id) => GetCachedUser(id);
+        IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
+        ICachedUser ICachedMessageChannel.GetUser(ulong id) => GetUser(id);
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }

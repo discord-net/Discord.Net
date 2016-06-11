@@ -1,4 +1,5 @@
-﻿using ChannelModel = Discord.API.Channel;
+﻿using Discord.Data;
+using ChannelModel = Discord.API.Channel;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
 
@@ -64,7 +65,7 @@ namespace Discord
             lock (this)
             {
                 if (--_references == 0 && DMChannel == null)
-                    Discord.RemoveCachedUser(Id);
+                    Discord.RemoveUser(Id);
             }
         }
 

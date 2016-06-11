@@ -7,10 +7,10 @@ namespace Discord
     {
         IReadOnlyCollection<ICachedUser> Members { get; }
 
-        CachedMessage AddCachedMessage(ICachedUser author, MessageModel model);
-        new CachedMessage GetCachedMessage(ulong id);
-        CachedMessage RemoveCachedMessage(ulong id);
+        CachedMessage AddMessage(ICachedUser author, MessageModel model);
+        CachedMessage GetMessage(ulong id);
+        CachedMessage RemoveMessage(ulong id);
 
-        ICachedUser GetCachedUser(ulong id);
+        ICachedUser GetUser(ulong id);
     }
 }
