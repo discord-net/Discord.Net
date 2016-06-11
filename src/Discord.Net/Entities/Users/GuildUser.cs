@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
@@ -9,6 +10,7 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class GuildUser : IGuildUser, ISnowflakeEntity
     {
         public bool IsDeaf { get; private set; }
@@ -45,20 +47,25 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            if (model.Deaf.HasValue)
+            if (model.Deaf.IsSpecified)
                 IsDeaf = model.Deaf.Value;
-            if (model.Mute.HasValue)
+            if (model.Mute.IsSpecified)
                 IsMute = model.Mute.Value;
-            JoinedAt = model.JoinedAt.Value;
-            Nickname = model.Nick;
+            if (model.JoinedAt.IsSpecified)
+                JoinedAt = model.JoinedAt.Value;
+            if (model.Nick.IsSpecified)
+                Nickname = model.Nick.Value;
 
-            var roles = ImmutableArray.CreateBuilder<Role>(model.Roles.Length + 1);
-            roles.Add(Guild.EveryoneRole);
-            for (int i = 0; i < model.Roles.Length; i++)
-                roles.Add(Guild.GetRole(model.Roles[i]));
-            Roles = roles.ToImmutable();
-
-            GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
+            if (model.Roles.IsSpecified)
+            {
+                var value = model.Roles.Value;
+                var roles = ImmutableArray.CreateBuilder<Role>(value.Length + 1);
+                roles.Add(Guild.EveryoneRole);
+                for (int i = 0; i < value.Length; i++)
+                    roles.Add(Guild.GetRole(value[i]));
+                Roles = roles.ToImmutable();
+                GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
+            }
         }
         public void Update(VoiceStateModel model, UpdateSource source)
         {
@@ -107,6 +114,9 @@ namespace Discord
         {
             await Discord.ApiClient.RemoveGuildMemberAsync(Guild.Id, Id).ConfigureAwait(false);
         }
+
+        public override string ToString() => $"{Username}#{Discriminator}";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
