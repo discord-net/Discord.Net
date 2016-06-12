@@ -1,4 +1,5 @@
 ﻿using Model = Discord.API.GuildMember;
+using PresenceModel = Discord.API.Presence;
 
 namespace Discord
 {
@@ -19,6 +20,10 @@ namespace Discord
         public CachedVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
 
         public CachedGuildUser(CachedGuild guild, CachedPublicUser user, Model model) 
+            : base(guild, user, model)
+        {
+        }
+        public CachedGuildUser(CachedGuild guild, CachedPublicUser user, PresenceModel model)
             : base(guild, user, model)
         {
         }

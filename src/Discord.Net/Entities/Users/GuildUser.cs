@@ -37,11 +37,19 @@ namespace Discord
 
         public DiscordClient Discord => Guild.Discord;
 
-        public GuildUser(Guild guild, User user, Model model)
+        private GuildUser(Guild guild, User user)
         {
             Guild = guild;
             User = user;
-
+        }
+        public GuildUser(Guild guild, User user, Model model)
+            : this(guild, user)
+        {
+            Update(model, UpdateSource.Creation);
+        }
+        public GuildUser(Guild guild, User user, PresenceModel model)
+            : this(guild, user)
+        {
             Update(model, UpdateSource.Creation);
         }
         public void Update(Model model, UpdateSource source)
@@ -63,7 +71,7 @@ namespace Discord
         public void Update(PresenceModel model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
-
+            
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
         }

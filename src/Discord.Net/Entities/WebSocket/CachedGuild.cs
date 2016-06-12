@@ -77,22 +77,27 @@ namespace Discord
                     AddChannel(model.Channels[i], dataStore, channels);
             }
             _channels = channels;
-
-            var presences = new ConcurrentDictionary<ulong, Presence>();
+            
             var members = new ConcurrentDictionary<ulong, CachedGuildUser>();
-            if (model.Presences != null)
-            {
-                for (int i = 0; i < model.Presences.Length; i++)
-                    AddOrUpdatePresence(model.Presences[i], presences, members);
-            }
+            var presences = new ConcurrentDictionary<ulong, Presence>();
             if (model.Members != null)
             {
+                DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
                     AddUser(model.Members[i], dataStore, members);
-                DownloadedMemberCount = model.Members.Length;
                 _downloaderPromise = new TaskCompletionSource<bool>();
                 if (!model.Large)
                     _downloaderPromise.SetResult(true);
+            }
+            if (model.Presences != null)
+            {
+                for (int i = 0; i < model.Presences.Length; i++)
+                {
+                    var presence = model.Presences[i];
+                    AddOrUpdatePresence(presence, presences);
+                    if (presence.Roles.IsSpecified)
+                        AddUser(presence, dataStore, members); //TODO: Does this ever happen?
+                }
             }
             _presences = presences;
             _members = members;
@@ -124,8 +129,7 @@ namespace Discord
             return Discord.DataStore.RemoveChannel(id) as ICachedGuildChannel;
         }
 
-        public Presence AddOrUpdatePresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null, 
-            ConcurrentDictionary<ulong, CachedGuildUser> members = null)
+        public Presence AddOrUpdatePresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
         {
             var game = model.Game != null ? new Game(model.Game) : (Game?)null;
             var presence = new Presence(model.Status, game);
@@ -194,10 +198,35 @@ namespace Discord
         public CachedGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
             var user = Discord.GetOrAddUser(model.User, dataStore);
-            var member = new CachedGuildUser(this, user, model);
-            (members ?? _members)[user.Id] = member;
-            user.AddRef();
-            DownloadedMemberCount++;
+            members = members ?? _members;
+
+            CachedGuildUser member;
+            if (members.TryGetValue(model.User.Id, out member))
+                member.Update(model, UpdateSource.WebSocket);
+            else
+            {
+                member = new CachedGuildUser(this, user, model);
+                members[user.Id] = member;
+                user.AddRef();
+                DownloadedMemberCount++;
+            }
+            return member;
+        }
+        public CachedGuildUser AddUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
+        {
+            var user = Discord.GetOrAddUser(model.User, dataStore);
+            members = members ?? _members;
+
+            CachedGuildUser member;
+            if (members.TryGetValue(model.User.Id, out member))
+                member.Update(model, UpdateSource.WebSocket);
+            else
+            {
+                member = new CachedGuildUser(this, user, model);
+                members[user.Id] = member;
+                user.AddRef();
+                DownloadedMemberCount++;
+            }            
             return member;
         }
         public CachedGuildUser GetUser(ulong id)
