@@ -104,7 +104,7 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (user.Id == user.Guild.OwnerId || GetValue(resolvedPermissions, GuildPermission.Administrator))
+            if (user.Id == user.Guild.OwnerId || GetValue(guildPermissions, GuildPermission.Administrator))
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
