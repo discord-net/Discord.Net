@@ -79,7 +79,6 @@ namespace Discord
             _channels = channels;
             
             var members = new ConcurrentDictionary<ulong, CachedGuildUser>();
-            var presences = new ConcurrentDictionary<ulong, Presence>();
             if (model.Members != null)
             {
                 DownloadedMemberCount = 0;
@@ -89,24 +88,25 @@ namespace Discord
                 if (!model.Large)
                     _downloaderPromise.SetResult(true);
             }
+            _members = members;
+
+            var presences = new ConcurrentDictionary<ulong, Presence>();
             if (model.Presences != null)
             {
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
                     var presence = model.Presences[i];
                     AddOrUpdatePresence(presence, presences);
-                    if (presence.Roles.IsSpecified)
-                        AddUser(presence, dataStore, members); //TODO: Does this ever happen?
+                    //AddUser(presence, dataStore, members);
                 }
             }
             _presences = presences;
-            _members = members;
 
             var voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
             if (model.VoiceStates != null)
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
-                    AddOrUpdateVoiceState(model.VoiceStates[i], voiceStates);
+                    AddOrUpdateVoiceState(model.VoiceStates[i], dataStore, voiceStates);
             }
             _voiceStates = voiceStates;
         }
@@ -165,9 +165,9 @@ namespace Discord
             return null;
         }
 
-        public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
+        public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, DataStore dataStore, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
         {
-            var voiceChannel = GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
+            var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
             var voiceState = new VoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
             (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
             return voiceState;
@@ -214,7 +214,6 @@ namespace Discord
         }
         public CachedGuildUser AddUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
-            var user = Discord.GetOrAddUser(model.User, dataStore);
             members = members ?? _members;
 
             CachedGuildUser member;
@@ -222,6 +221,7 @@ namespace Discord
                 member.Update(model, UpdateSource.WebSocket);
             else
             {
+                var user = Discord.GetOrAddUser(model.User, dataStore);
                 member = new CachedGuildUser(this, user, model);
                 members[user.Id] = member;
                 user.AddRef();

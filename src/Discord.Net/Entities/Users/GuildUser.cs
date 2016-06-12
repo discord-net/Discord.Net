@@ -16,7 +16,7 @@ namespace Discord
     {
         public bool IsDeaf { get; private set; }
         public bool IsMute { get; private set; }
-        public DateTime JoinedAt { get; private set; }
+        public DateTime? JoinedAt { get; private set; }
         public string Nickname { get; private set; }
         public GuildPermissions GuildPermissions { get; private set; }
 

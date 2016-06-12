@@ -13,7 +13,7 @@ namespace Discord
         /// <summary> Returns true if the guild has muted this user. </summary>
         bool IsMute { get; }
         /// <summary> Gets when this user joined this guild. </summary>
-        DateTime JoinedAt { get; }
+        DateTime? JoinedAt { get; }
         /// <summary> Gets the nickname for this user. </summary>
         string Nickname { get; }
         /// <summary> Gets the guild-level permissions granted to this user by their roles. </summary>

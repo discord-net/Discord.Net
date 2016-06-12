@@ -900,7 +900,7 @@ namespace Discord
                                             if (data.ChannelId == null)
                                                 guild.RemoveVoiceState(data.UserId);
                                             else
-                                                guild.AddOrUpdateVoiceState(data);
+                                                guild.AddOrUpdateVoiceState(data, DataStore);
 
                                             var user = guild.GetUser(data.UserId);
                                             if (user != null)
