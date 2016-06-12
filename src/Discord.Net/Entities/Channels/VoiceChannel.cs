@@ -22,8 +22,8 @@ namespace Discord
             if (source == UpdateSource.Rest && IsAttached) return;
 
             base.Update(model, source);
-            Bitrate = model.Bitrate;
-            UserLimit = model.UserLimit;
+            Bitrate = model.Bitrate.Value;
+            UserLimit = model.UserLimit.Value;
         }
         
         public async Task ModifyAsync(Action<ModifyVoiceChannelParams> func)

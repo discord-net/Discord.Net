@@ -26,7 +26,7 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            Topic = model.Topic;
+            Topic = model.Topic.Value;
             base.Update(model, source);
         }
 

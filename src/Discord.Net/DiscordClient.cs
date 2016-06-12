@@ -133,7 +133,7 @@ namespace Discord
             var model = await ApiClient.GetChannelAsync(id).ConfigureAwait(false);
             if (model != null)
             {
-                if (model.GuildId != null)
+                if (model.GuildId.IsSpecified)
                 {
                     var guildModel = await ApiClient.GetGuildAsync(model.GuildId.Value).ConfigureAwait(false);
                     if (guildModel != null)
@@ -143,7 +143,7 @@ namespace Discord
                     }
                 }
                 else
-                    return new DMChannel(this, new User(this, model.Recipient), model);
+                    return new DMChannel(this, new User(this, model.Recipient.Value), model);
             }
             return null;
         }
@@ -151,7 +151,7 @@ namespace Discord
         public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
         {
             var models = await ApiClient.GetMyDMsAsync().ConfigureAwait(false);
-            return models.Select(x => new DMChannel(this, new User(this, x.Recipient), x)).ToImmutableArray();
+            return models.Select(x => new DMChannel(this, new User(this, x.Recipient.Value), x)).ToImmutableArray();
         }
 
         /// <inheritdoc />

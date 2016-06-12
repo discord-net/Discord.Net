@@ -79,23 +79,22 @@ namespace Discord
             _channels = channels;
 
             var presences = new ConcurrentDictionary<ulong, Presence>();
+            var members = new ConcurrentDictionary<ulong, CachedGuildUser>();
             if (model.Presences != null)
             {
                 for (int i = 0; i < model.Presences.Length; i++)
-                    AddOrUpdatePresence(model.Presences[i], presences);
+                    AddOrUpdatePresence(model.Presences[i], presences, members);
             }
-            _presences = presences;
-
-            var members = new ConcurrentDictionary<ulong, CachedGuildUser>();
             if (model.Members != null)
             {
                 for (int i = 0; i < model.Members.Length; i++)
                     AddUser(model.Members[i], dataStore, members);
-                _downloaderPromise = new TaskCompletionSource<bool>();
                 DownloadedMemberCount = model.Members.Length;
+                _downloaderPromise = new TaskCompletionSource<bool>();
                 if (!model.Large)
                     _downloaderPromise.SetResult(true);
             }
+            _presences = presences;
             _members = members;
 
             var voiceStates = new ConcurrentDictionary<ulong, VoiceState>();
@@ -125,7 +124,8 @@ namespace Discord
             return Discord.DataStore.RemoveChannel(id) as ICachedGuildChannel;
         }
 
-        public Presence AddOrUpdatePresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null)
+        public Presence AddOrUpdatePresence(PresenceModel model, ConcurrentDictionary<ulong, Presence> presences = null, 
+            ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
             var game = model.Game != null ? new Game(model.Game) : (Game?)null;
             var presence = new Presence(model.Status, game);
@@ -229,14 +229,14 @@ namespace Discord
 
         new internal ICachedGuildChannel ToChannel(ChannelModel model)
         {
-            switch (model.Type)
+            switch (model.Type.Value)
             {
                 case ChannelType.Text:
                     return new CachedTextChannel(this, model);
                 case ChannelType.Voice:
                     return new CachedVoiceChannel(this, model);
                 default:
-                    throw new InvalidOperationException($"Unknown channel type: {model.Type}");
+                    throw new InvalidOperationException($"Unknown channel type: {model.Type.Value}");
             }
         }
     }

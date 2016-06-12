@@ -239,7 +239,7 @@ namespace Discord
         }
         internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
         {
-            var recipient = GetOrAddUser(model.Recipient, dataStore);
+            var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
             var channel = recipient.AddDMChannel(model);
             dataStore.AddChannel(channel);
             return channel;
@@ -457,7 +457,7 @@ namespace Discord
 
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                         ICachedChannel channel = null;
-                                        if (data.GuildId != null)
+                                        if (data.GuildId.IsSpecified)
                                         {
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
                                             if (guild != null)
@@ -499,7 +499,7 @@ namespace Discord
 
                                         ICachedChannel channel = null;
                                         var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                        if (data.GuildId != null)
+                                        if (data.GuildId.IsSpecified)
                                         {
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
                                             if (guild != null)
@@ -812,13 +812,7 @@ namespace Discord
                                         await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
 
                                         var data = (payload as JToken).ToObject<API.Presence>(_serializer);
-                                        if (data.GuildId == null)
-                                        {
-                                            var user = DataStore.GetUser(data.User.Id);
-                                            if (user == null)
-                                                user.Update(data, UpdateSource.WebSocket);
-                                        }
-                                        else
+                                        if (data.GuildId.IsSpecified)
                                         {
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
                                             if (guild == null)
@@ -830,6 +824,12 @@ namespace Discord
                                                 guild.RemovePresence(data.User.Id);
                                             else
                                                 guild.AddOrUpdatePresence(data);
+                                        }
+                                        else
+                                        {
+                                            var user = DataStore.GetUser(data.User.Id);
+                                            if (user == null)
+                                                user.Update(data, UpdateSource.WebSocket);
                                         }
                                     }
                                     break;

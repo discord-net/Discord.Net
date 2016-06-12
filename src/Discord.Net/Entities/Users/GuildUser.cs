@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
+using PresenceModel = Discord.API.Presence;
 using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
@@ -47,29 +48,24 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            if (model.Deaf.IsSpecified)
-                IsDeaf = model.Deaf.Value;
-            if (model.Mute.IsSpecified)
-                IsMute = model.Mute.Value;
-            if (model.JoinedAt.IsSpecified)
-                JoinedAt = model.JoinedAt.Value;
+            //if (model.Deaf.IsSpecified)
+                IsDeaf = model.Deaf;
+            //if (model.Mute.IsSpecified)
+                IsMute = model.Mute;
+            //if (model.JoinedAt.IsSpecified)
+                JoinedAt = model.JoinedAt;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
 
+            //if (model.Roles.IsSpecified)
+                UpdateRoles(model.Roles);
+        }
+        public void Update(PresenceModel model, UpdateSource source)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
             if (model.Roles.IsSpecified)
-            {
-                var value = model.Roles.Value;
-                var roles = ImmutableArray.CreateBuilder<Role>(value.Length + 1);
-                roles.Add(Guild.EveryoneRole);
-                for (int i = 0; i < value.Length; i++)
-                {
-                    var role = Guild.GetRole(value[i]);
-                    if (role != null)
-                        roles.Add(role);
-                }
-                Roles = roles.ToImmutable();
-                GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
-            }
+                UpdateRoles(model.Roles.Value);
         }
         public void Update(VoiceStateModel model, UpdateSource source)
         {
@@ -77,6 +73,19 @@ namespace Discord
 
             IsDeaf = model.Deaf;
             IsMute = model.Mute;
+        }
+        private void UpdateRoles(ulong[] roleIds)
+        {
+            var roles = ImmutableArray.CreateBuilder<Role>(roleIds.Length + 1);
+            roles.Add(Guild.EveryoneRole);
+            for (int i = 0; i < roleIds.Length; i++)
+            {
+                var role = Guild.GetRole(roleIds[i]);
+                if (role != null)
+                    roles.Add(role);
+            }
+            Roles = roles.ToImmutable();
+            GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
         }
 
         public async Task UpdateAsync()

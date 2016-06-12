@@ -17,6 +17,6 @@ namespace Discord
         public Game(string name)
             : this(name, null, StreamType.NotStreaming) { }
         internal Game(Model model)
-            : this(model.Name, model.StreamUrl, model.StreamType ?? StreamType.NotStreaming) { }
+            : this(model.Name, model.StreamUrl.GetValueOrDefault(null), model.StreamType.GetValueOrDefault(null) ?? StreamType.NotStreaming) { }
     }
 }

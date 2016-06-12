@@ -9,14 +9,14 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("color")]
-        public uint? Color { get; set; }
+        public uint Color { get; set; }
         [JsonProperty("hoist")]
-        public bool? Hoist { get; set; }
+        public bool Hoist { get; set; }
         [JsonProperty("position")]
-        public int? Position { get; set; }
+        public int Position { get; set; }
         [JsonProperty("permissions"), Int53]
-        public ulong? Permissions { get; set; }
+        public ulong Permissions { get; set; }
         [JsonProperty("managed")]
-        public bool? Managed { get; set; }
+        public bool Managed { get; set; }
     }
 }

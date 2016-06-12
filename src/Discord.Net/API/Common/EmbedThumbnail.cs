@@ -9,8 +9,8 @@ namespace Discord.API
         [JsonProperty("proxy_url")]
         public string ProxyUrl { get; set; }
         [JsonProperty("height")]
-        public int? Height { get; set; }
+        public int Height { get; set; }
         [JsonProperty("width")]
-        public int? Width { get; set; }
+        public int Width { get; set; }
     }
 }

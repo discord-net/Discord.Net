@@ -34,15 +34,13 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            Name = model.Name;
-            Position = model.Position;
+            Name = model.Name.Value;
+            Position = model.Position.Value;
 
+            var overwrites = model.PermissionOverwrites.Value;
             var newOverwrites = new ConcurrentDictionary<ulong, Overwrite>();
-            for (int i = 0; i < model.PermissionOverwrites.Length; i++)
-            {
-                var overwrite = model.PermissionOverwrites[i];
-                newOverwrites[overwrite.TargetId] = new Overwrite(overwrite);
-            }
+            for (int i = 0; i < overwrites.Length; i++)
+                newOverwrites[overwrites[i].TargetId] = new Overwrite(overwrites[i]);
             _overwrites = newOverwrites;
         }
 

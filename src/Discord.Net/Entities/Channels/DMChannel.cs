@@ -30,7 +30,7 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
             
-            Recipient.Update(model.Recipient, UpdateSource.Rest);
+            Recipient.Update(model.Recipient.Value, UpdateSource.Rest);
         }
 
         public async Task UpdateAsync()

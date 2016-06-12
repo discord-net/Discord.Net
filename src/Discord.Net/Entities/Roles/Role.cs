@@ -37,11 +37,11 @@ namespace Discord
             if (source == UpdateSource.Rest && IsAttached) return;
 
             Name = model.Name;
-            IsHoisted = model.Hoist.Value;
-            IsManaged = model.Managed.Value;
-            Position = model.Position.Value;
-            Color = new Color(model.Color.Value);
-            Permissions = new GuildPermissions(model.Permissions.Value);
+            IsHoisted = model.Hoist;
+            IsManaged = model.Managed;
+            Position = model.Position;
+            Color = new Color(model.Color);
+            Permissions = new GuildPermissions(model.Permissions);
         }
 
         public async Task ModifyAsync(Action<ModifyGuildRoleParams> func)

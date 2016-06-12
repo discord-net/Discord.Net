@@ -4,6 +4,8 @@ namespace Discord
 {
     public interface IInviteMetadata : IInvite
     {
+        /// <summary> Gets the user that created this invite. </summary>
+        IUser Inviter { get; }
         /// <summary> Returns true if this invite was revoked. </summary>
         bool IsRevoked { get; }
         /// <summary> Returns true if users accepting this invite will be removed from the guild when they log off. </summary>

@@ -11,6 +11,7 @@ namespace Discord
         public int? MaxUses { get; private set; }
         public int Uses { get; private set; }
         public DateTime CreatedAt { get; private set; }
+        public IUser Inviter { get; private set; }
 
         public InviteMetadata(DiscordClient client, Model model)
             : base(client, model)
@@ -21,6 +22,7 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
+            Inviter = new User(Discord, model.Inviter);
             IsRevoked = model.Revoked;
             IsTemporary = model.Temporary;
             MaxAge = model.MaxAge != 0 ? model.MaxAge : (int?)null;

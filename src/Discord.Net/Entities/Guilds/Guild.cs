@@ -288,14 +288,14 @@ namespace Discord
 
         internal GuildChannel ToChannel(API.Channel model)
         {
-            switch (model.Type)
+            switch (model.Type.Value)
             {
                 case ChannelType.Text:
                     return new TextChannel(this, model);
                 case ChannelType.Voice:
                     return new VoiceChannel(this, model);
                 default:
-                    throw new InvalidOperationException($"Unknown channel type: {model.Type}");
+                    throw new InvalidOperationException($"Unknown channel type: {model.Type.Value}");
             }
         }
 

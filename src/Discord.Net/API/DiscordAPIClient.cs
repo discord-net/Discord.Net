@@ -391,7 +391,7 @@ namespace Discord.API
             try
             {
                 var model = await SendAsync<Channel>("GET", $"channels/{channelId}", options: options).ConfigureAwait(false);
-                if (model.GuildId != guildId)
+                if (!model.GuildId.IsSpecified || model.GuildId.Value != guildId)
                     return null;
                 return model;
             }

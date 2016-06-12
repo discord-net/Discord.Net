@@ -7,8 +7,8 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("url")]
-        public string StreamUrl { get; set; }
+        public Optional<string> StreamUrl { get; set; }
         [JsonProperty("type")]
-        public StreamType? StreamType { get; set; }
+        public Optional<StreamType?> StreamType { get; set; }
     }
 }
