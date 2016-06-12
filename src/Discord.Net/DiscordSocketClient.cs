@@ -853,7 +853,7 @@ namespace Discord
                                         else
                                         {
                                             guild.AddOrUpdatePresence(data);
-                                            if (data.Roles.IsSpecified) //Happens when a user we haven't seen before logs in
+                                            if (data.Roles.IsSpecified || data.Nick.IsSpecified) //Happens when a user we haven't seen before logs in
                                             {
                                                 CachedGuildUser user = guild.GetUser(data.User.Id);
                                                 if (user == null)

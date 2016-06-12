@@ -74,6 +74,8 @@ namespace Discord
             
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.Nick.IsSpecified)
+                Nickname = model.Nick.Value;
         }
         public void Update(VoiceStateModel model, UpdateSource source)
         {
