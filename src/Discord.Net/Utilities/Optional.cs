@@ -41,7 +41,7 @@ namespace Discord
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;
 
         public override string ToString() => IsSpecified ? _value?.ToString() : null;
-        private string DebuggerDisplay => IsSpecified ? _value.ToString() : "<unspecified>";
+        private string DebuggerDisplay => IsSpecified ? (_value?.ToString() ?? "<null>") : "<unspecified>";
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
         public static explicit operator T(Optional<T> value) => value.Value;
