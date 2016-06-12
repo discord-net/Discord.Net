@@ -131,6 +131,6 @@ namespace Discord
         }
 
         public override string ToString() => RawValue.ToString();
-        private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
+        private string DebuggerDisplay => $"{string.Join(", ", ToList())}";
     }
 }
