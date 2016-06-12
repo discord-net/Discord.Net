@@ -336,6 +336,13 @@ namespace Discord
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _heartbeatCancelToken.Token);
                         }
                         break;
+                    case GatewayOpCode.Heartbeat:
+                        {
+                            await _gatewayLogger.DebugAsync("Received Heartbeat").ConfigureAwait(false);
+                            
+                            await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
+                        }
+                        break;
                     case GatewayOpCode.HeartbeatAck:
                         {
                             await _gatewayLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
