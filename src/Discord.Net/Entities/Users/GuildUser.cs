@@ -62,7 +62,11 @@ namespace Discord
                 var roles = ImmutableArray.CreateBuilder<Role>(value.Length + 1);
                 roles.Add(Guild.EveryoneRole);
                 for (int i = 0; i < value.Length; i++)
-                    roles.Add(Guild.GetRole(value[i]));
+                {
+                    var role = Guild.GetRole(value[i]);
+                    if (role != null)
+                        roles.Add(role);
+                }
                 Roles = roles.ToImmutable();
                 GuildPermissions = new GuildPermissions(Permissions.ResolveGuild(this));
             }

@@ -114,6 +114,11 @@ namespace Discord
 #endif
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+            _serializer.Error += (s, e) =>
+            {
+                _gatewayLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
+                e.ErrorContext.Handled = true;
+            };
             
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {(GatewayOpCode)opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
