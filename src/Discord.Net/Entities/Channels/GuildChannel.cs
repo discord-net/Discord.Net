@@ -90,14 +90,14 @@ namespace Discord
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             Overwrite value;
-            if (_overwrites.TryGetValue(Id, out value))
+            if (_overwrites.TryGetValue(user.Id, out value))
                 return value.Permissions;
             return null;
         }
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             Overwrite value;
-            if (_overwrites.TryGetValue(Id, out value))
+            if (_overwrites.TryGetValue(role.Id, out value))
                 return value.Permissions;
             return null;
         }
