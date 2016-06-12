@@ -55,17 +55,16 @@ namespace Discord.Net.Converters
                         converter = ImageConverter.Instance;
                     else if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
                     {
-                        var innerType = type.GenericTypeArguments[0];
                         var typeInput = propInfo.DeclaringType;
-                        var typeOutput = propInfo.PropertyType;
+                        var innerTypeOutput = type.GenericTypeArguments[0];
 
-                        var getter = typeof(Func<,>).MakeGenericType(typeInput, typeOutput);
+                        var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
                         var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
-                        var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, typeOutput);
+                        var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
                         var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
                         property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
 
-                        var converterType = typeof(OptionalConverter<>).MakeGenericType(innerType);
+                        var converterType = typeof(OptionalConverter<>).MakeGenericType(innerTypeOutput);
                         converter = converterType.GetTypeInfo().GetDeclaredField("Instance").GetValue(null) as JsonConverter;
                     }
                 }
@@ -81,9 +80,8 @@ namespace Discord.Net.Converters
         }
 
         private static bool ShouldSerialize<TOwner, TValue>(object owner, Delegate getter)
-            where TValue : IOptional
         {
-            return (getter as Func<TOwner, TValue>)((TOwner)owner).IsSpecified;
+            return (getter as Func<TOwner, Optional<TValue>>)((TOwner)owner).IsSpecified;
         }
     }
 }
