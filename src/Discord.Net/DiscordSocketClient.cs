@@ -805,6 +805,27 @@ namespace Discord
                                     }
                                 }
                                 break;
+                            case "MESSAGE_DELETE_BULK":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<MessageDeleteBulkEvent>(_serializer);
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    if (channel != null)
+                                    {
+                                        foreach (var id in data.Ids)
+                                        {
+                                            var msg = channel.RemoveMessage(id);
+                                            await MessageDeleted.RaiseAsync(msg).ConfigureAwait(false);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("MESSAGE_DELETE_BULK referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
 
                             //Statuses
                             case "PRESENCE_UPDATE":
