@@ -5,7 +5,7 @@ namespace Discord
 {
     //Based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Nullable.cs
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct Optional<T> : IOptional
+    public struct Optional<T>
     {
         private readonly T _value;
 
@@ -45,7 +45,5 @@ namespace Discord
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
         public static explicit operator T(Optional<T> value) => value.Value;
-
-        object IOptional.Value => Value;
     }
 }
