@@ -1,4 +1,6 @@
-﻿namespace Discord
+﻿using System;
+
+namespace Discord
 {
     public interface IInviteMetadata : IInvite
     {
@@ -12,5 +14,7 @@
         int? MaxUses { get; }
         /// <summary> Gets the amount of times this invite has been used. </summary>
         int Uses { get; }
+        /// <summary> Gets when this invite was created. </summary>
+        DateTime CreatedAt { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Model = Discord.API.InviteMetadata;
+﻿using System;
+using Model = Discord.API.InviteMetadata;
 
 namespace Discord
 {
@@ -9,6 +10,7 @@ namespace Discord
         public int? MaxAge { get; private set; }
         public int? MaxUses { get; private set; }
         public int Uses { get; private set; }
+        public DateTime CreatedAt { get; private set; }
 
         public InviteMetadata(DiscordClient client, Model model)
             : base(client, model)
@@ -24,6 +26,7 @@ namespace Discord
             MaxAge = model.MaxAge != 0 ? model.MaxAge : (int?)null;
             MaxUses = model.MaxUses;
             Uses = model.Uses;
+            CreatedAt = model.CreatedAt;
         }
     }
 }
