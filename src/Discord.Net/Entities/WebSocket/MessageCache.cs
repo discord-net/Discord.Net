@@ -104,11 +104,16 @@ namespace Discord
                 return cachedMessages.Skip(cachedMessages.Count - limit).ToImmutableArray();
             else
             {
+                Optional<ulong> relativeId;
+                if (cachedMessages.Count == 0)
+                    relativeId = fromId ?? new Optional<ulong>();
+                else
+                    relativeId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id;
                 var args = new GetChannelMessagesParams
                 {
                     Limit = limit - cachedMessages.Count,
                     RelativeDirection = dir,
-                    RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id
+                    RelativeMessageId = relativeId
                 };
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
                 return cachedMessages.Concat(downloadedMessages.Select(x => new CachedMessage(_channel, _channel.GetUser(x.Id), x))).ToImmutableArray();
