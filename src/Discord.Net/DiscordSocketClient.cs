@@ -852,7 +852,13 @@ namespace Discord
                                                     guild.AddOrUpdateVoiceState(data);
 
                                                 var user = guild.GetUser(data.UserId);
-                                                user.Update(data, UpdateSource.WebSocket);
+                                                if (user != null)
+                                                    user.Update(data, UpdateSource.WebSocket);
+                                                /*else //Happens when a user leaves/is kicked from a guild while in a voice channel
+                                                {
+                                                    await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                    return;
+                                                }*/
                                             }
                                             else
                                             {
