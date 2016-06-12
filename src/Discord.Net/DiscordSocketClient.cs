@@ -762,10 +762,23 @@ namespace Discord
                                         var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                         if (channel != null)
                                         {
-                                            var msg = channel.GetMessage(data.Id);
-                                            var before = _enablePreUpdateEvents ? msg.Clone() : null;
-                                            msg.Update(data, UpdateSource.WebSocket);
-                                            await MessageUpdated.RaiseAsync(before, msg).ConfigureAwait(false);
+                                            IMessage before = null, after = null;
+                                            CachedMessage cachedMsg = channel.GetMessage(data.Id);
+                                            if (cachedMsg != null)
+                                            {
+                                                before = _enablePreUpdateEvents ? cachedMsg.Clone() : null;
+                                                cachedMsg.Update(data, UpdateSource.WebSocket);
+                                                after = cachedMsg;
+                                            }
+                                            else if (data.Author.IsSpecified)
+                                            {
+                                                //Edited message isnt in cache, create a detached one
+                                                var author = channel.GetUser(data.Author.Value.Id);
+                                                if (author != null)
+                                                    after = new Message(channel, author, data);
+                                            }
+                                            if (after != null)
+                                                await MessageUpdated.RaiseAsync(before, after).ConfigureAwait(false);
                                         }
                                         else
                                         {
