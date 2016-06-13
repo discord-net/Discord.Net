@@ -627,6 +627,14 @@ namespace Discord.API
         {
             Preconditions.NotNullOrEmpty(inviteIdOrXkcd, nameof(inviteIdOrXkcd));
 
+            //Remove trailing slash
+            if (inviteIdOrXkcd[inviteIdOrXkcd.Length - 1] == '/')
+                inviteIdOrXkcd = inviteIdOrXkcd.Substring(0, inviteIdOrXkcd.Length - 1);
+            //Remove leading URL
+            int index = inviteIdOrXkcd.LastIndexOf('/');
+            if (index >= 0)
+                inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
+
             try
             {
                 return await SendAsync<Invite>("GET", $"invites/{inviteIdOrXkcd}", options: options).ConfigureAwait(false);
