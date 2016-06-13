@@ -118,7 +118,7 @@ namespace Discord
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
                 return cachedMessages.Concat(downloadedMessages.Select(x =>
                 {
-                    var user = _channel.GetUser(x.Id) ?? new User(_channel.Discord, x.Author.Value) as IUser;
+                    var user = _channel.GetUser(x.Author.Value.Id) ?? new User(_channel.Discord, x.Author.Value) as IUser;
                     return new CachedMessage(_channel, user, x);
                 })).ToImmutableArray();
             }
