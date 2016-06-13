@@ -116,9 +116,19 @@ namespace Discord
                     RelativeMessageId = relativeId
                 };
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
+
+                var guild = (_channel as ICachedGuildChannel).Guild;
                 return cachedMessages.Concat(downloadedMessages.Select(x =>
                 {
-                    var user = _channel.GetUser(x.Author.Value.Id) ?? new User(_channel.Discord, x.Author.Value) as IUser;
+                    IUser user = _channel.GetUser(x.Author.Value.Id);
+                    if (user == null)
+                    {
+                        var newUser = new User(_channel.Discord, x.Author.Value);
+                        if (guild != null)
+                            user = new GuildUser(guild, newUser);
+                        else
+                            user = newUser;
+                    }
                     return new CachedMessage(_channel, user, x);
                 })).ToImmutableArray();
             }

@@ -37,10 +37,11 @@ namespace Discord
 
         public DiscordClient Discord => Guild.Discord;
 
-        private GuildUser(Guild guild, User user)
+        public GuildUser(Guild guild, User user)
         {
             Guild = guild;
             User = user;
+            Roles = ImmutableArray.Create<Role>();
         }
         public GuildUser(Guild guild, User user, Model model)
             : this(guild, user)
