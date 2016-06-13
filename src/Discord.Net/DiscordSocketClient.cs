@@ -235,30 +235,37 @@ namespace Discord
         }
         private async Task ReconnectInternalAsync()
         {
-            int nextReconnectDelay = 1000;
-            while (_isReconnecting)
+            try
             {
-                try
+                int nextReconnectDelay = 1000;
+                while (_isReconnecting)
                 {
-                    await Task.Delay(nextReconnectDelay).ConfigureAwait(false);
-                    nextReconnectDelay *= 2;
-                    if (nextReconnectDelay > 30000)
-                        nextReconnectDelay = 30000;
-
-                    await _connectionLock.WaitAsync().ConfigureAwait(false);
                     try
                     {
-                        await ConnectInternalAsync().ConfigureAwait(false);
+                        await Task.Delay(nextReconnectDelay).ConfigureAwait(false);
+                        nextReconnectDelay *= 2;
+                        if (nextReconnectDelay > 30000)
+                            nextReconnectDelay = 30000;
+
+                        await _connectionLock.WaitAsync().ConfigureAwait(false);
+                        try
+                        {
+                            await ConnectInternalAsync().ConfigureAwait(false);
+                        }
+                        finally { _connectionLock.Release(); }
+                        return;
                     }
-                    finally { _connectionLock.Release(); }
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    await _gatewayLogger.WarningAsync("Reconnect failed", ex).ConfigureAwait(false);
-                }
+                    catch (Exception ex)
+                    {
+                        await _gatewayLogger.WarningAsync("Reconnect failed", ex).ConfigureAwait(false);
+                    }                }
             }
-            _reconnectTask = null;
+            finally
+            {
+                _isReconnecting = false;
+                _reconnectTask = null;
+
+            }
         }
 
         /// <inheritdoc />
@@ -397,6 +404,7 @@ namespace Discord
                                 await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
                             else
                                 await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+                            _heartbeatTime = 0;
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _heartbeatCancelToken.Token);
                         }
                         break;
