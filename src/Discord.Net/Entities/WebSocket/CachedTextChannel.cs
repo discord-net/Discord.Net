@@ -30,7 +30,9 @@ namespace Discord
         public CachedGuildUser GetUser(ulong id, bool skipCheck = false)
         {
             var user = Guild.GetUser(id);
-            if (user != null && !skipCheck)
+            if (skipCheck) return user;
+
+            if (user != null)
             {
                 ulong perms = Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue);
                 if (Permissions.GetValue(perms, ChannelPermission.ReadMessages))
