@@ -11,6 +11,6 @@ namespace Discord
         CachedMessage GetMessage(ulong id);
         CachedMessage RemoveMessage(ulong id);
 
-        ICachedUser GetUser(ulong id);
+        ICachedUser GetUser(ulong id, bool skipCheck = false);
     }
 }

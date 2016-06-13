@@ -3,8 +3,6 @@ using System.Reflection;
 
 namespace Discord
 {
-    //TODO: Add socket config items in their own class
-
     public class DiscordConfig
     {
         public static string Version { get; } = typeof(DiscordConfig).GetTypeInfo().Assembly?.GetName().Version.ToString(3) ?? "Unknown";

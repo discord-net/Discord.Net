@@ -92,7 +92,7 @@ namespace Discord.Net.Rest
                 {
                     foreach (var p in multipartParams)
                     {
-                        //TODO: C# Typeswitch candidate
+                        //TODO: C#7 Typeswitch candidate
                         var stringValue = p.Value as string;
                         if (stringValue != null) { content.Add(new StringContent(stringValue), p.Key); continue; }
                         var byteArrayValue = p.Value as byte[];

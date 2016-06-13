@@ -27,12 +27,15 @@ namespace Discord
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
-        public CachedGuildUser GetUser(ulong id)
+        public CachedGuildUser GetUser(ulong id, bool skipCheck = false)
         {
-            //TODO: It's slow to do a perms check here... Maybe only do it on external calls?
             var user = Guild.GetUser(id);
-            if (user != null && Permissions.GetValue(Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue), ChannelPermission.ReadMessages))
-                return user;
+            if (user != null && !skipCheck)
+            {
+                ulong perms = Permissions.ResolveChannel(user, this, user.GuildPermissions.RawValue);
+                if (Permissions.GetValue(perms, ChannelPermission.ReadMessages))
+                    return user;
+            }
             return null;
         }
 
@@ -69,7 +72,7 @@ namespace Discord
         IReadOnlyCollection<ICachedUser> ICachedMessageChannel.Members => Members;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
-        ICachedUser ICachedMessageChannel.GetUser(ulong id) => GetUser(id);
+        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id, skipCheck);
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }

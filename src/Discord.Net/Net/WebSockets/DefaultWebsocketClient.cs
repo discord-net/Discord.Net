@@ -124,8 +124,7 @@ namespace Discord.Net.WebSockets
                 _sendLock.Release();
             }
         }
-
-        //TODO: Check this code
+        
         private async Task RunAsync(CancellationToken cancelToken)
         {
             var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);

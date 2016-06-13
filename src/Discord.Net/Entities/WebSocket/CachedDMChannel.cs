@@ -66,6 +66,7 @@ namespace Discord
         public CachedDMChannel Clone() => MemberwiseClone() as CachedDMChannel;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
+        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id);
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }

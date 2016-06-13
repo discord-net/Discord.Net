@@ -361,8 +361,7 @@ namespace Discord
                             case "READY":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-
-                                    //TODO: Make downloading large guilds optional
+                                    
                                     var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
                                     var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
 
@@ -741,7 +740,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        var author = channel.GetUser(data.Author.Value.Id);
+                                        var author = channel.GetUser(data.Author.Value.Id, true);
 
                                         if (author != null)
                                         {
@@ -780,7 +779,7 @@ namespace Discord
                                         else if (data.Author.IsSpecified)
                                         {
                                             //Edited message isnt in cache, create a detached one
-                                            var author = channel.GetUser(data.Author.Value.Id);
+                                            var author = channel.GetUser(data.Author.Value.Id, true);
                                             if (author != null)
                                                 after = new Message(channel, author, data);
                                         }
@@ -879,7 +878,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        var user = channel.GetUser(data.UserId);
+                                        var user = channel.GetUser(data.UserId, true);
                                         if (user != null)
                                             await UserIsTyping.RaiseAsync(channel, user).ConfigureAwait(false);
                                     }

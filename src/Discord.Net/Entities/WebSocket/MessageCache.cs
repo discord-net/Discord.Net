@@ -120,7 +120,7 @@ namespace Discord
                 var guild = (_channel as ICachedGuildChannel).Guild;
                 return cachedMessages.Concat(downloadedMessages.Select(x =>
                 {
-                    IUser user = _channel.GetUser(x.Author.Value.Id);
+                    IUser user = _channel.GetUser(x.Author.Value.Id, true);
                     if (user == null)
                     {
                         var newUser = new User(_channel.Discord, x.Author.Value);

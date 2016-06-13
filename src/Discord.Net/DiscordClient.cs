@@ -41,8 +41,7 @@ namespace Discord
 
             _connectionLock = new SemaphoreSlim(1, 1);
             _requestQueue = new RequestQueue();
-
-            //TODO: Is there any better way to do this WebSocketProvider access?
+            
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _log.VerboseAsync("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }

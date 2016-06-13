@@ -130,7 +130,6 @@ namespace Discord
         }
         public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args)
         {
-            //TODO: Update channels
             await Discord.ApiClient.ModifyGuildChannelsAsync(Id, args).ConfigureAwait(false);
         }
         public async Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args)

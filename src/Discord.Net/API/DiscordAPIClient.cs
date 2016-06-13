@@ -155,7 +155,7 @@ namespace Discord.API
         }
         private async Task LogoutInternalAsync()
         {
-            //TODO: An exception here will lock the client into the unusable LoggingOut state. How should we handle? (Add same solution to both DiscordClients too)
+            //An exception here will lock the client into the unusable LoggingOut state, but that's probably fine since our client is in an undefined state too.
             if (LoginState == LoginState.LoggedOut) return;
             LoginState = LoginState.LoggingOut;
             
