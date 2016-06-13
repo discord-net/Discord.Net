@@ -55,8 +55,9 @@ namespace Discord
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
         private TaskCompletionSource<bool> _connectTask;
         private CancellationTokenSource _heartbeatCancelToken;
-        private Task _heartbeatTask;
+        private Task _heartbeatTask, _reconnectTask;
         private long _heartbeatTime;
+        private bool _isReconnecting;
 
         /// <summary> Gets the shard if of this client. </summary>
         public int ShardId { get; }
@@ -64,9 +65,9 @@ namespace Discord
         public ConnectionState ConnectionState { get; private set; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
+
         internal IWebSocketClient GatewaySocket { get; private set; }
         internal int MessageCacheSize { get; private set; }
-        //internal bool UsePermissionCache { get; private set; }
         internal DataStore DataStore { get; private set; }
 
         internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
@@ -104,7 +105,6 @@ namespace Discord
             _dataStoreProvider = config.DataStoreProvider;
 
             MessageCacheSize = config.MessageCacheSize;
-            //UsePermissionCache = config.UsePermissionsCache;
             _enablePreUpdateEvents = config.EnablePreUpdateEvents;
             _largeThreshold = config.LargeThreshold;
             
@@ -122,6 +122,16 @@ namespace Discord
             
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {(GatewayOpCode)opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
+            ApiClient.Disconnected += async ex =>
+            {
+                if (ex != null)
+                {
+                    await _gatewayLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
+                    await StartReconnectAsync().ConfigureAwait(false);
+                }
+                else
+                    await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
+            };
             GatewaySocket = config.WebSocketProvider();
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
@@ -147,6 +157,7 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                _isReconnecting = false;
                 await ConnectInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
@@ -157,6 +168,7 @@ namespace Discord
                 throw new InvalidOperationException("You must log in before connecting.");
 
             ConnectionState = ConnectionState.Connecting;
+            await _gatewayLogger.InfoAsync("Connecting");
             try
             {
                 _connectTask = new TaskCompletionSource<bool>();
@@ -165,6 +177,7 @@ namespace Discord
 
                 await _connectTask.Task.ConfigureAwait(false);
                 ConnectionState = ConnectionState.Connected;
+                await _gatewayLogger.InfoAsync("Connected");
             }
             catch (Exception)
             {
@@ -180,6 +193,7 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                _isReconnecting = false;
                 await DisconnectInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
@@ -190,14 +204,61 @@ namespace Discord
 
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
+            await _gatewayLogger.InfoAsync("Disconnecting");
 
+            try { _heartbeatCancelToken.Cancel(); } catch { }
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
             await _heartbeatTask.ConfigureAwait(false);
             while (_largeGuilds.TryDequeue(out guildId)) { }
 
             ConnectionState = ConnectionState.Disconnected;
+            await _gatewayLogger.InfoAsync("Disconnected").ConfigureAwait(false);
 
             await Disconnected.RaiseAsync().ConfigureAwait(false);
+        }
+        private async Task StartReconnectAsync()
+        {
+            //TODO: Is this thread-safe?
+            while (true)
+            {
+                if (_reconnectTask != null) return;
+
+                await _connectionLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    if (_reconnectTask != null) return;
+                    _isReconnecting = true;
+                    _reconnectTask = ReconnectInternalAsync();
+                }
+                finally { _connectionLock.Release(); }
+            }
+        }
+        private async Task ReconnectInternalAsync()
+        {
+            int nextReconnectDelay = 1000;
+            while (_isReconnecting)
+            {
+                try
+                {
+                    await Task.Delay(nextReconnectDelay).ConfigureAwait(false);
+                    nextReconnectDelay *= 2;
+                    if (nextReconnectDelay > 30000)
+                        nextReconnectDelay = 30000;
+
+                    await _connectionLock.WaitAsync().ConfigureAwait(false);
+                    try
+                    {
+                        await ConnectInternalAsync().ConfigureAwait(false);
+                    }
+                    finally { _connectionLock.Release(); }
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    await _gatewayLogger.WarningAsync("Reconnect failed", ex).ConfigureAwait(false);
+                }
+            }
+            _reconnectTask = null;
         }
 
         /// <inheritdoc />
@@ -332,7 +393,10 @@ namespace Discord
                             await _gatewayLogger.DebugAsync("Received Hello").ConfigureAwait(false);
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
-                            await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+                            if (_sessionId != null)
+                                await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
+                            else
+                                await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _heartbeatCancelToken.Token);
                         }
                         break;
@@ -352,6 +416,24 @@ namespace Discord
                             Latency = latency;
 
                             await LatencyUpdated.RaiseAsync(latency).ConfigureAwait(false);
+                        }
+                        break;
+                    case GatewayOpCode.InvalidSession:
+                        {
+                            await _gatewayLogger.DebugAsync("Received InvalidSession").ConfigureAwait(false);
+                            await _gatewayLogger.WarningAsync("Failed to resume previous session");
+
+                            _sessionId = null;
+                            _lastSeq = 0;
+                            await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+                        }
+                        break;
+                    case GatewayOpCode.Reconnect:
+                        {
+                            await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
+                            await _gatewayLogger.WarningAsync("Server requested a reconnect");
+
+                            await StartReconnectAsync().ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Dispatch:
@@ -380,6 +462,7 @@ namespace Discord
                                     await Ready.RaiseAsync().ConfigureAwait(false);
 
                                     _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
+                                    await _gatewayLogger.InfoAsync("Ready");
                                 }
                                 break;
 
@@ -410,7 +493,11 @@ namespace Discord
                                         }
                                     }
 
-                                    await GuildAvailable.RaiseAsync(guild).ConfigureAwait(false);
+                                    if (data.Unavailable != true)
+                                    {
+                                        await _gatewayLogger.InfoAsync($"Connected to {data.Name}").ConfigureAwait(false);
+                                        await GuildAvailable.RaiseAsync(guild).ConfigureAwait(false);
+                                    }
                                 }
                                 break;
                             case "GUILD_UPDATE":
@@ -442,11 +529,17 @@ namespace Discord
                                     var guild = RemoveGuild(data.Id);
                                     if (guild != null)
                                     {
-                                        await GuildUnavailable.RaiseAsync(guild).ConfigureAwait(false);
-                                        if (data.Unavailable != true)
-                                            await LeftGuild.RaiseAsync(guild).ConfigureAwait(false);
                                         foreach (var member in guild.Members)
                                             member.User.RemoveRef();
+
+                                        await GuildUnavailable.RaiseAsync(guild).ConfigureAwait(false);
+                                        await _gatewayLogger.InfoAsync($"Disconnected from {data.Name}").ConfigureAwait(false);
+                                        if (data.Unavailable != true)
+                                        {
+                                            await LeftGuild.RaiseAsync(guild).ConfigureAwait(false);
+                                            await _gatewayLogger.InfoAsync($"Left {data.Name}").ConfigureAwait(false);
+                                        }
+
                                     }
                                     else
                                     {
@@ -987,11 +1080,16 @@ namespace Discord
                 var state = ConnectionState;
                 while (state == ConnectionState.Connecting || state == ConnectionState.Connected)
                 {
-                    //if (_heartbeatTime != 0) //TODO: Connection lost, reconnect
+                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
 
+                    if (_heartbeatTime != 0) //Server never responded to our last heartbeat
+                    {
+                        await _gatewayLogger.WarningAsync("Server missed last heartbeat").ConfigureAwait(false);
+                        await StartReconnectAsync().ConfigureAwait(false);
+                        return;
+                    }
                     _heartbeatTime = Environment.TickCount;
                     await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
-                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) { }

@@ -8,6 +8,7 @@ namespace Discord.Net.WebSockets
     {
         event Func<byte[], int, int, Task> BinaryMessage;
         event Func<string, Task> TextMessage;
+        event Func<Exception, Task> Closed;
 
         void SetHeader(string key, string value);
         void SetCancelToken(CancellationToken cancelToken);

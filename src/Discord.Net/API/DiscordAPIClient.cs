@@ -7,7 +7,6 @@ using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -28,6 +27,7 @@ namespace Discord.API
         public event Func<string, string, double, Task> SentRequest;
         public event Func<int, Task> SentGatewayMessage;
         public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent;
+        public event Func<Exception, Task> Disconnected;
 
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
@@ -74,6 +74,11 @@ namespace Discord.API
                 {
                     var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
                     await ReceivedGatewayEvent.RaiseAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                };
+                _gatewayClient.Closed += async ex =>
+                {
+                    await DisconnectAsync().ConfigureAwait(false);
+                    await Disconnected.RaiseAsync(ex).ConfigureAwait(false);
                 };
             }
 
@@ -362,6 +367,15 @@ namespace Discord.API
                 UseCompression = useCompression
             };
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
+        }
+        public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
+        {
+            var msg = new ResumeParams()
+            {
+                SessionId = sessionId,
+                Sequence = lastSeq
+            };
+            await SendGatewayAsync(GatewayOpCode.Resume, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendHeartbeatAsync(int lastSeq, RequestOptions options = null)
         {
