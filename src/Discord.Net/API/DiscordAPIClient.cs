@@ -36,6 +36,7 @@ namespace Discord.API
         private readonly SemaphoreSlim _connectionLock;
         private CancellationTokenSource _loginCancelToken, _connectCancelToken;
         private string _authToken;
+        private string _gatewayUrl;
         private bool _isDisposed;
 
         public LoginState LoginState { get; private set; }
@@ -199,14 +200,18 @@ namespace Discord.API
                 if (_gatewayClient != null)
                     _gatewayClient.SetCancelToken(_connectCancelToken.Token);
 
-                var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                var url = $"{gatewayResponse.Url}?v={DiscordConfig.GatewayAPIVersion}&encoding={DiscordConfig.GatewayEncoding}";
-                await _gatewayClient.ConnectAsync(url).ConfigureAwait(false);
+                if (_gatewayUrl == null)
+                {
+                    var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
+                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.GatewayAPIVersion}&encoding={DiscordConfig.GatewayEncoding}";
+                }
+                await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
             }
             catch (Exception)
             {
+                _gatewayUrl = null; //Uncache  in case the gateway url changed
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }
