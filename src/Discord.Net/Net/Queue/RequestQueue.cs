@@ -24,7 +24,7 @@ namespace Discord.Net.Queue
             _globalLimits = new Dictionary<GlobalBucket, BucketDefinition>
             {
                 //REST
-                [GlobalBucket.GeneralRest] = new BucketDefinition(0, 0),
+                [GlobalBucket.GeneralRest] = new BucketDefinition(0, 0), //No Limit
                 //[GlobalBucket.Login] = new BucketDefinition(1, 1),
                 [GlobalBucket.DirectMessage] = new BucketDefinition(5, 5),
                 [GlobalBucket.SendEditMessage] = new BucketDefinition(50, 10),
