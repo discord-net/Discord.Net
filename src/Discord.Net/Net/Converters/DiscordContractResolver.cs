@@ -43,6 +43,8 @@ namespace Discord.Net.Converters
                         converter = PermissionTargetConverter.Instance;
                     else if (type == typeof(UserStatus))
                         converter = UserStatusConverter.Instance;
+                    else if (type == typeof(Direction))
+                        converter = DirectionConverter.Instance;
 
                     //Entities
                     if (typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<ulong>)))
