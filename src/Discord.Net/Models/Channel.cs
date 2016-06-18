@@ -293,10 +293,17 @@ namespace Discord
 
             try
             {
+                string dir;
+                switch (relativeDir)
+                {
+                    case Relative.Before: default: dir = "before"; break;
+                    case Relative.After: dir = "after"; break;
+                    case Relative.Around: dir = "around"; break;
+                }
                 var request = new GetMessagesRequest(Id)
                 {
                     Limit = limit,
-                    RelativeDir = relativeMessageId.HasValue ? relativeDir == Relative.Before ? "before" : "after" : null,
+                    RelativeDir = relativeMessageId.HasValue ? dir : null,
                     RelativeId = relativeMessageId ?? 0
                 };
                 var msgs = await Client.ClientAPI.Send(request).ConfigureAwait(false);
