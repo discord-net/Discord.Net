@@ -55,7 +55,7 @@ namespace Discord.API
             if (webSocketProvider != null)
             {
                 _gatewayClient = webSocketProvider();
-                _gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent);
+                //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
                 _gatewayClient.BinaryMessage += async (data, index, count) =>
                 {
                     using (var compressed = new MemoryStream(data, index + 2, count - 2))
