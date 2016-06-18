@@ -1052,11 +1052,6 @@ namespace Discord
             asyncAction().GetAwaiter().GetResult();
             _disconnectedEvent.WaitOne();
         }
-        /// <summary> Blocking call and wait until the client has been manually stopped. This is mainly intended for use in console applications. </summary>
-        public void Wait()
-        {
-            _disconnectedEvent.WaitOne();
-        }
         #endregion
 
         #region IDisposable
