@@ -22,7 +22,7 @@ namespace Discord.API.Client.Rest
         public ulong? VoiceChannelId { get; set; }
         [JsonProperty("roles"), JsonConverter(typeof(LongStringArrayConverter))]
         public ulong[] RoleIds { get; set; }
-        [JsonProperty("nick", DefaultValueHandling = DefaultValueHandling.Ignore), DefaultValue("")]
+        [JsonProperty("nick", NullValueHandling = NullValueHandling.Ignore)]
         public string Nickname { get; set; }
 
         public UpdateMemberRequest(ulong guildId, ulong userId)
