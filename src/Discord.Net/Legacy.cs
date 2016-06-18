@@ -28,11 +28,6 @@ namespace Discord.Legacy
         {
             client.ExecuteAndWait(asyncAction);
         }
-        [Obsolete("Use DiscordClient.Wait")]
-        public static void Run(this DiscordClient client)
-        {
-            client.Wait();
-        }
 
         [Obsolete("Use Server.FindChannels")]
         public static IEnumerable<Channel> FindChannels(this DiscordClient client, Server server, string name, ChannelType type = null, bool exactMatch = false)
