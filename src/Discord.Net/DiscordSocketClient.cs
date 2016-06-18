@@ -949,20 +949,7 @@ namespace Discord
                                             await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                             break;
                                         }
-                                        if (data.Status == UserStatus.Offline)
-                                            guild.RemovePresence(data.User.Id);
-                                        else
-                                        {
-                                            guild.AddOrUpdatePresence(data);
-                                            if (data.Roles.IsSpecified || data.Nick.IsSpecified) //Happens when a user we haven't seen before logs in
-                                            {
-                                                CachedGuildUser user = guild.GetUser(data.User.Id);
-                                                if (user == null)
-                                                    guild.AddUser(data, DataStore);
-                                                else
-                                                    user.Update(data, UpdateSource.WebSocket);
-                                            }
-                                        }
+                                        guild.UpdatePresence(data, DataStore);
                                     }
                                     else
                                     {

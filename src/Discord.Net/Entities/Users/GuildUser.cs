@@ -69,7 +69,7 @@ namespace Discord
             //if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles);
         }
-        public void Update(PresenceModel model, UpdateSource source)
+        public virtual void Update(PresenceModel model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
             
