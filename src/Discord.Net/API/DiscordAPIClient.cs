@@ -817,15 +817,11 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
 
-            //TODO: Improve when Discord adds support
-            var msgs = await GetChannelMessagesAsync(channelId, new GetChannelMessagesParams { Limit = 1, RelativeDirection = Direction.Before, RelativeMessageId = messageId + 1 }).ConfigureAwait(false);
-            return msgs.FirstOrDefault();
-
-            /*try
+            try
             {
-                return await Send<Message>("GET", $"channels/{channelId}/messages/{messageId}", options: options).ConfigureAwait(false);
+                return await SendAsync<Message>("GET", $"channels/{channelId}/messages/{messageId}", options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }*/
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<IReadOnlyCollection<Message>> GetChannelMessagesAsync(ulong channelId, GetChannelMessagesParams args, RequestOptions options = null)
         {
