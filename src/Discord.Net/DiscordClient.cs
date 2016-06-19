@@ -142,7 +142,7 @@ namespace Discord
                     }
                 }
                 else
-                    return new DMChannel(this, new User(this, model.Recipient.Value), model);
+                    return new DMChannel(this, new User(model.Recipient.Value), model);
             }
             return null;
         }
@@ -150,7 +150,7 @@ namespace Discord
         public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
         {
             var models = await ApiClient.GetMyDMsAsync().ConfigureAwait(false);
-            return models.Select(x => new DMChannel(this, new User(this, x.Recipient.Value), x)).ToImmutableArray();
+            return models.Select(x => new DMChannel(this, new User(x.Recipient.Value), x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
@@ -198,7 +198,7 @@ namespace Discord
         {
             var model = await ApiClient.GetUserAsync(id).ConfigureAwait(false);
             if (model != null)
-                return new User(this, model);
+                return new User(model);
             return null;
         }
         /// <inheritdoc />
@@ -206,7 +206,7 @@ namespace Discord
         {
             var model = await ApiClient.GetUserAsync(username, discriminator).ConfigureAwait(false);
             if (model != null)
-                return new User(this, model);
+                return new User(model);
             return null;
         }
         /// <inheritdoc />
@@ -225,7 +225,7 @@ namespace Discord
         public virtual async Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit)
         {
             var models = await ApiClient.QueryUsersAsync(query, limit).ConfigureAwait(false);
-            return models.Select(x => new User(this, x)).ToImmutableArray();
+            return models.Select(x => new User(x)).ToImmutableArray();
         }
 
         /// <inheritdoc />

@@ -13,6 +13,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Discord
 {
@@ -308,7 +309,7 @@ namespace Discord
         internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore, ConcurrentHashSet<ulong> dmChannels)
         {
             var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
-            var channel = recipient.AddDMChannel(model);
+            var channel = recipient.AddDMChannel(this, model);
             dataStore.AddChannel(channel);
             dmChannels.TryAdd(model.Id);
             return channel;
@@ -334,7 +335,7 @@ namespace Discord
         }
         internal CachedPublicUser GetOrAddUser(API.User model, DataStore dataStore)
         {
-            var user = dataStore.GetOrAddUser(model.Id, _ => new CachedPublicUser(this, model));
+            var user = dataStore.GetOrAddUser(model.Id, _ => new CachedPublicUser(model));
             user.AddRef();
             return user;
         }
@@ -543,7 +544,7 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         foreach (var member in guild.Members)
-                                            member.User.RemoveRef();
+                                            member.User.RemoveRef(this);
 
                                         await GuildUnavailable.RaiseAsync(guild).ConfigureAwait(false);
                                         await _gatewayLogger.InfoAsync($"Disconnected from {data.Name}").ConfigureAwait(false);
@@ -692,7 +693,7 @@ namespace Discord
                                         var user = guild.RemoveUser(data.User.Id);
                                         if (user != null)
                                         {
-                                            user.User.RemoveRef();
+                                            user.User.RemoveRef(this);
                                             await UserLeft.RaiseAsync(user).ConfigureAwait(false);
                                         }
                                         else
@@ -813,7 +814,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserBanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
+                                        await UserBanned.RaiseAsync(new User(data)).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
@@ -828,7 +829,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserUnbanned.RaiseAsync(new User(this, data)).ConfigureAwait(false);
+                                        await UserUnbanned.RaiseAsync(new User(data)).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
