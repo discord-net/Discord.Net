@@ -16,7 +16,7 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal class CachedGuild : Guild, ICachedEntity<ulong>
+    internal class CachedGuild : Guild, IUserGuild, ICachedEntity<ulong>
     {
         private TaskCompletionSource<bool> _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;
@@ -42,7 +42,7 @@ namespace Discord
             }
         }
         public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
-
+        
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {
             _downloaderPromise = new TaskCompletionSource<bool>();
@@ -257,5 +257,8 @@ namespace Discord
                     throw new InvalidOperationException($"Unknown channel type: {model.Type.Value}");
             }
         }
+
+        bool IUserGuild.IsOwner => OwnerId == Discord.CurrentUser.Id;
+        GuildPermissions IUserGuild.Permissions => CurrentUser.GuildPermissions;
     }
 }

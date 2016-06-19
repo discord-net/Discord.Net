@@ -6,6 +6,7 @@ namespace Discord
 {
     internal class CachedPublicUser : User, ICachedUser
     {
+        //TODO: Fix removed game/status (add CachedDMUser?)
         private int _references;
         //private Game? _game;
         //private UserStatus _status;

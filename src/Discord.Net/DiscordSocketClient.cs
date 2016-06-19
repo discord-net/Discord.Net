@@ -279,6 +279,18 @@ namespace Discord
         {
             return Task.FromResult<IGuild>(DataStore.GetGuild(id));
         }
+        public override Task<GuildEmbed?> GetGuildEmbedAsync(ulong id)
+        {
+            var guild = DataStore.GetGuild(id);
+            if (guild != null)
+                return Task.FromResult<GuildEmbed?>(new GuildEmbed(guild.IsEmbeddable, guild.EmbedChannelId));
+            else
+                return Task.FromResult<GuildEmbed?>(null);
+        }
+        public override Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync()
+        {
+            return Task.FromResult<IReadOnlyCollection<IUserGuild>>(Guilds);
+        }
         internal CachedGuild AddGuild(API.Gateway.ExtendedGuild model, DataStore dataStore)
         {
             var guild = new CachedGuild(this, model, dataStore);
@@ -296,7 +308,7 @@ namespace Discord
                 guild.RemoveUser(user.Id);
             return guild;
         }
-
+        
         /// <inheritdoc />
         public override Task<IChannel> GetChannelAsync(ulong id)
         {
@@ -385,6 +397,11 @@ namespace Discord
             }
         }
 
+        public override Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync()
+        {
+            return Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(_voiceRegions.ToReadOnlyCollection());
+        }
+        
         private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
         {
 #if BENCHMARK
