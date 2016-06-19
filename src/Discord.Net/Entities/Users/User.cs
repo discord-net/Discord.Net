@@ -9,14 +9,15 @@ namespace Discord
     internal class User : SnowflakeEntity, IUser
     {
         private string _avatarId;
-        
-        public string Discriminator { get; private set; }
+        private ushort _discriminator;
+
         public bool IsBot { get; private set; }
         public string Username { get; private set; }
 
         public override DiscordClient Discord { get; }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
+        public string Discriminator => _discriminator.ToString("D4");
         public string Mention => MentionUtils.Mention(this, false);
         public string NicknameMention => MentionUtils.Mention(this, true);
         public virtual Game? Game => null;
@@ -33,7 +34,7 @@ namespace Discord
             if (source == UpdateSource.Rest && IsAttached) return;
 
             _avatarId = model.Avatar;
-            Discriminator = model.Discriminator;
+            _discriminator = ushort.Parse(model.Discriminator);
             IsBot = model.Bot;
             Username = model.Username;
         }

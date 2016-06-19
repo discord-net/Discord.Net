@@ -9,13 +9,14 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class GuildIntegration : Entity<ulong>, IGuildIntegration
     {
+        private long _syncedAtTicks;
+
         public string Name { get; private set; }
         public string Type { get; private set; }
         public bool IsEnabled { get; private set; }
         public bool IsSyncing { get; private set; }
         public ulong ExpireBehavior { get; private set; }
         public ulong ExpireGracePeriod { get; private set; }
-        public DateTime SyncedAt { get; private set; }
 
         public Guild Guild { get; private set; }
         public Role Role { get; private set; }
@@ -23,6 +24,7 @@ namespace Discord
         public IntegrationAccount Account { get; private set; }
 
         public override DiscordClient Discord => Guild.Discord;
+        public DateTimeOffset SyncedAt => DateTimeUtils.FromTicks(_syncedAtTicks);
 
         public GuildIntegration(Guild guild, Model model)
             : base(model.Id)
@@ -41,7 +43,7 @@ namespace Discord
             IsSyncing = model.Syncing;
             ExpireBehavior = model.ExpireBehavior;
             ExpireGracePeriod = model.ExpireGracePeriod;
-            SyncedAt = model.SyncedAt;
+            _syncedAtTicks = model.SyncedAt.UtcTicks;
 
             Role = Guild.GetRole(model.RoleId);
             User = new User(Discord, model.User);

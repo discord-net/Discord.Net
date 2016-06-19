@@ -14,9 +14,9 @@ namespace Discord.API
         [JsonProperty("content")]
         public Optional<string> Content { get; set; }
         [JsonProperty("timestamp")]
-        public Optional<DateTime> Timestamp { get; set; }
+        public Optional<DateTimeOffset> Timestamp { get; set; }
         [JsonProperty("edited_timestamp")]
-        public Optional<DateTime?> EditedTimestamp { get; set; }
+        public Optional<DateTimeOffset?> EditedTimestamp { get; set; }
         [JsonProperty("tts")]
         public Optional<bool> IsTextToSpeech { get; set; }
         [JsonProperty("mention_everyone")]

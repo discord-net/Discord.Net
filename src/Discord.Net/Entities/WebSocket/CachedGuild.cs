@@ -32,7 +32,15 @@ namespace Discord
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public CachedGuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
-        public IReadOnlyCollection<ICachedGuildChannel> Channels => _channels.Select(x => GetChannel(x)).ToReadOnlyCollection(_channels);
+        public IReadOnlyCollection<ICachedGuildChannel> Channels
+        {
+            get
+            {
+                var channels = _channels;
+                var store = Discord.DataStore;
+                return channels.Select(x => store.GetChannel(x) as ICachedGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
+            }
+        }
         public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
 
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)

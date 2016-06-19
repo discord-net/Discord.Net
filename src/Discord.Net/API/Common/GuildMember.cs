@@ -12,7 +12,7 @@ namespace Discord.API
         [JsonProperty("roles")]
         public ulong[] Roles { get; set; }
         [JsonProperty("joined_at")]
-        public DateTime JoinedAt { get; set; }
+        public DateTimeOffset JoinedAt { get; set; }
         [JsonProperty("deaf")]
         public bool Deaf { get; set; }
         [JsonProperty("mute")]

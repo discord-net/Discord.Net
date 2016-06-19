@@ -11,12 +11,13 @@ namespace Discord.Extensions
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue, TSource>(this IEnumerable<TValue> query, IReadOnlyCollection<TSource> source)
             => new ConcurrentDictionaryWrapper<TValue, TSource>(source, query);
     }
-
+    
     internal struct ConcurrentDictionaryWrapper<TValue, TSource> : IReadOnlyCollection<TValue>
     {
         private readonly IReadOnlyCollection<TSource> _source;
         private readonly IEnumerable<TValue> _query;
 
+        //It's okay that this count is affected by race conditions - we're wrapping a concurrent collection and that's to be expected
         public int Count => _source.Count;
         
         public ConcurrentDictionaryWrapper(IReadOnlyCollection<TSource> source, IEnumerable<TValue> query)

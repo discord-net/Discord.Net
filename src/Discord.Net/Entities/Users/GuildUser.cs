@@ -14,9 +14,10 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class GuildUser : IGuildUser, ISnowflakeEntity
     {
+        private long? _joinedAtTicks;
+
         public bool IsDeaf { get; private set; }
         public bool IsMute { get; private set; }
-        public DateTime? JoinedAt { get; private set; }
         public string Nickname { get; private set; }
         public GuildPermissions GuildPermissions { get; private set; }
 
@@ -26,7 +27,7 @@ namespace Discord
 
         public ulong Id => User.Id;
         public string AvatarUrl => User.AvatarUrl;
-        public DateTime CreatedAt => User.CreatedAt;
+        public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
@@ -36,6 +37,7 @@ namespace Discord
         public virtual Game? Game => User.Game;
 
         public DiscordClient Discord => Guild.Discord;
+        public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         public GuildUser(Guild guild, User user)
         {
@@ -62,7 +64,7 @@ namespace Discord
             //if (model.Mute.IsSpecified)
                 IsMute = model.Mute;
             //if (model.JoinedAt.IsSpecified)
-                JoinedAt = model.JoinedAt;
+                _joinedAtTicks = model.JoinedAt.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
 

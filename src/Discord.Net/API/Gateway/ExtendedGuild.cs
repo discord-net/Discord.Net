@@ -19,6 +19,6 @@ namespace Discord.API.Gateway
         [JsonProperty("channels")]
         public Channel[] Channels { get; set; }
         [JsonProperty("joined_at")]
-        public DateTime JoinedAt { get; set; }
+        public DateTimeOffset JoinedAt { get; set; }
     }
 }

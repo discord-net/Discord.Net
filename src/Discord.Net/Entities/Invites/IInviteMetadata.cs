@@ -17,6 +17,6 @@ namespace Discord
         /// <summary> Gets the amount of times this invite has been used. </summary>
         int Uses { get; }
         /// <summary> Gets when this invite was created. </summary>
-        DateTime CreatedAt { get; }
+        DateTimeOffset CreatedAt { get; }
     }
 }

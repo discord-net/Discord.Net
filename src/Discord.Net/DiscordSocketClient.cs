@@ -10,7 +10,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +37,7 @@ namespace Discord
         public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated;
         public event Func<IChannel, IUser, Task> UserIsTyping;
         public event Func<int, Task> LatencyUpdated;
+        //TODO: Add PresenceUpdated? VoiceStateUpdated?
 
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly Logger _gatewayLogger;
@@ -50,6 +50,7 @@ namespace Discord
         private readonly bool _enablePreUpdateEvents;
         private readonly int _largeThreshold;
         private readonly int _totalShards;
+        private ConcurrentHashSet<ulong> _dmChannels;
         private string _sessionId;
         private int _lastSeq;
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
@@ -71,20 +72,14 @@ namespace Discord
         internal DataStore DataStore { get; private set; }
 
         internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
-        internal IReadOnlyCollection<CachedGuild> Guilds
-        {
-            get
-            {
-                var guilds = DataStore.Guilds;
-                return guilds.ToReadOnlyCollection(guilds);
-            }
-        }
+        internal IReadOnlyCollection<CachedGuild> Guilds => DataStore.Guilds;
         internal IReadOnlyCollection<CachedDMChannel> DMChannels
         {
             get
             {
-                var users = DataStore.Users;
-                return users.Select(x => x.DMChannel).Where(x => x != null).ToReadOnlyCollection(users);
+                var dmChannels = _dmChannels;
+                var store = DataStore;
+                return dmChannels.Select(x => store.GetChannel(x) as CachedDMChannel).Where(x => x != null).ToReadOnlyCollection(dmChannels);
             }
         }
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
@@ -136,6 +131,7 @@ namespace Discord
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
+            _dmChannels = new ConcurrentHashSet<ulong>();
         }
 
         protected override async Task OnLoginAsync()
@@ -305,11 +301,16 @@ namespace Discord
         {
             return Task.FromResult<IChannel>(DataStore.GetChannel(id));
         }
-        internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
+        public override Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
+        {
+            return Task.FromResult<IReadOnlyCollection<IDMChannel>>(DMChannels);
+        }
+        internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore, ConcurrentHashSet<ulong> dmChannels)
         {
             var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
             var channel = recipient.AddDMChannel(model);
             dataStore.AddChannel(channel);
+            dmChannels.TryAdd(model.Id);
             return channel;
         }
         internal CachedDMChannel RemoveDMChannel(ulong id)
@@ -317,6 +318,7 @@ namespace Discord
             var dmChannel = DataStore.RemoveChannel(id) as CachedDMChannel;            
             var recipient = dmChannel.Recipient;
             recipient.RemoveDMChannel(id);
+            _dmChannels.TryRemove(id);
             return dmChannel;
         }
 
@@ -455,6 +457,7 @@ namespace Discord
                                     
                                     var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
                                     var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
+                                    var dmChannels = new ConcurrentHashSet<ulong>();
 
                                     var currentUser = new CachedSelfUser(this, data.User);
                                     //dataStore.GetOrAddUser(data.User.Id, _ => currentUser);
@@ -462,10 +465,11 @@ namespace Discord
                                     for (int i = 0; i < data.Guilds.Length; i++)
                                         AddGuild(data.Guilds[i], dataStore);
                                     for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddDMChannel(data.PrivateChannels[i], dataStore);
+                                        AddDMChannel(data.PrivateChannels[i], dataStore, dmChannels);
 
                                     _sessionId = data.SessionId;
                                     _currentUser = currentUser;
+                                    _dmChannels = dmChannels;
                                     DataStore = dataStore;
 
                                     await Ready.RaiseAsync().ConfigureAwait(false);
@@ -577,7 +581,7 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = AddDMChannel(data, DataStore);
+                                        channel = AddDMChannel(data, DataStore, _dmChannels);
                                     if (channel != null)
                                         await ChannelCreated.RaiseAsync(channel).ConfigureAwait(false);
                                 }

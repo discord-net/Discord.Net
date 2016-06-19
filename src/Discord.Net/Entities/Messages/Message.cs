@@ -12,12 +12,12 @@ namespace Discord
     internal class Message : SnowflakeEntity, IMessage
     {
         private bool _isMentioningEveryone;
+        private long _timestampTicks;
+        private long? _editedTimestampTicks;
 
-        public DateTime? EditedTimestamp { get; private set; }
         public bool IsTTS { get; private set; }
         public string RawText { get; private set; }
         public string Text { get; private set; }
-        public DateTime Timestamp { get; private set; }
         
         public IMessageChannel Channel { get; }
         public IUser Author { get; }
@@ -29,6 +29,8 @@ namespace Discord
         public ImmutableArray<User> MentionedUsers { get; private set; }
 
         public override DiscordClient Discord => (Channel as Entity<ulong>).Discord;
+        public DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
+        public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
         public Message(IMessageChannel channel, IUser author, Model model)
             : base(model.Id)
@@ -56,9 +58,9 @@ namespace Discord
             if (model.IsTextToSpeech.IsSpecified)
                 IsTTS = model.IsTextToSpeech.Value;
             if (model.Timestamp.IsSpecified)
-                Timestamp = model.Timestamp.Value;
+                _timestampTicks = model.Timestamp.Value.UtcTicks;
             if (model.EditedTimestamp.IsSpecified)
-                EditedTimestamp = model.EditedTimestamp.Value;
+                _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.IsMentioningEveryone.IsSpecified)
                 _isMentioningEveryone = model.IsMentioningEveryone.Value;
             
