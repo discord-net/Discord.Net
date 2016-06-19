@@ -62,7 +62,7 @@ namespace Discord
         {
             var args = new CreateMessageParams { Content = text, IsTTS = isTTS };
             var model = await Discord.ApiClient.CreateMessageAsync(Guild.Id, Id, args).ConfigureAwait(false);
-            return new Message(this, new User(Discord, model.Author.Value), model);
+            return new Message(this, new User(model.Author.Value), model);
         }
         public async Task<IMessage> SendFileAsync(string filePath, string text, bool isTTS)
         {
@@ -71,33 +71,33 @@ namespace Discord
             {
                 var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
                 var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, file, args).ConfigureAwait(false);
-                return new Message(this, new User(Discord, model.Author.Value), model);
+                return new Message(this, new User(model.Author.Value), model);
             }
         }
         public async Task<IMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS)
         {
             var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
             var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, stream, args).ConfigureAwait(false);
-            return new Message(this, new User(Discord, model.Author.Value), model);
+            return new Message(this, new User(model.Author.Value), model);
         }
         public virtual async Task<IMessage> GetMessageAsync(ulong id)
         {
             var model = await Discord.ApiClient.GetChannelMessageAsync(Id, id).ConfigureAwait(false);
             if (model != null)
-                return new Message(this, new User(Discord, model.Author.Value), model);
+                return new Message(this, new User(model.Author.Value), model);
             return null;
         }
         public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
             var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
-            return models.Select(x => new Message(this, new User(Discord, x.Author.Value), x)).ToImmutableArray();
+            return models.Select(x => new Message(this, new User(x.Author.Value), x)).ToImmutableArray();
         }
         public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
         {
             var args = new GetChannelMessagesParams { Limit = limit };
             var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
-            return models.Select(x => new Message(this, new User(Discord, x.Author.Value), x)).ToImmutableArray();
+            return models.Select(x => new Message(this, new User(x.Author.Value), x)).ToImmutableArray();
         }
         public async Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
         {

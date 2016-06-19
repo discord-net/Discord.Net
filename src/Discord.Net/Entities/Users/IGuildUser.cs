@@ -31,5 +31,8 @@ namespace Discord
         Task KickAsync();
         /// <summary> Modifies this user's properties in this guild. </summary>
         Task ModifyAsync(Action<ModifyGuildMemberParams> func);
+
+        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
+        Task<IDMChannel> CreateDMChannelAsync();
     }
 }

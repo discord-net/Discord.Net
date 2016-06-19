@@ -99,7 +99,7 @@ namespace Discord
                 {
                     var mentions = new User[value.Length];
                     for (int i = 0; i < value.Length; i++)
-                        mentions[i] = new User(discord, value[i]);
+                        mentions[i] = new User(value[i]);
                     MentionedUsers = ImmutableArray.Create(mentions);
                 }
                 else

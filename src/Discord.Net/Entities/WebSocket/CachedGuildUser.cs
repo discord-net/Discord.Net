@@ -5,14 +5,14 @@ namespace Discord
 {
     internal class CachedGuildUser : GuildUser, ICachedUser
     {
-        private Game? _game;
+        private Game _game;
         private UserStatus _status;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
         public new CachedPublicUser User => base.User as CachedPublicUser;
 
-        public override Game? Game => _game;
+        public override Game Game => _game;
         public override UserStatus Status => _status;
 
         public VoiceState? VoiceState => Guild.GetVoiceState(Id);
@@ -35,7 +35,7 @@ namespace Discord
             base.Update(model, source);
 
             _status = model.Status;
-            _game = model.Game != null ? new Game(model.Game) : (Game?)null;
+            _game = model.Game != null ? new Game(model.Game) : (Game)null;
         }
 
         public CachedGuildUser Clone() => MemberwiseClone() as CachedGuildUser;

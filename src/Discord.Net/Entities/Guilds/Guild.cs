@@ -149,7 +149,7 @@ namespace Discord
         public async Task<IReadOnlyCollection<IUser>> GetBansAsync()
         {
             var models = await Discord.ApiClient.GetGuildBansAsync(Id).ConfigureAwait(false);
-            return models.Select(x => new User(Discord, x)).ToImmutableArray();
+            return models.Select(x => new User(x)).ToImmutableArray();
         }
         public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user, pruneDays);
         public async Task AddBanAsync(ulong userId, int pruneDays = 0)
@@ -254,7 +254,7 @@ namespace Discord
         {
             var model = await Discord.ApiClient.GetGuildMemberAsync(Id, id).ConfigureAwait(false);
             if (model != null)
-                return new GuildUser(this, new User(Discord, model.User), model);
+                return new GuildUser(this, new User(model.User), model);
             return null;
         }
         public virtual async Task<IGuildUser> GetCurrentUserAsync()
@@ -266,13 +266,13 @@ namespace Discord
         {
             var args = new GetGuildMembersParams();
             var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
-            return models.Select(x => new GuildUser(this, new User(Discord, x.User), x)).ToImmutableArray();
+            return models.Select(x => new GuildUser(this, new User(x.User), x)).ToImmutableArray();
         }
         public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
         {
             var args = new GetGuildMembersParams { Limit = limit, Offset = offset };
             var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
-            return models.Select(x => new GuildUser(this, new User(Discord, x.User), x)).ToImmutableArray();
+            return models.Select(x => new GuildUser(this, new User(x.User), x)).ToImmutableArray();
         }
         public async Task<int> PruneUsersAsync(int days = 30, bool simulate = false)
         {

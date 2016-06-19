@@ -46,7 +46,7 @@ namespace Discord
             _syncedAtTicks = model.SyncedAt.UtcTicks;
 
             Role = Guild.GetRole(model.RoleId);
-            User = new User(Discord, model.User);
+            User = new User(model.User);
         }
         
         public async Task DeleteAsync()

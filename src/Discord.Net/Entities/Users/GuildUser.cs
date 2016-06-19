@@ -34,7 +34,7 @@ namespace Discord
         public string Mention => User.Mention;
         public string Username => User.Username;
         public virtual UserStatus Status => User.Status;
-        public virtual Game? Game => User.Game;
+        public virtual Game Game => User.Game;
 
         public DiscordClient Discord => Guild.Discord;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
@@ -149,8 +149,14 @@ namespace Discord
             if (channel == null) throw new ArgumentNullException(nameof(channel));
             return new ChannelPermissions(Permissions.ResolveChannel(this, channel, GuildPermissions.RawValue));
         }
+        
+        public async Task<IDMChannel> CreateDMChannelAsync()
+        {
+            var args = new CreateDMChannelParams { RecipientId = Id };
+            var model = await Discord.ApiClient.CreateDMChannelAsync(args).ConfigureAwait(false);
 
-        public Task<IDMChannel> CreateDMChannelAsync() => User.CreateDMChannelAsync();
+            return new DMChannel(Discord, User, model);
+        }
 
         IGuild IGuildUser.Guild => Guild;
         IReadOnlyCollection<IRole> IGuildUser.Roles => Roles;

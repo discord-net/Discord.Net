@@ -25,7 +25,7 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            Inviter = new User(Discord, model.Inviter);
+            Inviter = new User(model.Inviter);
             IsRevoked = model.Revoked;
             IsTemporary = model.Temporary;
             MaxAge = model.MaxAge != 0 ? model.MaxAge : (int?)null;

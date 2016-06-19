@@ -11,7 +11,7 @@ namespace Discord
         public bool IsVerified { get; private set; }
 
         public SelfUser(DiscordClient discord, Model model)
-            : base(discord, model)
+            : base(model)
         {
         }
         public override void Update(Model model, UpdateSource source)

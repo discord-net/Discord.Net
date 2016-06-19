@@ -4,7 +4,7 @@ using Model = Discord.API.Game;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct Game
+    public class Game
     {
         public string Name { get; }
         public string StreamUrl { get; }

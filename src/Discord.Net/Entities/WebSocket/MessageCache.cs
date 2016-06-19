@@ -88,7 +88,7 @@ namespace Discord
                 return msg;
             var model = await _discord.ApiClient.GetChannelMessageAsync(_channel.Id, id).ConfigureAwait(false);
             if (model != null)
-                return new CachedMessage(_channel, new User(_discord, model.Author.Value), model);
+                return new CachedMessage(_channel, new User(model.Author.Value), model);
             return null;
         }
         public async Task<IReadOnlyCollection<CachedMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
@@ -123,7 +123,7 @@ namespace Discord
                     IUser user = _channel.GetUser(x.Author.Value.Id, true);
                     if (user == null)
                     {
-                        var newUser = new User(_channel.Discord, x.Author.Value);
+                        var newUser = new User(x.Author.Value);
                         if (guild != null)
                             user = new GuildUser(guild, newUser);
                         else

@@ -12,8 +12,5 @@ namespace Discord
         bool IsBot { get; }
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
-        
-        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
-        Task<IDMChannel> CreateDMChannelAsync();
     }
 }
