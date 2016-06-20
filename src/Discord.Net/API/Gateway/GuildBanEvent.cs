@@ -2,9 +2,11 @@
 
 namespace Discord.API.Gateway
 {
-    public class GuildBanEvent : User
+    public class GuildBanEvent
     {
         [JsonProperty("guild_id")]
         public ulong GuildId { get; set; }
+        [JsonProperty("user")]
+        public User User { get; set; }
     }
 }

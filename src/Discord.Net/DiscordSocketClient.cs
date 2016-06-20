@@ -831,7 +831,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserBanned.RaiseAsync(new User(data)).ConfigureAwait(false);
+                                        await UserBanned.RaiseAsync(new User(data.User)).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
@@ -846,7 +846,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserUnbanned.RaiseAsync(new User(data)).ConfigureAwait(false);
+                                        await UserUnbanned.RaiseAsync(new User(data.User)).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
