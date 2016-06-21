@@ -235,7 +235,6 @@ namespace Discord
         private async Task StartReconnectAsync()
         {
             //TODO: Is this thread-safe?
-            await _log.InfoAsync("Debug", "Trying to reconnect...").ConfigureAwait(false);
             if (_reconnectTask != null) return;
 
             await _connectionLock.WaitAsync().ConfigureAwait(false);
@@ -249,7 +248,6 @@ namespace Discord
         }
         private async Task ReconnectInternalAsync()
         {
-            await _log.InfoAsync("Debug", "Reconnecting...").ConfigureAwait(false);
             try
             {
                 int nextReconnectDelay = 1000;
@@ -1138,6 +1136,7 @@ namespace Discord
             }
 #endif
         }
+
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
             try
