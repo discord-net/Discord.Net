@@ -51,7 +51,7 @@ namespace Discord
         }
         public async Task ModifyAsync(Action<ModifyGuildChannelParams> func)
         {
-            if (func != null) throw new NullReferenceException(nameof(func));
+            if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildChannelParams();
             func(args);

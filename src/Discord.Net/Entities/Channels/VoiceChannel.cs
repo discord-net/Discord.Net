@@ -28,7 +28,7 @@ namespace Discord
         
         public async Task ModifyAsync(Action<ModifyVoiceChannelParams> func)
         {
-            if (func != null) throw new NullReferenceException(nameof(func));
+            if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyVoiceChannelParams();
             func(args);

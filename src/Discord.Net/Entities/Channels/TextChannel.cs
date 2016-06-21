@@ -32,7 +32,7 @@ namespace Discord
 
         public async Task ModifyAsync(Action<ModifyTextChannelParams> func)
         {
-            if (func != null) throw new NullReferenceException(nameof(func));
+            if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyTextChannelParams();
             func(args);

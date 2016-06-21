@@ -33,7 +33,7 @@ namespace Discord
         }
         public async Task ModifyAsync(Action<ModifyCurrentUserParams> func)
         {
-            if (func != null) throw new NullReferenceException(nameof(func));
+            if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyCurrentUserParams();
             func(args);
