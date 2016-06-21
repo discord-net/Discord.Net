@@ -711,10 +711,10 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
-            Preconditions.AtLeast(args.Offset, 0, nameof(args.Offset));
+            Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            int offset = args.Offset.GetValueOrDefault(0);
+            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             List<GuildMember[]> result;
             if (args.Limit.IsSpecified)
@@ -725,7 +725,7 @@ namespace Discord.API
             while (true)
             {
                 int runLimit = (limit >= DiscordConfig.MaxUsersPerBatch) ? DiscordConfig.MaxUsersPerBatch : limit;
-                string endpoint = $"guilds/{guildId}/members?limit={runLimit}&offset={offset}";
+                string endpoint = $"guilds/{guildId}/members?limit={runLimit}&after={afterUserId}";
                 var models = await SendAsync<GuildMember[]>("GET", endpoint, options: options).ConfigureAwait(false);
 
                 //Was this an empty batch?
@@ -734,7 +734,7 @@ namespace Discord.API
                 result.Add(models);
 
                 limit -= DiscordConfig.MaxUsersPerBatch;
-                offset += models.Length;
+                afterUserId = models[models.Length - 1].User.Id;
 
                 //Was this an incomplete (the last) batch?
                 if (models.Length != DiscordConfig.MaxUsersPerBatch) break;

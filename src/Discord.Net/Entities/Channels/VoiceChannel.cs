@@ -44,10 +44,6 @@ namespace Discord
         {
             throw new NotSupportedException();
         }
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
-        {
-            throw new NotSupportedException();
-        }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
     }

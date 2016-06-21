@@ -143,9 +143,6 @@ namespace Discord
             => Task.FromResult<IGuildUser>(CurrentUser);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        //TODO: Is there a better way of exposing pagination?
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset) 
-            => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.OrderBy(x => x.Id).Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
             members = members ?? _members;
