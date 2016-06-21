@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Data
 {
@@ -19,6 +18,7 @@ namespace Discord.Data
         private readonly ConcurrentDictionary<ulong, CachedPublicUser> _users;
 
         internal override IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
+        internal override IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
         internal override IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal override IReadOnlyCollection<CachedPublicUser> Users => _users.ToReadOnlyCollection();
 

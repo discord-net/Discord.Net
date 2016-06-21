@@ -6,6 +6,7 @@ namespace Discord.Data
     public abstract class DataStore
     {
         internal abstract IReadOnlyCollection<ICachedChannel> Channels { get; }
+        internal abstract IReadOnlyCollection<CachedDMChannel> DMChannels { get; }
         internal abstract IReadOnlyCollection<CachedGuild> Guilds { get; }
         internal abstract IReadOnlyCollection<CachedPublicUser> Users { get; }
 
