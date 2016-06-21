@@ -18,7 +18,7 @@ namespace Discord
         public int FailedReconnectDelay { get; set; } = 15000;
 
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
-        public int MessageCacheSize { get; set; } = 100;
+        public int MessageCacheSize { get; set; } = 0;
         /*/// <summary> 
         /// Gets or sets whether the permissions cache should be used. 
         /// This makes operations such as User.GetPermissions(Channel), User.GuildPermissions, Channel.GetUser, and Channel.Members much faster at the expense of increased memory usage.
