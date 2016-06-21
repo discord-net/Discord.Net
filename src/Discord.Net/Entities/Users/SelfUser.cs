@@ -10,9 +10,12 @@ namespace Discord
         public string Email { get; private set; }
         public bool IsVerified { get; private set; }
 
+        public override DiscordClient Discord { get; }
+
         public SelfUser(DiscordClient discord, Model model)
             : base(model)
         {
+            Discord = discord;
         }
         public override void Update(Model model, UpdateSource source)
         {
