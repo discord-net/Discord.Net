@@ -677,7 +677,7 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = RemoveDMChannel(data.Id);
+                                        channel = RemoveDMChannel(data.Recipient.Id);
                                     if (channel != null)
                                         await ChannelDestroyed.RaiseAsync(channel).ConfigureAwait(false);
                                     else
