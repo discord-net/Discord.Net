@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace Discord.Net.Converters
 {
@@ -28,11 +29,11 @@ namespace Discord.Net.Converters
                     var typeInput = propInfo.DeclaringType;
                     var innerTypeOutput = type.GenericTypeArguments[0];
 
-                    var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
-                    var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
-                    var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
-                    var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
-                    property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
+                    var parentArg = Expression.Parameter(typeof(object));
+                    var optional = Expression.Property(Expression.Convert(parentArg, property.DeclaringType), member as PropertyInfo);
+                    var isSpecified = Expression.Property(optional, "IsSpecified");
+                    var lambda = Expression.Lambda<Func<object, bool>>(isSpecified, parentArg).Compile();
+                    property.ShouldSerialize = x => lambda(x);
 
                     var converterType = typeof(OptionalConverter<>).MakeGenericType(innerTypeOutput).GetTypeInfo();
                     var instanceField = converterType.GetDeclaredField("Instance");
@@ -97,11 +98,6 @@ namespace Discord.Net.Converters
                 return StringEntityConverter.Instance;
 
             return null;
-        }
-
-        private static bool ShouldSerialize<TOwner, TValue>(object owner, Delegate getter)
-        {
-            return (getter as Func<TOwner, Optional<TValue>>)((TOwner)owner).IsSpecified;
         }
     }
 }
