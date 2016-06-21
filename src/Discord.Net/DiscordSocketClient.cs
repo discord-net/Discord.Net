@@ -141,7 +141,7 @@ namespace Discord
         }
 
         /// <inheritdoc />
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(bool waitForGuilds = true)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
@@ -150,6 +150,13 @@ namespace Discord
                 await ConnectInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
+
+            if (waitForGuilds)
+            {
+                var downloadTask = _guildDownloadTask;
+                if (downloadTask != null)
+                    await _guildDownloadTask.ConfigureAwait(false);
+            }
         }
         private async Task ConnectInternalAsync()
         {
@@ -1156,12 +1163,6 @@ namespace Discord
         {
             while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
                 await Task.Delay(500, cancelToken).ConfigureAwait(false);
-        }
-        public async Task WaitForGuildsAsync()
-        {
-            var downloadTask = _guildDownloadTask;
-            if (downloadTask != null)
-                await _guildDownloadTask.ConfigureAwait(false);
         }
     }
 }
