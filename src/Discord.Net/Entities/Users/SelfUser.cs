@@ -40,6 +40,10 @@ namespace Discord
 
             var args = new ModifyCurrentUserParams();
             func(args);
+
+            if (!args.Username.IsSpecified)
+                args.Username = Username;
+
             var model = await Discord.ApiClient.ModifySelfAsync(args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
