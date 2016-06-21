@@ -14,11 +14,11 @@ namespace Discord
     internal class DMChannel : SnowflakeEntity, IDMChannel
     {
         public override DiscordClient Discord { get; }
-        public User Recipient { get; private set; }
+        public IUser Recipient { get; private set; }
 
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
 
-        public DMChannel(DiscordClient discord, User recipient, Model model)
+        public DMChannel(DiscordClient discord, IUser recipient, Model model)
             : base(model.Id)
         {
             Discord = discord;
@@ -30,7 +30,9 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
             
-            Recipient.Update(model.Recipient.Value, UpdateSource.Rest);
+            //TODO: Is this cast okay?
+            if (Recipient is User)
+                (Recipient as User).Update(model.Recipient.Value, source);
         }
 
         public async Task UpdateAsync()
@@ -119,8 +121,7 @@ namespace Discord
         
         public override string ToString() => '@' + Recipient.ToString();
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
-
-        IUser IDMChannel.Recipient => Recipient;
+        
         IMessage IMessageChannel.GetCachedMessage(ulong id) => null;
     }
 }

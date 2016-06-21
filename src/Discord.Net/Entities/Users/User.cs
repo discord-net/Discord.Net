@@ -1,7 +1,5 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord

@@ -15,12 +15,12 @@ namespace Discord.Data
         private readonly ConcurrentDictionary<ulong, ICachedChannel> _channels;
         private readonly ConcurrentDictionary<ulong, CachedDMChannel> _dmChannels;
         private readonly ConcurrentDictionary<ulong, CachedGuild> _guilds;
-        private readonly ConcurrentDictionary<ulong, CachedPublicUser> _users;
+        private readonly ConcurrentDictionary<ulong, CachedGlobalUser> _users;
 
         internal override IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
         internal override IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
         internal override IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
-        internal override IReadOnlyCollection<CachedPublicUser> Users => _users.ToReadOnlyCollection();
+        internal override IReadOnlyCollection<CachedGlobalUser> Users => _users.ToReadOnlyCollection();
 
         public DefaultDataStore(int guildCount, int dmChannelCount)
         {
@@ -29,7 +29,7 @@ namespace Discord.Data
             _channels = new ConcurrentDictionary<ulong, ICachedChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
             _dmChannels = new ConcurrentDictionary<ulong, CachedDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, CachedGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
-            _users = new ConcurrentDictionary<ulong, CachedPublicUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
+            _users = new ConcurrentDictionary<ulong, CachedGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
         }
 
         internal override ICachedChannel GetChannel(ulong id)
@@ -94,20 +94,20 @@ namespace Discord.Data
             return null;
         }
 
-        internal override CachedPublicUser GetUser(ulong id)
+        internal override CachedGlobalUser GetUser(ulong id)
         {
-            CachedPublicUser user;
+            CachedGlobalUser user;
             if (_users.TryGetValue(id, out user))
                 return user;
             return null;
         }
-        internal override CachedPublicUser GetOrAddUser(ulong id, Func<ulong, CachedPublicUser> userFactory)
+        internal override CachedGlobalUser GetOrAddUser(ulong id, Func<ulong, CachedGlobalUser> userFactory)
         {
             return _users.GetOrAdd(id, userFactory);
         }
-        internal override CachedPublicUser RemoveUser(ulong id)
+        internal override CachedGlobalUser RemoveUser(ulong id)
         {
-            CachedPublicUser user;
+            CachedGlobalUser user;
             if (_users.TryRemove(id, out user))
                 return user;
             return null;

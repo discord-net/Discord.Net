@@ -9,7 +9,7 @@ namespace Discord
 {
     internal class CachedTextChannel : TextChannel, ICachedGuildChannel, ICachedMessageChannel
     {
-        private readonly MessageCache _messages;
+        private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
@@ -20,7 +20,10 @@ namespace Discord
         public CachedTextChannel(CachedGuild guild, Model model)
             : base(guild, model)
         {
-            _messages = new MessageCache(Discord, this);
+            if (Discord.MessageCacheSize > 0)
+                _messages = new MessageCache(Discord, this);
+            else
+                _messages = new MessageManager(Discord, this);
         }
 
         public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetUser(id));

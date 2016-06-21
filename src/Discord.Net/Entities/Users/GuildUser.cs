@@ -33,8 +33,9 @@ namespace Discord
         public bool IsBot => User.IsBot;
         public string Mention => User.Mention;
         public string Username => User.Username;
-        public virtual UserStatus Status => User.Status;
-        public virtual Game Game => User.Game;
+
+        public virtual UserStatus Status => UserStatus.Unknown;
+        public virtual Game Game => null;
 
         public DiscordClient Discord => Guild.Discord;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);

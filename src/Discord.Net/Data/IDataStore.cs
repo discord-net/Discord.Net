@@ -8,7 +8,7 @@ namespace Discord.Data
         internal abstract IReadOnlyCollection<ICachedChannel> Channels { get; }
         internal abstract IReadOnlyCollection<CachedDMChannel> DMChannels { get; }
         internal abstract IReadOnlyCollection<CachedGuild> Guilds { get; }
-        internal abstract IReadOnlyCollection<CachedPublicUser> Users { get; }
+        internal abstract IReadOnlyCollection<CachedGlobalUser> Users { get; }
 
         internal abstract ICachedChannel GetChannel(ulong id);
         internal abstract void AddChannel(ICachedChannel channel);
@@ -22,8 +22,8 @@ namespace Discord.Data
         internal abstract void AddGuild(CachedGuild guild);
         internal abstract CachedGuild RemoveGuild(ulong id);
 
-        internal abstract CachedPublicUser GetUser(ulong id);
-        internal abstract CachedPublicUser GetOrAddUser(ulong userId, Func<ulong, CachedPublicUser> userFactory);
-        internal abstract CachedPublicUser RemoveUser(ulong id);
+        internal abstract CachedGlobalUser GetUser(ulong id);
+        internal abstract CachedGlobalUser GetOrAddUser(ulong userId, Func<ulong, CachedGlobalUser> userFactory);
+        internal abstract CachedGlobalUser RemoveUser(ulong id);
     }
 }

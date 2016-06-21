@@ -10,7 +10,7 @@ namespace Discord
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
-        public new CachedPublicUser User => base.User as CachedPublicUser;
+        public new CachedGlobalUser User => base.User as CachedGlobalUser;
 
         public override Game Game => _game;
         public override UserStatus Status => _status;
@@ -21,11 +21,11 @@ namespace Discord
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
         public CachedVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
 
-        public CachedGuildUser(CachedGuild guild, CachedPublicUser user, Model model) 
+        public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, Model model) 
             : base(guild, user, model)
         {
         }
-        public CachedGuildUser(CachedGuild guild, CachedPublicUser user, PresenceModel model)
+        public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, PresenceModel model)
             : base(guild, user, model)
         {
         }

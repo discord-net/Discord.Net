@@ -9,16 +9,19 @@ namespace Discord
 {
     internal class CachedDMChannel : DMChannel, IDMChannel, ICachedChannel, ICachedMessageChannel
     {
-        private readonly MessageCache _messages;
+        private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedPublicUser Recipient => base.Recipient as CachedPublicUser;
+        public new CachedDMUser Recipient => base.Recipient as CachedDMUser;
         public IReadOnlyCollection<ICachedUser> Members => ImmutableArray.Create<ICachedUser>(Discord.CurrentUser, Recipient);
 
-        public CachedDMChannel(DiscordSocketClient discord, CachedPublicUser recipient, Model model)
+        public CachedDMChannel(DiscordSocketClient discord, CachedDMUser recipient, Model model)
             : base(discord, recipient, model)
         {
-            _messages = new MessageCache(Discord, this);
+            if (Discord.MessageCacheSize > 0)
+                _messages = new MessageCache(Discord, this);
+            else
+                _messages = new MessageManager(Discord, this);
         }
 
         public override Task<IUser> GetUserAsync(ulong id) => Task.FromResult<IUser>(GetUser(id));
