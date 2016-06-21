@@ -1,5 +1,4 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -20,8 +19,6 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is Optional<Stream>)
-                value = (Optional<Stream>)value;
             var stream = value as Stream;
 
             byte[] bytes = new byte[stream.Length - stream.Position];
