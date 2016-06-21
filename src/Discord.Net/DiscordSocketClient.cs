@@ -163,6 +163,10 @@ namespace Discord
             if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting.");
 
+            var state = ConnectionState;
+            if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
+                await DisconnectInternalAsync().ConfigureAwait(false);
+
             ConnectionState = ConnectionState.Connecting;
             await _gatewayLogger.InfoAsync("Connecting");
             try
