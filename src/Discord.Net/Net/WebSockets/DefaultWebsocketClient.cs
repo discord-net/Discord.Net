@@ -72,17 +72,13 @@ namespace Discord.Net.WebSockets
         public async Task DisconnectAsync()
         {
             //Assume locked
-            _cancelTokenSource.Cancel();
+            try { _cancelTokenSource.Cancel(false); } catch { }
             
             if (_client != null && _client.State == WebSocketState.Open)
             {
-                try
-                {
-                    var task = _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-                    if (task != null)
-                        await task.ConfigureAwait(false);
-                }
-                catch { }
+                var task = _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                if (task != null)
+                    await task.ConfigureAwait(false);
             }
             
             await (_task ?? Task.CompletedTask).ConfigureAwait(false);
