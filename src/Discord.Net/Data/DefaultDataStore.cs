@@ -8,12 +8,13 @@ namespace Discord.Data
 {
     public class DefaultDataStore : DataStore
     {
+        private const int CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
-        private const double CollectionMultiplier = 1.05; //Add buffer to handle growth
-        private const double CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
+        private const double CollectionMultiplier = 1.05; //Add 5% buffer to handle growth
 
         private readonly ConcurrentDictionary<ulong, ICachedChannel> _channels;
+        private readonly ConcurrentDictionary<ulong, CachedDMChannel> _dmChannels;
         private readonly ConcurrentDictionary<ulong, CachedGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, CachedPublicUser> _users;
 
@@ -25,9 +26,10 @@ namespace Discord.Data
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
-            _channels = new ConcurrentDictionary<ulong, ICachedChannel>(1, (int)(estimatedChannelCount * CollectionMultiplier));
-            _guilds = new ConcurrentDictionary<ulong, CachedGuild>(1, (int)(guildCount * CollectionMultiplier));
-            _users = new ConcurrentDictionary<ulong, CachedPublicUser>(1, (int)(estimatedUsersCount * CollectionMultiplier));
+            _channels = new ConcurrentDictionary<ulong, ICachedChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
+            _dmChannels = new ConcurrentDictionary<ulong, CachedDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
+            _guilds = new ConcurrentDictionary<ulong, CachedGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
+            _users = new ConcurrentDictionary<ulong, CachedPublicUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
         }
 
         internal override ICachedChannel GetChannel(ulong id)
@@ -46,6 +48,30 @@ namespace Discord.Data
             ICachedChannel channel;
             if (_channels.TryRemove(id, out channel))
                 return channel;
+            return null;
+        }
+
+        internal override CachedDMChannel GetDMChannel(ulong userId)
+        {
+            CachedDMChannel channel;
+            if (_dmChannels.TryGetValue(userId, out channel))
+                return channel;
+            return null;
+        }
+        internal override void AddDMChannel(CachedDMChannel channel)
+        {
+            _channels[channel.Id] = channel;
+            _dmChannels[channel.Recipient.Id] = channel;
+        }
+        internal override CachedDMChannel RemoveDMChannel(ulong userId)
+        {
+            CachedDMChannel channel;
+            ICachedChannel ignored;
+            if (_dmChannels.TryRemove(userId, out channel))
+            {
+                if (_channels.TryRemove(channel.Id, out ignored))
+                    return channel;
+            }
             return null;
         }
 

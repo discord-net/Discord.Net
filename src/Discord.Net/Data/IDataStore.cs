@@ -13,6 +13,10 @@ namespace Discord.Data
         internal abstract void AddChannel(ICachedChannel channel);
         internal abstract ICachedChannel RemoveChannel(ulong id);
 
+        internal abstract CachedDMChannel GetDMChannel(ulong userId);
+        internal abstract void AddDMChannel(CachedDMChannel channel);
+        internal abstract CachedDMChannel RemoveDMChannel(ulong userId);
+
         internal abstract CachedGuild GetGuild(ulong id);
         internal abstract void AddGuild(CachedGuild guild);
         internal abstract CachedGuild RemoveGuild(ulong id);
