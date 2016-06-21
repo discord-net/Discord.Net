@@ -552,6 +552,10 @@ namespace Discord
                                             await _gatewayLogger.WarningAsync($"{type} referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
+
+                                        var unavailableGuilds = _unavailableGuilds;
+                                        if (unavailableGuilds != 0)
+                                            _unavailableGuilds = unavailableGuilds - 1;
                                     }
 
                                     if (data.Unavailable != true)
@@ -600,6 +604,8 @@ namespace Discord
                                             await LeftGuild.RaiseAsync(guild).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync($"Left {data.Name}").ConfigureAwait(false);
                                         }
+                                        else
+                                            _unavailableGuilds++;
 
                                     }
                                     else
@@ -1148,7 +1154,7 @@ namespace Discord
 
         private async Task WaitForGuildsAsync(CancellationToken cancelToken)
         {
-            while ((_unavailableGuilds > 0) || (Environment.TickCount - _lastGuildAvailableTime > 2000))
+            while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
                 await Task.Delay(500, cancelToken).ConfigureAwait(false);
         }
         public async Task WaitForGuildsAsync()
