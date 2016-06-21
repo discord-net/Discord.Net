@@ -2,12 +2,12 @@
 
 namespace Discord.Commands
 {
-    public struct CommandSearchResults
+    public struct SearchResults
     {
         IReadOnlyList<Command> Commands { get; }
         int ArgsPos { get; }
 
-        public CommandSearchResults(IReadOnlyList<Command> commands, int argsPos)
+        public SearchResults(IReadOnlyList<Command> commands, int argsPos)
         {
             Commands = commands;
             ArgsPos = argsPos;
