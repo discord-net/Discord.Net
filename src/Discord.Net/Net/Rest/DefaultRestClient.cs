@@ -127,7 +127,8 @@ namespace Discord.Net.Rest
                     if (statusCode == 429)
                     {
                         //TODO: Include bucket info
-                        throw new HttpRateLimitException(int.Parse(response.Headers.GetValues("retry-after").First()));
+                        int retryAfterMillis = int.Parse(response.Headers.GetValues("retry-after").First());
+                        throw new HttpRateLimitException(retryAfterMillis);
                     }
 
                     string reason = null;

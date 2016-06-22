@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS4014
 using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -67,6 +68,10 @@ namespace Discord.Net.Queue
 
                         //We have all our semaphores, send the request
                         return await request.SendAsync().ConfigureAwait(false);
+                    }
+                    catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.BadGateway)
+                    {
+                        continue;
                     }
                     catch (HttpRateLimitException ex)
                     {
