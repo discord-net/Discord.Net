@@ -124,25 +124,32 @@ namespace Discord.Net.Rest
                 int statusCode = (int)response.StatusCode;
                 if (statusCode < 200 || statusCode >= 300) //2xx = Success
                 {
-                    if (statusCode == 429)
+                    string reason = null;
+                    JToken content = null;
+                    if (response.Content.Headers.GetValues("content-type").FirstOrDefault() == "application/json")
                     {
-                        //TODO: Include bucket info
-                        int retryAfterMillis = int.Parse(response.Headers.GetValues("retry-after").First());
-                        throw new HttpRateLimitException(retryAfterMillis);
+                        try
+                        {
+                            using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                            using (var reader = new StreamReader(stream))
+                            using (var json = new JsonTextReader(reader))
+                            {
+                                content = _errorDeserializer.Deserialize<JToken>(json);
+                                reason = content.Value<string>("message");
+                            }
+                        }
+                        catch { } //Might have been HTML Should we check for content-type?
                     }
 
-                    string reason = null;
-                    try
+                    if (statusCode == 429 && content != null)
                     {
-                        using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                        using (var reader = new StreamReader(stream))
-                        using (var json = new JsonTextReader(reader))
-                        {
-                            reason = (_errorDeserializer.Deserialize(json) as JToken).Value<string>("message");
-                        }
+                        //TODO: Include bucket info
+                        string bucketId = content.Value<string>("bucket");
+                        int retryAfterMillis = content.Value<int>("retry_after");
+                        throw new HttpRateLimitException(bucketId, retryAfterMillis, reason);
                     }
-                    catch { } //Might have been HTML
-                    throw new HttpException(response.StatusCode, reason);
+                    else
+                        throw new HttpException(response.StatusCode, reason);
                 }
 
                 if (headerOnly)

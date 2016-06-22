@@ -47,7 +47,7 @@ namespace Discord.Net.Queue
                     RequestQueueBucket bucket;
                     bool success = FindBucket(ex.BucketId, out bucket);
 
-                    await _queue.RaiseRateLimitTriggered(ex.BucketId, success ? bucket.Definition : (Bucket)null, ex.RetryAfterMilliseconds).ConfigureAwait(false);
+                    await _queue.RaiseRateLimitTriggered(ex.BucketId, success ? bucket.Definition : null, ex.RetryAfterMilliseconds).ConfigureAwait(false);
 
                     bucket.Pause(ex.RetryAfterMilliseconds);
                 }
@@ -67,6 +67,7 @@ namespace Discord.Net.Queue
                     //Get our 429 state
                     Task notifier;
                     int resumeTime;
+                    
                     lock (_pauseLock)
                     {
                         notifier = _resumeNotifier.Task;
@@ -133,14 +134,14 @@ namespace Discord.Net.Queue
                 {
                     _resumeNotifier = new TaskCompletionSource<byte>();
                     _pauseEndTick = unchecked(Environment.TickCount + milliseconds);
-                    QueueResumeAsync(milliseconds);
+                    QueueResumeAsync(_resumeNotifier, milliseconds);
                 }
             }
         }
-        private async Task QueueResumeAsync(int millis)
+        private async Task QueueResumeAsync(TaskCompletionSource<byte> resumeNotifier, int millis)
         {
             await Task.Delay(millis).ConfigureAwait(false);
-            _resumeNotifier.SetResult(0);
+            resumeNotifier.SetResult(0);
         }
 
         private async Task EnterAsync(int? endTick)
@@ -151,8 +152,7 @@ namespace Discord.Net.Queue
                 if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
                     throw new TimeoutException();
             }
-            else
-                await _semaphore.WaitAsync().ConfigureAwait(false);
+            await _semaphore.WaitAsync().ConfigureAwait(false);
         }
         private async Task QueueExitAsync()
         {
