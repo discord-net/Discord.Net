@@ -18,7 +18,7 @@ namespace Discord
         public event Func<LogMessage, Task> Log;
         public event Func<Task> LoggedIn, LoggedOut;
 
-        internal readonly Logger _discordLogger, _restLogger;
+        internal readonly Logger _discordLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
         internal readonly LogManager _log;
         internal readonly RequestQueue _requestQueue;
@@ -38,12 +38,20 @@ namespace Discord
             _log.Message += async msg => await Log.RaiseAsync(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
             _restLogger = _log.CreateLogger("Rest");
+            _queueLogger = _log.CreateLogger("Queue");
 
             _connectionLock = new SemaphoreSlim(1, 1);
+
             _requestQueue = new RequestQueue();
+            _requestQueue.RateLimitTriggered += async (id, bucket, millis) =>
+            {
+                await _queueLogger.WarningAsync($"Rate limit triggered (id = \"{id ?? "null"}\")").ConfigureAwait(false);
+                if (bucket == null && id != null)
+                    await _queueLogger.WarningAsync($"Unknown rate limit bucket \"{id ?? "null"}\"").ConfigureAwait(false);
+            };
             
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
-            ApiClient.SentRequest += async (method, endpoint, millis) => await _log.VerboseAsync("Rest", $"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
         /// <inheritdoc />

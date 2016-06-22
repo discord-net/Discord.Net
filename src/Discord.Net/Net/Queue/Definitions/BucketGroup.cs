@@ -3,6 +3,7 @@
     public enum BucketGroup
     {
         Global,
-        Guild
+        Guild,
+        Channel
     }
 }

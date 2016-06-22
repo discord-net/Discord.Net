@@ -9,27 +9,51 @@ namespace Discord.Net.Queue
 {
     internal class RequestQueueBucket
     {
-        private readonly int _windowMilliseconds;
+        private readonly RequestQueue _queue;
         private readonly SemaphoreSlim _semaphore;
         private readonly object _pauseLock;
         private int _pauseEndTick;
         private TaskCompletionSource<byte> _resumeNotifier;
 
+        public Bucket Definition { get; }
         public RequestQueueBucket Parent { get; }
         public Task _resetTask { get; }
 
-        public RequestQueueBucket(int windowCount, int windowMilliseconds, RequestQueueBucket parent = null)
+        public RequestQueueBucket(RequestQueue queue, Bucket definition, RequestQueueBucket parent = null)
         {
-            if (windowCount != 0)
-                _semaphore = new SemaphoreSlim(windowCount, windowCount);
+            _queue = queue;
+            Definition = definition;
+            if (definition.WindowCount != 0)
+                _semaphore = new SemaphoreSlim(definition.WindowCount, definition.WindowCount);
+            Parent = parent;
+
             _pauseLock = new object();
             _resumeNotifier = new TaskCompletionSource<byte>();
             _resumeNotifier.SetResult(0);
-            _windowMilliseconds = windowMilliseconds;
-            Parent = parent;
         }
 
         public async Task<Stream> SendAsync(IQueuedRequest request)
+        {
+            while (true)
+            {
+                try
+                {
+                    return await SendAsyncInternal(request).ConfigureAwait(false);
+                }
+                catch (HttpRateLimitException ex)
+                {
+                    //When a 429 occurs, we drop all our locks, including the ones we wanted. 
+                    //This is generally safe though since 429s actually occuring should be very rare.
+                    RequestQueueBucket bucket;
+                    bool success = FindBucket(ex.BucketId, out bucket);
+
+                    await _queue.RaiseRateLimitTriggered(ex.BucketId, success ? bucket.Definition : (Bucket)null, ex.RetryAfterMilliseconds).ConfigureAwait(false);
+
+                    bucket.Pause(ex.RetryAfterMilliseconds);
+                }
+            }
+        }
+        private async Task<Stream> SendAsyncInternal(IQueuedRequest request)
         {
             var endTick = request.TimeoutTick;
 
@@ -64,18 +88,13 @@ namespace Discord.Net.Queue
                     {
                         //If there's a parent bucket, pass this request to them
                         if (Parent != null)
-                            return await Parent.SendAsync(request).ConfigureAwait(false);
+                            return await Parent.SendAsyncInternal(request).ConfigureAwait(false);
 
                         //We have all our semaphores, send the request
                         return await request.SendAsync().ConfigureAwait(false);
                     }
                     catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.BadGateway)
                     {
-                        continue;
-                    }
-                    catch (HttpRateLimitException ex)
-                    {
-                        Pause(ex.RetryAfterMilliseconds);
                         continue;
                     }
                 }
@@ -86,6 +105,23 @@ namespace Discord.Net.Queue
                 if (_semaphore != null)
                     QueueExitAsync();
             }
+        }
+
+        private bool FindBucket(string id, out RequestQueueBucket bucket)
+        {
+            //Keep going up until we find a bucket with matching id or we're at the topmost bucket
+            if (Definition.Id == id)
+            {
+                bucket = this;
+                return true;
+            }
+            else if (Parent == null)
+            {
+                bucket = this;
+                return false;
+            }
+            else
+                return Parent.FindBucket(id, out bucket);
         }
 
         private void Pause(int milliseconds)
@@ -120,7 +156,7 @@ namespace Discord.Net.Queue
         }
         private async Task QueueExitAsync()
         {
-            await Task.Delay(_windowMilliseconds).ConfigureAwait(false);
+            await Task.Delay(Definition.WindowSeconds * 1000).ConfigureAwait(false);
             _semaphore.Release();
         }
     }

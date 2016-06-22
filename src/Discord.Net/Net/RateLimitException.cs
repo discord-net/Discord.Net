@@ -4,6 +4,7 @@ namespace Discord.Net
 {
     public class HttpRateLimitException : HttpException
     {
+        public string BucketId { get; }
         public int RetryAfterMilliseconds { get; }
 
         public HttpRateLimitException(int retryAfterMilliseconds)

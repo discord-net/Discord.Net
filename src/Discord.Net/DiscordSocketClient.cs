@@ -21,8 +21,7 @@ namespace Discord
     //TODO: Add resume logic
     public class DiscordSocketClient : DiscordClient, IDiscordClient
     {
-        public event Func<Task> Connected, Disconnected;
-        public event Func<Task> Ready;
+        public event Func<Task> Connected, Disconnected, Ready;
         //public event Func<Channel> VoiceConnected, VoiceDisconnected;
         public event Func<IChannel, Task> ChannelCreated, ChannelDestroyed;
         public event Func<IChannel, IChannel, Task> ChannelUpdated;
@@ -174,6 +173,7 @@ namespace Discord
                 _connectTask = new TaskCompletionSource<bool>();
                 _cancelToken = new CancellationTokenSource();
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
+                await Connected.RaiseAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
                 
@@ -185,8 +185,6 @@ namespace Discord
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }
-
-            await Connected.RaiseAsync().ConfigureAwait(false);
         }
         /// <inheritdoc />
         public async Task DisconnectAsync()
@@ -1139,6 +1137,7 @@ namespace Discord
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
+            //Clean this up when Discord's session patch is live
             try
             {
                 while (!cancelToken.IsCancellationRequested)
@@ -1161,7 +1160,6 @@ namespace Discord
             }
             catch (OperationCanceledException) { }
         }
-
         private async Task WaitForGuildsAsync(CancellationToken cancelToken)
         {
             while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
