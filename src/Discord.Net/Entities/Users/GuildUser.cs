@@ -124,7 +124,7 @@ namespace Discord
                 args.Nickname = new Optional<string>(); //Remove
             }
 
-            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.Roles.IsSpecified)
+            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
             {
                 await Discord.ApiClient.ModifyGuildMemberAsync(Guild.Id, Id, args).ConfigureAwait(false);
                 if (args.Deaf.IsSpecified)
@@ -133,8 +133,8 @@ namespace Discord
                     IsMute = args.Mute.Value;
                 if (args.Nickname.IsSpecified)
                     Nickname = args.Nickname.Value ?? "";
-                if (args.Roles.IsSpecified)
-                    Roles = args.Roles.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+                if (args.RoleIds.IsSpecified)
+                    Roles = args.RoleIds.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
             }
         }
         public async Task KickAsync()
@@ -153,7 +153,7 @@ namespace Discord
         
         public async Task<IDMChannel> CreateDMChannelAsync()
         {
-            var args = new CreateDMChannelParams { RecipientId = Id };
+            var args = new CreateDMChannelParams { Recipient = this };
             var model = await Discord.ApiClient.CreateDMChannelAsync(args).ConfigureAwait(false);
 
             return new DMChannel(Discord, User, model);

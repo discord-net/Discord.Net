@@ -535,7 +535,7 @@ namespace Discord.API
             Preconditions.NotEqual(args.AFKChannelId, 0, nameof(args.AFKChannelId));
             Preconditions.AtLeast(args.AFKTimeout, 0, nameof(args.AFKTimeout));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
-            Preconditions.NotNull(args.Owner, nameof(args.Owner));
+            Preconditions.GreaterThan(args.OwnerId, 0, nameof(args.OwnerId));
             Preconditions.NotNull(args.Region, nameof(args.Region));
             Preconditions.AtLeast(args.VerificationLevel, 0, nameof(args.VerificationLevel));
 
@@ -831,7 +831,21 @@ namespace Discord.API
 
             int limit = args.Limit;
             ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
-            string relativeDir = args.RelativeDirection == Direction.After ? "after" : "before";
+            string relativeDir;
+
+            switch (args.RelativeDirection)
+            {
+                case Direction.Before:
+                default:
+                    relativeDir = "before";
+                    break;
+                case Direction.After:
+                    relativeDir = "after";
+                    break;
+                case Direction.Around:
+                    relativeDir = "around";
+                    break;
+            }
             
             int runs = (limit + DiscordConfig.MaxMessagesPerBatch - 1) / DiscordConfig.MaxMessagesPerBatch;
             int lastRunCount = limit - (runs - 1) * DiscordConfig.MaxMessagesPerBatch;
@@ -1079,7 +1093,7 @@ namespace Discord.API
         public async Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotEqual(args.RecipientId, 0, nameof(args.RecipientId));
+            Preconditions.GreaterThan(args.RecipientId, 0, nameof(args.Recipient));
 
             return await SendAsync<Channel>("POST", $"users/@me/channels", args, options: options).ConfigureAwait(false);
         }

@@ -7,6 +7,7 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Optional<T>
     {
+        public static Optional<T> Unspecified => default(Optional<T>);
         private readonly T _value;
 
         /// <summary> Gets the value for this paramter. </summary>
@@ -28,7 +29,7 @@ namespace Discord
             _value = value;
             IsSpecified = true;
         }
-        
+
         public T GetValueOrDefault() => _value;
         public T GetValueOrDefault(T defaultValue) => IsSpecified ? _value : defaultValue;
 
@@ -45,5 +46,10 @@ namespace Discord
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
         public static explicit operator T(Optional<T> value) => value.Value;
+    }
+    public static class Optional
+    {
+        public static Optional<T> Create<T>() => Optional<T>.Unspecified;
+        public static Optional<T> Create<T>(T value) => new Optional<T>(value);
     }
 }

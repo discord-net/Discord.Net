@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.API.Rest
 {
@@ -7,5 +8,7 @@ namespace Discord.API.Rest
     {
         [JsonProperty("messages")]
         public IEnumerable<ulong> MessageIds { get; set; }
+        [JsonIgnore]
+        public IEnumerable<IMessage> Messages { set { MessageIds = value.Select(x => x.Id); } }
     }
 }

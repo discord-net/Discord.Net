@@ -77,8 +77,6 @@ namespace Discord.Net.Converters
                 return PermissionTargetConverter.Instance;
             if (type == typeof(UserStatus))
                 return UserStatusConverter.Instance;
-            if (type == typeof(Direction))
-                return DirectionConverter.Instance;
 
             //Special
             if (type == typeof(Stream) && propInfo.GetCustomAttribute<ImageAttribute>() != null)
