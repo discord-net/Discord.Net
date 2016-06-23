@@ -167,7 +167,7 @@ namespace Discord
                 await DisconnectInternalAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Connecting;
-            await _gatewayLogger.InfoAsync("Connecting");
+            await _gatewayLogger.InfoAsync("Connecting").ConfigureAwait(false);
             try
             {
                 _connectTask = new TaskCompletionSource<bool>();
@@ -178,7 +178,7 @@ namespace Discord
                 await _connectTask.Task.ConfigureAwait(false);
                 
                 ConnectionState = ConnectionState.Connected;
-                await _gatewayLogger.InfoAsync("Connected");
+                await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -203,7 +203,7 @@ namespace Discord
 
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
-            await _gatewayLogger.InfoAsync("Disconnecting");
+            await _gatewayLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
 
             //Signal tasks to complete
             try { _cancelToken.Cancel(); } catch { }
@@ -475,7 +475,7 @@ namespace Discord
                     case GatewayOpCode.InvalidSession:
                         {
                             await _gatewayLogger.DebugAsync("Received InvalidSession").ConfigureAwait(false);
-                            await _gatewayLogger.WarningAsync("Failed to resume previous session");
+                            await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
 
                             _sessionId = null;
                             _lastSeq = 0;
@@ -485,7 +485,7 @@ namespace Discord
                     case GatewayOpCode.Reconnect:
                         {
                             await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
-                            await _gatewayLogger.WarningAsync("Server requested a reconnect");
+                            await _gatewayLogger.WarningAsync("Server requested a reconnect").ConfigureAwait(false);
 
                             await StartReconnectAsync().ConfigureAwait(false);
                         }
@@ -526,7 +526,7 @@ namespace Discord
                                     await Ready.RaiseAsync().ConfigureAwait(false);
 
                                     _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
-                                    await _gatewayLogger.InfoAsync("Ready");
+                                    await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
                                 break;
 
@@ -586,7 +586,7 @@ namespace Discord
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_UPDATE referenced an unknown guild.");
+                                        await _gatewayLogger.WarningAsync("GUILD_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                         return;
                                     }
                                 }
