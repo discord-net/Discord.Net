@@ -116,12 +116,12 @@ namespace Discord
             remove { _guildUnavailableEvent.Remove(value); }
         }
         private AsyncEvent<Func<IGuild, Task>> _guildUnavailableEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildDownloadedMembers
+        public event Func<IGuild, Task> GuildMembersDownloaded
         {
-            add { _guildDownloadedMembersEvent.Add(value); }
-            remove { _guildDownloadedMembersEvent.Remove(value); }
+            add { _guildMembersDownloadedEvent.Add(value); }
+            remove { _guildMembersDownloadedEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _guildDownloadedMembersEvent = new AsyncEvent<Func<IGuild, Task>>();
+        private AsyncEvent<Func<IGuild, Task>> _guildMembersDownloadedEvent = new AsyncEvent<Func<IGuild, Task>>();
         public event Func<IGuild, IGuild, Task> GuildUpdated
         {
             add { _guildUpdatedEvent.Add(value); }

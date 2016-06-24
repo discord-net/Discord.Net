@@ -765,7 +765,7 @@ namespace Discord
                                         if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
                                         {
                                             guild.CompleteDownloadMembers();
-                                            await _guildDownloadedMembersEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                            await _guildMembersDownloadedEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
                                     }
                                     else
