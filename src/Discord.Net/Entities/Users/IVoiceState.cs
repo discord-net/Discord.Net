@@ -2,6 +2,10 @@
 {
     public interface IVoiceState
     {
+        /// <summary> Returns true if the guild has deafened this user. </summary>
+        bool IsDeafened { get; }
+        /// <summary> Returns true if the guild has muted this user. </summary>
+        bool IsMuted { get; }
         /// <summary> Returns true if this user has marked themselves as deafened. </summary>
         bool IsSelfDeafened { get; }
         /// <summary> Returns true if this user has marked themselves as muted. </summary>

@@ -8,10 +8,6 @@ namespace Discord
     /// <summary> A Guild-User pairing. </summary>
     public interface IGuildUser : IUpdateable, IUser, IVoiceState
     {
-        /// <summary> Returns true if the guild has deafened this user. </summary>
-        bool IsDeaf { get; }
-        /// <summary> Returns true if the guild has muted this user. </summary>
-        bool IsMute { get; }
         /// <summary> Gets when this user joined this guild. </summary>
         DateTimeOffset? JoinedAt { get; }
         /// <summary> Gets the nickname for this user. </summary>

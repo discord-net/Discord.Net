@@ -1,16 +1,20 @@
 ﻿using System;
+using Model = Discord.API.VoiceState;
 
 namespace Discord
 {
+    //TODO: C#7 Candidate for record type
     internal struct VoiceState : IVoiceState
     {
         [Flags]
         private enum Flags : byte
         {
-            None = 0x0,
-            Suppressed = 0x1,
-            SelfMuted = 0x2,
-            SelfDeafened = 0x4,
+            None = 0x00,
+            Suppressed = 0x01,
+            Muted = 0x02,
+            Deafened = 0x04,
+            SelfMuted = 0x08,
+            SelfDeafened = 0x10,
         }
 
         private readonly Flags _voiceStates;
@@ -18,10 +22,14 @@ namespace Discord
         public CachedVoiceChannel VoiceChannel { get; }
         public string VoiceSessionId { get; }
 
+        public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
+        public bool IsDeafened => (_voiceStates & Flags.Deafened) != 0;
+        public bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
-        public bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
-        
+
+        public VoiceState(CachedVoiceChannel voiceChannel, Model model) 
+            : this(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress) { }
         public VoiceState(CachedVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
         {
             VoiceChannel = voiceChannel;
@@ -36,6 +44,8 @@ namespace Discord
                 voiceStates |= Flags.Suppressed;
             _voiceStates = voiceStates;
         }
+
+        public VoiceState Clone() => this;
 
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

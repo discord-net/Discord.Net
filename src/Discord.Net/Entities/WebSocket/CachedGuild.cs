@@ -204,7 +204,7 @@ namespace Discord
         public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, DataStore dataStore, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
         {
             var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
-            var voiceState = new VoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
+            var voiceState = new VoiceState(voiceChannel, model);
             (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
             return voiceState;
         }

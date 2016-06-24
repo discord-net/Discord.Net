@@ -19,77 +19,8 @@ namespace Discord
     //TODO: Add event docstrings
     //TODO: Add reconnect logic (+ensure the heartbeat task to shut down)
     //TODO: Add resume logic
-    public class DiscordSocketClient : DiscordClient, IDiscordClient
+    public partial class DiscordSocketClient : DiscordClient, IDiscordClient
     {
-        private object _eventLock = new object();
-
-        //General
-        public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Task>> _disconnectedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Task> Ready { add { _readyEvent.Add(value); } remove { _readyEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Task>> _readyEvent = new AsyncEvent<Func<Task>>();
-
-        public event Func<int, int, Task> LatencyUpdated { add { _latencyUpdatedEvent.Add(value); } remove { _latencyUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
-
-        //Channels
-        public event Func<IChannel, Task> ChannelCreated { add { _channelCreatedEvent.Add(value); } remove { _channelCreatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IChannel, Task>> _channelCreatedEvent = new AsyncEvent<Func<IChannel, Task>>();
-        public event Func<IChannel, Task> ChannelDestroyed { add { _channelDestroyedEvent.Add(value); } remove { _channelDestroyedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IChannel, Task>> _channelDestroyedEvent = new AsyncEvent<Func<IChannel, Task>>();
-        public event Func<IChannel, IChannel, Task> ChannelUpdated { add { _channelUpdatedEvent.Add(value); } remove { _channelUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IChannel, IChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<IChannel, IChannel, Task>>();
-
-        //Messages
-        public event Func<IMessage, Task> MessageReceived { add { _messageReceivedEvent.Add(value); } remove { _messageReceivedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<IMessage, Task>>();
-        public event Func<ulong, Optional<IMessage>, Task> MessageDeleted { add { _messageDeletedEvent.Add(value); } remove { _messageDeletedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<ulong, Optional<IMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, Optional<IMessage>, Task>>();
-        public event Func<Optional<IMessage>, IMessage, Task> MessageUpdated { add { _messageUpdatedEvent.Add(value); } remove { _messageUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Optional<IMessage>, IMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Optional<IMessage>, IMessage, Task>>();
-
-        //Roles
-        public event Func<IRole, Task> RoleCreated { add { _roleCreatedEvent.Add(value); } remove { _roleCreatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IRole, Task>> _roleCreatedEvent = new AsyncEvent<Func<IRole, Task>>();
-        public event Func<IRole, Task> RoleDeleted { add { _roleDeletedEvent.Add(value); } remove { _roleDeletedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IRole, Task>> _roleDeletedEvent = new AsyncEvent<Func<IRole, Task>>();
-        public event Func<IRole, IRole, Task> RoleUpdated { add { _roleUpdatedEvent.Add(value); } remove { _roleUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IRole, IRole, Task>> _roleUpdatedEvent = new AsyncEvent<Func<IRole, IRole, Task>>();
-
-        //Guilds
-        public event Func<IGuild, Task> JoinedGuild { add { _joinedGuildEvent.Add(value); } remove { _joinedGuildEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, Task>> _joinedGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> LeftGuild { add { _leftGuildEvent.Add(value); } remove { _leftGuildEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, Task>> _leftGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildAvailable { add { _guildAvailableEvent.Add(value); } remove { _guildAvailableEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, Task>> _guildAvailableEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildUnavailable { add { _guildUnavailableEvent.Add(value); } remove { _guildUnavailableEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, Task>> _guildUnavailableEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildDownloadedMembers { add { _guildDownloadedMembersEvent.Add(value); } remove { _guildDownloadedMembersEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, Task>> _guildDownloadedMembersEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, IGuild, Task> GuildUpdated { add { _guildUpdatedEvent.Add(value); } remove { _guildUpdatedEvent.Remove(value); } }
-        private AsyncEvent<Func<IGuild, IGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<IGuild, IGuild, Task>>();
-
-        //Users
-        public event Func<IGuildUser, Task> UserJoined { add { _userJoinedEvent.Add(value); } remove { _userJoinedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IGuildUser, Task>> _userJoinedEvent = new AsyncEvent<Func<IGuildUser, Task>>();
-        public event Func<IGuildUser, Task> UserLeft { add { _userLeftEvent.Add(value); } remove { _userLeftEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IGuildUser, Task>> _userLeftEvent = new AsyncEvent<Func<IGuildUser, Task>>();
-        public event Func<IUser, IGuild, Task> UserBanned { add { _userBannedEvent.Add(value); } remove { _userBannedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userBannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
-        public event Func<IUser, IGuild, Task> UserUnbanned { add { _userUnbannedEvent.Add(value); } remove { _userUnbannedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userUnbannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
-        public event Func<Optional<IGuildUser>, IGuildUser, Task> UserUpdated { add { _userUpdatedEvent.Add(value); } remove { _userUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Optional<IGuildUser>, IGuildUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<Optional<IGuildUser>, IGuildUser, Task>>();
-        public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated { add { _selfUpdatedEvent.Add(value); } remove { _selfUpdatedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<ISelfUser, ISelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<ISelfUser, ISelfUser, Task>>();
-        public event Func<IUser, IChannel, Task> UserIsTyping { add { _userIsTypingEvent.Add(value); } remove { _userIsTypingEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<IUser, IChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<IUser, IChannel, Task>>();
-
-        //TODO: Add PresenceUpdated? VoiceStateUpdated?, VoiceConnected, VoiceDisconnected;
-
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly Logger _gatewayLogger;
 #if BENCHMARK
@@ -1066,19 +997,20 @@ namespace Discord
                                             break;
                                         }
 
+                                        IPresence before;
                                         var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
-                                            var before = user.Clone();
+                                            before = user.Presence.Clone();
                                             user.Update(data, UpdateSource.WebSocket);
-                                            await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
                                         }
                                         else
                                         {
+                                            before = new Presence(null, UserStatus.Offline);
                                             user = guild.AddOrUpdateUser(data, DataStore);
-                                            user.Update(data, UpdateSource.WebSocket);
-                                            await _userUpdatedEvent.InvokeAsync(Optional.Create<IGuildUser>(), user).ConfigureAwait(false);
                                         }
+
+                                        await _userPresenceUpdatedEvent.InvokeAsync(user, before, user).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1103,40 +1035,7 @@ namespace Discord
                                 }
                                 break;
 
-                            //Voice
-                            case "VOICE_STATE_UPDATE":
-                                {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
-
-                                    var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
-                                    if (data.GuildId.HasValue)
-                                    {
-                                        var guild = DataStore.GetGuild(data.GuildId.Value);
-                                        if (guild != null)
-                                        {
-                                            if (data.ChannelId == null)
-                                                guild.RemoveVoiceState(data.UserId);
-                                            else
-                                                guild.AddOrUpdateVoiceState(data, DataStore);
-
-                                            var user = guild.GetUser(data.UserId);
-                                            if (user != null)
-                                            {
-                                                var before =  user.Clone();
-                                                user.Update(data, UpdateSource.WebSocket);
-                                                await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
-                                            return;
-                                        }
-                                    }
-                                }
-                                break;
-
-                            //Settings
+                            //Users
                             case "USER_UPDATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (USER_UPDATE)").ConfigureAwait(false);
@@ -1152,6 +1051,49 @@ namespace Discord
                                     {
                                         await _gatewayLogger.WarningAsync("Received USER_UPDATE for wrong user.").ConfigureAwait(false);
                                         return;
+                                    }
+                                }
+                                break;
+
+                            //Voice
+                            case "VOICE_STATE_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
+                                    if (data.GuildId.HasValue)
+                                    {
+                                        var guild = DataStore.GetGuild(data.GuildId.Value);
+                                        if (guild != null)
+                                        {
+                                            VoiceState before, after;
+                                            if (data.ChannelId != null)
+                                            {
+                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                            }
+                                            else
+                                            {
+                                                before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
+                                                after = new VoiceState(null, data);
+                                            }
+
+                                            var user = guild.GetUser(data.UserId);
+                                            if (user != null)
+                                            {
+                                                await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
+                                            }
+                                            else
+                                            {
+                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                 }
                                 break;
