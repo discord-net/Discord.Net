@@ -1003,11 +1003,6 @@ namespace Discord
                                         }
                                         if (after != null)
                                             await _messageUpdatedEvent.InvokeAsync(Optional.Create(before), after).ConfigureAwait(false);
-                                        else
-                                        {
-                                            await _gatewayLogger.WarningAsync("MESSAGE_UPDATE was unable to build an updated message.").ConfigureAwait(false);
-                                            return;
-                                        }
                                     }
                                     else
                                     {
