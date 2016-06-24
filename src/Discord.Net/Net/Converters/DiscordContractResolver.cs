@@ -17,6 +17,9 @@ namespace Discord.Net.Converters
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
+            if (property.Ignored)
+                return property;
+
             var propInfo = member as PropertyInfo;
             if (propInfo != null)
             {
