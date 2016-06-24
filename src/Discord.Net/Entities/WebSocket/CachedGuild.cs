@@ -90,11 +90,7 @@ namespace Discord
                     _downloaderPromise.SetResult(true);
 
                 for (int i = 0; i < model.Presences.Length; i++)
-                {
-                    var presence = model.Presences[i];
-                    UpdatePresence(presence, dataStore, members);
-                    //AddUser(presence, dataStore, members);
-                }
+                    AddOrUpdateUser(model.Presences[i], dataStore, members);
             }
             _members = members;
             
@@ -163,7 +159,7 @@ namespace Discord
             }
             return member;
         }
-        public CachedGuildUser AddUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
+        public CachedGuildUser AddOrUpdateUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
         {
             members = members ?? _members;
 
@@ -193,22 +189,6 @@ namespace Discord
             if (_members.TryRemove(id, out member))
                 return member;
             return null;
-        }
-        public void UpdatePresence(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
-        {
-            members = members ?? _members;
-
-            CachedGuildUser member;
-            if (members.TryGetValue(model.User.Id, out member))
-                member.Update(model, UpdateSource.WebSocket);
-            else
-            {
-                var user = Discord.GetOrAddUser(model.User, dataStore);
-                member = new CachedGuildUser(this, user, model);
-                members[user.Id] = member;
-                user.AddRef();
-                DownloadedMemberCount++;
-            }
         }
         public async Task DownloadMembersAsync()
         {

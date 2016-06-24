@@ -15,8 +15,15 @@ namespace Discord
 {
     public class DiscordClient : IDiscordClient
     {
-        public event Func<LogMessage, Task> Log;
-        public event Func<Task> LoggedIn, LoggedOut;
+        private readonly object _eventLock = new object();
+
+        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+
+        public event Func<Task> LoggedIn { add { _loggedInEvent.Add(value); } remove { _loggedInEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _loggedInEvent = new AsyncEvent<Func<Task>>();
+        public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
         internal readonly Logger _discordLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
@@ -35,7 +42,7 @@ namespace Discord
         public DiscordClient(DiscordConfig config)
         {
             _log = new LogManager(config.LogLevel);
-            _log.Message += async msg => await Log.RaiseAsync(msg).ConfigureAwait(false);
+            _log.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
             _discordLogger = _log.CreateLogger("Discord");
             _restLogger = _log.CreateLogger("Rest");
             _queueLogger = _log.CreateLogger("Queue");
@@ -96,7 +103,7 @@ namespace Discord
                 throw;
             }
 
-            await LoggedIn.RaiseAsync().ConfigureAwait(false);
+            await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
         protected virtual Task OnLoginAsync() => Task.CompletedTask;
 
@@ -123,7 +130,7 @@ namespace Discord
 
             LoginState = LoginState.LoggedOut;
 
-            await LoggedOut.RaiseAsync().ConfigureAwait(false);
+            await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
         protected virtual Task OnLogoutAsync() => Task.CompletedTask;
 

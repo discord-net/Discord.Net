@@ -1,6 +1,5 @@
 ﻿using Discord.API.Gateway;
 using Discord.API.Rest;
-using Discord.Extensions;
 using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
@@ -24,10 +23,17 @@ namespace Discord.API
 {
     public class DiscordApiClient : IDisposable
     {
-        public event Func<string, string, double, Task> SentRequest;
-        public event Func<int, Task> SentGatewayMessage;
-        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent;
-        public event Func<Exception, Task> Disconnected;
+        private object _eventLock = new object();
+
+        public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
+        public event Func<int, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<int, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<int, Task>>();
+
+        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
+        public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
         private readonly RequestQueue _requestQueue;
         private readonly JsonSerializer _serializer;
@@ -67,19 +73,19 @@ namespace Discord.API
                         using (var reader = new StreamReader(decompressed))
                         {
                             var msg = JsonConvert.DeserializeObject<WebSocketMessage>(reader.ReadToEnd());
-                            await ReceivedGatewayEvent.RaiseAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                         }
                     }
                 };
                 _gatewayClient.TextMessage += async text =>
                 {
                     var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
-                    await ReceivedGatewayEvent.RaiseAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 };
                 _gatewayClient.Closed += async ex =>
                 {
                     await DisconnectAsync().ConfigureAwait(false);
-                    await Disconnected.RaiseAsync(ex).ConfigureAwait(false);
+                    await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
                 };
             }
 
@@ -311,7 +317,7 @@ namespace Discord.API
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            await SentRequest.RaiseAsync(method, endpoint, milliseconds).ConfigureAwait(false);
+            await _sentRequestEvent.InvokeAsync(method, endpoint, milliseconds).ConfigureAwait(false);
 
             return responseStream;
         }
@@ -324,7 +330,7 @@ namespace Discord.API
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
-            await SentRequest.RaiseAsync(method, endpoint, milliseconds).ConfigureAwait(false);
+            await _sentRequestEvent.InvokeAsync(method, endpoint, milliseconds).ConfigureAwait(false);
 
             return responseStream;
         }
@@ -344,7 +350,7 @@ namespace Discord.API
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
             await _requestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options), group, bucketId, guildId).ConfigureAwait(false);
-            await SentGatewayMessage.RaiseAsync((int)opCode).ConfigureAwait(false);
+            await _sentGatewayMessageEvent.InvokeAsync((int)opCode).ConfigureAwait(false);
         }
 
         //Auth

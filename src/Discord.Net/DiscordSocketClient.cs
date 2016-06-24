@@ -21,22 +21,74 @@ namespace Discord
     //TODO: Add resume logic
     public class DiscordSocketClient : DiscordClient, IDiscordClient
     {
-        public event Func<Task> Connected, Disconnected, Ready;
-        //public event Func<Channel> VoiceConnected, VoiceDisconnected;
-        public event Func<IChannel, Task> ChannelCreated, ChannelDestroyed;
-        public event Func<IChannel, IChannel, Task> ChannelUpdated;
-        public event Func<IMessage, Task> MessageReceived, MessageDeleted;
-        public event Func<IMessage, IMessage, Task> MessageUpdated;
-        public event Func<IRole, Task> RoleCreated, RoleDeleted;
-        public event Func<IRole, IRole, Task> RoleUpdated;
-        public event Func<IGuild, Task> JoinedGuild, LeftGuild, GuildAvailable, GuildUnavailable, GuildDownloadedMembers;
-        public event Func<IGuild, IGuild, Task> GuildUpdated;
-        public event Func<IUser, Task> UserJoined, UserLeft, UserBanned, UserUnbanned;
-        public event Func<IUser, IUser, Task> UserUpdated;
-        public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated;
-        public event Func<IChannel, IUser, Task> UserIsTyping;
-        public event Func<int, Task> LatencyUpdated;
-        //TODO: Add PresenceUpdated? VoiceStateUpdated?
+        private object _eventLock = new object();
+
+        //General
+        public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
+        public event Func<Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _disconnectedEvent = new AsyncEvent<Func<Task>>();
+        public event Func<Task> Ready { add { _readyEvent.Add(value); } remove { _readyEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _readyEvent = new AsyncEvent<Func<Task>>();
+
+        public event Func<int, int, Task> LatencyUpdated { add { _latencyUpdatedEvent.Add(value); } remove { _latencyUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
+
+        //Channels
+        public event Func<IChannel, Task> ChannelCreated { add { _channelCreatedEvent.Add(value); } remove { _channelCreatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IChannel, Task>> _channelCreatedEvent = new AsyncEvent<Func<IChannel, Task>>();
+        public event Func<IChannel, Task> ChannelDestroyed { add { _channelDestroyedEvent.Add(value); } remove { _channelDestroyedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IChannel, Task>> _channelDestroyedEvent = new AsyncEvent<Func<IChannel, Task>>();
+        public event Func<IChannel, IChannel, Task> ChannelUpdated { add { _channelUpdatedEvent.Add(value); } remove { _channelUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IChannel, IChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<IChannel, IChannel, Task>>();
+
+        //Messages
+        public event Func<IMessage, Task> MessageReceived { add { _messageReceivedEvent.Add(value); } remove { _messageReceivedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<IMessage, Task>>();
+        public event Func<ulong, Optional<IMessage>, Task> MessageDeleted { add { _messageDeletedEvent.Add(value); } remove { _messageDeletedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<ulong, Optional<IMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, Optional<IMessage>, Task>>();
+        public event Func<Optional<IMessage>, IMessage, Task> MessageUpdated { add { _messageUpdatedEvent.Add(value); } remove { _messageUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Optional<IMessage>, IMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Optional<IMessage>, IMessage, Task>>();
+
+        //Roles
+        public event Func<IRole, Task> RoleCreated { add { _roleCreatedEvent.Add(value); } remove { _roleCreatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IRole, Task>> _roleCreatedEvent = new AsyncEvent<Func<IRole, Task>>();
+        public event Func<IRole, Task> RoleDeleted { add { _roleDeletedEvent.Add(value); } remove { _roleDeletedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IRole, Task>> _roleDeletedEvent = new AsyncEvent<Func<IRole, Task>>();
+        public event Func<IRole, IRole, Task> RoleUpdated { add { _roleUpdatedEvent.Add(value); } remove { _roleUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IRole, IRole, Task>> _roleUpdatedEvent = new AsyncEvent<Func<IRole, IRole, Task>>();
+
+        //Guilds
+        public event Func<IGuild, Task> JoinedGuild { add { _joinedGuildEvent.Add(value); } remove { _joinedGuildEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, Task>> _joinedGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
+        public event Func<IGuild, Task> LeftGuild { add { _leftGuildEvent.Add(value); } remove { _leftGuildEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, Task>> _leftGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
+        public event Func<IGuild, Task> GuildAvailable { add { _guildAvailableEvent.Add(value); } remove { _guildAvailableEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, Task>> _guildAvailableEvent = new AsyncEvent<Func<IGuild, Task>>();
+        public event Func<IGuild, Task> GuildUnavailable { add { _guildUnavailableEvent.Add(value); } remove { _guildUnavailableEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, Task>> _guildUnavailableEvent = new AsyncEvent<Func<IGuild, Task>>();
+        public event Func<IGuild, Task> GuildDownloadedMembers { add { _guildDownloadedMembersEvent.Add(value); } remove { _guildDownloadedMembersEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, Task>> _guildDownloadedMembersEvent = new AsyncEvent<Func<IGuild, Task>>();
+        public event Func<IGuild, IGuild, Task> GuildUpdated { add { _guildUpdatedEvent.Add(value); } remove { _guildUpdatedEvent.Remove(value); } }
+        private AsyncEvent<Func<IGuild, IGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<IGuild, IGuild, Task>>();
+
+        //Users
+        public event Func<IGuildUser, Task> UserJoined { add { _userJoinedEvent.Add(value); } remove { _userJoinedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IGuildUser, Task>> _userJoinedEvent = new AsyncEvent<Func<IGuildUser, Task>>();
+        public event Func<IGuildUser, Task> UserLeft { add { _userLeftEvent.Add(value); } remove { _userLeftEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IGuildUser, Task>> _userLeftEvent = new AsyncEvent<Func<IGuildUser, Task>>();
+        public event Func<IUser, IGuild, Task> UserBanned { add { _userBannedEvent.Add(value); } remove { _userBannedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userBannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
+        public event Func<IUser, IGuild, Task> UserUnbanned { add { _userUnbannedEvent.Add(value); } remove { _userUnbannedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userUnbannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
+        public event Func<Optional<IGuildUser>, IGuildUser, Task> UserUpdated { add { _userUpdatedEvent.Add(value); } remove { _userUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Optional<IGuildUser>, IGuildUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<Optional<IGuildUser>, IGuildUser, Task>>();
+        public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated { add { _selfUpdatedEvent.Add(value); } remove { _selfUpdatedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<ISelfUser, ISelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<ISelfUser, ISelfUser, Task>>();
+        public event Func<IUser, IChannel, Task> UserIsTyping { add { _userIsTypingEvent.Add(value); } remove { _userIsTypingEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<IUser, IChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<IUser, IChannel, Task>>();
+
+        //TODO: Add PresenceUpdated? VoiceStateUpdated?, VoiceConnected, VoiceDisconnected;
 
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly Logger _gatewayLogger;
@@ -46,7 +98,6 @@ namespace Discord
         private readonly DataStoreProvider _dataStoreProvider;
         private readonly JsonSerializer _serializer;
         private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
-        private readonly bool _enablePreUpdateEvents;
         private readonly int _largeThreshold;
         private readonly int _totalShards;
 
@@ -78,8 +129,7 @@ namespace Discord
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public DiscordSocketClient()
-            : this(new DiscordSocketConfig()) { }
+        public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient(DiscordSocketConfig config)
             : base(config)
@@ -93,7 +143,6 @@ namespace Discord
             _dataStoreProvider = config.DataStoreProvider;
 
             MessageCacheSize = config.MessageCacheSize;
-            _enablePreUpdateEvents = config.EnablePreUpdateEvents;
             _largeThreshold = config.LargeThreshold;
             
             _gatewayLogger = _log.CreateLogger("Gateway");
@@ -173,7 +222,7 @@ namespace Discord
                 _connectTask = new TaskCompletionSource<bool>();
                 _cancelToken = new CancellationTokenSource();
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
-                await Connected.RaiseAsync().ConfigureAwait(false);
+                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
                 
@@ -228,7 +277,7 @@ namespace Discord
             ConnectionState = ConnectionState.Disconnected;
             await _gatewayLogger.InfoAsync("Disconnected").ConfigureAwait(false);
 
-            await Disconnected.RaiseAsync().ConfigureAwait(false);
+            await _disconnectedEvent.InvokeAsync().ConfigureAwait(false);
         }
         private async Task StartReconnectAsync()
         {
@@ -463,12 +512,14 @@ namespace Discord
                             var heartbeatTime = _heartbeatTime;
                             if (heartbeatTime != 0)
                             {
-                                var latency = (int)(Environment.TickCount - _heartbeatTime);
+                                int latency = (int)(Environment.TickCount - _heartbeatTime);
                                 _heartbeatTime = 0;
                                 await _gatewayLogger.VerboseAsync($"Latency = {latency} ms").ConfigureAwait(false);
+
+                                int before = Latency;
                                 Latency = latency;
 
-                                await LatencyUpdated.RaiseAsync(latency).ConfigureAwait(false);
+                                await _latencyUpdatedEvent.InvokeAsync(before, latency).ConfigureAwait(false);
                             }
                         }
                         break;
@@ -523,7 +574,7 @@ namespace Discord
 
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token);
 
-                                    await Ready.RaiseAsync().ConfigureAwait(false);
+                                    await _readyEvent.InvokeAsync().ConfigureAwait(false);
 
                                     _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -546,7 +597,7 @@ namespace Discord
                                     if (data.Unavailable != false)
                                     {
                                         guild = AddGuild(data, DataStore);
-                                        await JoinedGuild.RaiseAsync(guild).ConfigureAwait(false);
+                                        await _joinedGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         await _gatewayLogger.InfoAsync($"Joined {data.Name}").ConfigureAwait(false);
                                     }
                                     else
@@ -568,7 +619,7 @@ namespace Discord
                                     if (data.Unavailable != true)
                                     {
                                         await _gatewayLogger.VerboseAsync($"Connected to {data.Name}").ConfigureAwait(false);
-                                        await GuildAvailable.RaiseAsync(guild).ConfigureAwait(false);
+                                        await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                     }
                                 }
                                 break;
@@ -580,9 +631,9 @@ namespace Discord
                                     var guild = DataStore.GetGuild(data.Id);
                                     if (guild != null)
                                     {
-                                        var before = _enablePreUpdateEvents ? guild.Clone() : null;
+                                        var before = guild.Clone();
                                         guild.Update(data, UpdateSource.WebSocket);
-                                        await GuildUpdated.RaiseAsync(before, guild).ConfigureAwait(false);
+                                        await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -604,11 +655,11 @@ namespace Discord
                                         foreach (var member in guild.Members)
                                             member.User.RemoveRef(this);
 
-                                        await GuildUnavailable.RaiseAsync(guild).ConfigureAwait(false);
+                                        await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         await _gatewayLogger.VerboseAsync($"Disconnected from {data.Name}").ConfigureAwait(false);
                                         if (data.Unavailable != true)
                                         {
-                                            await LeftGuild.RaiseAsync(guild).ConfigureAwait(false);
+                                            await _leftGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync($"Left {data.Name}").ConfigureAwait(false);
                                         }
                                         else
@@ -644,7 +695,7 @@ namespace Discord
                                     else
                                         channel = AddDMChannel(data, DataStore);
                                     if (channel != null)
-                                        await ChannelCreated.RaiseAsync(channel).ConfigureAwait(false);
+                                        await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                 }
                                 break;
                             case "CHANNEL_UPDATE":
@@ -655,9 +706,9 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.Id);
                                     if (channel != null)
                                     {
-                                        var before = _enablePreUpdateEvents ? channel.Clone() : null;
+                                        var before = channel.Clone();
                                         channel.Update(data, UpdateSource.WebSocket);
-                                        await ChannelUpdated.RaiseAsync(before, channel).ConfigureAwait(false);
+                                        await _channelUpdatedEvent.InvokeAsync(before, channel).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -686,7 +737,7 @@ namespace Discord
                                     else
                                         channel = RemoveDMChannel(data.Recipient.Value.Id);
                                     if (channel != null)
-                                        await ChannelDestroyed.RaiseAsync(channel).ConfigureAwait(false);
+                                        await _channelDestroyedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown channel.").ConfigureAwait(false);
@@ -705,7 +756,7 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.AddUser(data, DataStore);
-                                        await UserJoined.RaiseAsync(user).ConfigureAwait(false);
+                                        await _userJoinedEvent.InvokeAsync(user).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -725,9 +776,9 @@ namespace Discord
                                         var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
-                                            var before = _enablePreUpdateEvents ? user.Clone() : null;
+                                            var before = user.Clone();
                                             user.Update(data, UpdateSource.WebSocket);
-                                            await UserUpdated.RaiseAsync(before, user).ConfigureAwait(false);
+                                            await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -754,7 +805,7 @@ namespace Discord
                                         if (user != null)
                                         {
                                             user.User.RemoveRef(this);
-                                            await UserLeft.RaiseAsync(user).ConfigureAwait(false);
+                                            await _userLeftEvent.InvokeAsync(user).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -783,7 +834,7 @@ namespace Discord
                                         if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
                                         {
                                             guild.CompleteDownloadMembers();
-                                            await GuildDownloadedMembers.RaiseAsync(guild).ConfigureAwait(false);
+                                            await _guildDownloadedMembersEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
                                     }
                                     else
@@ -804,7 +855,7 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var role = guild.AddRole(data.Role);
-                                        await RoleCreated.RaiseAsync(role).ConfigureAwait(false);
+                                        await _roleCreatedEvent.InvokeAsync(role).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -824,9 +875,9 @@ namespace Discord
                                         var role = guild.GetRole(data.Role.Id);
                                         if (role != null)
                                         {
-                                            var before = _enablePreUpdateEvents ? role.Clone() : null;
+                                            var before = role.Clone();
                                             role.Update(data.Role, UpdateSource.WebSocket);
-                                            await RoleUpdated.RaiseAsync(before, role).ConfigureAwait(false);
+                                            await _roleUpdatedEvent.InvokeAsync(before, role).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -851,7 +902,7 @@ namespace Discord
                                     {
                                         var role = guild.RemoveRole(data.RoleId);
                                         if (role != null)
-                                            await RoleDeleted.RaiseAsync(role).ConfigureAwait(false);
+                                            await _roleDeletedEvent.InvokeAsync(role).ConfigureAwait(false);
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
@@ -874,7 +925,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserBanned.RaiseAsync(new User(data.User)).ConfigureAwait(false);
+                                        await _userBannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
@@ -889,7 +940,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await UserUnbanned.RaiseAsync(new User(data.User)).ConfigureAwait(false);
+                                        await _userUnbannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
@@ -912,7 +963,7 @@ namespace Discord
                                         if (author != null)
                                         {
                                             var msg = channel.AddMessage(author, data);
-                                            await MessageReceived.RaiseAsync(msg).ConfigureAwait(false);
+                                            await _messageReceivedEvent.InvokeAsync(msg).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -939,7 +990,7 @@ namespace Discord
                                         CachedMessage cachedMsg = channel.GetMessage(data.Id);
                                         if (cachedMsg != null)
                                         {
-                                            before = _enablePreUpdateEvents ? cachedMsg.Clone() : null;
+                                            before = cachedMsg.Clone();
                                             cachedMsg.Update(data, UpdateSource.WebSocket);
                                             after = cachedMsg;
                                         }
@@ -951,7 +1002,12 @@ namespace Discord
                                                 after = new Message(channel, author, data);
                                         }
                                         if (after != null)
-                                            await MessageUpdated.RaiseAsync(before, after).ConfigureAwait(false);
+                                            await _messageUpdatedEvent.InvokeAsync(Optional.Create(before), after).ConfigureAwait(false);
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("MESSAGE_UPDATE was unable to build an updated message.").ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
                                     else
                                     {
@@ -969,7 +1025,7 @@ namespace Discord
                                     if (channel != null)
                                     {
                                         var msg = channel.RemoveMessage(data.Id);
-                                        await MessageDeleted.RaiseAsync(msg).ConfigureAwait(false);
+                                        await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -989,7 +1045,7 @@ namespace Discord
                                         foreach (var id in data.Ids)
                                         {
                                             var msg = channel.RemoveMessage(id);
-                                            await MessageDeleted.RaiseAsync(msg).ConfigureAwait(false);
+                                            await _messageDeletedEvent.InvokeAsync(msg.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
                                         }
                                     }
                                     else
@@ -1014,7 +1070,20 @@ namespace Discord
                                             await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                             break;
                                         }
-                                        guild.UpdatePresence(data, DataStore);
+
+                                        var user = guild.GetUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            var before = user.Clone();
+                                            user.Update(data, UpdateSource.WebSocket);
+                                            await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            user = guild.AddOrUpdateUser(data, DataStore);
+                                            user.Update(data, UpdateSource.WebSocket);
+                                            await _userUpdatedEvent.InvokeAsync(Optional.Create<IGuildUser>(), user).ConfigureAwait(false);
+                                        }
                                     }
                                     else
                                     {
@@ -1034,7 +1103,7 @@ namespace Discord
                                     {
                                         var user = channel.GetUser(data.UserId, true);
                                         if (user != null)
-                                            await UserIsTyping.RaiseAsync(channel, user).ConfigureAwait(false);
+                                            await _userIsTypingEvent.InvokeAsync(user, channel).ConfigureAwait(false);
                                     }
                                 }
                                 break;
@@ -1057,7 +1126,11 @@ namespace Discord
 
                                             var user = guild.GetUser(data.UserId);
                                             if (user != null)
+                                            {
+                                                var before =  user.Clone();
                                                 user.Update(data, UpdateSource.WebSocket);
+                                                await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
+                                            }
                                         }
                                         else
                                         {
@@ -1076,9 +1149,9 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<API.User>(_serializer);
                                     if (data.Id == CurrentUser.Id)
                                     {
-                                        var before = _enablePreUpdateEvents ? CurrentUser.Clone() : null;
+                                        var before = CurrentUser.Clone();
                                         CurrentUser.Update(data, UpdateSource.WebSocket);
-                                        await CurrentUserUpdated.RaiseAsync(before, CurrentUser).ConfigureAwait(false);
+                                        await _selfUpdatedEvent.InvokeAsync(before, CurrentUser).ConfigureAwait(false);
                                     }
                                     else
                                     {
