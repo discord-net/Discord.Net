@@ -42,6 +42,7 @@ namespace Discord
             }
         }
         public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
+        public IEnumerable<KeyValuePair<ulong, VoiceState>> VoiceStates => _voiceStates;
         
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {

@@ -12,7 +12,7 @@ namespace Discord
         public new CachedGuild Guild => base.Guild as CachedGuild;
 
         public IReadOnlyCollection<IGuildUser> Members 
-            => Guild.Members.Where(x => x.VoiceChannel.Id == Id).ToImmutableArray();
+            => Guild.VoiceStates.Where(x => x.Value.VoiceChannel.Id == Id).Select(x => Guild.GetUser(x.Key)).ToImmutableArray();
 
         public CachedVoiceChannel(CachedGuild guild, Model model)
             : base(guild, model)
