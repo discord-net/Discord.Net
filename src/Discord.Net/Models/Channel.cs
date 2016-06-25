@@ -204,7 +204,14 @@ namespace Discord
 
         public async Task DeleteMessages(ulong[] messageIds)
         {
-            await Client.ClientAPI.Send(new BulkMessageDelete(Id, messageIds));
+            if (messageIds.Count() > 100)
+                throw new ArgumentOutOfRangeException("messageIds",
+                    "You must provide no more than 100 Messages or Message Ids");
+                    
+            if (messageIds.Count() == 1)
+                await Client.ClientAPI.Send(new DeleteMessageRequest(Id, messageIds.First()));
+            else if (messageIds.Any())
+                await Client.ClientAPI.Send(new BulkMessageDelete(Id, messageIds));
         }
 
         public async Task Delete()
