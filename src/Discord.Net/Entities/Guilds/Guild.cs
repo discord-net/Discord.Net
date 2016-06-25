@@ -24,6 +24,7 @@ namespace Discord
         public bool IsEmbeddable { get; private set; }
         public VerificationLevel VerificationLevel { get; private set; }
         public MfaLevel MfaLevel { get; private set; }
+        public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
 
         public override DiscordClient Discord { get; }
         public ulong? AFKChannelId { get; private set; }
@@ -62,6 +63,7 @@ namespace Discord
             _splashId = model.Splash;
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
+            DefaultMessageNotifications = model.DefaultMessageNotifications;
 
             if (model.Emojis != null)
             {

@@ -13,6 +13,10 @@ namespace Discord
         int AFKTimeout { get; }
         /// <summary> Returns true if this guild is embeddable (e.g. widget) </summary>
         bool IsEmbeddable { get; }
+        /// <summary> Gets the default message notifications for users who haven't explicitly set their notification settings. </summary>
+        DefaultMessageNotifications DefaultMessageNotifications { get; }
+        /// <summary> Gets the level of mfa requirements a user must fulfill before being allowed to perform administrative actions in this guild. </summary>
+        MfaLevel MfaLevel { get; }
         /// <summary> Gets the level of requirements a user must fulfill before being allowed to post messages in this guild. </summary>
         VerificationLevel VerificationLevel { get; }
         /// <summary> Returns the url to this guild's icon, or null if one is not set. </summary>

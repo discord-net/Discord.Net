@@ -36,5 +36,7 @@ namespace Discord.API
         public string[] Features { get; set; }
         [JsonProperty("mfa_level")]
         public MfaLevel MfaLevel { get; set; }
+        [JsonProperty("default_message_notifications")]
+        public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
     }
 }

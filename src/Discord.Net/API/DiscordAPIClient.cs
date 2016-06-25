@@ -543,7 +543,6 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             Preconditions.GreaterThan(args.OwnerId, 0, nameof(args.OwnerId));
             Preconditions.NotNull(args.Region, nameof(args.Region));
-            Preconditions.AtLeast(args.VerificationLevel, 0, nameof(args.VerificationLevel));
 
             return await SendAsync<Guild>("PATCH", $"guilds/{guildId}", args, options: options).ConfigureAwait(false);
         }
