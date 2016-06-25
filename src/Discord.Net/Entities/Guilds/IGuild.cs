@@ -13,7 +13,8 @@ namespace Discord
         int AFKTimeout { get; }
         /// <summary> Returns true if this guild is embeddable (e.g. widget) </summary>
         bool IsEmbeddable { get; }
-        int VerificationLevel { get; }
+        /// <summary> Gets the level of requirements a user must fulfill before being allowed to post messages in this guild. </summary>
+        VerificationLevel VerificationLevel { get; }
         /// <summary> Returns the url to this guild's icon, or null if one is not set. </summary>
         string IconUrl { get; }
         /// <summary> Returns the url to this guild's splash image, or null if one is not set. </summary>

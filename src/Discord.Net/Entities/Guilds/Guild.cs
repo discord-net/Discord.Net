@@ -22,7 +22,7 @@ namespace Discord
         public string Name { get; private set; }
         public int AFKTimeout { get; private set; }
         public bool IsEmbeddable { get; private set; }
-        public int VerificationLevel { get; private set; }
+        public VerificationLevel VerificationLevel { get; private set; }
 
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
