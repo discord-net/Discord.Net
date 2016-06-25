@@ -10,7 +10,9 @@ namespace Discord.API.Rest
         [JsonProperty("region")]
         public Optional<IVoiceRegion> Region { get; set; }
         [JsonProperty("verification_level")]
-        public Optional<int> VerificationLevel { get; set; }
+        public Optional<VerificationLevel> VerificationLevel { get; set; }
+        [JsonProperty("default_message_notifications")]
+        public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
         [JsonProperty("afk_timeout")]
         public Optional<int> AFKTimeout { get; set; }
         [JsonProperty("icon"), Image]
