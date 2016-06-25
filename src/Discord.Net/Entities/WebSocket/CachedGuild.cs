@@ -1,5 +1,4 @@
-﻿using Discord.Data;
-using Discord.Extensions;
+﻿using Discord.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

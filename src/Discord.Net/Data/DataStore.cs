@@ -3,9 +3,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Discord.Data
+namespace Discord
 {
-    public class DefaultDataStore : DataStore
+    public class DataStore
     {
         private const int CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
@@ -17,12 +17,12 @@ namespace Discord.Data
         private readonly ConcurrentDictionary<ulong, CachedGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, CachedGlobalUser> _users;
 
-        internal override IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
-        internal override IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
-        internal override IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
-        internal override IReadOnlyCollection<CachedGlobalUser> Users => _users.ToReadOnlyCollection();
+        internal IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
+        internal IReadOnlyCollection<CachedGlobalUser> Users => _users.ToReadOnlyCollection();
 
-        public DefaultDataStore(int guildCount, int dmChannelCount)
+        public DataStore(int guildCount, int dmChannelCount)
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
@@ -32,18 +32,18 @@ namespace Discord.Data
             _users = new ConcurrentDictionary<ulong, CachedGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
         }
 
-        internal override ICachedChannel GetChannel(ulong id)
+        internal ICachedChannel GetChannel(ulong id)
         {
             ICachedChannel channel;
             if (_channels.TryGetValue(id, out channel))
                 return channel;
             return null;
         }
-        internal override void AddChannel(ICachedChannel channel)
+        internal void AddChannel(ICachedChannel channel)
         {
             _channels[channel.Id] = channel;
         }
-        internal override ICachedChannel RemoveChannel(ulong id)
+        internal ICachedChannel RemoveChannel(ulong id)
         {
             ICachedChannel channel;
             if (_channels.TryRemove(id, out channel))
@@ -51,19 +51,19 @@ namespace Discord.Data
             return null;
         }
 
-        internal override CachedDMChannel GetDMChannel(ulong userId)
+        internal CachedDMChannel GetDMChannel(ulong userId)
         {
             CachedDMChannel channel;
             if (_dmChannels.TryGetValue(userId, out channel))
                 return channel;
             return null;
         }
-        internal override void AddDMChannel(CachedDMChannel channel)
+        internal void AddDMChannel(CachedDMChannel channel)
         {
             _channels[channel.Id] = channel;
             _dmChannels[channel.Recipient.Id] = channel;
         }
-        internal override CachedDMChannel RemoveDMChannel(ulong userId)
+        internal CachedDMChannel RemoveDMChannel(ulong userId)
         {
             CachedDMChannel channel;
             ICachedChannel ignored;
@@ -75,18 +75,18 @@ namespace Discord.Data
             return null;
         }
 
-        internal override CachedGuild GetGuild(ulong id)
+        internal CachedGuild GetGuild(ulong id)
         {
             CachedGuild guild;
             if (_guilds.TryGetValue(id, out guild))
                 return guild;
             return null;
         }
-        internal override void AddGuild(CachedGuild guild)
+        internal void AddGuild(CachedGuild guild)
         {
             _guilds[guild.Id] = guild;
         }
-        internal override CachedGuild RemoveGuild(ulong id)
+        internal CachedGuild RemoveGuild(ulong id)
         {
             CachedGuild guild;
             if (_guilds.TryRemove(id, out guild))
@@ -94,18 +94,18 @@ namespace Discord.Data
             return null;
         }
 
-        internal override CachedGlobalUser GetUser(ulong id)
+        internal CachedGlobalUser GetUser(ulong id)
         {
             CachedGlobalUser user;
             if (_users.TryGetValue(id, out user))
                 return user;
             return null;
         }
-        internal override CachedGlobalUser GetOrAddUser(ulong id, Func<ulong, CachedGlobalUser> userFactory)
+        internal CachedGlobalUser GetOrAddUser(ulong id, Func<ulong, CachedGlobalUser> userFactory)
         {
             return _users.GetOrAdd(id, userFactory);
         }
-        internal override CachedGlobalUser RemoveUser(ulong id)
+        internal CachedGlobalUser RemoveUser(ulong id)
         {
             CachedGlobalUser user;
             if (_users.TryRemove(id, out user))

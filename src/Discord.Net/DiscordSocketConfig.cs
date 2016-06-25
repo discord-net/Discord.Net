@@ -1,5 +1,4 @@
-﻿using Discord.Data;
-using Discord.Net.WebSockets;
+﻿using Discord.Net.WebSockets;
 
 namespace Discord
 {
@@ -29,11 +28,7 @@ namespace Discord
         /// Decreasing this may reduce CPU usage while increasing login time and network usage. 
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
-
-        //Engines
-
-        /// <summary> Gets or sets the provider used to generate datastores. </summary>
-        public DataStoreProvider DataStoreProvider { get; set; } = (shardId, totalShards, guildCount, dmCount) => new DefaultDataStore(guildCount, dmCount);
+        
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
         public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
     }

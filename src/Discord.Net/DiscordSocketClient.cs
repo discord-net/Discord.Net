@@ -1,5 +1,4 @@
 ﻿using Discord.API.Gateway;
-using Discord.Data;
 using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -26,7 +25,6 @@ namespace Discord
 #if BENCHMARK
         private readonly Logger _benchmarkLogger;
 #endif
-        private readonly DataStoreProvider _dataStoreProvider;
         private readonly JsonSerializer _serializer;
         private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
         private readonly int _largeThreshold;
@@ -71,7 +69,6 @@ namespace Discord
             _connectionTimeout = config.ConnectionTimeout;
             _reconnectDelay = config.ReconnectDelay;
             _failedReconnectDelay = config.FailedReconnectDelay;
-            _dataStoreProvider = config.DataStoreProvider;
 
             MessageCacheSize = config.MessageCacheSize;
             _largeThreshold = config.LargeThreshold;
@@ -481,7 +478,7 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
                                     
                                     var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var dataStore = _dataStoreProvider(ShardId, _totalShards, data.Guilds.Length, data.PrivateChannels.Length);
+                                    var dataStore = new DataStore( data.Guilds.Length, data.PrivateChannels.Length);
 
                                     var currentUser = new CachedSelfUser(this, data.User);
                                     int unavailableGuilds = 0;

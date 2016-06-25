@@ -1,4 +1,5 @@
 ﻿using System;
+using Discord.API;
 using Model = Discord.API.User;
 
 namespace Discord
@@ -31,6 +32,12 @@ namespace Discord
                 if (--_references == 0)
                     discord.RemoveUser(Id);
             }
+        }
+
+        public override void Update(Model model, UpdateSource source)
+        {
+            lock (this)
+                base.Update(model, source);
         }
 
         public CachedGlobalUser Clone() => MemberwiseClone() as CachedGlobalUser;
