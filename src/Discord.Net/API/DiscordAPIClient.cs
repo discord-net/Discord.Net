@@ -494,13 +494,35 @@ namespace Discord.API
         //Channel Permissions
         public async Task ModifyChannelPermissionsAsync(ulong channelId, ulong targetId, ModifyChannelPermissionsParams args, RequestOptions options = null)
         {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(targetId, 0, nameof(targetId));
             Preconditions.NotNull(args, nameof(args));
 
             await SendAsync("PUT", $"channels/{channelId}/permissions/{targetId}", args, options: options).ConfigureAwait(false);
         }
         public async Task DeleteChannelPermissionAsync(ulong channelId, ulong targetId, RequestOptions options = null)
         {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(targetId, 0, nameof(targetId));
+
             await SendAsync("DELETE", $"channels/{channelId}/permissions/{targetId}", options: options).ConfigureAwait(false);
+        }
+
+        //Channel Pins
+        public async Task AddPinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+        {
+            Preconditions.GreaterThan(channelId, 0, nameof(channelId));
+            Preconditions.GreaterThan(messageId, 0, nameof(messageId));
+
+            await SendAsync("PUT", $"channels/{channelId}/pins/{messageId}", options: options).ConfigureAwait(false);
+
+        }
+        public async Task RemovePinAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            await SendAsync("DELETE", $"channels/{channelId}/pins/{messageId}", options: options).ConfigureAwait(false);
         }
 
         //Guilds

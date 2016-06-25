@@ -18,6 +18,7 @@ namespace Discord
         public bool IsTTS { get; private set; }
         public string RawText { get; private set; }
         public string Text { get; private set; }
+        public bool IsPinned { get; private set; }
         
         public IMessageChannel Channel { get; }
         public IUser Author { get; }
@@ -57,13 +58,15 @@ namespace Discord
 
             if (model.IsTextToSpeech.IsSpecified)
                 IsTTS = model.IsTextToSpeech.Value;
+            if (model.Pinned.IsSpecified)
+                IsPinned = model.Pinned.Value;
             if (model.Timestamp.IsSpecified)
                 _timestampTicks = model.Timestamp.Value.UtcTicks;
             if (model.EditedTimestamp.IsSpecified)
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
-            if (model.IsMentioningEveryone.IsSpecified)
-                _isMentioningEveryone = model.IsMentioningEveryone.Value;
-            
+            if (model.MentionEveryone.IsSpecified)
+                _isMentioningEveryone = model.MentionEveryone.Value;
+
             if (model.Attachments.IsSpecified)
             {
                 var value = model.Attachments.Value;
@@ -144,6 +147,9 @@ namespace Discord
                 model = await Discord.ApiClient.ModifyMessageAsync(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
                 model = await Discord.ApiClient.ModifyDMMessageAsync(Channel.Id, Id, args).ConfigureAwait(false);
+        {
+            await Discord.ApiClient.AddPinAsync(Channel.Id, Id).ConfigureAwait(false);
+        }
             Update(model, UpdateSource.Rest);
         }        
         public async Task DeleteAsync()
@@ -153,6 +159,16 @@ namespace Discord
                 await Discord.ApiClient.DeleteMessageAsync(guildChannel.Id, Channel.Id, Id).ConfigureAwait(false);
             else
                 await Discord.ApiClient.DeleteDMMessageAsync(Channel.Id, Id).ConfigureAwait(false);
+        }
+        /// <summary> Adds this message to its channel's pinned messages. </summary>
+        public async Task PinAsync()
+        {
+            await Discord.ApiClient.AddPinAsync(Channel.Id, Id).ConfigureAwait(false);
+        }
+        /// <summary> Removes this message from its channel's pinned messages. </summary>
+        public async Task UnpinAsync()
+        {
+            await Discord.ApiClient.RemovePinAsync(Channel.Id, Id).ConfigureAwait(false);
         }
 
         public override string ToString() => Text;

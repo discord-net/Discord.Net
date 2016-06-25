@@ -11,6 +11,8 @@ namespace Discord
         DateTimeOffset? EditedTimestamp { get; }
         /// <summary> Returns true if this message was sent as a text-to-speech message. </summary>
         bool IsTTS { get; }
+        /// <summary> Returns true if this message was added to its channel's pinned messages. </summary>
+        bool IsPinned { get; }
         /// <summary> Returns the original, unprocessed text for this message. </summary>
         string RawText { get; }
         /// <summary> Returns the text for this message after mention processing. </summary>
@@ -35,5 +37,9 @@ namespace Discord
 
         /// <summary> Modifies this message. </summary>
         Task ModifyAsync(Action<ModifyMessageParams> func);
+        /// <summary> Adds this message to its channel's pinned messages. </summary>
+        Task PinAsync();
+        /// <summary> Removes this message from its channel's pinned messages. </summary>
+        Task UnpinAsync();
     }
 }

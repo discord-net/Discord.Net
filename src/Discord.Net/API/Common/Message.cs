@@ -20,12 +20,14 @@ namespace Discord.API
         [JsonProperty("tts")]
         public Optional<bool> IsTextToSpeech { get; set; }
         [JsonProperty("mention_everyone")]
-        public Optional<bool> IsMentioningEveryone { get; set; }
+        public Optional<bool> MentionEveryone { get; set; }
         [JsonProperty("mentions")]
         public Optional<User[]> Mentions { get; set; }
         [JsonProperty("attachments")]
         public Optional<Attachment[]> Attachments { get; set; }
         [JsonProperty("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
+        [JsonProperty("pinned")]
+        public Optional<bool> Pinned { get; set; }
     }
 }
