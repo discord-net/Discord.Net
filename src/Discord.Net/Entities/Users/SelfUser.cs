@@ -9,6 +9,7 @@ namespace Discord
     {        
         public string Email { get; private set; }
         public bool IsVerified { get; private set; }
+        public bool IsMfaEnabled { get; private set; }
 
         public override DiscordClient Discord { get; }
 
@@ -24,7 +25,8 @@ namespace Discord
             base.Update(model, source);
 
             Email = model.Email;
-            IsVerified = model.IsVerified;
+            IsVerified = model.Verified;
+            IsMfaEnabled = model.MfaEnabled;
         }
         
         public async Task UpdateAsync()
