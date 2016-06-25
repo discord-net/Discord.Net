@@ -23,12 +23,13 @@ namespace Discord
         public int AFKTimeout { get; private set; }
         public bool IsEmbeddable { get; private set; }
         public VerificationLevel VerificationLevel { get; private set; }
+        public MfaLevel MfaLevel { get; private set; }
 
+        public override DiscordClient Discord { get; }
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
         public string VoiceRegionId { get; private set; }
-        public override DiscordClient Discord { get; }
         public ImmutableArray<Emoji> Emojis { get; protected set; }
         public ImmutableArray<string> Features { get; protected set; }
 
@@ -60,7 +61,8 @@ namespace Discord
             VoiceRegionId = model.Region;
             _splashId = model.Splash;
             VerificationLevel = model.VerificationLevel;
-            
+            MfaLevel = model.MfaLevel;
+
             if (model.Emojis != null)
             {
                 var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
