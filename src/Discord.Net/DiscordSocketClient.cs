@@ -948,7 +948,10 @@ namespace Discord
                                     if (channel != null)
                                     {
                                         var msg = channel.RemoveMessage(data.Id);
-                                        await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
+                                        if (msg != null)
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
+                                        else
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<IMessage>()).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -968,7 +971,10 @@ namespace Discord
                                         foreach (var id in data.Ids)
                                         {
                                             var msg = channel.RemoveMessage(id);
-                                            await _messageDeletedEvent.InvokeAsync(msg.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
+                                            if (msg != null)
+                                                await _messageDeletedEvent.InvokeAsync(id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
+                                            else
+                                                await _messageDeletedEvent.InvokeAsync(id, Optional.Create<IMessage>()).ConfigureAwait(false);
                                         }
                                     }
                                     else
