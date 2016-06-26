@@ -1,4 +1,5 @@
 using Discord.API;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     //TODO: Add docstrings
-    public interface IDiscordClient
+    public interface IDiscordClient : IDisposable
     {
         LoginState LoginState { get; }
         ConnectionState ConnectionState { get; }

@@ -47,8 +47,7 @@ namespace Discord
         public ConnectionState ConnectionState { get; private set; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
-
-        internal IWebSocketClient GatewaySocket { get; private set; }
+        
         internal int MessageCacheSize { get; private set; }
         internal DataStore DataStore { get; private set; }
 
@@ -97,7 +96,6 @@ namespace Discord
                 else
                     await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
-            GatewaySocket = config.WebSocketProvider();
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();

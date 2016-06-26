@@ -1,5 +1,4 @@
 ﻿using Discord.API.Rest;
-using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net;
 using Discord.Net.Queue;
@@ -56,7 +55,7 @@ namespace Discord
                 if (bucket == null && id != null)
                     await _queueLogger.WarningAsync($"Unknown rate limit bucket \"{id ?? "null"}\"").ConfigureAwait(false);
             };
-            
+
             ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
@@ -256,10 +255,11 @@ namespace Discord
             return models.Select(x => new VoiceRegion(x)).Where(x => x.Id == id).FirstOrDefault();
         }
 
-        internal void Dispose(bool disposing)
+        internal virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
                 _isDisposed = true;
+            ApiClient.Dispose();
         }
         /// <inheritdoc />
         public void Dispose() => Dispose(true);

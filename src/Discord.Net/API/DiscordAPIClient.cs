@@ -99,6 +99,8 @@ namespace Discord.API
                 {
                     _loginCancelToken?.Dispose();
                     _connectCancelToken?.Dispose();
+                    (_restClient as IDisposable)?.Dispose();
+                    (_gatewayClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
             }
