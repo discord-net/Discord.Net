@@ -50,7 +50,7 @@ namespace Discord.Commands
                 }
 
                 //If we're processing an unparsed parameter, ignore all other logic
-                if (curParam != null && curParam.IsUnparsed)
+                if (curParam != null && curParam.IsUnparsed && curPos != endPos)
                 {
                     argBuilder.Append(c);
                     continue;
