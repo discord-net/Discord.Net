@@ -27,6 +27,7 @@ namespace Discord
         public string AvatarUrl => User.AvatarUrl;
         public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
+        public ushort DiscriminatorValue => User.DiscriminatorValue;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => User.Mention;
