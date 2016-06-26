@@ -6,13 +6,14 @@ namespace Discord.Commands
     public class CommandAttribute : Attribute
     {
         public string Text { get; }
-        public string Name { get; }
 
-        public CommandAttribute(string name) : this(name, name) { }
-        public CommandAttribute(string text, string name)
+        public CommandAttribute()
         {
-            Text = text.ToLowerInvariant();
-            Name = name;
+            Text = null;
+        }
+        public CommandAttribute(string text)
+        {
+            Text = text;
         }
     }
 }
