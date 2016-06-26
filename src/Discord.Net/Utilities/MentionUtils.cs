@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -107,7 +108,7 @@ namespace Discord
             return builder;
         }
 
-        internal static string CleanUserMentions(string text, ImmutableArray<User> mentions)
+        /*internal static string CleanUserMentions(string text, ImmutableArray<User> mentions)
         {
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
@@ -123,58 +124,71 @@ namespace Discord
                 }
                 return e.Value;
             }));
-        }
-        internal static string CleanUserMentions<T>(string text, IReadOnlyDictionary<ulong, T> users, ImmutableArray<T>.Builder mentions = null)
-            where T : IGuildUser
+        }*/
+        internal static string CleanUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> fallbackUsers, ImmutableArray<IUser>.Builder mentions = null)
         {
-            return _channelRegex.Replace(text, new MatchEvaluator(e =>
+            return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    T user;
-                    if (users.TryGetValue(id, out user))
+                    IUser user = null;
+                    if (channel != null)
+                        user = channel.GetUserAsync(id).GetAwaiter().GetResult() as IUser;
+                    if (user == null)
                     {
-                        if (users != null)
-                            mentions.Add(user);
-                        if (e.Value[2] == '!' && user.Nickname != null)
-                            return '@' + user.Nickname;
-                        else
-                            return '@' + user.Username;
+                        foreach (var fallbackUser in fallbackUsers)
+                        {
+                            if (fallbackUser.Id == id)
+                            {
+                                user = fallbackUser;
+                                break;
+                            }
+                        }
+                    }
+                    if (user != null)
+                    {
+                        mentions.Add(user);
+
+                        if (e.Value[2] == '!')
+                        {
+                            var guildUser = user as IGuildUser;
+                            if (guildUser != null && guildUser.Nickname != null)
+                                return '@' + guildUser.Nickname;
+                        }
+                        return '@' + user.Username;
                     }
                 }
                 return e.Value;
             }));
         }
-        internal static string CleanChannelMentions<T>(string text, IReadOnlyDictionary<ulong, T> channels, ImmutableArray<T>.Builder mentions = null)
-            where T : IGuildChannel
+        internal static string CleanChannelMentions(string text, IGuild guild, ImmutableArray<ulong>.Builder mentions = null)
         {
             return _channelRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    T channel;
-                    if (channels.TryGetValue(id, out channel))
+                    var channel = guild.GetChannelAsync(id).GetAwaiter().GetResult() as IGuildChannel;
+                    if (channel != null)
                     {
-                        if (channels != null)
-                            mentions.Add(channel);
+                        if (mentions != null)
+                            mentions.Add(channel.Id);
                         return '#' + channel.Name;
                     }
                 }
                 return e.Value;
             }));
         }
-        internal static string CleanRoleMentions<T>(string text, IReadOnlyDictionary<ulong, T> roles, ImmutableArray<T>.Builder mentions = null)
-            where T : IRole
+        internal static string CleanRoleMentions(string text, IGuild guild, ImmutableArray<IRole>.Builder mentions = null)
         {
-            return _channelRegex.Replace(text, new MatchEvaluator(e =>
+            return _roleRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    T role;
-                    if (roles.TryGetValue(id, out role))
+                    var role = guild.GetRole(id);
+                    if (role != null)
                     {
                         if (mentions != null)
                             mentions.Add(role);

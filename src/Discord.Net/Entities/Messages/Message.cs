@@ -23,11 +23,11 @@ namespace Discord
         public IMessageChannel Channel { get; }
         public IUser Author { get; }
         
-        public ImmutableArray<Attachment> Attachments { get; private set; }
-        public ImmutableArray<Embed> Embeds { get; private set; }
-        public ImmutableArray<ulong> MentionedChannelIds { get; private set; }
-        public ImmutableArray<ulong> MentionedRoleIds { get; private set; }
-        public ImmutableArray<User> MentionedUsers { get; private set; }
+        public IReadOnlyCollection<Attachment> Attachments { get; private set; }
+        public IReadOnlyCollection<IEmbed> Embeds { get; private set; }
+        public IReadOnlyCollection<ulong> MentionedChannelIds { get; private set; }
+        public IReadOnlyCollection<IRole> MentionedRoles { get; private set; }
+        public IReadOnlyCollection<IUser> MentionedUsers { get; private set; }
 
         public override DiscordClient Discord => (Channel as Entity<ulong>).Discord;
         public DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
@@ -41,9 +41,9 @@ namespace Discord
 
             if (channel is IGuildChannel)
             {
-                MentionedUsers = ImmutableArray.Create<User>();
+                MentionedUsers = ImmutableArray.Create<IUser>();
                 MentionedChannelIds = ImmutableArray.Create<ulong>();
-                MentionedRoleIds = ImmutableArray.Create<ulong>();
+                MentionedRoles = ImmutableArray.Create<IRole>();
             }
 
             Update(model, UpdateSource.Creation);
@@ -106,21 +106,31 @@ namespace Discord
                     MentionedUsers = ImmutableArray.Create(mentions);
                 }
                 else
-                    MentionedUsers = ImmutableArray.Create<User>();
+                    MentionedUsers = ImmutableArray.Create<IUser>();
             }
 
             if (model.Content.IsSpecified)
             {
                 RawText = model.Content.Value;
-
-                if (Channel is IGuildChannel)
+                
+                if (guildChannel != null)
                 {
-                    Text = MentionUtils.CleanUserMentions(RawText, MentionedUsers);
-                    MentionedChannelIds = MentionUtils.GetChannelMentions(RawText);
-                    var mentionedRoleIds = MentionUtils.GetRoleMentions(RawText);
-                    if (_isMentioningEveryone)
-                        mentionedRoleIds = mentionedRoleIds.Add(guildChannel.Guild.EveryoneRole.Id);
-                    MentionedRoleIds = mentionedRoleIds;
+                    var orderedMentionedUsers = ImmutableArray.CreateBuilder<IUser>(5);
+                    Text = MentionUtils.CleanUserMentions(RawText, Channel.IsAttached ? Channel : null, MentionedUsers, orderedMentionedUsers);
+                    MentionedUsers = orderedMentionedUsers.ToImmutable();
+
+                    var roles = ImmutableArray.CreateBuilder<IRole>(5);
+                    Text = MentionUtils.CleanRoleMentions(Text, guildChannel.Guild, roles);
+                    MentionedRoles = roles.ToImmutable();
+
+                    if (guildChannel.IsAttached) //It's too expensive to do a channel lookup in REST mode
+                    {
+                        var channelIds = ImmutableArray.CreateBuilder<ulong>(5);
+                        Text = MentionUtils.CleanChannelMentions(Text, guildChannel.Guild, channelIds);
+                        MentionedChannelIds = channelIds.ToImmutable();
+                    }
+                    else
+                        MentionedChannelIds = MentionUtils.GetChannelMentions(RawText);
                 }
                 else
                     Text = RawText;
@@ -172,12 +182,6 @@ namespace Discord
         }
 
         public override string ToString() => Text;
-        private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Length > 0 ? $" [{Attachments.Length} Attachments]" : "")}";
-
-        IReadOnlyCollection<Attachment> IMessage.Attachments => Attachments;
-        IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
-        IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
-        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
-        IReadOnlyCollection<IUser> IMessage.MentionedUsers => MentionedUsers;
+        private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
     }
 }

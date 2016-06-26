@@ -30,9 +30,9 @@ namespace Discord
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary> Returns a collection of channel ids mentioned in this message. </summary>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
-        /// <summary> Returns a collection of role ids mentioned in this message. </summary>
-        IReadOnlyCollection<ulong> MentionedRoleIds { get; }
-        /// <summary> Returns a collection of user ids mentioned in this message. </summary>
+        /// <summary> Returns a collection of roles mentioned in this message. </summary>
+        IReadOnlyCollection<IRole> MentionedRoles { get; }
+        /// <summary> Returns a collection of users mentioned in this message. </summary>
         IReadOnlyCollection<IUser> MentionedUsers { get; }
 
         /// <summary> Modifies this message. </summary>
