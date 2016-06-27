@@ -233,8 +233,9 @@ namespace Discord.Commands
             else
                 return false;
         }
-        
-        public SearchResult Search(string input)
+
+        public SearchResult Search(IMessage message, int argPos) => Search(message, message.RawText.Substring(argPos));
+        public SearchResult Search(IMessage message, string input)
         {
             string lowerInput = input.ToLowerInvariant();
 
@@ -266,9 +267,10 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
+        public Task<IResult> Execute(IMessage message, int argPos) => Execute(message, message.RawText.Substring(argPos));
         public async Task<IResult> Execute(IMessage message, string input)
         {
-            var searchResult = Search(input);
+            var searchResult = Search(message, input);
             if (!searchResult.IsSuccess)
                 return searchResult;
 
