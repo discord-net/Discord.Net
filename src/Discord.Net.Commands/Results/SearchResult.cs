@@ -6,24 +6,24 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SearchResult : IResult
     {
+        public string Text { get; }
         public IReadOnlyList<Command> Commands { get; }
-        public string ArgText { get; }        
 
         public CommandError? Error { get; }
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
 
-        private SearchResult(IReadOnlyList<Command> commands, string argText, CommandError? error, string errorReason)
+        private SearchResult(string text, IReadOnlyList<Command> commands, CommandError? error, string errorReason)
         {
+            Text = text;
             Commands = commands;
-            ArgText = argText;
             Error = error;
             ErrorReason = errorReason;
         }
 
-        internal static SearchResult FromSuccess(IReadOnlyList<Command> commands, string argText)
-            => new SearchResult(commands, argText, null, null);
+        internal static SearchResult FromSuccess(string text, IReadOnlyList<Command> commands)
+            => new SearchResult(text, commands, null, null);
         internal static SearchResult FromError(CommandError error, string reason)
             => new SearchResult(null, null, error, reason);
 

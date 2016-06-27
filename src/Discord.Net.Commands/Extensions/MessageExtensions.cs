@@ -15,7 +15,7 @@
         public static bool HasStringPrefix(this IMessage msg, string str, ref int argPos)
         {
             var text = msg.RawText;
-            str = str + ' ';
+            //str = str + ' ';
             if (text.StartsWith(str))
             {
                 argPos = str.Length;

@@ -15,7 +15,7 @@ namespace Discord.Commands
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<object, Module> _modules;
         private readonly ConcurrentDictionary<string, List<Command>> _map;
-        private readonly Dictionary<Type, TypeReader> _typeReaders;
+        private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
 
         public IEnumerable<Module> Modules => _modules.Select(x => x.Value);
         public IEnumerable<Command> Commands => _modules.SelectMany(x => x.Value.Commands);
@@ -25,7 +25,7 @@ namespace Discord.Commands
             _moduleLock = new SemaphoreSlim(1, 1);
             _modules = new ConcurrentDictionary<object, Module>();
             _map = new ConcurrentDictionary<string, List<Command>>();
-            _typeReaders = new Dictionary<Type, TypeReader>
+            _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
                 [typeof(string)] = new GenericTypeReader((m, s) => Task.FromResult(TypeReaderResult.FromSuccess(s))),
                 [typeof(byte)] = new GenericTypeReader((m, s) =>
@@ -143,19 +143,20 @@ namespace Discord.Commands
                     throw new ArgumentException($"This module has already been loaded.");
 
                 var typeInfo = moduleInstance.GetType().GetTypeInfo();
-                if (typeInfo.GetCustomAttribute<ModuleAttribute>() == null)
+                var moduleAttr = typeInfo.GetCustomAttribute<ModuleAttribute>();
+                if (moduleAttr != null)
                     throw new ArgumentException($"Modules must be marked with ModuleAttribute.");
 
-                return LoadInternal(moduleInstance, typeInfo);
+                return LoadInternal(moduleInstance, moduleAttr, typeInfo);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private Module LoadInternal(object moduleInstance, TypeInfo typeInfo)
+        private Module LoadInternal(object moduleInstance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
         {
-            var loadedModule = new Module(this, moduleInstance, typeInfo);
+            var loadedModule = new Module(this, moduleInstance, moduleAttr, typeInfo);
             _modules[moduleInstance] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)
@@ -176,10 +177,11 @@ namespace Discord.Commands
                 foreach (var type in assembly.ExportedTypes)
                 {
                     var typeInfo = type.GetTypeInfo();
-                    if (typeInfo.GetCustomAttribute<ModuleAttribute>() != null)
+                    var moduleAttr = typeInfo.GetCustomAttribute<ModuleAttribute>();
+                    if (moduleAttr != null)
                     {
                         var moduleInstance = ReflectionUtils.CreateObject(typeInfo);
-                        modules.Add(LoadInternal(moduleInstance, typeInfo));
+                        modules.Add(LoadInternal(moduleInstance, moduleAttr, typeInfo));
                     }
                 }
                 return modules.ToImmutable();
@@ -239,30 +241,34 @@ namespace Discord.Commands
         {
             string lowerInput = input.ToLowerInvariant();
 
-            List<Command> bestGroup = null, group;
-            int startPos = 0, endPos;
+            ImmutableArray<Command>.Builder matches = null;
+            List<Command> group;
+            int pos = -1;
 
             while (true)
             {
-                endPos = input.IndexOf(' ', startPos);
-                string cmdText = endPos == -1 ? input.Substring(startPos) : input.Substring(startPos, endPos - startPos);
+                pos = input.IndexOf(' ', pos + 1);
+                string cmdText = pos == -1 ? input : input.Substring(0, pos);
                 if (!_map.TryGetValue(cmdText, out group))
                     break;
-                bestGroup = group;
-                if (endPos == -1)
+
+                lock (group)
                 {
-                    startPos = input.Length;
+                    if (matches == null)
+                        matches = ImmutableArray.CreateBuilder<Command>(group.Count);
+                    for (int i = 0; i < group.Count; i++)
+                        matches.Add(group[i]);
+                }
+
+                if (pos == -1)
+                {
+                    pos = input.Length;
                     break;
                 }
-                else
-                    startPos = endPos + 1;
             }
             
-            if (bestGroup != null)
-            {
-                lock (bestGroup)
-                    return SearchResult.FromSuccess(bestGroup.ToImmutableArray(), input.Substring(startPos));
-            }
+            if (matches != null)
+                return SearchResult.FromSuccess(input, matches.ToImmutable());
             else
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
@@ -275,7 +281,7 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
-            for (int i = 0; i < commands.Count; i++)
+            for (int i = commands.Count - 1; i >= 0; i++)
             {
                 var parseResult = await commands[i].Parse(message, searchResult);
                 if (!parseResult.IsSuccess)

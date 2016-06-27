@@ -18,6 +18,7 @@ namespace Discord.Commands
         public CommandParameter(string name, string description, TypeReader reader, bool isOptional, bool isUnparsed, object defaultValue)
         {
             _reader = reader;
+            Name = name;
             IsOptional = isOptional;
             IsUnparsed = isUnparsed;
             DefaultValue = defaultValue;

@@ -12,29 +12,39 @@ namespace Discord.Commands
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
 
-        internal Module(CommandService service, object instance, TypeInfo typeInfo)
+        internal Module(CommandService service, object instance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
         {
             Service = service;
             Name = typeInfo.Name;
             Instance = instance;
 
             List<Command> commands = new List<Command>();
-            SearchClass(instance, commands, typeInfo);
+            SearchClass(instance, commands, typeInfo, moduleAttr.Prefix ?? "");
             Commands = commands;
         }
 
-        private void SearchClass(object instance, List<Command> commands, TypeInfo typeInfo)
+        private void SearchClass(object instance, List<Command> commands, TypeInfo typeInfo, string groupPrefix)
         {
+            if (groupPrefix != "")
+                groupPrefix += " ";
             foreach (var method in typeInfo.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
                 if (cmdAttr != null)
-                    commands.Add(new Command(this, instance, cmdAttr, method));
+                    commands.Add(new Command(this, instance, cmdAttr, method, groupPrefix));
             }
             foreach (var type in typeInfo.DeclaredNestedTypes)
             {
-                if (type.GetCustomAttribute<GroupAttribute>() != null)
-                    SearchClass(ReflectionUtils.CreateObject(type), commands, type);
+                var groupAttrib = type.GetCustomAttribute<GroupAttribute>();
+                if (groupAttrib != null)
+                {
+                    string nextGroupPrefix;
+                    if (groupAttrib.Prefix != null)
+                        nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
+                    else
+                        nextGroupPrefix = groupPrefix;
+                    SearchClass(ReflectionUtils.CreateObject(type), commands, type, nextGroupPrefix);
+                }
             }
         }
 

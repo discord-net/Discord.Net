@@ -19,13 +19,13 @@ namespace Discord.Commands
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
 
-        internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo)
+        internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
             Module = module;
             _instance = instance;
 
             Name = methodInfo.Name;
-            Text = attribute.Text;
+            Text = groupPrefix + attribute.Text;
 
             var description = methodInfo.GetCustomAttribute<DescriptionAttribute>();
             if (description != null)
@@ -40,7 +40,7 @@ namespace Discord.Commands
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
 
-            return await CommandParser.ParseArgs(this, msg, searchResult.ArgText, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgs(this, msg, searchResult.Text.Substring(Text.Length), 0).ConfigureAwait(false);
         }
         public async Task<ExecuteResult> Execute(IMessage msg, ParseResult parseResult)
         {

@@ -5,10 +5,14 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class)]
     public class GroupAttribute : Attribute
     {
-        public string Name { get; }
-        public GroupAttribute(string name)
+        public string Prefix { get; }
+        public GroupAttribute()
         {
-            Name = name;
+            Prefix = null;
+        }
+        public GroupAttribute(string prefix)
+        {
+            Prefix = prefix;
         }
     }
 }

@@ -66,7 +66,7 @@ namespace Discord.Commands
                     else
                     {
                         curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
-                        if (curParam.IsUnparsed)
+                        if (curParam != null && curParam.IsUnparsed)
                         {
                             argBuilder.Append(c);
                             continue;
