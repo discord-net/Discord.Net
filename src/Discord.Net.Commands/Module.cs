@@ -10,11 +10,13 @@ namespace Discord.Commands
         public CommandService Service { get; }
         public string Name { get; }
         public IEnumerable<Command> Commands { get; }
+        internal object Instance { get; }
 
         internal Module(CommandService service, object instance, TypeInfo typeInfo)
         {
             Service = service;
             Name = typeInfo.Name;
+            Instance = instance;
 
             List<Command> commands = new List<Command>();
             SearchClass(instance, commands, typeInfo);

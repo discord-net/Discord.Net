@@ -190,6 +190,18 @@ namespace Discord.Commands
             }
         }
 
+        public async Task<bool> Unload(Module module)
+        {
+            await _moduleLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                return UnloadInternal(module.Instance);
+            }
+            finally
+            {
+                _moduleLock.Release();
+            }
+        }
         public async Task<bool> Unload(object module)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
