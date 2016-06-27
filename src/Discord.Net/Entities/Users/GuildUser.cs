@@ -31,6 +31,7 @@ namespace Discord
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => User.Mention;
+        public string NicknameMention => User.NicknameMention;
         public string Username => User.Username;
 
         public virtual UserStatus Status => UserStatus.Unknown;
