@@ -1,5 +1,5 @@
 # Discord.Net v0.9.3.2
-[![NuGet Pre Release](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net) [![AppVeyor](https://img.shields.io/appveyor/ci/foxbot/discord-net.svg?maxAge=2592000?style=plastic)](https://ci.appveyor.com/project/foxbot/discord-net/) [![Discord](https://discordapp.com/api/servers/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net) [![Discord](https://discordapp.com/api/servers/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
 
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
