@@ -32,6 +32,7 @@ namespace Discord.Net.Queue
                 //[GlobalBucket.Login] = new BucketDefinition(1, 1),
                 [GlobalBucket.DirectMessage] = new Bucket("bot:msg:dm", 5, 5, BucketTarget.Bot),
                 [GlobalBucket.SendEditMessage] = new Bucket("bot:msg:global", 50, 10, BucketTarget.Bot),
+                //[GlobalBucket.Username] = new Bucket("bot:msg:global", 2, 3600, BucketTarget.Both),
 
                 //Gateway
                 [GlobalBucket.GeneralGateway] = new Bucket(null, "gateway", 120, 60, BucketTarget.Both),
