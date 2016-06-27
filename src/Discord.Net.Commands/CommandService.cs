@@ -265,5 +265,24 @@ namespace Discord.Commands
             else
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
+
+        public async Task<IResult> Execute(IMessage message, string input)
+        {
+            var searchResult = Search(input);
+            if (!searchResult.IsSuccess)
+                return searchResult;
+
+            var commands = searchResult.Commands;
+            for (int i = 0; i < commands.Count; i++)
+            {
+                var parseResult = await commands[i].Parse(message, searchResult);
+                if (!parseResult.IsSuccess)
+                    continue;
+                var executeResult = await commands[i].Execute(message, parseResult);
+                return executeResult;
+            }
+            
+            return ParseResult.FromError(CommandError.ParseFailed, "This input does not match any overload.");
+        }
     }
 }
