@@ -134,29 +134,29 @@ namespace Discord.Commands
             return null;
         }
 
-        public async Task<Module> Load(object module)
+        public async Task<Module> Load(object moduleInstance)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (_modules.ContainsKey(module))
+                if (_modules.ContainsKey(moduleInstance))
                     throw new ArgumentException($"This module has already been loaded.");
 
-                var typeInfo = module.GetType().GetTypeInfo();
+                var typeInfo = moduleInstance.GetType().GetTypeInfo();
                 if (typeInfo.GetCustomAttribute<ModuleAttribute>() == null)
                     throw new ArgumentException($"Modules must be marked with ModuleAttribute.");
 
-                return LoadInternal(module, typeInfo);
+                return LoadInternal(moduleInstance, typeInfo);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private Module LoadInternal(object module, TypeInfo typeInfo)
+        private Module LoadInternal(object moduleInstance, TypeInfo typeInfo)
         {
-            var loadedModule = new Module(this, module, typeInfo);
-            _modules[module] = loadedModule;
+            var loadedModule = new Module(this, moduleInstance, typeInfo);
+            _modules[moduleInstance] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)
             {
@@ -169,7 +169,7 @@ namespace Discord.Commands
         }
         public async Task<IEnumerable<Module>> LoadAssembly(Assembly assembly)
         {
-            List<Module> modules = new List<Module>();
+            var modules = ImmutableArray.CreateBuilder<Module>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -178,11 +178,11 @@ namespace Discord.Commands
                     var typeInfo = type.GetTypeInfo();
                     if (typeInfo.GetCustomAttribute<ModuleAttribute>() != null)
                     {
-                        var module = ReflectionUtils.CreateObject(typeInfo);
-                        modules.Add(LoadInternal(module, typeInfo));
+                        var moduleInstance = ReflectionUtils.CreateObject(typeInfo);
+                        modules.Add(LoadInternal(moduleInstance, typeInfo));
                     }
                 }
-                return modules;
+                return modules.ToImmutable();
             }
             finally
             {
@@ -202,12 +202,12 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> Unload(object module)
+        public async Task<bool> Unload(object moduleInstance)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return UnloadInternal(module);
+                return UnloadInternal(moduleInstance);
             }
             finally
             {
@@ -233,8 +233,7 @@ namespace Discord.Commands
             else
                 return false;
         }
-
-        //TODO: C#7 Candidate for tuple
+        
         public SearchResult Search(string input)
         {
             string lowerInput = input.ToLowerInvariant();
