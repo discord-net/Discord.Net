@@ -81,7 +81,7 @@ namespace Discord.Commands
 
                 var reader = Module.Service.GetTypeReader(type);
                 if (reader == null)
-                    throw new InvalidOperationException($"This type ({type.FullName}) is not supported.");
+                    throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
 
                 bool isUnparsed = parameter.GetCustomAttribute<UnparsedAttribute>() != null;
                 if (isUnparsed)
@@ -103,6 +103,9 @@ namespace Discord.Commands
         }
         private Func<IMessage, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
         {
+            if (methodInfo.ReturnType != typeof(Task))
+                throw new InvalidOperationException("Commands must return a non-generic Task.");
+
             //TODO: Temporary reflection hack. Lets build an actual expression tree here.
             return (msg, args) =>
             {
