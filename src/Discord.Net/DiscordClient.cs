@@ -56,7 +56,9 @@ namespace Discord
                     await _queueLogger.WarningAsync($"Unknown rate limit bucket \"{id ?? "null"}\"").ConfigureAwait(false);
             };
 
-            ApiClient = new API.DiscordApiClient(config.RestClientProvider, (config as DiscordSocketConfig)?.WebSocketProvider, requestQueue: _requestQueue);
+            var restProvider = config.RestClientProvider;
+            var webSocketProvider = (this is DiscordSocketClient) ? (config as DiscordSocketConfig)?.WebSocketProvider : null; //TODO: Clean this check
+            ApiClient = new API.DiscordApiClient(restProvider, webSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
