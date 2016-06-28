@@ -38,6 +38,7 @@ namespace Discord
         public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, Model model) 
             : base(guild, user, model)
         {
+            Presence = new Presence(null, UserStatus.Offline);
         }
         public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, PresenceModel model)
             : base(guild, user, model)
