@@ -29,6 +29,8 @@ namespace Discord
         private int _lastSeq;
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
         private TaskCompletionSource<bool> _connectTask;
+        private ConcurrentHashSet<ulong> _syncedGuilds;
+        private SemaphoreSlim _syncedGuildsLock;
         private CancellationTokenSource _cancelToken;
         private Task _heartbeatTask, _guildDownloadTask, _reconnectTask;
         private long _heartbeatTime;
@@ -102,6 +104,8 @@ namespace Discord
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
+            _syncedGuilds = new ConcurrentHashSet<ulong>();
+            _syncedGuildsLock = new SemaphoreSlim(1, 1);
         }
 
         protected override async Task OnLoginAsync()
@@ -295,7 +299,7 @@ namespace Discord
         {
             return Task.FromResult<IReadOnlyCollection<IUserGuild>>(Guilds);
         }
-        internal CachedGuild AddGuild(API.Gateway.ExtendedGuild model, DataStore dataStore)
+        internal CachedGuild AddGuild(ExtendedGuild model, DataStore dataStore)
         {
             var guild = new CachedGuild(this, model, dataStore);
             dataStore.AddGuild(guild);
@@ -305,6 +309,7 @@ namespace Discord
         }
         internal CachedGuild RemoveGuild(ulong id)
         {
+            _syncedGuilds.TryRemove(id);
             var guild = DataStore.RemoveGuild(id);
             foreach (var channel in guild.Channels)
                 guild.RemoveChannel(channel.Id);
@@ -363,18 +368,47 @@ namespace Discord
         }
 
         /// <summary> Downloads the users list for all large guilds. </summary>
-        public Task DownloadAllUsersAsync()
+        public Task DownloadAllUsersAsync() 
             => DownloadUsersAsync(DataStore.Guilds.Where(x => !x.HasAllMembers));
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
+        public Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
+            => DownloadUsersAsync(guilds.Select(x => x as CachedGuild).Where(x => x != null));
+        public Task DownloadUsersAsync(params IGuild[] guilds)
+            => DownloadUsersAsync(guilds.Select(x => x as CachedGuild).Where(x => x != null));
+        private async Task DownloadUsersAsync(IEnumerable<CachedGuild> guilds)
         {
-            const short batchSize = 50;
-            var cachedGuilds = guilds.Select(x => x as CachedGuild).ToArray();
-            if (cachedGuilds.Length == 0)
-                return;
-            else if (cachedGuilds.Length == 1)
+            var cachedGuilds = guilds.ToArray();
+            if (cachedGuilds.Length == 0) return;
+
+            //Sync guilds
+            if (ApiClient.AuthTokenType == TokenType.User)
             {
-                await cachedGuilds[0].DownloadUsersAsync().ConfigureAwait(false);
+                await _syncedGuildsLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    foreach (var guild in cachedGuilds)
+                        _syncedGuilds.TryAdd(guild.Id);
+                    await ApiClient.SendGuildSyncAsync(_syncedGuilds).ConfigureAwait(false);
+                    await Task.WhenAll(cachedGuilds.Select(x => x.SyncPromise));
+
+                    //Reduce the list only to those with members left to download
+                    cachedGuilds = cachedGuilds.Where(x => !x.HasAllMembers).ToArray();
+                    if (cachedGuilds.Length == 0) return;
+                }
+                finally
+                {
+                    _syncedGuildsLock.Release();
+                }
+            }
+
+            //Download offline members
+            const short batchSize = 50;
+
+            if (cachedGuilds.Length == 1)
+            {
+                if (!cachedGuilds[0].HasAllMembers)
+                    await ApiClient.SendRequestMembersAsync(new ulong[] { cachedGuilds[0].Id }).ConfigureAwait(false);
+                await cachedGuilds[0].DownloaderPromise.ConfigureAwait(false);
                 return;
             }
 
@@ -502,6 +536,15 @@ namespace Discord
                                     _currentUser = currentUser;
                                     _unavailableGuilds = unavailableGuilds;
                                     _lastGuildAvailableTime = Environment.TickCount;
+                                    await _syncedGuildsLock.WaitAsync().ConfigureAwait(false);
+                                    try
+                                    {
+                                        _syncedGuilds = new ConcurrentHashSet<ulong>();
+                                    }
+                                    finally
+                                    {
+                                        _syncedGuildsLock.Release();
+                                    }
                                     DataStore = dataStore;
 
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token);
@@ -513,9 +556,11 @@ namespace Discord
                                 }
                                 break;
                             case "RESUMED":
-                                await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
 
-                                await _gatewayLogger.InfoAsync("Resume").ConfigureAwait(false);
+                                    await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
+                                }
                                 return;
 
                             //Guilds
@@ -579,9 +624,9 @@ namespace Discord
                                     }
                                 }
                                 break;
-                            case "GUILD_EMOJI_UPDATE": //TODO: Add
+                            case "GUILD_EMOJIS_UPDATE": //TODO: Add
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJI_UPDATE)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.GuildEmojiUpdateEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
@@ -593,13 +638,33 @@ namespace Discord
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_EMOJI_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await _gatewayLogger.WarningAsync("GUILD_EMOJIS_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                         return;
                                     }
                                 }
                                 return;
                             case "GUILD_INTEGRATIONS_UPDATE":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
+                                {
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
+                                }
+                                return;
+                            case "GUILD_SYNC":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SYNC)").ConfigureAwait(false);
+                                    var data = (payload as JToken).ToObject<GuildSyncEvent>(_serializer);
+                                    var guild = DataStore.GetGuild(data.Id);
+                                    if (guild != null)
+                                    {
+                                        var before = guild.Clone();
+                                        guild.Update(data, UpdateSource.WebSocket, DataStore);
+                                        await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("GUILD_SYNC referenced an unknown guild.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
                                 return;
                             case "GUILD_DELETE":
                                 {

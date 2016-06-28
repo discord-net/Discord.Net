@@ -18,13 +18,15 @@
         Resume = 6,
         /// <summary> C←S - Used to notify a client that they must reconnect to another gateway. </summary>
         Reconnect = 7,
-        /// <summary> C→S - Used to request all members that were withheld by large_threshold </summary>
+        /// <summary> C→S - Used to request members that were withheld by large_threshold </summary>
         RequestGuildMembers = 8,
         /// <summary> C←S - Used to notify the client that their session has expired and cannot be resumed. </summary>
         InvalidSession = 9,
         /// <summary> C←S - Used to provide information to the client immediately on connection. </summary>
         Hello = 10,
         /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
-        HeartbeatAck = 11
+        HeartbeatAck = 11,
+        /// <summary> C→S - Used to request presence updates from particular guilds. </summary>
+        GuildSync = 12
     }
 }

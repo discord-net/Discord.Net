@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
 using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
+using GuildSyncModel = Discord.API.Gateway.GuildSyncEvent;
 using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
@@ -18,10 +19,16 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
+    internal enum MemberDownloadState
+    {
+        Incomplete,
+        Synced,
+        Complete
+    }
     internal class CachedGuild : Guild, ICachedEntity<ulong>, IGuild, IUserGuild
     {
         private readonly SemaphoreSlim _audioLock;
-        private TaskCompletionSource<bool> _downloaderPromise;
+        private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, CachedGuildUser> _members;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
@@ -29,9 +36,11 @@ namespace Discord
         public bool Available { get; private set; }
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
-        public  AudioClient AudioClient { get; private set; }
+        public AudioClient AudioClient { get; private set; }
+        public MemberDownloadState MemberDownloadState { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
+        public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
@@ -51,6 +60,7 @@ namespace Discord
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {
             _audioLock = new SemaphoreSlim(1, 1);
+            _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
             Update(model, UpdateSource.Creation, dataStore);
         }
@@ -91,9 +101,12 @@ namespace Discord
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
                     AddUser(model.Members[i], dataStore, members);
-                _downloaderPromise = new TaskCompletionSource<bool>();
-                if (!model.Large)
-                    _downloaderPromise.SetResult(true);
+                if (Discord.ApiClient.AuthTokenType != TokenType.User)
+                {
+                    _syncPromise.TrySetResult(true);
+                    if (!model.Large)
+                        _downloaderPromise.TrySetResult(true);
+                }
 
                 for (int i = 0; i < model.Presences.Length; i++)
                     AddOrUpdateUser(model.Presences[i], dataStore, members);
@@ -106,6 +119,24 @@ namespace Discord
                     AddOrUpdateVoiceState(model.VoiceStates[i], dataStore, voiceStates);
             }
             _voiceStates = voiceStates;
+        }
+        public void Update(GuildSyncModel model, UpdateSource source, DataStore dataStore)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
+            var members = new ConcurrentDictionary<ulong, CachedGuildUser>(1, (int)(model.Presences.Length * 1.05));
+            {
+                DownloadedMemberCount = 0;
+                for (int i = 0; i < model.Members.Length; i++)
+                    AddUser(model.Members[i], dataStore, members);
+                _syncPromise.TrySetResult(true);
+                if (!model.Large)
+                    _downloaderPromise.TrySetResult(true);
+
+                for (int i = 0; i < model.Presences.Length; i++)
+                    AddOrUpdateUser(model.Presences[i], dataStore, members);
+            }
+            _members = members;
         }
 
         public void Update(EmojiUpdateModel model, UpdateSource source)
@@ -208,9 +239,7 @@ namespace Discord
         }
         public override async Task DownloadUsersAsync()
         {
-            if (!HasAllMembers)
-                await Discord.ApiClient.SendRequestMembersAsync(new ulong[] { Id }).ConfigureAwait(false);
-            await _downloaderPromise.Task.ConfigureAwait(false);
+            await Discord.DownloadUsersAsync(new [] { this });
         }
         public void CompleteDownloadMembers()
         {

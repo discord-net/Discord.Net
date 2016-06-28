@@ -409,6 +409,10 @@ namespace Discord.API
             };
             await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
         }
+        public async Task SendGuildSyncAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
+        {
+            await SendGatewayAsync(GatewayOpCode.GuildSync, guildIds, options: options).ConfigureAwait(false);
+        }
 
         //Channels
         public async Task<Channel> GetChannelAsync(ulong channelId, RequestOptions options = null)
