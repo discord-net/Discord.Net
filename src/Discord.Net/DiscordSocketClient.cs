@@ -29,8 +29,6 @@ namespace Discord
         private int _lastSeq;
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
         private TaskCompletionSource<bool> _connectTask;
-        private ConcurrentHashSet<ulong> _syncedGuilds;
-        private SemaphoreSlim _syncedGuildsLock;
         private CancellationTokenSource _cancelToken;
         private Task _heartbeatTask, _guildDownloadTask, _reconnectTask;
         private long _heartbeatTime;
@@ -104,8 +102,6 @@ namespace Discord
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
-            _syncedGuilds = new ConcurrentHashSet<ulong>();
-            _syncedGuildsLock = new SemaphoreSlim(1, 1);
         }
 
         protected override async Task OnLoginAsync()
@@ -309,7 +305,6 @@ namespace Discord
         }
         internal CachedGuild RemoveGuild(ulong id)
         {
-            _syncedGuilds.TryRemove(id);
             var guild = DataStore.RemoveGuild(id);
             foreach (var channel in guild.Channels)
                 guild.RemoveChannel(channel.Id);
@@ -380,26 +375,9 @@ namespace Discord
             var cachedGuilds = guilds.ToArray();
             if (cachedGuilds.Length == 0) return;
 
-            //Sync guilds
-            if (ApiClient.AuthTokenType == TokenType.User)
-            {
-                await _syncedGuildsLock.WaitAsync().ConfigureAwait(false);
-                try
-                {
-                    foreach (var guild in cachedGuilds)
-                        _syncedGuilds.TryAdd(guild.Id);
-                    await ApiClient.SendGuildSyncAsync(_syncedGuilds).ConfigureAwait(false);
-                    await Task.WhenAll(cachedGuilds.Select(x => x.SyncPromise));
-
-                    //Reduce the list only to those with members left to download
-                    cachedGuilds = cachedGuilds.Where(x => !x.HasAllMembers).ToArray();
-                    if (cachedGuilds.Length == 0) return;
-                }
-                finally
-                {
-                    _syncedGuildsLock.Release();
-                }
-            }
+            var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToArray();
+            if (unsyncedGuilds.Length > 0)
+                await Task.WhenAll(unsyncedGuilds);
 
             //Download offline members
             const short batchSize = 50;
@@ -521,7 +499,6 @@ namespace Discord
                                     var currentUser = new CachedSelfUser(this, data.User);
                                     int unavailableGuilds = 0;
                                     //dataStore.GetOrAddUser(data.User.Id, _ => currentUser);
-
                                     for (int i = 0; i < data.Guilds.Length; i++)
                                     {
                                         var model = data.Guilds[i];
@@ -536,20 +513,12 @@ namespace Discord
                                     _currentUser = currentUser;
                                     _unavailableGuilds = unavailableGuilds;
                                     _lastGuildAvailableTime = Environment.TickCount;
-                                    await _syncedGuildsLock.WaitAsync().ConfigureAwait(false);
-                                    try
-                                    {
-                                        _syncedGuilds = new ConcurrentHashSet<ulong>();
-                                    }
-                                    finally
-                                    {
-                                        _syncedGuildsLock.Release();
-                                    }
-                                    DataStore = dataStore;
+                                    DataStore = dataStore;                                   
 
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
+                                    await SyncGuildsAsync().ConfigureAwait(false);
 
                                     _connectTask.TrySetResult(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -579,6 +548,7 @@ namespace Discord
                                     if (data.Unavailable != false)
                                     {
                                         guild = AddGuild(data, DataStore);
+                                        await SyncGuildsAsync().ConfigureAwait(false);
                                         await _joinedGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         await _gatewayLogger.InfoAsync($"Joined {data.Name}").ConfigureAwait(false);
                                     }
@@ -1279,6 +1249,12 @@ namespace Discord
         {
             while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
                 await Task.Delay(500, cancelToken).ConfigureAwait(false);
+        }
+        private async Task SyncGuildsAsync()
+        {
+            var guildIds = Guilds.Where(x => x.Available).Select(x => x.Id).ToArray();
+            if (guildIds.Length > 0)
+                await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }
     }
 }
