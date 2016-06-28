@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Logging
 {
-    internal class LogManager : ILogger
+    internal class LogManager : ILogManager, ILogger
     {
         public LogSeverity Level { get; }
 
@@ -111,6 +111,6 @@ namespace Discord.Logging
         Task ILogger.DebugAsync(Exception ex)
             => LogAsync(LogSeverity.Debug, "Discord", ex);
 
-        public Logger CreateLogger(string name) => new Logger(this, name);
+        public ILogger CreateLogger(string name) => new Logger(this, name);
     }
 }

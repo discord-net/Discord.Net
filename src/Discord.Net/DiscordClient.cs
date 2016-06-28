@@ -24,7 +24,7 @@ namespace Discord
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
-        internal readonly Logger _discordLogger, _restLogger, _queueLogger;
+        internal readonly ILogger _discordLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
         internal readonly LogManager _log;
         internal readonly RequestQueue _requestQueue;

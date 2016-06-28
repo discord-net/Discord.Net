@@ -2,7 +2,7 @@
 {
     public enum GatewayOpCode : byte
     {
-        /// <summary> S→C - Used to send most events. </summary>
+        /// <summary> C←S - Used to send most events. </summary>
         Dispatch = 0,
         /// <summary> C↔S - Used to keep the connection alive and measure latency. </summary>
         Heartbeat = 1,
@@ -16,15 +16,15 @@
         VoiceServerPing = 5,
         /// <summary> C→S - Used to resume a connection after a redirect occurs. </summary>
         Resume = 6,
-        /// <summary> S→C - Used to notify a client that they must reconnect to another gateway. </summary>
+        /// <summary> C←S - Used to notify a client that they must reconnect to another gateway. </summary>
         Reconnect = 7,
         /// <summary> C→S - Used to request all members that were withheld by large_threshold </summary>
         RequestGuildMembers = 8,
-        /// <summary> S→C - Used to notify the client that their session has expired and cannot be resumed. </summary>
+        /// <summary> C←S - Used to notify the client that their session has expired and cannot be resumed. </summary>
         InvalidSession = 9,
-        /// <summary> S→C - Used to provide information to the client immediately on connection. </summary>
+        /// <summary> C←S - Used to provide information to the client immediately on connection. </summary>
         Hello = 10,
-        /// <summary> S→C - Used to reply to a client's heartbeat. </summary>
+        /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
         HeartbeatAck = 11
     }
 }

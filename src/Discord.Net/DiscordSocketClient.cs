@@ -2,7 +2,6 @@
 using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net.Converters;
-using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,9 +20,9 @@ namespace Discord
     public partial class DiscordSocketClient : DiscordClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
-        private readonly Logger _gatewayLogger;
+        private readonly ILogger _gatewayLogger;
 #if BENCHMARK
-        private readonly Logger _benchmarkLogger;
+        private readonly ILogger _benchmarkLogger;
 #endif
         private readonly JsonSerializer _serializer;
         private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
@@ -150,6 +149,11 @@ namespace Discord
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
+                if (_sessionId != null)
+                    await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
+                else
+                    await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+
                 await _connectTask.Task.ConfigureAwait(false);
                 
                 ConnectionState = ConnectionState.Connected;
@@ -205,6 +209,7 @@ namespace Discord
 
             await _disconnectedEvent.InvokeAsync().ConfigureAwait(false);
         }
+
         private async Task StartReconnectAsync()
         {
             //TODO: Is this thread-safe?
@@ -416,10 +421,6 @@ namespace Discord
                             await _gatewayLogger.DebugAsync("Received Hello").ConfigureAwait(false);
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
-                            if (_sessionId != null)
-                                await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
-                            else
-                                await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
                             _heartbeatTime = 0;
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token);
                         }

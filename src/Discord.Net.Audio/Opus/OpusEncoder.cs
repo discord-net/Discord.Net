@@ -36,7 +36,7 @@ namespace Discord.Audio.Opus
         {
             if (channels != 1 && channels != 2)
                 throw new ArgumentOutOfRangeException(nameof(channels));
-            if (bitrate != null && (bitrate < 1 || bitrate > AudioClient.MaxBitrate))
+            if (bitrate != null && (bitrate < 1 || bitrate > AudioAPIClient.MaxBitrate))
                 throw new ArgumentOutOfRangeException(nameof(bitrate));
 
             OpusError error;
