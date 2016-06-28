@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    public class AudioAPIClient
+    public class DiscordVoiceAPIClient
     {
         public const int MaxBitrate = 128;
         private const string Mode = "xsalsa20_poly1305";
@@ -40,7 +40,7 @@ namespace Discord.Audio
         public string SessionId { get; }
         public ConnectionState ConnectionState { get; private set; }
 
-        internal AudioAPIClient(ulong guildId, ulong userId, string sessionId, string token, WebSocketProvider webSocketProvider, JsonSerializer serializer = null)
+        internal DiscordVoiceAPIClient(ulong guildId, ulong userId, string sessionId, string token, WebSocketProvider webSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;
             _userId = userId;

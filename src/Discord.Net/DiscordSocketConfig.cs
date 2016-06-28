@@ -1,4 +1,5 @@
-﻿using Discord.Net.WebSockets;
+﻿using Discord.Audio;
+using Discord.Net.WebSockets;
 
 namespace Discord
 {
@@ -28,7 +29,10 @@ namespace Discord
         /// Decreasing this may reduce CPU usage while increasing login time and network usage. 
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
-        
+
+        /// <summary> Gets or sets the type of audio this DiscordClient supports. </summary>
+        public AudioMode AudioMode { get; set; } = AudioMode.Disabled;
+
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
         public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
     }

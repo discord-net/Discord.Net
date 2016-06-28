@@ -1,7 +1,9 @@
 ﻿using Discord.API.Gateway;
+using Discord.Audio;
 using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net.Converters;
+using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,9 +16,6 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    //TODO: Add event docstrings
-    //TODO: Add reconnect logic (+ensure the heartbeat task to shut down)
-    //TODO: Add resume logic
     public partial class DiscordSocketClient : DiscordClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
@@ -25,9 +24,6 @@ namespace Discord
         private readonly ILogger _benchmarkLogger;
 #endif
         private readonly JsonSerializer _serializer;
-        private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
-        private readonly int _largeThreshold;
-        private readonly int _totalShards;
 
         private string _sessionId;
         private int _lastSeq;
@@ -46,9 +42,17 @@ namespace Discord
         public ConnectionState ConnectionState { get; private set; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
-        
+
+        //From DiscordConfig
+        internal int TotalShards { get; private set; }
+        internal int ConnectionTimeout { get; private set; }
+        internal int ReconnectDelay { get; private set; }
+        internal int FailedReconnectDelay { get; private set; }
         internal int MessageCacheSize { get; private set; }
+        internal int LargeThreshold { get; private set; }
+        internal AudioMode AudioMode { get; private set; }
         internal DataStore DataStore { get; private set; }
+        internal WebSocketProvider WebSocketProvider { get; private set; }
 
         internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
         internal IReadOnlyCollection<CachedGuild> Guilds => DataStore.Guilds;
@@ -62,15 +66,15 @@ namespace Discord
             : base(config)
         {
             ShardId = config.ShardId;
-            _totalShards = config.TotalShards;
-
-            _connectionTimeout = config.ConnectionTimeout;
-            _reconnectDelay = config.ReconnectDelay;
-            _failedReconnectDelay = config.FailedReconnectDelay;
-
+            TotalShards = config.TotalShards;
+            ConnectionTimeout = config.ConnectionTimeout;
+            ReconnectDelay = config.ReconnectDelay;
+            FailedReconnectDelay = config.FailedReconnectDelay;
             MessageCacheSize = config.MessageCacheSize;
-            _largeThreshold = config.LargeThreshold;
-            
+            LargeThreshold = config.LargeThreshold;
+            AudioMode = config.AudioMode;
+            WebSocketProvider = config.WebSocketProvider;
+
             _gatewayLogger = _log.CreateLogger("Gateway");
 #if BENCHMARK
             _benchmarkLogger = _log.CreateLogger("Benchmark");
@@ -471,7 +475,7 @@ namespace Discord
                     case GatewayOpCode.Dispatch:
                         switch (type)
                         {
-                            //Global
+                            //Connection
                             case "READY":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
@@ -507,6 +511,11 @@ namespace Discord
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
                                 break;
+                            case "RESUMED":
+                                await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
+
+                                await _gatewayLogger.InfoAsync("Resume").ConfigureAwait(false);
+                                return;
 
                             //Guilds
                             case "GUILD_CREATE":
@@ -569,6 +578,28 @@ namespace Discord
                                     }
                                 }
                                 break;
+                            case "GUILD_EMOJI_UPDATE": //TODO: Add
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJI_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.GuildEmojiUpdateEvent>(_serializer);
+                                    var guild = DataStore.GetGuild(data.GuildId);
+                                    if (guild != null)
+                                    {
+                                        var before = guild.Clone();
+                                        guild.Update(data, UpdateSource.WebSocket);
+                                        await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("GUILD_EMOJI_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                return;
+                            case "GUILD_INTEGRATIONS_UPDATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
+                                return;
                             case "GUILD_DELETE":
                                 {
                                     var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
@@ -1099,25 +1130,16 @@ namespace Discord
                                     }
                                 }
                                 break;
+                            case "VOICE_SERVER_UPDATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
+                                return;
 
-                            //Ignored
+                            //Ignored (User only)
                             case "USER_SETTINGS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
                                 return;
-                            case "MESSAGE_ACK": //TODO: Add (User only)
+                            case "MESSAGE_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
-                                return;
-                            case "GUILD_EMOJIS_UPDATE": //TODO: Add
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
-                                return;
-                            case "GUILD_INTEGRATIONS_UPDATE": //TODO: Add
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
-                                return;
-                            case "VOICE_SERVER_UPDATE": //TODO: Add
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
-                                return;
-                            case "RESUMED": //TODO: Add
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (RESUMED)").ConfigureAwait(false);
                                 return;
 
                             //Others

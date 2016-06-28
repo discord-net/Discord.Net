@@ -398,6 +398,17 @@ namespace Discord.API
         {
             await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
         }
+        public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
+        {
+            var payload = new VoiceStateUpdateParams
+            {
+                GuildId = guildId,
+                ChannelId = channelId,
+                SelfDeaf = selfDeaf,
+                SelfMute = selfMute
+            };
+            await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
+        }
 
         //Channels
         public async Task<Channel> GetChannelAsync(ulong channelId, RequestOptions options = null)

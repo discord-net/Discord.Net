@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    //TODO: Add event docstrings
     public partial class DiscordSocketClient
     {
         //General

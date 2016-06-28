@@ -1,15 +1,15 @@
 ﻿using Discord.API.Voice;
 using Discord.Logging;
 using Discord.Net.Converters;
+using Discord.Net.WebSockets;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    public class AudioClient
+    internal class AudioClient : IAudioClient
     {
         public event Func<Task> Connected
         {
@@ -30,12 +30,11 @@ namespace Discord.Audio
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
 
-        private readonly ILogger _webSocketLogger;
+        private readonly ILogger _webSocketLogger, _udpLogger;
 #if BENCHMARK
         private readonly ILogger _benchmarkLogger;
 #endif
         private readonly JsonSerializer _serializer;
-        private readonly int _connectionTimeout, _reconnectDelay, _failedReconnectDelay;
         internal readonly SemaphoreSlim _connectionLock;
 
         private TaskCompletionSource<bool> _connectTask;
@@ -45,20 +44,18 @@ namespace Discord.Audio
         private bool _isReconnecting;
         private string _url;
 
-        public AudioAPIClient ApiClient { get; private set; }
-        /// <summary> Gets the current connection state of this client. </summary>
+        private DiscordSocketClient Discord { get; }
+        public DiscordVoiceAPIClient ApiClient { get; private set; }
         public ConnectionState ConnectionState { get; private set; }
-        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        internal AudioClient(ulong guildId, ulong userId, string sessionId, string token, AudioConfig config, ILogManager logManager)
+        internal AudioClient(DiscordSocketClient discord, ulong guildId, ulong userId, string sessionId, string token, WebSocketProvider webSocketProvider, ILogManager logManager)
         {
-            _connectionTimeout = config.ConnectionTimeout;
-            _reconnectDelay = config.ReconnectDelay;
-            _failedReconnectDelay = config.FailedReconnectDelay;
+            Discord = discord;
 
-            _webSocketLogger = logManager.CreateLogger("AudioWS");
+            _webSocketLogger = logManager.CreateLogger("Audio");
+            _udpLogger = logManager.CreateLogger("AudioUDP");
 #if BENCHMARK
             _benchmarkLogger = logManager.CreateLogger("Benchmark");
 #endif
@@ -72,8 +69,7 @@ namespace Discord.Audio
                 e.ErrorContext.Handled = true;
             };
             
-            var webSocketProvider = config.WebSocketProvider; //TODO: Clean this check
-            ApiClient = new AudioAPIClient(guildId, userId, sessionId, token, config.WebSocketProvider);
+            ApiClient = new DiscordVoiceAPIClient(guildId, userId, sessionId, token, webSocketProvider);
 
             ApiClient.SentGatewayMessage += async opCode => await _webSocketLogger.DebugAsync($"Sent {(VoiceOpCode)opCode}").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;

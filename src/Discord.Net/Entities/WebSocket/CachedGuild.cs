@@ -1,4 +1,5 @@
-﻿using Discord.Extensions;
+﻿using Discord.Audio;
+using Discord.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using ChannelModel = Discord.API.Channel;
+using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
 using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
 using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
@@ -25,6 +27,7 @@ namespace Discord
         public bool Available { get; private set; }
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
+        public IAudioClient AudioClient { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
         public Task DownloaderPromise => _downloaderPromise.Task;
@@ -100,6 +103,16 @@ namespace Discord
                     AddOrUpdateVoiceState(model.VoiceStates[i], dataStore, voiceStates);
             }
             _voiceStates = voiceStates;
+        }
+
+        public void Update(EmojiUpdateModel model, UpdateSource source)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+            
+            var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
+            for (int i = 0; i < model.Emojis.Length; i++)
+                emojis.Add(new Emoji(model.Emojis[i]));
+            Emojis = emojis.ToImmutableArray();
         }
 
         public override Task<IGuildChannel> GetChannelAsync(ulong id) => Task.FromResult<IGuildChannel>(GetChannel(id));

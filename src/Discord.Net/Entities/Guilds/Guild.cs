@@ -1,4 +1,5 @@
 ﻿using Discord.API.Rest;
+using Discord.Audio;
 using Discord.Extensions;
 using System;
 using System.Collections.Concurrent;
@@ -311,6 +312,7 @@ namespace Discord
         IReadOnlyCollection<Emoji> IGuild.Emojis => Emojis;
         IReadOnlyCollection<string> IGuild.Features => Features;
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+        IAudioClient IGuild.AudioClient => null;
 
         IRole IGuild.GetRole(ulong id) => GetRole(id);
     }

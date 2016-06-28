@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Audio;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +33,19 @@ namespace Discord
             if (user != null && user.VoiceChannel.Id == Id)
                 return user;
             return null;
+        }
+
+        public override async Task<IAudioClient> ConnectAsync()
+        {
+            var audioMode = Discord.AudioMode;
+            if (audioMode == AudioMode.Disabled)
+                throw new InvalidOperationException($"Audio is not enabled on this client, {nameof(DiscordSocketConfig.AudioMode)} in {nameof(DiscordSocketConfig)} must be set.");
+
+            await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, Id,
+                (audioMode & AudioMode.Incoming) == 0, 
+                (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
+            return null;
+            //TODO: Block and return
         }
 
         public CachedVoiceChannel Clone() => MemberwiseClone() as CachedVoiceChannel;

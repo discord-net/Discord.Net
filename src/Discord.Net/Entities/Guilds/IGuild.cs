@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.API.Rest;
+using Discord.Audio;
 
 namespace Discord
 {
@@ -37,6 +38,8 @@ namespace Discord
         /// <summary> Gets the id of the region hosting this guild's voice channels. </summary>
         string VoiceRegionId { get; }
 
+        /// <summary> Gets the IAudioClient currently associated with this guild. </summary>
+        IAudioClient AudioClient { get; }
         /// <summary> Gets the built-in role containing all users in this guild. </summary>
         IRole EveryoneRole { get; }
         /// <summary> Gets a collection of all custom emojis for this guild. </summary>

@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Discord.Net.Audio
+namespace Discord.Net.Audio.Sodium
 {
-    public unsafe static class LibSodium
+    public unsafe static class SecretBox
     {
         [DllImport("libsodium", EntryPoint = "crypto_secretbox_easy", CallingConvention = CallingConvention.Cdecl)]
         private static extern int SecretBoxEasy(byte* output, byte[] input, long inputLength, byte[] nonce, byte[] secret);
