@@ -28,24 +28,19 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-
-        private readonly ulong _userId;
-        private readonly string _token;
+        
         private readonly JsonSerializer _serializer;
         private readonly IWebSocketClient _gatewayClient;
         private readonly SemaphoreSlim _connectionLock;
         private CancellationTokenSource _connectCancelToken;
+        private bool _isDisposed;
 
-        public ulong GuildId { get; }        
-        public string SessionId { get; }
+        public ulong GuildId { get; }
         public ConnectionState ConnectionState { get; private set; }
 
-        internal DiscordVoiceAPIClient(ulong guildId, ulong userId, string sessionId, string token, WebSocketProvider webSocketProvider, JsonSerializer serializer = null)
+        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;
-            _userId = userId;
-            SessionId = sessionId;
-            _token = token;
             _connectionLock = new SemaphoreSlim(1, 1);
 
             _gatewayClient = webSocketProvider();
@@ -78,6 +73,19 @@ namespace Discord.Audio
 
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
+        void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _connectCancelToken?.Dispose();
+                    (_gatewayClient as IDisposable)?.Dispose();
+                }
+                _isDisposed = true;
+            }
+        }
+        public void Dispose() => Dispose(true);
 
         public Task SendAsync(VoiceOpCode opCode, object payload, RequestOptions options = null)
         {
@@ -105,16 +113,16 @@ namespace Discord.Audio
             });
         }
 
-        public async Task ConnectAsync(string url)
+        public async Task ConnectAsync(string url, ulong userId, string sessionId, string token)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await ConnectInternalAsync(url).ConfigureAwait(false);
+                await ConnectInternalAsync(url, userId, sessionId, token).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ConnectInternalAsync(string url)
+        private async Task ConnectInternalAsync(string url, ulong userId, string sessionId, string token)
         {
             ConnectionState = ConnectionState.Connecting;
             try
@@ -123,7 +131,7 @@ namespace Discord.Audio
                 _gatewayClient.SetCancelToken(_connectCancelToken.Token);                
                 await _gatewayClient.ConnectAsync(url).ConfigureAwait(false);
 
-                await SendIdentityAsync(GuildId, _userId, SessionId, _token).ConfigureAwait(false);
+                await SendIdentityAsync(GuildId, userId, sessionId, token).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
             }

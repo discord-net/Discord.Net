@@ -75,7 +75,7 @@ namespace Discord
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
 
-            _gatewayLogger = _log.CreateLogger("Gateway");
+            _gatewayLogger = LogManager.CreateLogger("Gateway");
 #if BENCHMARK
             _benchmarkLogger = _log.CreateLogger("Benchmark");
 #endif
@@ -94,7 +94,7 @@ namespace Discord
                 if (ex != null)
                 {
                     await _gatewayLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
-                    await StartReconnectAsync().ConfigureAwait(false);
+                    await StartReconnectAsync(ex).ConfigureAwait(false);
                 }
                 else
                     await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
@@ -112,7 +112,7 @@ namespace Discord
         protected override async Task OnLogoutAsync()
         {
             if (ConnectionState != ConnectionState.Disconnected)
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(null).ConfigureAwait(false);
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
         }
@@ -142,7 +142,7 @@ namespace Discord
 
             var state = ConnectionState;
             if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(null).ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Connecting;
             await _gatewayLogger.InfoAsync("Connecting").ConfigureAwait(false);
@@ -165,7 +165,7 @@ namespace Discord
             }
             catch (Exception)
             {
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(null).ConfigureAwait(false);
                 throw;
             }
         }
@@ -176,11 +176,11 @@ namespace Discord
             try
             {
                 _isReconnecting = false;
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(null).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task DisconnectInternalAsync()
+        private async Task DisconnectInternalAsync(Exception ex)
         {
             ulong guildId;
 
@@ -211,10 +211,10 @@ namespace Discord
             ConnectionState = ConnectionState.Disconnected;
             await _gatewayLogger.InfoAsync("Disconnected").ConfigureAwait(false);
 
-            await _disconnectedEvent.InvokeAsync().ConfigureAwait(false);
+            await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
         }
 
-        private async Task StartReconnectAsync()
+        private async Task StartReconnectAsync(Exception ex)
         {
             //TODO: Is this thread-safe?
             if (_reconnectTask != null) return;
@@ -222,6 +222,7 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                await DisconnectInternalAsync(ex).ConfigureAwait(false);
                 if (_reconnectTask != null) return;
                 _isReconnecting = true;
                 _reconnectTask = ReconnectInternalAsync();
@@ -469,7 +470,7 @@ namespace Discord
                             await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
                             await _gatewayLogger.WarningAsync("Server requested a reconnect").ConfigureAwait(false);
 
-                            await StartReconnectAsync().ConfigureAwait(false);
+                            await StartReconnectAsync(new Exception("Server requested a reconnect")).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Dispatch:
@@ -1113,9 +1114,7 @@ namespace Discord
 
                                             var user = guild.GetUser(data.UserId);
                                             if (user != null)
-                                            {
                                                 await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
-                                            }
                                             else
                                             {
                                                 await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
@@ -1131,7 +1130,21 @@ namespace Discord
                                 }
                                 break;
                             case "VOICE_SERVER_UPDATE":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
+                                await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
+
+                                if (AudioMode != AudioMode.Disabled)
+                                {
+                                    var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
+                                    var guild = DataStore.GetGuild(data.GuildId);
+                                    if (guild != null)
+                                        await guild.ConnectAudio("wss://" + data.Endpoint, data.Token).ConfigureAwait(false);
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("VOICE_SERVER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+
                                 return;
 
                             //Ignored (User only)
@@ -1183,7 +1196,7 @@ namespace Discord
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? false))
                         {
                             await _gatewayLogger.WarningAsync("Server missed last heartbeat").ConfigureAwait(false);
-                            await StartReconnectAsync().ConfigureAwait(false);
+                            await StartReconnectAsync(new Exception("Server missed last heartbeat")).ConfigureAwait(false);
                             return;
                         }
                     }

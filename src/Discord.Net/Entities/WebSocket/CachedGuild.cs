@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
@@ -17,8 +18,9 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal class CachedGuild : Guild, IUserGuild, ICachedEntity<ulong>
+    internal class CachedGuild : Guild, ICachedEntity<ulong>, IGuild, IUserGuild
     {
+        private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, CachedGuildUser> _members;
@@ -27,7 +29,7 @@ namespace Discord
         public bool Available { get; private set; }
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
-        public IAudioClient AudioClient { get; private set; }
+        public  AudioClient AudioClient { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
         public Task DownloaderPromise => _downloaderPromise.Task;
@@ -48,6 +50,7 @@ namespace Discord
         
         public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {
+            _audioLock = new SemaphoreSlim(1, 1);
             _downloaderPromise = new TaskCompletionSource<bool>();
             Update(model, UpdateSource.Creation, dataStore);
         }
@@ -236,6 +239,55 @@ namespace Discord
             return null;
         }
 
+        public async Task ConnectAudio(string url, string token)
+        {
+            AudioClient audioClient;
+            await _audioLock.WaitAsync().ConfigureAwait(false);
+            var voiceState = GetVoiceState(CurrentUser.Id).Value;
+            try
+            {
+                audioClient = AudioClient;
+                if (audioClient == null)
+                {
+                    audioClient = new AudioClient(this);
+                    audioClient.Disconnected += async ex =>
+                    {
+                        await _audioLock.WaitAsync().ConfigureAwait(false);
+                        try
+                        {
+                            if (ex != null)
+                            {
+                                //Reconnect if we still have channel info.
+                                //TODO: Is this threadsafe? Could channel data be deleted before we access it?
+                                var voiceState2 = GetVoiceState(CurrentUser.Id);
+                                if (voiceState2.HasValue)
+                                {
+                                    var voiceChannelId = voiceState2.Value.VoiceChannel?.Id;
+                                    if (voiceChannelId != null)
+                                        await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, voiceChannelId, voiceState2.Value.IsSelfDeafened, voiceState2.Value.IsSelfMuted);
+                                }
+                            }
+                            else
+                            {
+                                try { AudioClient.Dispose(); } catch { }
+                                AudioClient = null;
+                            }
+                        }
+                        finally
+                        {
+                            _audioLock.Release();
+                        }
+                    };
+                    AudioClient = audioClient;
+                }
+            }
+            finally
+            {
+                _audioLock.Release();
+            }
+            await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+        }
+
         public CachedGuild Clone() => MemberwiseClone() as CachedGuild;
 
         new internal ICachedGuildChannel ToChannel(ChannelModel model)
@@ -253,5 +305,6 @@ namespace Discord
 
         bool IUserGuild.IsOwner => OwnerId == Discord.CurrentUser.Id;
         GuildPermissions IUserGuild.Permissions => CurrentUser.GuildPermissions;
+        IAudioClient IGuild.AudioClient => AudioClient;
     }
 }

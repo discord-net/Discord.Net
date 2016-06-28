@@ -1,4 +1,5 @@
 using Discord.API;
+using Discord.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ namespace Discord
         ConnectionState ConnectionState { get; }
 
         DiscordApiClient ApiClient { get; }
+        ILogManager LogManager { get; }
         
         Task LoginAsync(TokenType tokenType, string token, bool validateToken = true);
         Task LogoutAsync();

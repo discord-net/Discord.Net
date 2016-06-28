@@ -6,7 +6,7 @@ namespace Discord.Audio
     public interface IAudioClient
     {
         event Func<Task> Connected;
-        event Func<Task> Disconnected;
+        event Func<Exception, Task> Disconnected;
         event Func<int, int, Task> LatencyUpdated;
 
         DiscordVoiceAPIClient ApiClient { get; }

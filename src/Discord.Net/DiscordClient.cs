@@ -26,13 +26,13 @@ namespace Discord
 
         internal readonly ILogger _discordLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
-        internal readonly LogManager _log;
         internal readonly RequestQueue _requestQueue;
         internal bool _isDisposed;
         internal SelfUser _currentUser;
 
+        public API.DiscordApiClient ApiClient { get; }
+        internal LogManager LogManager { get; }
         public LoginState LoginState { get; private set; }
-        public API.DiscordApiClient ApiClient { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordClient()
@@ -40,11 +40,11 @@ namespace Discord
         /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordClient(DiscordConfig config)
         {
-            _log = new LogManager(config.LogLevel);
-            _log.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
-            _discordLogger = _log.CreateLogger("Discord");
-            _restLogger = _log.CreateLogger("Rest");
-            _queueLogger = _log.CreateLogger("Queue");
+            LogManager = new LogManager(config.LogLevel);
+            LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
+            _discordLogger = LogManager.CreateLogger("Discord");
+            _restLogger = LogManager.CreateLogger("Rest");
+            _queueLogger = LogManager.CreateLogger("Queue");
 
             _connectionLock = new SemaphoreSlim(1, 1);
 
@@ -267,6 +267,8 @@ namespace Discord
         public void Dispose() => Dispose(true);
         
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
+        ILogManager IDiscordClient.LogManager => LogManager;
+
         Task IDiscordClient.ConnectAsync() { throw new NotSupportedException(); }
         Task IDiscordClient.DisconnectAsync() { throw new NotSupportedException(); }
     }
