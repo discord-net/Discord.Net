@@ -19,12 +19,6 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal enum MemberDownloadState
-    {
-        Incomplete,
-        Synced,
-        Complete
-    }
     internal class CachedGuild : Guild, ICachedEntity<ulong>, IGuild, IUserGuild
     {
         private readonly SemaphoreSlim _audioLock;
@@ -37,7 +31,6 @@ namespace Discord
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
         public AudioClient AudioClient { get; private set; }
-        public MemberDownloadState MemberDownloadState { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
