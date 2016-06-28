@@ -1137,7 +1137,10 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
-                                        await guild.ConnectAudio("wss://" + data.Endpoint, data.Token).ConfigureAwait(false);
+                                    {
+                                        string endpoint = "wss://" + data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
+                                        await guild.ConnectAudio(endpoint, data.Token).ConfigureAwait(false);
+                                    }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("VOICE_SERVER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
