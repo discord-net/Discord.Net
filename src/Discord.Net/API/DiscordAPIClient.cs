@@ -394,6 +394,15 @@ namespace Discord.API
         {
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
+        public async Task SendStatusUpdateAsync(long? idleSince, Game game, RequestOptions options = null)
+        {
+            var args = new StatusUpdateParams
+            {
+                IdleSince = idleSince,
+                Game = game
+            };
+            await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
+        }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
             await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
