@@ -206,7 +206,7 @@ namespace Discord
                 return member;
             return null;
         }
-        public async Task DownloadMembersAsync()
+        public override async Task DownloadUsersAsync()
         {
             if (!HasAllMembers)
                 await Discord.ApiClient.SendRequestMembersAsync(new ulong[] { Id }).ConfigureAwait(false);

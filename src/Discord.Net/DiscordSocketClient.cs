@@ -362,11 +362,11 @@ namespace Discord
             return DataStore.RemoveUser(id);
         }
 
-        /// <summary> Downloads the members list for all large guilds. </summary>
-        public Task DownloadAllMembersAsync()
-            => DownloadMembersAsync(DataStore.Guilds.Where(x => !x.HasAllMembers));
-        /// <summary> Downloads the members list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadMembersAsync(IEnumerable<IGuild> guilds)
+        /// <summary> Downloads the users list for all large guilds. </summary>
+        public Task DownloadAllUsersAsync()
+            => DownloadUsersAsync(DataStore.Guilds.Where(x => !x.HasAllMembers));
+        /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
+        public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             const short batchSize = 50;
             var cachedGuilds = guilds.Select(x => x as CachedGuild).ToArray();
@@ -374,7 +374,7 @@ namespace Discord
                 return;
             else if (cachedGuilds.Length == 1)
             {
-                await cachedGuilds[0].DownloadMembersAsync().ConfigureAwait(false);
+                await cachedGuilds[0].DownloadUsersAsync().ConfigureAwait(false);
                 return;
             }
 

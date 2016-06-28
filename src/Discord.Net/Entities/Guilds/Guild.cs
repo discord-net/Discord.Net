@@ -289,6 +289,10 @@ namespace Discord
                 model = await Discord.ApiClient.BeginGuildPruneAsync(Id, args).ConfigureAwait(false);
             return model.Pruned;
         }
+        public virtual Task DownloadUsersAsync()
+        {
+            throw new NotSupportedException();
+        }
 
         internal GuildChannel ToChannel(API.Channel model)
         {
@@ -311,7 +315,6 @@ namespace Discord
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<Emoji> IGuild.Emojis => Emojis;
         IReadOnlyCollection<string> IGuild.Features => Features;
-        Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
         IAudioClient IGuild.AudioClient => null;
 
         IRole IGuild.GetRole(ulong id) => GetRole(id);
