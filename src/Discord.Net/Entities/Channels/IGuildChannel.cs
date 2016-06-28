@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IGuildChannel : IChannel, IDeletable, IUpdateable
+    public interface IGuildChannel : IChannel, IDeletable
     {
         /// <summary> Gets the name of this channel. </summary>
         string Name { get; }

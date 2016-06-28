@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IChannel : ISnowflakeEntity
+    public interface IChannel : ISnowflakeEntity, IUpdateable
     {
         /// <summary> Gets a collection of all users in this channel. </summary>
         Task<IReadOnlyCollection<IUser>> GetUsersAsync();
