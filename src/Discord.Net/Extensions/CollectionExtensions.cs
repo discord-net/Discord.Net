@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Discord.Extensions
@@ -11,7 +12,8 @@ namespace Discord.Extensions
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue, TSource>(this IEnumerable<TValue> query, IReadOnlyCollection<TSource> source)
             => new ConcurrentDictionaryWrapper<TValue, TSource>(source, query);
     }
-    
+
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal struct ConcurrentDictionaryWrapper<TValue, TSource> : IReadOnlyCollection<TValue>
     {
         private readonly IReadOnlyCollection<TSource> _source;
@@ -25,6 +27,8 @@ namespace Discord.Extensions
             _source = source;
             _query = query;
         }
+
+        private string DebuggerDisplay => $"Count = {Count}";
 
         public IEnumerator<TValue> GetEnumerator() => _query.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _query.GetEnumerator();
