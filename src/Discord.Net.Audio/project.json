@@ -20,7 +20,7 @@
 
   "dependencies": {
     "Discord.Net": "1.0.0-dev",
-    "System.Runtime.InteropServices": "4.1.0-rc2-24027"
+    "System.Runtime.InteropServices": "4.1.0"
   },
 
   "frameworks": {

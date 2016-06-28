@@ -9,16 +9,14 @@ Check out the [documentation](http://rtd.discord.foxbot.me/en/docs-dev/index.htm
 You can download Discord.Net and its extensions from NuGet:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
-- [Discord.Net.Modules](https://www.nuget.org/packages/Discord.Net.Modules/)
 - [Discord.Net.Audio](https://www.nuget.org/packages/Discord.Net.Audio/)
 
 ### Compiling
 In order to compile Discord.Net, you require the following:
 
 #### Visual Studio 2015
-- [VS2015 Update 2](https://www.visualstudio.com/en-us/news/vs2015-update2-vs.aspx)
-- [.Net Core SDK + VS Plugin](https://www.microsoft.com/net/core#windows)
-- NuGet 3.3+ (available through Visual Studio)
+- [VS2015 Update 3](https://www.microsoft.com/net/core#windows)
+- [.Net Core 1.0 VS Plugin](https://www.microsoft.com/net/core#windows)
 
 #### CLI
-- [.Net Core SDK](https://www.microsoft.com/net/core#windows)
+- [.Net Core 1.0 SDK](https://www.microsoft.com/net/core)
