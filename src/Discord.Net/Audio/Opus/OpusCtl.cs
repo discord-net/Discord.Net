@@ -1,6 +1,6 @@
-﻿namespace Discord.Audio.Opus
+﻿namespace Discord.Audio
 {
-    internal enum Ctl : int
+    internal enum OpusCtl : int
     {
         SetBitrateRequest = 4002,
         GetBitrateRequest = 4003,

@@ -14,6 +14,8 @@ namespace Discord.Audio
 {
     internal class AudioClient : IAudioClient, IDisposable
     {
+        public const int SampleRate = 48000;
+
         public event Func<Task> Connected
         {
             add { _connectedEvent.Add(value); }
@@ -57,7 +59,7 @@ namespace Discord.Audio
         private DiscordSocketClient Discord => Guild.Discord;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        internal AudioClient(CachedGuild guild, int id)
+        public AudioClient(CachedGuild guild, int id)
         {
             Guild = guild;
 
@@ -171,6 +173,22 @@ namespace Discord.Audio
             await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
         }
 
+        public void Send(byte[] data, int count)
+        {
+            //TODO: Queue these?
+            ApiClient.SendAsync(data, count).ConfigureAwait(false);
+        }
+
+        public RTPWriteStream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000)
+        {
+            return new RTPWriteStream(this, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
+        }
+        public OpusEncodeStream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int channels = 2,
+            OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
+        {
+            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, SampleRate, bitrate, channels, application, bufferSize);
+        }
+
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
         {
 #if BENCHMARK
@@ -253,7 +271,6 @@ namespace Discord.Audio
             }
 #endif
         }
-
         private async Task ProcessPacketAsync(byte[] packet)
         {
             if (!_connectTask.Task.IsCompleted)

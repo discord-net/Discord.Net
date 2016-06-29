@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Discord.Audio.Opus
+namespace Discord.Audio
 {
     internal unsafe class OpusDecoder : OpusConverter
     {
@@ -10,13 +10,13 @@ namespace Discord.Audio.Opus
         [DllImport("opus", EntryPoint = "opus_decoder_destroy", CallingConvention = CallingConvention.Cdecl)]
         private static extern void DestroyDecoder(IntPtr decoder);
         [DllImport("opus", EntryPoint = "opus_decode", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int Decode(IntPtr st, byte* data, int len, byte[] pcm, int frame_size, int decode_fec);
+        private static extern int Decode(IntPtr st, byte* data, int len, byte* pcm, int max_frame_size, int decode_fec);
 
-        public OpusDecoder(int samplingRate)
-            : base(samplingRate)
+        public OpusDecoder(int samplingRate, int channels)
+            : base(samplingRate, channels)
         {
             OpusError error;
-            _ptr = CreateDecoder(samplingRate, 2, out error);
+            _ptr = CreateDecoder(samplingRate, channels, out error);
             if (error != OpusError.OK)
                 throw new InvalidOperationException($"Error occured while creating decoder: {error}");
         }
@@ -25,11 +25,12 @@ namespace Discord.Audio.Opus
         /// <param name="input">PCM samples to decode.</param>
         /// <param name="inputOffset">Offset of the frame in input.</param>
         /// <param name="output">Buffer to store the decoded frame.</param>
-        public unsafe int DecodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output)
+        public unsafe int DecodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output, int outputOffset)
         {
             int result = 0;
             fixed (byte* inPtr = input)
-                result = Decode(_ptr, inPtr + inputOffset, inputCount, output, inputCount, 0);
+            fixed (byte* outPtr = output)
+                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, (output.Length - outputOffset) / SampleSize / MaxChannels, 0);
 
             if (result < 0)
                 throw new Exception(((OpusError)result).ToString());

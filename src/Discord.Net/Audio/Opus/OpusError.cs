@@ -1,4 +1,4 @@
-﻿namespace Discord.Audio.Opus
+﻿namespace Discord.Audio
 {
     internal enum OpusError : int
     {

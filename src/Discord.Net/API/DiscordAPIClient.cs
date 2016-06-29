@@ -91,7 +91,7 @@ namespace Discord.API
 
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
