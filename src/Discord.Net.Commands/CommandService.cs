@@ -281,7 +281,7 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
-            for (int i = commands.Count - 1; i >= 0; i++)
+            for (int i = commands.Count - 1; i >= 0; i--)
             {
                 var parseResult = await commands[i].Parse(message, searchResult);
                 if (!parseResult.IsSuccess)
