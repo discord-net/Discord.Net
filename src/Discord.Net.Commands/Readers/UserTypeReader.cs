@@ -9,48 +9,44 @@ namespace Discord.Commands
     {
         public override async Task<TypeReaderResult> Read(IMessage context, string input)
         {
-            IGuildChannel guildChannel = context.Channel as IGuildChannel;
             IUser result = null;
-
-            if (guildChannel != null)
+            
+            //By Id
+            ulong id;
+            if (MentionUtils.TryParseUser(input, out id) || ulong.TryParse(input, out id))
             {
-                //By Id
-                ulong id;
-                if (MentionUtils.TryParseUser(input, out id) || ulong.TryParse(input, out id))
-                {
-                    var user = await guildChannel.Guild.GetUserAsync(id).ConfigureAwait(false);
-                    if (user != null)
-                        result = user;
-                }
+                var user = await context.Channel.GetUserAsync(id).ConfigureAwait(false);
+                if (user != null)
+                    result = user;
+            }
 
-                //By Username + Discriminator
-                if (result == null)
+            //By Username + Discriminator
+            if (result == null)
+            {
+                int index = input.LastIndexOf('#');
+                if (index >= 0)
                 {
-                    int index = input.LastIndexOf('#');
-                    if (index >= 0)
+                    string username = input.Substring(0, index);
+                    ushort discriminator;
+                    if (ushort.TryParse(input.Substring(index + 1), out discriminator))
                     {
-                        string username = input.Substring(0, index);
-                        ushort discriminator;
-                        if (ushort.TryParse(input.Substring(index + 1), out discriminator))
-                        {
-                            var users = await guildChannel.Guild.GetUsersAsync().ConfigureAwait(false);
-                            result = users.Where(x =>
-                                x.DiscriminatorValue == discriminator &&
-                                string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                        }
+                        var users = await context.Channel.GetUsersAsync().ConfigureAwait(false);
+                        result = users.Where(x =>
+                            x.DiscriminatorValue == discriminator &&
+                            string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                     }
                 }
+            }
 
-                //By Username
-                if (result == null)
-                {
-                    var users = await guildChannel.Guild.GetUsersAsync().ConfigureAwait(false);
-                    var filteredUsers = users.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)).ToArray();
-                    if (filteredUsers.Length > 1)
-                        return TypeReaderResult.FromError(CommandError.MultipleMatches, "Multiple users found.");
-                    else if (filteredUsers.Length == 1)
-                        result = filteredUsers[0];
-                }
+            //By Username
+            if (result == null)
+            {
+                var users = await context.Channel.GetUsersAsync().ConfigureAwait(false);
+                var filteredUsers = users.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)).ToArray();
+                if (filteredUsers.Length > 1)
+                    return TypeReaderResult.FromError(CommandError.MultipleMatches, "Multiple users found.");
+                else if (filteredUsers.Length == 1)
+                    result = filteredUsers[0];
             }
 
             if (result == null)
