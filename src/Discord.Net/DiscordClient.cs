@@ -35,8 +35,7 @@ namespace Discord
         public LoginState LoginState { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordClient()
-            : this(new DiscordConfig()) { }
+        public DiscordClient() : this(new DiscordConfig()) { }
         /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordClient(DiscordConfig config)
         {

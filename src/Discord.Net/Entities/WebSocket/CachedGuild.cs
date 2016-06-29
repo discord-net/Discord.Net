@@ -261,7 +261,7 @@ namespace Discord
             return null;
         }
 
-        public async Task ConnectAudio(string url, string token)
+        public async Task ConnectAudio(int id, string url, string token)
         {
             AudioClient audioClient;
             await _audioLock.WaitAsync().ConfigureAwait(false);
@@ -271,7 +271,7 @@ namespace Discord
                 audioClient = AudioClient;
                 if (audioClient == null)
                 {
-                    audioClient = new AudioClient(this);
+                    audioClient = new AudioClient(this, id);
                     audioClient.Disconnected += async ex =>
                     {
                         await _audioLock.WaitAsync().ConfigureAwait(false);

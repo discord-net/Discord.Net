@@ -35,6 +35,7 @@ namespace Discord
         private bool _isReconnecting;
         private int _unavailableGuilds;
         private long _lastGuildAvailableTime;
+        private int _nextAudioId;
 
         /// <summary> Gets the shard if of this client. </summary>
         public int ShardId { get; }
@@ -74,6 +75,7 @@ namespace Discord
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
+            _nextAudioId = 1;
 
             _gatewayLogger = LogManager.CreateLogger("Gateway");
 #if BENCHMARK
@@ -87,7 +89,7 @@ namespace Discord
                 e.ErrorContext.Handled = true;
             };
             
-            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {(GatewayOpCode)opCode}").ConfigureAwait(false);
+            ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
             ApiClient.Disconnected += async ex =>
             {
@@ -1173,8 +1175,8 @@ namespace Discord
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
-                                        string endpoint = "wss://" + data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
-                                        await guild.ConnectAudio(endpoint, data.Token).ConfigureAwait(false);
+                                        string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
+                                        var _ = guild.ConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
                                     }
                                     else
                                     {

@@ -27,8 +27,8 @@ namespace Discord.API
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
-        public event Func<int, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<int, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<int, Task>>();
+        public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();
 
         public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
@@ -352,7 +352,7 @@ namespace Discord.API
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
             await _requestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options), group, bucketId, guildId).ConfigureAwait(false);
-            await _sentGatewayMessageEvent.InvokeAsync((int)opCode).ConfigureAwait(false);
+            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
         //Auth

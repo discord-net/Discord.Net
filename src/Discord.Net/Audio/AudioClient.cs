@@ -2,7 +2,11 @@
 using Discord.Logging;
 using Discord.Net.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,7 +33,7 @@ namespace Discord.Audio
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
 
-        private readonly ILogger _webSocketLogger, _udpLogger;
+        private readonly ILogger _audioLogger;
 #if BENCHMARK
         private readonly ILogger _benchmarkLogger;
 #endif
@@ -42,6 +46,8 @@ namespace Discord.Audio
         private long _heartbeatTime;
         private string _url;
         private bool _isDisposed;
+        private uint _ssrc;
+        private byte[] _secretKey;
 
         public CachedGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
@@ -51,12 +57,11 @@ namespace Discord.Audio
         private DiscordSocketClient Discord => Guild.Discord;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        internal AudioClient(CachedGuild guild)
+        internal AudioClient(CachedGuild guild, int id)
         {
             Guild = guild;
 
-            _webSocketLogger = Discord.LogManager.CreateLogger("Audio");
-            _udpLogger = Discord.LogManager.CreateLogger("AudioUDP");
+            _audioLogger = Discord.LogManager.CreateLogger($"Audio #{id}");
 #if BENCHMARK
             _benchmarkLogger = logManager.CreateLogger("Benchmark");
 #endif
@@ -66,20 +71,22 @@ namespace Discord.Audio
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
             {
-                _webSocketLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
+                _audioLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
             };
             
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider);
 
-            ApiClient.SentGatewayMessage += async opCode => await _webSocketLogger.DebugAsync($"Sent {(VoiceOpCode)opCode}").ConfigureAwait(false);
+            ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
+            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
+            ApiClient.ReceivedPacket += ProcessPacketAsync;
             ApiClient.Disconnected += async ex =>
             {
                 if (ex != null)
-                    await _webSocketLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
+                    await _audioLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
                 else
-                    await _webSocketLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
+                    await _audioLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
         }
 
@@ -100,19 +107,20 @@ namespace Discord.Audio
                 await DisconnectInternalAsync(null).ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Connecting;
-            await _webSocketLogger.InfoAsync("Connecting").ConfigureAwait(false);
+            await _audioLogger.InfoAsync("Connecting").ConfigureAwait(false);
             try
             {
                 _url = url;
                 _connectTask = new TaskCompletionSource<bool>();
                 _cancelToken = new CancellationTokenSource();
-                await ApiClient.ConnectAsync(url, userId, sessionId, token).ConfigureAwait(false);
-                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
+                await ApiClient.ConnectAsync("wss://" + url).ConfigureAwait(false);
+                await ApiClient.SendIdentityAsync(userId, sessionId, token).ConfigureAwait(false);
                 await _connectTask.Task.ConfigureAwait(false);
 
+                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
                 ConnectionState = ConnectionState.Connected;
-                await _webSocketLogger.InfoAsync("Connected").ConfigureAwait(false);
+                await _audioLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -143,7 +151,7 @@ namespace Discord.Audio
         {
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
-            await _webSocketLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
+            await _audioLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
 
             //Signal tasks to complete
             try { _cancelToken.Cancel(); } catch { }
@@ -158,7 +166,7 @@ namespace Discord.Audio
             _heartbeatTask = null;
 
             ConnectionState = ConnectionState.Disconnected;
-            await _webSocketLogger.InfoAsync("Disconnected").ConfigureAwait(false);
+            await _audioLogger.InfoAsync("Disconnected").ConfigureAwait(false);
 
             await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
         }
@@ -174,25 +182,49 @@ namespace Discord.Audio
             {
                 switch (opCode)
                 {
-                    /*case VoiceOpCode.Ready:
+                    case VoiceOpCode.Ready:
                         {
-                            await _webSocketLogger.DebugAsync("Received Ready").ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
                             var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                            
+
+                            _ssrc = data.SSRC;
+
+                            if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
+                                throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
+
                             _heartbeatTime = 0;
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token);
+
+                            var entry = await Dns.GetHostEntryAsync(_url).ConfigureAwait(false);
+
+                            ApiClient.SetUdpEndpoint(new IPEndPoint(entry.AddressList[0], data.Port));
+                            await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
                         }
-                        break;*/
+                        break;
+                    case VoiceOpCode.SessionDescription:
+                        {
+                            await _audioLogger.DebugAsync("Received SessionDescription").ConfigureAwait(false);
+                            var data = (payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
+
+                            if (data.Mode != DiscordVoiceAPIClient.Mode)
+                                throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
+
+                            _secretKey = data.SecretKey;
+                            await ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
+
+                            _connectTask.TrySetResult(true);
+                        }
+                        break;
                     case VoiceOpCode.HeartbeatAck:
                         {
-                            await _webSocketLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
 
                             var heartbeatTime = _heartbeatTime;
                             if (heartbeatTime != 0)
                             {
                                 int latency = (int)(Environment.TickCount - _heartbeatTime);
                                 _heartbeatTime = 0;
-                                await _webSocketLogger.VerboseAsync($"Latency = {latency} ms").ConfigureAwait(false);
+                                await _audioLogger.VerboseAsync($"Latency = {latency} ms").ConfigureAwait(false);
 
                                 int before = Latency;
                                 Latency = latency;
@@ -202,13 +234,13 @@ namespace Discord.Audio
                         }
                         break;
                     default:
-                        await _webSocketLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
+                        await _audioLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
                         return;
                 }
             }
             catch (Exception ex)
             {
-                await _webSocketLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
+                await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
                 return;
             }
 #if BENCHMARK
@@ -220,6 +252,27 @@ namespace Discord.Audio
                 await _benchmarkLogger.DebugAsync($"{millis} ms").ConfigureAwait(false);
             }
 #endif
+        }
+
+        private async Task ProcessPacketAsync(byte[] packet)
+        {
+            if (!_connectTask.Task.IsCompleted)
+            {
+                if (packet.Length == 70)
+                {
+                    string ip;
+                    int port;
+                    try
+                    {
+                        ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
+                        port = packet[68] | packet[69] << 8;
+                    }
+                    catch { return; }
+                    
+                    await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
+                    await ApiClient.SendSelectProtocol(ip, port);
+                }
+            }
         }
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
@@ -235,7 +288,7 @@ namespace Discord.Audio
                     {
                         if (ConnectionState == ConnectionState.Connected)
                         {
-                            await _webSocketLogger.WarningAsync("Server missed last heartbeat").ConfigureAwait(false);
+                            await _audioLogger.WarningAsync("Server missed last heartbeat").ConfigureAwait(false);
                             await DisconnectInternalAsync(new Exception("Server missed last heartbeat")).ConfigureAwait(false);
                             return;
                         }
