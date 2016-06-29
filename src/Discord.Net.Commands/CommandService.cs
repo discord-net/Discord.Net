@@ -14,8 +14,8 @@ namespace Discord.Commands
     {
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<object, Module> _modules;
-        private readonly ConcurrentDictionary<string, List<Command>> _map;
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
+        private readonly CommandMap _map;
 
         public IEnumerable<Module> Modules => _modules.Select(x => x.Value);
         public IEnumerable<Command> Commands => _modules.SelectMany(x => x.Value.Commands);
@@ -24,7 +24,7 @@ namespace Discord.Commands
         {
             _moduleLock = new SemaphoreSlim(1, 1);
             _modules = new ConcurrentDictionary<object, Module>();
-            _map = new ConcurrentDictionary<string, List<Command>>();
+            _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
                 [typeof(string)] = new GenericTypeReader((m, s) => Task.FromResult(TypeReaderResult.FromSuccess(s))),
@@ -160,11 +160,7 @@ namespace Discord.Commands
             _modules[moduleInstance] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)
-            {
-                var list = _map.GetOrAdd(cmd.Text, _ => new List<Command>());
-                lock (list)
-                    list.Add(cmd);
-            }
+                _map.AddCommand(cmd);
 
             return loadedModule;
         }
@@ -222,14 +218,7 @@ namespace Discord.Commands
             if (_modules.TryRemove(module, out unloadedModule))
             {
                 foreach (var cmd in unloadedModule.Commands)
-                {
-                    List<Command> list;
-                    if (_map.TryGetValue(cmd.Text, out list))
-                    {
-                        lock (list)
-                            list.Remove(cmd);
-                    }
-                }
+                    _map.RemoveCommand(cmd);
                 return true;
             }
             else
@@ -240,35 +229,10 @@ namespace Discord.Commands
         public SearchResult Search(IMessage message, string input)
         {
             string lowerInput = input.ToLowerInvariant();
-
-            ImmutableArray<Command>.Builder matches = null;
-            List<Command> group;
-            int pos = -1;
-
-            while (true)
-            {
-                pos = input.IndexOf(' ', pos + 1);
-                string cmdText = pos == -1 ? input : input.Substring(0, pos);
-                if (!_map.TryGetValue(cmdText, out group))
-                    break;
-
-                lock (group)
-                {
-                    if (matches == null)
-                        matches = ImmutableArray.CreateBuilder<Command>(group.Count);
-                    for (int i = 0; i < group.Count; i++)
-                        matches.Add(group[i]);
-                }
-
-                if (pos == -1)
-                {
-                    pos = input.Length;
-                    break;
-                }
-            }
+            var matches = _map.GetCommands(input).ToImmutableArray();
             
-            if (matches != null)
-                return SearchResult.FromSuccess(input, matches.ToImmutable());
+            if (matches.Length > 0)
+                return SearchResult.FromSuccess(input, matches);
             else
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
