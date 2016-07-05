@@ -981,6 +981,20 @@ namespace Discord
                                     user.Update(data);
                                     //Logger.Verbose($"Voice Updated: {server.Name}/{user.Name}");
                                     OnUserUpdated(before, user);
+
+                                    if (before.VoiceChannel != user.VoiceChannel)
+                                    {
+                                        if (before.VoiceChannel != null)
+                                        {
+                                            Logger.Verbose($"USER_LEFT_VOICE_CHANNEL: {user.Path} left voice channel {before.VoiceChannel.Path}");
+                                            OnUserLeftVoiceChannel(before.VoiceChannel, user);
+                                        }
+                                        if (user.VoiceChannel != null)
+                                        {
+                                            Logger.Verbose($"USER_JOINED_VOICE_CHANNEL: {user.Path} joined voice channel {user.VoiceChannel.Path}");
+                                            OnUserJoinedVoiceChannel(user.VoiceChannel, user);
+                                        }
+                                    }
                                 }
                                 /*else //Occurs when a user leaves a server
                                     Logger.Warning("VOICE_STATE_UPDATE referenced an unknown user.");*/
