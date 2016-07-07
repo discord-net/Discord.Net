@@ -25,7 +25,7 @@ namespace Discord
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }
         /// <summary> Returns a collection of all attachments included in this message. </summary>
-        IReadOnlyCollection<Attachment> Attachments { get; }
+        IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary> Returns a collection of all embeds included in this message. </summary>
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary> Returns a collection of channel ids mentioned in this message. </summary>

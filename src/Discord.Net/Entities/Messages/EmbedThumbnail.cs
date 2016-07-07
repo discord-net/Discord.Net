@@ -18,6 +18,12 @@ namespace Discord
         }
 
         internal EmbedThumbnail(Model model)
-            : this(model.Url, model.ProxyUrl, model.Height, model.Width) { }
+            : this(
+                  model.Url, 
+                  model.ProxyUrl,
+                  model.Height.IsSpecified ? model.Height.Value : (int?)null,
+                  model.Width.IsSpecified ? model.Width.Value : (int?)null)
+        {
+        }
     }
 }

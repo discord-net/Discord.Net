@@ -23,7 +23,7 @@ namespace Discord
         public IMessageChannel Channel { get; }
         public IUser Author { get; }
         
-        public IReadOnlyCollection<Attachment> Attachments { get; private set; }
+        public IReadOnlyCollection<IAttachment> Attachments { get; private set; }
         public IReadOnlyCollection<IEmbed> Embeds { get; private set; }
         public IReadOnlyCollection<ulong> MentionedChannelIds { get; private set; }
         public IReadOnlyCollection<IRole> MentionedRoles { get; private set; }
