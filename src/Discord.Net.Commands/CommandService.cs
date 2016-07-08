@@ -144,7 +144,7 @@ namespace Discord.Commands
 
                 var typeInfo = moduleInstance.GetType().GetTypeInfo();
                 var moduleAttr = typeInfo.GetCustomAttribute<ModuleAttribute>();
-                if (moduleAttr != null)
+                if (moduleAttr == null)
                     throw new ArgumentException($"Modules must be marked with ModuleAttribute.");
 
                 return LoadInternal(moduleInstance, moduleAttr, typeInfo);
