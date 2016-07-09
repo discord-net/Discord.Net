@@ -15,13 +15,13 @@ namespace Discord
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
         /// <summary>When a channel is updated. Discord API Event name: CHANNEL_UPDATE.</summary>
         public event EventHandler<ChannelUpdatedEventArgs> ChannelUpdated = delegate { };
-        /// <summary>NOT IMPLEMENTED YET</summary>
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageAcknowledged = delegate { };
         /// <summary>When a message is deleted. Discord API Event name: MESSAGE_DELETE.</summary>
         public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
         /// <summary>When a message is created. Discord API Event name: MESSAGE_CREATE.</summary>
         public event EventHandler<MessageEventArgs> MessageReceived = delegate { };
-        /// <summary>NOT IMPLEMENTED YET</summary>
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageSent = delegate { };
         /// <summary>When a message is updated. Discord API Event name: MESSAGE_UPDATE.</summary>
         public event EventHandler<MessageUpdatedEventArgs> MessageUpdated = delegate { };
