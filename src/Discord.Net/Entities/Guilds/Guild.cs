@@ -121,6 +121,12 @@ namespace Discord
 
             var args = new ModifyGuildParams();
             func(args);
+
+            if (args.Splash.IsSpecified && _splashId != null)
+                args.SplashHash = _splashId;
+            if (args.Icon.IsSpecified && _iconId != null)
+                args.IconHash = _iconId;
+
             var model = await Discord.ApiClient.ModifyGuildAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }

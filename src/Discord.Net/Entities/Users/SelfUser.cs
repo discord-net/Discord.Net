@@ -52,6 +52,8 @@ namespace Discord
 
             if (!args.Username.IsSpecified)
                 args.Username = Username;
+            if (args.Avatar.IsSpecified && _avatarId != null)
+                args.AvatarHash = _avatarId;
 
             var model = await Discord.ApiClient.ModifySelfAsync(args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);

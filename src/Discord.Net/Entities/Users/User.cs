@@ -7,7 +7,7 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class User : SnowflakeEntity, IUser
     {
-        private string _avatarId;
+        protected string _avatarId;
 
         public bool IsBot { get; private set; }
         public string Username { get; private set; }

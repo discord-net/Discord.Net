@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.API;
+using Newtonsoft.Json;
 using System;
-using System.IO;
 
 namespace Discord.Net.Converters
 {
@@ -19,13 +19,18 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var stream = value as Stream;
+            var image = (Image)value;
 
-            byte[] bytes = new byte[stream.Length - stream.Position];
-            stream.Read(bytes, 0, bytes.Length);
+            if (image.Stream != null)
+            {
+                byte[] bytes = new byte[image.Stream.Length - image.Stream.Position];
+                image.Stream.Read(bytes, 0, bytes.Length);
 
-            string base64 = Convert.ToBase64String(bytes);
-            writer.WriteValue($"data:image/jpeg;base64,{base64}");
+                string base64 = Convert.ToBase64String(bytes);
+                writer.WriteValue($"data:image/jpeg;base64,{base64}");
+            }
+            else if (image.Hash != null)
+                writer.WriteValue(image.Hash);
         }
     }
 }

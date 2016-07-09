@@ -56,12 +56,14 @@ namespace Discord.Net.Converters
                     property.MemberConverter = converter;
                 }
             }
+            else
+                throw new InvalidOperationException($"{member.DeclaringType.FullName}.{member.Name} is not a property.");
             return property;
         }
 
-        private JsonConverter GetConverter(PropertyInfo propInfo, Type type, TypeInfo typeInfo = null)
+        private JsonConverter GetConverter(MemberInfo member, Type type, TypeInfo typeInfo = null)
         {
-            bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
+            bool hasInt53 = member.GetCustomAttribute<Int53Attribute>() != null;
 
             //Primitives
             if (!hasInt53)
@@ -81,9 +83,8 @@ namespace Discord.Net.Converters
                 return UserStatusConverter.Instance;
 
             //Special
-            if (type == typeof(Stream) && propInfo.GetCustomAttribute<ImageAttribute>() != null)
-                return ImageConverter.Instance;
-            
+            if (type == typeof(Image))
+                return ImageConverter.Instance;            
 
             if (typeInfo == null) typeInfo = type.GetTypeInfo();
 
