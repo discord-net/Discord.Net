@@ -61,7 +61,7 @@ namespace Discord
                 };
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
 
-                var guild = (_channel as ICachedGuildChannel).Guild;
+                var guild = (_channel as ICachedGuildChannel)?.Guild;
                 return cachedMessages.Concat(downloadedMessages.Select(x =>
                 {
                     IUser user = _channel.GetUser(x.Author.Value.Id, true);

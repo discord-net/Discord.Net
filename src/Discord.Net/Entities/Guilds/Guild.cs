@@ -279,12 +279,6 @@ namespace Discord
             var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new GuildUser(this, new User(x.User), x)).ToImmutableArray();
         }
-        public virtual async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
-        {
-            var args = new GetGuildMembersParams { Limit = limit, Offset = offset };
-            var models = await Discord.ApiClient.GetGuildMembersAsync(Id, args).ConfigureAwait(false);
-            return models.Select(x => new GuildUser(this, new User(x.User), x)).ToImmutableArray();
-        }
         public async Task<int> PruneUsersAsync(int days = 30, bool simulate = false)
         {
             var args = new GuildPruneParams() { Days = days };

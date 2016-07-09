@@ -157,9 +157,7 @@ namespace Discord
                 model = await Discord.ApiClient.ModifyMessageAsync(guildChannel.Guild.Id, Channel.Id, Id, args).ConfigureAwait(false);
             else
                 model = await Discord.ApiClient.ModifyDMMessageAsync(Channel.Id, Id, args).ConfigureAwait(false);
-        {
-            await Discord.ApiClient.AddPinAsync(Channel.Id, Id).ConfigureAwait(false);
-        }
+                
             Update(model, UpdateSource.Rest);
         }        
         public async Task DeleteAsync()

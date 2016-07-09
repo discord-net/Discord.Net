@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
@@ -26,8 +25,6 @@ namespace Discord
 
         public override Task<IUser> GetUserAsync(ulong id) => Task.FromResult<IUser>(GetUser(id));
         public override Task<IReadOnlyCollection<IUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IUser>>(Members);
-        public override Task<IReadOnlyCollection<IUser>> GetUsersAsync(int limit, int offset) 
-            => Task.FromResult<IReadOnlyCollection<IUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
         public ICachedUser GetUser(ulong id)
         {
             var currentUser = Discord.CurrentUser;

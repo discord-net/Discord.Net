@@ -28,8 +28,6 @@ namespace Discord
 
         public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetUser(id));
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
-            => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members.Skip(offset).Take(limit).ToImmutableArray());
         public CachedGuildUser GetUser(ulong id, bool skipCheck = false)
         {
             var user = Guild.GetUser(id);
