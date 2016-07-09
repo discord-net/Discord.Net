@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IGuildChannel : IChannel, IDeletable, IUpdateable
+    public interface IGuildChannel : IChannel, IDeletable
     {
         /// <summary> Gets the name of this channel. </summary>
         string Name { get; }
@@ -20,32 +20,32 @@ namespace Discord
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
         /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        Task<IInviteMetadata> CreateInvite(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
         /// <summary> Returns a collection of all invites to this channel. </summary>
-        Task<IEnumerable<IInviteMetadata>> GetInvites();
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync();
 
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
-        IReadOnlyDictionary<ulong, Overwrite> PermissionOverwrites { get; }
-
+        IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
+        
         /// <summary> Modifies this guild channel. </summary>
-        Task Modify(Action<ModifyGuildChannelParams> func);
+        Task ModifyAsync(Action<ModifyGuildChannelParams> func);
 
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
         OverwritePermissions? GetPermissionOverwrite(IRole role);
         /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
         OverwritePermissions? GetPermissionOverwrite(IUser user);
         /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
-        Task RemovePermissionOverwrite(IRole role);
+        Task RemovePermissionOverwriteAsync(IRole role);
         /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
-        Task RemovePermissionOverwrite(IUser user);
+        Task RemovePermissionOverwriteAsync(IUser user);
         /// <summary> Adds or updates the permission overwrite for the given role. </summary>
-        Task AddPermissionOverwrite(IRole role, OverwritePermissions permissions);
+        Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions);
         /// <summary> Adds or updates the permission overwrite for the given user. </summary>
-        Task AddPermissionOverwrite(IUser user, OverwritePermissions permissions);
+        Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions);
 
         /// <summary> Gets a collection of all users in this channel. </summary>
-        new Task<IEnumerable<IGuildUser>> GetUsers();
+        new Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
         /// <summary> Gets a user in this channel with the provided id.</summary>
-        new Task<IGuildUser> GetUser(ulong id);
+        new Task<IGuildUser> GetUserAsync(ulong id);
     }
 }

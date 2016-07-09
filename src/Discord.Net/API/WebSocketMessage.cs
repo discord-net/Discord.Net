@@ -9,7 +9,7 @@ namespace Discord.API
         [JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
         [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
-        public uint? Sequence { get; set; }
+        public int? Sequence { get; set; }
         [JsonProperty("d")]
         public object Payload { get; set; }
     }

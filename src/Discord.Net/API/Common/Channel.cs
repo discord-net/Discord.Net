@@ -14,28 +14,28 @@ namespace Discord.API
 
         //GuildChannel
         [JsonProperty("guild_id")]
-        public ulong? GuildId { get; set; }
+        public Optional<ulong> GuildId { get; set; }
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public Optional<string> Name { get; set; }
         [JsonProperty("type")]
-        public ChannelType Type { get; set; }
+        public Optional<ChannelType> Type { get; set; }
         [JsonProperty("position")]
-        public int Position { get; set; }
+        public Optional<int> Position { get; set; }
         [JsonProperty("permission_overwrites")]
-        public Overwrite[] PermissionOverwrites { get; set; }
+        public Optional<Overwrite[]> PermissionOverwrites { get; set; }
 
         //TextChannel
         [JsonProperty("topic")]
-        public string Topic { get; set; }
+        public Optional<string> Topic { get; set; }
 
         //VoiceChannel
         [JsonProperty("bitrate")]
-        public int Bitrate { get; set; }
+        public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
-        public int UserLimit { get; set; }
+        public Optional<int> UserLimit { get; set; }
 
         //DMChannel
         [JsonProperty("recipient")]
-        public User Recipient { get; set; }
+        public Optional<User> Recipient { get; set; }
     }
 }

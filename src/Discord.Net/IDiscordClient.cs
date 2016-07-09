@@ -1,6 +1,6 @@
 using Discord.API;
-using Discord.Net.Queue;
-using Discord.WebSocket.Data;
+using Discord.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,39 +8,37 @@ using System.Threading.Tasks;
 namespace Discord
 {
     //TODO: Add docstrings
-    public interface IDiscordClient
+    public interface IDiscordClient : IDisposable
     {
         LoginState LoginState { get; }
         ConnectionState ConnectionState { get; }
 
         DiscordApiClient ApiClient { get; }
-        IRequestQueue RequestQueue { get; }
-        IDataStore DataStore { get; }
-
-        Task Login(string email, string password);
-        Task Login(TokenType tokenType, string token, bool validateToken = true);
-        Task Logout();
-
-        Task Connect();
-        Task Disconnect();
-
-        Task<IChannel> GetChannel(ulong id);
-        Task<IEnumerable<IDMChannel>> GetDMChannels();
-
-        Task<IEnumerable<IConnection>> GetConnections();
-
-        Task<IGuild> GetGuild(ulong id);
-        Task<IEnumerable<IUserGuild>> GetGuilds();
-        Task<IGuild> CreateGuild(string name, IVoiceRegion region, Stream jpegIcon = null);
+        ILogManager LogManager { get; }
         
-        Task<IInvite> GetInvite(string inviteIdOrXkcd);
+        Task LoginAsync(TokenType tokenType, string token, bool validateToken = true);
+        Task LogoutAsync();
 
-        Task<IUser> GetUser(ulong id);
-        Task<IUser> GetUser(string username, ushort discriminator);
-        Task<ISelfUser> GetCurrentUser();
-        Task<IEnumerable<IUser>> QueryUsers(string query, int limit);
+        Task ConnectAsync();
+        Task DisconnectAsync();
 
-        Task<IEnumerable<IVoiceRegion>> GetVoiceRegions();
-        Task<IVoiceRegion> GetVoiceRegion(string id);
+        Task<IChannel> GetChannelAsync(ulong id);
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync();
+
+        Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
+
+        Task<IGuild> GetGuildAsync(ulong id);
+        Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync();
+        Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
+        
+        Task<IInvite> GetInviteAsync(string inviteIdOrXkcd);
+
+        Task<IUser> GetUserAsync(ulong id);
+        Task<IUser> GetUserAsync(string username, string discriminator);
+        Task<ISelfUser> GetCurrentUserAsync();
+        Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit);
+
+        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync();
+        Task<IVoiceRegion> GetVoiceRegionAsync(string id);
     }
 }

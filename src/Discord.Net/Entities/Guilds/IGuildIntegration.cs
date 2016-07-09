@@ -2,6 +2,7 @@
 
 namespace Discord
 {
+    //TODO: Add docstrings
     public interface IGuildIntegration
     {
         ulong Id { get; }
@@ -11,7 +12,7 @@ namespace Discord
         bool IsSyncing { get; }
         ulong ExpireBehavior { get; }
         ulong ExpireGracePeriod { get; }
-        DateTime SyncedAt { get; }
+        DateTimeOffset SyncedAt { get; }
         IntegrationAccount Account { get; }
 
         IGuild Guild { get; }

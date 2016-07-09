@@ -7,6 +7,6 @@ namespace Discord.API.Gateway
         [JsonProperty("session_id")]
         public string SessionId { get; set; }
         [JsonProperty("seq")]
-        public uint Sequence { get; set; }
+        public int Sequence { get; set; }
     }
 }

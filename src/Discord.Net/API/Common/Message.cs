@@ -10,24 +10,24 @@ namespace Discord.API
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
         [JsonProperty("author")]
-        public User Author { get; set; }
+        public Optional<User> Author { get; set; }
         [JsonProperty("content")]
-        public string Content { get; set; }
+        public Optional<string> Content { get; set; }
         [JsonProperty("timestamp")]
-        public DateTime Timestamp { get; set; }
+        public Optional<DateTimeOffset> Timestamp { get; set; }
         [JsonProperty("edited_timestamp")]
-        public DateTime? EditedTimestamp { get; set; }
+        public Optional<DateTimeOffset?> EditedTimestamp { get; set; }
         [JsonProperty("tts")]
-        public bool IsTextToSpeech { get; set; }
+        public Optional<bool> IsTextToSpeech { get; set; }
         [JsonProperty("mention_everyone")]
-        public bool IsMentioningEveryone { get; set; }
+        public Optional<bool> MentionEveryone { get; set; }
         [JsonProperty("mentions")]
-        public User[] Mentions { get; set; }
+        public Optional<User[]> Mentions { get; set; }
         [JsonProperty("attachments")]
-        public Attachment[] Attachments { get; set; }
+        public Optional<Attachment[]> Attachments { get; set; }
         [JsonProperty("embeds")]
-        public Embed[] Embeds { get; set; }
-        [JsonProperty("nonce")]
-        public uint? Nonce { get; set; }
+        public Optional<Embed[]> Embeds { get; set; }
+        [JsonProperty("pinned")]
+        public Optional<bool> Pinned { get; set; }
     }
 }

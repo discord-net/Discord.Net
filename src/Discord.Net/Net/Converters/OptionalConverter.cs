@@ -1,27 +1,40 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Reflection;
 
 namespace Discord.Net.Converters
 {
-    public class OptionalConverter : JsonConverter
+    public class OptionalConverter<T> : JsonConverter
     {
-        public static readonly OptionalConverter Instance = new OptionalConverter();
-        internal static readonly PropertyInfo IsSpecifiedProperty = typeof(IOptional).GetTypeInfo().GetDeclaredProperty(nameof(IOptional.IsSpecified));
+        public static OptionalConverter<T> Instance;
+
+        private readonly JsonConverter _innerConverter;
 
         public override bool CanConvert(Type objectType) => true;
-        public override bool CanRead => false;
+        public override bool CanRead => true;
         public override bool CanWrite => true;
+
+        public OptionalConverter(JsonConverter innerConverter)
+        {
+            _innerConverter = innerConverter;
+        }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new InvalidOperationException();
+            T obj;
+            if (_innerConverter != null)
+                obj = (T)_innerConverter.ReadJson(reader, typeof(T), null, serializer);
+            else
+                obj = serializer.Deserialize<T>(reader);
+            return new Optional<T>(obj);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, (value as IOptional).Value);
+            value = ((Optional<T>)value).Value;
+            if (_innerConverter != null)
+                _innerConverter.WriteJson(writer, value, serializer);
+            else
+                serializer.Serialize(writer, value, typeof(T));
         }
     }
 }

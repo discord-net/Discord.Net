@@ -3,6 +3,7 @@
     public enum Direction
     {
         Before,
-        After
+        After,
+        Around
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Discord.API.Rest;
+using Discord.Audio;
 using System;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace Discord
         int UserLimit { get; }
 
         /// <summary> Modifies this voice channel. </summary>
-        Task Modify(Action<ModifyVoiceChannelParams> func);
+        Task ModifyAsync(Action<ModifyVoiceChannelParams> func);
+        /// <summary> Connects to this voice channel. </summary>
+        Task<IAudioClient> ConnectAsync();
     }
 }

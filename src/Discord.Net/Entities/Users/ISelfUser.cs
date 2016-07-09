@@ -10,7 +10,10 @@ namespace Discord
         string Email { get; }
         /// <summary> Returns true if this user's email has been verified. </summary>
         bool IsVerified { get; }
+        /// <summary> Returns true if this user has enabled MFA on their account. </summary>
+        bool IsMfaEnabled { get; }
 
-        Task Modify(Action<ModifyCurrentUserParams> func);
+        Task ModifyAsync(Action<ModifyCurrentUserParams> func);
+        Task ModifyStatusAsync(Action<ModifyPresenceParams> func);
     }
 }

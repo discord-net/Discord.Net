@@ -12,11 +12,14 @@ namespace Discord
         public OverwritePermissions Permissions { get; }
 
         /// <summary> Creates a new Overwrite with provided target information and modified permissions. </summary>
-        internal Overwrite(Model model)
+        public Overwrite(ulong targetId, PermissionTarget targetType, OverwritePermissions permissions)
         {
-            TargetId = model.TargetId;
-            TargetType = model.TargetType;
-            Permissions = new OverwritePermissions(model.Allow, model.Deny);
+            TargetId = targetId;
+            TargetType = targetType;
+            Permissions = permissions;
         }
+
+        internal Overwrite(Model model)
+            : this(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny)) { }
     }
 }

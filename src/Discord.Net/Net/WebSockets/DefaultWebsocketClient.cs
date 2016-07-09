@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net.WebSockets;
@@ -10,14 +11,17 @@ namespace Discord.Net.WebSockets
 {
     public class DefaultWebSocketClient : IWebSocketClient
     {
-        public const int ReceiveChunkSize = 12 * 1024; //12KB
+        public const int ReceiveChunkSize = 16 * 1024; //16KB
         public const int SendChunkSize = 4 * 1024; //4KB
         private const int HR_TIMEOUT = -2147012894;
 
         public event Func<byte[], int, int, Task> BinaryMessage;
         public event Func<string, Task> TextMessage;
-        
-        private readonly ClientWebSocket _client;
+        public event Func<Exception, Task> Closed;
+
+        private readonly SemaphoreSlim _sendLock;
+        private readonly Dictionary<string, string> _headers;
+        private ClientWebSocket _client;
         private Task _task;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
@@ -25,13 +29,11 @@ namespace Discord.Net.WebSockets
 
         public DefaultWebSocketClient()
         {
-            _client = new ClientWebSocket();
-            _client.Options.Proxy = null;
-            _client.Options.KeepAliveInterval = TimeSpan.Zero;
-
+            _sendLock = new SemaphoreSlim(1, 1);
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
+            _headers = new Dictionary<string, string>();
         }
         private void Dispose(bool disposing)
         {
@@ -47,31 +49,44 @@ namespace Discord.Net.WebSockets
             Dispose(true);
         }
 
-        public async Task Connect(string host)
+        public async Task ConnectAsync(string host)
         {
             //Assume locked
-            await Disconnect().ConfigureAwait(false);
+            await DisconnectAsync().ConfigureAwait(false);
 
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
 
+            _client = new ClientWebSocket();
+            _client.Options.Proxy = null;
+            _client.Options.KeepAliveInterval = TimeSpan.Zero;
+            foreach (var header in _headers)
+            {
+                if (header.Value != null)
+                    _client.Options.SetRequestHeader(header.Key, header.Value);
+            }
+
             await _client.ConnectAsync(new Uri(host), _cancelToken).ConfigureAwait(false);
-            _task = Run(_cancelToken);
+            _task = RunAsync(_cancelToken);
         }
-        public async Task Disconnect()
+        public async Task DisconnectAsync()
         {
             //Assume locked
-            _cancelTokenSource.Cancel();
-
-            if (_client.State == WebSocketState.Open)
-                try { await _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None); } catch { }
+            try { _cancelTokenSource.Cancel(false); } catch { }
+            
+            if (_client != null && _client.State == WebSocketState.Open)
+            {
+                var task = _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                if (task != null)
+                    await task.ConfigureAwait(false);
+            }
             
             await (_task ?? Task.CompletedTask).ConfigureAwait(false);
         }
 
         public void SetHeader(string key, string value)
         {
-            _client.Options.SetRequestHeader(key, value);
+            _headers[key] = value;
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
@@ -79,78 +94,108 @@ namespace Discord.Net.WebSockets
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task Send(byte[] data, int index, int count, bool isText)
+        public async Task SendAsync(byte[] data, int index, int count, bool isText)
         {
-            //TODO: If connection is temporarily down, retry?
-            int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
-            
-            for (int i = 0; i < frameCount; i++, index += SendChunkSize)
+            await _sendLock.WaitAsync(_cancelToken).ConfigureAwait(false);
+            try
             {
-                bool isLast = i == (frameCount - 1);
+                //TODO: If connection is temporarily down, retry?
+                int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
 
-                int frameSize;
-                if (isLast)
-                    frameSize = count - (i * SendChunkSize);
-                else
-                    frameSize = SendChunkSize;
+                for (int i = 0; i < frameCount; i++, index += SendChunkSize)
+                {
+                    bool isLast = i == (frameCount - 1);
 
-                try
-                {
-                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary, isLast, _cancelToken).ConfigureAwait(false);
-                }
-                catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
-                {
-                    return;
+                    int frameSize;
+                    if (isLast)
+                        frameSize = count - (i * SendChunkSize);
+                    else
+                        frameSize = SendChunkSize;
+
+                    try
+                    {
+                        var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
+                        await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
+                    }
+                    catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
+                    {
+                        return;
+                    }
                 }
             }
+            finally
+            {
+                _sendLock.Release();
+            }
         }
-
-        //TODO: Check this code
-        private async Task Run(CancellationToken cancelToken)
+        
+        private async Task RunAsync(CancellationToken cancelToken)
         {
             var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
-            var stream = new MemoryStream();
 
             try
             {
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    WebSocketReceiveResult result = null;
-                    do
+                    WebSocketReceiveResult socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
+                    byte[] result;
+                    int resultCount;
+                        
+                    if (socketResult.MessageType == WebSocketMessageType.Close)
                     {
-                        if (cancelToken.IsCancellationRequested) return;
-
-                        try
-                        {
-                            result = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
-                        }
-                        catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
-                        {
-                            throw new Exception("Connection timed out.");
-                        }
-
-                        if (result.MessageType == WebSocketMessageType.Close)
-                            throw new WebSocketException((int)result.CloseStatus.Value, result.CloseStatusDescription);
-                        else
-                            stream.Write(buffer.Array, 0, result.Count);
-
-                    }
-                    while (result == null || !result.EndOfMessage);
-
-                    var array = stream.ToArray();
-                    if (result.MessageType == WebSocketMessageType.Binary)
-                        await BinaryMessage.Raise(array, 0, array.Length).ConfigureAwait(false);
-                    else if (result.MessageType == WebSocketMessageType.Text)
-                    {
-                        string text = Encoding.UTF8.GetString(array, 0, array.Length);
-                        await TextMessage.Raise(text).ConfigureAwait(false);
+                        var _ = Closed(new WebSocketClosedException((int)socketResult.CloseStatus, socketResult.CloseStatusDescription));
+                        return;
                     }
 
-                    stream.Position = 0;
-                    stream.SetLength(0);
+                    if (!socketResult.EndOfMessage)
+                    {
+                        //This is a large message (likely just READY), lets create a temporary expandable stream
+                        using (var stream = new MemoryStream())
+                        {
+                            stream.Write(buffer.Array, 0, socketResult.Count);
+                            do
+                            {
+                                if (cancelToken.IsCancellationRequested) return;
+                                socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
+                                stream.Write(buffer.Array, 0, socketResult.Count);
+                            }
+                            while (socketResult == null || !socketResult.EndOfMessage);
+
+                            //Use the internal buffer if we can get it
+                            resultCount = (int)stream.Length;
+                            ArraySegment<byte> streamBuffer;
+                            if (stream.TryGetBuffer(out streamBuffer))
+                                result = streamBuffer.Array;
+                            else
+                                result = stream.ToArray();
+                        }
+                    }
+                    else
+                    {
+                        //Small message
+                        resultCount = socketResult.Count;
+                        result = buffer.Array;
+                    }
+
+                    if (socketResult.MessageType == WebSocketMessageType.Text)
+                    {
+                        string text = Encoding.UTF8.GetString(result, 0, resultCount);
+                        await TextMessage(text).ConfigureAwait(false);
+                    }
+                    else
+                        await BinaryMessage(result, 0, resultCount).ConfigureAwait(false);
                 }
             }
+            catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
+            {
+                var _ = Closed(new Exception("Connection timed out.", ex));
+            }
             catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                //This cannot be awaited otherwise we'll deadlock when DiscordApiClient waits for this task to complete.
+                var _ = Closed(ex);
+            }
         }
     }
 }

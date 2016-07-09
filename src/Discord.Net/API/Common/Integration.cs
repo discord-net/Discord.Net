@@ -26,6 +26,6 @@ namespace Discord.API
         [JsonProperty("account")]
         public IntegrationAccount Account { get; set; }
         [JsonProperty("synced_at")]
-        public DateTime SyncedAt { get; set; }
+        public DateTimeOffset SyncedAt { get; set; }
     }
 }

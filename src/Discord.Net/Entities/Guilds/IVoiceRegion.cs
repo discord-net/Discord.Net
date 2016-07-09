@@ -1,7 +1,9 @@
 ﻿namespace Discord
 {
-    public interface IVoiceRegion : IEntity<string>
+    public interface IVoiceRegion
     {
+        /// <summary> Gets the unique identifier for this voice region. </summary>
+        string Id { get; }
         /// <summary> Gets the name of this voice region. </summary>
         string Name { get; }
         /// <summary> Returns true if this voice region is exclusive to VIP accounts. </summary>

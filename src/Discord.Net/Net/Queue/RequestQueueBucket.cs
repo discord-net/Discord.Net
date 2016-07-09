@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿#pragma warning disable CS4014
+using System;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -7,185 +7,157 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    //TODO: Implement bucket chaining
     internal class RequestQueueBucket
     {
-        private readonly RequestQueue _parent;
-        private readonly BucketGroup _bucketGroup;
-        private readonly GlobalBucket? _chainedBucket;
-        private readonly int _bucketId;
-        private readonly ulong _guildId;
-        private readonly ConcurrentQueue<IQueuedRequest> _queue;
-        private readonly SemaphoreSlim _lock;
-        private Task _resetTask;
-        private bool _waitingToProcess;
-        private int _id;
+        private readonly RequestQueue _queue;
+        private readonly SemaphoreSlim _semaphore;
+        private readonly object _pauseLock;
+        private int _pauseEndTick;
+        private TaskCompletionSource<byte> _resumeNotifier;
 
-        public int WindowMaxCount { get; }
-        public int WindowSeconds { get; }
-        public int WindowCount { get; private set; }
+        public Bucket Definition { get; }
+        public RequestQueueBucket Parent { get; }
+        public Task _resetTask { get; }
 
-        public RequestQueueBucket(RequestQueue parent, GlobalBucket bucket, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
-            : this(parent, windowMaxCount, windowSeconds, chainedBucket)
+        public RequestQueueBucket(RequestQueue queue, Bucket definition, RequestQueueBucket parent = null)
         {
-            _bucketGroup = BucketGroup.Global;
-            _bucketId = (int)bucket;
-            _guildId = 0;
-        }
-        public RequestQueueBucket(RequestQueue parent, GuildBucket bucket, ulong guildId, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
-            : this(parent, windowMaxCount, windowSeconds, chainedBucket)
-        {
-            _bucketGroup = BucketGroup.Guild;
-            _bucketId = (int)bucket;
-            _guildId = guildId;
-        }
-        private RequestQueueBucket(RequestQueue parent, int windowMaxCount, int windowSeconds, GlobalBucket? chainedBucket = null)
-        {
-            _parent = parent;
-            WindowMaxCount = windowMaxCount;
-            WindowSeconds = windowSeconds;
-            _chainedBucket = chainedBucket;
-            _queue = new ConcurrentQueue<IQueuedRequest>();
-            _lock = new SemaphoreSlim(1, 1);
-            _id = new System.Random().Next(0, int.MaxValue);
+            _queue = queue;
+            Definition = definition;
+            if (definition.WindowCount != 0)
+                _semaphore = new SemaphoreSlim(definition.WindowCount, definition.WindowCount);
+            Parent = parent;
+
+            _pauseLock = new object();
+            _resumeNotifier = new TaskCompletionSource<byte>();
+            _resumeNotifier.SetResult(0);
         }
 
-        public void Queue(IQueuedRequest request)
+        public async Task<Stream> SendAsync(IQueuedRequest request)
         {
-            _queue.Enqueue(request);
+            while (true)
+            {
+                try
+                {
+                    return await SendAsyncInternal(request).ConfigureAwait(false);
+                }
+                catch (HttpRateLimitException ex)
+                {
+                    //When a 429 occurs, we drop all our locks, including the ones we wanted. 
+                    //This is generally safe though since 429s actually occuring should be very rare.
+                    RequestQueueBucket bucket;
+                    bool success = FindBucket(ex.BucketId, out bucket);
+
+                    await _queue.RaiseRateLimitTriggered(ex.BucketId, success ? bucket.Definition : null, ex.RetryAfterMilliseconds).ConfigureAwait(false);
+
+                    bucket.Pause(ex.RetryAfterMilliseconds);
+                }
+            }
         }
-        public async Task ProcessQueue(bool acquireLock = false)
+        private async Task<Stream> SendAsyncInternal(IQueuedRequest request)
         {
-            //Assume this obj is under lock
+            var endTick = request.TimeoutTick;
 
-            int nextRetry = 1000;
-
-            //If we have another ProcessQueue waiting to run, dont bother with this one
-            if (_waitingToProcess) return;
-            _waitingToProcess = true;
-
-            if (acquireLock)
-                await Lock().ConfigureAwait(false);
+            //Wait until a spot is open in our bucket
+            if (_semaphore != null)
+                await EnterAsync(endTick).ConfigureAwait(false);
             try
             {
-                _waitingToProcess = false;
                 while (true)
                 {
-                    IQueuedRequest request;
+                    //Get our 429 state
+                    Task notifier;
+                    int resumeTime;
+                    
+                    lock (_pauseLock)
+                    {
+                        notifier = _resumeNotifier.Task;
+                        resumeTime = _pauseEndTick;
+                    }
 
-                    //If we're waiting to reset (due to a rate limit exception, or preemptive check), abort
-                    if (WindowCount == WindowMaxCount) return;
-                    //Get next request, return if queue is empty
-                    if (!_queue.TryPeek(out request)) break;
+                    //Are we paused due to a 429?
+                    if (!notifier.IsCompleted)
+                    {
+                        //If the 429 ends after the maximum time for this request, timeout immediately
+                        if (endTick.HasValue && endTick.Value < resumeTime)
+                            throw new TimeoutException();
+
+                        //Wait for the 429 to complete
+                        await notifier.ConfigureAwait(false);
+                    }
 
                     try
                     {
-                        if (request.CancelToken.IsCancellationRequested)
-                            request.Promise.SetException(new OperationCanceledException(request.CancelToken));
-                        else
-                        {
-                            Stream stream = await request.Send().ConfigureAwait(false);
-                            request.Promise.SetResult(stream);
-                        }
-                    }
-                    catch (HttpRateLimitException ex) //Preemptive check failed, use Discord's time instead of our own
-                    {
-                        WindowCount = WindowMaxCount;
-                        var task = _resetTask;
-                        if (task != null)
-                        {
-                            var retryAfter = DateTime.UtcNow.AddMilliseconds(ex.RetryAfterMilliseconds);
-                            await task.ConfigureAwait(false);
-                            int millis = (int)Math.Ceiling((DateTime.UtcNow - retryAfter).TotalMilliseconds);
-                            _resetTask = ResetAfter(millis);
-                        }
-                        else
-                            _resetTask = ResetAfter(ex.RetryAfterMilliseconds);
-                        return;
-                    }
-                    catch (HttpException ex)
-                    {
-                        if (ex.StatusCode == HttpStatusCode.BadGateway) //Gateway unavailable, retry
-                        {
-                            await Task.Delay(nextRetry).ConfigureAwait(false);
-                            nextRetry *= 2;
-                            if (nextRetry > 30000)
-                                nextRetry = 30000;
-                            continue;
-                        }
-                        else
-                        {
-                            //We dont need to throw this here, pass the exception via the promise
-                            request.Promise.SetException(ex);
-                        }
-                    }
+                        //If there's a parent bucket, pass this request to them
+                        if (Parent != null)
+                            return await Parent.SendAsyncInternal(request).ConfigureAwait(false);
 
-                    //Request completed or had an error other than 429
-                    _queue.TryDequeue(out request);
-                    WindowCount++;
-                    nextRetry = 1000;
-
-                    if (WindowCount == 1 && WindowSeconds > 0)
-                    {
-                        //First request for this window, schedule a reset
-                        _resetTask = ResetAfter(WindowSeconds * 1000);
+                        //We have all our semaphores, send the request
+                        return await request.SendAsync().ConfigureAwait(false);
                     }
-                }
-
-                //If queue is empty, non-global, and there is no active rate limit, remove this bucket
-                if (_resetTask == null && _bucketGroup == BucketGroup.Guild)
-                {
-                    try
+                    catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.BadGateway)
                     {
-                        await _parent.Lock().ConfigureAwait(false);
-                        if (_queue.IsEmpty) //Double check, in case a request was queued before we got both locks
-                            _parent.DestroyGuildBucket((GuildBucket)_bucketId, _guildId);
-                    }
-                    finally
-                    {
-                        _parent.Unlock();
+                        continue;
                     }
                 }
             }
             finally
             {
-                if (acquireLock)
-                    Unlock();
+                //Make sure we put this entry back after WindowMilliseconds
+                if (_semaphore != null)
+                    QueueExitAsync();
             }
         }
-        public void Clear()
-        {
-            //Assume this obj is under lock
-            IQueuedRequest request;
 
-            while (_queue.TryDequeue(out request)) { }
-        }
-
-        private async Task ResetAfter(int milliseconds)
+        private bool FindBucket(string id, out RequestQueueBucket bucket)
         {
-            if (milliseconds > 0)
-                await Task.Delay(milliseconds).ConfigureAwait(false);
-            try
+            //Keep going up until we find a bucket with matching id or we're at the topmost bucket
+            if (Definition.Id == id)
             {
-                await Lock().ConfigureAwait(false);
-
-                //Reset the current window count and set our state back to normal
-                WindowCount = 0;
-                _resetTask = null;
-
-                //Wait is over, work through the current queue
-                await ProcessQueue().ConfigureAwait(false);
+                bucket = this;
+                return true;
             }
-            finally { Unlock(); }
+            else if (Parent == null)
+            {
+                bucket = this;
+                return false;
+            }
+            else
+                return Parent.FindBucket(id, out bucket);
         }
 
-        public async Task Lock()
+        private void Pause(int milliseconds)
         {
-            await _lock.WaitAsync();
+            lock (_pauseLock)
+            {
+                //If we aren't already waiting on a 429's time, create a new notifier task
+                if (_resumeNotifier.Task.IsCompleted)
+                {
+                    _resumeNotifier = new TaskCompletionSource<byte>();
+                    _pauseEndTick = unchecked(Environment.TickCount + milliseconds);
+                    QueueResumeAsync(_resumeNotifier, milliseconds);
+                }
+            }
         }
-        public void Unlock()
+        private async Task QueueResumeAsync(TaskCompletionSource<byte> resumeNotifier, int millis)
         {
-            _lock.Release();
+            await Task.Delay(millis).ConfigureAwait(false);
+            resumeNotifier.SetResult(0);
+        }
+
+        private async Task EnterAsync(int? endTick)
+        {
+            if (endTick.HasValue)
+            {
+                int millis = unchecked(Environment.TickCount - endTick.Value);
+                if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
+                    throw new TimeoutException();
+            }
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+        }
+        private async Task QueueExitAsync()
+        {
+            await Task.Delay(Definition.WindowSeconds * 1000).ConfigureAwait(false);
+            _semaphore.Release();
         }
     }
 }

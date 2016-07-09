@@ -6,5 +6,7 @@ namespace Discord.API.Rest
     {
         [JsonProperty("recipient_id")]
         public ulong RecipientId { get; set; }
+        [JsonIgnore]
+        public IUser Recipient { set { RecipientId = value.Id; } }
     }
 }

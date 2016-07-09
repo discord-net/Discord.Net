@@ -1,165 +1,171 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    public class RequestQueue : IRequestQueue
+    public class RequestQueue
     {
+        public event Func<string, Bucket, int, Task> RateLimitTriggered;
+
+        private readonly static ImmutableDictionary<GlobalBucket, Bucket> _globalLimits;
+        private readonly static ImmutableDictionary<GuildBucket, Bucket> _guildLimits;
+        private readonly static ImmutableDictionary<ChannelBucket, Bucket> _channelLimits;
         private readonly SemaphoreSlim _lock;
         private readonly RequestQueueBucket[] _globalBuckets;
-        private readonly Dictionary<ulong, RequestQueueBucket>[] _guildBuckets;
+        private readonly ConcurrentDictionary<ulong, RequestQueueBucket>[] _guildBuckets;
+        private readonly ConcurrentDictionary<ulong, RequestQueueBucket>[] _channelBuckets;
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
         private CancellationToken _cancelToken;
 
+        static RequestQueue()
+        {
+            _globalLimits = new Dictionary<GlobalBucket, Bucket>
+            {
+                //REST
+                [GlobalBucket.GeneralRest] = new Bucket(null, "rest", 0, 0, BucketTarget.Both), //No Limit
+                //[GlobalBucket.Login] = new BucketDefinition(1, 1),
+                [GlobalBucket.DirectMessage] = new Bucket("bot:msg:dm", 5, 5, BucketTarget.Bot),
+                [GlobalBucket.SendEditMessage] = new Bucket("bot:msg:global", 50, 10, BucketTarget.Bot),
+                //[GlobalBucket.Username] = new Bucket("bot:msg:global", 2, 3600, BucketTarget.Both),
+
+                //Gateway
+                [GlobalBucket.GeneralGateway] = new Bucket(null, "gateway", 120, 60, BucketTarget.Both),
+                [GlobalBucket.UpdateStatus] = new Bucket(null, "status", 5, 1, BucketTarget.Both, GlobalBucket.GeneralGateway)
+            }.ToImmutableDictionary();
+
+            _guildLimits = new Dictionary<GuildBucket, Bucket>
+            {
+                //REST
+                [GuildBucket.SendEditMessage] = new Bucket("bot:msg:server", 5, 5, BucketTarget.Bot, GlobalBucket.SendEditMessage),
+                [GuildBucket.DeleteMessage] = new Bucket("dmsg", 5, 1, BucketTarget.Bot),
+                [GuildBucket.DeleteMessages] = new Bucket("bdmsg", 1, 1, BucketTarget.Bot),
+                [GuildBucket.ModifyMember] = new Bucket("guild_member", 10, 10, BucketTarget.Bot),
+                [GuildBucket.Nickname] = new Bucket("guild_member_nick", 1, 1, BucketTarget.Bot)
+            }.ToImmutableDictionary();
+
+            //Client-Only
+            _channelLimits = new Dictionary<ChannelBucket, Bucket>
+            {
+                //REST
+                [ChannelBucket.SendEditMessage] = new Bucket("msg", 10, 10, BucketTarget.Client, GlobalBucket.SendEditMessage),
+            }.ToImmutableDictionary();
+        }
+
+        public static Bucket GetBucketInfo(GlobalBucket bucket) => _globalLimits[bucket];
+        public static Bucket GetBucketInfo(GuildBucket bucket) => _guildLimits[bucket];
+        public static Bucket GetBucketInfo(ChannelBucket bucket) => _channelLimits[bucket];
+
         public RequestQueue()
         {
             _lock = new SemaphoreSlim(1, 1);
-            _globalBuckets = new RequestQueueBucket[Enum.GetValues(typeof(GlobalBucket)).Length];
-            _guildBuckets = new Dictionary<ulong, RequestQueueBucket>[Enum.GetValues(typeof(GuildBucket)).Length];
+
+            _globalBuckets = new RequestQueueBucket[_globalLimits.Count];
+            foreach (var pair in _globalLimits)
+            {
+                //var target = _globalLimits[pair.Key].Target;
+                //if (target == BucketTarget.Both || (target == BucketTarget.Bot && isBot) || (target == BucketTarget.Client && !isBot))
+                    _globalBuckets[(int)pair.Key] = CreateBucket(pair.Value);
+            }
+
+            _guildBuckets = new ConcurrentDictionary<ulong, RequestQueueBucket>[_guildLimits.Count];
+            for (int i = 0; i < _guildLimits.Count; i++)
+            {
+                //var target = _guildLimits[(GuildBucket)i].Target;
+                //if (target == BucketTarget.Both || (target == BucketTarget.Bot && isBot) || (target == BucketTarget.Client && !isBot))
+                    _guildBuckets[i] = new ConcurrentDictionary<ulong, RequestQueueBucket>();
+            }
+            
+            _channelBuckets = new ConcurrentDictionary<ulong, RequestQueueBucket>[_channelLimits.Count];
+            for (int i = 0; i < _channelLimits.Count; i++)
+            {
+                //var target = _channelLimits[(GuildBucket)i].Target;
+                //if (target == BucketTarget.Both || (target == BucketTarget.Bot && isBot) || (target == BucketTarget.Client && !isBot))
+                    _channelBuckets[i] = new ConcurrentDictionary<ulong, RequestQueueBucket>();
+            }
 
             _clearToken = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
         }
-        public async Task SetCancelToken(CancellationToken cancelToken)
+        public async Task SetCancelTokenAsync(CancellationToken cancelToken)
         {
-            await Lock().ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _parentToken = cancelToken;
                 _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token).Token;
             }
-            finally { Unlock(); }
+            finally { _lock.Release(); }
         }
 
-        internal Task<Stream> Send(RestRequest request, BucketGroup group, int bucketId, ulong guildId)
+        internal async Task<Stream> SendAsync(RestRequest request, BucketGroup group, int bucketId, ulong objId)
         {
             request.CancelToken = _cancelToken;
-            return Send(request as IQueuedRequest, group, bucketId, guildId);
+            var bucket = GetBucket(group, bucketId, objId);
+            return await bucket.SendAsync(request).ConfigureAwait(false);
         }
-        internal Task<Stream> Send(WebSocketRequest request, BucketGroup group, int bucketId, ulong guildId)
+        internal async Task<Stream> SendAsync(WebSocketRequest request, BucketGroup group, int bucketId, ulong objId)
         {
             request.CancelToken = _cancelToken;
-            return Send(request as IQueuedRequest, group, bucketId, guildId);
+            var bucket = GetBucket(group, bucketId, objId);
+            return await bucket.SendAsync(request).ConfigureAwait(false);
         }
-        private async Task<Stream> Send(IQueuedRequest request, BucketGroup group, int bucketId, ulong guildId)
+        
+        private RequestQueueBucket CreateBucket(Bucket def)
         {
+            var parent = def.Parent != null ? GetGlobalBucket(def.Parent.Value) : null;
+            return new RequestQueueBucket(this, def, parent);
+        }
+
+        public void DestroyGuildBucket(GuildBucket type, ulong guildId)
+        {
+            //Assume this object is locked
             RequestQueueBucket bucket;
-
-            await Lock().ConfigureAwait(false);
-            try
-            {
-                bucket = GetBucket(group, bucketId, guildId);
-                bucket.Queue(request);
-            }
-            finally { Unlock(); }
-
-            //There is a chance the bucket will send this request on its own, but this will simply become a noop then.
-            var _ = bucket.ProcessQueue(acquireLock: true).ConfigureAwait(false);
-
-            return await request.Promise.Task.ConfigureAwait(false);
+            _guildBuckets[(int)type].TryRemove(guildId, out bucket);
         }
-
-        private RequestQueueBucket CreateBucket(GlobalBucket bucket)
+        public void DestroyChannelBucket(ChannelBucket type, ulong channelId)
         {
-            switch (bucket)
-            {
-                //Globals
-                case GlobalBucket.General: return new RequestQueueBucket(this, bucket, int.MaxValue, 0); //Catch-all
-                case GlobalBucket.Login: return new RequestQueueBucket(this, bucket, 1, 1); //TODO: Is this actual logins or token validations too?
-                case GlobalBucket.DirectMessage: return new RequestQueueBucket(this, bucket, 5, 5);
-                case GlobalBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, 50, 10);
-                case GlobalBucket.Gateway: return new RequestQueueBucket(this, bucket, 120, 60);
-                case GlobalBucket.UpdateStatus: return new RequestQueueBucket(this, bucket, 5, 1, GlobalBucket.Gateway);
-
-                default: throw new ArgumentException($"Unknown global bucket: {bucket}", nameof(bucket));
-            }
-        }
-        private RequestQueueBucket CreateBucket(GuildBucket bucket, ulong guildId)
-        {
-            switch (bucket)
-            {
-                //Per Guild
-                case GuildBucket.SendEditMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 5, GlobalBucket.SendEditMessage);
-                case GuildBucket.DeleteMessage: return new RequestQueueBucket(this, bucket, guildId, 5, 1);
-                case GuildBucket.DeleteMessages: return new RequestQueueBucket(this, bucket, guildId, 1, 1);
-                case GuildBucket.ModifyMember: return new RequestQueueBucket(this, bucket, guildId, 10, 10); //TODO: Is this all users or just roles?
-                case GuildBucket.Nickname: return new RequestQueueBucket(this, bucket, guildId, 1, 1);
-
-                default: throw new ArgumentException($"Unknown guild bucket: {bucket}", nameof(bucket));
-            }
+            //Assume this object is locked
+            RequestQueueBucket bucket;
+            _channelBuckets[(int)type].TryRemove(channelId, out bucket);
         }
 
-        private RequestQueueBucket GetBucket(BucketGroup group, int bucketId, ulong guildId)
+        private RequestQueueBucket GetBucket(BucketGroup group, int bucketId, ulong objId)
         {
             switch (group)
             {
                 case BucketGroup.Global:
                     return GetGlobalBucket((GlobalBucket)bucketId);
                 case BucketGroup.Guild:
-                    return GetGuildBucket((GuildBucket)bucketId, guildId);
+                    return GetGuildBucket((GuildBucket)bucketId, objId);
+                case BucketGroup.Channel:
+                    return GetChannelBucket((ChannelBucket)bucketId, objId);
                 default:
                     throw new ArgumentException($"Unknown bucket group: {group}", nameof(group));
             }
         }
         private RequestQueueBucket GetGlobalBucket(GlobalBucket type)
         {
-            var bucket = _globalBuckets[(int)type];
-            if (bucket == null)
-            {
-                bucket = CreateBucket(type);
-                _globalBuckets[(int)type] = bucket;
-            }
-            return bucket;
+            return _globalBuckets[(int)type];
         }
         private RequestQueueBucket GetGuildBucket(GuildBucket type, ulong guildId)
         {
-            var bucketGroup = _guildBuckets[(int)type];
-            if (bucketGroup == null)
-            {
-                bucketGroup = new Dictionary<ulong, RequestQueueBucket>();
-                _guildBuckets[(int)type] = bucketGroup;
-            }
-            RequestQueueBucket bucket;
-            if (!bucketGroup.TryGetValue(guildId, out bucket))
-            {
-                bucket = CreateBucket(type, guildId);
-                bucketGroup[guildId] = bucket;
-            }
-            return bucket;
+            return _guildBuckets[(int)type].GetOrAdd(guildId, _ => CreateBucket(_guildLimits[type]));
+        }
+        private RequestQueueBucket GetChannelBucket(ChannelBucket type, ulong channelId)
+        {
+            return _channelBuckets[(int)type].GetOrAdd(channelId, _ => CreateBucket(_channelLimits[type]));
         }
 
-        public void DestroyGlobalBucket(GlobalBucket type)
+        public async Task ClearAsync()
         {
-            //Assume this object is locked
-
-            _globalBuckets[(int)type] = null;
-        }
-        public void DestroyGuildBucket(GuildBucket type, ulong guildId)
-        {
-            //Assume this object is locked
-
-            var bucketGroup = _guildBuckets[(int)type];
-            if (bucketGroup != null)
-                bucketGroup.Remove(guildId);
-        }
-
-        public async Task Lock()
-        {
-            await _lock.WaitAsync();
-        }
-        public void Unlock()
-        {
-            _lock.Release();
-        }
-
-        public async Task Clear()
-        {
-            await Lock().ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _clearToken?.Cancel();
@@ -169,37 +175,12 @@ namespace Discord.Net.Queue
                 else
                     _cancelToken = _clearToken.Token;
             }
-            finally { Unlock(); }
+            finally { _lock.Release(); }
         }
-        public async Task Clear(GlobalBucket type)
+
+        internal async Task RaiseRateLimitTriggered(string id, Bucket bucket, int millis)
         {
-            var bucket = _globalBuckets[(int)type];
-            if (bucket != null)
-            {
-                try
-                {
-                    await bucket.Lock().ConfigureAwait(false);
-                    bucket.Clear();
-                }
-                finally { bucket.Unlock(); }
-            }
-        }
-        public async Task Clear(GuildBucket type, ulong guildId)
-        {
-            var bucketGroup = _guildBuckets[(int)type];
-            if (bucketGroup != null)
-            {
-                RequestQueueBucket bucket;
-                if (bucketGroup.TryGetValue(guildId, out bucket))
-                {
-                    try
-                    {
-                        await bucket.Lock().ConfigureAwait(false);
-                        bucket.Clear();
-                    }
-                    finally { bucket.Unlock(); }
-                }
-            }
+            await RateLimitTriggered.Invoke(id, bucket, millis).ConfigureAwait(false);
         }
     }
 }

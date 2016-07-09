@@ -135,10 +135,10 @@ namespace Discord
             }
             return perms;
         }
-        /// <inheritdoc />
+
         public override string ToString() => $"Allow {AllowValue}, Deny {DenyValue}";
         private string DebuggerDisplay => 
-            $"Allow {AllowValue} ({string.Join(", ", ToAllowList())})\n" +
-            $"Deny {DenyValue} ({string.Join(", ", ToDenyList())})";
+            $"Allow {string.Join(", ", ToAllowList())}, " +
+            $"Deny {string.Join(", ", ToDenyList())}";
     }
 }

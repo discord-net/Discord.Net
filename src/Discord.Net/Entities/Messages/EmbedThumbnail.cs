@@ -9,12 +9,21 @@ namespace Discord
         public int? Height { get; }
         public int? Width { get; }
 
-        internal EmbedThumbnail(Model model)
+        public EmbedThumbnail(string url, string proxyUrl, int? height, int? width)
         {
-            Url = model.Url;
-            ProxyUrl = model.ProxyUrl;
-            Height = model.Height;
-            Width = model.Width;
+            Url = url;
+            ProxyUrl = proxyUrl;
+            Height = height;
+            Width = width;
+        }
+
+        internal EmbedThumbnail(Model model)
+            : this(
+                  model.Url, 
+                  model.ProxyUrl,
+                  model.Height.IsSpecified ? model.Height.Value : (int?)null,
+                  model.Width.IsSpecified ? model.Width.Value : (int?)null)
+        {
         }
     }
 }

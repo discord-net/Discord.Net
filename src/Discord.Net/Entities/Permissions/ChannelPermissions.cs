@@ -7,37 +7,22 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct ChannelPermissions
     {
-#if CSHARP7
-        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(0b000100_000000_0011111111_0000011001);
-        private static ChannelPermissions _allText { get; } = new ChannelPermissions(0b000000_000000_0001110011_0000000000);
-        private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(0b000100_111111_0000000000_0000011001);
-#else
+        //TODO: C#7 Candidate for binary literals
         private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000000111111110000011001", 2));
         private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000000011100110000000000", 2));
         private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000011001", 2));
-#endif
 
         /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
         public static ChannelPermissions None { get; } = new ChannelPermissions();
         /// <summary> Gets a ChannelPermissions that grants all permissions for a given channelType. </summary>
         public static ChannelPermissions All(IChannel channel)
         {
-#if CSHARP7
-            switch (channel)
-            {
-                case ITextChannel _: return _allText;
-                case IVoiceChannel _: return _allVoice;
-                case IDMChannel _: return _allDM;
-                default:
-                    throw new ArgumentException("Unknown channel type", nameof(channel));
-            }
-#else
+            //TODO: C#7 Candidate for typeswitch
             if (channel is ITextChannel) return _allText;
             if (channel is IVoiceChannel) return _allVoice;
             if (channel is IDMChannel) return _allDM;
 
             throw new ArgumentException("Unknown channel type", nameof(channel));
-#endif
         }
 
         /// <summary> Gets a packed value representing all the permissions in this ChannelPermissions. </summary>
@@ -144,8 +129,8 @@ namespace Discord
             }
             return perms;
         }
-        /// <inheritdoc />
+
         public override string ToString() => RawValue.ToString();
-        private string DebuggerDisplay => $"{RawValue} ({string.Join(", ", ToList())})";
+        private string DebuggerDisplay => $"{string.Join(", ", ToList())}";
     }
 }

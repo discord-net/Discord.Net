@@ -16,7 +16,7 @@ namespace Discord.API
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
         [JsonProperty("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         [JsonProperty("revoked")]
         public bool Revoked { get; set; }
     }

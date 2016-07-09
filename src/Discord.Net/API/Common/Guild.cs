@@ -25,7 +25,7 @@ namespace Discord.API
         [JsonProperty("embed_channel_id")]
         public ulong? EmbedChannelId { get; set; }
         [JsonProperty("verification_level")]
-        public int VerificationLevel { get; set; }
+        public VerificationLevel VerificationLevel { get; set; }
         [JsonProperty("voice_states")]
         public VoiceState[] VoiceStates { get; set; }
         [JsonProperty("roles")]
@@ -34,5 +34,9 @@ namespace Discord.API
         public Emoji[] Emojis { get; set; }
         [JsonProperty("features")]
         public string[] Features { get; set; }
+        [JsonProperty("mfa_level")]
+        public MfaLevel MfaLevel { get; set; }
+        [JsonProperty("default_message_notifications")]
+        public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
     }
 }

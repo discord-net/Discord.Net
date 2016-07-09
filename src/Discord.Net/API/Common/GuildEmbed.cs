@@ -7,6 +7,6 @@ namespace Discord.API
         [JsonProperty("enabled")]
         public bool Enabled { get; set; }
         [JsonProperty("channel_id")]
-        public ulong? ChannelId { get; set; }
+        public ulong ChannelId { get; set; }
     }
 }

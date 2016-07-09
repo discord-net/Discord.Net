@@ -90,8 +90,8 @@ namespace Discord
         {
             var roles = user.Roles;
             ulong newPermissions = 0;
-            for (int i = 0; i < roles.Count; i++)
-                newPermissions |= roles[i].Permissions.RawValue;
+            foreach (var role in roles)
+                newPermissions |= role.Permissions.RawValue;
             return newPermissions;
         }
 
@@ -104,52 +104,40 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (user.Id == user.Guild.OwnerId || GetValue(resolvedPermissions, GuildPermission.Administrator))
+            if (user.Id == user.Guild.OwnerId || GetValue(guildPermissions, GuildPermission.Administrator))
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
-                var overwrites = channel.PermissionOverwrites;
 
-                Overwrite entry;
+                OverwritePermissions? perms;
                 var roles = user.Roles;
                 if (roles.Count > 0)
                 {
-                    for (int i = 0; i < roles.Count; i++)
+                    ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
+                    foreach (var role in roles)
                     {
-                        if (overwrites.TryGetValue(roles[i].Id, out entry))
-                            resolvedPermissions &= ~entry.Permissions.DenyValue;
+                        perms = channel.GetPermissionOverwrite(role);
+                        if (perms != null)
+                        {
+                            deniedPermissions |= perms.Value.DenyValue;
+                            allowedPermissions |= perms.Value.AllowValue;
+                        }
                     }
-                    for (int i = 0; i < roles.Count; i++)
-                    {
-                        if (overwrites.TryGetValue(roles[i].Id, out entry))
-                            resolvedPermissions |= entry.Permissions.AllowValue;
-                    }
+                    resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
                 }
-                if (overwrites.TryGetValue(user.Id, out entry))
-                    resolvedPermissions = (resolvedPermissions & ~entry.Permissions.DenyValue) | entry.Permissions.AllowValue;
-
-#if CSHARP7
-                switch (channel)
-                {
-                    case ITextChannel _:
-                        if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
-                            resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
-                        break;
-                    case IVoiceChannel _:
-                        if (!GetValue(resolvedPermissions, ChannelPermission.Connect))
-                            resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
-                        break;
-                }
-#else
+                perms = channel.GetPermissionOverwrite(user);
+                if (perms != null)
+                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
+                
+                //TODO: C#7 Typeswitch candidate
                 var textChannel = channel as ITextChannel;
                 var voiceChannel = channel as IVoiceChannel;
                 if (textChannel != null && !GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
                     resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
                 else if (voiceChannel != null && !GetValue(resolvedPermissions, ChannelPermission.Connect))
                     resolvedPermissions = 0; //No connect permission on a voice channel removes all other permissions
-#endif
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
             }
 
