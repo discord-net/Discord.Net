@@ -7,11 +7,12 @@ namespace Discord
     {
         public CachedGlobalUser User { get; }
 
-        public Game Game { get; private set; }
-        public UserStatus Status { get; private set; }
-
         public DiscordSocketClient Discord => User.Discord;
-        
+
+        public Game Game => Presence.Game;
+        public UserStatus Status => Presence.Status;
+        public Presence Presence => User.Presence; //{ get; private set; }
+
         public ulong Id => User.Id;
         public string AvatarUrl => User.AvatarUrl;
         public DateTimeOffset CreatedAt => User.CreatedAt;
@@ -30,8 +31,7 @@ namespace Discord
 
         public void Update(PresenceModel model, UpdateSource source)
         {
-            Status = model.Status;
-            Game = model.Game != null ? new Game(model.Game) : null;
+            User.Update(model, source);
         }
 
         public CachedDMUser Clone() => MemberwiseClone() as CachedDMUser;

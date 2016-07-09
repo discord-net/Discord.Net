@@ -596,7 +596,7 @@ namespace Discord
                                     }
                                 }
                                 break;
-                            case "GUILD_EMOJIS_UPDATE": //TODO: Add
+                            case "GUILD_EMOJIS_UPDATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
 

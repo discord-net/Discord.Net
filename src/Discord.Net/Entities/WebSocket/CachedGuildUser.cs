@@ -3,28 +3,12 @@ using PresenceModel = Discord.API.Presence;
 
 namespace Discord
 {
-    //TODO: C#7 Candidate for record type
-    internal struct Presence : IPresence
-    {
-        public Game Game { get; }
-        public UserStatus Status { get; }
-
-        public Presence(Game game, UserStatus status)
-        {
-            Game = game;
-            Status = status;
-        }
-
-        public Presence Clone() => this;
-    }
-
     internal class CachedGuildUser : GuildUser, ICachedUser
     {
-        public Presence Presence { get; private set; }
-
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
         public new CachedGlobalUser User => base.User as CachedGlobalUser;
+        public Presence Presence => User.Presence; //{ get; private set; }
 
         public override Game Game => Presence.Game;
         public override UserStatus Status => Presence.Status;
@@ -38,7 +22,7 @@ namespace Discord
         public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, Model model) 
             : base(guild, user, model)
         {
-            Presence = new Presence(null, UserStatus.Offline);
+            //Presence = new Presence(null, UserStatus.Offline);
         }
         public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, PresenceModel model)
             : base(guild, user, model)
@@ -50,7 +34,9 @@ namespace Discord
             base.Update(model, source);
 
             var game = model.Game != null ? new Game(model.Game) : null;
-            Presence = new Presence(game, model.Status);
+            //Presence = new Presence(game, model.Status);
+
+            User.Update(model, source);
         }
 
         public CachedGuildUser Clone() => MemberwiseClone() as CachedGuildUser;

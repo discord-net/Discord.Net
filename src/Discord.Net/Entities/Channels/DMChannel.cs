@@ -28,11 +28,9 @@ namespace Discord
         }
         public void Update(Model model, UpdateSource source)
         {
-            if (source == UpdateSource.Rest && IsAttached) return;
+            if (/*source == UpdateSource.Rest && */IsAttached) return;
             
-            //TODO: Is this cast okay?
-            if (Recipient is User)
-                (Recipient as User).Update(model.Recipient.Value, source);
+            (Recipient as User).Update(model.Recipient.Value, source);
         }
 
         public async Task UpdateAsync()
