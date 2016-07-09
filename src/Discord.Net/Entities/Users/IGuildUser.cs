@@ -20,7 +20,7 @@ namespace Discord
         /// <summary> Returns a collection of the roles this user is a member of in this guild, including the guild's @everyone role. </summary>
         IReadOnlyCollection<IRole> Roles { get; }
 
-        /// <summary> Gets the channel-level permissions granted to this user for a given channel. </summary>
+        /// <summary> Gets the level permissions granted to this user to a given channel. </summary>
         ChannelPermissions GetPermissions(IGuildChannel channel);
 
         /// <summary> Kicks this user from this guild. </summary>
