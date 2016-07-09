@@ -65,7 +65,6 @@ namespace Discord
 
         public abstract Task<IGuildUser> GetUserAsync(ulong id);
         public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
-        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset);
 
         public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync()
         {
@@ -151,6 +150,5 @@ namespace Discord
 
         async Task<IUser> IChannel.GetUserAsync(ulong id) => await GetUserAsync(id).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync() => await GetUsersAsync().ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(int limit, int offset) => await GetUsersAsync(limit, offset).ConfigureAwait(false);
     }
 }

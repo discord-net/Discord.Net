@@ -45,10 +45,6 @@ namespace Discord
         {
             throw new NotSupportedException();
         }
-        public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
-        {
-            throw new NotSupportedException();
-        }
 
         public virtual Task<IAudioClient> ConnectAsync() { throw new NotSupportedException(); }
 

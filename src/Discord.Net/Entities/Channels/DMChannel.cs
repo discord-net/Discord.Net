@@ -60,12 +60,7 @@ namespace Discord
         public virtual async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
         {
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            return ImmutableArray.Create<IUser>(currentUser, Recipient);
-        }
-        public virtual async Task<IReadOnlyCollection<IUser>> GetUsersAsync(int limit, int offset)
-        {
-            var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            return new IUser[] { currentUser, Recipient }.Skip(offset).Take(limit).ToImmutableArray();
+            return ImmutableArray.Create(currentUser, Recipient);
         }
 
         public async Task<IMessage> SendMessageAsync(string text, bool isTTS)

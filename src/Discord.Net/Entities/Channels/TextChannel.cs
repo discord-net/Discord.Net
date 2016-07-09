@@ -52,11 +52,6 @@ namespace Discord
             var users = await Guild.GetUsersAsync().ConfigureAwait(false);
             return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
         }
-        public override async Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(int limit, int offset)
-        {
-            var users = await Guild.GetUsersAsync(limit, offset).ConfigureAwait(false);
-            return users.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
-        }
 
         public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
         {
