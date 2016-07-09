@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Discord.Tests.Rest
+namespace Discord.Tests.Framework
 {
     public class EndpointHandler
     {

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
 
-namespace Discord.Tests.Rest
+namespace Discord.Tests.Framework
 {
     public class Json
     {

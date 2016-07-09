@@ -1,10 +1,11 @@
-﻿using Discord.Rest;
+﻿using Discord;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Discord.Tests.Framework;
 
 namespace Discord.Tests.Rest
 {
@@ -12,7 +13,7 @@ namespace Discord.Tests.Rest
     public class GuildTests
     {
         public static TestContext Context;
-        private static IDiscordClient _client;
+        private static DiscordClient _client;
 
         [ClassInitialize]
         public static void Initialize(TestContext context)
@@ -21,15 +22,15 @@ namespace Discord.Tests.Rest
             _client = new DiscordClient(new DiscordConfig() { RestClientProvider = (url, ct) => new TestRestClient(url, ct) });
             if (EndpointHandler.Instance == null) EndpointHandler.Instance = new EndpointHandler();
             if (Json.Serializer == null) new Json();
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.User;
-            _client.Login(TokenType.User, "UserToken_Voltana").Wait();
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.User;
+            _client.LoginAsync(TokenType.User, "UserToken_Voltana").GetAwaiter().GetResult();
         }
-        
+
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Get_Guild()
         {
-            var guild = await _client.GetGuild(66078535390867456);
+            var guild = await _client.GetGuildAsync(66078535390867456);
             Assert.AreEqual(66078535390867456UL, guild.Id, "Expected ID '66078535390867456'");
             Assert.AreEqual("Discord API", guild.Name, "Expected Name 'Discord API'");
             // Cannot Verify Guild URL, ID not publicly exposed.
@@ -44,76 +45,76 @@ namespace Discord.Tests.Rest
         [TestCategory("Guilds")]
         public async Task Test_Get_Guild_Invalid_Id()
         {
-            var guild = await _client.GetGuild(1);
+            var guild = await _client.GetGuildAsync(1);
             Assert.IsNull(guild);
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Get_Guilds()
         {
-            var guilds = await _client.GetGuilds();
+            var guilds = await _client.GetGuildsAsync();
             Assert.AreEqual(2, guilds.Count(), "Expected 2 Guilds");
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Bans()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var bans = await guild.GetBans();
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var bans = await guild.GetBansAsync();
             Assert.AreEqual(2, bans.Count());
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_User()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var user = await guild.GetUser(66078337084162048);
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var user = await guild.GetUserAsync(66078337084162048);
             // TODO: Asserts
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Invalid_User()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var user = await guild.GetUser(1);
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var user = await guild.GetUserAsync(1);
             Assert.IsNull(user, "Expected returned user to be null");
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Users()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var users = await guild.GetUsers();
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var users = await guild.GetUsersAsync();
             Assert.AreEqual(2, users.Count());
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Role()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var role = await guild.GetRole(1);
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var role = guild.GetRole(1);
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Invalid_Role()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var role = await guild.GetRole(1);
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var role = guild.GetRole(1);
             Assert.IsNull(role, "Expected returned role to be null.");
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Roles()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var roles = await guild.GetRoles();
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var roles = guild.Roles;
         }
         [TestMethod]
         [TestCategory("Guilds")]
         public async Task Test_Guild_Get_Invites()
         {
-            var guild = await _client.GetGuild(66078535390867456);
-            var invites = await guild.GetInvites();
+            var guild = await _client.GetGuildAsync(66078535390867456);
+            var invites = await guild.GetInvitesAsync();
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Tests.Rest.Responses.Guilds
+namespace Discord.Tests.Framework.Responses.Guilds
 {
     public static class GuildHandlers
     {

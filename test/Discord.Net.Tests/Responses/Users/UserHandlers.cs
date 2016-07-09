@@ -4,7 +4,7 @@ using Discord.Net;
 using System.Net;
 using System;
 
-namespace Discord.Tests.Rest.Responses.Users
+namespace Discord.Tests.Framework.Responses.Users
 {
     public static class UserHandlers
     {

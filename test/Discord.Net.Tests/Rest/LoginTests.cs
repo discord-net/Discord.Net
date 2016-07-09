@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord.Rest;
+using Discord;
+using Discord.Tests.Framework;
+using Discord.Tests.Framework.Responses;
 
 namespace Discord.Tests.Rest
 {
@@ -27,31 +29,31 @@ namespace Discord.Tests.Rest
         [TestCategory("Login")]
         public async Task Test_Login_As_User()
         {
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.User;
-            await _client.Login(TokenType.User, "UserToken_Voltana");
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.User;
+            await _client.LoginAsync(TokenType.User, "UserToken_Voltana");
         }
         [TestMethod]
         [ExpectedException(typeof(Net.HttpException))]
         [TestCategory("Login")]
         public async Task Test_Login_As_User_With_Invalid_Token()
         {
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.User;
-            await _client.Login(TokenType.User, "UserToken-NotVoltana");
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.User;
+            await _client.LoginAsync(TokenType.User, "UserToken-NotVoltana");
         }
         [TestMethod]
         [TestCategory("Login")]
         public async Task Test_Login_As_Bot()
         {
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.Bot;
-            await _client.Login(TokenType.Bot, "UserToken_VoltanaBot");
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.Bot;
+            await _client.LoginAsync(TokenType.Bot, "UserToken_VoltanaBot");
         }
         [TestMethod]
         [ExpectedException(typeof(Net.HttpException))]
         [TestCategory("Login")]
         public async Task Test_Login_As_Bot_With_Invalid_Token()
         {
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.Bot;
-            await _client.Login(TokenType.Bot, "UserToken-NotVoltanaBot");
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.Bot;
+            await _client.LoginAsync(TokenType.Bot, "UserToken-NotVoltanaBot");
         }
     }
 }

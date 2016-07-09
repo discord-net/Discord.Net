@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord.Rest;
+using Discord;
+using Discord.Tests.Framework;
 
 namespace Discord.Tests.Rest
 {
@@ -21,15 +22,15 @@ namespace Discord.Tests.Rest
             _client = new DiscordClient(new DiscordConfig() { RestClientProvider = (url, ct) => new TestRestClient(url, ct) });
             if (EndpointHandler.Instance == null) EndpointHandler.Instance = new EndpointHandler();
             if (Json.Serializer == null) new Json();
-            Responses.Users.UserHandlers.Mode = Rest.Responses.Users.TestMode.User;
-            _client.Login(TokenType.User, "UserToken_Voltana").Wait();
+            Framework.Responses.Users.UserHandlers.Mode = Framework.Responses.Users.TestMode.User;
+            _client.LoginAsync(TokenType.User, "UserToken_Voltana").GetAwaiter().GetResult();
         }
-        
+
         [TestMethod]
         [TestCategory("Users")]
         public async Task Test_Get_Current_User()
         {
-            var currentUser = await _client.GetCurrentUser();
+            var currentUser = await _client.GetCurrentUserAsync();
             Assert.AreEqual((UInt64)66078337084162048, currentUser.Id, "Expected Id '66078337084162048'");
             Assert.AreEqual("Voltana", currentUser.Username, "Expected Name 'Voltana'");
             Assert.AreEqual(0001, currentUser.Discriminator, "Expected Discriminator '0001'");
@@ -44,7 +45,7 @@ namespace Discord.Tests.Rest
         [TestCategory("Users")]
         public async Task Test_Get_User()
         {
-            var user = await _client.GetUser(96642168176807936);
+            var user = await _client.GetUserAsync(96642168176807936);
             Assert.AreEqual((UInt64)96642168176807936, user.Id, "Expected Id '96642168176807936'");
             Assert.AreEqual("Khionu", user.Username, "Expected Name 'Khionu'");
             Assert.AreEqual(9999, user.Discriminator, "Expected Discriminator '0001'");
@@ -57,7 +58,7 @@ namespace Discord.Tests.Rest
         [TestCategory("Users")]
         public async Task Test_Get_Invalid_User()
         {
-            var user = await _client.GetUser(1);
+            var user = await _client.GetUserAsync(1);
             Assert.IsNull(user, "Expected Invalid User to be 'null'");
         }
     }
