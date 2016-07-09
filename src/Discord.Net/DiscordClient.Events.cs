@@ -7,28 +7,59 @@ namespace Discord
     {
         public event EventHandler Ready = delegate { };
         //public event EventHandler<DisconnectedEventArgs> LoggedOut = delegate { };
+        /// <summary>When a new channel is created, relevant to the current user.
+        /// Discord API Event name: CHANNEL_CREATE.</summary>
         public event EventHandler<ChannelEventArgs> ChannelCreated = delegate { };
+        /// <summary>When a channel relevant to the current user is deleted.
+        /// Discord API Event name: CHANNEL_DELETE.</summary>
         public event EventHandler<ChannelEventArgs> ChannelDestroyed = delegate { };
+        /// <summary>When a channel is updated. Discord API Event name: CHANNEL_UPDATE.</summary>
         public event EventHandler<ChannelUpdatedEventArgs> ChannelUpdated = delegate { };
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageAcknowledged = delegate { };
+        /// <summary>When a message is deleted. Discord API Event name: MESSAGE_DELETE.</summary>
         public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
+        /// <summary>When a message is created. Discord API Event name: MESSAGE_CREATE.</summary>
         public event EventHandler<MessageEventArgs> MessageReceived = delegate { };
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageSent = delegate { };
+        /// <summary>When a message is updated. Discord API Event name: MESSAGE_UPDATE.</summary>
         public event EventHandler<MessageUpdatedEventArgs> MessageUpdated = delegate { };
+        /// <summary>When properties about the user change. Discord API Event name: USER_UPDATE.</summary>
         public event EventHandler<ProfileUpdatedEventArgs> ProfileUpdated = delegate { };
+        /// <summary>When a server role is created. Discord API Event name: GUILD_ROLE_CREATE.</summary>
         public event EventHandler<RoleEventArgs> RoleCreated = delegate { };
+        /// <summary>When a server role is updated. Discord API Event name: GUILD_ROLE_UPDATE.</summary>
         public event EventHandler<RoleUpdatedEventArgs> RoleUpdated = delegate { };
+        /// <summary>When a server role is deleted. Discord API Event name: GUILD_ROLE_DELETE.</summary>
         public event EventHandler<RoleEventArgs> RoleDeleted = delegate { };
+        /// <summary>When the current user joins a new server. Discord API Event name: GUILD_CREATE.</summary>
         public event EventHandler<ServerEventArgs> JoinedServer = delegate { };
+        /// <summary>When the user leaves or is removed from a server.
+        /// Discord API Event name: GUILD_DELETE.</summary>
         public event EventHandler<ServerEventArgs> LeftServer = delegate { };
+        /// <summary>When a server becomes available (current user is initially connecting,
+        /// or a server becomes available again).
+        /// Discord API Event name: GUILD_CREATE or GUILD_MEMBERS_CHUNK.</summary>
         public event EventHandler<ServerEventArgs> ServerAvailable = delegate { };
+        /// <summary>When a server is updated. Discord API Event name: GUILD_UPDATE.</summary>
         public event EventHandler<ServerUpdatedEventArgs> ServerUpdated = delegate { };
+        /// <summary>When a server becomes unavailable during a server outage.
+        /// Discord API Event name: GUILD_DELETE.</summary>
         public event EventHandler<ServerEventArgs> ServerUnavailable = delegate { };
+        /// <summary>When a user is banned from a server. Discord API Event name: GUILD_BAN_ADD.</summary>
         public event EventHandler<UserEventArgs> UserBanned = delegate { };
+        /// <summary>When a user starts typing in a channel. Discord API Event name: TYPING_START.</summary>
         public event EventHandler<ChannelUserEventArgs> UserIsTyping = delegate { };
+        /// <summary>When a new user joins a server. Discord API Event name: GUILD_MEMBER_ADD.</summary>
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
+        /// <summary>When a user is removed from a server (leave/kick/ban).
+        /// Discord API Event name: GUILD_MEMBER_REMOVE.</summary>
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
+        /// <summary>When a server member is updated.
+        /// Discord API Event name: GUILD_MEMBER_UPDATE or PRESENCE_UPDATE or VOICE_STATE_UPDATE.</summary>
         public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };
+        /// <summary>When a user is unbanned from a server. Discord API Event name: GUILD_BAN_REMOVE.</summary>
         public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
 
         private void OnReady()
