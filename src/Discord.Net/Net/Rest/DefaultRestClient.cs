@@ -136,6 +136,8 @@ namespace Discord.Net.Rest
                             {
                                 content = _errorDeserializer.Deserialize<JToken>(json);
                                 reason = content.Value<string>("message");
+                                if (reason == null) //Occasionally an error message is given under a different key because reasons
+                                    reason = content.ToString(Formatting.None);
                             }
                         }
                         catch { } //Might have been HTML Should we check for content-type?
