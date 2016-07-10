@@ -1,5 +1,9 @@
+using System;
+using System.Diagnostics;
+
 ﻿namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color
     {
         /// <summary> Gets the default user color value. </summary>
