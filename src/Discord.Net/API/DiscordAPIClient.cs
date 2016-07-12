@@ -918,8 +918,19 @@ namespace Discord.API
                 //Was this an empty batch?
                 if (models.Length == 0) break;
 
-                result[i] = models;                
-                relativeId = args.RelativeDirection == Direction.Before ? models[0].Id : models[models.Length - 1].Id;
+                switch (args.RelativeDirection)
+                {
+                    case Direction.Before:
+                    case Direction.Around:
+                    default:
+                        result[i] = models;
+                        relativeId = models[models.Length - 1].Id;
+                        break;
+                    case Direction.After:
+                        result[runs - i - 1] = models;
+                        relativeId = models[0].Id;
+                        break;
+                }
 
                 //Was this an incomplete (the last) batch?
                 if (models.Length != DiscordConfig.MaxMessagesPerBatch) { i++; break; }
@@ -927,10 +938,15 @@ namespace Discord.API
 
             if (i > 1)
             {
-                if (args.RelativeDirection == Direction.Before)
-                    return result.Take(i).SelectMany(x => x).ToImmutableArray();
-                else
-                    return result.Take(i).Reverse().SelectMany(x => x).ToImmutableArray();
+                switch (args.RelativeDirection)
+                {
+                    case Direction.Before:
+                    case Direction.Around:
+                    default:
+                        return result.Take(i).SelectMany(x => x).ToImmutableArray();
+                    case Direction.After:
+                        return result.Skip(runs - i).Take(i).SelectMany(x => x).ToImmutableArray();
+                }
             }
             else if (i == 1)
                 return result[0];
