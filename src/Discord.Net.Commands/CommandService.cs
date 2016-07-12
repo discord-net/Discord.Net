@@ -249,7 +249,12 @@ namespace Discord.Commands
             {
                 var parseResult = await commands[i].Parse(message, searchResult);
                 if (!parseResult.IsSuccess)
-                    continue;
+                {
+                    if (commands.Count == 1)
+                        return parseResult;
+                    else
+                        continue;
+                }
                 var executeResult = await commands[i].Execute(message, parseResult);
                 return executeResult;
             }
