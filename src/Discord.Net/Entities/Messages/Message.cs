@@ -114,7 +114,7 @@ namespace Discord
                 
                 if (guildChannel != null)
                 {
-                    MentionedUsers = MentionUtils.GetUserMentions(text, Channel.IsAttached ? Channel : null, MentionedUsers);
+                    MentionedUsers = MentionUtils.GetUserMentions(text, Channel, MentionedUsers);
                     MentionedChannelIds = MentionUtils.GetChannelMentions(text, guildChannel.Guild);
                     MentionedRoles = MentionUtils.GetRoleMentions(text, guildChannel.Guild);
                 }
@@ -173,8 +173,7 @@ namespace Discord
             text = MentionUtils.ResolveUserMentions(text, Channel, MentionedUsers, userMode);
             if (guild != null)
             {
-                if  (guild.IsAttached)  //It's too expensive to do a channel lookup in REST mode
-                    text = MentionUtils.ResolveChannelMentions(text, guild);
+                text = MentionUtils.ResolveChannelMentions(text, guild);
                 text = MentionUtils.ResolveRoleMentions(text, guild, MentionedRoles);
             }
             return text;

@@ -99,7 +99,7 @@ namespace Discord
                 if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
                     IUser user = null;
-                    if (channel != null)
+                    if (channel.IsAttached) //Waiting this sync is safe because it's using a cache
                         user = channel.GetUserAsync(id).GetAwaiter().GetResult() as IUser;
                     if (user == null)
                     {
@@ -195,18 +195,22 @@ namespace Discord
         }
         internal static string ResolveChannelMentions(string text, IGuild guild)
         {
-            return _channelRegex.Replace(text, new MatchEvaluator(e =>
+            if (guild.IsAttached) //It's too expensive to do a channel lookup in REST mode
             {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                return _channelRegex.Replace(text, new MatchEvaluator(e =>
                 {
-                    IGuildChannel channel = null;
-                    channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
-                    if (channel != null)
-                        return '#' + channel.Name;
-                }
-                return e.Value;
-            }));
+                    ulong id;
+                    if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                    {
+                        IGuildChannel channel = null;
+                        channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
+                        if (channel != null)
+                            return '#' + channel.Name;
+                    }
+                    return e.Value;
+                }));
+            }
+            return text;
         }
         internal static string ResolveRoleMentions(string text, IGuild guild, IReadOnlyCollection<IRole> mentions)
         {
