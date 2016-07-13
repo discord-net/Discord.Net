@@ -926,7 +926,8 @@ namespace Discord.API
                     default:
                         result[i] = models;
                         relativeId = ulong.MaxValue;
-                        for (int j = 0; j < models.Length; j++)
+                        //Lowest id *should* be the last one
+                        for (int j = models.Length - 1; j >= 0; j--)
                         {
                             if (models[j].Id < relativeId.Value)
                                 relativeId = models[j].Id;
@@ -935,6 +936,7 @@ namespace Discord.API
                     case Direction.After:
                         result[runs - i - 1] = models;
                         relativeId = ulong.MinValue;
+                        //Highest id *should* be the first one
                         for (int j = 0; j < models.Length; j++)
                         {
                             if (models[j].Id > relativeId.Value)
@@ -960,7 +962,17 @@ namespace Discord.API
                 }
             }
             else if (i == 1)
-                return result[0];
+            {
+                switch (args.RelativeDirection)
+                {
+                    case Direction.Before:
+                    case Direction.Around:
+                    default:
+                        return result[0];
+                    case Direction.After:
+                        return result[runs - 1];
+                }
+            }
             else
                 return ImmutableArray.Create<Message>();
         }
