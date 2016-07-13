@@ -918,17 +918,28 @@ namespace Discord.API
                 //Was this an empty batch?
                 if (models.Length == 0) break;
 
+                //We can't assume these messages to be sorted by id (fails in rare cases), lets search for the highest/lowest id ourselves
                 switch (args.RelativeDirection)
                 {
                     case Direction.Before:
                     case Direction.Around:
                     default:
                         result[i] = models;
-                        relativeId = models[models.Length - 1].Id;
+                        relativeId = ulong.MaxValue;
+                        for (int j = 0; j < models.Length; j++)
+                        {
+                            if (models[j].Id < relativeId.Value)
+                                relativeId = models[j].Id;
+                        }
                         break;
                     case Direction.After:
                         result[runs - i - 1] = models;
-                        relativeId = models[0].Id;
+                        relativeId = ulong.MinValue;
+                        for (int j = 0; j < models.Length; j++)
+                        {
+                            if (models[j].Id > relativeId.Value)
+                                relativeId = models[j].Id;
+                        }
                         break;
                 }
 

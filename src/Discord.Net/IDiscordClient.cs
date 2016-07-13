@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     //TODO: Add docstrings
+    //TODO: Docstrings should explain when REST requests are sent and how many
     public interface IDiscordClient : IDisposable
     {
         LoginState LoginState { get; }
@@ -28,7 +29,8 @@ namespace Discord
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 
         Task<IGuild> GetGuildAsync(ulong id);
-        Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync();
+        Task<IReadOnlyCollection<IGuild>> GetGuildsAsync();
+        Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync();
         Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
         
         Task<IInvite> GetInviteAsync(string inviteIdOrXkcd);

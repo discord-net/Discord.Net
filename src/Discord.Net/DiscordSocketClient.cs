@@ -190,24 +190,29 @@ namespace Discord
             ConnectionState = ConnectionState.Disconnecting;
             await _gatewayLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
 
+            await _gatewayLogger.DebugAsync("Disconnecting - CancelToken").ConfigureAwait(false);
             //Signal tasks to complete
             try { _cancelToken.Cancel(); } catch { }
 
+            await _gatewayLogger.DebugAsync("Disconnecting - ApiClient").ConfigureAwait(false);
             //Disconnect from server
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
 
             //Wait for tasks to complete
+            await _gatewayLogger.DebugAsync("Disconnecting - Heartbeat").ConfigureAwait(false);
             var heartbeatTask = _heartbeatTask;
             if (heartbeatTask != null)
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
+            await _gatewayLogger.DebugAsync("Disconnecting - Guild Downloader").ConfigureAwait(false);
             var guildDownloadTask = _guildDownloadTask;
             if (guildDownloadTask != null)
                 await guildDownloadTask.ConfigureAwait(false);
             _guildDownloadTask = null;
 
             //Clear large guild queue
+            await _gatewayLogger.DebugAsync("Disconnecting - Clean Large Guilds").ConfigureAwait(false);
             while (_largeGuilds.TryDequeue(out guildId)) { }
 
             ConnectionState = ConnectionState.Disconnected;
@@ -293,9 +298,13 @@ namespace Discord
             else
                 return Task.FromResult<GuildEmbed?>(null);
         }
-        public override Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync()
+        public override Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync()
         {
             return Task.FromResult<IReadOnlyCollection<IUserGuild>>(Guilds);
+        }
+        public override Task<IReadOnlyCollection<IGuild>> GetGuildsAsync()
+        {
+            return Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
         }
         internal CachedGuild AddGuild(ExtendedGuild model, DataStore dataStore)
         {

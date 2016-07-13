@@ -194,11 +194,23 @@ namespace Discord
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IUserGuild>> GetGuildsAsync()
+        public virtual async Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync()
         {
             var models = await ApiClient.GetMyGuildsAsync().ConfigureAwait(false);
             return models.Select(x => new UserGuild(this, x)).ToImmutableArray();
-
+        }
+        /// <inheritdoc />
+        public virtual async Task<IReadOnlyCollection<IGuild>> GetGuildsAsync()
+        {
+            var summaryModels = await ApiClient.GetMyGuildsAsync().ConfigureAwait(false);
+            var guilds = ImmutableArray.CreateBuilder<IGuild>(summaryModels.Count);
+            foreach (var summaryModel in summaryModels)
+            {
+                var guildModel = await ApiClient.GetGuildAsync(summaryModel.Id).ConfigureAwait(false);
+                if (guildModel != null)
+                    guilds.Add(new Guild(this, guildModel));
+            }
+            return guilds.ToImmutable();
         }
         /// <inheritdoc />
         public virtual async Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
