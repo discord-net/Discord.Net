@@ -12,8 +12,7 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
-
-        //TODO: Check support for escaping
+        
         public static async Task<ParseResult> ParseArgs(Command command, IMessage context, string input, int startPos)
         {
             CommandParameter curParam = null;
@@ -43,7 +42,7 @@ namespace Discord.Commands
                     }
                 }
                 //Are we escaping the next character?
-                if (c == '\\')
+                if (c == '\\' && (curParam == null || !curParam.IsUnparsed))
                 {
                     isEscaping = true;
                     continue;
