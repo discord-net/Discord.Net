@@ -65,6 +65,7 @@ namespace Discord
             channelId = 0;
             return false;
         }
+
         /// <summary> Parses a provided role mention string. </summary>
         public static ulong ParseRole(string mentionText)
         {
@@ -87,49 +88,15 @@ namespace Discord
             roleId = 0;
             return false;
         }
-
-        /// <summary> Gets the ids of all users mentioned in a provided text.</summary>
-        public static ImmutableArray<ulong> GetUserMentions(string text) => GetMentions(text, _userRegex).ToImmutable();
-        /// <summary> Gets the ids of all channels mentioned in a provided text.</summary>
-        public static ImmutableArray<ulong> GetChannelMentions(string text) => GetMentions(text, _channelRegex).ToImmutable();
-        /// <summary> Gets the ids of all roles mentioned in a provided text.</summary>
-        public static ImmutableArray<ulong> GetRoleMentions(string text) => GetMentions(text, _roleRegex).ToImmutable();
-        private static ImmutableArray<ulong>.Builder GetMentions(string text, Regex regex)
+        
+        internal static ImmutableArray<IUser> GetUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> fallbackUsers)
         {
-            var matches = regex.Matches(text);
-            var builder = ImmutableArray.CreateBuilder<ulong>(matches.Count);
+            var matches = _userRegex.Matches(text);
+            var builder = ImmutableArray.CreateBuilder<IUser>(matches.Count);
             foreach (var match in matches.OfType<Match>())
             {
                 ulong id;
                 if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                    builder.Add(id);
-            }
-            return builder;
-        }
-
-        /*internal static string CleanUserMentions(string text, ImmutableArray<User> mentions)
-        {
-            return _userRegex.Replace(text, new MatchEvaluator(e =>
-            {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                {
-                    for (int i = 0; i < mentions.Length; i++)
-                    {
-                        var mention = mentions[i];
-                        if (mention.Id == id)
-                            return '@' + mention.Username;
-                    }
-                }
-                return e.Value;
-            }));
-        }*/
-        internal static string CleanUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> fallbackUsers, ImmutableArray<IUser>.Builder mentions = null)
-        {
-            return _userRegex.Replace(text, new MatchEvaluator(e =>
-            {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
                     IUser user = null;
                     if (channel != null)
@@ -145,54 +112,120 @@ namespace Discord
                             }
                         }
                     }
+
+                    if (user != null)
+                        builder.Add(user);
+                }
+            }
+            return builder.ToImmutable();
+        }
+        internal static ImmutableArray<ulong> GetChannelMentions(string text, IGuild guild)
+        {
+            var matches = _channelRegex.Matches(text);
+            var builder = ImmutableArray.CreateBuilder<ulong>(matches.Count);
+            foreach (var match in matches.OfType<Match>())
+            {
+                ulong id;
+                if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                {
+                    /*var channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
+                    if (channel != null)
+                        builder.Add(channel);*/
+                    builder.Add(id);
+                }
+            }
+            return builder.ToImmutable();
+        }
+        internal static ImmutableArray<IRole> GetRoleMentions(string text, IGuild guild)
+        {
+            var matches = _roleRegex.Matches(text);
+            var builder = ImmutableArray.CreateBuilder<IRole>(matches.Count);
+            foreach (var match in matches.OfType<Match>())
+            {
+                ulong id;
+                if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                {
+                    var role = guild.GetRole(id);
+                    if (role != null)
+                        builder.Add(role);
+                }
+            }
+            return builder.ToImmutable();
+        }
+        
+        internal static string ResolveUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> mentions, UserResolveMode mode)
+        {
+            return _userRegex.Replace(text, new MatchEvaluator(e =>
+            {
+                ulong id;
+                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                {
+                    IUser user = null;
+                    foreach (var mention in mentions)
+                    {
+                        if (mention.Id == id)
+                        {
+                            user = mention;
+                            break;
+                        }
+                    }
                     if (user != null)
                     {
-                        mentions.Add(user);
+                        string name = user.Username;
 
+                        var guildUser = user as IGuildUser;
                         if (e.Value[2] == '!')
                         {
-                            var guildUser = user as IGuildUser;
                             if (guildUser != null && guildUser.Nickname != null)
-                                return '@' + guildUser.Nickname;
+                                name = guildUser.Nickname;
                         }
-                        return '@' + user.Username;
+
+                        switch (mode)
+                        {
+                            case UserResolveMode.NameOnly:
+                            default:
+                                return $"@{name}";
+                            case UserResolveMode.NameAndDiscriminator:
+                                return $"@{name}#{user.Discriminator}";
+                        }
                     }
                 }
                 return e.Value;
             }));
         }
-        internal static string CleanChannelMentions(string text, IGuild guild, ImmutableArray<ulong>.Builder mentions = null)
+        internal static string ResolveChannelMentions(string text, IGuild guild)
         {
             return _channelRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    var channel = guild.GetChannelAsync(id).GetAwaiter().GetResult() as IGuildChannel;
+                    IGuildChannel channel = null;
+                    channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
                     if (channel != null)
-                    {
-                        if (mentions != null)
-                            mentions.Add(channel.Id);
                         return '#' + channel.Name;
-                    }
                 }
                 return e.Value;
             }));
         }
-        internal static string CleanRoleMentions(string text, IGuild guild, ImmutableArray<IRole>.Builder mentions = null)
+        internal static string ResolveRoleMentions(string text, IGuild guild, IReadOnlyCollection<IRole> mentions)
         {
             return _roleRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    var role = guild.GetRole(id);
-                    if (role != null)
+                    IRole role = null;
+                    foreach (var mention in mentions)
                     {
-                        if (mentions != null)
-                            mentions.Add(role);
-                        return '@' + role.Name;
+                        if (mention.Id == id)
+                        {
+                            role = mention;
+                            break;
+                        }
                     }
+                    if (role != null)
+                        return '@' + role.Name;
                 }
                 return e.Value;
             }));

@@ -16,7 +16,6 @@ namespace Discord
         private long? _editedTimestampTicks;
 
         public bool IsTTS { get; private set; }
-        public string RawText { get; private set; }
         public string Text { get; private set; }
         public bool IsPinned { get; private set; }
         
@@ -111,29 +110,15 @@ namespace Discord
 
             if (model.Content.IsSpecified)
             {
-                RawText = model.Content.Value;
+                var text = model.Content.Value;
                 
                 if (guildChannel != null)
                 {
-                    var orderedMentionedUsers = ImmutableArray.CreateBuilder<IUser>(5);
-                    Text = MentionUtils.CleanUserMentions(RawText, Channel.IsAttached ? Channel : null, MentionedUsers, orderedMentionedUsers);
-                    MentionedUsers = orderedMentionedUsers.ToImmutable();
-
-                    var roles = ImmutableArray.CreateBuilder<IRole>(5);
-                    Text = MentionUtils.CleanRoleMentions(Text, guildChannel.Guild, roles);
-                    MentionedRoles = roles.ToImmutable();
-
-                    if (guildChannel.IsAttached) //It's too expensive to do a channel lookup in REST mode
-                    {
-                        var channelIds = ImmutableArray.CreateBuilder<ulong>(5);
-                        Text = MentionUtils.CleanChannelMentions(Text, guildChannel.Guild, channelIds);
-                        MentionedChannelIds = channelIds.ToImmutable();
-                    }
-                    else
-                        MentionedChannelIds = MentionUtils.GetChannelMentions(RawText);
+                    MentionedUsers = MentionUtils.GetUserMentions(text, Channel.IsAttached ? Channel : null, MentionedUsers);
+                    MentionedChannelIds = MentionUtils.GetChannelMentions(text, guildChannel.Guild);
+                    MentionedRoles = MentionUtils.GetRoleMentions(text, guildChannel.Guild);
                 }
-                else
-                    Text = RawText;
+                Text = text;
             }
         }
 
@@ -168,15 +153,31 @@ namespace Discord
             else
                 await Discord.ApiClient.DeleteDMMessageAsync(Channel.Id, Id).ConfigureAwait(false);
         }
-        /// <summary> Adds this message to its channel's pinned messages. </summary>
         public async Task PinAsync()
         {
             await Discord.ApiClient.AddPinAsync(Channel.Id, Id).ConfigureAwait(false);
         }
-        /// <summary> Removes this message from its channel's pinned messages. </summary>
         public async Task UnpinAsync()
         {
             await Discord.ApiClient.RemovePinAsync(Channel.Id, Id).ConfigureAwait(false);
+        }
+        
+        public string Resolve(int startIndex, int length, UserResolveMode userMode = UserResolveMode.NameOnly)
+            => Resolve(Text.Substring(startIndex, length), userMode);
+        public string Resolve(UserResolveMode userMode = UserResolveMode.NameOnly)
+            => Resolve(Text, userMode);
+        
+        private string Resolve(string text, UserResolveMode userMode = UserResolveMode.NameOnly)
+        {
+            var guild = (Channel as IGuildChannel)?.Guild;
+            text = MentionUtils.ResolveUserMentions(text, Channel, MentionedUsers, userMode);
+            if (guild != null)
+            {
+                if  (guild.IsAttached)  //It's too expensive to do a channel lookup in REST mode
+                    text = MentionUtils.ResolveChannelMentions(text, guild);
+                text = MentionUtils.ResolveRoleMentions(text, guild, MentionedRoles);
+            }
+            return text;
         }
 
         public override string ToString() => Text;

@@ -13,9 +13,7 @@ namespace Discord
         bool IsTTS { get; }
         /// <summary> Returns true if this message was added to its channel's pinned messages. </summary>
         bool IsPinned { get; }
-        /// <summary> Returns the original, unprocessed text for this message. </summary>
-        string RawText { get; }
-        /// <summary> Returns the text for this message after mention processing. </summary>
+        /// <summary> Returns the text for this message. </summary>
         string Text { get; }
         /// <summary> Gets the time this message was sent. </summary>
         DateTimeOffset Timestamp { get; }
@@ -41,5 +39,10 @@ namespace Discord
         Task PinAsync();
         /// <summary> Removes this message from its channel's pinned messages. </summary>
         Task UnpinAsync();
+
+        /// <summary> Transforms this message's text into a human readable form, resolving things like mentions to that object's name. </summary>
+        string Resolve(int startIndex, int length, UserResolveMode userMode = UserResolveMode.NameOnly);
+        /// <summary> Transforms this message's text into a human readable form, resolving things like mentions to that object's name. </summary>
+        string Resolve(UserResolveMode userMode = UserResolveMode.NameOnly);
     }
 }
