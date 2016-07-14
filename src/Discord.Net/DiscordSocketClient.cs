@@ -1239,8 +1239,6 @@ namespace Discord
                 await logger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
-
                     if (_heartbeatTime != 0) //Server never responded to our last heartbeat
                     {
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? false))
@@ -1250,9 +1248,11 @@ namespace Discord
                             return;
                         }
                     }
-                    else
-                        _heartbeatTime = Environment.TickCount;
+
                     await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
+                    _heartbeatTime = Environment.TickCount;
+
+                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
                 }
                 await logger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
             }
