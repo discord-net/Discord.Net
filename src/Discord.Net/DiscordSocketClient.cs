@@ -531,7 +531,7 @@ namespace Discord
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
                                     await SyncGuildsAsync().ConfigureAwait(false);
                                     
-                                    var _ = Task.Run(() => _connectTask.TrySetResult(true)); //Signal the .Connect() call to complete
+                                    var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
                                 break;
