@@ -96,9 +96,9 @@ namespace Discord
                     AddUser(model.Members[i], dataStore, members);
                 if (Discord.ApiClient.AuthTokenType != TokenType.User)
                 {
-                    _syncPromise.TrySetResult(true);
+                    var _ = _syncPromise.TrySetResultAsync(true);
                     if (!model.Large)
-                        _downloaderPromise.TrySetResult(true);
+                        _ = _downloaderPromise.TrySetResultAsync(true);
                 }
 
                 for (int i = 0; i < model.Presences.Length; i++)
@@ -122,9 +122,9 @@ namespace Discord
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
                     AddUser(model.Members[i], dataStore, members);
-                _syncPromise.TrySetResult(true);
+                var _ = _syncPromise.TrySetResultAsync(true);
                 if (!model.Large)
-                    _downloaderPromise.TrySetResult(true);
+                    _ = _downloaderPromise.TrySetResultAsync(true);
 
                 for (int i = 0; i < model.Presences.Length; i++)
                     AddOrUpdateUser(model.Presences[i], dataStore, members);
@@ -233,7 +233,7 @@ namespace Discord
         }
         public void CompleteDownloadMembers()
         {
-            _downloaderPromise.TrySetResult(true);
+            _downloaderPromise.TrySetResultAsync(true);
         }
 
         public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, DataStore dataStore, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)

@@ -141,7 +141,7 @@ namespace Discord.Net.Queue
         private async Task QueueResumeAsync(TaskCompletionSource<byte> resumeNotifier, int millis)
         {
             await Task.Delay(millis).ConfigureAwait(false);
-            resumeNotifier.SetResult(0);
+            resumeNotifier.TrySetResultAsync<byte>(0);
         }
 
         private async Task EnterAsync(int? endTick)

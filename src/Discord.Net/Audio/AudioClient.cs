@@ -230,7 +230,7 @@ namespace Discord.Audio
                             _secretKey = data.SecretKey;
                             await ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
 
-                            _connectTask.TrySetResult(true);
+                            var _ = _connectTask.TrySetResultAsync(true);
                         }
                         break;
                     case VoiceOpCode.HeartbeatAck:
