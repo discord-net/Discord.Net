@@ -33,6 +33,7 @@ namespace Discord
         public AudioClient AudioClient { get; private set; }
 
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
+        public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
 

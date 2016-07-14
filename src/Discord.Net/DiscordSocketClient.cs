@@ -963,6 +963,12 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
+                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        { 
+                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         var author = channel.GetUser(data.Author.Value.Id, true);
 
                                         if (author != null)
@@ -991,6 +997,12 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
+                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        { 
+                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         IMessage before = null, after = null;
                                         CachedMessage cachedMsg = channel.GetMessage(data.Id);
                                         if (cachedMsg != null)
@@ -1019,11 +1031,17 @@ namespace Discord
                             case "MESSAGE_DELETE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
-
+                                    
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
+                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        { 
+                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         var msg = channel.RemoveMessage(data.Id);
                                         if (msg != null)
                                             await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<IMessage>(msg)).ConfigureAwait(false);
@@ -1045,6 +1063,12 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
+                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE_BULK, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         foreach (var id in data.Ids)
                                         {
                                             var msg = channel.RemoveMessage(id);
@@ -1075,6 +1099,12 @@ namespace Discord
                                         {
                                             await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                             break;
+                                        }
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored PRESENCE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
                                         }
 
                                         IPresence before;
@@ -1108,6 +1138,12 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
+                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored TYPING_START, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         var user = channel.GetUser(data.UserId, true);
                                         if (user != null)
                                             await _userIsTypingEvent.InvokeAsync(user, channel).ConfigureAwait(false);
@@ -1146,6 +1182,12 @@ namespace Discord
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
                                         {
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             VoiceState before, after;
                                             if (data.ChannelId != null)
                                             {
