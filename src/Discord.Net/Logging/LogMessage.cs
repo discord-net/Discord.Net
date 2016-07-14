@@ -18,9 +18,8 @@ namespace Discord
             Exception = exception;
         }
 
-        public override string ToString() => ToString(null, true);
-
-        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, bool clearBuilder = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 7)
+        public override string ToString() => ToString(null);
+        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 7)
         {
             string sourceName = Source;
             string message = Message;
@@ -36,11 +35,8 @@ namespace Discord
                 builder = new StringBuilder(maxLength);
             else
             {
-                if (clearBuilder)
-                {
-                    builder.Clear();
-                    builder.EnsureCapacity(maxLength);
-                }
+                builder.Clear();
+                builder.EnsureCapacity(maxLength);
             }
 
             if (prependTimestamp)
