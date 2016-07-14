@@ -286,7 +286,7 @@ namespace Discord
         /// <inheritdoc />
         public void Dispose() => Dispose(true);
 
-        protected async Task WriteInitialLog()
+        private async Task WriteInitialLog()
         {
             if (this is DiscordSocketClient)
                 await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (Gateway v{DiscordConfig.GatewayAPIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
