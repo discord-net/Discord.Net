@@ -31,6 +31,7 @@
     "System.Net.WebSockets.Client": "4.0.0",
     "System.Reflection.Extensions": "4.0.1",
     "System.Runtime.InteropServices": "4.1.0",
+    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
     "System.Runtime.Serialization.Primitives": "4.1.1",
     "System.Text.RegularExpressions": "4.1.0"
   },

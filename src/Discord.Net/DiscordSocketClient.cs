@@ -450,7 +450,7 @@ namespace Discord
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
                             _heartbeatTime = 0;
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token);
+                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, _clientLogger);
                         }
                         break;
                     case GatewayOpCode.Heartbeat:
@@ -526,7 +526,7 @@ namespace Discord
                                     _lastGuildAvailableTime = Environment.TickCount;
                                     DataStore = dataStore;                                   
 
-                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token);
+                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _clientLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
                                     await SyncGuildsAsync().ConfigureAwait(false);
@@ -1231,11 +1231,12 @@ namespace Discord
 #endif
         }
 
-        private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
+        private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken, ILogger logger)
         {
             //Clean this up when Discord's session patch is live
             try
             {
+                await logger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
                     await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
@@ -1253,13 +1254,19 @@ namespace Discord
                         _heartbeatTime = Environment.TickCount;
                     await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
                 }
+                await logger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException ex)
+            {
+                await logger.DebugAsync("Heartbeat Stopped", ex).ConfigureAwait(false);
+            }
         }
-        private async Task WaitForGuildsAsync(CancellationToken cancelToken)
+        private async Task WaitForGuildsAsync(CancellationToken cancelToken, ILogger logger)
         {
+            await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
             while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
                 await Task.Delay(500, cancelToken).ConfigureAwait(false);
+            await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
         }
         private async Task SyncGuildsAsync()
         {

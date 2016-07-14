@@ -20,26 +20,64 @@ namespace Discord
 
         public override string ToString() => ToString(null, true);
 
-        public string ToString(StringBuilder builder = null, bool fullException = true)
+        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, bool clearBuilder = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 7)
         {
             string sourceName = Source;
             string message = Message;
             string exMessage = fullException ? Exception?.ToString() : Exception?.Message;
 
-            int maxLength = 1 + (sourceName?.Length ?? 0) + 2 + (message?.Length ?? 0) + 3 + (exMessage?.Length ?? 0);
+            int maxLength = 1 + 
+                (prependTimestamp ? 8 : 0) + 1 +
+                (padSource.HasValue ? padSource.Value : sourceName?.Length ?? 0) + 1 + 
+                (message?.Length ?? 0) +
+                (exMessage?.Length ?? 0) + 3;
+
             if (builder == null)
                 builder = new StringBuilder(maxLength);
             else
             {
-                builder.Clear();
-                builder.EnsureCapacity(maxLength);
+                if (clearBuilder)
+                {
+                    builder.Clear();
+                    builder.EnsureCapacity(maxLength);
+                }
             }
 
+            if (prependTimestamp)
+            {
+                DateTime now;
+                if (timestampKind == DateTimeKind.Utc)
+                    now = DateTime.UtcNow;
+                else
+                    now = DateTime.Now;
+                if (now.Hour < 10)
+                    builder.Append('0');
+                builder.Append(now.Hour);
+                builder.Append(':');
+                if (now.Minute < 10)
+                    builder.Append('0');
+                builder.Append(now.Minute);
+                builder.Append(':');
+                if (now.Second < 10)
+                    builder.Append('0');
+                builder.Append(now.Second);
+                builder.Append(' ');
+            }
             if (sourceName != null)
             {
-                builder.Append('[');
-                builder.Append(sourceName);
-                builder.Append("] ");
+                if (padSource.HasValue)
+                {
+                    if (sourceName.Length < padSource.Value)
+                    {
+                        builder.Append(sourceName);
+                        builder.Append(' ', padSource.Value - sourceName.Length);
+                    }
+                    else if (sourceName.Length > padSource.Value)
+                        builder.Append(sourceName.Substring(0, padSource.Value));
+                    else
+                        builder.Append(sourceName);
+                }
+                builder.Append(' ');
             }
             if (!string.IsNullOrEmpty(Message))
             {
@@ -53,7 +91,8 @@ namespace Discord
             }
             if (exMessage != null)
             {
-                builder.AppendLine(":");
+                builder.Append(':');
+                builder.AppendLine();
                 builder.Append(exMessage);
             }
 

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Discord
 {
@@ -24,11 +25,12 @@ namespace Discord
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
-        internal readonly ILogger _discordLogger, _restLogger, _queueLogger;
+        internal readonly ILogger _clientLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
         internal readonly RequestQueue _requestQueue;
         internal bool _isDisposed;
         internal SelfUser _currentUser;
+        private bool _isFirstLogSub;
 
         public API.DiscordApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
@@ -41,9 +43,10 @@ namespace Discord
         {
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
-            _discordLogger = LogManager.CreateLogger("Discord");
+            _clientLogger = LogManager.CreateLogger("Client");
             _restLogger = LogManager.CreateLogger("Rest");
             _queueLogger = LogManager.CreateLogger("Queue");
+            _isFirstLogSub = true;
 
             _connectionLock = new SemaphoreSlim(1, 1);
 
@@ -73,6 +76,12 @@ namespace Discord
         }
         private async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
         {
+            if (_isFirstLogSub)
+            {
+                _isFirstLogSub = false;
+                await WriteInitialLog().ConfigureAwait(false);
+            }
+
             if (LoginState != LoginState.LoggedOut)
                 await LogoutInternalAsync().ConfigureAwait(false);
             LoginState = LoginState.LoggingIn;
@@ -276,7 +285,28 @@ namespace Discord
         }
         /// <inheritdoc />
         public void Dispose() => Dispose(true);
-        
+
+        protected async Task WriteInitialLog()
+        {
+            if (this is DiscordSocketClient)
+                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (Gateway v{DiscordConfig.GatewayAPIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
+            else
+                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.Version}").ConfigureAwait(false);
+            await _clientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
+            await _clientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
+            await _clientLogger.VerboseAsync($"Processors: {Environment.ProcessorCount}").ConfigureAwait(false);
+        }
+
+        private static string ToArchString(Architecture arch)
+        {
+            switch (arch)
+            {
+                case Architecture.X64: return "x64";
+                case Architecture.X86: return "x86";
+                default: return arch.ToString();
+            }
+        }
+
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         ILogManager IDiscordClient.LogManager => LogManager;
 
