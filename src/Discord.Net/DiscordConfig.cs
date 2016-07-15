@@ -11,7 +11,7 @@ namespace Discord
         public const int GatewayAPIVersion = 6;
         public const string GatewayEncoding = "json";
 
-        public const string ClientAPIUrl = "https://discordapp.com/api/";
+        public const string ClientAPIUrl = "https://discordapp.com/api/v6/";
         public const string CDNUrl = "https://cdn.discordapp.com/";
         public const string InviteUrl = "https://discord.gg/";
 

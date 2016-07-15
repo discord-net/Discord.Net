@@ -442,9 +442,6 @@ namespace Discord
                 _lastSeq = seq.Value;
             try
             {
-                string writeOutput = $"PACKET ---\n OPCODE: {opCode}\nSEQ: {(seq.HasValue ? seq.Value : -1)}\nTYPE: {type}\n========== BEGIN PAYLOAD ==========\n\n{payload}\n=========================";
-                System.IO.File.WriteAllText($"./discord-debug/{opCode}-{DateTime.Now.ToFileTime()}", writeOutput);
-
                 switch (opCode)
                 {
                     case GatewayOpCode.Hello:
@@ -508,7 +505,7 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
                                     
                                     var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var privateChannels = data.PrivateChannels.Where(c => c.Recipients.IsSpecified && c.Recipients.Value.Count() == 1).ToArray();
+                                    var privateChannels = data.PrivateChannels.Where(c => c.Type == ChannelType.DM).ToArray();
                                     var dataStore = new DataStore( data.Guilds.Length, privateChannels.Length);
 
                                     var currentUser = new CachedSelfUser(this, data.User);
@@ -1264,7 +1261,7 @@ namespace Discord
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                throw;
+                return;
             }
 #if BENCHMARK
             }
