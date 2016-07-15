@@ -17,6 +17,8 @@ namespace Discord
         string Text { get; }
         /// <summary> Gets the time this message was sent. </summary>
         DateTimeOffset Timestamp { get; }
+        /// <summary> Gets the type of message this is. Value will always be default, unless the message was sent in a group. </summary>
+        MessageType Type { get; }
 
         /// <summary> Gets the channel this message was sent to. </summary>
         IMessageChannel Channel { get; }
