@@ -3,7 +3,7 @@
 
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
-Check out the [documentation](http://rtd.discord.foxbot.me/en/legacy/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
+Check out the [documentation](http://rtd.discord.foxbot.me/en/legacy/) or join the [Discord API Chat](https://discord.gg/discord-api).
 
 ### Installation
 You can download Discord.Net and its extensions from NuGet:
