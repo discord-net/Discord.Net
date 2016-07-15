@@ -335,7 +335,7 @@ namespace Discord
         }
         internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
         {
-            var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
+            var recipient = GetOrAddUser(model.Recipients.Value[0], dataStore);
             var channel = new CachedDMChannel(this, new CachedDMUser(recipient), model);
             recipient.AddRef();
             dataStore.AddDMChannel(channel);
@@ -442,6 +442,9 @@ namespace Discord
                 _lastSeq = seq.Value;
             try
             {
+                string writeOutput = $"PACKET ---\n OPCODE: {opCode}\nSEQ: {(seq.HasValue ? seq.Value : -1)}\nTYPE: {type}\n========== BEGIN PAYLOAD ==========\n\n{payload}\n=========================";
+                System.IO.File.WriteAllText($"./discord-debug/{opCode}-{DateTime.Now.ToFileTime()}", writeOutput);
+
                 switch (opCode)
                 {
                     case GatewayOpCode.Hello:
@@ -505,7 +508,8 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
                                     
                                     var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var dataStore = new DataStore( data.Guilds.Length, data.PrivateChannels.Length);
+                                    var privateChannels = data.PrivateChannels.Where(c => c.Recipients.IsSpecified && c.Recipients.Value.Count() == 1).ToArray();
+                                    var dataStore = new DataStore( data.Guilds.Length, privateChannels.Length);
 
                                     var currentUser = new CachedSelfUser(this, data.User);
                                     int unavailableGuilds = 0;
@@ -517,8 +521,8 @@ namespace Discord
                                         if (model.Unavailable == true)
                                             unavailableGuilds++;
                                     }
-                                    for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddDMChannel(data.PrivateChannels[i], dataStore);
+                                    for (int i = 0; i < privateChannels.Length; i++)
+                                        AddDMChannel(privateChannels[i], dataStore);
 
                                     _sessionId = data.SessionId;
                                     _currentUser = currentUser;
@@ -740,7 +744,7 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = RemoveDMChannel(data.Recipient.Value.Id);
+                                        channel = RemoveDMChannel(data.Id);
                                     if (channel != null)
                                         await _channelDestroyedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                     else
@@ -1260,7 +1264,7 @@ namespace Discord
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                return;
+                throw;
             }
 #if BENCHMARK
             }

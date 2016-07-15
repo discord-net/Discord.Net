@@ -13,12 +13,17 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            switch ((string)reader.Value)
+            // TODO: This should probably just be a cast to an enum
+            switch ((long)reader.Value)
             {
-                case "text":
+                case 0:
                     return ChannelType.Text;
-                case "voice":
+                case 1:
+                    return ChannelType.DM;
+                case 2:
                     return ChannelType.Voice;
+                case 3:
+                    return ChannelType.Group;
                 default:
                     throw new JsonSerializationException("Unknown channel type");
             }
@@ -26,7 +31,7 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            switch ((ChannelType)value)
+            /*switch ((ChannelType)value)
             {
                 case ChannelType.Text:
                     writer.WriteValue("text");
@@ -36,7 +41,8 @@ namespace Discord.Net.Converters
                     break;
                 default:
                     throw new JsonSerializationException("Invalid channel type");
-            }
+            }*/
+            writer.WriteValue((int)value);
         }
     }
 }

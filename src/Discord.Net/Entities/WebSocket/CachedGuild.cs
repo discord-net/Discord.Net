@@ -311,14 +311,14 @@ namespace Discord
 
         new internal ICachedGuildChannel ToChannel(ChannelModel model)
         {
-            switch (model.Type.Value)
+            switch (model.Type)
             {
                 case ChannelType.Text:
                     return new CachedTextChannel(this, model);
                 case ChannelType.Voice:
                     return new CachedVoiceChannel(this, model);
                 default:
-                    throw new InvalidOperationException($"Unknown channel type: {model.Type.Value}");
+                    throw new InvalidOperationException($"Unknown channel type: {model.Type}");
             }
         }
 

@@ -11,14 +11,14 @@ namespace Discord.API
         public bool IsPrivate { get; set; }
         [JsonProperty("last_message_id")]
         public ulong? LastMessageId { get; set; }
+        [JsonProperty("type")]
+        public ChannelType Type { get; set; }
 
         //GuildChannel
         [JsonProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
         [JsonProperty("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("type")]
-        public Optional<ChannelType> Type { get; set; }
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
         [JsonProperty("permission_overwrites")]
@@ -34,8 +34,9 @@ namespace Discord.API
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
 
-        //DMChannel
-        [JsonProperty("recipient")]
-        public Optional<User> Recipient { get; set; }
+        //DMChannel or GroupChannel
+        [JsonProperty("recipients")]
+        public Optional<User[]> Recipients { get; set; }
+
     }
 }
