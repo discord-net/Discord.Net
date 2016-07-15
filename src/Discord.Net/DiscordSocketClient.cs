@@ -963,7 +963,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_CREATE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -997,7 +997,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1036,7 +1036,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1063,7 +1063,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
                                         {
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE_BULK, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1138,7 +1138,7 @@ namespace Discord
                                     var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!(channel as ICachedGuildChannel)?.Guild.IsSynced ?? true)
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
                                         {
                                             await _gatewayLogger.DebugAsync("Ignored TYPING_START, guild is not synced yet.").ConfigureAwait(false);
                                             return;
