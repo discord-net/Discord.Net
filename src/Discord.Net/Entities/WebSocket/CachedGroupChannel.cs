@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
-using Discord.API;
 
 namespace Discord
 {
