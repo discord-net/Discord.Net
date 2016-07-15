@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Collections.Concurrent;
 
 namespace Discord
 {
@@ -165,16 +166,26 @@ namespace Discord
                         return guild.ToChannel(model);
                     }
                 }
+                else if (model.Type == ChannelType.DM)
+                    return new DMChannel(this, new User(model.Recipients.Value[0]), model);
+                else if (model.Type == ChannelType.Group)
+                {
+                    var recipients = model.Recipients.Value;
+                    var users = new ConcurrentDictionary<ulong, IUser>(1, recipients.Length);
+                    for (int i = 0; i < recipients.Length; i++)
+                        users[recipients[i].Id] = new User(recipients[i]);
+                    return new GroupChannel(this, users, model);
+                }
                 else
-                    return new DMChannel(this, new User(model.Recipient.Value), model);
+                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
             return null;
         }
         /// <inheritdoc />
-        public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
+        public virtual async Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
         {
-            var models = await ApiClient.GetMyDMsAsync().ConfigureAwait(false);
-            return models.Select(x => new DMChannel(this, new User(x.Recipient.Value), x)).ToImmutableArray();
+            var models = await ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
+            return models.Select(x => new DMChannel(this, new User(x.Recipients.Value[0]), x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
@@ -289,9 +300,9 @@ namespace Discord
         private async Task WriteInitialLog()
         {
             if (this is DiscordSocketClient)
-                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (Gateway v{DiscordConfig.GatewayAPIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
             else
-                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.Version}").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"Processors: {Environment.ProcessorCount}").ConfigureAwait(false);

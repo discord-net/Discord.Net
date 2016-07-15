@@ -57,7 +57,6 @@ namespace Discord
 
         internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
         internal IReadOnlyCollection<CachedGuild> Guilds => DataStore.Guilds;
-        internal IReadOnlyCollection<CachedDMChannel> DMChannels => DataStore.DMChannels;
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
@@ -329,27 +328,42 @@ namespace Discord
         {
             return Task.FromResult<IChannel>(DataStore.GetChannel(id));
         }
-        public override Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
+        public override Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
         {
-            return Task.FromResult<IReadOnlyCollection<IDMChannel>>(DMChannels);
+            return Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(DataStore.PrivateChannels);
         }
-        internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
+        internal ICachedChannel AddPrivateChannel(API.Channel model, DataStore dataStore)
         {
-            var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
-            var channel = new CachedDMChannel(this, new CachedDMUser(recipient), model);
-            recipient.AddRef();
-            dataStore.AddDMChannel(channel);
-            return channel;
-        }
-        internal CachedDMChannel RemoveDMChannel(ulong id)
-        {            
-            var dmChannel = DataStore.RemoveDMChannel(id);
-            if (dmChannel != null)
+            switch (model.Type)
             {
-                var recipient = dmChannel.Recipient;
-                recipient.User.RemoveRef(this);
+                case ChannelType.DM:
+                    {
+                        var recipients = model.Recipients.Value;
+                        var user = GetOrAddUser(recipients[0], dataStore);
+                        var channel = new CachedDMChannel(this, new CachedPrivateUser(user), model);
+                        dataStore.AddChannel(channel);
+                        return channel;
+                    }
+                case ChannelType.Group:
+                    {
+                        var recipients = model.Recipients.Value;
+                        var users = new ConcurrentDictionary<ulong, IUser>(1, recipients.Length);
+                        for (int i = 0; i < recipients.Length; i++)
+                            users[recipients[i].Id] = new CachedPrivateUser(GetOrAddUser(recipients[i], dataStore));
+                        var channel = new CachedGroupChannel(this, users, model);
+                        dataStore.AddChannel(channel);
+                        return channel;
+                    }
+                default:
+                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
-            return dmChannel;
+        }
+        internal ICachedChannel RemovePrivateChannel(ulong id)
+        {
+            var channel = DataStore.RemoveChannel(id) as ICachedPrivateChannel;
+            foreach (var recipient in channel.Recipients)
+                recipient.User.RemoveRef(this);
+            return channel;
         }
 
         /// <inheritdoc />
@@ -361,6 +375,11 @@ namespace Discord
         public override Task<IUser> GetUserAsync(string username, string discriminator)
         {
             return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
+        }
+        /// <inheritdoc />
+        public override Task<ISelfUser> GetCurrentUserAsync()
+        {
+            return Task.FromResult<ISelfUser>(_currentUser);
         }
         internal CachedGlobalUser GetOrAddUser(API.User model, DataStore dataStore)
         {
@@ -518,7 +537,7 @@ namespace Discord
                                             unavailableGuilds++;
                                     }
                                     for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddDMChannel(data.PrivateChannels[i], dataStore);
+                                        AddPrivateChannel(data.PrivateChannels[i], dataStore);
 
                                     _sessionId = data.SessionId;
                                     _currentUser = currentUser;
@@ -686,7 +705,7 @@ namespace Discord
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     ICachedChannel channel = null;
-                                    if (!data.IsPrivate)
+                                    if (data.GuildId.IsSpecified)
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
@@ -698,7 +717,8 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = AddDMChannel(data, DataStore);
+                                        channel = AddPrivateChannel(data, DataStore);
+
                                     if (channel != null)
                                         await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                 }
@@ -728,7 +748,7 @@ namespace Discord
 
                                     ICachedChannel channel = null;
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    if (!data.IsPrivate)
+                                    if (data.GuildId.IsSpecified)
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
@@ -740,7 +760,8 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = RemoveDMChannel(data.Recipient.Value.Id);
+                                        channel = RemovePrivateChannel(data.Id);
+
                                     if (channel != null)
                                         await _channelDestroyedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                     else

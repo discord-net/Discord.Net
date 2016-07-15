@@ -75,8 +75,6 @@ namespace Discord.Net.Converters
             }
 
             //Enums
-            if (type == typeof(ChannelType))
-                return ChannelTypeConverter.Instance;
             if (type == typeof(PermissionTarget))
                 return PermissionTargetConverter.Instance;
             if (type == typeof(UserStatus))

@@ -1,5 +1,7 @@
 ﻿using Discord.API.Rest;
+using Discord.Extensions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -11,27 +13,44 @@ using Model = Discord.API.Channel;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    internal class DMChannel : SnowflakeEntity, IDMChannel
+    internal class GroupChannel : SnowflakeEntity, IGroupChannel
     {
+        protected ConcurrentDictionary<ulong, IUser> _users;
+        
         public override DiscordClient Discord { get; }
-        public IUser Recipient { get; private set; }
+        public string Name { get; private set; }
 
+        public IReadOnlyCollection<IUser> Recipients => _users.ToReadOnlyCollection();
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
-        IReadOnlyCollection<IUser> IPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
 
-        public DMChannel(DiscordClient discord, IUser recipient, Model model)
+        public GroupChannel(DiscordClient discord, ConcurrentDictionary<ulong, IUser> recipients, Model model)
             : base(model.Id)
         {
             Discord = discord;
-            Recipient = recipient;
-
+            _users = recipients;
+            
             Update(model, UpdateSource.Creation);
         }
         public void Update(Model model, UpdateSource source)
         {
-            if (/*source == UpdateSource.Rest && */IsAttached) return;
+            if (source == UpdateSource.Rest && IsAttached) return;
+
+            if (model.Name.IsSpecified)
+                Name = model.Name.Value;
             
-            (Recipient as User).Update(model.Recipients.Value[0], source);
+            if (source != UpdateSource.Creation && model.Recipients.IsSpecified)
+                UpdateUsers(model.Recipients.Value, source);
+        }
+
+        protected virtual void UpdateUsers(API.User[] models, UpdateSource source)
+        {
+            if (!IsAttached)
+            {
+                var users = new ConcurrentDictionary<ulong, IUser>(1, (int)(models.Length * 1.05));
+                for (int i = 0; i < models.Length; i++)
+                    users[models[i].Id] = new User(models[i]);
+                _users = users;
+            }
         }
 
         public async Task UpdateAsync()
@@ -41,25 +60,25 @@ namespace Discord
             var model = await Discord.ApiClient.GetChannelAsync(Id).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
-        public async Task CloseAsync()
+        public async Task LeaveAsync()
         {
             await Discord.ApiClient.DeleteChannelAsync(Id).ConfigureAwait(false);
         }
 
-        public virtual async Task<IUser> GetUserAsync(ulong id)
+        public async Task<IUser> GetUserAsync(ulong id)
         {
+            IUser user;
+            if (_users.TryGetValue(id, out user))
+                return user;
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            if (id == Recipient.Id)
-                return Recipient;
-            else if (id == currentUser.Id)
+            if (id == currentUser.Id)
                 return currentUser;
-            else
-                return null;
+            return null;
         }
-        public virtual async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
+        public async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
         {
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            return ImmutableArray.Create(currentUser, Recipient);
+            return _users.Select(x => x.Value).Concat(ImmutableArray.Create(currentUser)).ToReadOnlyCollection(_users, 1);
         }
 
         public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
@@ -106,16 +125,16 @@ namespace Discord
         public async Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
         {
             await Discord.ApiClient.DeleteDMMessagesAsync(Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
-        }   
+        }
 
         public async Task TriggerTypingAsync()
         {
             await Discord.ApiClient.TriggerTypingIndicatorAsync(Id).ConfigureAwait(false);
-        }        
-        
-        public override string ToString() => '@' + Recipient.ToString();
-        private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
-        
+        }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"@{Name} ({Id}, Group)";
+
         IMessage IMessageChannel.GetCachedMessage(ulong id) => null;
     }
 }

@@ -1,9 +1,10 @@
 ﻿namespace Discord
 {
-    public enum ChannelType : byte
+    public enum ChannelType
     {
-        DM,
-        Text,
-        Voice
+        Text = 0,
+        DM = 1,
+        Voice = 2,
+        Group = 3
     }
 }

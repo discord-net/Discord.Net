@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -16,11 +17,18 @@ namespace Discord
         private readonly ConcurrentDictionary<ulong, CachedDMChannel> _dmChannels;
         private readonly ConcurrentDictionary<ulong, CachedGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, CachedGlobalUser> _users;
+        private readonly ConcurrentHashSet<ulong> _groupChannels;
 
         internal IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
         internal IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<CachedGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as CachedGroupChannel).ToReadOnlyCollection(_groupChannels);
         internal IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<CachedGlobalUser> Users => _users.ToReadOnlyCollection();
+
+        internal IReadOnlyCollection<ICachedPrivateChannel> PrivateChannels =>
+            _dmChannels.Select(x => x.Value as ICachedPrivateChannel).Concat(
+                _groupChannels.Select(x => GetChannel(x) as ICachedPrivateChannel))
+            .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
         public DataStore(int guildCount, int dmChannelCount)
         {
@@ -30,6 +38,7 @@ namespace Discord
             _dmChannels = new ConcurrentDictionary<ulong, CachedDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, CachedGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, CachedGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
+            _groupChannels = new ConcurrentHashSet<ulong>(CollectionConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
         internal ICachedChannel GetChannel(ulong id)
@@ -39,18 +48,6 @@ namespace Discord
                 return channel;
             return null;
         }
-        internal void AddChannel(ICachedChannel channel)
-        {
-            _channels[channel.Id] = channel;
-        }
-        internal ICachedChannel RemoveChannel(ulong id)
-        {
-            ICachedChannel channel;
-            if (_channels.TryRemove(id, out channel))
-                return channel;
-            return null;
-        }
-
         internal CachedDMChannel GetDMChannel(ulong userId)
         {
             CachedDMChannel channel;
@@ -58,19 +55,25 @@ namespace Discord
                 return channel;
             return null;
         }
-        internal void AddDMChannel(CachedDMChannel channel)
+        internal void AddChannel(ICachedChannel channel)
         {
             _channels[channel.Id] = channel;
-            _dmChannels[channel.Recipient.Id] = channel;
+            var dmChannel = channel as CachedDMChannel;
+            if (dmChannel != null)
+                _dmChannels[dmChannel.Recipient.Id] = dmChannel;
         }
-        internal CachedDMChannel RemoveDMChannel(ulong userId)
+        internal ICachedChannel RemoveChannel(ulong id)
         {
-            CachedDMChannel channel;
-            ICachedChannel ignored;
-            if (_dmChannels.TryRemove(userId, out channel))
+            ICachedChannel channel;
+            if (_channels.TryRemove(id, out channel))
             {
-                if (_channels.TryRemove(channel.Id, out ignored))
-                    return channel;
+                var dmChannel = channel as CachedDMChannel;
+                if (dmChannel != null)
+                {
+                    CachedDMChannel ignored;
+                    _dmChannels.TryRemove(dmChannel.Recipient.Id, out ignored);
+                }
+                return channel;
             }
             return null;
         }
