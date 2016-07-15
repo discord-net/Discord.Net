@@ -14,11 +14,6 @@ namespace Discord
 
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 0;
-        /*/// <summary> 
-        /// Gets or sets whether the permissions cache should be used. 
-        /// This makes operations such as User.GetPermissions(Channel), User.GuildPermissions, Channel.GetUser, and Channel.Members much faster at the expense of increased memory usage.
-        /// </summary>
-        public bool UsePermissionsCache { get; set; } = false;*/
         /// <summary> 
         /// Gets or sets the max number of users a guild may have for offline users to be included in the READY packet. Max is 250. 
         /// Decreasing this may reduce CPU usage while increasing login time and network usage. 

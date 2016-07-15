@@ -5,7 +5,10 @@
         GeneralRest,
         DirectMessage,
         SendEditMessage,
+
         GeneralGateway,
-        UpdateStatus
+        UpdateStatus,
+
+        GeneralRpc
     }
 }

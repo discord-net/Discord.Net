@@ -12,7 +12,7 @@ namespace Discord
         private readonly DiscordSocketClient _discord;
         private readonly ISocketMessageChannel _channel;
 
-        public virtual IReadOnlyCollection<SocketMessage> Messages 
+        public virtual IReadOnlyCollection<SocketMessage> Messages
             => ImmutableArray.Create<SocketMessage>();
 
         public MessageManager(DiscordSocketClient discord, ISocketMessageChannel channel)

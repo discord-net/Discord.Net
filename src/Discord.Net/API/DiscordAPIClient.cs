@@ -106,7 +106,7 @@ namespace Discord.API
             }
         }
         public void Dispose() => Dispose(true);
-        
+
         public async Task LoginAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
@@ -121,7 +121,7 @@ namespace Discord.API
             if (LoginState != LoginState.LoggedOut)
                 await LogoutInternalAsync().ConfigureAwait(false);
             LoginState = LoginState.LoggingIn;
-            
+
             try
             {
                 _loginCancelToken = new CancellationTokenSource();
@@ -172,7 +172,7 @@ namespace Discord.API
             //An exception here will lock the client into the unusable LoggingOut state, but that's probably fine since our client is in an undefined state too.
             if (LoginState == LoginState.LoggedOut) return;
             LoginState = LoginState.LoggingOut;
-            
+
             try { _loginCancelToken?.Cancel(false); }
             catch { }
 
@@ -250,7 +250,7 @@ namespace Discord.API
 
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
-            
+
             try { _connectCancelToken?.Cancel(false); }
             catch { }
 
@@ -260,29 +260,29 @@ namespace Discord.API
         }
 
         //REST
-        public Task SendAsync(string method, string endpoint, 
+        public Task SendAsync(string method, string endpoint,
             GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
             => SendInternalAsync(method, endpoint, null, true, BucketGroup.Global, (int)bucket, 0, options);
-        public Task SendAsync(string method, string endpoint, object payload, 
+        public Task SendAsync(string method, string endpoint, object payload,
             GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
             => SendInternalAsync(method, endpoint, payload, true, BucketGroup.Global, (int)bucket, 0, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
             GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null) where TResponse : class
             => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, BucketGroup.Global, (int)bucket, 0, options).ConfigureAwait(false));
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload, GlobalBucket bucket = 
+        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload, GlobalBucket bucket =
             GlobalBucket.GeneralRest, RequestOptions options = null) where TResponse : class
             => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, BucketGroup.Global, (int)bucket, 0, options).ConfigureAwait(false));
-        
-        public Task SendAsync(string method, string endpoint, 
+
+        public Task SendAsync(string method, string endpoint,
             GuildBucket bucket, ulong guildId, RequestOptions options = null)
             => SendInternalAsync(method, endpoint, null, true, BucketGroup.Guild, (int)bucket, guildId, options);
-        public Task SendAsync(string method, string endpoint, object payload, 
+        public Task SendAsync(string method, string endpoint, object payload,
             GuildBucket bucket, ulong guildId, RequestOptions options = null)
             => SendInternalAsync(method, endpoint, payload, true, BucketGroup.Guild, (int)bucket, guildId, options);
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, 
+        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
             GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
             => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload, 
+        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload,
             GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
             => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
 
@@ -311,7 +311,7 @@ namespace Discord.API
             => SendGatewayInternalAsync(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
 
         //Core
-        private async Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly, 
+        private async Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly,
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -326,7 +326,7 @@ namespace Discord.API
 
             return responseStream;
         }
-        private async Task<Stream> SendMultipartInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, 
+        private async Task<Stream> SendMultipartInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly,
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -339,7 +339,7 @@ namespace Discord.API
 
             return responseStream;
         }
-        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload, 
+        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload,
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
         {
             //TODO: Add ETF
@@ -913,7 +913,7 @@ namespace Discord.API
                     relativeDir = "around";
                     break;
             }
-            
+
             int runs = (limit + DiscordRestConfig.MaxMessagesPerBatch - 1) / DiscordRestConfig.MaxMessagesPerBatch;
             int lastRunCount = limit - (runs - 1) * DiscordRestConfig.MaxMessagesPerBatch;
             var result = new API.Message[runs][];
@@ -1027,7 +1027,7 @@ namespace Discord.API
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
-            
+
             if (args._content.GetValueOrDefault(null) == null)
                 args._content = "";
             else if (args._content.IsSpecified)
@@ -1153,7 +1153,7 @@ namespace Discord.API
         {
             Preconditions.NotNullOrEmpty(username, nameof(username));
             Preconditions.NotNullOrEmpty(discriminator, nameof(discriminator));
-            
+
             try
             {
                 var models = await QueryUsersAsync($"{username}#{discriminator}", 1, options: options).ConfigureAwait(false);

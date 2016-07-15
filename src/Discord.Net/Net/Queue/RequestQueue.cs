@@ -36,7 +36,10 @@ namespace Discord.Net.Queue
 
                 //Gateway
                 [GlobalBucket.GeneralGateway] = new Bucket(null, "gateway", 120, 60, BucketTarget.Both),
-                [GlobalBucket.UpdateStatus] = new Bucket(null, "status", 5, 1, BucketTarget.Both, GlobalBucket.GeneralGateway)
+                [GlobalBucket.UpdateStatus] = new Bucket(null, "status", 5, 1, BucketTarget.Both, GlobalBucket.GeneralGateway),
+
+                //Rpc
+                [GlobalBucket.GeneralRpc] = new Bucket(null, "rpc", 120, 60, BucketTarget.Both)
             }.ToImmutableDictionary();
 
             _guildLimits = new Dictionary<GuildBucket, Bucket>

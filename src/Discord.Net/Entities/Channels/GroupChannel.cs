@@ -17,7 +17,7 @@ namespace Discord
     {
         protected ConcurrentDictionary<ulong, GroupUser> _users;
         private string _iconId;
-        
+
         public override DiscordRestClient Discord { get; }
         public string Name { get; private set; }
 
