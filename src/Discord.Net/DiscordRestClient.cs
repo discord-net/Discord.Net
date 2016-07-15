@@ -314,7 +314,7 @@ namespace Discord
         private async Task WriteInitialLog()
         {
             if (this is DiscordSocketClient)
-                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, {DiscordSocketConfig.GatewayEncoding})").ConfigureAwait(false);
             else if (this is DiscordRpcClient)
                 await _clientLogger.InfoAsync($"DiscordRpcClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, RPC API v{DiscordRpcConfig.RpcAPIVersion})").ConfigureAwait(false);
             else

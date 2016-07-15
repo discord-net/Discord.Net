@@ -4,7 +4,6 @@ using Discord.Net.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +47,7 @@ namespace Discord
         public ConnectionState ConnectionState { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
-        public DiscordRpcClient(string clientId) : this(new DiscordRpcConfig(clientId)) { }
+        public DiscordRpcClient(string clientId, string origin) : this(new DiscordRpcConfig(clientId, origin)) { }
         /// <summary> Creates a new RPC discord client. </summary>
         public DiscordRpcClient(DiscordRpcConfig config)
         {
@@ -59,7 +58,7 @@ namespace Discord
             _isFirstLogSub = true;
 
             _connectionLock = new SemaphoreSlim(1, 1);
-            
+
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
             {
@@ -67,7 +66,7 @@ namespace Discord
                 e.ErrorContext.Handled = true;
             };
 
-            ApiClient = new API.DiscordRpcApiClient(config.ClientId, config.WebSocketProvider);
+            ApiClient = new API.DiscordRpcApiClient(config.ClientId, config.Origin, config.WebSocketProvider);
             ApiClient.SentRpcMessage += async opCode => await _rpcLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedRpcEvent += ProcessMessageAsync;
             ApiClient.Disconnected += async ex =>
@@ -198,11 +197,6 @@ namespace Discord
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
-                /*if (_sessionId != null)
-                    await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
-                else
-                    await ApiClient.SendIdentifyAsync().ConfigureAwait(false);*/
-
                 await _connectTask.Task.ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
@@ -301,25 +295,40 @@ namespace Discord
             }
         }
 
-        private async Task ProcessMessageAsync(string cmd, string evnt, object payload, string nonce)
+        private async Task ProcessMessageAsync(string cmd, Optional<string> evnt, Optional<object> payload)
         {
             try
             {
                 switch (cmd)
                 {
                     case "DISPATCH":
-                        switch (evnt)
+                        switch (evnt.Value)
                         {
                             //Connection
                             case "READY":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-                                    var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                                    var data = (payload.Value as JToken).ToObject<ReadyEvent>(_serializer);
+                                    var cancelToken = _cancelToken;
 
-                                    if (_scopes != null)
-                                        await ApiClient.SendAuthorizeAsync(_scopes).ConfigureAwait(false); //No bearer
-                                    else
-                                        await ApiClient.SendAuthenticateAsync().ConfigureAwait(false); //Has bearer
+                                    var _ = Task.Run(async () =>
+                                    {
+                                        RequestOptions options = new RequestOptions
+                                        {
+                                            //CancellationToken = cancelToken //TODO: Implement
+                                        };
+
+                                        if (_scopes != null) //No bearer
+                                        {
+                                            var authorizeData = await ApiClient.SendAuthorizeAsync(_scopes, options).ConfigureAwait(false);
+                                            await ApiClient.LoginAsync(TokenType.Bearer, authorizeData.Code, options).ConfigureAwait(false);
+                                        }
+
+                                        var authenticateData = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false); //Has bearer
+
+                                        var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                        await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
+                                    });
                                 }
                                 break;
 
@@ -329,32 +338,15 @@ namespace Discord
                                 return;
                         }
                         break;
-                    case "AUTHORIZE":
-                        {
-                            await _rpcLogger.DebugAsync("Received AUTHORIZE").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<AuthorizeEvent>(_serializer);
-                            await ApiClient.LoginAsync(TokenType.Bearer, data.Code).ConfigureAwait(false);
-                            await ApiClient.SendAuthenticateAsync().ConfigureAwait(false);
-                        }
-                        break;
-                    case "AUTHENTICATE":
-                        {
-                            await _rpcLogger.DebugAsync("Received AUTHENTICATE").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<AuthenticateEvent>(_serializer);
 
-                            var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
-                            await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
-                        }
-                        break;
-
-                    default:
+                    /*default:
                         await _rpcLogger.WarningAsync($"Unknown OpCode ({cmd})").ConfigureAwait(false);
-                        return;
+                        return;*/
                 }
             }
             catch (Exception ex)
             {
-                await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt != null ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
+                await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt.IsSpecified ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
                 return;
             }
         }

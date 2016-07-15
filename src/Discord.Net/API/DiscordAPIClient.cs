@@ -71,16 +71,21 @@ namespace Discord.API
                             zlib.CopyTo(decompressed);
                         decompressed.Position = 0;
                         using (var reader = new StreamReader(decompressed))
+                        using (var jsonReader = new JsonTextReader(reader))
                         {
-                            var msg = JsonConvert.DeserializeObject<WebSocketMessage>(reader.ReadToEnd());
+                            var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                         }
                     }
                 };
                 _gatewayClient.TextMessage += async text =>
                 {
-                    var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
-                    await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    using (var reader = new StringReader(text))
+                    using (var jsonReader = new JsonTextReader(reader))
+                    {
+                        var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
+                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    }
                 };
                 _gatewayClient.Closed += async ex =>
                 {

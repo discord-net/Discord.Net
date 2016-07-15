@@ -11,7 +11,7 @@ namespace Discord.API.Rpc
         [JsonProperty("id")]
         public ulong Id { get; set; }
         [JsonProperty("rpc_origins")]
-        public string RpcOrigins { get; set; }
+        public string[] RpcOrigins { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
     }
