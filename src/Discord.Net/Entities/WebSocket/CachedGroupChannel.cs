@@ -9,7 +9,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord
 {
-    internal class CachedGroupChannel : GroupChannel, IGroupChannel, ICachedChannel, ICachedMessageChannel
+    internal class CachedGroupChannel : GroupChannel, IGroupChannel, ICachedChannel, ICachedMessageChannel, ICachedPrivateChannel
     {
         private readonly MessageManager _messages;
 
