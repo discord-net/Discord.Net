@@ -4,7 +4,7 @@
     {
         public static bool HasCharPrefix(this IMessage msg, char c, ref int argPos)
         {
-            var text = msg.Text;
+            var text = msg.Content;
             if (text.Length > 0 && text[0] == c)
             {
                 argPos = 1;
@@ -14,7 +14,7 @@
         }
         public static bool HasStringPrefix(this IMessage msg, string str, ref int argPos)
         {
-            var text = msg.Text;
+            var text = msg.Content;
             //str = str + ' ';
             if (text.StartsWith(str))
             {
@@ -25,7 +25,7 @@
         }
         public static bool HasMentionPrefix(this IMessage msg, IUser user, ref int argPos)
         {
-            var text = msg.Text;
+            var text = msg.Content;
             string mention = user.Mention + ' ';
             if (text.StartsWith(mention))
             {

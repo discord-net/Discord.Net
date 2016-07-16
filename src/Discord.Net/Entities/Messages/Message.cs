@@ -20,7 +20,7 @@ namespace Discord
         public IUser Author { get; }
 
         public bool IsTTS { get; private set; }
-        public string Text { get; private set; }
+        public string Content { get; private set; }
         public bool IsPinned { get; private set; }
 
         public IReadOnlyCollection<IAttachment> Attachments { get; private set; }
@@ -120,7 +120,7 @@ namespace Discord
                     MentionedChannelIds = MentionUtils.GetChannelMentions(text, guildChannel.Guild);
                     MentionedRoles = MentionUtils.GetRoleMentions(text, guildChannel.Guild);
                 }
-                Text = text;
+                Content = text;
             }
         }
 
@@ -165,9 +165,9 @@ namespace Discord
         }
         
         public string Resolve(int startIndex, int length, UserResolveMode userMode = UserResolveMode.NameOnly)
-            => Resolve(Text.Substring(startIndex, length), userMode);
+            => Resolve(Content.Substring(startIndex, length), userMode);
         public string Resolve(UserResolveMode userMode = UserResolveMode.NameOnly)
-            => Resolve(Text, userMode);
+            => Resolve(Content, userMode);
         
         private string Resolve(string text, UserResolveMode userMode = UserResolveMode.NameOnly)
         {
@@ -181,7 +181,7 @@ namespace Discord
             return text;
         }
 
-        public override string ToString() => Text;
-        private string DebuggerDisplay => $"{Author}: {Text}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
+        public override string ToString() => Content;
+        private string DebuggerDisplay => $"{Author}: {Content}{(Attachments.Count > 0 ? $" [{Attachments.Count} Attachments]" : "")}";
     }
 }
