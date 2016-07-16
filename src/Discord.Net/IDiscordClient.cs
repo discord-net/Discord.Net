@@ -24,7 +24,7 @@ namespace Discord
         Task DisconnectAsync();
 
         Task<IChannel> GetChannelAsync(ulong id);
-        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync();
+        Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync();
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 

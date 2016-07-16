@@ -211,7 +211,7 @@ namespace Discord.API
                 if (_gatewayUrl == null)
                 {
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.GatewayAPIVersion}&encoding={DiscordConfig.GatewayEncoding}";
+                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordConfig.GatewayEncoding}";
                 }
                 await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
@@ -1160,7 +1160,7 @@ namespace Discord.API
         {
             return await SendAsync<IReadOnlyCollection<Connection>>("GET", "users/@me/connections", options: options).ConfigureAwait(false);
         }
-        public async Task<IReadOnlyCollection<Channel>> GetMyDMsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Channel>> GetMyPrivateChannelsAsync(RequestOptions options = null)
         {
             return await SendAsync<IReadOnlyCollection<Channel>>("GET", "users/@me/channels", options: options).ConfigureAwait(false);
         }

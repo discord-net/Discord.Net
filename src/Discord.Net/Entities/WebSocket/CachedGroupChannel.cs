@@ -1,22 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Extensions;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 
 namespace Discord
 {
-    internal class CachedDMChannel : DMChannel, IDMChannel, ICachedChannel, ICachedMessageChannel, ICachedPrivateChannel
+    internal class CachedGroupChannel : GroupChannel, IGroupChannel, ICachedChannel, ICachedMessageChannel
     {
         private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedPrivateUser Recipient => base.Recipient as CachedPrivateUser;
-        public IReadOnlyCollection<ICachedUser> Members => ImmutableArray.Create<ICachedUser>(Discord.CurrentUser, Recipient);
-        IReadOnlyCollection<CachedPrivateUser> ICachedPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
+        public IReadOnlyCollection<ICachedUser> Members 
+            => _users.Select(x => x.Value).Concat(ImmutableArray.Create(Discord.CurrentUser)).Cast<ICachedUser>().ToReadOnlyCollection(_users, 1);
+        public new IReadOnlyCollection<CachedPrivateUser> Recipients => _users.Cast<CachedPrivateUser>().ToReadOnlyCollection(_users);
 
-        public CachedDMChannel(DiscordSocketClient discord, CachedPrivateUser recipient, Model model)
-            : base(discord, recipient, model)
+        public CachedGroupChannel(DiscordSocketClient discord, ConcurrentDictionary<ulong, IUser> recipients, Model model)
+            : base(discord, recipients, model)
         {
             if (Discord.MessageCacheSize > 0)
                 _messages = new MessageCache(Discord, this);
@@ -24,17 +27,12 @@ namespace Discord
                 _messages = new MessageManager(Discord, this);
         }
 
-        public override Task<IUser> GetUserAsync(ulong id) => Task.FromResult<IUser>(GetUser(id));
-        public override Task<IReadOnlyCollection<IUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IUser>>(Members);
-        public ICachedUser GetUser(ulong id)
+        protected override void UpdateUsers(API.User[] models, UpdateSource source)
         {
-            var currentUser = Discord.CurrentUser;
-            if (id == Recipient.Id)
-                return Recipient;
-            else if (id == currentUser.Id)
-                return currentUser;
-            else
-                return null;
+            var users = new ConcurrentDictionary<ulong, IUser>(1, models.Length);
+            for (int i = 0; i < models.Length; i++)
+                users[models[i].Id] = new CachedPrivateUser(Discord.GetOrAddUser(models[i], Discord.DataStore));
+            _users = users;
         }
 
         public override async Task<IMessage> GetMessageAsync(ulong id)
@@ -67,7 +65,15 @@ namespace Discord
         public CachedDMChannel Clone() => MemberwiseClone() as CachedDMChannel;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
-        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id);
+        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck)
+        {
+            IUser user;
+            if (_users.TryGetValue(id, out user))
+                return user as ICachedUser;
+            if (id == Discord.CurrentUser.Id)
+                return Discord.CurrentUser;
+            return null;
+        }
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }
