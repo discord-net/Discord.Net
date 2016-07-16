@@ -708,7 +708,15 @@ namespace Discord
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
+                                        {
                                             guild.AddChannel(data, DataStore);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.").ConfigureAwait(false);
@@ -732,6 +740,13 @@ namespace Discord
                                     {
                                         var before = channel.Clone();
                                         channel.Update(data, UpdateSource.WebSocket);
+
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored CHANNEL_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _channelUpdatedEvent.InvokeAsync(before, channel).ConfigureAwait(false);
                                     }
                                     else
@@ -751,7 +766,15 @@ namespace Discord
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
+                                        {
                                             channel = guild.RemoveChannel(data.Id);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown guild.").ConfigureAwait(false);
@@ -781,6 +804,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.AddUser(data, DataStore);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userJoinedEvent.InvokeAsync(user).ConfigureAwait(false);
                                     }
                                     else
@@ -799,6 +829,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.GetUser(data.User.Id);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         if (user != null)
                                         {
                                             var before = user.Clone();
@@ -827,6 +864,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.RemoveUser(data.User.Id);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         if (user != null)
                                         {
                                             user.User.RemoveRef(this);
@@ -880,6 +924,12 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var role = guild.AddRole(data.Role);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
                                         await _roleCreatedEvent.InvokeAsync(role).ConfigureAwait(false);
                                     }
                                     else
@@ -902,6 +952,13 @@ namespace Discord
                                         {
                                             var before = role.Clone();
                                             role.Update(data.Role, UpdateSource.WebSocket);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _roleUpdatedEvent.InvokeAsync(before, role).ConfigureAwait(false);
                                         }
                                         else
@@ -927,7 +984,15 @@ namespace Discord
                                     {
                                         var role = guild.RemoveRole(data.RoleId);
                                         if (role != null)
+                                        {
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _roleDeletedEvent.InvokeAsync(role).ConfigureAwait(false);
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
@@ -950,7 +1015,15 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userBannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
+                                    }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
@@ -965,7 +1038,15 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userUnbannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
+                                    }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
