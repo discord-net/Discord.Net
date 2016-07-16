@@ -82,7 +82,7 @@ namespace Discord
         public async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
         {
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            return _users.Select(x => x.Value).Concat(ImmutableArray.Create(currentUser)).ToReadOnlyCollection(_users, 1);
+            return _users.Select(x => x.Value).Concat(ImmutableArray.Create(currentUser)).ToReadOnlyCollection(_users);
         }
 
         public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
