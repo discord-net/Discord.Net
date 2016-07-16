@@ -13,30 +13,12 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            switch ((string)reader.Value)
-            {
-                case "text":
-                    return ChannelType.Text;
-                case "voice":
-                    return ChannelType.Voice;
-                default:
-                    throw new JsonSerializationException("Unknown channel type");
-            }
+            return (ChannelType)((long)reader.Value);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            switch ((ChannelType)value)
-            {
-                case ChannelType.Text:
-                    writer.WriteValue("text");
-                    break;
-                case ChannelType.Voice:
-                    writer.WriteValue("voice");
-                    break;
-                default:
-                    throw new JsonSerializationException("Invalid channel type");
-            }
+            writer.WriteValue((int)value);
         }
     }
 }

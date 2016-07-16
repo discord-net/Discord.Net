@@ -166,7 +166,11 @@ namespace Discord
                     }
                 }
                 else
-                    return new DMChannel(this, new User(model.Recipient.Value), model);
+                {
+                    if (model.Type == ChannelType.DM)
+                        return new DMChannel(this, new User(model.Recipients.Value[0]), model);
+                    throw new NotImplementedException("Groups are not implemented.");
+                }
             }
             return null;
         }
@@ -174,7 +178,7 @@ namespace Discord
         public virtual async Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
         {
             var models = await ApiClient.GetMyDMsAsync().ConfigureAwait(false);
-            return models.Select(x => new DMChannel(this, new User(x.Recipient.Value), x)).ToImmutableArray();
+            return models.Where(m => m.Type == ChannelType.DM).Select(x => new DMChannel(this, new User(x.Recipients.Value[0]), x)).ToImmutableArray();
         }
 
         /// <inheritdoc />

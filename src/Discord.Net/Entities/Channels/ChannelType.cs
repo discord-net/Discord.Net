@@ -2,8 +2,9 @@
 {
     public enum ChannelType : byte
     {
-        DM,
-        Text,
-        Voice
+        DM = 1,
+        Text = 0,
+        Voice = 2,
+        Group = 3
     }
 }

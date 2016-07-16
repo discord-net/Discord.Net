@@ -18,6 +18,7 @@ namespace Discord
         public bool IsTTS { get; private set; }
         public string Text { get; private set; }
         public bool IsPinned { get; private set; }
+        public MessageType Type { get; private set; }
         
         public IMessageChannel Channel { get; }
         public IUser Author { get; }

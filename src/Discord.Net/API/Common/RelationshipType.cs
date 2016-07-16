@@ -4,6 +4,7 @@
     {
         Friend = 1,
         Blocked = 2,
-        Pending = 4
+        Incoming = 3,
+        Outgoing = 3
     }
 }

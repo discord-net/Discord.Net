@@ -9,6 +9,8 @@ namespace Discord.API
         public ulong Id { get; set; }
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
+        [JsonProperty("type")]
+        public MessageType Type { get; set; }
         [JsonProperty("author")]
         public Optional<User> Author { get; set; }
         [JsonProperty("content")]
