@@ -16,12 +16,14 @@ namespace Discord
     internal class GroupChannel : SnowflakeEntity, IGroupChannel
     {
         protected ConcurrentDictionary<ulong, IUser> _users;
+        private string _iconId;
         
         public override DiscordClient Discord { get; }
         public string Name { get; private set; }
 
         public IReadOnlyCollection<IUser> Recipients => _users.ToReadOnlyCollection();
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
+        public string IconUrl => API.CDN.GetChannelIconUrl(Id, _iconId);
 
         public GroupChannel(DiscordClient discord, ConcurrentDictionary<ulong, IUser> recipients, Model model)
             : base(model.Id)
@@ -37,6 +39,8 @@ namespace Discord
 
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+            if (model.Icon.IsSpecified)
+                _iconId = model.Icon.Value;
             
             if (source != UpdateSource.Creation && model.Recipients.IsSpecified)
                 UpdateUsers(model.Recipients.Value, source);

@@ -35,8 +35,12 @@ namespace Discord.API
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
 
-        //DMChannel
+        //PrivateChannel
         [JsonProperty("recipients")]
         public Optional<User[]> Recipients { get; set; }
+
+        //GroupChannel
+        [JsonProperty("icon")]
+        public Optional<string> Icon { get; set; }
     }
 }
