@@ -89,7 +89,7 @@ namespace Discord
             return false;
         }
         
-        internal static ImmutableArray<IUser> GetUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> fallbackUsers)
+        internal static ImmutableArray<IUser> GetUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> mentionedUsers)
         {
             var matches = _userRegex.Matches(text);
             var builder = ImmutableArray.CreateBuilder<IUser>(matches.Count);
@@ -99,17 +99,17 @@ namespace Discord
                 if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
                     IUser user = null;
-                    if (channel.IsAttached) //Waiting this sync is safe because it's using a cache
-                        user = channel.GetUserAsync(id).GetAwaiter().GetResult() as IUser;
-                    if (user == null)
+
+                    //Verify this user was actually mentioned
+                    foreach (var userMention in mentionedUsers)
                     {
-                        foreach (var fallbackUser in fallbackUsers)
+                        if (userMention.Id == id)
                         {
-                            if (fallbackUser.Id == id)
-                            {
-                                user = fallbackUser;
-                                break;
-                            }
+                            if (channel.IsAttached) //Waiting this sync is safe because it's using a cache
+                                user = channel.GetUserAsync(id).GetAwaiter().GetResult() as IUser;
+                            if (user == null) //User not found, fallback to basic mention info
+                                user = userMention;
+                            break;
                         }
                     }
 
