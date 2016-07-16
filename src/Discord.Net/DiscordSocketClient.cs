@@ -528,7 +528,6 @@ namespace Discord
 
                                     var currentUser = new CachedSelfUser(this, data.User);
                                     int unavailableGuilds = 0;
-                                    //dataStore.GetOrAddUser(data.User.Id, _ => currentUser);
                                     for (int i = 0; i < data.Guilds.Length; i++)
                                     {
                                         var model = data.Guilds[i];

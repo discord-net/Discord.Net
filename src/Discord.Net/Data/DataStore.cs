@@ -58,9 +58,16 @@ namespace Discord
         internal void AddChannel(ICachedChannel channel)
         {
             _channels[channel.Id] = channel;
+
             var dmChannel = channel as CachedDMChannel;
             if (dmChannel != null)
                 _dmChannels[dmChannel.Recipient.Id] = dmChannel;
+            else
+            {
+                var groupChannel = channel as CachedGroupChannel;
+                if (groupChannel != null)
+                    _groupChannels.TryAdd(groupChannel.Id);
+            }
         }
         internal ICachedChannel RemoveChannel(ulong id)
         {
@@ -72,6 +79,12 @@ namespace Discord
                 {
                     CachedDMChannel ignored;
                     _dmChannels.TryRemove(dmChannel.Recipient.Id, out ignored);
+                }
+                else
+                {
+                    var groupChannel = channel as CachedGroupChannel;
+                    if (groupChannel != null)
+                        _groupChannels.TryRemove(id);
                 }
                 return channel;
             }

@@ -31,9 +31,12 @@ namespace Discord
 
             base.Update(model, source);
 
-            Email = model.Email;
-            IsVerified = model.Verified;
-            IsMfaEnabled = model.MfaEnabled;
+            if (model.Email.IsSpecified)
+                Email = model.Email.Value;
+            if (model.Verified.IsSpecified)
+                IsVerified = model.Verified.Value;
+            if (model.MfaEnabled.IsSpecified)
+                IsMfaEnabled = model.MfaEnabled.Value;
         }
         
         public async Task UpdateAsync()

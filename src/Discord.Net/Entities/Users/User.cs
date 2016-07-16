@@ -31,10 +31,14 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            _avatarId = model.Avatar;
-            DiscriminatorValue = ushort.Parse(model.Discriminator);
-            IsBot = model.Bot;
-            Username = model.Username;
+            if (model.Avatar.IsSpecified)
+                _avatarId = model.Avatar.Value;
+            if (model.Discriminator.IsSpecified)
+                DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
+            if (model.Bot.IsSpecified)
+                IsBot = model.Bot.Value;
+            if (model.Username.IsSpecified)
+                Username = model.Username.Value;
         }
 
         public override string ToString() => $"{Username}#{Discriminator}";

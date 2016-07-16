@@ -7,20 +7,20 @@ namespace Discord.API
         [JsonProperty("id")]
         public ulong Id { get; set; }
         [JsonProperty("username")]
-        public string Username { get; set; }
+        public Optional<string> Username { get; set; }
         [JsonProperty("discriminator")]
-        public string Discriminator { get; set; }
+        public Optional<string> Discriminator { get; set; }
         [JsonProperty("bot")]
-        public bool Bot { get; set; }
+        public Optional<bool> Bot { get; set; }
         [JsonProperty("avatar")]
-        public string Avatar { get; set; }
+        public Optional<string> Avatar { get; set; }
 
         //CurrentUser
         [JsonProperty("verified")]
-        public bool Verified { get; set; }
+        public Optional<bool> Verified { get; set; }
         [JsonProperty("email")]
-        public string Email { get; set; }
+        public Optional<string> Email { get; set; }
         [JsonProperty("mfa_enabled")]
-        public bool MfaEnabled { get; set; }
+        public Optional<bool> MfaEnabled { get; set; }
     }
 }
