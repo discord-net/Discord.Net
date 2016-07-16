@@ -1280,39 +1280,66 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
                                     if (data.GuildId.HasValue)
                                     {
-                                        var guild = DataStore.GetGuild(data.GuildId.Value);
-                                        if (guild != null)
+                                        ICachedUser user;
+                                        VoiceState before, after;
+                                        if (data.GuildId != null)
                                         {
-                                            if (!guild.IsSynced)
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild != null)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
-                                                return;
-                                            }
+                                                if (!guild.IsSynced)
+                                                {
+                                                    await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                    return;
+                                                }
 
-                                            VoiceState before, after;
-                                            if (data.ChannelId != null)
-                                            {
-                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
-                                                after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                if (data.ChannelId != null)
+                                                {
+                                                    before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                }
+                                                else
+                                                {
+                                                    before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
+                                                    after = new VoiceState(null, data);
+                                                }
+                                                user = guild.GetUser(data.UserId);
                                             }
                                             else
                                             {
-                                                before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
-                                                after = new VoiceState(null, data);
-                                            }
-
-                                            var user = guild.GetUser(data.UserId);
-                                            if (user != null)
-                                                await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
-                                            else
-                                            {
-                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                                 return;
                                             }
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                            var groupChannel = DataStore.GetChannel(data.ChannelId.Value) as CachedGroupChannel;
+                                            if (groupChannel != null)
+                                            {
+                                                if (data.ChannelId != null)
+                                                {
+                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    after = groupChannel.AddOrUpdateVoiceState(data, DataStore);
+                                                }
+                                                else
+                                                {
+                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
+                                                    after = new VoiceState(null, data);
+                                                }
+                                                user = groupChannel.GetUser(data.UserId);
+                                            }
+                                            else
+                                            {
+                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+
+                                        if (user != null)
+                                            await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
                                             return;
                                         }
                                     }

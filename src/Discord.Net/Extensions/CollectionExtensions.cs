@@ -10,8 +10,8 @@ namespace Discord.Extensions
     {
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source)
             => new ConcurrentDictionaryWrapper<TValue>(source.Select(x => x.Value), () => source.Count);
-        public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue, TSource>(this IEnumerable<TValue> query, IReadOnlyCollection<TSource> source, int countOffset = 0)
-            => new ConcurrentDictionaryWrapper<TValue>(query, () => source.Count + countOffset);
+        public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue, TSource>(this IEnumerable<TValue> query, IReadOnlyCollection<TSource> source)
+            => new ConcurrentDictionaryWrapper<TValue>(query, () => source.Count);
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue>(this IEnumerable<TValue> query, Func<int> countFunc)
             => new ConcurrentDictionaryWrapper<TValue>(query, countFunc);
     }

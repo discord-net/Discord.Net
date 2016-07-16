@@ -30,10 +30,10 @@ namespace Discord
         {
             Discord = discord;
             _users = recipients;
-            
+
             Update(model, UpdateSource.Creation);
         }
-        public void Update(Model model, UpdateSource source)
+        public virtual void Update(Model model, UpdateSource source)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
@@ -41,7 +41,7 @@ namespace Discord
                 Name = model.Name.Value;
             if (model.Icon.IsSpecified)
                 _iconId = model.Icon.Value;
-            
+
             if (source != UpdateSource.Creation && model.Recipients.IsSpecified)
                 UpdateUsers(model.Recipients.Value, source);
         }

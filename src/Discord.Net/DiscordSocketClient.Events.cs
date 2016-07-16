@@ -167,12 +167,12 @@ namespace Discord
             remove { _userPresenceUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>>();
-        public event Func<IGuildUser, IVoiceState, IVoiceState, Task> UserVoiceStateUpdated
+        public event Func<IUser, IVoiceState, IVoiceState, Task> UserVoiceStateUpdated
         {
             add { _userVoiceStateUpdatedEvent.Add(value); }
             remove { _userVoiceStateUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, IVoiceState, IVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<IGuildUser, IVoiceState, IVoiceState, Task>>();
+        private readonly AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>>();
         public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated
         {
             add { _selfUpdatedEvent.Add(value); }
