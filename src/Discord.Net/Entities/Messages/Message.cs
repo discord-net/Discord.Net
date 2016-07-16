@@ -14,14 +14,15 @@ namespace Discord
         private bool _isMentioningEveryone;
         private long _timestampTicks;
         private long? _editedTimestampTicks;
+        
+        public MessageType Type { get; }
+        public IMessageChannel Channel { get; }
+        public IUser Author { get; }
 
         public bool IsTTS { get; private set; }
         public string Text { get; private set; }
         public bool IsPinned { get; private set; }
-        
-        public IMessageChannel Channel { get; }
-        public IUser Author { get; }
-        
+
         public IReadOnlyCollection<IAttachment> Attachments { get; private set; }
         public IReadOnlyCollection<IEmbed> Embeds { get; private set; }
         public IReadOnlyCollection<ulong> MentionedChannelIds { get; private set; }
@@ -37,6 +38,7 @@ namespace Discord
         {
             Channel = channel;
             Author = author;
+            Type = model.Type;
 
             if (channel is IGuildChannel)
             {

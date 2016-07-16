@@ -18,6 +18,8 @@ namespace Discord
         /// <summary> Gets the time this message was sent. </summary>
         DateTimeOffset Timestamp { get; }
 
+        /// <summary> Gets the type of this message. </summary>
+        MessageType Type { get; }
         /// <summary> Gets the channel this message was sent to. </summary>
         IMessageChannel Channel { get; }
         /// <summary> Gets the author of this message. </summary>
