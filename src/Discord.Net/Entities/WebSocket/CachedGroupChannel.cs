@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
+using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
@@ -17,11 +18,11 @@ namespace Discord
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public IReadOnlyCollection<ICachedUser> Members 
-            => _users.Select(x => x.Value).Concat(ImmutableArray.Create(Discord.CurrentUser)).Cast<ICachedUser>().ToReadOnlyCollection(() => _users.Count + 1);
-        public new IReadOnlyCollection<CachedPrivateUser> Recipients => _users.Cast<CachedPrivateUser>().ToReadOnlyCollection(_users);
+            => _users.Select(x => x.Value as ICachedUser).Concat(ImmutableArray.Create(Discord.CurrentUser)).ToReadOnlyCollection(() => _users.Count + 1);
+        public new IReadOnlyCollection<CachedDMUser> Recipients => _users.Cast<CachedDMUser>().ToReadOnlyCollection(_users);
 
-        public CachedGroupChannel(DiscordSocketClient discord, ConcurrentDictionary<ulong, IUser> recipients, Model model)
-            : base(discord, recipients, model)
+        public CachedGroupChannel(DiscordSocketClient discord, Model model)
+            : base(discord, model)
         {
             if (Discord.MessageCacheSize > 0)
                 _messages = new MessageCache(Discord, this);
@@ -36,21 +37,44 @@ namespace Discord
             base.Update(model, source);
         }
 
-        protected override void UpdateUsers(API.User[] models, UpdateSource source)
+        internal override void UpdateUsers(UserModel[] models, UpdateSource source)
         {
-            var users = new ConcurrentDictionary<ulong, IUser>(1, models.Length);
+            var users = new ConcurrentDictionary<ulong, GroupUser>(1, models.Length);
             for (int i = 0; i < models.Length; i++)
-                users[models[i].Id] = new CachedPrivateUser(Discord.GetOrAddUser(models[i], Discord.DataStore));
+            {
+                var globalUser = Discord.GetOrAddUser(models[i], Discord.DataStore);
+                users[models[i].Id] = new CachedGroupUser(this, globalUser);
+            }
             _users = users;
         }
 
+        public CachedGroupUser AddUser(UserModel model, DataStore dataStore)
+        {
+            GroupUser user;
+            if (_users.TryGetValue(model.Id, out user))
+                return user as CachedGroupUser;
+            else
+            {
+                var globalUser = Discord.GetOrAddUser(model, dataStore);
+                var privateUser = new CachedGroupUser(this, globalUser);
+                _users[privateUser.Id] = privateUser;
+                return privateUser;
+            }
+        }
         public ICachedUser GetUser(ulong id)
         {
-            IUser user;
+            GroupUser user;
             if (_users.TryGetValue(id, out user))
-                return user as ICachedUser;
+                return user as CachedGroupUser;
             if (id == Discord.CurrentUser.Id)
                 return Discord.CurrentUser;
+            return null;
+        }
+        public CachedGroupUser RemoveUser(ulong id)
+        {
+            GroupUser user;
+            if (_users.TryRemove(id, out user))
+                return user as CachedGroupUser;
             return null;
         }
 
@@ -106,15 +130,7 @@ namespace Discord
         public CachedDMChannel Clone() => MemberwiseClone() as CachedDMChannel;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
-        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck)
-        {
-            IUser user;
-            if (_users.TryGetValue(id, out user))
-                return user as ICachedUser;
-            if (id == Discord.CurrentUser.Id)
-                return Discord.CurrentUser;
-            return null;
-        }
+        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id);
         ICachedChannel ICachedChannel.Clone() => Clone();
     }
 }

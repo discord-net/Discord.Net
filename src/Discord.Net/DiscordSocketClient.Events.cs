@@ -185,6 +185,18 @@ namespace Discord
             remove { _userIsTypingEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<IUser, IChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<IUser, IChannel, Task>>();
+        public event Func<IGroupUser, Task> RecipientAdded
+        {
+            add { _recipientAddedEvent.Add(value); }
+            remove { _recipientAddedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientAddedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
+        public event Func<IGroupUser, Task> RecipientRemoved
+        {
+            add { _recipientRemovedEvent.Add(value); }
+            remove { _recipientRemovedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
 
         //TODO: Add PresenceUpdated? VoiceStateUpdated?, VoiceConnected, VoiceDisconnected;
     }

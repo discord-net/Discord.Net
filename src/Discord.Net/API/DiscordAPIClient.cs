@@ -551,6 +551,23 @@ namespace Discord.API
             await SendAsync("DELETE", $"channels/{channelId}/pins/{messageId}", options: options).ConfigureAwait(false);
         }
 
+        //Channel Recipients
+        public async Task AddGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.GreaterThan(channelId, 0, nameof(channelId));
+            Preconditions.GreaterThan(userId, 0, nameof(userId));
+
+            await SendAsync("PUT", $"channels/{channelId}/recipients/{userId}", options: options).ConfigureAwait(false);
+
+        }
+        public async Task RemoveGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+
+            await SendAsync("DELETE", $"channels/{channelId}/recipients/{userId}", options: options).ConfigureAwait(false);
+        }
+
         //Guilds
         public async Task<Guild> GetGuildAsync(ulong guildId, RequestOptions options = null)
         {

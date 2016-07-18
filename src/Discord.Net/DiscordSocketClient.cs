@@ -147,6 +147,7 @@ namespace Discord
 
             ConnectionState = ConnectionState.Connecting;
             await _gatewayLogger.InfoAsync("Connecting").ConfigureAwait(false);
+            
             try
             {
                 _connectTask = new TaskCompletionSource<bool>();
@@ -160,7 +161,6 @@ namespace Discord
                     await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
-                
                 ConnectionState = ConnectionState.Connected;
                 await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
@@ -173,11 +173,23 @@ namespace Discord
         /// <inheritdoc />
         public async Task DisconnectAsync()
         {
+            if (_connectTask?.TrySetCanceled() ?? false) return;
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _isReconnecting = false;
                 await DisconnectInternalAsync(null).ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task DisconnectAsync(Exception ex)
+        {
+            if (_connectTask?.TrySetException(ex) ?? false) return;
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                _isReconnecting = false;
+                await DisconnectInternalAsync(ex).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -340,17 +352,14 @@ namespace Discord
                     {
                         var recipients = model.Recipients.Value;
                         var user = GetOrAddUser(recipients[0], dataStore);
-                        var channel = new CachedDMChannel(this, new CachedPrivateUser(user), model);
+                        var channel = new CachedDMChannel(this, new CachedDMUser(user), model);
                         dataStore.AddChannel(channel);
                         return channel;
                     }
                 case ChannelType.Group:
                     {
-                        var recipients = model.Recipients.Value;
-                        var users = new ConcurrentDictionary<ulong, IUser>(1, recipients.Length);
-                        for (int i = 0; i < recipients.Length; i++)
-                            users[recipients[i].Id] = new CachedPrivateUser(GetOrAddUser(recipients[i], dataStore));
-                        var channel = new CachedGroupChannel(this, users, model);
+                        var channel = new CachedGroupChannel(this, model);
+                        channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation);
                         dataStore.AddChannel(channel);
                         return channel;
                     }
@@ -521,34 +530,43 @@ namespace Discord
                             //Connection
                             case "READY":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-                                    
-                                    var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var dataStore = new DataStore( data.Guilds.Length, data.PrivateChannels.Length);
-
-                                    var currentUser = new CachedSelfUser(this, data.User);
-                                    int unavailableGuilds = 0;
-                                    for (int i = 0; i < data.Guilds.Length; i++)
+                                    try
                                     {
-                                        var model = data.Guilds[i];
-                                        AddGuild(model, dataStore);
-                                        if (model.Unavailable == true)
-                                            unavailableGuilds++;
-                                    }
-                                    for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddPrivateChannel(data.PrivateChannels[i], dataStore);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
 
-                                    _sessionId = data.SessionId;
-                                    _currentUser = currentUser;
-                                    _unavailableGuilds = unavailableGuilds;
-                                    _lastGuildAvailableTime = Environment.TickCount;
-                                    DataStore = dataStore;                                   
+                                        var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                                        var dataStore = new DataStore(data.Guilds.Length, data.PrivateChannels.Length);
+
+                                        var currentUser = new CachedSelfUser(this, data.User);
+                                        int unavailableGuilds = 0;
+                                        for (int i = 0; i < data.Guilds.Length; i++)
+                                        {
+                                            var model = data.Guilds[i];
+                                            AddGuild(model, dataStore);
+                                            if (model.Unavailable == true)
+                                                unavailableGuilds++;
+                                        }
+                                        for (int i = 0; i < data.PrivateChannels.Length; i++)
+                                            AddPrivateChannel(data.PrivateChannels[i], dataStore);
+
+                                        _sessionId = data.SessionId;
+                                        _currentUser = currentUser;
+                                        _unavailableGuilds = unavailableGuilds;
+                                        _lastGuildAvailableTime = Environment.TickCount;
+                                        DataStore = dataStore;
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        await DisconnectAsync(new Exception("Processing READY failed", ex));
+                                        return;
+                                    }
 
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _clientLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
                                     await SyncGuildsAsync().ConfigureAwait(false);
-                                    
+
                                     var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
@@ -909,6 +927,51 @@ namespace Discord
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_MEMBERS_CHUNK referenced an unknown guild.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "CHANNEL_RECIPIENT_ADD":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_ADD)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
+                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    if (channel != null)
+                                    {
+                                        var user = channel.AddUser(data.User, DataStore);
+                                        await _recipientAddedEvent.InvokeAsync(user).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "CHANNEL_RECIPIENT_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
+                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    if (channel != null)
+                                    {
+                                        var user = channel.RemoveUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            user.User.RemoveRef(this);
+                                            await _recipientRemovedEvent.InvokeAsync(user).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_REMOVE referenced an unknown user.").ConfigureAwait(false);
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
                                         return;
                                     }
                                 }

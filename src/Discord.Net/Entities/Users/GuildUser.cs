@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
-using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {

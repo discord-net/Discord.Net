@@ -4,6 +4,6 @@ namespace Discord
 {
     internal interface ICachedPrivateChannel : ICachedChannel, IPrivateChannel
     {
-        new IReadOnlyCollection<CachedPrivateUser> Recipients { get; }
+        new IReadOnlyCollection<CachedDMUser> Recipients { get; }
     }
 }

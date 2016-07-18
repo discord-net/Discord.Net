@@ -5,7 +5,7 @@ using PresenceModel = Discord.API.Presence;
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    internal class CachedPrivateUser : ICachedUser
+    internal class CachedDMUser : ICachedUser
     {
         public CachedGlobalUser User { get; }
 
@@ -26,7 +26,7 @@ namespace Discord
         public string NicknameMention => User.NicknameMention;
         public string Username => User.Username;
 
-        public CachedPrivateUser(CachedGlobalUser user)
+        public CachedDMUser(CachedGlobalUser user)
         {
             User = user;
         }
@@ -36,7 +36,7 @@ namespace Discord
             User.Update(model, source);
         }
 
-        public CachedPrivateUser Clone() => MemberwiseClone() as CachedPrivateUser;
+        public CachedDMUser Clone() => MemberwiseClone() as CachedDMUser;
         ICachedUser ICachedUser.Clone() => Clone();
 
         public override string ToString() => $"{Username}#{Discriminator}";

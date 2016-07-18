@@ -170,11 +170,9 @@ namespace Discord
                     return new DMChannel(this, new User(model.Recipients.Value[0]), model);
                 else if (model.Type == ChannelType.Group)
                 {
-                    var recipients = model.Recipients.Value;
-                    var users = new ConcurrentDictionary<ulong, IUser>(1, recipients.Length);
-                    for (int i = 0; i < recipients.Length; i++)
-                        users[recipients[i].Id] = new User(recipients[i]);
-                    return new GroupChannel(this, users, model);
+                    var channel = new GroupChannel(this, model);
+                    channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation);
+                    return channel;
                 }
                 else
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");

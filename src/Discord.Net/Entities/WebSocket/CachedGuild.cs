@@ -208,7 +208,6 @@ namespace Discord
                 var user = Discord.GetOrAddUser(model.User, dataStore);
                 member = new CachedGuildUser(this, user, model);
                 members[user.Id] = member;
-                user.AddRef();
                 DownloadedMemberCount++;
             }            
             return member;

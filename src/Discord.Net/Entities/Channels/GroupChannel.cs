@@ -15,7 +15,7 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class GroupChannel : SnowflakeEntity, IGroupChannel
     {
-        protected ConcurrentDictionary<ulong, IUser> _users;
+        protected ConcurrentDictionary<ulong, GroupUser> _users;
         private string _iconId;
         
         public override DiscordClient Discord { get; }
@@ -25,11 +25,10 @@ namespace Discord
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
         public string IconUrl => API.CDN.GetChannelIconUrl(Id, _iconId);
 
-        public GroupChannel(DiscordClient discord, ConcurrentDictionary<ulong, IUser> recipients, Model model)
+        public GroupChannel(DiscordClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;
-            _users = recipients;
 
             Update(model, UpdateSource.Creation);
         }
@@ -46,13 +45,13 @@ namespace Discord
                 UpdateUsers(model.Recipients.Value, source);
         }
 
-        protected virtual void UpdateUsers(API.User[] models, UpdateSource source)
+        internal virtual void UpdateUsers(API.User[] models, UpdateSource source)
         {
             if (!IsAttached)
             {
-                var users = new ConcurrentDictionary<ulong, IUser>(1, (int)(models.Length * 1.05));
+                var users = new ConcurrentDictionary<ulong, GroupUser>(1, (int)(models.Length * 1.05));
                 for (int i = 0; i < models.Length; i++)
-                    users[models[i].Id] = new User(models[i]);
+                    users[models[i].Id] = new GroupUser(this, new User(models[i]));
                 _users = users;
             }
         }
@@ -69,9 +68,13 @@ namespace Discord
             await Discord.ApiClient.DeleteChannelAsync(Id).ConfigureAwait(false);
         }
 
+        public async Task AddUserAsync(IUser user)
+        {
+            await Discord.ApiClient.AddGroupRecipientAsync(Id, user.Id).ConfigureAwait(false);
+        }
         public async Task<IUser> GetUserAsync(ulong id)
         {
-            IUser user;
+            GroupUser user;
             if (_users.TryGetValue(id, out user))
                 return user;
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
@@ -82,7 +85,7 @@ namespace Discord
         public async Task<IReadOnlyCollection<IUser>> GetUsersAsync()
         {
             var currentUser = await Discord.GetCurrentUserAsync().ConfigureAwait(false);
-            return _users.Select(x => x.Value).Concat(ImmutableArray.Create(currentUser)).ToReadOnlyCollection(_users);
+            return _users.Select(x => x.Value).Concat<IUser>(ImmutableArray.Create(currentUser)).ToReadOnlyCollection(_users);
         }
 
         public async Task<IMessage> SendMessageAsync(string text, bool isTTS)
