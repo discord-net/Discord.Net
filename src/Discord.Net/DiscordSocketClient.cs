@@ -359,7 +359,7 @@ namespace Discord
                 case ChannelType.Group:
                     {
                         var channel = new CachedGroupChannel(this, model);
-                        channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation);
+                        channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation, dataStore);
                         dataStore.AddChannel(channel);
                         return channel;
                     }

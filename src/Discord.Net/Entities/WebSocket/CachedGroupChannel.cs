@@ -8,6 +8,7 @@ using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
+using Discord.API;
 
 namespace Discord
 {
@@ -37,16 +38,18 @@ namespace Discord
             base.Update(model, source);
         }
 
-        internal override void UpdateUsers(UserModel[] models, UpdateSource source)
+        internal void UpdateUsers(UserModel[] models, UpdateSource source, DataStore dataStore)
         {
             var users = new ConcurrentDictionary<ulong, GroupUser>(1, models.Length);
             for (int i = 0; i < models.Length; i++)
             {
-                var globalUser = Discord.GetOrAddUser(models[i], Discord.DataStore);
+                var globalUser = Discord.GetOrAddUser(models[i], dataStore);
                 users[models[i].Id] = new CachedGroupUser(this, globalUser);
             }
             _users = users;
         }
+        internal override void UpdateUsers(UserModel[] models, UpdateSource source)
+            => UpdateUsers(models, source, Discord.DataStore);
 
         public CachedGroupUser AddUser(UserModel model, DataStore dataStore)
         {
