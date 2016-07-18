@@ -1,18 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Net.Rest;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Discord.API.Rest
 {
     public class UploadFileParams
     {
+        public Stream File { get; set; }
         public string Filename { get; set; } = "unknown.dat";
 
         public Optional<string> Content { get; set; }
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
 
-        public IReadOnlyDictionary<string, string> ToDictionary()
+        public UploadFileParams(Stream file)
         {
-            var d = new Dictionary<string, string>();
+            File = file;
+        }
+
+        public IReadOnlyDictionary<string, object> ToDictionary()
+        {
+            var d = new Dictionary<string, object>();
+            d["file"] = new MultipartFile(File, Filename);
             if (Content.IsSpecified)
                 d["content"] = Content.Value;
             if (IsTTS.IsSpecified)

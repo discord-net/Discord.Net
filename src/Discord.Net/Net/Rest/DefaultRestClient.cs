@@ -102,7 +102,7 @@ namespace Discord.Net.Rest
                         if (p.Value is MultipartFile)
                         {
                             var fileValue = (MultipartFile)p.Value;
-                            content.Add(new StreamContent(fileValue.Stream), fileValue.Filename, p.Key);
+                            content.Add(new StreamContent(fileValue.Stream), p.Key, fileValue.Filename);
                             continue;
                         }
 

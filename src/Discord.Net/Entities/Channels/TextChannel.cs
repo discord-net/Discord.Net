@@ -68,15 +68,15 @@ namespace Discord
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
             {
-                var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-                var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, file, args).ConfigureAwait(false);
+                var args = new UploadFileParams(file) { Filename = filename, Content = text, IsTTS = isTTS };
+                var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, args).ConfigureAwait(false);
                 return new Message(this, new User(model.Author.Value), model);
             }
         }
         public async Task<IMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS)
         {
-            var args = new UploadFileParams { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, stream, args).ConfigureAwait(false);
+            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
+            var model = await Discord.ApiClient.UploadFileAsync(Guild.Id, Id, args).ConfigureAwait(false);
             return new Message(this, new User(model.Author.Value), model);
         }
         public virtual async Task<IMessage> GetMessageAsync(ulong id)

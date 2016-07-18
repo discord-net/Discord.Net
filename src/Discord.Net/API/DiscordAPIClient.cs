@@ -250,64 +250,58 @@ namespace Discord.API
             ConnectionState = ConnectionState.Disconnected;
         }
 
-        //Core
+        //REST
         public Task SendAsync(string method, string endpoint, 
             GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, null, true, bucket, options);
+            => SendInternalAsync(method, endpoint, null, true, BucketGroup.Global, (int)bucket, 0, options);
         public Task SendAsync(string method, string endpoint, object payload, 
             GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, payload, true, bucket, options);
-        public Task SendAsync(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, 
-            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, multipartArgs, true, bucket, options);
+            => SendInternalAsync(method, endpoint, payload, true, BucketGroup.Global, (int)bucket, 0, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, bucket, options).ConfigureAwait(false));
+            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, BucketGroup.Global, (int)bucket, 0, options).ConfigureAwait(false));
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload, GlobalBucket bucket = 
-            GlobalBucket.GeneralRest, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, bucket, options).ConfigureAwait(false));
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, 
-            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, multipartArgs, false, bucket, options).ConfigureAwait(false));
-
+            GlobalBucket.GeneralRest, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, BucketGroup.Global, (int)bucket, 0, options).ConfigureAwait(false));
+        
         public Task SendAsync(string method, string endpoint, 
             GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, null, true, bucket, guildId, options);
+            => SendInternalAsync(method, endpoint, null, true, BucketGroup.Guild, (int)bucket, guildId, options);
         public Task SendAsync(string method, string endpoint, object payload, 
             GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, payload, true, bucket, guildId, options);
-        public Task SendAsync(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, 
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendInternalAsync(method, endpoint, multipartArgs, true, bucket, guildId, options);
+            => SendInternalAsync(method, endpoint, payload, true, BucketGroup.Guild, (int)bucket, guildId, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, 
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, bucket, guildId, options).ConfigureAwait(false));
+            GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, null, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, object payload, 
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, bucket, guildId, options).ConfigureAwait(false));
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, Stream file, IReadOnlyDictionary<string, string> multipartArgs, 
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            where TResponse : class
-            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, multipartArgs, false, bucket, guildId, options).ConfigureAwait(false));
-        
-        private Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly, 
-            GlobalBucket bucket, RequestOptions options)
-            => SendInternalAsync(method, endpoint, payload, headerOnly, BucketGroup.Global, (int)bucket, 0, options);
-        private Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly, 
-            GuildBucket bucket, ulong guildId, RequestOptions options)
-            => SendInternalAsync(method, endpoint, payload, headerOnly, BucketGroup.Guild, (int)bucket, guildId, options);
-        private Task<Stream> SendInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, 
-            GlobalBucket bucket, RequestOptions options)
-            => SendInternalAsync(method, endpoint, multipartArgs, headerOnly, BucketGroup.Global, (int)bucket, 0, options);
-        private Task<Stream> SendInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, 
-            GuildBucket bucket, ulong guildId, RequestOptions options)
-            => SendInternalAsync(method, endpoint, multipartArgs, headerOnly, BucketGroup.Guild, (int)bucket, guildId, options);
+            GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, payload, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
 
+        //REST - Multipart
+        public Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null)
+            => SendMultipartInternalAsync(method, endpoint, multipartArgs, true, BucketGroup.Global, (int)bucket, 0, options);
+        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+            GlobalBucket bucket = GlobalBucket.GeneralRest, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendMultipartInternalAsync(method, endpoint, multipartArgs, false, BucketGroup.Global, (int)bucket, 0, options).ConfigureAwait(false));
+
+        public Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+            GuildBucket bucket, ulong guildId, RequestOptions options = null)
+            => SendMultipartInternalAsync(method, endpoint, multipartArgs, true, BucketGroup.Guild, (int)bucket, guildId, options);
+        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+            GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
+            => DeserializeJson<TResponse>(await SendMultipartInternalAsync(method, endpoint, multipartArgs, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
+
+        //Gateway
+        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
+            GlobalBucket bucket = GlobalBucket.GeneralGateway, RequestOptions options = null)
+            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Global, (int)bucket, 0, options);
+
+        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
+            GuildBucket bucket, ulong guildId, RequestOptions options = null)
+            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
+
+        //Core
         private async Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly, 
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
         {
@@ -323,7 +317,7 @@ namespace Discord.API
 
             return responseStream;
         }
-        private async Task<Stream> SendInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, 
+        private async Task<Stream> SendMultipartInternalAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, bool headerOnly, 
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -336,14 +330,7 @@ namespace Discord.API
 
             return responseStream;
         }
-
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload, 
-            GlobalBucket bucket = GlobalBucket.GeneralGateway, RequestOptions options = null)
-            => SendGatewayAsync(opCode, payload, BucketGroup.Global, (int)bucket, 0, options);
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload, 
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendGatewayAsync(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
-        private async Task SendGatewayAsync(GatewayOpCode opCode, object payload, 
+        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload, 
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
         {
             //TODO: Add ETF
@@ -1016,31 +1003,35 @@ namespace Discord.API
             else
                 return await SendAsync<Message>("POST", $"channels/{channelId}/messages", args, GlobalBucket.DirectMessage, options: options).ConfigureAwait(false);
         }
-        public Task<Message> UploadFileAsync(ulong guildId, ulong channelId, Stream file, UploadFileParams args, RequestOptions options = null)
+        public Task<Message> UploadFileAsync(ulong guildId, ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
-            return UploadFileInternalAsync(guildId, channelId, file, args);
+            return UploadFileInternalAsync(guildId, channelId, args);
         }
-        public Task<Message> UploadDMFileAsync(ulong channelId, Stream file, UploadFileParams args, RequestOptions options = null)
+        public Task<Message> UploadDMFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
-            return UploadFileInternalAsync(0, channelId, file, args);
+            return UploadFileInternalAsync(0, channelId, args);
         }
-        private async Task<Message> UploadFileInternalAsync(ulong guildId, ulong channelId, Stream file, UploadFileParams args, RequestOptions options = null)
+        private async Task<Message> UploadFileInternalAsync(ulong guildId, ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
-            if (args.Content.IsSpecified)
+            
+            if (args.Content.GetValueOrDefault(null) == null)
+                args.Content = "";
+            else if (args.Content.IsSpecified)
             {
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                if (args.Content.Value == null)
+                    args.Content = "";
+                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
             if (guildId != 0)
-                return await SendAsync<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GuildBucket.SendEditMessage, guildId, options: options).ConfigureAwait(false);
+                return await SendMultipartAsync<Message>("POST", $"channels/{channelId}/messages", args.ToDictionary(), GuildBucket.SendEditMessage, guildId, options: options).ConfigureAwait(false);
             else
-                return await SendAsync<Message>("POST", $"channels/{channelId}/messages", file, args.ToDictionary(), GlobalBucket.DirectMessage, options: options).ConfigureAwait(false);
+                return await SendMultipartAsync<Message>("POST", $"channels/{channelId}/messages", args.ToDictionary(), GlobalBucket.DirectMessage, options: options).ConfigureAwait(false);
         }
         public Task DeleteMessageAsync(ulong guildId, ulong channelId, ulong messageId, RequestOptions options = null)
         {
