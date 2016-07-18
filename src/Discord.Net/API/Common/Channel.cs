@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {
@@ -7,8 +8,8 @@ namespace Discord.API
         //Shared
         [JsonProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("is_private")]
-        public bool IsPrivate { get; set; }
+        [JsonProperty("type")]
+        public ChannelType Type { get; set; }
         [JsonProperty("last_message_id")]
         public ulong? LastMessageId { get; set; }
 
@@ -17,8 +18,6 @@ namespace Discord.API
         public Optional<ulong> GuildId { get; set; }
         [JsonProperty("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("type")]
-        public Optional<ChannelType> Type { get; set; }
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
         [JsonProperty("permission_overwrites")]
@@ -27,6 +26,8 @@ namespace Discord.API
         //TextChannel
         [JsonProperty("topic")]
         public Optional<string> Topic { get; set; }
+        [JsonProperty("last_pin_timestamp")]
+        public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
 
         //VoiceChannel
         [JsonProperty("bitrate")]
@@ -34,8 +35,12 @@ namespace Discord.API
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
 
-        //DMChannel
-        [JsonProperty("recipient")]
-        public Optional<User> Recipient { get; set; }
+        //PrivateChannel
+        [JsonProperty("recipients")]
+        public Optional<User[]> Recipients { get; set; }
+
+        //GroupChannel
+        [JsonProperty("icon")]
+        public Optional<string> Icon { get; set; }
     }
 }

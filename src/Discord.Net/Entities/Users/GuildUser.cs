@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
-using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
@@ -141,7 +140,7 @@ namespace Discord
             var args = new CreateDMChannelParams { Recipient = this };
             var model = await Discord.ApiClient.CreateDMChannelAsync(args).ConfigureAwait(false);
 
-            return new DMChannel(Discord, User, model);
+            return new DMChannel(Discord, new User(model.Recipients.Value[0]), model);
         }
 
         IGuild IGuildUser.Guild => Guild;

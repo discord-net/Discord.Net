@@ -211,7 +211,7 @@ namespace Discord.API
                 if (_gatewayUrl == null)
                 {
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.GatewayAPIVersion}&encoding={DiscordConfig.GatewayEncoding}";
+                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordConfig.GatewayEncoding}";
                 }
                 await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
@@ -549,6 +549,23 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
 
             await SendAsync("DELETE", $"channels/{channelId}/pins/{messageId}", options: options).ConfigureAwait(false);
+        }
+
+        //Channel Recipients
+        public async Task AddGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.GreaterThan(channelId, 0, nameof(channelId));
+            Preconditions.GreaterThan(userId, 0, nameof(userId));
+
+            await SendAsync("PUT", $"channels/{channelId}/recipients/{userId}", options: options).ConfigureAwait(false);
+
+        }
+        public async Task RemoveGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+
+            await SendAsync("DELETE", $"channels/{channelId}/recipients/{userId}", options: options).ConfigureAwait(false);
         }
 
         //Guilds
@@ -1160,7 +1177,7 @@ namespace Discord.API
         {
             return await SendAsync<IReadOnlyCollection<Connection>>("GET", "users/@me/connections", options: options).ConfigureAwait(false);
         }
-        public async Task<IReadOnlyCollection<Channel>> GetMyDMsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Channel>> GetMyPrivateChannelsAsync(RequestOptions options = null)
         {
             return await SendAsync<IReadOnlyCollection<Channel>>("GET", "users/@me/channels", options: options).ConfigureAwait(false);
         }

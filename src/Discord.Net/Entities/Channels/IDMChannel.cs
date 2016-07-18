@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public interface IDMChannel : IMessageChannel
+    public interface IDMChannel : IMessageChannel, IPrivateChannel
     {
         /// <summary> Gets the recipient of all messages in this channel. </summary>
         IUser Recipient { get; }

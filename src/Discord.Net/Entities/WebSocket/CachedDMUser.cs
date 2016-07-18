@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class CachedDMUser : ICachedUser
     {
         public CachedGlobalUser User { get; }
@@ -36,5 +38,8 @@ namespace Discord
 
         public CachedDMUser Clone() => MemberwiseClone() as CachedDMUser;
         ICachedUser ICachedUser.Clone() => Clone();
+
+        public override string ToString() => $"{Username}#{Discriminator}";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";
     }
 }

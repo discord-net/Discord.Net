@@ -57,7 +57,6 @@ namespace Discord
 
         internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
         internal IReadOnlyCollection<CachedGuild> Guilds => DataStore.Guilds;
-        internal IReadOnlyCollection<CachedDMChannel> DMChannels => DataStore.DMChannels;
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
@@ -148,6 +147,7 @@ namespace Discord
 
             ConnectionState = ConnectionState.Connecting;
             await _gatewayLogger.InfoAsync("Connecting").ConfigureAwait(false);
+            
             try
             {
                 _connectTask = new TaskCompletionSource<bool>();
@@ -161,7 +161,6 @@ namespace Discord
                     await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
-                
                 ConnectionState = ConnectionState.Connected;
                 await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
@@ -174,11 +173,23 @@ namespace Discord
         /// <inheritdoc />
         public async Task DisconnectAsync()
         {
+            if (_connectTask?.TrySetCanceled() ?? false) return;
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _isReconnecting = false;
                 await DisconnectInternalAsync(null).ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
+        private async Task DisconnectAsync(Exception ex)
+        {
+            if (_connectTask?.TrySetException(ex) ?? false) return;
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                _isReconnecting = false;
+                await DisconnectInternalAsync(ex).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -329,27 +340,39 @@ namespace Discord
         {
             return Task.FromResult<IChannel>(DataStore.GetChannel(id));
         }
-        public override Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync()
+        public override Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
         {
-            return Task.FromResult<IReadOnlyCollection<IDMChannel>>(DMChannels);
+            return Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(DataStore.PrivateChannels);
         }
-        internal CachedDMChannel AddDMChannel(API.Channel model, DataStore dataStore)
+        internal ICachedChannel AddPrivateChannel(API.Channel model, DataStore dataStore)
         {
-            var recipient = GetOrAddUser(model.Recipient.Value, dataStore);
-            var channel = new CachedDMChannel(this, new CachedDMUser(recipient), model);
-            recipient.AddRef();
-            dataStore.AddDMChannel(channel);
-            return channel;
-        }
-        internal CachedDMChannel RemoveDMChannel(ulong id)
-        {            
-            var dmChannel = DataStore.RemoveDMChannel(id);
-            if (dmChannel != null)
+            switch (model.Type)
             {
-                var recipient = dmChannel.Recipient;
-                recipient.User.RemoveRef(this);
+                case ChannelType.DM:
+                    {
+                        var recipients = model.Recipients.Value;
+                        var user = GetOrAddUser(recipients[0], dataStore);
+                        var channel = new CachedDMChannel(this, new CachedDMUser(user), model);
+                        dataStore.AddChannel(channel);
+                        return channel;
+                    }
+                case ChannelType.Group:
+                    {
+                        var channel = new CachedGroupChannel(this, model);
+                        channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation, dataStore);
+                        dataStore.AddChannel(channel);
+                        return channel;
+                    }
+                default:
+                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
-            return dmChannel;
+        }
+        internal ICachedChannel RemovePrivateChannel(ulong id)
+        {
+            var channel = DataStore.RemoveChannel(id) as ICachedPrivateChannel;
+            foreach (var recipient in channel.Recipients)
+                recipient.User.RemoveRef(this);
+            return channel;
         }
 
         /// <inheritdoc />
@@ -361,6 +384,11 @@ namespace Discord
         public override Task<IUser> GetUserAsync(string username, string discriminator)
         {
             return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
+        }
+        /// <inheritdoc />
+        public override Task<ISelfUser> GetCurrentUserAsync()
+        {
+            return Task.FromResult<ISelfUser>(_currentUser);
         }
         internal CachedGlobalUser GetOrAddUser(API.User model, DataStore dataStore)
         {
@@ -502,35 +530,43 @@ namespace Discord
                             //Connection
                             case "READY":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-                                    
-                                    var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var dataStore = new DataStore( data.Guilds.Length, data.PrivateChannels.Length);
-
-                                    var currentUser = new CachedSelfUser(this, data.User);
-                                    int unavailableGuilds = 0;
-                                    //dataStore.GetOrAddUser(data.User.Id, _ => currentUser);
-                                    for (int i = 0; i < data.Guilds.Length; i++)
+                                    try
                                     {
-                                        var model = data.Guilds[i];
-                                        AddGuild(model, dataStore);
-                                        if (model.Unavailable == true)
-                                            unavailableGuilds++;
-                                    }
-                                    for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                        AddDMChannel(data.PrivateChannels[i], dataStore);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
 
-                                    _sessionId = data.SessionId;
-                                    _currentUser = currentUser;
-                                    _unavailableGuilds = unavailableGuilds;
-                                    _lastGuildAvailableTime = Environment.TickCount;
-                                    DataStore = dataStore;                                   
+                                        var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                                        var dataStore = new DataStore(data.Guilds.Length, data.PrivateChannels.Length);
+
+                                        var currentUser = new CachedSelfUser(this, data.User);
+                                        int unavailableGuilds = 0;
+                                        for (int i = 0; i < data.Guilds.Length; i++)
+                                        {
+                                            var model = data.Guilds[i];
+                                            AddGuild(model, dataStore);
+                                            if (model.Unavailable == true)
+                                                unavailableGuilds++;
+                                        }
+                                        for (int i = 0; i < data.PrivateChannels.Length; i++)
+                                            AddPrivateChannel(data.PrivateChannels[i], dataStore);
+
+                                        _sessionId = data.SessionId;
+                                        _currentUser = currentUser;
+                                        _unavailableGuilds = unavailableGuilds;
+                                        _lastGuildAvailableTime = Environment.TickCount;
+                                        DataStore = dataStore;
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        await DisconnectAsync(new Exception("Processing READY failed", ex));
+                                        return;
+                                    }
 
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _clientLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
                                     await SyncGuildsAsync().ConfigureAwait(false);
-                                    
+
                                     var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
@@ -686,11 +722,19 @@ namespace Discord
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     ICachedChannel channel = null;
-                                    if (!data.IsPrivate)
+                                    if (data.GuildId.IsSpecified)
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
+                                        {
                                             guild.AddChannel(data, DataStore);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.").ConfigureAwait(false);
@@ -698,7 +742,8 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = AddDMChannel(data, DataStore);
+                                        channel = AddPrivateChannel(data, DataStore);
+
                                     if (channel != null)
                                         await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                 }
@@ -713,6 +758,13 @@ namespace Discord
                                     {
                                         var before = channel.Clone();
                                         channel.Update(data, UpdateSource.WebSocket);
+
+                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored CHANNEL_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _channelUpdatedEvent.InvokeAsync(before, channel).ConfigureAwait(false);
                                     }
                                     else
@@ -728,11 +780,19 @@ namespace Discord
 
                                     ICachedChannel channel = null;
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    if (!data.IsPrivate)
+                                    if (data.GuildId.IsSpecified)
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
                                         if (guild != null)
+                                        {
                                             channel = guild.RemoveChannel(data.Id);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown guild.").ConfigureAwait(false);
@@ -740,7 +800,8 @@ namespace Discord
                                         }
                                     }
                                     else
-                                        channel = RemoveDMChannel(data.Recipient.Value.Id);
+                                        channel = RemovePrivateChannel(data.Id);
+
                                     if (channel != null)
                                         await _channelDestroyedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                     else
@@ -761,6 +822,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.AddUser(data, DataStore);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userJoinedEvent.InvokeAsync(user).ConfigureAwait(false);
                                     }
                                     else
@@ -779,6 +847,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.GetUser(data.User.Id);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         if (user != null)
                                         {
                                             var before = user.Clone();
@@ -807,6 +882,13 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var user = guild.RemoveUser(data.User.Id);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         if (user != null)
                                         {
                                             user.User.RemoveRef(this);
@@ -849,6 +931,51 @@ namespace Discord
                                     }
                                 }
                                 break;
+                            case "CHANNEL_RECIPIENT_ADD":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_ADD)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
+                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    if (channel != null)
+                                    {
+                                        var user = channel.AddUser(data.User, DataStore);
+                                        await _recipientAddedEvent.InvokeAsync(user).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "CHANNEL_RECIPIENT_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
+                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    if (channel != null)
+                                    {
+                                        var user = channel.RemoveUser(data.User.Id);
+                                        if (user != null)
+                                        {
+                                            user.User.RemoveRef(this);
+                                            await _recipientRemovedEvent.InvokeAsync(user).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_REMOVE referenced an unknown user.").ConfigureAwait(false);
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
 
                             //Roles
                             case "GUILD_ROLE_CREATE":
@@ -860,6 +987,12 @@ namespace Discord
                                     if (guild != null)
                                     {
                                         var role = guild.AddRole(data.Role);
+
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
                                         await _roleCreatedEvent.InvokeAsync(role).ConfigureAwait(false);
                                     }
                                     else
@@ -882,6 +1015,13 @@ namespace Discord
                                         {
                                             var before = role.Clone();
                                             role.Update(data.Role, UpdateSource.WebSocket);
+
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _roleUpdatedEvent.InvokeAsync(before, role).ConfigureAwait(false);
                                         }
                                         else
@@ -907,7 +1047,15 @@ namespace Discord
                                     {
                                         var role = guild.RemoveRole(data.RoleId);
                                         if (role != null)
+                                        {
+                                            if (!guild.IsSynced)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _roleDeletedEvent.InvokeAsync(role).ConfigureAwait(false);
+                                        }
                                         else
                                         {
                                             await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
@@ -930,7 +1078,15 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userBannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
+                                    }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
@@ -945,7 +1101,15 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<GuildBanEvent>(_serializer);
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
+                                    {
+                                        if (!guild.IsSynced)
+                                        {
+                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            return;
+                                        }
+
                                         await _userUnbannedEvent.InvokeAsync(new User(data.User), guild).ConfigureAwait(false);
+                                    }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
@@ -1179,39 +1343,66 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
                                     if (data.GuildId.HasValue)
                                     {
-                                        var guild = DataStore.GetGuild(data.GuildId.Value);
-                                        if (guild != null)
+                                        ICachedUser user;
+                                        VoiceState before, after;
+                                        if (data.GuildId != null)
                                         {
-                                            if (!guild.IsSynced)
+                                            var guild = DataStore.GetGuild(data.GuildId.Value);
+                                            if (guild != null)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
-                                                return;
-                                            }
+                                                if (!guild.IsSynced)
+                                                {
+                                                    await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                    return;
+                                                }
 
-                                            VoiceState before, after;
-                                            if (data.ChannelId != null)
-                                            {
-                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
-                                                after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                if (data.ChannelId != null)
+                                                {
+                                                    before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                }
+                                                else
+                                                {
+                                                    before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
+                                                    after = new VoiceState(null, data);
+                                                }
+                                                user = guild.GetUser(data.UserId);
                                             }
                                             else
                                             {
-                                                before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
-                                                after = new VoiceState(null, data);
-                                            }
-
-                                            var user = guild.GetUser(data.UserId);
-                                            if (user != null)
-                                                await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
-                                            else
-                                            {
-                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
                                                 return;
                                             }
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                            var groupChannel = DataStore.GetChannel(data.ChannelId.Value) as CachedGroupChannel;
+                                            if (groupChannel != null)
+                                            {
+                                                if (data.ChannelId != null)
+                                                {
+                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    after = groupChannel.AddOrUpdateVoiceState(data, DataStore);
+                                                }
+                                                else
+                                                {
+                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
+                                                    after = new VoiceState(null, data);
+                                                }
+                                                user = groupChannel.GetUser(data.UserId);
+                                            }
+                                            else
+                                            {
+                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+
+                                        if (user != null)
+                                            await _userVoiceStateUpdatedEvent.InvokeAsync(user, before, after).ConfigureAwait(false);
+                                        else
+                                        {
+                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
                                             return;
                                         }
                                     }

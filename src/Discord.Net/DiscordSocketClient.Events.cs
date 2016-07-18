@@ -167,12 +167,12 @@ namespace Discord
             remove { _userPresenceUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>>();
-        public event Func<IGuildUser, IVoiceState, IVoiceState, Task> UserVoiceStateUpdated
+        public event Func<IUser, IVoiceState, IVoiceState, Task> UserVoiceStateUpdated
         {
             add { _userVoiceStateUpdatedEvent.Add(value); }
             remove { _userVoiceStateUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, IVoiceState, IVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<IGuildUser, IVoiceState, IVoiceState, Task>>();
+        private readonly AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>>();
         public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated
         {
             add { _selfUpdatedEvent.Add(value); }
@@ -185,6 +185,18 @@ namespace Discord
             remove { _userIsTypingEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<IUser, IChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<IUser, IChannel, Task>>();
+        public event Func<IGroupUser, Task> RecipientAdded
+        {
+            add { _recipientAddedEvent.Add(value); }
+            remove { _recipientAddedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientAddedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
+        public event Func<IGroupUser, Task> RecipientRemoved
+        {
+            add { _recipientRemovedEvent.Add(value); }
+            remove { _recipientRemovedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
 
         //TODO: Add PresenceUpdated? VoiceStateUpdated?, VoiceConnected, VoiceDisconnected;
     }

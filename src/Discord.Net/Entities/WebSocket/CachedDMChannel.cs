@@ -6,13 +6,14 @@ using Model = Discord.API.Channel;
 
 namespace Discord
 {
-    internal class CachedDMChannel : DMChannel, IDMChannel, ICachedChannel, ICachedMessageChannel
+    internal class CachedDMChannel : DMChannel, IDMChannel, ICachedChannel, ICachedMessageChannel, ICachedPrivateChannel
     {
         private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedDMUser Recipient => base.Recipient as CachedDMUser;
         public IReadOnlyCollection<ICachedUser> Members => ImmutableArray.Create<ICachedUser>(Discord.CurrentUser, Recipient);
+        IReadOnlyCollection<CachedDMUser> ICachedPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
 
         public CachedDMChannel(DiscordSocketClient discord, CachedDMUser recipient, Model model)
             : base(discord, recipient, model)

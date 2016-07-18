@@ -13,11 +13,13 @@ namespace Discord
         bool IsTTS { get; }
         /// <summary> Returns true if this message was added to its channel's pinned messages. </summary>
         bool IsPinned { get; }
-        /// <summary> Returns the text for this message. </summary>
-        string Text { get; }
+        /// <summary> Returns the content for this message. </summary>
+        string Content { get; }
         /// <summary> Gets the time this message was sent. </summary>
         DateTimeOffset Timestamp { get; }
 
+        /// <summary> Gets the type of this message. </summary>
+        MessageType Type { get; }
         /// <summary> Gets the channel this message was sent to. </summary>
         IMessageChannel Channel { get; }
         /// <summary> Gets the author of this message. </summary>
