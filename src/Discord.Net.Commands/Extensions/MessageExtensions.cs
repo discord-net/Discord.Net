@@ -15,7 +15,6 @@
         public static bool HasStringPrefix(this IMessage msg, string str, ref int argPos)
         {
             var text = msg.Content;
-            //str = str + ' ';
             if (text.StartsWith(str))
             {
                 argPos = str.Length;
@@ -26,19 +25,14 @@
         public static bool HasMentionPrefix(this IMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
-            string mention = user.Mention + ' ';
-            if (text.StartsWith(mention))
-            {
-                argPos = mention.Length;
-                return true;
-            }
-            string nickMention = user.NicknameMention + ' ';
-            if (text.StartsWith(mention))
-            {
-                argPos = nickMention.Length;
-                return true;
-            }
-            return false;
+            if (text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
+
+            int endPos = text.IndexOf('>');
+            if (endPos == -1) return false;
+
+            ulong userId;
+            if (!MentionUtils.TryParseUser(text.Substring(0, endPos), out userId)) return false;
+            return userId == user.Id;
         }
     }
 }

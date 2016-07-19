@@ -13,7 +13,8 @@ namespace Discord
         private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
         private static readonly Regex _roleRegex = new Regex(@"<@&([0-9]+)>", RegexOptions.Compiled);
 
-        internal static string Mention(IUser user, bool useNickname) => useNickname ? $"<@!{user.Id}>" : $"<@{user.Id}>";
+        //Unsure the system can be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
+        internal static string Mention(IUser user, bool useNickname = true) => useNickname ? $"<@!{user.Id}>" : $"<@{user.Id}>";
         internal static string Mention(IChannel channel) => $"<#{channel.Id}>";
         internal static string Mention(IRole role) => $"<&{role.Id}>";
 

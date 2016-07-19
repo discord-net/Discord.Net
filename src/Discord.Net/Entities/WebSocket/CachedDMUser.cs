@@ -22,8 +22,7 @@ namespace Discord
         public ushort DiscriminatorValue => User.DiscriminatorValue;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
-        public string Mention => User.Mention;
-        public string NicknameMention => User.NicknameMention;
+        public string Mention => MentionUtils.Mention(this);
         public string Username => User.Username;
 
         public CachedDMUser(CachedGlobalUser user)

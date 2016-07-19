@@ -12,7 +12,5 @@ namespace Discord
         bool IsBot { get; }
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
-        /// <summary> Returns a special string used to mention this object, by nickname.  </summary>
-        string NicknameMention { get; }
     }
 }

@@ -17,8 +17,7 @@ namespace Discord
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
         public string Discriminator => DiscriminatorValue.ToString("D4");
-        public string Mention => MentionUtils.Mention(this, false);
-        public string NicknameMention => MentionUtils.Mention(this, true);
+        public string Mention => MentionUtils.Mention(this);
         public virtual Game Game => null;
         public virtual UserStatus Status => UserStatus.Unknown;
 

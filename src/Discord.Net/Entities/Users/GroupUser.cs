@@ -16,9 +16,8 @@ namespace Discord
         public ushort DiscriminatorValue => User.DiscriminatorValue;
         public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
-        public string Mention => User.Mention;
-        public string NicknameMention => User.NicknameMention;
         public string Username => User.Username;
+        public string Mention => MentionUtils.Mention(this, false);
 
         public virtual UserStatus Status => UserStatus.Unknown;
         public virtual Game Game => null;
