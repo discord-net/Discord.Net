@@ -20,15 +20,15 @@ namespace Discord.Net.Queue
         public WebSocketRequest(IWebSocketClient client, byte[] data, bool isText, RequestOptions options) : this(client, data, 0, data.Length, isText, options) { }
         public WebSocketRequest(IWebSocketClient client, byte[] data, int index, int count, bool isText, RequestOptions options)
         {
+            if (options == null)
+                options = RequestOptions.Default;
+
             Client = client;
             Data = data;
             DataIndex = index;
             DataCount = count;
             IsText = isText;
-            if (options != null)
-                TimeoutTick = unchecked(Environment.TickCount + options.Timeout.Value);
-            else
-                TimeoutTick = null;
+            TimeoutTick = options.Timeout.HasValue ? (int?)unchecked(Environment.TickCount + options.Timeout.Value) : null;
             Promise = new TaskCompletionSource<Stream>();
         }
 

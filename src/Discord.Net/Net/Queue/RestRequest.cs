@@ -35,7 +35,8 @@ namespace Discord.Net.Queue
 
         private RestRequest(IRestClient client, string method, string endpoint, bool headerOnly, RequestOptions options)
         {
-            var timeout = options?.Timeout;
+            if (options == null)
+                options = RequestOptions.Default;
 
             Client = client;
             Method = method;
@@ -43,7 +44,7 @@ namespace Discord.Net.Queue
             Json = null;
             MultipartParams = null;
             HeaderOnly = headerOnly;
-            TimeoutTick = timeout.HasValue ? (int?)unchecked(Environment.TickCount + timeout.Value) : null;
+            TimeoutTick = options.Timeout.HasValue ? (int?)unchecked(Environment.TickCount + options.Timeout.Value) : null;
             Promise = new TaskCompletionSource<Stream>();
         }
 
