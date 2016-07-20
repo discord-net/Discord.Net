@@ -65,7 +65,7 @@ namespace Discord
             if (source == UpdateSource.Rest && IsAttached) return;
 
             _available = !(model.Unavailable ?? false);
-            if (!Available)
+            if (!_available)
             {
                 if (_channels == null)
                     _channels = new ConcurrentHashSet<ulong>();
