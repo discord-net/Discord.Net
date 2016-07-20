@@ -43,7 +43,7 @@ namespace Discord.Commands
                         nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
                     else
                         nextGroupPrefix = groupPrefix;
-                    SearchClass(ReflectionUtils.CreateObject(type), commands, type, nextGroupPrefix);
+                    SearchClass(ReflectionUtils.CreateObject(type, Service), commands, type, nextGroupPrefix);
                 }
             }
         }
