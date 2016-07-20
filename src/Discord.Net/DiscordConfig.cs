@@ -6,6 +6,7 @@ namespace Discord
     public class DiscordConfig
     {
         public static string Version { get; } = typeof(DiscordConfig).GetTypeInfo().Assembly?.GetName().Version.ToString(3) ?? "Unknown";
+        public static string FullVersion { get; } = typeof(DiscordConfig).GetTypeInfo().Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion ?? "Unknown";
         public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
 
         public const int APIVersion = 6;
