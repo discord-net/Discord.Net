@@ -298,9 +298,9 @@ namespace Discord
         private async Task WriteInitialLog()
         {
             if (this is DiscordSocketClient)
-                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.FullVersion} (API v{DiscordConfig.APIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
             else
-                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.FullVersion} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"Processors: {Environment.ProcessorCount}").ConfigureAwait(false);

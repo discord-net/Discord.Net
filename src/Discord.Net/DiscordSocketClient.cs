@@ -29,10 +29,9 @@ namespace Discord
         private int _lastSeq;
         private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
         private TaskCompletionSource<bool> _connectTask;
-        private CancellationTokenSource _cancelToken;
+        private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _heartbeatTask, _guildDownloadTask, _reconnectTask;
         private long _heartbeatTime;
-        private bool _isReconnecting;
         private int _unavailableGuilds;
         private long _lastGuildAvailableTime;
         private int _nextAudioId;
@@ -124,7 +123,6 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                _isReconnecting = false;
                 await ConnectInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
@@ -140,6 +138,9 @@ namespace Discord
         {
             if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting.");
+
+            if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
+                _reconnectCancelToken.Cancel();
 
             var state = ConnectionState;
             if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
@@ -177,7 +178,6 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                _isReconnecting = false;
                 await DisconnectInternalAsync(null).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
@@ -188,13 +188,15 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                _isReconnecting = false;
                 await DisconnectInternalAsync(ex).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
         private async Task DisconnectInternalAsync(Exception ex)
         {
+            if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
+                _reconnectCancelToken.Cancel();
+
             ulong guildId;
 
             if (ConnectionState == ConnectionState.Disconnected) return;
@@ -234,29 +236,26 @@ namespace Discord
 
         private async Task StartReconnectAsync(Exception ex)
         {
-            //TODO: Is this thread-safe?
-            if (_reconnectTask != null) return;
-
+            _connectTask?.TrySetException(ex);
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(ex).ConfigureAwait(false);
-                if (_reconnectTask != null) return;
-                _isReconnecting = true;
-                _reconnectTask = ReconnectInternalAsync();
+                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                _reconnectCancelToken = new CancellationTokenSource();
+                _reconnectTask = ReconnectInternalAsync(_reconnectCancelToken.Token);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ReconnectInternalAsync()
+        private async Task ReconnectInternalAsync(CancellationToken cancelToken)
         {
             try
             {
                 int nextReconnectDelay = 1000;
-                while (_isReconnecting)
+                while (!cancelToken.IsCancellationRequested)
                 {
                     try
                     {
-                        await Task.Delay(nextReconnectDelay).ConfigureAwait(false);
+                        await Task.Delay(nextReconnectDelay, cancelToken).ConfigureAwait(false);
                         nextReconnectDelay *= 2;
                         if (nextReconnectDelay > 30000)
                             nextReconnectDelay = 30000;
@@ -264,6 +263,7 @@ namespace Discord
                         await _connectionLock.WaitAsync().ConfigureAwait(false);
                         try
                         {
+                            if (cancelToken.IsCancellationRequested) return;
                             await ConnectInternalAsync().ConfigureAwait(false);
                         }
                         finally { _connectionLock.Release(); }
@@ -275,15 +275,10 @@ namespace Discord
                     }
                 }
             }
+            catch (OperationCanceledException) { }
             finally
             {
-                await _connectionLock.WaitAsync().ConfigureAwait(false);
-                try
-                {
-                    _isReconnecting = false;
-                    _reconnectTask = null;
-                }
-                finally { _connectionLock.Release(); }
+                _reconnectTask = null;
             }
         }
 
@@ -575,6 +570,7 @@ namespace Discord
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
 
+                                    var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                                 }
                                 return;
@@ -1489,17 +1485,32 @@ namespace Discord
                 }
                 await logger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                await logger.DebugAsync("Heartbeat Stopped", ex).ConfigureAwait(false);
+                await logger.DebugAsync("Heartbeat Stopped").ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await logger.ErrorAsync("Heartbeat Errored", ex).ConfigureAwait(false);
             }
         }
         private async Task WaitForGuildsAsync(CancellationToken cancelToken, ILogger logger)
         {
-            await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
-            while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
-                await Task.Delay(500, cancelToken).ConfigureAwait(false);
-            await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
+            try
+            {
+                await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
+                while ((_unavailableGuilds != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
+                    await Task.Delay(500, cancelToken).ConfigureAwait(false);
+                await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await logger.ErrorAsync("GuildDownloader Errored", ex).ConfigureAwait(false);
+            }
         }
         private async Task SyncGuildsAsync()
         {

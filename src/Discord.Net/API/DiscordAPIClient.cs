@@ -234,6 +234,15 @@ namespace Discord.API
             }
             finally { _connectionLock.Release(); }
         }
+        public async Task DisconnectAsync(Exception ex)
+        {
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectInternalAsync().ConfigureAwait(false);
+            }
+            finally { _connectionLock.Release(); }
+        }
         private async Task DisconnectInternalAsync()
         {
             if (_gatewayClient == null)
