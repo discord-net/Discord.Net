@@ -174,7 +174,7 @@ namespace Discord.Commands
                 {
                     var typeInfo = type.GetTypeInfo();
                     var moduleAttr = typeInfo.GetCustomAttribute<ModuleAttribute>();
-                    if (moduleAttr != null)
+                    if (moduleAttr != null && moduleAttr.Autoload)
                     {
                         var moduleInstance = ReflectionUtils.CreateObject(typeInfo);
                         modules.Add(LoadInternal(moduleInstance, moduleAttr, typeInfo));
