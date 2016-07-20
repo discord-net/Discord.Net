@@ -16,23 +16,23 @@ namespace Discord.Commands
                 if (constructor.GetParameters().Length == 0)
                     return constructor.Invoke(null);
                 else if (constructor.GetParameters().Length > 1)
-                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\"");
+                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Found too many parameters)");
                 var parameter = constructor.GetParameters().FirstOrDefault();
                 if (parameter == null)
-                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\"");
-                if (parameter.GetType() == typeof(CommandService))
+                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (No valid parameters)");
+                if (parameter.ParameterType == typeof(CommandService))
                     return constructor.Invoke(new object[1] { commands });
-                else if (parameter is IDependencyMap)
+                else if (parameter.ParameterType == typeof(IDependencyMap))
                 {
                     if (map == null) throw new InvalidOperationException($"The constructor for \"{typeInfo.FullName}\" requires a Dependency Map.");
                     return constructor.Invoke(new object[1] { map });
                 }
                 else
-                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\"");
+                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Invalid Parameter Type: \"{parameter.ParameterType.FullName}\")");
             }
-            catch
+            catch (Exception e)
             {
-                throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\"");
+                throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Error invoking constructor)");
             }
         }
     }

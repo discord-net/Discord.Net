@@ -8,6 +8,11 @@ namespace Discord.Commands
     {
         private Dictionary<Type, object> map;
 
+        public DependencyMap()
+        {
+            map = new Dictionary<Type, object>();
+        }
+
         public T Get<T>() where T : class
         {
             var t = typeof(T);
