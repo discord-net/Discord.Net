@@ -372,6 +372,7 @@ namespace Discord.API
         {
             var msg = new ResumeParams()
             {
+                Token = _authToken,
                 SessionId = sessionId,
                 Sequence = lastSeq
             };

@@ -43,7 +43,7 @@ namespace Discord.Net.Converters
                     if (converter == null)
                     {
                         var innerConverter = GetConverter(propInfo, innerTypeOutput);
-                        converter = converterType.DeclaredConstructors.FirstOrDefault().Invoke(new object[] { innerConverter }) as JsonConverter;
+                        converter = converterType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
                         instanceField.SetValue(null, converter);
                     }
                 }
