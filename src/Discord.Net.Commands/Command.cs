@@ -75,11 +75,17 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var typeInfo = type.GetTypeInfo();
-                if (typeInfo.IsEnum)
-                    type = Enum.GetUnderlyingType(type);
-
                 var reader = Module.Service.GetTypeReader(type);
+
+                if (reader == null)
+                {
+                    var typeInfo = type.GetTypeInfo();
+                    if (typeInfo.IsEnum)
+                        type = Enum.GetUnderlyingType(type);
+
+                    reader = Module.Service.GetTypeReader(type);
+                }
+
                 if (reader == null)
                     throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
 
