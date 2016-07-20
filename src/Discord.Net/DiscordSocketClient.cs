@@ -73,6 +73,8 @@ namespace Discord
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
+
+            DataStore = new DataStore(0, 0);
             _nextAudioId = 1;
 
             _gatewayLogger = LogManager.CreateLogger("Gateway");

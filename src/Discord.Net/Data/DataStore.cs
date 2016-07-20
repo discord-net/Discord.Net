@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Discord
 {
-    public class DataStore
+    internal class DataStore
     {
         private const int CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
