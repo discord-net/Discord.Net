@@ -148,7 +148,7 @@ namespace Discord.Net.Queue
         {
             if (endTick.HasValue)
             {
-                int millis = unchecked(Environment.TickCount - endTick.Value);
+                int millis = unchecked(endTick.Value - Environment.TickCount);
                 if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
                     throw new TimeoutException();
             }
