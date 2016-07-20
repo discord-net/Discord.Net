@@ -35,6 +35,7 @@ namespace Discord
         private int _unavailableGuilds;
         private long _lastGuildAvailableTime;
         private int _nextAudioId;
+        private bool _canReconnect;
 
         /// <summary> Gets the shard if of this client. </summary>
         public int ShardId { get; }
@@ -114,7 +115,7 @@ namespace Discord
         protected override async Task OnLogoutAsync()
         {
             if (ConnectionState != ConnectionState.Disconnected)
-                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                await DisconnectInternalAsync(null, false).ConfigureAwait(false);
 
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
         }
@@ -125,7 +126,7 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await ConnectInternalAsync().ConfigureAwait(false);
+                await ConnectInternalAsync(false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
 
@@ -136,17 +137,17 @@ namespace Discord
                     await _guildDownloadTask.ConfigureAwait(false);
             }
         }
-        private async Task ConnectInternalAsync()
+        private async Task ConnectInternalAsync(bool isReconnecting)
         {
             if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting.");
 
-            if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
+            if (!isReconnecting && _reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
                 _reconnectCancelToken.Cancel();
 
             var state = ConnectionState;
             if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
-                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                await DisconnectInternalAsync(null, isReconnecting).ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Connecting;
             await _gatewayLogger.InfoAsync("Connecting").ConfigureAwait(false);
@@ -164,12 +165,13 @@ namespace Discord
                     await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
+                _canReconnect = true;
                 ConnectionState = ConnectionState.Connected;
                 await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
             catch (Exception)
             {
-                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                await DisconnectInternalAsync(null, isReconnecting).ConfigureAwait(false);
                 throw;
             }
         }
@@ -180,7 +182,7 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                await DisconnectInternalAsync(null, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -190,14 +192,18 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(ex).ConfigureAwait(false);
+                await DisconnectInternalAsync(ex, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task DisconnectInternalAsync(Exception ex)
+        private async Task DisconnectInternalAsync(Exception ex, bool isReconnecting)
         {
-            if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
-                _reconnectCancelToken.Cancel();
+            if (!isReconnecting)
+            {
+                _canReconnect = false;
+                if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
+                    _reconnectCancelToken.Cancel();
+            }
 
             ulong guildId;
 
@@ -242,7 +248,8 @@ namespace Discord
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(null).ConfigureAwait(false);
+                if (!_canReconnect || _reconnectTask != null) return;
+                await DisconnectInternalAsync(null, true).ConfigureAwait(false);
                 _reconnectCancelToken = new CancellationTokenSource();
                 _reconnectTask = ReconnectInternalAsync(_reconnectCancelToken.Token);
             }
@@ -253,34 +260,37 @@ namespace Discord
             try
             {
                 int nextReconnectDelay = 1000;
-                while (!cancelToken.IsCancellationRequested)
+                while (true)
                 {
+                    await Task.Delay(nextReconnectDelay, cancelToken).ConfigureAwait(false);
+                    nextReconnectDelay *= 2;
+                    if (nextReconnectDelay > 30000)
+                        nextReconnectDelay = 30000;
+
+                    await _connectionLock.WaitAsync().ConfigureAwait(false);
                     try
                     {
-                        await Task.Delay(nextReconnectDelay, cancelToken).ConfigureAwait(false);
-                        nextReconnectDelay *= 2;
-                        if (nextReconnectDelay > 30000)
-                            nextReconnectDelay = 30000;
-
-                        await _connectionLock.WaitAsync().ConfigureAwait(false);
-                        try
-                        {
-                            if (cancelToken.IsCancellationRequested) return;
-                            await ConnectInternalAsync().ConfigureAwait(false);
-                        }
-                        finally { _connectionLock.Release(); }
+                        if (cancelToken.IsCancellationRequested) return;
+                        await ConnectInternalAsync(true).ConfigureAwait(false);
+                        _reconnectTask = null;
                         return;
                     }
                     catch (Exception ex)
                     {
                         await _gatewayLogger.WarningAsync("Reconnect failed", ex).ConfigureAwait(false);
                     }
+                    finally {  _connectionLock.Release(); }
                 }
             }
-            catch (OperationCanceledException) { }
-            finally
+            catch (OperationCanceledException)
             {
-                _reconnectTask = null;
+                await _connectionLock.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    await _gatewayLogger.DebugAsync("Reconnect cancelled").ConfigureAwait(false);
+                    _reconnectTask = null;
+                }
+                finally { _connectionLock.Release(); }
             }
         }
 
