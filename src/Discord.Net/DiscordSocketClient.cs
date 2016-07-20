@@ -562,7 +562,7 @@ namespace Discord
                                         {
                                             var model = data.Guilds[i];
                                             var guild = AddGuild(model, dataStore);
-                                            if (model.Unavailable == true)
+                                            if (!guild._available || ApiClient.AuthTokenType == TokenType.User)
                                                 unavailableGuilds++;
                                             else
                                                 await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
@@ -573,9 +573,7 @@ namespace Discord
                                         _sessionId = data.SessionId;
                                         _currentUser = currentUser;
                                         _unavailableGuilds = unavailableGuilds;
-                                        _lastGuildAvailableTime = Environment.TickCount;
                                         DataStore = dataStore;
-
                                     }
                                     catch (Exception ex)
                                     {
@@ -583,10 +581,13 @@ namespace Discord
                                         return;
                                     }
 
+                                    if (ApiClient.AuthTokenType == TokenType.User)
+                                        await SyncGuildsAsync().ConfigureAwait(false);
+
+                                    _lastGuildAvailableTime = Environment.TickCount;
                                     _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _clientLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
-                                    await SyncGuildsAsync().ConfigureAwait(false);
 
                                     var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -625,7 +626,8 @@ namespace Discord
                                     if (data.Unavailable != false)
                                     {
                                         guild = AddGuild(data, DataStore);
-                                        await SyncGuildsAsync().ConfigureAwait(false);
+                                        if (ApiClient.AuthTokenType == TokenType.User)
+                                            await SyncGuildsAsync().ConfigureAwait(false);
                                         await _joinedGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                     }
                                     else
@@ -700,6 +702,9 @@ namespace Discord
                                     {
                                         var before = guild.Clone();
                                         guild.Update(data, UpdateSource.WebSocket, DataStore);
+                                        //This is treated as an extension of GUILD_AVAILABLE
+                                        _unavailableGuilds--;
+                                        _lastGuildAvailableTime = Environment.TickCount;
                                         await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -727,7 +732,6 @@ namespace Discord
                                             await _leftGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         else
                                             _unavailableGuilds++;
-
                                     }
                                     else
                                     {
@@ -1522,6 +1526,7 @@ namespace Discord
         }
         private async Task WaitForGuildsAsync(CancellationToken cancelToken, ILogger logger)
         {
+            //Wait for GUILD_AVAILABLEs
             try
             {
                 await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
@@ -1540,7 +1545,7 @@ namespace Discord
         }
         private async Task SyncGuildsAsync()
         {
-            var guildIds = Guilds.Where(x => x.Available).Select(x => x.Id).ToArray();
+            var guildIds = Guilds.Where(x => !x.IsSynced).Select(x => x.Id).ToArray();
             if (guildIds.Length > 0)
                 await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }
