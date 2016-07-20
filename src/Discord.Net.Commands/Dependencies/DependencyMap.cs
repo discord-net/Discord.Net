@@ -13,12 +13,16 @@ namespace Discord.Commands
             map = new Dictionary<Type, object>();
         }
 
-        public T Get<T>() where T : class
+        public object Get(Type t)
         {
-            var t = typeof(T);
             if (!map.ContainsKey(t))
                 throw new KeyNotFoundException($"The dependency map does not contain \"{t.FullName}\"");
-            return map[t] as T;
+            return map[t];
+        }
+
+        public T Get<T>() where T : class
+        {
+            return Get(typeof(T)) as T;
         }
 
         public void Add<T>(T obj)

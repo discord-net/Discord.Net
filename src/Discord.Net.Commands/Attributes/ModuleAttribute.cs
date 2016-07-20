@@ -6,16 +6,16 @@ namespace Discord.Commands
     public class ModuleAttribute : Attribute
     {
         public string Prefix { get; }
-        public bool Autoload { get; }
-        public ModuleAttribute(bool autoload = true)
+        public bool AutoLoad { get; set; }
+        public ModuleAttribute()
         {
             Prefix = null;
-            Autoload = autoload;
+            AutoLoad = true;
         }
-        public ModuleAttribute(string prefix, bool autoload = true)
+        public ModuleAttribute(string prefix)
         {
             Prefix = prefix;
-            Autoload = autoload;
+            AutoLoad = true;
         }
     }
 }
