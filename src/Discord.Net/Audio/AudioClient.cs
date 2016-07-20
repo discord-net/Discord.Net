@@ -90,6 +90,8 @@ namespace Discord.Audio
                 else
                     await _audioLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
+
+            LatencyUpdated += async (old, val) => await _audioLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -242,7 +244,6 @@ namespace Discord.Audio
                             {
                                 int latency = (int)(Environment.TickCount - _heartbeatTime);
                                 _heartbeatTime = 0;
-                                await _audioLogger.VerboseAsync($"Latency = {latency} ms").ConfigureAwait(false);
 
                                 int before = Latency;
                                 Latency = latency;

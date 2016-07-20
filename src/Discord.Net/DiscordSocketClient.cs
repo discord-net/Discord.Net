@@ -103,6 +103,12 @@ namespace Discord
                     await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
 
+            LeftGuild += async g => await _gatewayLogger.InfoAsync($"Left {g.Name}").ConfigureAwait(false);
+            JoinedGuild += async g => await _gatewayLogger.InfoAsync($"Joined {g.Name}").ConfigureAwait(false);
+            GuildAvailable += async g => await _gatewayLogger.VerboseAsync($"Connected to {g.Name}").ConfigureAwait(false);
+            GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
+            LatencyUpdated += async (old, val) => await _gatewayLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
+
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
@@ -235,6 +241,13 @@ namespace Discord
             //Clear large guild queue
             await _gatewayLogger.DebugAsync("Disconnecting - Clean Large Guilds").ConfigureAwait(false);
             while (_largeGuilds.TryDequeue(out guildId)) { }
+
+            //Raise virtual GUILD_UNAVAILABLEs
+            foreach (var guild in DataStore.Guilds)
+            {
+                if (guild._available)
+                    await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+            }
 
             ConnectionState = ConnectionState.Disconnected;
             await _gatewayLogger.InfoAsync("Disconnected").ConfigureAwait(false);
@@ -504,7 +517,6 @@ namespace Discord
                             {
                                 int latency = (int)(Environment.TickCount - _heartbeatTime);
                                 _heartbeatTime = 0;
-                                await _gatewayLogger.VerboseAsync($"Latency = {latency} ms").ConfigureAwait(false);
 
                                 int before = Latency;
                                 Latency = latency;
@@ -549,9 +561,11 @@ namespace Discord
                                         for (int i = 0; i < data.Guilds.Length; i++)
                                         {
                                             var model = data.Guilds[i];
-                                            AddGuild(model, dataStore);
+                                            var guild = AddGuild(model, dataStore);
                                             if (model.Unavailable == true)
                                                 unavailableGuilds++;
+                                            else
+                                                await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
                                         for (int i = 0; i < data.PrivateChannels.Length; i++)
                                             AddPrivateChannel(data.PrivateChannels[i], dataStore);
@@ -583,6 +597,14 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
 
                                     var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+
+                                    //Notify the client that these guilds are available again
+                                    foreach (var guild in DataStore.Guilds)
+                                    {
+                                        if (guild._available)
+                                            await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                    }
+
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                                 }
                                 return;
@@ -605,7 +627,6 @@ namespace Discord
                                         guild = AddGuild(data, DataStore);
                                         await SyncGuildsAsync().ConfigureAwait(false);
                                         await _joinedGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
-                                        await _gatewayLogger.InfoAsync($"Joined {data.Name}").ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -624,10 +645,7 @@ namespace Discord
                                     }
 
                                     if (data.Unavailable != true)
-                                    {
-                                        await _gatewayLogger.VerboseAsync($"Connected to {data.Name}").ConfigureAwait(false);
                                         await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
-                                    }
                                 }
                                 break;
                             case "GUILD_UPDATE":
@@ -705,12 +723,8 @@ namespace Discord
                                             member.User.RemoveRef(this);
 
                                         await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
-                                        await _gatewayLogger.VerboseAsync($"Disconnected from {data.Name}").ConfigureAwait(false);
                                         if (data.Unavailable != true)
-                                        {
                                             await _leftGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
-                                            await _gatewayLogger.InfoAsync($"Left {data.Name}").ConfigureAwait(false);
-                                        }
                                         else
                                             _unavailableGuilds++;
 

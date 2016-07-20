@@ -26,8 +26,9 @@ namespace Discord
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, CachedGuildUser> _members;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
+        internal bool _available;
 
-        public bool Available { get; private set; }
+        public bool Available => _available && Discord.ConnectionState == ConnectionState.Connected;
         public int MemberCount { get; private set; }
         public int DownloadedMemberCount { get; private set; }
         public AudioClient AudioClient { get; private set; }
@@ -62,8 +63,8 @@ namespace Discord
         public void Update(ExtendedModel model, UpdateSource source, DataStore dataStore)
         {
             if (source == UpdateSource.Rest && IsAttached) return;
-            
-            Available = !(model.Unavailable ?? false);
+
+            _available = !(model.Unavailable ?? false);
             if (!Available)
             {
                 if (_channels == null)
