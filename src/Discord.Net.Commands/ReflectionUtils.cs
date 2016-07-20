@@ -30,7 +30,7 @@ namespace Discord.Commands
                 else
                     throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Invalid Parameter Type: \"{parameter.ParameterType.FullName}\")");
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Error invoking constructor)");
             }
