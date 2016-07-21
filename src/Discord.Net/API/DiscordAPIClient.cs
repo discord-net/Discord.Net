@@ -351,6 +351,13 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
+        //Application
+        public async Task<Application> GetMyApplicationInfoAsync(RequestOptions options = null)
+        {
+            return await SendAsync<Application>("GET", "oauth2/applications/@me", options: options).ConfigureAwait(false);
+        }
+
+
         //Auth
         public async Task ValidateTokenAsync(RequestOptions options = null)
         {

@@ -23,6 +23,8 @@ namespace Discord
         Task ConnectAsync();
         Task DisconnectAsync();
 
+        Task<IApplication> GetApplicationInfoAsync();
+
         Task<IChannel> GetChannelAsync(ulong id);
         Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync();
 

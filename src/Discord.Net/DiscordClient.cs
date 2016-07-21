@@ -145,12 +145,12 @@ namespace Discord
         protected virtual Task OnLogoutAsync() => Task.CompletedTask;
 
         /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync()
+        public async Task<IApplication> GetApplicationInfoAsync()
         {
-            var models = await ApiClient.GetMyConnectionsAsync().ConfigureAwait(false);
-            return models.Select(x => new Connection(x)).ToImmutableArray();
+            var model = await ApiClient.GetMyApplicationInfoAsync().ConfigureAwait(false);
+            return new Application(this, model);
         }
-
+        
         /// <inheritdoc />
         public virtual async Task<IChannel> GetChannelAsync(ulong id)
         {
@@ -184,6 +184,13 @@ namespace Discord
         {
             var models = await ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
             return models.Select(x => new DMChannel(this, new User(x.Recipients.Value[0]), x)).ToImmutableArray();
+        }
+        
+        /// <inheritdoc />
+        public async Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync()
+        {
+            var models = await ApiClient.GetMyConnectionsAsync().ConfigureAwait(false);
+            return models.Select(x => new Connection(x)).ToImmutableArray();
         }
 
         /// <inheritdoc />
