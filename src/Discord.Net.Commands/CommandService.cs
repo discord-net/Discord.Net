@@ -164,7 +164,7 @@ namespace Discord.Commands
 
             return loadedModule;
         }
-        public async Task<IEnumerable<Module>> LoadAssembly(Assembly assembly)
+        public async Task<IEnumerable<Module>> LoadAssembly(Assembly assembly, IDependencyMap dependencyMap = null)
         {
             var modules = ImmutableArray.CreateBuilder<Module>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -174,9 +174,9 @@ namespace Discord.Commands
                 {
                     var typeInfo = type.GetTypeInfo();
                     var moduleAttr = typeInfo.GetCustomAttribute<ModuleAttribute>();
-                    if (moduleAttr != null)
+                    if (moduleAttr != null && moduleAttr.AutoLoad)
                     {
-                        var moduleInstance = ReflectionUtils.CreateObject(typeInfo);
+                        var moduleInstance = ReflectionUtils.CreateObject(typeInfo, this, dependencyMap);
                         modules.Add(LoadInternal(moduleInstance, moduleAttr, typeInfo));
                     }
                 }
