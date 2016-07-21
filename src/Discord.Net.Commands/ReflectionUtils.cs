@@ -64,7 +64,7 @@ namespace Discord.Commands
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (Error invoking constructor)", ex);
+                throw new InvalidOperationException($"Could not create \"{typeInfo.FullName}\"", ex);
             }
         }
     }
