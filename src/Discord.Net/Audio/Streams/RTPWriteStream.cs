@@ -46,7 +46,7 @@ namespace Discord.Audio
             }
 
             Buffer.BlockCopy(buffer, 0, _nonce, 0, 12);
-            count = SecretBox.Encrypt(buffer, offset, count, _buffer, 12, _nonce, _secretKey);
+            SecretBox.Encrypt(buffer, offset, (ulong)count, _buffer, 12, _nonce, _secretKey);
             _audioClient.Send(_buffer, count);
         }
 
