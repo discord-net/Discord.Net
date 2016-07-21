@@ -19,7 +19,7 @@
   },
 
   "dependencies": {
-    "Discord.Net": "1.0.0-dev-*"
+    "Discord.Net": "1.0.0-*"
   },
 
   "frameworks": {
