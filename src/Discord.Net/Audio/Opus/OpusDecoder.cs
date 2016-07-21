@@ -18,7 +18,7 @@ namespace Discord.Audio
             OpusError error;
             _ptr = CreateDecoder(samplingRate, channels, out error);
             if (error != OpusError.OK)
-                throw new InvalidOperationException($"Error occured while creating decoder: {error}");
+                throw new Exception($"Opus Error: {error}");
         }
         
         /// <summary> Produces PCM samples from Opus-encoded audio. </summary>
@@ -33,7 +33,7 @@ namespace Discord.Audio
                 result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, (output.Length - outputOffset) / SampleSize / MaxChannels, 0);
 
             if (result < 0)
-                throw new Exception(((OpusError)result).ToString());
+                throw new Exception($"Opus Error: {(OpusError)result}");
             return result;
         }
 

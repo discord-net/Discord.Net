@@ -25,13 +25,12 @@ namespace Discord.Audio
             OpusError error;
             _ptr = CreateEncoder(samplingRate, channels, (int)application, out error);
             if (error != OpusError.OK)
-                throw new InvalidOperationException($"Error occured while creating encoder: {error}");
+                throw new Exception($"Opus Error: {error}");
         }
 
 
         /// <summary> Produces Opus encoded audio from PCM samples. </summary>
         /// <param name="input">PCM samples to encode.</param>
-        /// <param name="inputOffset">Offset of the frame in pcmSamples.</param>
         /// <param name="output">Buffer to store the encoded frame.</param>
         /// <returns>Length of the frame contained in outputBuffer.</returns>
         public unsafe int EncodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output, int outputOffset)
@@ -42,7 +41,7 @@ namespace Discord.Audio
                 result = Encode(_ptr, inPtr + inputOffset, inputCount / SampleSize, outPtr + outputOffset, output.Length - outputOffset);
 
             if (result < 0)
-                throw new Exception(((OpusError)result).ToString());
+                throw new Exception($"Opus Error: {(OpusError)result}");
             return result;
         }
 
@@ -51,7 +50,7 @@ namespace Discord.Audio
         {
             var result = EncoderCtl(_ptr, OpusCtl.SetInbandFECRequest, value ? 1 : 0);
             if (result < 0)
-                throw new Exception(((OpusError)result).ToString());
+                throw new Exception($"Opus Error: {(OpusError)result}");
         }
 
         /// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
@@ -62,7 +61,7 @@ namespace Discord.Audio
 
             var result = EncoderCtl(_ptr, OpusCtl.SetBitrateRequest, value * 1000);
             if (result < 0)
-                throw new Exception(((OpusError)result).ToString());
+                throw new Exception($"Opus Error: {(OpusError)result}");
         }
 
         protected override void Dispose(bool disposing)
