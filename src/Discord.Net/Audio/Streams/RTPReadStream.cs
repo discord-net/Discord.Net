@@ -32,7 +32,7 @@ namespace Discord.Audio
         public override void Write(byte[] buffer, int offset, int count)
         {
             Buffer.BlockCopy(buffer, 0, _nonce, 0, 12);
-            count = SecretBox.Decrypt(buffer, offset, count, _buffer, 0, _nonce, _secretKey);
+            SecretBox.Decrypt(buffer, offset, (ulong)count, _buffer, 0, _nonce, _secretKey);
             var newBuffer = new byte[count];
             Buffer.BlockCopy(_buffer, 0, newBuffer, 0, count);
             _queuedData.Add(newBuffer);
