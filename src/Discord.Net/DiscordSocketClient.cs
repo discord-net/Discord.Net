@@ -207,6 +207,9 @@ namespace Discord
             if (!isReconnecting)
             {
                 _canReconnect = false;
+                _sessionId = null;
+                _lastSeq = 0;
+
                 if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
                     _reconnectCancelToken.Cancel();
             }
