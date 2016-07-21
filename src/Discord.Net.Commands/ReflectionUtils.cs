@@ -17,25 +17,50 @@ namespace Discord.Commands
             if (constructor == null)
                 throw new InvalidOperationException($"Found no constructor for \"{typeInfo.FullName}\"");
 
-            object[] parameters;
-            try
+            object[] arguments = null;
+
+            ParameterInfo[] parameters = constructor.GetParameters();
+
+            // TODO: can this logic be made better/cleaner?
+            if (parameters.Length == 1)
             {
-                // TODO: probably change this ternary into something sensible
-                parameters = constructor.GetParameters()
-                    .Select(x => x.ParameterType == typeof(CommandService) ? service : map.Get(x.ParameterType)).ToArray();
+                if (parameters[0].ParameterType == typeof(IDependencyMap))
+                {
+                    if (map != null)
+                        arguments = new object[] { map };
+                    else
+                        throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)");
+                }
             }
-            catch (KeyNotFoundException ex) // tried to inject an invalid dependency
+            else if (parameters.Length == 2)
             {
-                throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (could not provide parameter)", ex);
+                if (parameters[0].ParameterType == typeof(CommandService) && parameters[1].ParameterType == typeof(IDependencyMap))
+                    if (map != null)
+                        arguments = new object[] { service, map };
+                    else
+                        throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)");
             }
-            catch (NullReferenceException ex) // tried to find a dependency
+
+            if (arguments == null)
             {
-                throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (type requires dependency injection)", ex);
+                try
+                {
+                    // TODO: probably change this ternary into something sensible?
+                    arguments = parameters.Select(x => x.ParameterType == typeof(CommandService) ? service : map.Get(x.ParameterType)).ToArray();
+                }
+                catch (KeyNotFoundException ex) // tried to inject an invalid dependency
+                {
+                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (could not provide parameter)", ex);
+                }
+                catch (NullReferenceException ex) // tried to find a dependency
+                {
+                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)", ex);
+                }
             }
 
             try
             {
-                return constructor.Invoke(parameters);
+                return constructor.Invoke(arguments);
             }
             catch (Exception ex)
             {
