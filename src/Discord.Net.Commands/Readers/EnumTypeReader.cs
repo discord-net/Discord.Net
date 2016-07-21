@@ -62,12 +62,12 @@ namespace Discord.Commands
 
         public override Task<TypeReaderResult> Read(IMessage context, string input)
         {
-            T intValue;
+            T baseValue;
             object enumValue;
 
-            if (_tryParse(input, out intValue))
+            if (_tryParse(input, out baseValue))
             {
-                if (_enumsByValue.TryGetValue(intValue, out enumValue))
+                if (_enumsByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
                 else
                     return Task.FromResult(TypeReaderResult.FromError(CommandError.CastFailed, $"Value is not a {_enumType.Name}"));
