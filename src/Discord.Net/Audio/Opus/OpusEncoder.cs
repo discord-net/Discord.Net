@@ -28,7 +28,6 @@ namespace Discord.Audio
                 throw new Exception($"Opus Error: {error}");
         }
 
-
         /// <summary> Produces Opus encoded audio from PCM samples. </summary>
         /// <param name="input">PCM samples to encode.</param>
         /// <param name="output">Buffer to store the encoded frame.</param>
