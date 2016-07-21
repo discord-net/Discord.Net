@@ -18,7 +18,7 @@ namespace Discord.Commands
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
-
+        
         internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
             Module = module;
@@ -76,23 +76,16 @@ namespace Discord.Commands
                 }
 
                 var typeInfo = type.GetTypeInfo();
-                if (typeInfo.IsEnum)
-                    Module.Service.AddTypeReader(type, new EnumTypeReader(type));
-
                 var reader = Module.Service.GetTypeReader(type);
 
-                if (reader == null)
+                if (reader == null && typeInfo.IsEnum)
                 {
-                    if (typeInfo.IsEnum)
-                    {
-                        type = Enum.GetUnderlyingType(type);
-
-                        reader = Module.Service.GetTypeReader(type);
-                    }
-
-                    if (reader == null)
-                        throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
+                    reader = EnumTypeReader.GetReader(type);
+                    Module.Service.AddTypeReader(type, reader);
                 }
+
+                if (reader == null)
+                    throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
 
                 bool isUnparsed = parameter.GetCustomAttribute<UnparsedAttribute>() != null;
                 if (isUnparsed)
