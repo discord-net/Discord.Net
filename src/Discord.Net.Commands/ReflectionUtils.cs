@@ -14,10 +14,10 @@ namespace Discord.Commands
             else if (constructors.Length > 1)
                 throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\"");
 
-            var constructor = constructors[0];
-            
+            var constructor = constructors[0];            
             ParameterInfo[] parameters = constructor.GetParameters();
             object[] args = new object[parameters.Length];
+
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];

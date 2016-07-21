@@ -19,7 +19,7 @@ namespace Discord
         }
 
         public override string ToString() => ToString(null);
-        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 7)
+        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 9)
         {
             string sourceName = Source;
             string message = Message;
