@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -9,62 +8,39 @@ namespace Discord.Commands
     {
         internal static object CreateObject(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
         {
-            if (typeInfo.DeclaredConstructors.Count() > 1)
-                throw new InvalidOperationException($"Found too many constructors for \"{typeInfo.FullName}\"");
+            var constructors = typeInfo.DeclaredConstructors.ToArray();
+            if (constructors.Length == 0)
+                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\"");
+            else if (constructors.Length > 1)
+                throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\"");
 
-            var constructor = typeInfo.DeclaredConstructors.FirstOrDefault();
-
-            if (constructor == null)
-                throw new InvalidOperationException($"Found no constructor for \"{typeInfo.FullName}\"");
-
-            object[] arguments = null;
-
+            var constructor = constructors[0];
+            
             ParameterInfo[] parameters = constructor.GetParameters();
-
-            // TODO: can this logic be made better/cleaner?
-            if (parameters.Length == 1)
+            object[] args = new object[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
             {
-                if (parameters[0].ParameterType == typeof(IDependencyMap))
+                var parameter = parameters[i];
+                object arg;
+                if (map == null || !map.TryGet(parameter.ParameterType, out arg))
                 {
-                    if (map != null)
-                        arguments = new object[] { map };
+                    if (parameter.ParameterType == typeof(CommandService))
+                        arg = service;
+                    else if (parameter.ParameterType == typeof(IDependencyMap))
+                        arg = map;
                     else
-                        throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)");
+                        throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{parameter.ParameterType.Name}\" was not found.");
                 }
-            }
-            else if (parameters.Length == 2)
-            {
-                if (parameters[0].ParameterType == typeof(CommandService) && parameters[1].ParameterType == typeof(IDependencyMap))
-                    if (map != null)
-                        arguments = new object[] { service, map };
-                    else
-                        throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)");
-            }
-
-            if (arguments == null)
-            {
-                try
-                {
-                    // TODO: probably change this ternary into something sensible?
-                    arguments = parameters.Select(x => x.ParameterType == typeof(CommandService) ? service : map.Get(x.ParameterType)).ToArray();
-                }
-                catch (KeyNotFoundException ex) // tried to inject an invalid dependency
-                {
-                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (could not provide parameter)", ex);
-                }
-                catch (NullReferenceException ex) // tried to find a dependency
-                {
-                    throw new InvalidOperationException($"Could not find a valid constructor for \"{typeInfo.FullName}\" (an IDependencyMap is required)", ex);
-                }
+                args[i] = arg;
             }
 
             try
             {
-                return constructor.Invoke(arguments);
+                return constructor.Invoke(args);
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Could not create \"{typeInfo.FullName}\"", ex);
+                throw new Exception($"Failed to create \"{typeInfo.FullName}\"", ex);
             }
         }
     }

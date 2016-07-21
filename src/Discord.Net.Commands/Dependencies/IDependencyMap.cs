@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
     public interface IDependencyMap
     {
-        object Get(Type t);
-        T Get<T>() where T : class;
         void Add<T>(T obj);
+
+        T Get<T>();
+        bool TryGet<T>(out T result);
+
+        object Get(Type t);
+        bool TryGet(Type t, out object result);
     }
 }
