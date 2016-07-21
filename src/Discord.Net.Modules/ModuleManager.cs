@@ -43,15 +43,15 @@ namespace Discord.Modules
         public event EventHandler<UserEventArgs> UserJoined = delegate { };
         public event EventHandler<UserEventArgs> UserLeft = delegate { };
         public event EventHandler<UserUpdatedEventArgs> UserUpdated = delegate { };
-        //public event EventHandler<UserEventArgs> UserPresenceUpdated = delegate { };
-        //public event EventHandler<UserEventArgs> UserVoiceStateUpdated = delegate { };
         public event EventHandler<UserEventArgs> UserUnbanned = delegate { };
         public event EventHandler<ChannelUserEventArgs> UserIsTyping = delegate { };
 
         public event EventHandler<MessageEventArgs> MessageReceived = delegate { };
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageSent = delegate { };
         public event EventHandler<MessageEventArgs> MessageDeleted = delegate { };
         public event EventHandler<MessageUpdatedEventArgs> MessageUpdated = delegate { };
+        [Obsolete]
         public event EventHandler<MessageEventArgs> MessageReadRemotely = delegate { };
         
 		private readonly bool _useServerWhitelist, _useChannelWhitelist, _allowAll, _allowPrivate;
@@ -99,10 +99,8 @@ namespace Discord.Modules
 			client.ChannelUpdated += (s, e) => { if (HasChannel(e.After)) ChannelUpdated(s, e); };
 
 			client.MessageReceived += (s, e) => { if (HasChannel(e.Channel)) MessageReceived(s, e); };
-			client.MessageSent += (s, e) => { if (HasChannel(e.Channel)) MessageSent(s, e); };
 			client.MessageDeleted += (s, e) => { if (HasChannel(e.Channel)) MessageDeleted(s, e); };
 			client.MessageUpdated += (s, e) => { if (HasChannel(e.Channel)) MessageUpdated(s, e); };
-			client.MessageAcknowledged += (s, e) => { if (HasChannel(e.Channel)) MessageReadRemotely(s, e); };
 
 			client.RoleCreated += (s, e) => { if (HasIndirectServer(e.Server)) RoleCreated(s, e); };
 			client.RoleUpdated += (s, e) => { if (HasIndirectServer(e.Server)) RoleUpdated(s, e); };
