@@ -705,6 +705,7 @@ namespace Discord
                                         //This is treated as an extension of GUILD_AVAILABLE
                                         _unavailableGuilds--;
                                         _lastGuildAvailableTime = Environment.TickCount;
+                                        await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
                                     }
                                     else
