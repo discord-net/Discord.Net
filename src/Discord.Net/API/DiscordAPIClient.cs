@@ -357,7 +357,6 @@ namespace Discord.API
             return await SendAsync<Application>("GET", "oauth2/applications/@me", options: options).ConfigureAwait(false);
         }
 
-
         //Auth
         public async Task ValidateTokenAsync(RequestOptions options = null)
         {

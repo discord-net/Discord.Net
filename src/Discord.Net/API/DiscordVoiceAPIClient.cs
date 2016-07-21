@@ -27,6 +27,8 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<VoiceOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<VoiceOpCode, Task>>();
         public event Func<Task> SentDiscovery { add { _sentDiscoveryEvent.Add(value); } remove { _sentDiscoveryEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _sentDiscoveryEvent = new AsyncEvent<Func<Task>>();
+        public event Func<int, Task> SentData { add { _sentDataEvent.Add(value); } remove { _sentDataEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<int, Task>> _sentDataEvent = new AsyncEvent<Func<int, Task>>();
 
         public event Func<VoiceOpCode, object, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
@@ -110,9 +112,10 @@ namespace Discord.Audio
         {
             if (_udpEndpoint != null)
             {
-                await _udp.SendAsync(data, bytes, _udpEndpoint).ConfigureAwait(false);
-                await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
+                await _udp.SendAsync(data, bytes, _udpEndpoint).ConfigureAwait(false);                
+                await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
             }
+
         }
 
         //WebSocket
@@ -214,6 +217,7 @@ namespace Discord.Audio
             packet[2] = (byte)(ssrc >> 8);
             packet[3] = (byte)(ssrc >> 0);
             await SendAsync(packet, 70).ConfigureAwait(false);
+            await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
 
         public void SetUdpEndpoint(IPEndPoint endpoint)
