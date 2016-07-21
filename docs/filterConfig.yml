@@ -1,0 +1,5 @@
+apiRules:
+- exclude:
+    uidRegex: ^Discord\.API$
+- exclude:
+    uidRegex: ^Discord\.API.*$
