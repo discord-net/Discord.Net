@@ -14,8 +14,6 @@ namespace Discord.Audio
 {
     internal class AudioClient : IAudioClient, IDisposable
     {
-        public const int SampleRate = 48000;
-
         public event Func<Task> Connected
         {
             add { _connectedEvent.Add(value); }
@@ -81,6 +79,7 @@ namespace Discord.Audio
 
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
+            ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
             ApiClient.Disconnected += async ex =>
@@ -185,10 +184,10 @@ namespace Discord.Audio
         {
             return new RTPWriteStream(this, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
         }
-        public OpusEncodeStream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int channels = 2,
+        public OpusEncodeStream CreatePCMStream(int samplesPerFrame, int? bitrate = null,
             OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
         {
-            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, SampleRate, bitrate, channels, application, bufferSize);
+            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, bitrate, application, bufferSize);
         }
 
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
@@ -283,7 +282,7 @@ namespace Discord.Audio
                     try
                     {
                         ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-                        port = packet[68] | packet[69] << 8;
+                        port = packet[69] | (packet[68] << 8);
                     }
                     catch { return; }
                     

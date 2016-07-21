@@ -2,15 +2,18 @@
 {
     public class OpusEncodeStream : RTPWriteStream
     {
+        public int SampleRate = 48000;
+        public int Channels = 2;
+
         private readonly byte[] _buffer;
         private readonly OpusEncoder _encoder;
 
-        internal OpusEncodeStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int samplingRate, int? bitrate = null, 
-            int channels = OpusConverter.MaxChannels,  OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
+        internal OpusEncodeStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int? bitrate = null, 
+            OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
             : base(audioClient, secretKey, samplesPerFrame, ssrc)
         {
             _buffer = new byte[bufferSize];
-            _encoder = new OpusEncoder(samplingRate, channels);
+            _encoder = new OpusEncoder(SampleRate, Channels);
 
             _encoder.SetForwardErrorCorrection(true);
             if (bitrate != null)

@@ -36,7 +36,7 @@ namespace Discord.Audio
             unchecked
             {
                 if (_buffer[3]++ == byte.MaxValue)
-                    _buffer[4]++;
+                    _buffer[2]++;
 
                 _timestamp += (uint)_samplesPerFrame;
                 _buffer[4] = (byte)(_timestamp >> 24);
@@ -45,9 +45,9 @@ namespace Discord.Audio
                 _buffer[7] = (byte)(_timestamp >> 0);
             }
 
-            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12);
+            Buffer.BlockCopy(_buffer, 0, _nonce, 0, 12); //Copy the 12-byte header to be used for nonce
             count = SecretBox.Encrypt(buffer, offset, count, _buffer, 12, _nonce, _secretKey);
-            _audioClient.Send(_buffer, count);
+            _audioClient.Send(_buffer, count + 12);
         }
 
         public override void Flush() { }
