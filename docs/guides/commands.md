@@ -16,21 +16,21 @@ Modules serve as a host for commands you create.
 
 To create a module, create a class that you will place commands in. Flag this class with the `[Module]` attribute. You may optionally pass in a string to the `Module` attribute to set a prefix for all of the commands inside the module.
 
-### Example:
+### Example Module
 
 [!code-csharp[Modules](samples/module.cs)]
 
-### Loading Modules Automatically
+#### Loading Modules Automatically
 
 The Command Service can automatically discover all classes in an Assembly that are flagged with the `Module` attribute, and load them.
 
 To have a module opt-out of auto-loading, pass `autoload: false` in the Module attribute.
 
-Invoke [CommandService.LoadAssembly](Discord.Commands.CommandService#Discord_Commands_CommandService_LoadAssembly) to discover modules and install them.
+Invoke [CommandService.LoadAssembly](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_LoadAssembly) to discover modules and install them.
 
-### Loading Modules Manually
+#### Loading Modules Manually
 
-To manually load a module, invoke [CommandService.Load](Discord.Commands.CommandService#Discord_Commands_CommandService_Load), and pass in an instance of your module.
+To manually load a module, invoke [CommandService.Load](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_Load), and pass in an instance of your module.
 
 ### Module Constructors
 
@@ -42,7 +42,7 @@ Alternatively, you can use an @Discord.Commands.IDependencyMap, as shown below.
 
 The Commands Service includes a very basic implementation of Dependency Injection that allows you to have completely custom constructors, within certain limitations.
 
-## Setup
+### Setup
 
 First, you need to create an @Discord.Commands.IDependencyMap . The library includes @Discord.Commands.DependencyMap to help with this, however you may create your own IDependencyMap if you wish. 
 
@@ -52,7 +52,7 @@ Finally, pass the map into the `LoadAssembly` method. Your modules will automati
 
 [!code-csharp[DependencyMap Setup](samples/dependency_map_setup.cs)]
 
-## Usage in Modules
+### Usage in Modules
 
 In the constructor of your module, any parameters will be filled in by the @Discord.Commands.IDependencyMap you pass into `LoadAssembly`.
 
