@@ -1,0 +1,9 @@
+apiRules:
+- exclude:
+    uidRegex: ^Discord\.API$
+- exclude:
+    uidRegex: ^Discord\.API.*$
+- exclude:
+    uidRegex: ^Discord\.Net\.Converters$
+- exclude:
+    uidRegex: ^Discord\.Net.*$

@@ -1,2 +1,0 @@
-.. |stub| unicode:: U+1F527
-.. |stub-desc| replace:: This page is a placeholder and has not been written yet. It should be coming soon!
