@@ -5,3 +5,5 @@
   href: terminology.md
 - name: Logging
   href: logging.md
+- name: Commands
+  href: commands.md
