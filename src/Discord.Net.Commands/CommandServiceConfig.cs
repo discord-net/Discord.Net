@@ -41,7 +41,7 @@ namespace Discord.Commands
         /// <summary> Gets or sets whether a help function should be automatically generated. </summary>
 		public HelpMode HelpMode { get; set; } = HelpMode.Disabled;
 
-        internal CommandServiceConfig(CommandServiceConfigBuilder builder)
+        public CommandServiceConfig(CommandServiceConfigBuilder builder)
         {
             PrefixChar = builder.PrefixChar;
             AllowMentionPrefix = builder.AllowMentionPrefix;
