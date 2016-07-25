@@ -11,6 +11,7 @@ namespace Discord
         public Presence Presence { get; private set; }
 
         public new DiscordSocketClient Discord { get { throw new NotSupportedException(); } }
+        CachedGlobalUser ICachedUser.User => this;
 
         public CachedGlobalUser(Model model) 
             : base(model)
