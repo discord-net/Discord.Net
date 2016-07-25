@@ -892,6 +892,12 @@ namespace Discord
                                         }
                                         else
                                         {
+                                            if (!guild.HasAllMembers)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_UPDATE, this user has not been downloaded yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown user.").ConfigureAwait(false);
                                             return;
                                         }
@@ -926,6 +932,12 @@ namespace Discord
                                         }
                                         else
                                         {
+                                            if (!guild.HasAllMembers)
+                                            {
+                                                await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_REMOVE, this user has not been downloaded yet.").ConfigureAwait(false);
+                                                return;
+                                            }
+
                                             await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown user.").ConfigureAwait(false);
                                             return;
                                         }
