@@ -42,7 +42,7 @@ namespace Discord.Net.Queue
                 }
                 catch (HttpRateLimitException ex)
                 {
-                    //When a 429 occurs, we drop all our locks, including the ones we wanted. 
+                    //When a 429 occurs, we drop all our locks. 
                     //This is generally safe though since 429s actually occuring should be very rare.
                     RequestQueueBucket bucket;
                     bool success = FindBucket(ex.BucketId, out bucket);
@@ -152,7 +152,8 @@ namespace Discord.Net.Queue
                 if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
                     throw new TimeoutException();
             }
-            await _semaphore.WaitAsync().ConfigureAwait(false);
+            else
+                await _semaphore.WaitAsync().ConfigureAwait(false);
         }
         private async Task QueueExitAsync()
         {

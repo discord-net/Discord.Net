@@ -8,7 +8,6 @@ using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
-using Discord.API;
 
 namespace Discord
 {
@@ -20,7 +19,7 @@ namespace Discord
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public IReadOnlyCollection<ICachedUser> Members 
             => _users.Select(x => x.Value as ICachedUser).Concat(ImmutableArray.Create(Discord.CurrentUser)).ToReadOnlyCollection(() => _users.Count + 1);
-        public new IReadOnlyCollection<CachedDMUser> Recipients => _users.Cast<CachedDMUser>().ToReadOnlyCollection(_users);
+        public new IReadOnlyCollection<ICachedUser> Recipients => _users.Select(x => x.Value as ICachedUser).ToReadOnlyCollection(_users);
 
         public CachedGroupChannel(DiscordSocketClient discord, Model model)
             : base(discord, model)
