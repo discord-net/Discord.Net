@@ -8,17 +8,17 @@ using Model = Discord.API.Channel;
 
 namespace Discord
 {
-    internal class CachedVoiceChannel : VoiceChannel, ICachedGuildChannel
+    internal class SocketVoiceChannel : VoiceChannel, ISocketGuildChannel
     {
-        bool IEntity<ulong>.IsAttached => true;
+        internal override bool IsAttached => true;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedGuild Guild => base.Guild as CachedGuild;
+        public new SocketGuild Guild => base.Guild as SocketGuild;
 
         public IReadOnlyCollection<IGuildUser> Members 
             => Guild.VoiceStates.Where(x => x.Value.VoiceChannel.Id == Id).Select(x => Guild.GetUser(x.Key)).ToImmutableArray();
 
-        public CachedVoiceChannel(CachedGuild guild, Model model)
+        public SocketVoiceChannel(SocketGuild guild, Model model)
             : base(guild, model)
         {
         }
@@ -48,8 +48,8 @@ namespace Discord
             //TODO: Block and return
         }
 
-        public CachedVoiceChannel Clone() => MemberwiseClone() as CachedVoiceChannel;
+        public SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
 
-        ICachedChannel ICachedChannel.Clone() => Clone();
+        ISocketChannel ISocketChannel.Clone() => Clone();
     }
 }

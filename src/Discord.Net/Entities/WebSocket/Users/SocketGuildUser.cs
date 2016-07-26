@@ -3,13 +3,13 @@ using PresenceModel = Discord.API.Presence;
 
 namespace Discord
 {
-    internal class CachedGuildUser : GuildUser, ICachedUser
+    internal class SocketGuildUser : GuildUser, ISocketUser
     {
-        bool IEntity<ulong>.IsAttached => true;
+        internal override bool IsAttached => true;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedGuild Guild => base.Guild as CachedGuild;
-        public new CachedGlobalUser User => base.User as CachedGlobalUser;
+        public new SocketGuild Guild => base.Guild as SocketGuild;
+        public new SocketGlobalUser User => base.User as SocketGlobalUser;
         public Presence Presence => User.Presence; //{ get; private set; }
 
         public override Game Game => Presence.Game;
@@ -19,14 +19,14 @@ namespace Discord
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public CachedVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
 
-        public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, Model model) 
+        public SocketGuildUser(SocketGuild guild, SocketGlobalUser user, Model model) 
             : base(guild, user, model)
         {
             //Presence = new Presence(null, UserStatus.Offline);
         }
-        public CachedGuildUser(CachedGuild guild, CachedGlobalUser user, PresenceModel model)
+        public SocketGuildUser(SocketGuild guild, SocketGlobalUser user, PresenceModel model)
             : base(guild, user, model)
         {
         }
@@ -41,7 +41,7 @@ namespace Discord
             User.Update(model, source);
         }
 
-        public CachedGuildUser Clone() => MemberwiseClone() as CachedGuildUser;
-        ICachedUser ICachedUser.Clone() => Clone();
+        public SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+        ISocketUser ISocketUser.Clone() => Clone();
     }
 }

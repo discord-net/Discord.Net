@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Collections.Concurrent;
 
 namespace Discord
 {

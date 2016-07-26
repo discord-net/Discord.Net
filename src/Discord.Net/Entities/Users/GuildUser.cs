@@ -13,6 +13,9 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class GuildUser : IGuildUser, ISnowflakeEntity
     {
+        internal virtual bool IsAttached => false;
+        bool IEntity<ulong>.IsAttached => IsAttached;
+
         private long? _joinedAtTicks;
         
         public string Nickname { get; private set; }
@@ -27,7 +30,6 @@ namespace Discord
         public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
         public ushort DiscriminatorValue => User.DiscriminatorValue;
-        public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => MentionUtils.Mention(this, Nickname != null);
         public string Username => User.Username;

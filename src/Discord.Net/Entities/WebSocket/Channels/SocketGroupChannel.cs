@@ -11,19 +11,19 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal class CachedGroupChannel : GroupChannel, IGroupChannel, ICachedChannel, ICachedMessageChannel, ICachedPrivateChannel
+    internal class SocketGroupChannel : GroupChannel, IGroupChannel, ISocketChannel, ISocketMessageChannel, ISocketPrivateChannel
     {
-        bool IEntity<ulong>.IsAttached => true;
+        internal override bool IsAttached => true;
 
         private readonly MessageManager _messages;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public IReadOnlyCollection<ICachedUser> Members 
-            => _users.Select(x => x.Value as ICachedUser).Concat(ImmutableArray.Create(Discord.CurrentUser)).ToReadOnlyCollection(() => _users.Count + 1);
-        public new IReadOnlyCollection<ICachedUser> Recipients => _users.Select(x => x.Value as ICachedUser).ToReadOnlyCollection(_users);
+        public IReadOnlyCollection<ISocketUser> Users 
+            => _users.Select(x => x.Value as ISocketUser).Concat(ImmutableArray.Create(Discord.CurrentUser)).ToReadOnlyCollection(() => _users.Count + 1);
+        public new IReadOnlyCollection<ISocketUser> Recipients => _users.Select(x => x.Value as ISocketUser).ToReadOnlyCollection(_users);
 
-        public CachedGroupChannel(DiscordSocketClient discord, Model model)
+        public SocketGroupChannel(DiscordSocketClient discord, Model model)
             : base(discord, model)
         {
             if (Discord.MessageCacheSize > 0)
@@ -45,46 +45,46 @@ namespace Discord
             for (int i = 0; i < models.Length; i++)
             {
                 var globalUser = Discord.GetOrAddUser(models[i], dataStore);
-                users[models[i].Id] = new CachedGroupUser(this, globalUser);
+                users[models[i].Id] = new SocketGroupUser(this, globalUser);
             }
             _users = users;
         }
         internal override void UpdateUsers(UserModel[] models, UpdateSource source)
             => UpdateUsers(models, source, Discord.DataStore);
 
-        public CachedGroupUser AddUser(UserModel model, DataStore dataStore)
+        public SocketGroupUser AddUser(UserModel model, DataStore dataStore)
         {
             GroupUser user;
             if (_users.TryGetValue(model.Id, out user))
-                return user as CachedGroupUser;
+                return user as SocketGroupUser;
             else
             {
                 var globalUser = Discord.GetOrAddUser(model, dataStore);
-                var privateUser = new CachedGroupUser(this, globalUser);
+                var privateUser = new SocketGroupUser(this, globalUser);
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
             }
         }
-        public ICachedUser GetUser(ulong id)
+        public ISocketUser GetUser(ulong id)
         {
             GroupUser user;
             if (_users.TryGetValue(id, out user))
-                return user as CachedGroupUser;
+                return user as SocketGroupUser;
             if (id == Discord.CurrentUser.Id)
                 return Discord.CurrentUser;
             return null;
         }
-        public CachedGroupUser RemoveUser(ulong id)
+        public SocketGroupUser RemoveUser(ulong id)
         {
             GroupUser user;
             if (_users.TryRemove(id, out user))
-                return user as CachedGroupUser;
+                return user as SocketGroupUser;
             return null;
         }
 
         public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, DataStore dataStore, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
         {
-            var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
+            var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
             var voiceState = new VoiceState(voiceChannel, model);
             (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
             return voiceState;
@@ -116,25 +116,25 @@ namespace Discord
         {
             return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
-        public CachedMessage AddMessage(ICachedUser author, MessageModel model)
+        public SocketMessage AddMessage(ISocketUser author, MessageModel model)
         {
-            var msg = new CachedMessage(this, author, model);
+            var msg = new SocketMessage(this, author, model);
             _messages.Add(msg);
             return msg;
         }
-        public CachedMessage GetMessage(ulong id)
+        public SocketMessage GetMessage(ulong id)
         {
             return _messages.Get(id);
         }
-        public CachedMessage RemoveMessage(ulong id)
+        public SocketMessage RemoveMessage(ulong id)
         {
             return _messages.Remove(id);
         }
 
-        public CachedDMChannel Clone() => MemberwiseClone() as CachedDMChannel;
+        public SocketDMChannel Clone() => MemberwiseClone() as SocketDMChannel;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
-        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id);
-        ICachedChannel ICachedChannel.Clone() => Clone();
+        ISocketUser ISocketMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id);
+        ISocketChannel ISocketChannel.Clone() => Clone();
     }
 }

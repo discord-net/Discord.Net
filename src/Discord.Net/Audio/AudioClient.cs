@@ -49,7 +49,7 @@ namespace Discord.Audio
         private uint _ssrc;
         private byte[] _secretKey;
 
-        public CachedGuild Guild { get; }
+        public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public ConnectionState ConnectionState { get; private set; }
         public int Latency { get; private set; }
@@ -57,7 +57,7 @@ namespace Discord.Audio
         private DiscordSocketClient Discord => Guild.Discord;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public AudioClient(CachedGuild guild, int id)
+        public AudioClient(SocketGuild guild, int id)
         {
             Guild = guild;
 

@@ -6,7 +6,8 @@
 
         public abstract DiscordClient Discord { get; }
 
-        bool IEntity<T>.IsAttached => false;
+        internal virtual bool IsAttached => false;
+        bool IEntity<T>.IsAttached => IsAttached;
 
         public Entity(T id)
         {

@@ -3,13 +3,13 @@
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    internal class CachedGroupUser : GroupUser, ICachedUser
+    internal class SocketGroupUser : GroupUser, ISocketUser
     {
-        bool IEntity<ulong>.IsAttached => true;
+        internal override bool IsAttached => true;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedGroupChannel Channel => base.Channel as CachedGroupChannel;
-        public new CachedGlobalUser User => base.User as CachedGlobalUser;
+        public new SocketGroupChannel Channel => base.Channel as SocketGroupChannel;
+        public new SocketGlobalUser User => base.User as SocketGlobalUser;
         public Presence Presence => User.Presence; //{ get; private set; }
 
         public override Game Game => Presence.Game;
@@ -19,15 +19,15 @@ namespace Discord
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public CachedVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
 
-        public CachedGroupUser(CachedGroupChannel channel, CachedGlobalUser user)
+        public SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser user)
             : base(channel, user)
         {
         }
 
-        public CachedGroupUser Clone() => MemberwiseClone() as CachedGroupUser;
-        ICachedUser ICachedUser.Clone() => Clone();
+        public SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
+        ISocketUser ISocketUser.Clone() => Clone();
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";

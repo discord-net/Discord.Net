@@ -2,10 +2,10 @@
 
 namespace Discord
 {
-    internal interface ICachedChannel : IChannel, ICachedEntity<ulong>
+    internal interface ISocketChannel : IChannel
     {
         void Update(Model model, UpdateSource source);
 
-        ICachedChannel Clone();
+        ISocketChannel Clone();
     }
 }

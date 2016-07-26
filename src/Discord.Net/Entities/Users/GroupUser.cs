@@ -6,6 +6,9 @@ namespace Discord
 {
     internal class GroupUser : IGroupUser
     {
+        internal virtual bool IsAttached => false;
+        bool IEntity<ulong>.IsAttached => IsAttached;
+
         public GroupChannel Channel { get; private set; }
         public User User { get; private set; }
 
@@ -14,7 +17,6 @@ namespace Discord
         public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
         public ushort DiscriminatorValue => User.DiscriminatorValue;
-        public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Username => User.Username;
         public string Mention => MentionUtils.Mention(this, false);

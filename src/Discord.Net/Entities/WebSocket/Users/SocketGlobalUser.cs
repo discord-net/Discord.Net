@@ -4,18 +4,18 @@ using PresenceModel = Discord.API.Presence;
 
 namespace Discord
 {
-    internal class CachedGlobalUser : User, ICachedUser
+    internal class SocketGlobalUser : User, ISocketUser
     {
-        bool IEntity<ulong>.IsAttached => true;
+        internal override bool IsAttached => true;
 
         private ushort _references;
 
         public Presence Presence { get; private set; }
 
         public new DiscordSocketClient Discord { get { throw new NotSupportedException(); } }
-        CachedGlobalUser ICachedUser.User => this;
+        SocketGlobalUser ISocketUser.User => this;
 
-        public CachedGlobalUser(Model model) 
+        public SocketGlobalUser(Model model) 
             : base(model)
         {
         }
@@ -53,7 +53,7 @@ namespace Discord
             //}
         }
 
-        public CachedGlobalUser Clone() => MemberwiseClone() as CachedGlobalUser;
-        ICachedUser ICachedUser.Clone() => Clone();
+        public SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
+        ISocketUser ISocketUser.Clone() => Clone();
     }
 }
