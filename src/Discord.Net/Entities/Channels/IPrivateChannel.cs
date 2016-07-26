@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public interface IPrivateChannel
+    public interface IPrivateChannel : IChannel
     {
         IReadOnlyCollection<IUser> Recipients { get; }
     }
