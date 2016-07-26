@@ -48,11 +48,11 @@ namespace Discord
         {
             return await _messages.DownloadAsync(id).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordRestConfig.MaxMessagesPerBatch)
         {
             return await _messages.DownloadAsync(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
         {
             return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }

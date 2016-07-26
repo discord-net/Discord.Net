@@ -55,9 +55,9 @@ namespace Discord.API
 
             _requestQueue = requestQueue ?? new RequestQueue();
 
-            _restClient = restClientProvider(DiscordConfig.ClientAPIUrl);
+            _restClient = restClientProvider(DiscordRestConfig.ClientAPIUrl);
             _restClient.SetHeader("accept", "*/*");
-            _restClient.SetHeader("user-agent", DiscordConfig.UserAgent);
+            _restClient.SetHeader("user-agent", DiscordRestConfig.UserAgent);
             if (webSocketProvider != null)
             {
                 _gatewayClient = webSocketProvider();
@@ -211,7 +211,7 @@ namespace Discord.API
                 if (_gatewayUrl == null)
                 {
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordConfig.GatewayEncoding}";
+                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}";
                 }
                 await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
@@ -791,13 +791,13 @@ namespace Discord.API
 
             List<GuildMember[]> result;
             if (args.Limit.IsSpecified)
-                result = new List<GuildMember[]>((limit + DiscordConfig.MaxUsersPerBatch - 1) / DiscordConfig.MaxUsersPerBatch);
+                result = new List<GuildMember[]>((limit + DiscordRestConfig.MaxUsersPerBatch - 1) / DiscordRestConfig.MaxUsersPerBatch);
             else
                 result = new List<GuildMember[]>();
 
             while (true)
             {
-                int runLimit = (limit >= DiscordConfig.MaxUsersPerBatch) ? DiscordConfig.MaxUsersPerBatch : limit;
+                int runLimit = (limit >= DiscordRestConfig.MaxUsersPerBatch) ? DiscordRestConfig.MaxUsersPerBatch : limit;
                 string endpoint = $"guilds/{guildId}/members?limit={runLimit}&after={afterUserId}";
                 var models = await SendAsync<GuildMember[]>("GET", endpoint, options: options).ConfigureAwait(false);
 
@@ -806,11 +806,11 @@ namespace Discord.API
 
                 result.Add(models);
 
-                limit -= DiscordConfig.MaxUsersPerBatch;
+                limit -= DiscordRestConfig.MaxUsersPerBatch;
                 afterUserId = models[models.Length - 1].User.Id;
 
                 //Was this an incomplete (the last) batch?
-                if (models.Length != DiscordConfig.MaxUsersPerBatch) break;
+                if (models.Length != DiscordRestConfig.MaxUsersPerBatch) break;
             }
 
             if (result.Count > 1)
@@ -920,14 +920,14 @@ namespace Discord.API
                     break;
             }
             
-            int runs = (limit + DiscordConfig.MaxMessagesPerBatch - 1) / DiscordConfig.MaxMessagesPerBatch;
-            int lastRunCount = limit - (runs - 1) * DiscordConfig.MaxMessagesPerBatch;
+            int runs = (limit + DiscordRestConfig.MaxMessagesPerBatch - 1) / DiscordRestConfig.MaxMessagesPerBatch;
+            int lastRunCount = limit - (runs - 1) * DiscordRestConfig.MaxMessagesPerBatch;
             var result = new API.Message[runs][];
 
             int i = 0;
             for (; i < runs; i++)
             {
-                int runCount = i == (runs - 1) ? lastRunCount : DiscordConfig.MaxMessagesPerBatch;
+                int runCount = i == (runs - 1) ? lastRunCount : DiscordRestConfig.MaxMessagesPerBatch;
                 string endpoint;
                 if (relativeId != null)
                     endpoint = $"channels/{channelId}/messages?limit={runCount}&{relativeDir}={relativeId}";
@@ -966,7 +966,7 @@ namespace Discord.API
                 }
 
                 //Was this an incomplete (the last) batch?
-                if (models.Length != DiscordConfig.MaxMessagesPerBatch) { i++; break; }
+                if (models.Length != DiscordRestConfig.MaxMessagesPerBatch) { i++; break; }
             }
 
             if (i > 1)
@@ -1011,8 +1011,8 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-            if (args.Content.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            if (args.Content.Length > DiscordRestConfig.MaxMessageSize)
+                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
 
             if (guildId != 0)
                 return await SendAsync<Message>("POST", $"channels/{channelId}/messages", args, GuildBucket.SendEditMessage, guildId, options: options).ConfigureAwait(false);
@@ -1040,8 +1040,8 @@ namespace Discord.API
             {
                 if (args.Content.Value == null)
                     args.Content = "";
-                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+                if (args.Content.Value?.Length > DiscordRestConfig.MaxMessageSize)
+                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
             if (guildId != 0)
@@ -1121,8 +1121,8 @@ namespace Discord.API
             if (args.Content.IsSpecified)
             {
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+                if (args.Content.Value.Length > DiscordRestConfig.MaxMessageSize)
+                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
             if (guildId != 0)

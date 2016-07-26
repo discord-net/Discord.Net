@@ -51,7 +51,7 @@ namespace Discord
                 return result;
             return null;
         }
-        public override IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0) return ImmutableArray<SocketMessage>.Empty;

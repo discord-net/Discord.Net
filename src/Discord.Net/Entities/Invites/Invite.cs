@@ -16,8 +16,8 @@ namespace Discord
         public override DiscordRestClient Discord { get; }
 
         public string Code => Id;
-        public string Url => $"{DiscordConfig.InviteUrl}/{XkcdCode ?? Code}";
-        public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
+        public string Url => $"{DiscordRestConfig.InviteUrl}/{XkcdCode ?? Code}";
+        public string XkcdUrl => XkcdCode != null ? $"{DiscordRestConfig.InviteUrl}/{XkcdCode}" : null;
 
         public Invite(DiscordRestClient discord, Model model)
             : base(model.Code)

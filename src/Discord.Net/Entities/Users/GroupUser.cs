@@ -24,7 +24,7 @@ namespace Discord
         public virtual UserStatus Status => UserStatus.Unknown;
         public virtual Game Game => null;
 
-        public DiscordClient Discord => Channel.Discord;
+        public DiscordRestClient Discord => Channel.Discord;
 
         public GroupUser(GroupChannel channel, User user)
         {

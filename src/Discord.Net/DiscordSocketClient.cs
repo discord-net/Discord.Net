@@ -46,9 +46,6 @@ namespace Discord
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
-        internal int ConnectionTimeout { get; private set; }
-        internal int ReconnectDelay { get; private set; }
-        internal int FailedReconnectDelay { get; private set; }
         internal int MessageCacheSize { get; private set; }
         internal int LargeThreshold { get; private set; }
         internal AudioMode AudioMode { get; private set; }
@@ -67,9 +64,6 @@ namespace Discord
         {
             ShardId = config.ShardId;
             TotalShards = config.TotalShards;
-            ConnectionTimeout = config.ConnectionTimeout;
-            ReconnectDelay = config.ReconnectDelay;
-            FailedReconnectDelay = config.FailedReconnectDelay;
             MessageCacheSize = config.MessageCacheSize;
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
