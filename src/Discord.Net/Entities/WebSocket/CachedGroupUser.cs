@@ -5,6 +5,8 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class CachedGroupUser : GroupUser, ICachedUser
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGroupChannel Channel => base.Channel as CachedGroupChannel;
         public new CachedGlobalUser User => base.User as CachedGlobalUser;

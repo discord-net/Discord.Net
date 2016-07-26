@@ -13,6 +13,8 @@ namespace Discord
 {
     internal class CachedGroupChannel : GroupChannel, IGroupChannel, ICachedChannel, ICachedMessageChannel, ICachedPrivateChannel
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         private readonly MessageManager _messages;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
 

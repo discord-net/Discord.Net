@@ -2,8 +2,10 @@
 
 namespace Discord
 {
-    internal class CachedMessage : Message, ICachedEntity<ulong>
+    internal class CachedMessage : Message
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new ICachedMessageChannel Channel => base.Channel as ICachedMessageChannel;
 

@@ -5,6 +5,8 @@ namespace Discord
 {
     internal class CachedGuildUser : GuildUser, ICachedUser
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
         public new CachedGlobalUser User => base.User as CachedGlobalUser;

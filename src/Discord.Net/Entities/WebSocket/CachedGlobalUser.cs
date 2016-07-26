@@ -6,6 +6,8 @@ namespace Discord
 {
     internal class CachedGlobalUser : User, ICachedUser
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         private ushort _references;
 
         public Presence Presence { get; private set; }

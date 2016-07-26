@@ -7,6 +7,8 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class CachedDMUser : ICachedUser
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public CachedGlobalUser User { get; }
 
         public DiscordSocketClient Discord => User.Discord;

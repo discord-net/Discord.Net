@@ -5,6 +5,8 @@ namespace Discord
 {
     internal class CachedSelfUser : SelfUser, ICachedUser
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         CachedGlobalUser ICachedUser.User { get { throw new NotSupportedException(); } }
 

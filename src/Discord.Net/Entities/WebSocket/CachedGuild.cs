@@ -19,8 +19,10 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal class CachedGuild : Guild, ICachedEntity<ulong>, IGuild, IUserGuild
+    internal class CachedGuild : Guild, IGuild, IUserGuild
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;

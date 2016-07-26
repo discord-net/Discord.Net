@@ -10,6 +10,8 @@ namespace Discord
 {
     internal class CachedVoiceChannel : VoiceChannel, ICachedGuildChannel
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public new CachedGuild Guild => base.Guild as CachedGuild;
 

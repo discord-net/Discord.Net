@@ -9,6 +9,8 @@ namespace Discord
 {
     internal class CachedTextChannel : TextChannel, ICachedGuildChannel, ICachedMessageChannel
     {
+        bool IEntity<ulong>.IsAttached => true;
+
         private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
