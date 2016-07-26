@@ -29,7 +29,7 @@ namespace Discord
         public IReadOnlyCollection<IRole> MentionedRoles { get; private set; }
         public IReadOnlyCollection<IUser> MentionedUsers { get; private set; }
 
-        public override DiscordClient Discord => (Channel as Entity<ulong>).Discord;
+        public override DiscordRestClient Discord => (Channel as Entity<ulong>).Discord;
         public DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 

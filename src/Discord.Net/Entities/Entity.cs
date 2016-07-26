@@ -4,7 +4,7 @@
     {
         public T Id { get; }
 
-        public abstract DiscordClient Discord { get; }
+        public abstract DiscordRestClient Discord { get; }
 
         internal virtual bool IsAttached => false;
         bool IEntity<T>.IsAttached => IsAttached;

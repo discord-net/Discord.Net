@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace Discord
 {
-    public class DiscordClient : IDiscordClient
+    public class DiscordRestClient : IDiscordClient
     {
         private readonly object _eventLock = new object();
 
@@ -37,9 +37,9 @@ namespace Discord
         public LoginState LoginState { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordClient() : this(new DiscordConfig()) { }
+        public DiscordRestClient() : this(new DiscordConfig()) { }
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordClient(DiscordConfig config)
+        public DiscordRestClient(DiscordConfig config)
         {
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);

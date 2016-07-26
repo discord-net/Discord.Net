@@ -13,13 +13,13 @@ namespace Discord
 
         public ulong ChannelId { get; private set; }
         public ulong GuildId { get; private set; }
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
 
         public string Code => Id;
         public string Url => $"{DiscordConfig.InviteUrl}/{XkcdCode ?? Code}";
         public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
 
-        public Invite(DiscordClient discord, Model model)
+        public Invite(DiscordRestClient discord, Model model)
             : base(model.Code)
         {
             Discord = discord;

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public partial class DiscordSocketClient : DiscordClient, IDiscordClient
+    public partial class DiscordSocketClient : DiscordRestClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly ILogger _gatewayLogger;

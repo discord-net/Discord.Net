@@ -23,7 +23,7 @@ namespace Discord
         public User User { get; private set; }
         public IntegrationAccount Account { get; private set; }
 
-        public override DiscordClient Discord => Guild.Discord;
+        public override DiscordRestClient Discord => Guild.Discord;
         public DateTimeOffset SyncedAt => DateTimeUtils.FromTicks(_syncedAtTicks);
 
         public GuildIntegration(Guild guild, Model model)

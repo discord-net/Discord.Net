@@ -5,7 +5,7 @@ namespace Discord.Extensions
 {
     public static class DiscordClientExtensions
     {
-        public static async Task<IVoiceRegion> GetOptimalVoiceRegionAsync(this DiscordClient discord)
+        public static async Task<IVoiceRegion> GetOptimalVoiceRegionAsync(this DiscordRestClient discord)
         {
             var regions = await discord.GetVoiceRegionsAsync().ConfigureAwait(false);
             return regions.FirstOrDefault(x => x.IsOptimal);

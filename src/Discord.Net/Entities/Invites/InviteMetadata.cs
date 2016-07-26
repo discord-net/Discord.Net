@@ -16,7 +16,7 @@ namespace Discord
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
-        public InviteMetadata(DiscordClient client, Model model)
+        public InviteMetadata(DiscordRestClient client, Model model)
             : base(client, model)
         {
             Update(model, UpdateSource.Creation);

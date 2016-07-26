@@ -27,7 +27,7 @@ namespace Discord
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
 
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
@@ -42,7 +42,7 @@ namespace Discord
         public Role EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<IRole> Roles => _roles.ToReadOnlyCollection();
 
-        public Guild(DiscordClient discord, Model model)
+        public Guild(DiscordRestClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;

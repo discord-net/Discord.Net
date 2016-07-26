@@ -18,9 +18,9 @@ namespace Discord
         public override UserStatus Status => _status;
         public override Game Game => _game;
 
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
 
-        public SelfUser(DiscordClient discord, Model model)
+        public SelfUser(DiscordRestClient discord, Model model)
             : base(model)
         {
             Discord = discord;

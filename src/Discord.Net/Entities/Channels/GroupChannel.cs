@@ -18,14 +18,14 @@ namespace Discord
         protected ConcurrentDictionary<ulong, GroupUser> _users;
         private string _iconId;
         
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
         public string Name { get; private set; }
 
         public IReadOnlyCollection<IUser> Recipients => _users.ToReadOnlyCollection();
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
         public string IconUrl => API.CDN.GetChannelIconUrl(Id, _iconId);
 
-        public GroupChannel(DiscordClient discord, Model model)
+        public GroupChannel(DiscordRestClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;

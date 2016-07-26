@@ -23,7 +23,7 @@ namespace Discord
         
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.Mention(this);
-        public override DiscordClient Discord => Guild.Discord;
+        public override DiscordRestClient Discord => Guild.Discord;
 
         public Role(Guild guild, Model model)
             : base(model.Id)

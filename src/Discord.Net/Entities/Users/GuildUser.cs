@@ -37,7 +37,7 @@ namespace Discord
         public virtual UserStatus Status => UserStatus.Unknown;
         public virtual Game Game => null;
 
-        public DiscordClient Discord => Guild.Discord;
+        public DiscordRestClient Discord => Guild.Discord;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         public GuildUser(Guild guild, User user)

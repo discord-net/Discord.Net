@@ -19,7 +19,7 @@ namespace Discord
 
         public Guild Guild { get; private set; }
 
-        public override DiscordClient Discord => Guild.Discord;
+        public override DiscordRestClient Discord => Guild.Discord;
 
         public GuildChannel(Guild guild, Model model)
             : base(model.Id)
