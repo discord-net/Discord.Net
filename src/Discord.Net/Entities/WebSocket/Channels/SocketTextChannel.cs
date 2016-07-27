@@ -7,17 +7,19 @@ using Model = Discord.API.Channel;
 
 namespace Discord
 {
-    internal class CachedTextChannel : TextChannel, ICachedGuildChannel, ICachedMessageChannel
+    internal class SocketTextChannel : TextChannel, ISocketGuildChannel, ISocketMessageChannel
     {
+        internal override bool IsAttached => true;
+
         private readonly MessageManager _messages;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new CachedGuild Guild => base.Guild as CachedGuild;
+        public new SocketGuild Guild => base.Guild as SocketGuild;
 
-        public IReadOnlyCollection<CachedGuildUser> Members
+        public IReadOnlyCollection<SocketGuildUser> Members
             => Guild.Members.Where(x => Permissions.GetValue(Permissions.ResolveChannel(x, this, x.GuildPermissions.RawValue), ChannelPermission.ReadMessages)).ToImmutableArray();
 
-        public CachedTextChannel(CachedGuild guild, Model model)
+        public SocketTextChannel(SocketGuild guild, Model model)
             : base(guild, model)
         {
             if (Discord.MessageCacheSize > 0)
@@ -28,7 +30,7 @@ namespace Discord
 
         public override Task<IGuildUser> GetUserAsync(ulong id) => Task.FromResult<IGuildUser>(GetUser(id));
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        public CachedGuildUser GetUser(ulong id, bool skipCheck = false)
+        public SocketGuildUser GetUser(ulong id, bool skipCheck = false)
         {
             var user = Guild.GetUser(id);
             if (skipCheck) return user;
@@ -46,36 +48,36 @@ namespace Discord
         {
             return await _messages.DownloadAsync(id).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordRestConfig.MaxMessagesPerBatch)
         {
             return await _messages.DownloadAsync(null, Direction.Before, limit).ConfigureAwait(false);
         }
-        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
         {
             return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
 
-        public CachedMessage AddMessage(ICachedUser author, MessageModel model)
+        public SocketMessage AddMessage(ISocketUser author, MessageModel model)
         {
-            var msg = new CachedMessage(this, author, model);
+            var msg = new SocketMessage(this, author, model);
             _messages.Add(msg);
             return msg;
         }
-        public CachedMessage GetMessage(ulong id)
+        public SocketMessage GetMessage(ulong id)
         {
             return _messages.Get(id);
         }
-        public CachedMessage RemoveMessage(ulong id)
+        public SocketMessage RemoveMessage(ulong id)
         {
             return _messages.Remove(id);
         }
 
-        public CachedTextChannel Clone() => MemberwiseClone() as CachedTextChannel;
+        public SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
 
-        IReadOnlyCollection<ICachedUser> ICachedMessageChannel.Members => Members;
+        IReadOnlyCollection<ISocketUser> ISocketMessageChannel.Users => Members;
 
         IMessage IMessageChannel.GetCachedMessage(ulong id) => GetMessage(id);
-        ICachedUser ICachedMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id, skipCheck);
-        ICachedChannel ICachedChannel.Clone() => Clone();
+        ISocketUser ISocketMessageChannel.GetUser(ulong id, bool skipCheck) => GetUser(id, skipCheck);
+        ISocketChannel ISocketChannel.Clone() => Clone();
     }
 }

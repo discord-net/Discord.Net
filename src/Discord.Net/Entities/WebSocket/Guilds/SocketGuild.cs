@@ -19,12 +19,14 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord
 {
-    internal class CachedGuild : Guild, ICachedEntity<ulong>, IGuild, IUserGuild
+    internal class SocketGuild : Guild, IGuild, IUserGuild
     {
+        internal override bool IsAttached => true;
+
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private ConcurrentHashSet<ulong> _channels;
-        private ConcurrentDictionary<ulong, CachedGuildUser> _members;
+        private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
         internal bool _available;
 
@@ -39,20 +41,20 @@ namespace Discord
         public Task DownloaderPromise => _downloaderPromise.Task;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public CachedGuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
-        public IReadOnlyCollection<ICachedGuildChannel> Channels
+        public SocketGuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
+        public IReadOnlyCollection<ISocketGuildChannel> Channels
         {
             get
             {
                 var channels = _channels;
                 var store = Discord.DataStore;
-                return channels.Select(x => store.GetChannel(x) as ICachedGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
+                return channels.Select(x => store.GetChannel(x) as ISocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
-        public IReadOnlyCollection<CachedGuildUser> Members => _members.ToReadOnlyCollection();
+        public IReadOnlyCollection<SocketGuildUser> Members => _members.ToReadOnlyCollection();
         public IEnumerable<KeyValuePair<ulong, VoiceState>> VoiceStates => _voiceStates;
         
-        public CachedGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
+        public SocketGuild(DiscordSocketClient discord, ExtendedModel model, DataStore dataStore) : base(discord, model)
         {
             _audioLock = new SemaphoreSlim(1, 1);
             _syncPromise = new TaskCompletionSource<bool>();
@@ -70,7 +72,7 @@ namespace Discord
                 if (_channels == null)
                     _channels = new ConcurrentHashSet<ulong>();
                 if (_members == null)
-                    _members = new ConcurrentDictionary<ulong, CachedGuildUser>();
+                    _members = new ConcurrentDictionary<ulong, SocketGuildUser>();
                 if (_roles == null)
                     _roles = new ConcurrentDictionary<ulong, Role>();
                 if (Emojis == null)
@@ -91,7 +93,7 @@ namespace Discord
             }
             _channels = channels;
             
-            var members = new ConcurrentDictionary<ulong, CachedGuildUser>(1, (int)(model.Presences.Length * 1.05));
+            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(1, (int)(model.Presences.Length * 1.05));
             {
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
@@ -119,7 +121,7 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            var members = new ConcurrentDictionary<ulong, CachedGuildUser>(1, (int)(model.Presences.Length * 1.05));
+            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(1, (int)(model.Presences.Length * 1.05));
             {
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
@@ -152,14 +154,14 @@ namespace Discord
             (channels ?? _channels).TryAdd(model.Id);
             dataStore.AddChannel(channel);
         }
-        public ICachedGuildChannel GetChannel(ulong id)
+        public ISocketGuildChannel GetChannel(ulong id)
         {
-            return Discord.DataStore.GetChannel(id) as ICachedGuildChannel;
+            return Discord.DataStore.GetChannel(id) as ISocketGuildChannel;
         }
-        public ICachedGuildChannel RemoveChannel(ulong id)
+        public ISocketGuildChannel RemoveChannel(ulong id)
         {
             _channels.TryRemove(id);
-            return Discord.DataStore.RemoveChannel(id) as ICachedGuildChannel;
+            return Discord.DataStore.RemoveChannel(id) as ISocketGuildChannel;
         }
         
         public Role AddRole(RoleModel model, ConcurrentDictionary<ulong, Role> roles = null)
@@ -181,48 +183,48 @@ namespace Discord
             => Task.FromResult<IGuildUser>(CurrentUser);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        public CachedGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
+        public SocketGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, SocketGuildUser> members = null)
         {
             members = members ?? _members;
 
-            CachedGuildUser member;
+            SocketGuildUser member;
             if (members.TryGetValue(model.User.Id, out member))
                 member.Update(model, UpdateSource.WebSocket);
             else
             {
                 var user = Discord.GetOrAddUser(model.User, dataStore);
-                member = new CachedGuildUser(this, user, model);
+                member = new SocketGuildUser(this, user, model);
                 members[user.Id] = member;
                 DownloadedMemberCount++;
             }
             return member;
         }
-        public CachedGuildUser AddOrUpdateUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, CachedGuildUser> members = null)
+        public SocketGuildUser AddOrUpdateUser(PresenceModel model, DataStore dataStore, ConcurrentDictionary<ulong, SocketGuildUser> members = null)
         {
             members = members ?? _members;
 
-            CachedGuildUser member;
+            SocketGuildUser member;
             if (members.TryGetValue(model.User.Id, out member))
                 member.Update(model, UpdateSource.WebSocket);
             else
             {
                 var user = Discord.GetOrAddUser(model.User, dataStore);
-                member = new CachedGuildUser(this, user, model);
+                member = new SocketGuildUser(this, user, model);
                 members[user.Id] = member;
                 DownloadedMemberCount++;
             }            
             return member;
         }
-        public CachedGuildUser GetUser(ulong id)
+        public SocketGuildUser GetUser(ulong id)
         {
-            CachedGuildUser member;
+            SocketGuildUser member;
             if (_members.TryGetValue(id, out member))
                 return member;
             return null;
         }
-        public CachedGuildUser RemoveUser(ulong id)
+        public SocketGuildUser RemoveUser(ulong id)
         {
-            CachedGuildUser member;
+            SocketGuildUser member;
             if (_members.TryRemove(id, out member))
                 return member;
             return null;
@@ -238,7 +240,7 @@ namespace Discord
 
         public VoiceState AddOrUpdateVoiceState(VoiceStateModel model, DataStore dataStore, ConcurrentDictionary<ulong, VoiceState> voiceStates = null)
         {
-            var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as CachedVoiceChannel;
+            var voiceChannel = dataStore.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
             var voiceState = new VoiceState(voiceChannel, model);
             (voiceStates ?? _voiceStates)[model.UserId] = voiceState;
             return voiceState;
@@ -307,16 +309,16 @@ namespace Discord
             await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
         }
 
-        public CachedGuild Clone() => MemberwiseClone() as CachedGuild;
+        public SocketGuild Clone() => MemberwiseClone() as SocketGuild;
 
-        new internal ICachedGuildChannel ToChannel(ChannelModel model)
+        new internal ISocketGuildChannel ToChannel(ChannelModel model)
         {
             switch (model.Type)
             {
                 case ChannelType.Text:
-                    return new CachedTextChannel(this, model);
+                    return new SocketTextChannel(this, model);
                 case ChannelType.Voice:
-                    return new CachedVoiceChannel(this, model);
+                    return new SocketVoiceChannel(this, model);
                 default:
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }

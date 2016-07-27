@@ -2,13 +2,19 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyGuildIntegrationParams
     {
         [JsonProperty("expire_behavior")]
-        public Optional<int> ExpireBehavior { get; set; }
+        internal Optional<int> _expireBehavior { get; set; }
+        public int ExpireBehavior { set { _expireBehavior = value; } }
+
         [JsonProperty("expire_grace_period")]
-        public Optional<int> ExpireGracePeriod { get; set; }
+        internal Optional<int> _expireGracePeriod { get; set; }
+        public int ExpireGracePeriod { set { _expireGracePeriod = value; } }
+
         [JsonProperty("enable_emoticons")]
-        public Optional<bool> EnableEmoticons { get; set; }
+        internal Optional<bool> _enableEmoticons { get; set; }
+        public bool EnableEmoticons { set { _enableEmoticons = value; } }
     }
 }

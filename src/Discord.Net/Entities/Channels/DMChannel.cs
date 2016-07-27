@@ -13,13 +13,13 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class DMChannel : SnowflakeEntity, IDMChannel
     {
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
         public IUser Recipient { get; private set; }
 
         public virtual IReadOnlyCollection<IMessage> CachedMessages => ImmutableArray.Create<IMessage>();
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
 
-        public DMChannel(DiscordClient discord, IUser recipient, Model model)
+        public DMChannel(DiscordRestClient discord, IUser recipient, Model model)
             : base(model.Id)
         {
             Discord = discord;

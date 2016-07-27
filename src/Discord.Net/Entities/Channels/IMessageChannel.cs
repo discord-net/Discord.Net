@@ -20,12 +20,11 @@ namespace Discord
         /// <summary> Gets the message from this channel's cache with the given id, or null if not found. </summary>
         IMessage GetCachedMessage(ulong id);
         /// <summary> Gets the last N messages from this message channel. </summary>
-        Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch);
+        Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordRestConfig.MaxMessagesPerBatch);
         /// <summary> Gets a collection of messages in this channel. </summary>
-        Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch);
+        Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch);
         /// <summary> Bulk deletes multiple messages. </summary>
-        Task DeleteMessagesAsync(IEnumerable<IMessage> messages);
-        
+        Task DeleteMessagesAsync(IEnumerable<IMessage> messages);        
 
         /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds.</summary>
         Task TriggerTypingAsync();

@@ -2,11 +2,13 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyChannelPermissionsParams
     {
         [JsonProperty("allow")]
-        public Optional<ulong> Allow { get; set; }
+        public ulong Allow { internal get; set; }
+
         [JsonProperty("deny")]
-        public Optional<ulong> Deny { get; set; }
+        public ulong Deny { internal get; set; }
     }
 }

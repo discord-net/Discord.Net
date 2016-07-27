@@ -11,14 +11,10 @@ namespace Discord
     //TODO: Docstrings should explain when REST requests are sent and how many
     public interface IDiscordClient : IDisposable
     {
-        LoginState LoginState { get; }
         ConnectionState ConnectionState { get; }
 
         DiscordApiClient ApiClient { get; }
         ILogManager LogManager { get; }
-        
-        Task LoginAsync(TokenType tokenType, string token, bool validateToken = true);
-        Task LogoutAsync();
 
         Task ConnectAsync();
         Task DisconnectAsync();

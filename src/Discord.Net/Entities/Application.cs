@@ -13,12 +13,12 @@ namespace Discord
         public string[] RPCOrigins { get; private set; }
         public ulong Flags { get; private set; }
 
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
         public IUser Owner { get; private set; }
 
         public string IconUrl => API.CDN.GetApplicationIconUrl(Id, _iconId);
 
-        public Application(DiscordClient discord, Model model)
+        public Application(DiscordRestClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;

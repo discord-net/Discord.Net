@@ -3,20 +3,17 @@ using System.IO;
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class CreateGuildParams
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { internal get; set; }
+
         [JsonProperty("region")]
-        public string Region { get; set; }
+        public string Region { internal get; set; }
 
         [JsonProperty("icon")]
-        private Optional<Image> _icon { get; set; }
-        [JsonIgnore]
-        public Optional<Stream> Icon
-        {
-            get { return _icon.IsSpecified ? _icon.Value.Stream : null; }
-            set { _icon = value.IsSpecified ? new Image(value.Value) : Optional.Create<Image>(); }
-        }
+        internal Optional<Image?> _icon { get; set; }
+        public Stream Icon { set { _icon = value != null ? new Image(value) : (Image?)null; } }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -27,94 +26,56 @@ namespace Discord.Commands
             _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
-                [typeof(string)] = new GenericTypeReader((m, s) => Task.FromResult(TypeReaderResult.FromSuccess(s))),
-                [typeof(byte)] = new GenericTypeReader((m, s) =>
-                {
-                    byte value;
-                    if (byte.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Byte"));
-                }),
-                [typeof(sbyte)] = new GenericTypeReader((m, s) =>
-                {
-                    sbyte value;
-                    if (sbyte.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse SByte"));
-                }),
-                [typeof(ushort)] = new GenericTypeReader((m, s) =>
-                {
-                    ushort value;
-                    if (ushort.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse UInt16"));
-                }),
-                [typeof(short)] = new GenericTypeReader((m, s) =>
-                {
-                    short value;
-                    if (short.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Int16"));
-                }),
-                [typeof(uint)] = new GenericTypeReader((m, s) =>
-                {
-                    uint value;
-                    if (uint.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse UInt32"));
-                }),
-                [typeof(int)] = new GenericTypeReader((m, s) =>
-                {
-                    int value;
-                    if (int.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Int32"));
-                }),
-                [typeof(ulong)] = new GenericTypeReader((m, s) =>
-                {
-                    ulong value;
-                    if (ulong.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse UInt64"));
-                }),
-                [typeof(long)] = new GenericTypeReader((m, s) =>
-                {
-                    long value;
-                    if (long.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Int64"));
-                }),
-                [typeof(float)] = new GenericTypeReader((m, s) =>
-                {
-                    float value;
-                    if (float.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Single"));
-                }),
-                [typeof(double)] = new GenericTypeReader((m, s) =>
-                {
-                    double value;
-                    if (double.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Double"));
-                }),
-                [typeof(decimal)] = new GenericTypeReader((m, s) =>
-                {
-                    decimal value;
-                    if (decimal.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Decimal"));
-                }),
-                [typeof(DateTime)] = new GenericTypeReader((m, s) =>
-                {
-                    DateTime value;
-                    if (DateTime.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse DateTime"));
-                }),
-                [typeof(DateTimeOffset)] = new GenericTypeReader((m, s) =>
-                {
-                    DateTimeOffset value;
-                    if (DateTimeOffset.TryParse(s, out value)) return Task.FromResult(TypeReaderResult.FromSuccess(value));
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse DateTimeOffset"));
-                }),
+                [typeof(string)] = new SimpleTypeReader<string>(),
+                [typeof(byte)] = new SimpleTypeReader<byte>(),
+                [typeof(sbyte)] = new SimpleTypeReader<sbyte>(),
+                [typeof(ushort)] = new SimpleTypeReader<ushort>(),
+                [typeof(short)] = new SimpleTypeReader<short>(),
+                [typeof(uint)] = new SimpleTypeReader<uint>(),
+                [typeof(int)] = new SimpleTypeReader<int>(),
+                [typeof(ulong)] = new SimpleTypeReader<ulong>(),
+                [typeof(long)] = new SimpleTypeReader<long>(),
+                [typeof(float)] = new SimpleTypeReader<float>(),
+                [typeof(double)] = new SimpleTypeReader<double>(),
+                [typeof(decimal)] = new SimpleTypeReader<decimal>(),
+                [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
+                [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
+
+                //TODO: Do we want to support any other interfaces?
+
+                //[typeof(IMentionable)] = new GeneralTypeReader(),
+                //[typeof(ISnowflakeEntity)] = new GeneralTypeReader(),
+                //[typeof(IEntity<ulong>)] = new GeneralTypeReader(),
 
                 [typeof(IMessage)] = new MessageTypeReader(),
+                //[typeof(IAttachment)] = new xxx(),
+                //[typeof(IEmbed)] = new xxx(),
+
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
+                [typeof(IDMChannel)] = new ChannelTypeReader<IDMChannel>(),
+                [typeof(IGroupChannel)] = new ChannelTypeReader<IGroupChannel>(),
                 [typeof(IGuildChannel)] = new ChannelTypeReader<IGuildChannel>(),
+                [typeof(IMessageChannel)] = new ChannelTypeReader<IMessageChannel>(),
+                [typeof(IPrivateChannel)] = new ChannelTypeReader<IPrivateChannel>(),
                 [typeof(ITextChannel)] = new ChannelTypeReader<ITextChannel>(),
                 [typeof(IVoiceChannel)] = new ChannelTypeReader<IVoiceChannel>(),
+
+                //[typeof(IGuild)] = new GuildTypeReader<IGuild>(),
+                //[typeof(IUserGuild)] = new GuildTypeReader<IUserGuild>(),
+                //[typeof(IGuildIntegration)] = new xxx(),
+
                 [typeof(IRole)] = new RoleTypeReader(),
+
+                //[typeof(IInvite)] = new InviteTypeReader<IInvite>(),
+                //[typeof(IInviteMetadata)] = new InviteTypeReader<IInviteMetadata>(),
+
                 [typeof(IUser)] = new UserTypeReader<IUser>(),
-                [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>()
+                [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
+                [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
+                //[typeof(ISelfUser)] = new UserTypeReader<ISelfUser>(),
+                //[typeof(IPresence)] = new UserTypeReader<IPresence>(),
+                //[typeof(IVoiceState)] = new UserTypeReader<IVoiceState>(),
+                //[typeof(IConnection)] = new xxx(),
             };
         }
 

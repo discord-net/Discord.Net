@@ -34,8 +34,8 @@ namespace Discord
             var args = new ModifyVoiceChannelParams();
             func(args);
 
-            if (!args.Name.IsSpecified)
-                args.Name = Name;
+            if (!args._name.IsSpecified)
+                args._name = Name;
 
             var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);

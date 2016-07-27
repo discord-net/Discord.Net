@@ -2,6 +2,7 @@
 
 namespace Discord.API.Gateway
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ResumeParams
     {
         [JsonProperty("token")]

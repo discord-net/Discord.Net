@@ -27,7 +27,7 @@ namespace Discord
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
 
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
@@ -42,7 +42,7 @@ namespace Discord
         public Role EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<IRole> Roles => _roles.ToReadOnlyCollection();
 
-        public Guild(DiscordClient discord, Model model)
+        public Guild(DiscordRestClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;
@@ -122,10 +122,10 @@ namespace Discord
             var args = new ModifyGuildParams();
             func(args);
 
-            if (args.Splash.IsSpecified && _splashId != null)
-                args.SplashHash = _splashId;
-            if (args.Icon.IsSpecified && _iconId != null)
-                args.IconHash = _iconId;
+            if (args._splash.IsSpecified && _splashId != null)
+                args._splash = new API.Image(_splashId);
+            if (args._icon.IsSpecified && _iconId != null)
+                args._icon = new API.Image(_iconId);
 
             var model = await Discord.ApiClient.ModifyGuildAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
@@ -165,7 +165,7 @@ namespace Discord
         public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user, pruneDays);
         public async Task AddBanAsync(ulong userId, int pruneDays = 0)
         {
-            var args = new CreateGuildBanParams() { PruneDays = pruneDays };
+            var args = new CreateGuildBanParams() { DeleteMessageDays = pruneDays };
             await Discord.ApiClient.CreateGuildBanAsync(Id, userId, args).ConfigureAwait(false);
         }
         public Task RemoveBanAsync(IUser user) => RemoveBanAsync(user.Id);

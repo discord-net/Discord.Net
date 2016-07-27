@@ -5,9 +5,12 @@ using PresenceModel = Discord.API.Presence;
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    internal class CachedDMUser : ICachedUser
+    internal class SocketDMUser : ISocketUser
     {
-        public CachedGlobalUser User { get; }
+        internal bool IsAttached => true;
+        bool IEntity<ulong>.IsAttached => IsAttached;
+
+        public SocketGlobalUser User { get; }
 
         public DiscordSocketClient Discord => User.Discord;
 
@@ -20,12 +23,11 @@ namespace Discord
         public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
         public ushort DiscriminatorValue => User.DiscriminatorValue;
-        public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => MentionUtils.Mention(this);
         public string Username => User.Username;
 
-        public CachedDMUser(CachedGlobalUser user)
+        public SocketDMUser(SocketGlobalUser user)
         {
             User = user;
         }
@@ -35,8 +37,8 @@ namespace Discord
             User.Update(model, source);
         }
 
-        public CachedDMUser Clone() => MemberwiseClone() as CachedDMUser;
-        ICachedUser ICachedUser.Clone() => Clone();
+        public SocketDMUser Clone() => MemberwiseClone() as SocketDMUser;
+        ISocketUser ISocketUser.Clone() => Clone();
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id})";

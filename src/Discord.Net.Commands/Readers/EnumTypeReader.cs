@@ -7,31 +7,13 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    delegate bool TryParseDelegate<T>(string str, out T value);
-
     internal static class EnumTypeReader
-    {        
-        private static readonly IReadOnlyDictionary<Type, object> _parsers;
-
-        static EnumTypeReader()
-        {
-            var parserBuilder = ImmutableDictionary.CreateBuilder<Type, object>();
-            parserBuilder[typeof(sbyte)] = (TryParseDelegate<sbyte>)sbyte.TryParse;
-            parserBuilder[typeof(byte)] = (TryParseDelegate<byte>)byte.TryParse;
-            parserBuilder[typeof(short)] = (TryParseDelegate<short>)short.TryParse;
-            parserBuilder[typeof(ushort)] = (TryParseDelegate<ushort>)ushort.TryParse;
-            parserBuilder[typeof(int)] = (TryParseDelegate<int>)int.TryParse;
-            parserBuilder[typeof(uint)] = (TryParseDelegate<uint>)uint.TryParse;
-            parserBuilder[typeof(long)] = (TryParseDelegate<long>)long.TryParse;
-            parserBuilder[typeof(ulong)] = (TryParseDelegate<ulong>)ulong.TryParse;
-            _parsers = parserBuilder.ToImmutable();
-        }
-
+    {
         public static TypeReader GetReader(Type type)
         {
             Type baseType = Enum.GetUnderlyingType(type);
             var constructor = typeof(EnumTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors.First();
-            return (TypeReader)constructor.Invoke(new object[] { type, _parsers[baseType] });
+            return (TypeReader)constructor.Invoke(new object[] { type, PrimitiveParsers.Get(baseType) });
         }
     }
 

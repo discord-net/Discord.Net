@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public partial class DiscordSocketClient : DiscordClient, IDiscordClient
+    public partial class DiscordSocketClient : DiscordRestClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly ILogger _gatewayLogger;
@@ -44,19 +44,16 @@ namespace Discord
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
 
-        //From DiscordConfig
+        //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
-        internal int ConnectionTimeout { get; private set; }
-        internal int ReconnectDelay { get; private set; }
-        internal int FailedReconnectDelay { get; private set; }
         internal int MessageCacheSize { get; private set; }
         internal int LargeThreshold { get; private set; }
         internal AudioMode AudioMode { get; private set; }
         internal DataStore DataStore { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
 
-        internal CachedSelfUser CurrentUser => _currentUser as CachedSelfUser;
-        internal IReadOnlyCollection<CachedGuild> Guilds => DataStore.Guilds;
+        internal SocketSelfUser CurrentUser => _currentUser as SocketSelfUser;
+        internal IReadOnlyCollection<SocketGuild> Guilds => DataStore.Guilds;
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
@@ -67,9 +64,6 @@ namespace Discord
         {
             ShardId = config.ShardId;
             TotalShards = config.TotalShards;
-            ConnectionTimeout = config.ConnectionTimeout;
-            ReconnectDelay = config.ReconnectDelay;
-            FailedReconnectDelay = config.FailedReconnectDelay;
             MessageCacheSize = config.MessageCacheSize;
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
@@ -340,15 +334,15 @@ namespace Discord
         {
             return Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
         }
-        internal CachedGuild AddGuild(ExtendedGuild model, DataStore dataStore)
+        internal SocketGuild AddGuild(ExtendedGuild model, DataStore dataStore)
         {
-            var guild = new CachedGuild(this, model, dataStore);
+            var guild = new SocketGuild(this, model, dataStore);
             dataStore.AddGuild(guild);
             if (model.Large)
                 _largeGuilds.Enqueue(model.Id);
             return guild;
         }
-        internal CachedGuild RemoveGuild(ulong id)
+        internal SocketGuild RemoveGuild(ulong id)
         {
             var guild = DataStore.RemoveGuild(id);
             foreach (var channel in guild.Channels)
@@ -367,7 +361,7 @@ namespace Discord
         {
             return Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(DataStore.PrivateChannels);
         }
-        internal ICachedChannel AddPrivateChannel(API.Channel model, DataStore dataStore)
+        internal ISocketChannel AddPrivateChannel(API.Channel model, DataStore dataStore)
         {
             switch (model.Type)
             {
@@ -375,13 +369,13 @@ namespace Discord
                     {
                         var recipients = model.Recipients.Value;
                         var user = GetOrAddUser(recipients[0], dataStore);
-                        var channel = new CachedDMChannel(this, new CachedDMUser(user), model);
+                        var channel = new SocketDMChannel(this, new SocketDMUser(user), model);
                         dataStore.AddChannel(channel);
                         return channel;
                     }
                 case ChannelType.Group:
                     {
-                        var channel = new CachedGroupChannel(this, model);
+                        var channel = new SocketGroupChannel(this, model);
                         channel.UpdateUsers(model.Recipients.Value, UpdateSource.Creation, dataStore);
                         dataStore.AddChannel(channel);
                         return channel;
@@ -390,9 +384,9 @@ namespace Discord
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
         }
-        internal ICachedChannel RemovePrivateChannel(ulong id)
+        internal ISocketChannel RemovePrivateChannel(ulong id)
         {
-            var channel = DataStore.RemoveChannel(id) as ICachedPrivateChannel;
+            var channel = DataStore.RemoveChannel(id) as ISocketPrivateChannel;
             foreach (var recipient in channel.Recipients)
                 recipient.User.RemoveRef(this);
             return channel;
@@ -413,13 +407,13 @@ namespace Discord
         {
             return Task.FromResult<ISelfUser>(_currentUser);
         }
-        internal CachedGlobalUser GetOrAddUser(API.User model, DataStore dataStore)
+        internal SocketGlobalUser GetOrAddUser(API.User model, DataStore dataStore)
         {
-            var user = dataStore.GetOrAddUser(model.Id, _ => new CachedGlobalUser(model));
+            var user = dataStore.GetOrAddUser(model.Id, _ => new SocketGlobalUser(model));
             user.AddRef();
             return user;
         }
-        internal CachedGlobalUser RemoveUser(ulong id)
+        internal SocketGlobalUser RemoveUser(ulong id)
         {
             return DataStore.RemoveUser(id);
         }
@@ -429,10 +423,10 @@ namespace Discord
             => DownloadUsersAsync(DataStore.Guilds.Where(x => !x.HasAllMembers));
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
         public Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
-            => DownloadUsersAsync(guilds.Select(x => x as CachedGuild).Where(x => x != null));
+            => DownloadUsersAsync(guilds.Select(x => x as SocketGuild).Where(x => x != null));
         public Task DownloadUsersAsync(params IGuild[] guilds)
-            => DownloadUsersAsync(guilds.Select(x => x as CachedGuild).Where(x => x != null));
-        private async Task DownloadUsersAsync(IEnumerable<CachedGuild> guilds)
+            => DownloadUsersAsync(guilds.Select(x => x as SocketGuild).Where(x => x != null));
+        private async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
         {
             var cachedGuilds = guilds.ToArray();
             if (cachedGuilds.Length == 0) return;
@@ -559,7 +553,7 @@ namespace Discord
                                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
                                         var dataStore = new DataStore(data.Guilds.Length, data.PrivateChannels.Length);
 
-                                        var currentUser = new CachedSelfUser(this, data.User);
+                                        var currentUser = new SocketSelfUser(this, data.User);
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
                                         {
@@ -625,7 +619,7 @@ namespace Discord
                                     }
                                     await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
 
-                                    CachedGuild guild;
+                                    SocketGuild guild;
                                     if (data.Unavailable != false)
                                     {
                                         guild = AddGuild(data, DataStore);
@@ -751,7 +745,7 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    ICachedChannel channel = null;
+                                    ISocketChannel channel = null;
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = DataStore.GetGuild(data.GuildId.Value);
@@ -789,7 +783,7 @@ namespace Discord
                                         var before = channel.Clone();
                                         channel.Update(data, UpdateSource.WebSocket);
 
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         {
                                             await _gatewayLogger.DebugAsync("Ignored CHANNEL_UPDATE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -808,7 +802,7 @@ namespace Discord
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
-                                    ICachedChannel channel = null;
+                                    ISocketChannel channel = null;
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     if (data.GuildId.IsSpecified)
                                     {
@@ -978,7 +972,7 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_ADD)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as SocketGroupChannel;
                                     if (channel != null)
                                     {
                                         var user = channel.AddUser(data.User, DataStore);
@@ -996,7 +990,7 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<RecipientEvent>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as CachedGroupChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as SocketGroupChannel;
                                     if (channel != null)
                                     {
                                         var user = channel.RemoveUser(data.User.Id);
@@ -1166,10 +1160,10 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_CREATE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1200,17 +1194,17 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
                                         }
 
                                         IMessage before = null, after = null;
-                                        CachedMessage cachedMsg = channel.GetMessage(data.Id);
+                                        SocketMessage cachedMsg = channel.GetMessage(data.Id);
                                         if (cachedMsg != null)
                                         {
                                             before = cachedMsg.Clone();
@@ -1239,10 +1233,10 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
                                     
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         { 
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1266,10 +1260,10 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<MessageDeleteBulkEvent>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         {
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE_BULK, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1341,10 +1335,10 @@ namespace Discord
                                     await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
-                                    var channel = DataStore.GetChannel(data.ChannelId) as ICachedMessageChannel;
+                                    var channel = DataStore.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as ICachedGuildChannel)?.Guild.IsSynced ?? true))
+                                        if (!((channel as ISocketGuildChannel)?.Guild.IsSynced ?? true))
                                         {
                                             await _gatewayLogger.DebugAsync("Ignored TYPING_START, guild is not synced yet.").ConfigureAwait(false);
                                             return;
@@ -1385,7 +1379,7 @@ namespace Discord
                                     var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
                                     if (data.GuildId.HasValue)
                                     {
-                                        ICachedUser user;
+                                        ISocketUser user;
                                         VoiceState before, after;
                                         if (data.GuildId != null)
                                         {
@@ -1418,7 +1412,7 @@ namespace Discord
                                         }
                                         else
                                         {
-                                            var groupChannel = DataStore.GetChannel(data.ChannelId.Value) as CachedGroupChannel;
+                                            var groupChannel = DataStore.GetChannel(data.ChannelId.Value) as SocketGroupChannel;
                                             if (groupChannel != null)
                                             {
                                                 if (data.ChannelId != null)

@@ -10,36 +10,36 @@ namespace Discord
     internal class MessageManager
     {
         private readonly DiscordSocketClient _discord;
-        private readonly ICachedMessageChannel _channel;
+        private readonly ISocketMessageChannel _channel;
 
-        public virtual IReadOnlyCollection<CachedMessage> Messages 
-            => ImmutableArray.Create<CachedMessage>();
+        public virtual IReadOnlyCollection<SocketMessage> Messages 
+            => ImmutableArray.Create<SocketMessage>();
 
-        public MessageManager(DiscordSocketClient discord, ICachedMessageChannel channel)
+        public MessageManager(DiscordSocketClient discord, ISocketMessageChannel channel)
         {
             _discord = discord;
             _channel = channel;
         }
 
-        public virtual void Add(CachedMessage message) { }
-        public virtual CachedMessage Remove(ulong id) => null;
-        public virtual CachedMessage Get(ulong id) => null;
+        public virtual void Add(SocketMessage message) { }
+        public virtual SocketMessage Remove(ulong id) => null;
+        public virtual SocketMessage Get(ulong id) => null;
 
-        public virtual IImmutableList<CachedMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ImmutableArray.Create<CachedMessage>();
+        public virtual IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
+            => ImmutableArray.Create<SocketMessage>();
 
-        public virtual async Task<CachedMessage> DownloadAsync(ulong id)
+        public virtual async Task<SocketMessage> DownloadAsync(ulong id)
         {
             var model = await _discord.ApiClient.GetChannelMessageAsync(_channel.Id, id).ConfigureAwait(false);
             if (model != null)
-                return new CachedMessage(_channel, new User(model.Author.Value), model);
+                return new SocketMessage(_channel, new User(model.Author.Value), model);
             return null;
         }
-        public async Task<IReadOnlyCollection<CachedMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
+        public async Task<IReadOnlyCollection<SocketMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
         {
             //TODO: Test heavily, especially the ordering of messages
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
-            if (limit == 0) return ImmutableArray<CachedMessage>.Empty;
+            if (limit == 0) return ImmutableArray<SocketMessage>.Empty;
 
             var cachedMessages = GetMany(fromId, dir, limit);
             if (cachedMessages.Count == limit)
@@ -48,20 +48,21 @@ namespace Discord
                 return cachedMessages.Skip(cachedMessages.Count - limit).ToImmutableArray();
             else
             {
-                Optional<ulong> relativeId;
-                if (cachedMessages.Count == 0)
-                    relativeId = fromId ?? new Optional<ulong>();
-                else
-                    relativeId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id;
                 var args = new GetChannelMessagesParams
                 {
                     Limit = limit - cachedMessages.Count,
-                    RelativeDirection = dir,
-                    RelativeMessageId = relativeId
+                    RelativeDirection = dir
                 };
+                if (cachedMessages.Count == 0)
+                {
+                    if (fromId != null)
+                        args.RelativeMessageId = fromId.Value;
+                }
+                else
+                    args.RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id;
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
 
-                var guild = (_channel as ICachedGuildChannel)?.Guild;
+                var guild = (_channel as ISocketGuildChannel)?.Guild;
                 return cachedMessages.Concat(downloadedMessages.Select(x =>
                 {
                     IUser user = _channel.GetUser(x.Author.Value.Id, true);
@@ -73,7 +74,7 @@ namespace Discord
                         else
                             user = newUser;
                     }
-                    return new CachedMessage(_channel, user, x);
+                    return new SocketMessage(_channel, user, x);
                 })).ToImmutableArray();
             }
         }

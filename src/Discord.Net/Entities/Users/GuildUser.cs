@@ -13,6 +13,9 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class GuildUser : IGuildUser, ISnowflakeEntity
     {
+        internal virtual bool IsAttached => false;
+        bool IEntity<ulong>.IsAttached => IsAttached;
+
         private long? _joinedAtTicks;
         
         public string Nickname { get; private set; }
@@ -27,7 +30,6 @@ namespace Discord
         public DateTimeOffset CreatedAt => User.CreatedAt;
         public string Discriminator => User.Discriminator;
         public ushort DiscriminatorValue => User.DiscriminatorValue;
-        public bool IsAttached => User.IsAttached;
         public bool IsBot => User.IsBot;
         public string Mention => MentionUtils.Mention(this, Nickname != null);
         public string Username => User.Username;
@@ -35,7 +37,7 @@ namespace Discord
         public virtual UserStatus Status => UserStatus.Unknown;
         public virtual Game Game => null;
 
-        public DiscordClient Discord => Guild.Discord;
+        public DiscordRestClient Discord => Guild.Discord;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         public GuildUser(Guild guild, User user)
@@ -75,6 +77,15 @@ namespace Discord
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
         }
+        private void Update(ModifyGuildMemberParams args, UpdateSource source)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
+            if (args._roleIds.IsSpecified)
+                Roles = args._roleIds.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+            if (args._nickname.IsSpecified)
+                Nickname = args._nickname.Value ?? "";
+        }
         private void UpdateRoles(ulong[] roleIds)
         {
             var roles = ImmutableArray.CreateBuilder<Role>(roleIds.Length + 1);
@@ -104,20 +115,17 @@ namespace Discord
             func(args);
 
             bool isCurrentUser = (await Discord.GetCurrentUserAsync().ConfigureAwait(false)).Id == Id;
-            if (isCurrentUser && args.Nickname.IsSpecified)
+            if (isCurrentUser && args._nickname.IsSpecified)
             {
-                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value ?? "" };
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args._nickname.Value ?? "" };
                 await Discord.ApiClient.ModifyMyNickAsync(Guild.Id, nickArgs).ConfigureAwait(false);
-                args.Nickname = new Optional<string>(); //Remove
+                args._nickname = Optional.Create<string>(); //Remove
             }
 
-            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
+            if (!isCurrentUser || args._deaf.IsSpecified || args._mute.IsSpecified || args._roleIds.IsSpecified)
             {
                 await Discord.ApiClient.ModifyGuildMemberAsync(Guild.Id, Id, args).ConfigureAwait(false);
-                if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname.Value ?? "";
-                if (args.RoleIds.IsSpecified)
-                    Roles = args.RoleIds.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+                Update(args, UpdateSource.Rest);
             }
         }
         public async Task KickAsync()

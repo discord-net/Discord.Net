@@ -10,11 +10,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Collections.Concurrent;
 
 namespace Discord
 {
-    public class DiscordClient : IDiscordClient
+    public class DiscordRestClient : IDiscordClient
     {
         private readonly object _eventLock = new object();
 
@@ -38,9 +37,9 @@ namespace Discord
         public LoginState LoginState { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordClient() : this(new DiscordConfig()) { }
+        public DiscordRestClient() : this(new DiscordRestConfig()) { }
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordClient(DiscordConfig config)
+        public DiscordRestClient(DiscordRestConfig config)
         {
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -305,9 +304,10 @@ namespace Discord
         private async Task WriteInitialLog()
         {
             if (this is DiscordSocketClient)
-                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.FullVersion} (API v{DiscordConfig.APIVersion}, {DiscordConfig.GatewayEncoding})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordSocketClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion}, {DiscordSocketConfig.GatewayEncoding})").ConfigureAwait(false);
             else
-                await _clientLogger.InfoAsync($"DiscordClient v{DiscordConfig.FullVersion} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
+                await _clientLogger.InfoAsync($"DiscordRestClient v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
+
             await _clientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
             await _clientLogger.VerboseAsync($"Processors: {Environment.ProcessorCount}").ConfigureAwait(false);

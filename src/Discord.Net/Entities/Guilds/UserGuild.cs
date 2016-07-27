@@ -13,11 +13,11 @@ namespace Discord
         public bool IsOwner { get; private set; }
         public GuildPermissions Permissions { get; private set; }
 
-        public override DiscordClient Discord { get; }
+        public override DiscordRestClient Discord { get; }
 
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
-        public UserGuild(DiscordClient discord, Model model)
+        public UserGuild(DiscordRestClient discord, Model model)
             : base(model.Id)
         {
             Discord = discord;

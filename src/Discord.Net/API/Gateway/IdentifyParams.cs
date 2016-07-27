@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Gateway
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class IdentifyParams
     {
         [JsonProperty("token")]

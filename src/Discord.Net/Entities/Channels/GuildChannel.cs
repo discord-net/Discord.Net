@@ -19,7 +19,7 @@ namespace Discord
 
         public Guild Guild { get; private set; }
 
-        public override DiscordClient Discord => Guild.Discord;
+        public override DiscordRestClient Discord => Guild.Discord;
 
         public GuildChannel(Guild guild, Model model)
             : base(model.Id)
@@ -56,8 +56,8 @@ namespace Discord
             var args = new ModifyGuildChannelParams();
             func(args);
 
-            if (!args.Name.IsSpecified)
-                args.Name = Name;
+            if (!args._name.IsSpecified)
+                args._name = Name;
 
             var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);

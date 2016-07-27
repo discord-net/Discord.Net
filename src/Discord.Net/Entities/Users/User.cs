@@ -13,7 +13,7 @@ namespace Discord
         public string Username { get; private set; }
         public ushort DiscriminatorValue { get; private set; }
 
-        public override DiscordClient Discord { get { throw new NotSupportedException(); } }
+        public override DiscordRestClient Discord { get { throw new NotSupportedException(); } }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, _avatarId);
         public string Discriminator => DiscriminatorValue.ToString("D4");

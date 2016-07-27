@@ -4,9 +4,10 @@
     {
         public T Id { get; }
 
-        public abstract DiscordClient Discord { get; }
+        public abstract DiscordRestClient Discord { get; }
 
-        public bool IsAttached => this is ICachedEntity<T>;
+        internal virtual bool IsAttached => false;
+        bool IEntity<T>.IsAttached => IsAttached;
 
         public Entity(T id)
         {

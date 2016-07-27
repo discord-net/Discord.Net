@@ -19,7 +19,7 @@ namespace Discord
 
         private readonly Flags _voiceStates;
         
-        public CachedVoiceChannel VoiceChannel { get; }
+        public SocketVoiceChannel VoiceChannel { get; }
         public string VoiceSessionId { get; }
 
         public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
@@ -28,9 +28,9 @@ namespace Discord
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
 
-        public VoiceState(CachedVoiceChannel voiceChannel, Model model) 
+        public VoiceState(SocketVoiceChannel voiceChannel, Model model) 
             : this(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress) { }
-        public VoiceState(CachedVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
+        public VoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;

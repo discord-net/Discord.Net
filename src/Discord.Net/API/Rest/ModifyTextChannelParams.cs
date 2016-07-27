@@ -2,9 +2,11 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyTextChannelParams : ModifyGuildChannelParams
     {
         [JsonProperty("topic")]
-        public Optional<string> Topic { get; set; }
+        internal Optional<string> _topic { get; set; }
+        public string Topic { set { _topic = value; } }
     }
 }

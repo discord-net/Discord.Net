@@ -2,14 +2,16 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyGuildEmbedParams
     {        
         [JsonProperty("enabled")]
-        public Optional<bool> Enabled { get; set; }
+        internal Optional<bool> _enabled { get; set; }
+        public bool Enabled { set { _enabled = value; } }
 
         [JsonProperty("channel")]
-        public Optional<ulong> ChannelId { get; set; }
-        [JsonIgnore]
-        public Optional<IVoiceChannel> Channel { set { ChannelId = value.IsSpecified ? value.Value.Id : Optional.Create<ulong>(); } }
+        internal Optional<ulong?> _channelId { get; set; }
+        public ulong? ChannelId { set { _channelId = value; } }
+        public IVoiceChannel Channel { set { _channelId = value != null ? value.Id : (ulong?)null; } }
     }
 }

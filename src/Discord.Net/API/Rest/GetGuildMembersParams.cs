@@ -2,7 +2,10 @@
 {
     public class GetGuildMembersParams
     {
-        public Optional<int> Limit { get; set; }
-        public Optional<ulong> AfterUserId { get; set; }
+        internal Optional<int> _limit { get; set; }
+        public int Limit { set { _limit = value; } }
+
+        internal Optional<ulong> _afterUserId { get; set; }
+        public ulong AfterUserId { set { _afterUserId = value; } }
     }
 }

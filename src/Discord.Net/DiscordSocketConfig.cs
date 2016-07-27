@@ -3,19 +3,14 @@ using Discord.Net.WebSockets;
 
 namespace Discord
 {
-    public class DiscordSocketConfig : DiscordConfig
+    public class DiscordSocketConfig : DiscordRestConfig
     {
+        public const string GatewayEncoding = "json";
+
         /// <summary> Gets or sets the id for this shard. Must be less than TotalShards. </summary>
         public int ShardId { get; set; } = 0;
         /// <summary> Gets or sets the total number of shards for this application. </summary>
         public int TotalShards { get; set; } = 1;
-
-        /// <summary> Gets or sets the time (in milliseconds) to wait for the websocket to connect and initialize. </summary>
-        public int ConnectionTimeout { get; set; } = 30000;
-        /// <summary> Gets or sets the time (in milliseconds) to wait after an unexpected disconnect before reconnecting. </summary>
-        public int ReconnectDelay { get; set; } = 1000;
-        /// <summary> Gets or sets the time (in milliseconds) to wait after an reconnect fails before retrying. </summary>
-        public int FailedReconnectDelay { get; set; } = 15000;
 
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 0;

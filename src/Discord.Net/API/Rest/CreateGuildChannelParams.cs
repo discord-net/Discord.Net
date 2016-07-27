@@ -2,14 +2,19 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class CreateGuildChannelParams
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        internal string _name { get; set; }
+        public string Name { set { _name = value; } }
+
         [JsonProperty("type")]
-        public ChannelType Type { get; set; }
+        internal ChannelType _type { get; set; }
+        public ChannelType Type { set { _type = value; } }
 
         [JsonProperty("bitrate")]
-        public Optional<int> Bitrate { get; set; }
+        internal Optional<int> _bitrate { get; set; }
+        public int Bitrate { set { _bitrate = value; } }
     }
 }

@@ -13,76 +13,76 @@ namespace Discord
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
         private const double CollectionMultiplier = 1.05; //Add 5% buffer to handle growth
 
-        private readonly ConcurrentDictionary<ulong, ICachedChannel> _channels;
-        private readonly ConcurrentDictionary<ulong, CachedDMChannel> _dmChannels;
-        private readonly ConcurrentDictionary<ulong, CachedGuild> _guilds;
-        private readonly ConcurrentDictionary<ulong, CachedGlobalUser> _users;
+        private readonly ConcurrentDictionary<ulong, ISocketChannel> _channels;
+        private readonly ConcurrentDictionary<ulong, SocketDMChannel> _dmChannels;
+        private readonly ConcurrentDictionary<ulong, SocketGuild> _guilds;
+        private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
         private readonly ConcurrentHashSet<ulong> _groupChannels;
 
-        internal IReadOnlyCollection<ICachedChannel> Channels => _channels.ToReadOnlyCollection();
-        internal IReadOnlyCollection<CachedDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
-        internal IReadOnlyCollection<CachedGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as CachedGroupChannel).ToReadOnlyCollection(_groupChannels);
-        internal IReadOnlyCollection<CachedGuild> Guilds => _guilds.ToReadOnlyCollection();
-        internal IReadOnlyCollection<CachedGlobalUser> Users => _users.ToReadOnlyCollection();
+        internal IReadOnlyCollection<ISocketChannel> Channels => _channels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
+        internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
 
-        internal IReadOnlyCollection<ICachedPrivateChannel> PrivateChannels =>
-            _dmChannels.Select(x => x.Value as ICachedPrivateChannel).Concat(
-                _groupChannels.Select(x => GetChannel(x) as ICachedPrivateChannel))
+        internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
+            _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
+                _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
         public DataStore(int guildCount, int dmChannelCount)
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
-            _channels = new ConcurrentDictionary<ulong, ICachedChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
-            _dmChannels = new ConcurrentDictionary<ulong, CachedDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
-            _guilds = new ConcurrentDictionary<ulong, CachedGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
-            _users = new ConcurrentDictionary<ulong, CachedGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
+            _channels = new ConcurrentDictionary<ulong, ISocketChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
+            _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
+            _guilds = new ConcurrentDictionary<ulong, SocketGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
+            _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(CollectionConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
-        internal ICachedChannel GetChannel(ulong id)
+        internal ISocketChannel GetChannel(ulong id)
         {
-            ICachedChannel channel;
+            ISocketChannel channel;
             if (_channels.TryGetValue(id, out channel))
                 return channel;
             return null;
         }
-        internal CachedDMChannel GetDMChannel(ulong userId)
+        internal SocketDMChannel GetDMChannel(ulong userId)
         {
-            CachedDMChannel channel;
+            SocketDMChannel channel;
             if (_dmChannels.TryGetValue(userId, out channel))
                 return channel;
             return null;
         }
-        internal void AddChannel(ICachedChannel channel)
+        internal void AddChannel(ISocketChannel channel)
         {
             _channels[channel.Id] = channel;
 
-            var dmChannel = channel as CachedDMChannel;
+            var dmChannel = channel as SocketDMChannel;
             if (dmChannel != null)
                 _dmChannels[dmChannel.Recipient.Id] = dmChannel;
             else
             {
-                var groupChannel = channel as CachedGroupChannel;
+                var groupChannel = channel as SocketGroupChannel;
                 if (groupChannel != null)
                     _groupChannels.TryAdd(groupChannel.Id);
             }
         }
-        internal ICachedChannel RemoveChannel(ulong id)
+        internal ISocketChannel RemoveChannel(ulong id)
         {
-            ICachedChannel channel;
+            ISocketChannel channel;
             if (_channels.TryRemove(id, out channel))
             {
-                var dmChannel = channel as CachedDMChannel;
+                var dmChannel = channel as SocketDMChannel;
                 if (dmChannel != null)
                 {
-                    CachedDMChannel ignored;
+                    SocketDMChannel ignored;
                     _dmChannels.TryRemove(dmChannel.Recipient.Id, out ignored);
                 }
                 else
                 {
-                    var groupChannel = channel as CachedGroupChannel;
+                    var groupChannel = channel as SocketGroupChannel;
                     if (groupChannel != null)
                         _groupChannels.TryRemove(id);
                 }
@@ -91,39 +91,39 @@ namespace Discord
             return null;
         }
 
-        internal CachedGuild GetGuild(ulong id)
+        internal SocketGuild GetGuild(ulong id)
         {
-            CachedGuild guild;
+            SocketGuild guild;
             if (_guilds.TryGetValue(id, out guild))
                 return guild;
             return null;
         }
-        internal void AddGuild(CachedGuild guild)
+        internal void AddGuild(SocketGuild guild)
         {
             _guilds[guild.Id] = guild;
         }
-        internal CachedGuild RemoveGuild(ulong id)
+        internal SocketGuild RemoveGuild(ulong id)
         {
-            CachedGuild guild;
+            SocketGuild guild;
             if (_guilds.TryRemove(id, out guild))
                 return guild;
             return null;
         }
 
-        internal CachedGlobalUser GetUser(ulong id)
+        internal SocketGlobalUser GetUser(ulong id)
         {
-            CachedGlobalUser user;
+            SocketGlobalUser user;
             if (_users.TryGetValue(id, out user))
                 return user;
             return null;
         }
-        internal CachedGlobalUser GetOrAddUser(ulong id, Func<ulong, CachedGlobalUser> userFactory)
+        internal SocketGlobalUser GetOrAddUser(ulong id, Func<ulong, SocketGlobalUser> userFactory)
         {
             return _users.GetOrAdd(id, userFactory);
         }
-        internal CachedGlobalUser RemoveUser(ulong id)
+        internal SocketGlobalUser RemoveUser(ulong id)
         {
-            CachedGlobalUser user;
+            SocketGlobalUser user;
             if (_users.TryRemove(id, out user))
                 return user;
             return null;
