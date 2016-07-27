@@ -269,13 +269,14 @@ namespace Discord
         {
             try
             {
+                Random jitter = new Random();
                 int nextReconnectDelay = 1000;
                 while (true)
                 {
                     await Task.Delay(nextReconnectDelay, cancelToken).ConfigureAwait(false);
-                    nextReconnectDelay *= 2;
-                    if (nextReconnectDelay > 30000)
-                        nextReconnectDelay = 30000;
+                    nextReconnectDelay = nextReconnectDelay * 2 + jitter.Next(-250, 250);
+                    if (nextReconnectDelay > 60000)
+                        nextReconnectDelay = 60000;
 
                     await _connectionLock.WaitAsync().ConfigureAwait(false);
                     try
