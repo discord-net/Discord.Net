@@ -8,7 +8,7 @@ namespace Discord.Commands
     {
         internal static object CreateObject(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
         {
-            var constructors = typeInfo.DeclaredConstructors.ToArray();
+            var constructors = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
                 throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\"");
             else if (constructors.Length > 1)
