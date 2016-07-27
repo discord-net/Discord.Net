@@ -2,15 +2,23 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class CreateChannelInviteParams
     {
         [JsonProperty("max_age")]
-        public Optional<int> MaxAge { get; set; }
+        internal Optional<int> _maxAge { get; set; }
+        public int MaxAge { set { _maxAge = value; } }
+
         [JsonProperty("max_uses")]
-        public Optional<int> MaxUses { get; set; }
+        internal Optional<int> _maxUses { get; set; }
+        public int MaxUses { set { _maxUses = value; } }
+
         [JsonProperty("temporary")]
-        public Optional<bool> Temporary { get; set; }
+        internal Optional<bool> _temporary { get; set; }
+        public bool Temporary { set { _temporary = value; } }
+
         [JsonProperty("xkcdpass")]
-        public Optional<bool> XkcdPass { get; set; }
+        internal Optional<bool> _xkcdPass { get; set; }
+        public bool XkcdPass { set { _xkcdPass = value; } }
     }
 }

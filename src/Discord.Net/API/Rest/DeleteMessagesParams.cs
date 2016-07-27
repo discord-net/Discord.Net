@@ -4,11 +4,12 @@ using System.Linq;
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class DeleteMessagesParams
     {
         [JsonProperty("messages")]
-        public IEnumerable<ulong> MessageIds { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IMessage> Messages { set { MessageIds = value.Select(x => x.Id); } }
+        internal ulong[] _messages;
+        public IEnumerable<ulong> MessageIds { set { _messages = value.ToArray(); } }
+        public IEnumerable<IMessage> Messages { set { _messages = value.Select(x => x.Id).ToArray(); } }
     }
 }

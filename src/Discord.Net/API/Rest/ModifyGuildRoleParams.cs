@@ -2,17 +2,27 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyGuildRoleParams
     {
         [JsonProperty("name")]
-        public Optional<string> Name { get; set; }
+        internal Optional<string> _name;
+        public string Name { set { _name = value; } }
+
         [JsonProperty("permissions")]
-        public Optional<ulong> Permissions { get; set; }
+        internal Optional<ulong> _permissions;
+        public ulong Permissions { set { _permissions = value; } }
+
         [JsonProperty("position")]
-        public Optional<int> Position { get; set; }
+        internal Optional<int> _position;
+        public int Position { set { _position = value; } }
+
         [JsonProperty("color")]
-        public Optional<uint> Color { get; set; }
+        internal Optional<uint> _color;
+        public uint Color { set { _color = value; } }
+
         [JsonProperty("hoist")]
-        public Optional<bool> Hoist { get; set; }
+        internal Optional<bool> _hoist;
+        public bool Hoist { set { _hoist = value; } }
     }
 }

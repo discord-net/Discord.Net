@@ -4,23 +4,29 @@ using System.Linq;
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyGuildMemberParams
     {
         [JsonProperty("mute")]
-        public Optional<bool> Mute { get; set; }
+        internal Optional<bool> _mute;
+        public bool Mute { set { _mute = value; } }
+
         [JsonProperty("deaf")]
-        public Optional<bool> Deaf { get; set; }
+        internal Optional<bool> _deaf;
+        public bool Deaf { set { _deaf = value; } }
+
         [JsonProperty("nick")]
-        public Optional<string> Nickname { get; set; }
+        internal Optional<string> _nickname;
+        public string Nickname { set { _nickname = value; } }
 
         [JsonProperty("roles")]
-        public Optional<IEnumerable<ulong>> RoleIds { get; set; }
-        [JsonIgnore]
-        public Optional<IEnumerable<IRole>> Roles { set { RoleIds = value.IsSpecified ? Optional.Create(value.Value.Select(x => x.Id)) : Optional.Create<IEnumerable<ulong>>(); } }
+        internal Optional<ulong[]> _roleIds;
+        public IEnumerable<ulong> RoleIds { set { _roleIds = value.ToArray(); } }
+        public IEnumerable<IRole> Roles { set { _roleIds = value.Select(x => x.Id).ToArray(); } }
 
         [JsonProperty("channel_id")]
-        public Optional<ulong> VoiceChannelId { get; set; }
-        [JsonIgnore]
-        public Optional<IVoiceChannel> VoiceChannel { set { VoiceChannelId = value.IsSpecified ? value.Value.Id : Optional.Create<ulong>(); } }
+        internal Optional<ulong> _channelId;
+        public ulong VoiceChannelId { set { _channelId = value; } }
+        public IVoiceChannel VoiceChannel { set { _channelId = value.Id; } }
     }
 }

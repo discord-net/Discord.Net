@@ -3,60 +3,49 @@ using System.IO;
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ModifyGuildParams
     {
         [JsonProperty("username")]
-        public Optional<string> Username { get; set; }
+        internal Optional<string> _username;
+        public string Username { set { _username = value; } }
 
         [JsonProperty("name")]
-        public Optional<string> Name { get; set; }
+        internal Optional<string> _name;
+        public string Name { set { _name = value; } }
+
         [JsonProperty("region")]
-        public Optional<IVoiceRegion> Region { get; set; }
+        internal Optional<IVoiceRegion> _region;
+        public IVoiceRegion Region { set { _region = Optional.Create(value); } }
+
         [JsonProperty("verification_level")]
-        public Optional<VerificationLevel> VerificationLevel { get; set; }
+        internal Optional<VerificationLevel> _verificationLevel;
+        public VerificationLevel VerificationLevel { set { _verificationLevel = value; } }
+
         [JsonProperty("default_message_notifications")]
-        public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
+        internal Optional<DefaultMessageNotifications> _defaultMessageNotifications;
+        public DefaultMessageNotifications DefaultMessageNotifications { set { _defaultMessageNotifications = value; } }
+
         [JsonProperty("afk_timeout")]
-        public Optional<int> AFKTimeout { get; set; }
+        internal Optional<int> _afkTimeout;
+        public int AFKTimeout { set { _afkTimeout = value; } }
 
         [JsonProperty("icon")]
-        private Optional<Image> _icon { get; set; }
-        [JsonIgnore]
-        public Optional<Stream> Icon
-        {
-            get { return _icon.IsSpecified ? _icon.Value.Stream : null; }
-            set { _icon = value.IsSpecified ? new Image(value.Value) : Optional.Create<Image>(); }
-        }
-        [JsonIgnore]
-        internal Optional<string> IconHash
-        {
-            get { return _icon.IsSpecified ? _icon.Value.Hash : null; }
-            set { _icon = value.IsSpecified ? new Image(value.Value) : Optional.Create<Image>(); }
-        }
+        internal Optional<Image?> _icon;
+        public Stream Icon { set { _icon = value != null ? new Image(value) : (Image?)null; } }
 
         [JsonProperty("splash")]
-        private Optional<Image> _splash { get; set; }
-        [JsonIgnore]
-        public Optional<Stream> Splash
-        {
-            get { return _splash.IsSpecified ? _splash.Value.Stream : null; }
-            set { _splash = value.IsSpecified ? new Image(value.Value) : Optional.Create<Image>(); }
-        }
-        [JsonIgnore]
-        internal Optional<string> SplashHash
-        {
-            get { return _splash.IsSpecified ? _splash.Value.Hash : null; }
-            set { _splash = value.IsSpecified ? new Image(value.Value) : Optional.Create<Image>(); }
-        }
+        internal Optional<Image?> _splash;
+        public Stream Splash { set { _splash = value != null ? new Image(value) : (Image?)null; } }
 
         [JsonProperty("afk_channel_id")]
-        public Optional<ulong?> AFKChannelId { get; set; }
-        [JsonIgnore]
-        public Optional<IVoiceChannel> AFKChannel { set { OwnerId = value.IsSpecified ? value.Value.Id : Optional.Create<ulong>(); } }
+        internal Optional<ulong?> _afkChannelId;
+        public ulong? AFKChannelId { set { _afkChannelId = value; } }
+        public IVoiceChannel AFKChannel { set { _afkChannelId = value?.Id; } }
 
         [JsonProperty("owner_id")]
-        public Optional<ulong> OwnerId { get; set; }
-        [JsonIgnore]
-        public Optional<IGuildUser> Owner { set { OwnerId = value.IsSpecified ? value.Value.Id : Optional.Create<ulong>(); } }
+        internal Optional<ulong> _ownerId;
+        public ulong OwnerId { set { _ownerId = value; } }
+        public IGuildUser Owner { set { _ownerId = value.Id; } }
     }
 }

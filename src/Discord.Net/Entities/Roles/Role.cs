@@ -51,6 +51,7 @@ namespace Discord
             var args = new ModifyGuildRoleParams();
             func(args);
             var response = await Discord.ApiClient.ModifyGuildRoleAsync(Guild.Id, Id, args).ConfigureAwait(false);
+
             Update(response, UpdateSource.Rest);
         }
         public async Task DeleteAsync()

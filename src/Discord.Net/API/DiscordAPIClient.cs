@@ -461,8 +461,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
-            Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
+            Preconditions.GreaterThan(args._bitrate, 0, nameof(args.Bitrate));
+            Preconditions.NotNullOrWhitespace(args._name, nameof(args.Name));
 
             return await SendAsync<Channel>("POST", $"guilds/{guildId}/channels", args, options: options).ConfigureAwait(false);
         }
@@ -476,8 +476,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
+            Preconditions.AtLeast(args._position, 0, nameof(args.Position));
+            Preconditions.NotNullOrEmpty(args._name, nameof(args.Name));
 
             return await SendAsync<Channel>("PATCH", $"channels/{channelId}", args, options: options).ConfigureAwait(false);
         }
@@ -485,8 +485,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
+            Preconditions.AtLeast(args._position, 0, nameof(args.Position));
+            Preconditions.NotNullOrEmpty(args._name, nameof(args.Name));
 
             return await SendAsync<Channel>("PATCH", $"channels/{channelId}", args, options: options).ConfigureAwait(false);
         }
@@ -494,10 +494,10 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
-            Preconditions.AtLeast(args.UserLimit, 0, nameof(args.Bitrate));
-            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
-            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
+            Preconditions.GreaterThan(args._bitrate, 0, nameof(args.Bitrate));
+            Preconditions.AtLeast(args._userLimit, 0, nameof(args.Bitrate));
+            Preconditions.AtLeast(args._position, 0, nameof(args.Position));
+            Preconditions.NotNullOrEmpty(args._name, nameof(args.Name));
 
             return await SendAsync<Channel>("PATCH", $"channels/{channelId}", args, options: options).ConfigureAwait(false);
         }
@@ -606,11 +606,11 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotEqual(args.AFKChannelId, 0, nameof(args.AFKChannelId));
-            Preconditions.AtLeast(args.AFKTimeout, 0, nameof(args.AFKTimeout));
-            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
-            Preconditions.GreaterThan(args.OwnerId, 0, nameof(args.OwnerId));
-            Preconditions.NotNull(args.Region, nameof(args.Region));
+            Preconditions.NotEqual(args._afkChannelId, 0, nameof(args.AFKChannelId));
+            Preconditions.AtLeast(args._afkTimeout, 0, nameof(args.AFKTimeout));
+            Preconditions.NotNullOrEmpty(args._name, nameof(args.Name));
+            Preconditions.GreaterThan(args._ownerId, 0, nameof(args.OwnerId));
+            Preconditions.NotNull(args._region, nameof(args.Region));
 
             return await SendAsync<Guild>("PATCH", $"guilds/{guildId}", args, options: options).ConfigureAwait(false);
         }
@@ -643,7 +643,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.PruneDays, 0, nameof(args.PruneDays));
+            Preconditions.AtLeast(args._deleteMessageDays, 0, nameof(args.DeleteMessageDays));
 
             await SendAsync("PUT", $"guilds/{guildId}/bans/{userId}", args, options: options).ConfigureAwait(false);
         }
@@ -701,8 +701,8 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.ExpireBehavior, 0, nameof(args.ExpireBehavior));
-            Preconditions.AtLeast(args.ExpireGracePeriod, 0, nameof(args.ExpireGracePeriod));
+            Preconditions.AtLeast(args._expireBehavior, 0, nameof(args.ExpireBehavior));
+            Preconditions.AtLeast(args._expireGracePeriod, 0, nameof(args.ExpireGracePeriod));
 
             return await SendAsync<Integration>("PATCH", $"guilds/{guildId}/integrations/{integrationId}", args, options: options).ConfigureAwait(false);
         }
@@ -749,8 +749,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.MaxAge, 0, nameof(args.MaxAge));
-            Preconditions.AtLeast(args.MaxUses, 0, nameof(args.MaxUses));
+            Preconditions.AtLeast(args._maxAge, 0, nameof(args.MaxAge));
+            Preconditions.AtLeast(args._maxUses, 0, nameof(args.MaxUses));
 
             return await SendAsync<InviteMetadata>("POST", $"channels/{channelId}/invites", args, options: options).ConfigureAwait(false);
         }
@@ -783,14 +783,14 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
-            Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
+            Preconditions.GreaterThan(args._limit, 0, nameof(args.Limit));
+            Preconditions.GreaterThan(args._afterUserId, 0, nameof(args.AfterUserId));
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
+            int limit = args._limit.GetValueOrDefault(int.MaxValue);
+            ulong afterUserId = args._afterUserId.GetValueOrDefault(0);
 
             List<GuildMember[]> result;
-            if (args.Limit.IsSpecified)
+            if (args._limit.IsSpecified)
                 result = new List<GuildMember[]>((limit + DiscordRestConfig.MaxUsersPerBatch - 1) / DiscordRestConfig.MaxUsersPerBatch);
             else
                 result = new List<GuildMember[]>();
@@ -861,9 +861,9 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.Color, 0, nameof(args.Color));
-            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
-            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
+            Preconditions.AtLeast(args._color, 0, nameof(args.Color));
+            Preconditions.NotNullOrEmpty(args._name, nameof(args.Name));
+            Preconditions.AtLeast(args._position, 0, nameof(args.Position));
 
             return await SendAsync<Role>("PATCH", $"guilds/{guildId}/roles/{roleId}", args, options: options).ConfigureAwait(false);
         }
@@ -903,7 +903,7 @@ namespace Discord.API
             Preconditions.AtLeast(args.Limit, 0, nameof(args.Limit));
 
             int limit = args.Limit;
-            ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
+            ulong? relativeId = args._relativeMessageId.IsSpecified ? args._relativeMessageId.Value : (ulong?)null;
             string relativeDir;
 
             switch (args.RelativeDirection)
@@ -1010,8 +1010,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-            if (args.Content.Length > DiscordRestConfig.MaxMessageSize)
+            Preconditions.NotNullOrEmpty(args._content, nameof(args.Content));
+            if (args._content.Length > DiscordRestConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
 
             if (guildId != 0)
@@ -1034,13 +1034,13 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             
-            if (args.Content.GetValueOrDefault(null) == null)
-                args.Content = "";
-            else if (args.Content.IsSpecified)
+            if (args._content.GetValueOrDefault(null) == null)
+                args._content = "";
+            else if (args._content.IsSpecified)
             {
-                if (args.Content.Value == null)
-                    args.Content = "";
-                if (args.Content.Value?.Length > DiscordRestConfig.MaxMessageSize)
+                if (args._content.Value == null)
+                    args._content = "";
+                if (args._content.Value?.Length > DiscordRestConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
@@ -1084,8 +1084,8 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
 
-            var messageIds = args.MessageIds?.ToArray();
-            Preconditions.NotNull(args.MessageIds, nameof(args.MessageIds));
+            var messageIds = args._messages;
+            Preconditions.NotNull(args._messages, nameof(args.MessageIds));
             Preconditions.AtMost(messageIds.Length, 100, nameof(messageIds.Length));
 
             switch (messageIds.Length)
@@ -1118,10 +1118,10 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             Preconditions.NotNull(args, nameof(args));
-            if (args.Content.IsSpecified)
+            if (args._content.IsSpecified)
             {
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value.Length > DiscordRestConfig.MaxMessageSize)
+                Preconditions.NotNullOrEmpty(args._content, nameof(args.Content));
+                if (args._content.Value.Length > DiscordRestConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordRestConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
@@ -1195,7 +1195,7 @@ namespace Discord.API
         public async Task<User> ModifySelfAsync(ModifyCurrentUserParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotNullOrEmpty(args.Username, nameof(args.Username));
+            Preconditions.NotNullOrEmpty(args._username, nameof(args.Username));
 
             return await SendAsync<User>("PATCH", "users/@me", args, options: options).ConfigureAwait(false);
         }
@@ -1209,7 +1209,7 @@ namespace Discord.API
         public async Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.GreaterThan(args.RecipientId, 0, nameof(args.Recipient));
+            Preconditions.GreaterThan(args._recipientId, 0, nameof(args.Recipient));
 
             return await SendAsync<Channel>("POST", $"users/@me/channels", args, options: options).ConfigureAwait(false);
         }

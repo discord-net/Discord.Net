@@ -48,17 +48,18 @@ namespace Discord
                 return cachedMessages.Skip(cachedMessages.Count - limit).ToImmutableArray();
             else
             {
-                Optional<ulong> relativeId;
-                if (cachedMessages.Count == 0)
-                    relativeId = fromId ?? new Optional<ulong>();
-                else
-                    relativeId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id;
                 var args = new GetChannelMessagesParams
                 {
                     Limit = limit - cachedMessages.Count,
-                    RelativeDirection = dir,
-                    RelativeMessageId = relativeId
+                    RelativeDirection = dir
                 };
+                if (cachedMessages.Count == 0)
+                {
+                    if (fromId != null)
+                        args.RelativeMessageId = fromId.Value;
+                }
+                else
+                    args.RelativeMessageId = dir == Direction.Before ? cachedMessages[0].Id : cachedMessages[cachedMessages.Count - 1].Id;
                 var downloadedMessages = await _discord.ApiClient.GetChannelMessagesAsync(_channel.Id, args).ConfigureAwait(false);
 
                 var guild = (_channel as ISocketGuildChannel)?.Guild;

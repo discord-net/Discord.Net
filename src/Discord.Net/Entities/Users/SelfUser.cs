@@ -53,10 +53,10 @@ namespace Discord
             var args = new ModifyCurrentUserParams();
             func(args);
 
-            if (!args.Username.IsSpecified)
-                args.Username = Username;
-            if (args.Avatar.IsSpecified && _avatarId != null)
-                args.AvatarHash = _avatarId;
+            if (!args._username.IsSpecified)
+                args._username = Username;
+            if (!args._avatar.IsSpecified && _avatarId != null)
+                args._avatar = new API.Image(_avatarId);
 
             var model = await Discord.ApiClient.ModifySelfAsync(args).ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
@@ -68,8 +68,8 @@ namespace Discord
             var args = new ModifyPresenceParams();
             func(args);
 
-            var game = args.Game.GetValueOrDefault(_game);
-            var status = args.Status.GetValueOrDefault(_status);
+            var game = args._game.GetValueOrDefault(_game);
+            var status = args._status.GetValueOrDefault(_status);
 
             long idleSince = _idleSince;
             if (status == UserStatus.Idle && _status != UserStatus.Idle)

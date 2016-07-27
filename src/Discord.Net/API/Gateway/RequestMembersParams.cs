@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Discord.API.Gateway
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class RequestMembersParams
     {
         [JsonProperty("query")]
@@ -12,8 +13,8 @@ namespace Discord.API.Gateway
         public int Limit { get; set; }
 
         [JsonProperty("guild_id")]
-        public IEnumerable<ulong> GuildIds { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IGuild> Guilds { set { GuildIds = value.Select(x => x.Id); } }
+        private ulong[] _guildIds;
+        public IEnumerable<ulong> GuildIds { set { _guildIds = value.ToArray(); } }
+        public IEnumerable<IGuild> Guilds { set { _guildIds = value.Select(x => x.Id).ToArray(); } }
     }
 }

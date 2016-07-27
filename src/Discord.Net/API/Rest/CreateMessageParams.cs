@@ -2,14 +2,19 @@
 
 namespace Discord.API.Rest
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class CreateMessageParams
     {
         [JsonProperty("content")]
-        public string Content { get; set; } = "";
+        internal string _content;
+        public string Content { set { _content = value; } }
 
-        [JsonProperty("nonce", NullValueHandling = NullValueHandling.Ignore)]
-        public Optional<string> Nonce { get; set; }
-        [JsonProperty("tts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Optional<bool> IsTTS { get; set; }
+        [JsonProperty("nonce")]
+        internal Optional<string> _nonce;
+        public string Nonce { set { _nonce = value; } }
+
+        [JsonProperty("tts")]
+        internal Optional<bool> _tts;
+        public bool IsTTS { set { _tts = value; } }
     }
 }

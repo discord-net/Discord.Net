@@ -2,7 +2,10 @@
 {
     public class ModifyPresenceParams
     {
-        public Optional<UserStatus> Status { get; set; }
-        public Optional<Discord.Game> Game { get; set; }
+        internal Optional<UserStatus> _status;
+        public UserStatus Status { set { _status = value; } }
+
+        internal Optional<Discord.Game> _game;
+        public Discord.Game Game { set { _game = value; } }
     }
 }

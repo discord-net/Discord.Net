@@ -6,28 +6,35 @@ namespace Discord.API.Rest
 {
     public class UploadFileParams
     {
-        public Stream File { get; set; }
-        public string Filename { get; set; } = "unknown.dat";
+        public Stream File { internal get; set; }
 
-        public Optional<string> Content { get; set; }
-        public Optional<string> Nonce { get; set; }
-        public Optional<bool> IsTTS { get; set; }
+        internal Optional<string> _filename;
+        public string Filename { set { _filename = value; } }
+
+        internal Optional<string> _content;
+        public string Content { set { _content = value; } }
+
+        internal Optional<string> _nonce;
+        public string Nonce { set { _nonce = value; } }
+
+        internal Optional<bool> _isTTS;
+        public bool IsTTS { set { _isTTS = value; } }
 
         public UploadFileParams(Stream file)
         {
             File = file;
         }
 
-        public IReadOnlyDictionary<string, object> ToDictionary()
+        internal IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            d["file"] = new MultipartFile(File, Filename);
-            if (Content.IsSpecified)
-                d["content"] = Content.Value;
-            if (IsTTS.IsSpecified)
-                d["tts"] = IsTTS.Value.ToString();
-            if (Nonce.IsSpecified)
-                d["nonce"] = Nonce.Value;
+            d["file"] = new MultipartFile(File, _filename.GetValueOrDefault("unknown.dat"));
+            if (_content.IsSpecified)
+                d["content"] = _content.Value;
+            if (_isTTS.IsSpecified)
+                d["tts"] = _isTTS.Value.ToString();
+            if (_nonce.IsSpecified)
+                d["nonce"] = _nonce.Value;
             return d;
         }
     }

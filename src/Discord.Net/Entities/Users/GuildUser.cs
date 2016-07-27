@@ -77,6 +77,15 @@ namespace Discord
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
         }
+        private void Update(ModifyGuildMemberParams args, UpdateSource source)
+        {
+            if (source == UpdateSource.Rest && IsAttached) return;
+
+            if (args._roleIds.IsSpecified)
+                Roles = args._roleIds.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+            if (args._nickname.IsSpecified)
+                Nickname = args._nickname.Value ?? "";
+        }
         private void UpdateRoles(ulong[] roleIds)
         {
             var roles = ImmutableArray.CreateBuilder<Role>(roleIds.Length + 1);
@@ -106,20 +115,17 @@ namespace Discord
             func(args);
 
             bool isCurrentUser = (await Discord.GetCurrentUserAsync().ConfigureAwait(false)).Id == Id;
-            if (isCurrentUser && args.Nickname.IsSpecified)
+            if (isCurrentUser && args._nickname.IsSpecified)
             {
-                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args.Nickname.Value ?? "" };
+                var nickArgs = new ModifyCurrentUserNickParams { Nickname = args._nickname.Value ?? "" };
                 await Discord.ApiClient.ModifyMyNickAsync(Guild.Id, nickArgs).ConfigureAwait(false);
-                args.Nickname = new Optional<string>(); //Remove
+                args._nickname = Optional.Create<string>(); //Remove
             }
 
-            if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
+            if (!isCurrentUser || args._deaf.IsSpecified || args._mute.IsSpecified || args._roleIds.IsSpecified)
             {
                 await Discord.ApiClient.ModifyGuildMemberAsync(Guild.Id, Id, args).ConfigureAwait(false);
-                if (args.Nickname.IsSpecified)
-                    Nickname = args.Nickname.Value ?? "";
-                if (args.RoleIds.IsSpecified)
-                    Roles = args.RoleIds.Value.Select(x => Guild.GetRole(x)).Where(x => x != null).ToImmutableArray();
+                Update(args, UpdateSource.Rest);
             }
         }
         public async Task KickAsync()
