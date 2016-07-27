@@ -74,7 +74,7 @@ namespace Discord
             long idleSince = _idleSince;
             if (status == UserStatus.Idle && _status != UserStatus.Idle)
                 idleSince = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            var apiGame = new API.Game { Name = game.Name, StreamType = game.StreamType, StreamUrl = game.StreamUrl };
+            var apiGame = game != null ? new API.Game { Name = game.Name, StreamType = game.StreamType, StreamUrl = game.StreamUrl } : null;
 
             await Discord.ApiClient.SendStatusUpdateAsync(status == UserStatus.Idle ? _idleSince : (long?)null, apiGame).ConfigureAwait(false);
             
