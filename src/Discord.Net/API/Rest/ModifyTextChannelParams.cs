@@ -6,7 +6,7 @@ namespace Discord.API.Rest
     public class ModifyTextChannelParams : ModifyGuildChannelParams
     {
         [JsonProperty("topic")]
-        internal Optional<string> _topic;
+        internal Optional<string> _topic { get; set; }
         public string Topic { set { _topic = value; } }
     }
 }

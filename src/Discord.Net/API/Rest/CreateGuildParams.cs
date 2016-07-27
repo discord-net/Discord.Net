@@ -13,7 +13,7 @@ namespace Discord.API.Rest
         public string Region { internal get; set; }
 
         [JsonProperty("icon")]
-        internal Optional<Image?> _icon;
+        internal Optional<Image?> _icon { get; set; }
         public Stream Icon { set { _icon = value != null ? new Image(value) : (Image?)null; } }
     }
 }

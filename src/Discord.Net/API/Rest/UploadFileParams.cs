@@ -8,16 +8,16 @@ namespace Discord.API.Rest
     {
         public Stream File { internal get; set; }
 
-        internal Optional<string> _filename;
+        internal Optional<string> _filename { get; set; }
         public string Filename { set { _filename = value; } }
 
-        internal Optional<string> _content;
+        internal Optional<string> _content { get; set; }
         public string Content { set { _content = value; } }
 
-        internal Optional<string> _nonce;
+        internal Optional<string> _nonce { get; set; }
         public string Nonce { set { _nonce = value; } }
 
-        internal Optional<bool> _isTTS;
+        internal Optional<bool> _isTTS { get; set; }
         public bool IsTTS { set { _isTTS = value; } }
 
         public UploadFileParams(Stream file)

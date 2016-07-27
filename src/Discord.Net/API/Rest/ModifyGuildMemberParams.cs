@@ -8,24 +8,24 @@ namespace Discord.API.Rest
     public class ModifyGuildMemberParams
     {
         [JsonProperty("mute")]
-        internal Optional<bool> _mute;
+        internal Optional<bool> _mute { get; set; }
         public bool Mute { set { _mute = value; } }
 
         [JsonProperty("deaf")]
-        internal Optional<bool> _deaf;
+        internal Optional<bool> _deaf { get; set; }
         public bool Deaf { set { _deaf = value; } }
 
         [JsonProperty("nick")]
-        internal Optional<string> _nickname;
+        internal Optional<string> _nickname { get; set; }
         public string Nickname { set { _nickname = value; } }
 
         [JsonProperty("roles")]
-        internal Optional<ulong[]> _roleIds;
+        internal Optional<ulong[]> _roleIds { get; set; }
         public IEnumerable<ulong> RoleIds { set { _roleIds = value.ToArray(); } }
         public IEnumerable<IRole> Roles { set { _roleIds = value.Select(x => x.Id).ToArray(); } }
 
         [JsonProperty("channel_id")]
-        internal Optional<ulong> _channelId;
+        internal Optional<ulong> _channelId { get; set; }
         public ulong VoiceChannelId { set { _channelId = value; } }
         public IVoiceChannel VoiceChannel { set { _channelId = value.Id; } }
     }

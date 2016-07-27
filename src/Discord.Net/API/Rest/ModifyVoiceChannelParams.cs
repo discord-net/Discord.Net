@@ -6,11 +6,11 @@ namespace Discord.API.Rest
     public class ModifyVoiceChannelParams : ModifyGuildChannelParams
     {
         [JsonProperty("bitrate")]
-        internal Optional<int> _bitrate;
+        internal Optional<int> _bitrate { get; set; }
         public int Bitrate { set { _bitrate = value; } }
 
         [JsonProperty("user_limit")]
-        internal Optional<int> _userLimit;
+        internal Optional<int> _userLimit { get; set; }
         public int UserLimit { set { _userLimit = value; } }
     }
 }

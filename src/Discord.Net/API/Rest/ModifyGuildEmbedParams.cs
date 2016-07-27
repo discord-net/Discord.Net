@@ -6,11 +6,11 @@ namespace Discord.API.Rest
     public class ModifyGuildEmbedParams
     {        
         [JsonProperty("enabled")]
-        internal Optional<bool> _enabled;
+        internal Optional<bool> _enabled { get; set; }
         public bool Enabled { set { _enabled = value; } }
 
         [JsonProperty("channel")]
-        internal Optional<ulong?> _channelId;
+        internal Optional<ulong?> _channelId { get; set; }
         public ulong? ChannelId { set { _channelId = value; } }
         public IVoiceChannel Channel { set { _channelId = value != null ? value.Id : (ulong?)null; } }
     }

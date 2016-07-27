@@ -6,7 +6,7 @@ namespace Discord.API.Rest
     public class ModifyMessageParams
     {
         [JsonProperty("content")]
-        internal Optional<string> _content;
+        internal Optional<string> _content { get; set; }
         public string Content { set { _content = value; } }
     }
 }

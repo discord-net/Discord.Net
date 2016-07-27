@@ -7,11 +7,11 @@ namespace Discord.API.Rest
     public class ModifyCurrentUserParams
     {
         [JsonProperty("username")]
-        internal Optional<string> _username;
+        internal Optional<string> _username { get; set; }
         public string Username { set { _username = value; } }
 
         [JsonProperty("avatar")]
-        internal Optional<Image> _avatar;
+        internal Optional<Image> _avatar { get; set; }
         public Stream Avatar { set { _avatar = new Image(value); } }
     }
 }
