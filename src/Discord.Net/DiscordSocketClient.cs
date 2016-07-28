@@ -799,6 +799,11 @@ namespace Discord
                                     }
                                 }
                                 break;
+                            case "CHANNEL_PINS_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Ignored Disbatch (CHANNEL_PINS_UPDATE)");
+                                }
+                                break;
                             case "CHANNEL_DELETE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
