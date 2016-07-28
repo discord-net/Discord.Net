@@ -13,7 +13,7 @@ namespace Discord
     {
         ConnectionState ConnectionState { get; }
 
-        DiscordApiClient ApiClient { get; }
+        DiscordRestApiClient ApiClient { get; }
         ILogManager LogManager { get; }
 
         Task ConnectAsync();

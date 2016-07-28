@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public class DiscordRpcConfig : DiscordConfig
+    public class DiscordRpcConfig : DiscordRestConfig
     {
         public const int RpcAPIVersion = 1;
 

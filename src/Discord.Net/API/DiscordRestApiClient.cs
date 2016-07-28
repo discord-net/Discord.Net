@@ -21,91 +21,48 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordApiClient : IDisposable
+    public class DiscordRestApiClient : IDisposable
     {
-        private object _eventLock = new object();
-
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
-        public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();
+        
+        protected readonly JsonSerializer _serializer;
+        protected readonly SemaphoreSlim _stateLock;
+        private readonly RestClientProvider _restClientProvider;
 
-        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
-        public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-
-        private readonly RequestQueue _requestQueue;
-        private readonly JsonSerializer _serializer;
-        private readonly IRestClient _restClient;
-        private readonly IWebSocketClient _gatewayClient;
-        private readonly SemaphoreSlim _connectionLock;
-        private CancellationTokenSource _loginCancelToken, _connectCancelToken;
-        private string _authToken;
-        private string _gatewayUrl;
-        private bool _isDisposed;
+        protected string _authToken;
+        protected bool _isDisposed;
+        private CancellationTokenSource _loginCancelToken;
+        private IRestClient _restClient;
 
         public LoginState LoginState { get; private set; }
-        public ConnectionState ConnectionState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
+        internal RequestQueue RequestQueue { get; private set; }
 
-        public DiscordApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider = null, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+        public DiscordRestApiClient(RestClientProvider restClientProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
         {
-            _connectionLock = new SemaphoreSlim(1, 1);
+            _restClientProvider = restClientProvider;
+            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+            RequestQueue = requestQueue;
 
-            _requestQueue = requestQueue ?? new RequestQueue();
+            _stateLock = new SemaphoreSlim(1, 1);
 
-            _restClient = restClientProvider(DiscordRestConfig.ClientAPIUrl);
+            SetBaseUrl(DiscordConfig.ClientAPIUrl);
+        }
+        internal void SetBaseUrl(string baseUrl)
+        {
+            _restClient = _restClientProvider(baseUrl);
             _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("user-agent", DiscordRestConfig.UserAgent);
-            if (webSocketProvider != null)
-            {
-                _gatewayClient = webSocketProvider();
-                //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
-                _gatewayClient.BinaryMessage += async (data, index, count) =>
-                {
-                    using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                    using (var decompressed = new MemoryStream())
-                    {
-                        using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                            zlib.CopyTo(decompressed);
-                        decompressed.Position = 0;
-                        using (var reader = new StreamReader(decompressed))
-                        using (var jsonReader = new JsonTextReader(reader))
-                        {
-                            var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
-                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
-                        }
-                    }
-                };
-                _gatewayClient.TextMessage += async text =>
-                {
-                    using (var reader = new StringReader(text))
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
-                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
-                    }
-                };
-                _gatewayClient.Closed += async ex =>
-                {
-                    await DisconnectAsync().ConfigureAwait(false);
-                    await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
-                };
-            }
-
-            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
-        private void Dispose(bool disposing)
+        internal virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
                 if (disposing)
                 {
                     _loginCancelToken?.Dispose();
-                    _connectCancelToken?.Dispose();
                     (_restClient as IDisposable)?.Dispose();
-                    (_gatewayClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -114,12 +71,12 @@ namespace Discord.API
 
         public async Task LoginAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await LoginInternalAsync(tokenType, token, options).ConfigureAwait(false);
             }
-            finally { _connectionLock.Release(); }
+            finally { _stateLock.Release(); }
         }
         private async Task LoginInternalAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
@@ -134,7 +91,7 @@ namespace Discord.API
                 AuthTokenType = TokenType.User;
                 _authToken = null;
                 _restClient.SetHeader("authorization", null);
-                await _requestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
+                await RequestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
                 _restClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
@@ -165,12 +122,12 @@ namespace Discord.API
 
         public async Task LogoutAsync()
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await LogoutInternalAsync().ConfigureAwait(false);
             }
-            finally { _connectionLock.Release(); }
+            finally { _stateLock.Release(); }
         }
         private async Task LogoutInternalAsync()
         {
@@ -182,87 +139,16 @@ namespace Discord.API
             catch { }
 
             await DisconnectInternalAsync().ConfigureAwait(false);
-            await _requestQueue.ClearAsync().ConfigureAwait(false);
+            await RequestQueue.ClearAsync().ConfigureAwait(false);
 
-            await _requestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
+            await RequestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
             _restClient.SetCancelToken(CancellationToken.None);
 
             LoginState = LoginState.LoggedOut;
         }
 
-        public async Task ConnectAsync()
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await ConnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task ConnectInternalAsync()
-        {
-            if (LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");
-            if (_gatewayClient == null)
-                throw new NotSupportedException("This client is not configured with websocket support.");
-
-            ConnectionState = ConnectionState.Connecting;
-            try
-            {
-                _connectCancelToken = new CancellationTokenSource();
-                if (_gatewayClient != null)
-                    _gatewayClient.SetCancelToken(_connectCancelToken.Token);
-
-                if (_gatewayUrl == null)
-                {
-                    var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
-                    _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}";
-                }
-                await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
-
-                ConnectionState = ConnectionState.Connected;
-            }
-            catch (Exception)
-            {
-                _gatewayUrl = null; //Uncache  in case the gateway url changed
-                await DisconnectInternalAsync().ConfigureAwait(false);
-                throw;
-            }
-        }
-
-        public async Task DisconnectAsync()
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        public async Task DisconnectAsync(Exception ex)
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task DisconnectInternalAsync()
-        {
-            if (_gatewayClient == null)
-                throw new NotSupportedException("This client is not configured with websocket support.");
-
-            if (ConnectionState == ConnectionState.Disconnected) return;
-            ConnectionState = ConnectionState.Disconnecting;
-
-            try { _connectCancelToken?.Cancel(false); }
-            catch { }
-
-            await _gatewayClient.DisconnectAsync().ConfigureAwait(false);
-
-            ConnectionState = ConnectionState.Disconnected;
-        }
+        internal virtual Task ConnectInternalAsync() => Task.CompletedTask;
+        internal virtual Task DisconnectInternalAsync() => Task.CompletedTask;
 
         //REST
         public Task SendAsync(string method, string endpoint,
@@ -306,15 +192,6 @@ namespace Discord.API
             GuildBucket bucket, ulong guildId, RequestOptions options = null) where TResponse : class
             => DeserializeJson<TResponse>(await SendMultipartInternalAsync(method, endpoint, multipartArgs, false, BucketGroup.Guild, (int)bucket, guildId, options).ConfigureAwait(false));
 
-        //Gateway
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
-            GlobalBucket bucket = GlobalBucket.GeneralGateway, RequestOptions options = null)
-            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Global, (int)bucket, 0, options);
-
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
-
         //Core
         private async Task<Stream> SendInternalAsync(string method, string endpoint, object payload, bool headerOnly,
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
@@ -323,7 +200,7 @@ namespace Discord.API
             string json = null;
             if (payload != null)
                 json = SerializeJson(payload);
-            var responseStream = await _requestQueue.SendAsync(new RestRequest(_restClient, method, endpoint, json, headerOnly, options), group, bucketId, guildId).ConfigureAwait(false);
+            var responseStream = await RequestQueue.SendAsync(new RestRequest(_restClient, method, endpoint, json, headerOnly, options), group, bucketId, guildId).ConfigureAwait(false);
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
@@ -335,7 +212,7 @@ namespace Discord.API
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options = null)
         {
             var stopwatch = Stopwatch.StartNew();
-            var responseStream = await _requestQueue.SendAsync(new RestRequest(_restClient, method, endpoint, multipartArgs, headerOnly, options), group, bucketId, guildId).ConfigureAwait(false);
+            var responseStream = await RequestQueue.SendAsync(new RestRequest(_restClient, method, endpoint, multipartArgs, headerOnly, options), group, bucketId, guildId).ConfigureAwait(false);
             int bytes = headerOnly ? 0 : (int)responseStream.Length;
             stopwatch.Stop();
 
@@ -344,85 +221,11 @@ namespace Discord.API
 
             return responseStream;
         }
-        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload,
-            BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
-        {
-            //TODO: Add ETF
-            byte[] bytes = null;
-            payload = new WebSocketMessage { Operation = (int)opCode, Payload = payload };
-            if (payload != null)
-                bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await _requestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options), group, bucketId, guildId).ConfigureAwait(false);
-            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
-        }
 
         //Auth
         public async Task ValidateTokenAsync(RequestOptions options = null)
         {
             await SendAsync("GET", "auth/login", options: options).ConfigureAwait(false);
-        }
-
-        //Gateway
-        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
-        {
-            return await SendAsync<GetGatewayResponse>("GET", "gateway", options: options).ConfigureAwait(false);
-        }
-        public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, RequestOptions options = null)
-        {
-            var props = new Dictionary<string, string>
-            {
-                ["$device"] = "Discord.Net"
-            };
-            var msg = new IdentifyParams()
-            {
-                Token = _authToken,
-                Properties = props,
-                LargeThreshold = largeThreshold,
-                UseCompression = useCompression
-            };
-            await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
-        }
-        public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
-        {
-            var msg = new ResumeParams()
-            {
-                Token = _authToken,
-                SessionId = sessionId,
-                Sequence = lastSeq
-            };
-            await SendGatewayAsync(GatewayOpCode.Resume, msg, options: options).ConfigureAwait(false);
-        }
-        public async Task SendHeartbeatAsync(int lastSeq, RequestOptions options = null)
-        {
-            await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
-        }
-        public async Task SendStatusUpdateAsync(long? idleSince, Game game, RequestOptions options = null)
-        {
-            var args = new StatusUpdateParams
-            {
-                IdleSince = idleSince,
-                Game = game
-            };
-            await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
-        }
-        public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
-        {
-            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
-        }
-        public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
-        {
-            var payload = new VoiceStateUpdateParams
-            {
-                GuildId = guildId,
-                ChannelId = channelId,
-                SelfDeaf = selfDeaf,
-                SelfMute = selfMute
-            };
-            await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
-        }
-        public async Task SendGuildSyncAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
-        {
-            await SendGatewayAsync(GatewayOpCode.GuildSync, guildIds, options: options).ConfigureAwait(false);
         }
 
         //Channels
@@ -1230,8 +1033,8 @@ namespace Discord.API
         }
 
         //Helpers
-        private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-        private string SerializeJson(object value)
+        protected static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
+        protected string SerializeJson(object value)
         {
             var sb = new StringBuilder(256);
             using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
@@ -1239,7 +1042,7 @@ namespace Discord.API
                 _serializer.Serialize(writer, value);
             return sb.ToString();
         }
-        private T DeserializeJson<T>(Stream jsonStream)
+        protected T DeserializeJson<T>(Stream jsonStream)
         {
             using (TextReader text = new StreamReader(jsonStream))
             using (JsonReader reader = new JsonTextReader(text))

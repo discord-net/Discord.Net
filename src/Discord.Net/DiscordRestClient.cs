@@ -27,20 +27,21 @@ namespace Discord
 
         internal readonly ILogger _clientLogger, _restLogger, _queueLogger;
         internal readonly SemaphoreSlim _connectionLock;
-        internal readonly RequestQueue _requestQueue;
         internal SelfUser _currentUser;
         private bool _isFirstLogSub;
         internal bool _isDisposed;
 
-        public API.DiscordApiClient ApiClient { get; }
+        public API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
         public LoginState LoginState { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
+        public DiscordRestClient(DiscordRestConfig config) : this(config, CreateApiClient(config)) { }
         /// <summary> Creates a new REST-only discord client. </summary>
-        public DiscordRestClient(DiscordRestConfig config)
+        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient client)
         {
+            ApiClient = client;
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
             _clientLogger = LogManager.CreateLogger("Client");
@@ -50,19 +51,16 @@ namespace Discord
 
             _connectionLock = new SemaphoreSlim(1, 1);
 
-            _requestQueue = new RequestQueue();
-            _requestQueue.RateLimitTriggered += async (id, bucket, millis) =>
+            ApiClient.RequestQueue.RateLimitTriggered += async (id, bucket, millis) =>
             {
                 await _queueLogger.WarningAsync($"Rate limit triggered (id = \"{id ?? "null"}\")").ConfigureAwait(false);
                 if (bucket == null && id != null)
                     await _queueLogger.WarningAsync($"Unknown rate limit bucket \"{id ?? "null"}\"").ConfigureAwait(false);
             };
-
-            var restProvider = config.RestClientProvider;
-            var webSocketProvider = (this is DiscordSocketClient) ? (config as DiscordSocketConfig)?.WebSocketProvider : null; //TODO: Clean this check
-            ApiClient = new API.DiscordApiClient(restProvider, webSocketProvider, requestQueue: _requestQueue);
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
+        private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
+            => new API.DiscordRestApiClient(config.RestClientProvider, requestQueue: new RequestQueue());
 
         /// <inheritdoc />
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
@@ -89,27 +87,9 @@ namespace Discord
             try
             {
                 await ApiClient.LoginAsync(tokenType, token).ConfigureAwait(false);
-
                 if (validateToken)
-                {
-                    try
-                    {
-                        var user = await GetCurrentUserAsync().ConfigureAwait(false);
-                        if (user == null) //Is using a cached DiscordClient
-                            user = new SelfUser(this, await ApiClient.GetMyUserAsync().ConfigureAwait(false));
-
-                        if (user.IsBot && tokenType == TokenType.User)
-                            throw new InvalidOperationException($"A bot token used provided with {nameof(TokenType)}.{nameof(TokenType.User)}");
-                        else if (!user.IsBot && tokenType == TokenType.Bot) //Discord currently sends a 401 in this case
-                            throw new InvalidOperationException($"A user token used provided with {nameof(TokenType)}.{nameof(TokenType.Bot)}");
-                    }
-                    catch (HttpException ex)
-                    {
-                        throw new ArgumentException("Token validation failed", nameof(token), ex);
-                    }
-                }
-
-                await OnLoginAsync().ConfigureAwait(false);
+                    await ValidateTokenAsync(tokenType, token).ConfigureAwait(false);
+                await OnLoginAsync(tokenType, token).ConfigureAwait(false);
 
                 LoginState = LoginState.LoggedIn;
             }
@@ -121,7 +101,26 @@ namespace Discord
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLoginAsync() => Task.CompletedTask;
+        protected virtual async Task ValidateTokenAsync(TokenType tokenType, string token)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync().ConfigureAwait(false);
+                if (user == null) //Is using a cached DiscordClient
+                    user = new SelfUser(this, await ApiClient.GetMyUserAsync().ConfigureAwait(false));
+
+                if (user.IsBot && tokenType == TokenType.User)
+                    throw new InvalidOperationException($"A bot token used provided with {nameof(TokenType)}.{nameof(TokenType.User)}");
+                else if (!user.IsBot && tokenType == TokenType.Bot) //Discord currently sends a 401 in this case
+                    throw new InvalidOperationException($"A user token used provided with {nameof(TokenType)}.{nameof(TokenType.Bot)}");
+            }
+            catch (HttpException ex)
+            {
+                throw new ArgumentException("Token validation failed", nameof(token), ex);
+            }
+        }
+        protected virtual Task OnLoginAsync(TokenType tokenType, string token) => Task.CompletedTask;
+
 
         /// <inheritdoc />
         public async Task LogoutAsync()

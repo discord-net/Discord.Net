@@ -2,6 +2,7 @@
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
+using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordRpcApiClient : IDisposable
+    public class DiscordRpcApiClient : DiscordRestApiClient, IDisposable
     {
         private abstract class RpcRequest
         {
@@ -60,19 +61,16 @@ namespace Discord.API
 
         private readonly ConcurrentDictionary<Guid, RpcRequest> _requests;
         private readonly RequestQueue _requestQueue;
-        private readonly JsonSerializer _serializer;
         private readonly IWebSocketClient _webSocketClient;
         private readonly SemaphoreSlim _connectionLock;
         private readonly string _clientId;
         private CancellationTokenSource _loginCancelToken, _connectCancelToken;
-        private string _authToken;
         private string _origin;
-        private bool _isDisposed;
 
-        public LoginState LoginState { get; private set; }
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordRpcApiClient(string clientId, string origin, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+        public DiscordRpcApiClient(string clientId, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+            : base(restClientProvider, serializer, requestQueue)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;
@@ -80,33 +78,19 @@ namespace Discord.API
 
             _requestQueue = requestQueue ?? new RequestQueue();
             _requests = new ConcurrentDictionary<Guid, RpcRequest>();
-
-            if (webSocketProvider != null)
+            
+            _webSocketClient = webSocketProvider();
+            //_webSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
+            _webSocketClient.SetHeader("origin", _origin);
+            _webSocketClient.BinaryMessage += async (data, index, count) =>
             {
-                _webSocketClient = webSocketProvider();
-                //_webSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
-                _webSocketClient.SetHeader("origin", _origin);
-                _webSocketClient.BinaryMessage += async (data, index, count) =>
+                using (var compressed = new MemoryStream(data, index + 2, count - 2))
+                using (var decompressed = new MemoryStream())
                 {
-                    using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                    using (var decompressed = new MemoryStream())
-                    {
-                        using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                            zlib.CopyTo(decompressed);
-                        decompressed.Position = 0;
-                        using (var reader = new StreamReader(decompressed))
-                        using (var jsonReader = new JsonTextReader(reader))
-                        {
-                            var msg = _serializer.Deserialize<RpcMessage>(jsonReader);
-                            await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
-                            if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
-                                ProcessMessage(msg);
-                        }
-                    }
-                };
-                _webSocketClient.TextMessage += async text =>
-                {
-                    using (var reader = new StringReader(text))
+                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+                        zlib.CopyTo(decompressed);
+                    decompressed.Position = 0;
+                    using (var reader = new StreamReader(decompressed))
                     using (var jsonReader = new JsonTextReader(reader))
                     {
                         var msg = _serializer.Deserialize<RpcMessage>(jsonReader);
@@ -114,17 +98,26 @@ namespace Discord.API
                         if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
                             ProcessMessage(msg);
                     }
-                };
-                _webSocketClient.Closed += async ex =>
+                }
+            };
+            _webSocketClient.TextMessage += async text =>
+            {
+                using (var reader = new StringReader(text))
+                using (var jsonReader = new JsonTextReader(reader))
                 {
-                    await DisconnectAsync().ConfigureAwait(false);
-                    await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
-                };
-            }
-
-            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+                    var msg = _serializer.Deserialize<RpcMessage>(jsonReader);
+                    await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
+                    if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
+                        ProcessMessage(msg);
+                }
+            };
+            _webSocketClient.Closed += async ex =>
+            {
+                await DisconnectAsync().ConfigureAwait(false);
+                await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
+            };
         }
-        private void Dispose(bool disposing)
+        internal override void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
@@ -136,67 +129,6 @@ namespace Discord.API
                 _isDisposed = true;
             }
         }
-        public void Dispose() => Dispose(true);
-
-        public async Task LoginAsync(TokenType tokenType, string token, bool upgrade = false, RequestOptions options = null)
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LoginInternalAsync(tokenType, token, upgrade, options).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task LoginInternalAsync(TokenType tokenType, string token, bool upgrade = false, RequestOptions options = null)
-        {
-            if (!upgrade && LoginState != LoginState.LoggedOut)
-                await LogoutInternalAsync().ConfigureAwait(false);
-
-            if (tokenType != TokenType.Bearer)
-                throw new InvalidOperationException("RPC only supports bearer tokens");
-
-            LoginState = LoginState.LoggingIn;
-            try
-            {
-                _loginCancelToken = new CancellationTokenSource();                
-                await _requestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
-                
-                _authToken = token;
-
-                LoginState = LoginState.LoggedIn;
-            }
-            catch (Exception)
-            {
-                await LogoutInternalAsync().ConfigureAwait(false);
-                throw;
-            }
-        }
-
-        public async Task LogoutAsync()
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LogoutInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task LogoutInternalAsync()
-        {
-            //An exception here will lock the client into the unusable LoggingOut state, but that's probably fine since our client is in an undefined state too.
-            if (LoginState == LoginState.LoggedOut) return;
-            LoginState = LoginState.LoggingOut;
-
-            try { _loginCancelToken?.Cancel(false); }
-            catch { }
-
-            await DisconnectInternalAsync().ConfigureAwait(false);
-            await _requestQueue.ClearAsync().ConfigureAwait(false);
-
-            await _requestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
-
-            LoginState = LoginState.LoggedOut;
-        }
 
         public async Task ConnectAsync()
         {
@@ -207,7 +139,7 @@ namespace Discord.API
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ConnectInternalAsync()
+        internal override async Task ConnectInternalAsync()
         {
             /*if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting.");*/
@@ -226,6 +158,7 @@ namespace Discord.API
                     {
                         string url = $"wss://discordapp.io:{port}/?v={DiscordRpcConfig.RpcAPIVersion}&client_id={_clientId}";
                         await _webSocketClient.ConnectAsync(url).ConfigureAwait(false);
+                        SetBaseUrl($"https://discordapp.io:{port}");
                         success = true;
                         break;
                     }
@@ -254,7 +187,7 @@ namespace Discord.API
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task DisconnectInternalAsync()
+        internal override async Task DisconnectInternalAsync()
         {
             if (_webSocketClient == null)
                 throw new NotSupportedException("This client is not configured with websocket support.");
@@ -420,23 +353,6 @@ namespace Discord.API
             }
             else
                 return false;
-        }
-
-        //Helpers
-        private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-        private string SerializeJson(object value)
-        {
-            var sb = new StringBuilder(256);
-            using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
-            using (JsonWriter writer = new JsonTextWriter(text))
-                _serializer.Serialize(writer, value);
-            return sb.ToString();
-        }
-        private T DeserializeJson<T>(Stream jsonStream)
-        {
-            using (TextReader text = new StreamReader(jsonStream))
-            using (JsonReader reader = new JsonTextReader(text))
-                return _serializer.Deserialize<T>(reader);
         }
     }
 }

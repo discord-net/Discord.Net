@@ -3,6 +3,7 @@ using Discord.Audio;
 using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net.Converters;
+using Discord.Net.Queue;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,7 @@ namespace Discord
         internal DataStore DataStore { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
 
+        public new API.DiscordSocketApiClient ApiClient => base.ApiClient as API.DiscordSocketApiClient;
         internal SocketSelfUser CurrentUser => _currentUser as SocketSelfUser;
         internal IReadOnlyCollection<SocketGuild> Guilds => DataStore.Guilds;
         internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
@@ -60,7 +62,7 @@ namespace Discord
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient(DiscordSocketConfig config)
-            : base(config)
+            : base(config, CreateApiClient(config))
         {
             ShardId = config.ShardId;
             TotalShards = config.TotalShards;
@@ -106,8 +108,10 @@ namespace Discord
             _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
+        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
 
-        protected override async Task OnLoginAsync()
+        protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var voiceRegions = await ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
             _voiceRegions = voiceRegions.Select(x => new VoiceRegion(x)).ToImmutableDictionary(x => x.Id);
