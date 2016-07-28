@@ -39,7 +39,6 @@ namespace Discord
         private bool _isFirstLogSub;
         private bool _isReconnecting;
         private bool _isDisposed;
-        private string[] _scopes;
 
         public API.DiscordRpcApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
@@ -150,33 +149,21 @@ namespace Discord
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-
-        /// <inheritdoc />
+        
         public async Task ConnectAsync()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _isReconnecting = false;
-                await ConnectInternalAsync(null).ConfigureAwait(false);
+                await ConnectInternalAsync().ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        public async Task ConnectAndAuthorizeAsync(params string[] scopes)
+        private async Task ConnectInternalAsync(bool ignoreLoginCheck = false)
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                _isReconnecting = false;
-                await ConnectInternalAsync(scopes).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task ConnectInternalAsync(string[] scopes)
-        {
-            if (scopes == null && LoginState != LoginState.LoggedIn)
+            if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting or call ConnectAndAuthorizeAsync.");
-            _scopes = scopes;
 
             if (_isFirstLogSub)
             {
@@ -232,8 +219,7 @@ namespace Discord
             await _rpcLogger.DebugAsync("Disconnecting - ApiClient").ConfigureAwait(false);
             //Disconnect from server
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
-
-            _scopes = null;
+            
             ConnectionState = ConnectionState.Disconnected;
             await _rpcLogger.InfoAsync("Disconnected").ConfigureAwait(false);
 
@@ -272,7 +258,7 @@ namespace Discord
                         await _connectionLock.WaitAsync().ConfigureAwait(false);
                         try
                         {
-                            await ConnectInternalAsync(_scopes).ConfigureAwait(false);
+                            await ConnectInternalAsync().ConfigureAwait(false);
                         }
                         finally { _connectionLock.Release(); }
                         return;
@@ -295,6 +281,14 @@ namespace Discord
             }
         }
 
+        public async Task<string> AuthorizeAsync(string[] scopes)
+        {
+            await ConnectAsync().ConfigureAwait(false);
+            var result = await ApiClient.SendAuthorizeAsync(scopes).ConfigureAwait(false);
+            await DisconnectAsync().ConfigureAwait(false);
+            return result.Code;
+        }
+
         private async Task ProcessMessageAsync(string cmd, Optional<string> evnt, Optional<object> payload)
         {
             try
@@ -313,21 +307,23 @@ namespace Discord
 
                                     var _ = Task.Run(async () =>
                                     {
-                                        RequestOptions options = new RequestOptions
+                                        try
                                         {
-                                            //CancellationToken = cancelToken //TODO: Implement
-                                        };
+                                            RequestOptions options = new RequestOptions
+                                            {
+                                                //CancellationToken = cancelToken //TODO: Implement
+                                            };
+                                            
+                                            await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false); //Has bearer
 
-                                        if (_scopes != null) //No bearer
-                                        {
-                                            var authorizeData = await ApiClient.SendAuthorizeAsync(_scopes, options).ConfigureAwait(false);
-                                            await ApiClient.LoginAsync(TokenType.Bearer, authorizeData.Code, options).ConfigureAwait(false);
+                                            var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                            await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
                                         }
-
-                                        var authenticateData = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false); //Has bearer
-
-                                        var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
-                                        await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
+                                        catch (Exception ex)
+                                        {
+                                            await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt.IsSpecified ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
+                                            return;
+                                        }
                                     });
                                 }
                                 break;
