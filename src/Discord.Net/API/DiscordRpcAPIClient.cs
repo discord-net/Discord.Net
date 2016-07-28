@@ -1,6 +1,4 @@
 ﻿using Discord.API.Rpc;
-using Discord.Logging;
-using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
@@ -8,8 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -158,7 +154,7 @@ namespace Discord.API
                     {
                         string url = $"wss://discordapp.io:{port}/?v={DiscordRpcConfig.RpcAPIVersion}&client_id={_clientId}";
                         await _webSocketClient.ConnectAsync(url).ConfigureAwait(false);
-                        SetBaseUrl($"https://discordapp.io:{port}");
+                        SetBaseUrl($"https://discordapp.io:{port}/");
                         success = true;
                         break;
                     }
