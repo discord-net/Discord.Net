@@ -42,7 +42,7 @@ namespace Discord
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var response = await Discord.ApiClient.GetMyApplicationInfoAsync().ConfigureAwait(false);
+            var response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
             if (response.Id != Id)
                 throw new InvalidOperationException("Unable to update this object from a different application token.");
             Update(response, UpdateSource.Rest);

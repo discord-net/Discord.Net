@@ -94,7 +94,14 @@ namespace Discord
                 {
                     try
                     {
-                        await ApiClient.ValidateTokenAsync().ConfigureAwait(false);
+                        var user = await GetCurrentUserAsync().ConfigureAwait(false);
+                        if (user == null) //Is using a cached DiscordClient
+                            user = new SelfUser(this, await ApiClient.GetMyUserAsync().ConfigureAwait(false));
+
+                        if (user.IsBot && tokenType == TokenType.User)
+                            throw new InvalidOperationException($"A bot token used provided with {nameof(TokenType)}.{nameof(TokenType.User)}");
+                        else if (!user.IsBot && tokenType == TokenType.Bot) //Discord currently sends a 401 in this case
+                            throw new InvalidOperationException($"A user token used provided with {nameof(TokenType)}.{nameof(TokenType.Bot)}");
                     }
                     catch (HttpException ex)
                     {
@@ -146,7 +153,7 @@ namespace Discord
         /// <inheritdoc />
         public async Task<IApplication> GetApplicationInfoAsync()
         {
-            var model = await ApiClient.GetMyApplicationInfoAsync().ConfigureAwait(false);
+            var model = await ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
             return new Application(this, model);
         }
         
@@ -266,12 +273,13 @@ namespace Discord
             var user = _currentUser;
             if (user == null)
             {
-                var model = await ApiClient.GetSelfAsync().ConfigureAwait(false);
+                var model = await ApiClient.GetMyUserAsync().ConfigureAwait(false);
                 user = new SelfUser(this, model);
                 _currentUser = user;
             }
             return user;
         }
+
         /// <inheritdoc />
         public virtual async Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit)
         {

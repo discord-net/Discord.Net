@@ -351,12 +351,6 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        //Application
-        public async Task<Application> GetMyApplicationInfoAsync(RequestOptions options = null)
-        {
-            return await SendAsync<Application>("GET", "oauth2/applications/@me", options: options).ConfigureAwait(false);
-        }
-
         //Auth
         public async Task ValidateTokenAsync(RequestOptions options = null)
         {
@@ -1176,7 +1170,7 @@ namespace Discord.API
         }
 
         //Current User/DMs
-        public async Task<User> GetSelfAsync(RequestOptions options = null)
+        public async Task<User> GetMyUserAsync(RequestOptions options = null)
         {
             return await SendAsync<User>("GET", "users/@me", options: options).ConfigureAwait(false);
         }
@@ -1191,6 +1185,10 @@ namespace Discord.API
         public async Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(RequestOptions options = null)
         {
             return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", "users/@me/guilds", options: options).ConfigureAwait(false);
+        }
+        public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
+        {
+            return await SendAsync<Application>("GET", "oauth2/applications/@me", options: options).ConfigureAwait(false);
         }
         public async Task<User> ModifySelfAsync(ModifyCurrentUserParams args, RequestOptions options = null)
         {

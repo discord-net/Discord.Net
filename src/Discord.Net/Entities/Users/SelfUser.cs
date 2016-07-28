@@ -43,7 +43,7 @@ namespace Discord
         {
             if (IsAttached) throw new NotSupportedException();
 
-            var model = await Discord.ApiClient.GetSelfAsync().ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetMyUserAsync().ConfigureAwait(false);
             Update(model, UpdateSource.Rest);
         }
         public async Task ModifyAsync(Action<ModifyCurrentUserParams> func)
