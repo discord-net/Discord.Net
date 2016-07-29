@@ -72,15 +72,6 @@ namespace Discord
             if (!_isDisposed)
                 ApiClient.Dispose();
         }
-        
-        protected override async Task OnLoginAsync(TokenType tokenType, string token)
-        {
-            await ApiClient.LoginAsync(tokenType, token).ConfigureAwait(false);
-        }
-        protected override async Task OnLogoutAsync()
-        {
-            await ApiClient.LogoutAsync().ConfigureAwait(false);
-        }
 
         protected override Task ValidateTokenAsync(TokenType tokenType, string token)
         {

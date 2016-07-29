@@ -54,6 +54,21 @@ namespace Discord.API
             _restClient = _restClientProvider(baseUrl);
             _restClient.SetHeader("accept", "*/*");
             _restClient.SetHeader("user-agent", DiscordRestConfig.UserAgent);
+            _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
+        }
+        internal static string GetPrefixedToken(TokenType tokenType, string token)
+        {
+            switch (tokenType)
+            {
+                case TokenType.Bot:
+                    return $"Bot {token}";
+                case TokenType.Bearer:
+                    return $"Bearer {token}";
+                case TokenType.User:
+                    return token;
+                default:
+                    throw new ArgumentException("Unknown OAuth token type", nameof(tokenType));
+            }
         }
         internal virtual void Dispose(bool disposing)
         {
@@ -90,26 +105,12 @@ namespace Discord.API
 
                 AuthTokenType = TokenType.User;
                 _authToken = null;
-                _restClient.SetHeader("authorization", null);
                 await RequestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
                 _restClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
                 _authToken = token;
-                switch (tokenType)
-                {
-                    case TokenType.Bot:
-                        token = $"Bot {token}";
-                        break;
-                    case TokenType.Bearer:
-                        token = $"Bearer {token}";
-                        break;
-                    case TokenType.User:
-                        break;
-                    default:
-                        throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
-                }
-                _restClient.SetHeader("authorization", token);
+                _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
 
                 LoginState = LoginState.LoggedIn;
             }
