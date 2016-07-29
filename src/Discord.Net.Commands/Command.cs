@@ -88,13 +88,8 @@ namespace Discord.Commands
                     throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
 
                 bool isUnparsed = parameter.GetCustomAttribute<UnparsedAttribute>() != null;
-                if (isUnparsed)
-                {
-                    if (type != typeof(string))
-                        throw new InvalidOperationException("Unparsed parameters only support the string type.");
-                    else if (i != parameters.Length - 1)
-                        throw new InvalidOperationException("Unparsed parameters must be the last parameter in a command.");
-                }
+                if (isUnparsed && i != parameters.Length - 1)
+                    throw new InvalidOperationException("Unparsed parameters must be the last parameter in a command.");
 
                 string name = parameter.Name;
                 string description = typeInfo.GetCustomAttribute<DescriptionAttribute>()?.Text;
