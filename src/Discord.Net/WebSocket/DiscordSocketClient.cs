@@ -803,11 +803,6 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
-                            case "CHANNEL_PINS_UPDATE":
-                                {
-                                    await _gatewayLogger.DebugAsync("Ignored Disbatch (CHANNEL_PINS_UPDATE)");
-                                }
-                                break;
                             case "CHANNEL_DELETE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
@@ -1476,6 +1471,9 @@ namespace Discord.WebSocket
                                 return;
 
                             //Ignored (User only)
+                            case "CHANNEL_PINS_UPDATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)");
+                                break;
                             case "USER_SETTINGS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
                                 return;
