@@ -220,10 +220,10 @@ namespace Discord
             }
         }
 
-        public async Task<string> AuthorizeAsync(string[] scopes)
+        public async Task<string> AuthorizeAsync(string[] scopes, string rpcToken = null)
         {
             await ConnectAsync(true).ConfigureAwait(false);
-            var result = await ApiClient.SendAuthorizeAsync(scopes).ConfigureAwait(false);
+            var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken).ConfigureAwait(false);
             await DisconnectAsync().ConfigureAwait(false);
             return result.Code;
         }

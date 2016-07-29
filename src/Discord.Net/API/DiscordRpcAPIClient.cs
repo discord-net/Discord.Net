@@ -236,7 +236,7 @@ namespace Discord.API
         //Rpc
         public async Task<AuthenticateResponse> SendAuthenticateAsync(RequestOptions options = null)
         {
-            var msg = new AuthenticateParams()
+            var msg = new AuthenticateParams
             {
                 AccessToken = _authToken
             };
@@ -244,7 +244,7 @@ namespace Discord.API
         }
         public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
-            var msg = new AuthorizeParams()
+            var msg = new AuthorizeParams
             {
                 ClientId = _clientId,
                 Scopes = scopes,
