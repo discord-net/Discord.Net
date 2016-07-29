@@ -1,7 +1,8 @@
-﻿using System.Linq;
+﻿using Discord.Rest;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Extensions
+namespace Discord
 {
     public static class DiscordClientExtensions
     {

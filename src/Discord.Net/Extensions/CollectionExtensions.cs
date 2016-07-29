@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Discord.Extensions
+namespace Discord
 {
     internal static class CollectionExtensions
     {
