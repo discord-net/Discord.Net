@@ -237,7 +237,7 @@ namespace Discord.Rpc
                                             {
                                                 //CancellationToken = cancelToken //TODO: Implement
                                             };
-                                            
+
                                             if (LoginState != LoginState.LoggedOut)
                                                 await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false); //Has bearer
 
@@ -253,6 +253,58 @@ namespace Discord.Rpc
                                 }
                                 break;
 
+                            //Guilds
+                            case "GUILD_STATUS":
+                                {
+                                    await _guildUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+
+                            //Voice
+                            case "VOICE_STATE_CREATE":
+                                {
+                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+                            case "VOICE_STATE_UPDATE":
+                                {
+                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+                            case "VOICE_STATE_DELETE":
+                                {
+                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+
+                            case "SPEAKING_START":
+                                {
+                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+                            case "SPEAKING_STOP":
+                                {
+                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+
+                            //Messages
+                            case "MESSAGE_CREATE":
+                                {
+                                    await _messageReceivedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+                            case "MESSAGE_UPDATE":
+                                {
+                                    await _messageUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+                            case "MESSAGE_DELETE":
+                                {
+                                    await _messageDeletedEvent.InvokeAsync().ConfigureAwait(false);
+                                }
+                                break;
+
                             //Others
                             default:
                                 await _rpcLogger.WarningAsync($"Unknown Dispatch ({evnt})").ConfigureAwait(false);
@@ -260,7 +312,7 @@ namespace Discord.Rpc
                         }
                         break;
 
-                    /*default:
+                    /*default: //Other opcodes are used for command responses
                         await _rpcLogger.WarningAsync($"Unknown OpCode ({cmd})").ConfigureAwait(false);
                         return;*/
                 }
