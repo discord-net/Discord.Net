@@ -191,8 +191,9 @@ namespace Discord.API
                 Properties = props,
                 LargeThreshold = largeThreshold,
                 UseCompression = useCompression,
-                ShardingParams = totalShards > 1 ? new int[] { shardID, totalShards } : null
             };
+            if (totalShards > 1)
+                msg.ShardingParams = new int[] { shardID, totalShards };
 
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
