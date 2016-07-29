@@ -8,5 +8,7 @@ namespace Discord.API.Rpc
         public string ClientId { get; set; }
         [JsonProperty("scopes")]
         public string[] Scopes { get; set; }
+        [JsonProperty("rpc_token")]
+        public Optional<string> RpcToken { get; set; }
     }
 }

@@ -148,13 +148,15 @@ namespace Discord.API
                     _webSocketClient.SetCancelToken(_connectCancelToken.Token);
 
                 bool success = false;
-                for (int port = DiscordRpcConfig.PortRangeStart; port <= DiscordRpcConfig.PortRangeEnd; port++)
+                int port;
+                string uuid = Guid.NewGuid().ToString();
+
+                for ( port = DiscordRpcConfig.PortRangeStart; port <= DiscordRpcConfig.PortRangeEnd; port++)
                 {
                     try
                     {
-                        string url = $"wss://discordapp.io:{port}/?v={DiscordRpcConfig.RpcAPIVersion}&client_id={_clientId}";
+                        string url = $"wss://{uuid}.discordapp.io:{port}/?v={DiscordRpcConfig.RpcAPIVersion}&client_id={_clientId}";
                         await _webSocketClient.ConnectAsync(url).ConfigureAwait(false);
-                        SetBaseUrl($"https://discordapp.io:{port}/");
                         success = true;
                         break;
                     }
@@ -162,9 +164,11 @@ namespace Discord.API
                     {
                     }
                 }
+
                 if (!success)
                     throw new Exception("Unable to connect to the RPC server.");
 
+                SetBaseUrl($"https://{uuid}.discordapp.io:{port}/");
                 ConnectionState = ConnectionState.Connected;
             }
             catch (Exception)
@@ -238,12 +242,13 @@ namespace Discord.API
             };
             return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, options: options).ConfigureAwait(false);
         }
-        public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, RequestOptions options = null)
+        public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
             var msg = new AuthorizeParams()
             {
                 ClientId = _clientId,
-                Scopes = scopes
+                Scopes = scopes,
+                RpcToken = rpcToken != null ? rpcToken : Optional.Create<string>()
             };
             if (options == null)
                 options = new RequestOptions();
