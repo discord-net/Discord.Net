@@ -166,7 +166,7 @@ namespace Discord
                 if (_sessionId != null)
                     await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
                 else
-                    await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards:TotalShards).ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
                 _canReconnect = true;
@@ -534,7 +534,7 @@ namespace Discord
 
                             _sessionId = null;
                             _lastSeq = 0;
-                            await ApiClient.SendIdentifyAsync().ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:

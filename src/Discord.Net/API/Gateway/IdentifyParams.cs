@@ -14,5 +14,7 @@ namespace Discord.API.Gateway
         public int LargeThreshold { get; set; }
         [JsonProperty("compress")]
         public bool UseCompression { get; set; }
+        [JsonProperty("shard", NullValueHandling = NullValueHandling.Ignore)]
+        public int[] ShardingParams { get; set; }
     }
 }
