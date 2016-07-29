@@ -179,7 +179,7 @@ namespace Discord.API
         {
             return await SendAsync<GetGatewayResponse>("GET", "gateway", options: options).ConfigureAwait(false);
         }
-        public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, RequestOptions options = null)
+        public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
             var props = new Dictionary<string, string>
             {
@@ -190,8 +190,11 @@ namespace Discord.API
                 Token = _authToken,
                 Properties = props,
                 LargeThreshold = largeThreshold,
-                UseCompression = useCompression
+                UseCompression = useCompression,
             };
+            if (totalShards > 1)
+                msg.ShardingParams = new int[] { shardID, totalShards };
+
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
