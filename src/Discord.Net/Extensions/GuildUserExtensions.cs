@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Extensions
+namespace Discord
 {
     public static class GuildUserExtensions
     {

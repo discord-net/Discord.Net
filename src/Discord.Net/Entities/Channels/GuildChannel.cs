@@ -1,4 +1,5 @@
 ﻿using Discord.API.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

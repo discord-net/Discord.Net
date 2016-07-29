@@ -1,5 +1,5 @@
 ﻿using Discord.Audio;
-using Discord.Extensions;
+using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

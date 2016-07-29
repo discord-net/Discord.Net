@@ -1,8 +1,10 @@
-﻿namespace Discord.API.Rest
+﻿using Discord.Rest;
+
+namespace Discord.API.Rest
 {
     public class GetChannelMessagesParams
     {
-        public int Limit { internal get; set; } = DiscordRestConfig.MaxMessagesPerBatch;
+        public int Limit { internal get; set; } = DiscordConfig.MaxMessagesPerBatch;
 
         public Direction RelativeDirection { internal get; set; } = Direction.Before;
 

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Discord.Rest;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
 

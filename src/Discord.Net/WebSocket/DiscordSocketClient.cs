@@ -1,10 +1,10 @@
 ﻿using Discord.API.Gateway;
 using Discord.Audio;
-using Discord.Extensions;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.WebSockets;
+using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,7 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     public partial class DiscordSocketClient : DiscordRestClient, IDiscordClient
     {

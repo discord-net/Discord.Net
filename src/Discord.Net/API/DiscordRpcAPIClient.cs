@@ -2,6 +2,7 @@
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
+using Discord.Rpc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

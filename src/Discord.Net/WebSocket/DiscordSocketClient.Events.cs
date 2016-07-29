@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     //TODO: Add event docstrings
     public partial class DiscordSocketClient

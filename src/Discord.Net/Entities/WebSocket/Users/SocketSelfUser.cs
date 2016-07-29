@@ -1,4 +1,5 @@
 ﻿using Discord.API.Rest;
+using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;

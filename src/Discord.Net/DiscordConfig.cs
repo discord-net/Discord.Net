@@ -14,6 +14,10 @@ namespace Discord
         public const string CDNUrl = "https://cdn.discordapp.com/";
         public const string InviteUrl = "https://discord.gg/";
 
+        public const int MaxMessageSize = 2000;
+        public const int MaxMessagesPerBatch = 100;
+        public const int MaxUsersPerBatch = 1000;
+
         /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
     }

@@ -1,4 +1,5 @@
-﻿using Model = Discord.API.GuildMember;
+﻿using Discord.WebSocket;
+using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord

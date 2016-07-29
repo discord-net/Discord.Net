@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using Model = Discord.API.Rpc.RpcUserGuild;
 
 namespace Discord.Entities.Rpc

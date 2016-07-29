@@ -1,4 +1,6 @@
-﻿namespace Discord
+﻿using Discord.Rest;
+
+namespace Discord
 {
     internal abstract class Entity<T> : IEntity<T>
     {

@@ -1,5 +1,5 @@
 ﻿using Discord.API.Rest;
-using Discord.Extensions;
+using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

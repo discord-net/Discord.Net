@@ -1,4 +1,5 @@
-﻿using Model = Discord.API.Message;
+﻿using Discord.WebSocket;
+using Model = Discord.API.Message;
 
 namespace Discord
 {

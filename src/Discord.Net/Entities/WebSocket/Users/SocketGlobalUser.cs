@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
 

@@ -1,4 +1,6 @@
 ﻿using Discord.API.Rest;
+using Discord.Rest;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -25,7 +27,7 @@ namespace Discord
         public virtual SocketMessage Remove(ulong id) => null;
         public virtual SocketMessage Get(ulong id) => null;
 
-        public virtual IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
+        public virtual IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
             => ImmutableArray.Create<SocketMessage>();
 
         public virtual async Task<SocketMessage> DownloadAsync(ulong id)

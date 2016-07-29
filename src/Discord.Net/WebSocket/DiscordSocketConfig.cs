@@ -1,5 +1,6 @@
 ﻿using Discord.Audio;
 using Discord.Net.WebSockets;
+using Discord.Rest;
 
 namespace Discord
 {

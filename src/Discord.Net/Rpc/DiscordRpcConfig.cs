@@ -1,6 +1,7 @@
 ﻿using Discord.Net.WebSockets;
+using Discord.Rest;
 
-namespace Discord
+namespace Discord.Rpc
 {
     public class DiscordRpcConfig : DiscordRestConfig
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 

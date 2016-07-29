@@ -1,4 +1,5 @@
-﻿using Discord.Extensions;
+﻿using Discord.Rest;
+using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace Discord
                 return result;
             return null;
         }
-        public override IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordRestConfig.MaxMessagesPerBatch)
+        public override IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0) return ImmutableArray<SocketMessage>.Empty;

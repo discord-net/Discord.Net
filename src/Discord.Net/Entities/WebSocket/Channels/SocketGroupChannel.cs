@@ -1,4 +1,4 @@
-﻿using Discord.Extensions;
+﻿using Discord.WebSocket;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;

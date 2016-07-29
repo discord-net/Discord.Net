@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Discord.WebSocket;
+using System.Diagnostics;
 
 namespace Discord
 {

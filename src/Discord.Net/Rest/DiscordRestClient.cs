@@ -10,8 +10,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using Discord.Rpc;
+using Discord.WebSocket;
 
-namespace Discord
+namespace Discord.Rest
 {
     public class DiscordRestClient : IDiscordClient
     {
