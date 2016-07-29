@@ -53,7 +53,6 @@ namespace Discord
 
             var guildChannel = Channel as GuildChannel;
             var guild = guildChannel?.Guild;
-            var discord = Discord;
 
             if (model.IsTextToSpeech.IsSpecified)
                 IsTTS = model.IsTextToSpeech.Value;

@@ -2,9 +2,9 @@
 using System;
 using Model = Discord.API.Rpc.RpcUserGuild;
 
-namespace Discord.Entities.Rpc
+namespace Discord.Rpc
 {
-    internal class RemoteUserGuild : IRemoteUserGuild, ISnowflakeEntity
+    /*internal class RemoteUserGuild : IRemoteUserGuild, ISnowflakeEntity
     {
         public ulong Id { get; }
         public DiscordRestClient Discord { get; }
@@ -26,5 +26,5 @@ namespace Discord.Entities.Rpc
         }
 
         bool IEntity<ulong>.IsAttached => false;
-    }
+    }*/
 }

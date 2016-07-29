@@ -355,7 +355,7 @@ namespace Discord.Rpc
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
-                                    var msg = new Message(null, new User(data.Message.Author.Value), data.Message);
+                                    var msg = new RpcMessage(this, data.Message);
 
                                     await _messageReceivedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
                                 }
@@ -364,7 +364,7 @@ namespace Discord.Rpc
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
-                                    var msg = new Message(null, new User(data.Message.Author.Value), data.Message);
+                                    var msg = new RpcMessage(this, data.Message);
 
                                     await _messageUpdatedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
                                 }

@@ -90,7 +90,7 @@ namespace Discord.API
                     using (var reader = new StreamReader(decompressed))
                     using (var jsonReader = new JsonTextReader(reader))
                     {
-                        var msg = _serializer.Deserialize<RpcMessage>(jsonReader);
+                        var msg = _serializer.Deserialize<API.Rpc.RpcMessage>(jsonReader);
                         await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
                         if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
                             ProcessMessage(msg);
@@ -102,7 +102,7 @@ namespace Discord.API
                 using (var reader = new StringReader(text))
                 using (var jsonReader = new JsonTextReader(reader))
                 {
-                    var msg = _serializer.Deserialize<RpcMessage>(jsonReader);
+                    var msg = _serializer.Deserialize<API.Rpc.RpcMessage>(jsonReader);
                     await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
                     if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
                         ProcessMessage(msg);
@@ -219,7 +219,7 @@ namespace Discord.API
         {
             byte[] bytes = null;
             var guid = Guid.NewGuid();
-            payload = new RpcMessage { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };
+            payload = new API.Rpc.RpcMessage { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };
             if (payload != null)
             {
                 var json = SerializeJson(payload);
@@ -338,7 +338,7 @@ namespace Discord.API
             return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
         }
 
-        private bool ProcessMessage(RpcMessage msg)
+        private bool ProcessMessage(API.Rpc.RpcMessage msg)
         {
             RpcRequest requestTracker;
             if (_requests.TryGetValue(msg.Nonce.Value.Value, out requestTracker))
