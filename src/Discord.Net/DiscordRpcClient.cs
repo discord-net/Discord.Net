@@ -27,7 +27,6 @@ namespace Discord
         private TaskCompletionSource<bool> _connectTask;
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _reconnectTask;
-        private bool _isFirstLogSub;
         private bool _isReconnecting;
         private bool _canReconnect;
 
@@ -42,7 +41,6 @@ namespace Discord
             : base(config, CreateApiClient(config))
         {
             _rpcLogger = LogManager.CreateLogger("RPC");
-            _isFirstLogSub = true;
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -97,12 +95,6 @@ namespace Discord
             
             if (!isReconnecting && _reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
                 _reconnectCancelToken.Cancel();
-
-            if (_isFirstLogSub)
-            {
-                _isFirstLogSub = false;
-                await WriteInitialLog().ConfigureAwait(false);
-            }
 
             var state = ConnectionState;
             if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
@@ -284,23 +276,6 @@ namespace Discord
             {
                 await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt.IsSpecified ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
                 return;
-            }
-        }
-
-        private async Task WriteInitialLog()
-        {
-            await _clientLogger.InfoAsync($"DiscordRpcClient v{DiscordRestConfig.Version} (RPC v{DiscordRpcConfig.RpcAPIVersion})").ConfigureAwait(false);
-            await _clientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
-            await _clientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
-            await _clientLogger.VerboseAsync($"Processors: {Environment.ProcessorCount}").ConfigureAwait(false);
-        }
-        private static string ToArchString(Architecture arch)
-        {
-            switch (arch)
-            {
-                case Architecture.X64: return "x64";
-                case Architecture.X86: return "x86";
-                default: return arch.ToString();
             }
         }
     }
