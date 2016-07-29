@@ -42,23 +42,23 @@ namespace Discord.Rpc
         private readonly AsyncEvent<Func<Task>> _voiceStateUpdatedEvent = new AsyncEvent<Func<Task>>();
 
         //Messages
-        public event Func<Task> MessageReceived
+        public event Func<ulong, IMessage, Task> MessageReceived
         {
             add { _messageReceivedEvent.Add(value); }
             remove { _messageReceivedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Task>> _messageReceivedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Task> MessageUpdated
+        private readonly AsyncEvent<Func<ulong, IMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<ulong, IMessage, Task>>();
+        public event Func<ulong, IMessage, Task> MessageUpdated
         {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Task>> _messageUpdatedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Task> MessageDeleted
+        private readonly AsyncEvent<Func<ulong, IMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<ulong, IMessage, Task>>();
+        public event Func<ulong, ulong, Task> MessageDeleted
         {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Task>> _messageDeletedEvent = new AsyncEvent<Func<Task>>();
+        private readonly AsyncEvent<Func<ulong, ulong, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, ulong, Task>>();
     }
 }

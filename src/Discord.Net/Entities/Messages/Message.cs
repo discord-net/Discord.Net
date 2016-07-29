@@ -40,13 +40,10 @@ namespace Discord
             Channel = channel;
             Author = author;
             Type = model.Type;
-
-            if (channel is IGuildChannel)
-            {
-                MentionedUsers = ImmutableArray.Create<IUser>();
-                MentionedChannelIds = ImmutableArray.Create<ulong>();
-                MentionedRoles = ImmutableArray.Create<IRole>();
-            }
+            
+            MentionedUsers = ImmutableArray.Create<IUser>();
+            MentionedChannelIds = ImmutableArray.Create<ulong>();
+            MentionedRoles = ImmutableArray.Create<IRole>();
 
             Update(model, UpdateSource.Creation);
         }

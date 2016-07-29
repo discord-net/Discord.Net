@@ -213,6 +213,57 @@ namespace Discord.Rpc
             return result.Code;
         }
 
+        public async Task SubscribeGuild(ulong guildId, params RpcChannelEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendGuildSubscribeAsync(GetEventName(events[i]), guildId);
+        }
+        public async Task UnsubscribeGuild(ulong guildId, params RpcChannelEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendGuildUnsubscribeAsync(GetEventName(events[i]), guildId);
+        }
+        public async Task SubscribeChannel(ulong channelId, params RpcChannelEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendChannelSubscribeAsync(GetEventName(events[i]), channelId);
+        }
+        public async Task UnsubscribeChannel(ulong channelId, params RpcChannelEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendChannelUnsubscribeAsync(GetEventName(events[i]), channelId);
+        }
+
+        private static string GetEventName(RpcGuildEvent rpcEvent)
+        {
+            switch (rpcEvent)
+            {
+                case RpcGuildEvent.GuildStatus: return "GUILD_STATUS";
+                default:
+                    throw new InvalidOperationException($"Unknown RPC Guild Event: {rpcEvent}");
+            }
+        }
+        private static string GetEventName(RpcChannelEvent rpcEvent)
+        {
+            switch (rpcEvent)
+            {
+                case RpcChannelEvent.VoiceStateCreate: return "VOICE_STATE_CREATE";
+                case RpcChannelEvent.VoiceStateUpdate: return "VOICE_STATE_UPDATE";
+                case RpcChannelEvent.VoiceStateDelete: return "VOICE_STATE_DELETE";
+                case RpcChannelEvent.SpeakingStart: return "SPEAKING_START";
+                case RpcChannelEvent.SpeakingStop: return "SPEAKING_STOP";
+                case RpcChannelEvent.MessageCreate: return "MESSAGE_CREATE";
+                case RpcChannelEvent.MessageUpdate: return "MESSAGE_UPDATE";
+                case RpcChannelEvent.MessageDelete: return "MESSAGE_DELETE";
+                default:
+                    throw new InvalidOperationException($"Unknown RPC Channel Event: {rpcEvent}");
+            }
+        }
+
         private async Task ProcessMessageAsync(string cmd, Optional<string> evnt, Optional<object> payload)
         {
             try
@@ -291,17 +342,22 @@ namespace Discord.Rpc
                             //Messages
                             case "MESSAGE_CREATE":
                                 {
-                                    await _messageReceivedEvent.InvokeAsync().ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    var msg = new Message(null, new User(data.Message.Author.Value), data.Message);
+                                    await _messageReceivedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
                                 }
                                 break;
                             case "MESSAGE_UPDATE":
                                 {
-                                    await _messageUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    var msg = new Message(null, new User(data.Message.Author.Value), data.Message);
+                                    await _messageUpdatedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
                                 }
                                 break;
                             case "MESSAGE_DELETE":
                                 {
-                                    await _messageDeletedEvent.InvokeAsync().ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    await _messageDeletedEvent.InvokeAsync(data.ChannelId, data.Message.Id).ConfigureAwait(false);
                                 }
                                 break;
 

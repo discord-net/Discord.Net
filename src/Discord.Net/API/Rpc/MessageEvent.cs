@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿using Newtonsoft.Json;
 namespace Discord.API.Rpc
 {
     public class MessageEvent
     {
+        [JsonProperty("channel_id")]
+        public ulong ChannelId { get; set; }
+        [JsonProperty("message")]
+        public Message Message { get; set; }
     }
 }
