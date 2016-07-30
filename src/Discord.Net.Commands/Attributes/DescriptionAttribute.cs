@@ -11,4 +11,14 @@ namespace Discord.Commands
             Text = text;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class SynopsisAttribute : Attribute
+    {
+        public string Text { get; }
+        public SynopsisAttribute(string text)
+        {
+            Text = text;
+        }
+    }
 }
