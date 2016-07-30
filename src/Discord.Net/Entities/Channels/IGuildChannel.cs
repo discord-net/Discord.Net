@@ -19,8 +19,7 @@ namespace Discord
         /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
-        /// <param name="withXkcd"> If true, creates a human-readable link. Not supported if maxAge is set to null. </param>
-        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool withXkcd = false);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false);
         /// <summary> Returns a collection of all invites to this channel. </summary>
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync();
 

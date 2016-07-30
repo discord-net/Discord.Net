@@ -220,7 +220,7 @@ namespace Discord
             var models = await Discord.ApiClient.GetGuildInvitesAsync(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x)).ToImmutableArray();
         }
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false, bool withXkcd = false)
+        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = null, bool isTemporary = false)
         {
             if (maxAge <= 0) throw new ArgumentOutOfRangeException(nameof(maxAge));
             if (maxUses <= 0) throw new ArgumentOutOfRangeException(nameof(maxUses));
@@ -229,8 +229,7 @@ namespace Discord
             {
                 MaxAge = maxAge ?? 0,
                 MaxUses = maxUses ?? 0,
-                Temporary = isTemporary,
-                XkcdPass = withXkcd
+                Temporary = isTemporary
             };
             var model = await Discord.ApiClient.CreateChannelInviteAsync(DefaultChannelId, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);

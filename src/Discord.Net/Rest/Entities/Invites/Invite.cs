@@ -10,15 +10,13 @@ namespace Discord
     {
         public string ChannelName { get; private set; }
         public string GuildName { get; private set; }
-        public string XkcdCode { get; private set; }
 
         public ulong ChannelId { get; private set; }
         public ulong GuildId { get; private set; }
         public override DiscordRestClient Discord { get; }
 
         public string Code => Id;
-        public string Url => $"{DiscordConfig.InviteUrl}/{XkcdCode ?? Code}";
-        public string XkcdUrl => XkcdCode != null ? $"{DiscordConfig.InviteUrl}/{XkcdCode}" : null;
+        public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
         public Invite(DiscordRestClient discord, Model model)
             : base(model.Code)
@@ -31,7 +29,6 @@ namespace Discord
         {
             if (source == UpdateSource.Rest && IsAttached) return;
 
-            XkcdCode = model.XkcdPass;
             GuildId = model.Guild.Id;
             ChannelId = model.Channel.Id;
             GuildName = model.Guild.Name;
@@ -47,7 +44,7 @@ namespace Discord
             await Discord.ApiClient.DeleteInviteAsync(Code).ConfigureAwait(false);
         }
 
-        public override string ToString() => XkcdUrl ?? Url;
-        private string DebuggerDisplay => $"{XkcdUrl ?? Url} ({GuildName} / {ChannelName})";
+        public override string ToString() => Url;
+        private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
     }
 }
