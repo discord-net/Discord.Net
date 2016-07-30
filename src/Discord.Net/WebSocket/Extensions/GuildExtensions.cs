@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord.WebSocket.Extensions
 {
-    // TODO: Docstrings
+    // Todo: Docstrings
     public static class GuildExtensions
     {
         // Channels
