@@ -1,6 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace Discord.Commands
 {
@@ -20,6 +23,7 @@ namespace Discord.Commands
             int endPos = input.Length;
             var curPart = ParserPart.None;
             int lastArgEndPos = int.MinValue;
+            IList<object> paramsList = null; // TODO: could we use a better type?
             var argList = ImmutableArray.CreateBuilder<object>();
             bool isEscaping = false;
             char c;
@@ -70,6 +74,10 @@ namespace Discord.Commands
                             argBuilder.Append(c);
                             continue;
                         }
+                        if (curParam != null && curParam.IsParams)
+                        {
+                            paramsList = new List<object>();
+                        }
                         if (c == '\"')
                         {
                             curPart = ParserPart.QuotedParameter;
@@ -110,10 +118,32 @@ namespace Discord.Commands
                     var typeReaderResult = await curParam.Parse(context, argString).ConfigureAwait(false);
                     if (!typeReaderResult.IsSuccess)
                         return ParseResult.FromError(typeReaderResult);
-                    argList.Add(typeReaderResult.Value);
 
-                    curParam = null;
-                    curPart = ParserPart.None;
+                    if (curParam.IsParams)
+                    {
+                        paramsList.Add(typeReaderResult.Value);
+
+                        if (curPos == endPos)
+                        {
+                            // TODO: can this logic be improved?
+                            object[] _params = paramsList.ToArray();
+                            Array realParams = Array.CreateInstance(curParam.UnderlyingType, _params.Length);
+                            for (int i = 0; i < _params.Length; i++)
+                                realParams.SetValue(Convert.ChangeType(_params[i], curParam.UnderlyingType), i);
+
+                            argList.Add(realParams);
+
+                            curParam = null;
+                            curPart = ParserPart.None;
+                        }
+                    }
+                    else
+                    {
+                        argList.Add(typeReaderResult.Value);
+
+                        curParam = null;
+                        curPart = ParserPart.None;
+                    }
                     argBuilder.Clear();
                 }
             }

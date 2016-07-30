@@ -71,6 +71,7 @@ namespace Discord.Commands
             {
                 var parameter = parameters[i];
                 var type = parameter.ParameterType;
+                Type underlyingType = null;
 
                 if (i == 0)
                 {
@@ -80,10 +81,24 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var typeInfo = type.GetTypeInfo();
                 var reader = Module.Service.GetTypeReader(type);
 
-                if (reader == null && typeInfo.IsEnum)
+                // TODO: is there a better way of detecting 'params'?
+                bool isParams = type.IsArray && i == parameters.Length - 1;
+                if (isParams)
+                {
+                    underlyingType = type.GetElementType();
+                    reader = Module.Service.GetTypeReader(underlyingType);
+                }
+                else
+                {
+                    underlyingType = type;
+                }
+
+                var underlyingTypeInfo = underlyingType.GetTypeInfo();
+                var typeInfo = type.GetTypeInfo();
+
+                if (reader == null && underlyingTypeInfo.IsEnum)
                 {
                     reader = EnumTypeReader.GetReader(type);
                     Module.Service.AddTypeReader(type, reader);
@@ -101,7 +116,7 @@ namespace Discord.Commands
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
-                paramBuilder.Add(new CommandParameter(name, description, type, reader, isOptional, isRemainder, defaultValue));
+                paramBuilder.Add(new CommandParameter(name, description, type, underlyingType, reader, isOptional, isRemainder, isParams, defaultValue));
             }
             return paramBuilder.ToImmutable();
         }
