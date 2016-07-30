@@ -117,6 +117,9 @@ namespace Discord.Commands
         }
         private Module LoadInternal(object moduleInstance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
         {
+            if (_modules.Any(m => m.Key.GetType().GetTypeInfo() == typeInfo))
+                return _modules.FirstOrDefault(m => m.Key.GetType().GetTypeInfo() == typeInfo).Value;
+
             var loadedModule = new Module(this, moduleInstance, moduleAttr, typeInfo);
             _modules[moduleInstance] = loadedModule;
 
