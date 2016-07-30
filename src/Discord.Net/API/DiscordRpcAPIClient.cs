@@ -61,7 +61,7 @@ namespace Discord.API
         private readonly IWebSocketClient _webSocketClient;
         private readonly SemaphoreSlim _connectionLock;
         private readonly string _clientId;
-        private CancellationTokenSource _loginCancelToken, _connectCancelToken;
+        private CancellationTokenSource _stateCancelToken;
         private string _origin;
 
         public ConnectionState ConnectionState { get; private set; }
@@ -120,7 +120,7 @@ namespace Discord.API
             {
                 if (disposing)
                 {
-                    _connectCancelToken?.Dispose();
+                    _stateCancelToken?.Dispose();
                     (_webSocketClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
@@ -144,9 +144,9 @@ namespace Discord.API
             ConnectionState = ConnectionState.Connecting;
             try
             {
-                _connectCancelToken = new CancellationTokenSource();
+                _stateCancelToken = new CancellationTokenSource();
                 if (_webSocketClient != null)
-                    _webSocketClient.SetCancelToken(_connectCancelToken.Token);
+                    _webSocketClient.SetCancelToken(_stateCancelToken.Token);
 
                 bool success = false;
                 int port;
@@ -196,7 +196,7 @@ namespace Discord.API
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
             
-            try { _connectCancelToken?.Cancel(false); }
+            try { _stateCancelToken?.Cancel(false); }
             catch { }
 
             await _webSocketClient.DisconnectAsync().ConfigureAwait(false);
