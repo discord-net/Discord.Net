@@ -191,13 +191,13 @@ namespace Discord.WebSocket
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task DisconnectAsync(Exception ex)
+        private async Task DisconnectAsync(Exception ex, bool isReconnecting)
         {
             if (_connectTask?.TrySetException(ex) ?? false) return;
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(ex, false).ConfigureAwait(false);
+                await DisconnectInternalAsync(ex, isReconnecting).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -259,19 +259,19 @@ namespace Discord.WebSocket
 
         private async Task StartReconnectAsync(Exception ex)
         {
-            _connectTask?.TrySetException(ex);
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (!_canReconnect || _reconnectTask != null) return;
-                await DisconnectInternalAsync(null, true).ConfigureAwait(false);
                 _reconnectCancelToken = new CancellationTokenSource();
-                _reconnectTask = ReconnectInternalAsync(_reconnectCancelToken.Token);
+                _reconnectTask = ReconnectInternalAsync(ex, _reconnectCancelToken.Token);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ReconnectInternalAsync(CancellationToken cancelToken)
+        private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
         {
+            await DisconnectAsync(null, true).ConfigureAwait(false);
+
             try
             {
                 Random jitter = new Random();
@@ -291,9 +291,9 @@ namespace Discord.WebSocket
                         _reconnectTask = null;
                         return;
                     }
-                    catch (Exception ex)
+                    catch (Exception ex2)
                     {
-                        await _gatewayLogger.WarningAsync("Reconnect failed", ex).ConfigureAwait(false);
+                        await _gatewayLogger.WarningAsync("Reconnect failed", ex2).ConfigureAwait(false);
                     }
                     finally {  _connectionLock.Release(); }
                 }
@@ -580,7 +580,7 @@ namespace Discord.WebSocket
                                     }
                                     catch (Exception ex)
                                     {
-                                        await DisconnectAsync(new Exception("Processing READY failed", ex));
+                                        await DisconnectAsync(new Exception("Processing READY failed", ex), false);
                                         return;
                                     }
 
