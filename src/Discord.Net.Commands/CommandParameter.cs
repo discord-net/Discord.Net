@@ -20,8 +20,10 @@ namespace Discord.Commands
 
         public CommandParameter(string name, string description, Type type, TypeReader reader, bool isOptional, bool isRemainder, object defaultValue)
         {
-            _reader = reader;
             Name = name;
+            Description = description;
+            Type = type;
+            _reader = reader;
             IsOptional = isOptional;
             IsRemainder = isRemainder;
             DefaultValue = defaultValue;
