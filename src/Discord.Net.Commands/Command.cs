@@ -81,20 +81,14 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var reader = Module.Service.GetTypeReader(type);
-
                 // TODO: is there a better way of detecting 'params'?
                 bool isParams = type.IsArray && i == parameters.Length - 1;
                 if (isParams)
-                {
                     underlyingType = type.GetElementType();
-                    reader = Module.Service.GetTypeReader(underlyingType);
-                }
                 else
-                {
                     underlyingType = type;
-                }
 
+                var reader = Module.Service.GetTypeReader(underlyingType);
                 var underlyingTypeInfo = underlyingType.GetTypeInfo();
                 var typeInfo = type.GetTypeInfo();
 
