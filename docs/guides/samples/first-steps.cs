@@ -1,4 +1,5 @@
 using Discord;
+using Discord.WebSocket;
 
 class Program
 {

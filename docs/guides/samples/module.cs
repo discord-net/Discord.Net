@@ -1,4 +1,5 @@
 using Discord.Commands;
+using Discord.WebSocket;
 
 // Create a module with no prefix
 [Module]

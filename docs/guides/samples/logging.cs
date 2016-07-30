@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Rest;
 
 public class Program
 {

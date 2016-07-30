@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using System.Reflection;
 using Discord;
+using Discord.WebSocket;
 using Discord.Commands;
 
 public class Program
