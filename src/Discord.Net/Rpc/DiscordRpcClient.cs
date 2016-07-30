@@ -20,7 +20,6 @@ namespace Discord.Rpc
         private TaskCompletionSource<bool> _connectTask;
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _reconnectTask;
-        private bool _isReconnecting;
         private bool _canReconnect;
 
         public ConnectionState ConnectionState { get; private set; }
@@ -76,7 +75,6 @@ namespace Discord.Rpc
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                _isReconnecting = false;
                 await ConnectInternalAsync(ignoreLoginCheck, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
@@ -103,7 +101,8 @@ namespace Discord.Rpc
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
-                _canReconnect = true;
+                if (!isReconnecting)
+                    _canReconnect = true;
                 ConnectionState = ConnectionState.Connected;
                 await _rpcLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
@@ -119,7 +118,6 @@ namespace Discord.Rpc
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                _isReconnecting = false;
                 await DisconnectInternalAsync(null, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }

@@ -169,7 +169,8 @@ namespace Discord.WebSocket
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards:TotalShards).ConfigureAwait(false);
 
                 await _connectTask.Task.ConfigureAwait(false);
-                _canReconnect = true;
+                if (!isReconnecting)
+                    _canReconnect = true;
                 ConnectionState = ConnectionState.Connected;
                 await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
