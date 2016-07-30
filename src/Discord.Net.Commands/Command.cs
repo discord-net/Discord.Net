@@ -96,7 +96,7 @@ namespace Discord.Commands
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
-                paramBuilder.Add(new CommandParameter(name, description, reader, isOptional, isRemainder, defaultValue));
+                paramBuilder.Add(new CommandParameter(name, description, type, reader, isOptional, isRemainder, defaultValue));
             }
             return paramBuilder.ToImmutable();
         }

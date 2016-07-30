@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -13,9 +15,10 @@ namespace Discord.Commands
         public string Description { get; }
         public bool IsOptional { get; }
         public bool IsRemainder { get; }
+        public Type Type { get; }
         internal object DefaultValue { get; }
 
-        public CommandParameter(string name, string description, TypeReader reader, bool isOptional, bool isRemainder, object defaultValue)
+        public CommandParameter(string name, string description, Type type, TypeReader reader, bool isOptional, bool isRemainder, object defaultValue)
         {
             _reader = reader;
             Name = name;
