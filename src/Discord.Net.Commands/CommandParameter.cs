@@ -15,17 +15,21 @@ namespace Discord.Commands
         public string Description { get; }
         public bool IsOptional { get; }
         public bool IsRemainder { get; }
+        public bool IsParams { get; }
         public Type Type { get; }
+        public Type UnderlyingType { get; }
         internal object DefaultValue { get; }
 
-        public CommandParameter(string name, string description, Type type, TypeReader reader, bool isOptional, bool isRemainder, object defaultValue)
+        public CommandParameter(string name, string description, Type type, Type underlyingType, TypeReader reader, bool isOptional, bool isRemainder, bool isParams, object defaultValue)
         {
             Name = name;
             Description = description;
             Type = type;
+            UnderlyingType = underlyingType;
             _reader = reader;
             IsOptional = isOptional;
             IsRemainder = isRemainder;
+            IsParams = isParams;
             DefaultValue = defaultValue;
         }
 
