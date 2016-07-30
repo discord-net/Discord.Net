@@ -95,7 +95,7 @@ namespace Discord.Commands
 
                 if (reader == null && underlyingTypeInfo.IsEnum)
                 {
-                    reader = EnumTypeReader.GetReader(type);
+                    reader = EnumTypeReader.GetReader(underlyingType);
                     Module.Service.AddTypeReader(type, reader);
                 }
 
