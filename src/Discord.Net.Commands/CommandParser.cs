@@ -42,14 +42,14 @@ namespace Discord.Commands
                     }
                 }
                 //Are we escaping the next character?
-                if (c == '\\' && (curParam == null || !curParam.IsUnparsed))
+                if (c == '\\' && (curParam == null || !curParam.IsRemainder))
                 {
                     isEscaping = true;
                     continue;
                 }
 
-                //If we're processing an unparsed parameter, ignore all other logic
-                if (curParam != null && curParam.IsUnparsed && curPos != endPos)
+                //If we're processing an remainder parameter, ignore all other logic
+                if (curParam != null && curParam.IsRemainder && curPos != endPos)
                 {
                     argBuilder.Append(c);
                     continue;
@@ -65,7 +65,7 @@ namespace Discord.Commands
                     else
                     {
                         curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
-                        if (curParam != null && curParam.IsUnparsed)
+                        if (curParam != null && curParam.IsRemainder)
                         {
                             argBuilder.Append(c);
                             continue;
@@ -118,8 +118,13 @@ namespace Discord.Commands
                 }
             }
 
-            if (curParam != null && curParam.IsUnparsed)
-                argList.Add(argBuilder.ToString());
+            if (curParam != null && curParam.IsRemainder)
+            {
+                var typeReaderResult = await curParam.Parse(context, argBuilder.ToString()).ConfigureAwait(false);
+                if (!typeReaderResult.IsSuccess)
+                    return ParseResult.FromError(typeReaderResult);
+                argList.Add(typeReaderResult.Value);
+            }
 
             if (isEscaping)
                 return ParseResult.FromError(CommandError.ParseFailed, "Input text may not end on an incomplete escape.");

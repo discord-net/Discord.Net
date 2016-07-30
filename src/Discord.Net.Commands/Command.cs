@@ -87,16 +87,16 @@ namespace Discord.Commands
                 if (reader == null)
                     throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
 
-                bool isUnparsed = parameter.GetCustomAttribute<UnparsedAttribute>() != null;
-                if (isUnparsed && i != parameters.Length - 1)
-                    throw new InvalidOperationException("Unparsed parameters must be the last parameter in a command.");
+                bool isRemainder = parameter.GetCustomAttribute<RemainderAttribute>() != null;
+                if (isRemainder && i != parameters.Length - 1)
+                    throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
 
                 string name = parameter.Name;
                 string description = typeInfo.GetCustomAttribute<DescriptionAttribute>()?.Text;
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
-                paramBuilder.Add(new CommandParameter(name, description, reader, isOptional, isUnparsed, defaultValue));
+                paramBuilder.Add(new CommandParameter(name, description, reader, isOptional, isRemainder, defaultValue));
             }
             return paramBuilder.ToImmutable();
         }

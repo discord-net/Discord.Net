@@ -12,15 +12,15 @@ namespace Discord.Commands
         public string Name { get; }
         public string Description { get; }
         public bool IsOptional { get; }
-        public bool IsUnparsed { get; }
+        public bool IsRemainder { get; }
         internal object DefaultValue { get; }
 
-        public CommandParameter(string name, string description, TypeReader reader, bool isOptional, bool isUnparsed, object defaultValue)
+        public CommandParameter(string name, string description, TypeReader reader, bool isOptional, bool isRemainder, object defaultValue)
         {
             _reader = reader;
             Name = name;
             IsOptional = isOptional;
-            IsUnparsed = isUnparsed;
+            IsRemainder = isRemainder;
             DefaultValue = defaultValue;
         }
 
@@ -30,6 +30,6 @@ namespace Discord.Commands
         }
 
         public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name}{(IsOptional ? " (Optional)" : "")}{(IsUnparsed ? " (Unparsed)" : "")}";
+        private string DebuggerDisplay => $"{Name}{(IsOptional ? " (Optional)" : "")}{(IsRemainder ? " (Remainder)" : "")}";
     }
 }

@@ -3,7 +3,7 @@
 namespace Discord.Commands
 {
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class UnparsedAttribute : Attribute
+    public class RemainderAttribute : Attribute
     {
     }
 }
