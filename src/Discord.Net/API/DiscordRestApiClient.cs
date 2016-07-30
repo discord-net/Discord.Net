@@ -519,21 +519,21 @@ namespace Discord.API
         }
 
         //Guild Invites
-        public async Task<Invite> GetInviteAsync(string inviteIdOrXkcd, RequestOptions options = null)
+        public async Task<Invite> GetInviteAsync(string inviteId, RequestOptions options = null)
         {
-            Preconditions.NotNullOrEmpty(inviteIdOrXkcd, nameof(inviteIdOrXkcd));
+            Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
 
             //Remove trailing slash
-            if (inviteIdOrXkcd[inviteIdOrXkcd.Length - 1] == '/')
-                inviteIdOrXkcd = inviteIdOrXkcd.Substring(0, inviteIdOrXkcd.Length - 1);
+            if (inviteId[inviteId.Length - 1] == '/')
+                inviteId = inviteId.Substring(0, inviteId.Length - 1);
             //Remove leading URL
-            int index = inviteIdOrXkcd.LastIndexOf('/');
+            int index = inviteId.LastIndexOf('/');
             if (index >= 0)
-                inviteIdOrXkcd = inviteIdOrXkcd.Substring(index + 1);
+                inviteId = inviteId.Substring(index + 1);
 
             try
             {
-                return await SendAsync<Invite>("GET", $"invites/{inviteIdOrXkcd}", options: options).ConfigureAwait(false);
+                return await SendAsync<Invite>("GET", $"invites/{inviteId}", options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
         }

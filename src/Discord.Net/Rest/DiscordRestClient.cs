@@ -201,9 +201,9 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public virtual async Task<IInvite> GetInviteAsync(string inviteIdOrXkcd)
+        public virtual async Task<IInvite> GetInviteAsync(string inviteId)
         {
-            var model = await ApiClient.GetInviteAsync(inviteIdOrXkcd).ConfigureAwait(false);
+            var model = await ApiClient.GetInviteAsync(inviteId).ConfigureAwait(false);
             if (model != null)
                 return new Invite(this, model);
             return null;

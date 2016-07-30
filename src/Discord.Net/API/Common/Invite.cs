@@ -10,7 +10,5 @@ namespace Discord.API
         public InviteGuild Guild { get; set; }
         [JsonProperty("channel")]
         public InviteChannel Channel { get; set; }
-        [JsonProperty("xkcdpass")]
-        public string XkcdPass { get; set; }
     }
 }

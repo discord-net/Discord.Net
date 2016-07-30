@@ -76,14 +76,13 @@ namespace Discord
             var models = await Discord.ApiClient.GetChannelInvitesAsync(Id).ConfigureAwait(false);
             return models.Select(x => new InviteMetadata(Discord, x)).ToImmutableArray();
         }
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool withXkcd)
+        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary)
         {
             var args = new CreateChannelInviteParams
             {
                 MaxAge = maxAge ?? 0,
                 MaxUses = maxUses ?? 0,
-                Temporary = isTemporary,
-                XkcdPass = withXkcd
+                Temporary = isTemporary
             };
             var model = await Discord.ApiClient.CreateChannelInviteAsync(Id, args).ConfigureAwait(false);
             return new InviteMetadata(Discord, model);

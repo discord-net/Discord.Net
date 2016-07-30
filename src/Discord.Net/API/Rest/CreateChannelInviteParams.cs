@@ -16,9 +16,5 @@ namespace Discord.API.Rest
         [JsonProperty("temporary")]
         internal Optional<bool> _temporary { get; set; }
         public bool Temporary { set { _temporary = value; } }
-
-        [JsonProperty("xkcdpass")]
-        internal Optional<bool> _xkcdPass { get; set; }
-        public bool XkcdPass { set { _xkcdPass = value; } }
     }
 }

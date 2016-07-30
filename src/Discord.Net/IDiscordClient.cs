@@ -31,7 +31,7 @@ namespace Discord
         Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync();
         Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
         
-        Task<IInvite> GetInviteAsync(string inviteIdOrXkcd);
+        Task<IInvite> GetInviteAsync(string inviteId);
 
         Task<IUser> GetUserAsync(ulong id);
         Task<IUser> GetUserAsync(string username, string discriminator);
