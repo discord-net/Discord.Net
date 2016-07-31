@@ -307,8 +307,16 @@ namespace Discord
             {
                 _audioLock.Release();
             }
-            await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
-            _audioConnectPromise.TrySetResult(true);
+
+            try
+            {
+                await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+                await _audioConnectPromise.TrySetResultAsync(true).ConfigureAwait(false);
+            }
+            catch(Exception e)
+            {
+                await _audioConnectPromise.SetExceptionAsync(e).ConfigureAwait(false);
+            }
         }
 
         public SocketGuild Clone() => MemberwiseClone() as SocketGuild;
