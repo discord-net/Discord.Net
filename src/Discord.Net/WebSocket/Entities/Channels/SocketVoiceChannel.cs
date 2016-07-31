@@ -46,7 +46,7 @@ namespace Discord
                 (audioMode & AudioMode.Incoming) == 0, 
                 (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
 
-            await Guild.AudioPromise.ConfigureAwait(false);
+            await Guild.AudioConnectPromise.ConfigureAwait(false);
             return Guild.AudioClient;
         }
 
