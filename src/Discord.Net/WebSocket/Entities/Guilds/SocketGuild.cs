@@ -24,7 +24,7 @@ namespace Discord
         internal override bool IsAttached => true;
 
         private readonly SemaphoreSlim _audioLock;
-        private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
+        private TaskCompletionSource<bool> _syncPromise, _downloaderPromise, _audioPromise;
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
@@ -39,6 +39,7 @@ namespace Discord
         public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
+        public Task AudioPromise => _audioPromise.Task;
 
         public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
         public SocketGuildUser CurrentUser => GetUser(Discord.CurrentUser.Id);
@@ -307,6 +308,7 @@ namespace Discord
                 _audioLock.Release();
             }
             await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+            _audioPromise.TrySetResult(true);
         }
 
         public SocketGuild Clone() => MemberwiseClone() as SocketGuild;
