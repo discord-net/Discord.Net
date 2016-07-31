@@ -23,8 +23,8 @@ namespace Discord.Commands
             int endPos = input.Length;
             var curPart = ParserPart.None;
             int lastArgEndPos = int.MinValue;
-            IList<object> paramsList = null; // TODO: could we use a better type?
             var argList = ImmutableArray.CreateBuilder<object>();
+            List<object> paramsList = null; // TODO: could we use a better type?
             bool isEscaping = false;
             char c;
 
@@ -74,10 +74,6 @@ namespace Discord.Commands
                             argBuilder.Append(c);
                             continue;
                         }
-                        if (curParam != null && curParam.IsParams)
-                        {
-                            paramsList = new List<object>();
-                        }
                         if (c == '\"')
                         {
                             curPart = ParserPart.QuotedParameter;
@@ -119,17 +115,17 @@ namespace Discord.Commands
                     if (!typeReaderResult.IsSuccess)
                         return ParseResult.FromError(typeReaderResult);
 
-                    if (curParam.IsParams)
+                    if (curParam.IsMultiple)
                     {
+                        if (paramsList == null)
+                            paramsList = new List<object>();
                         paramsList.Add(typeReaderResult.Value);
 
                         if (curPos == endPos)
                         {
-                            // TODO: can this logic be improved?
-                            object[] _params = paramsList.ToArray();
-                            Array realParams = Array.CreateInstance(curParam.UnderlyingType, _params.Length);
-                            for (int i = 0; i < _params.Length; i++)
-                                realParams.SetValue(Convert.ChangeType(_params[i], curParam.UnderlyingType), i);
+                            Array realParams = Array.CreateInstance(curParam.Type, paramsList.Count);
+                            for (int i = 0; i < paramsList.Count; i++)
+                                realParams.SetValue(Convert.ChangeType(paramsList[i], curParam.Type), i);
 
                             argList.Add(realParams);
 
