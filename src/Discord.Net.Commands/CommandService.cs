@@ -12,7 +12,7 @@ namespace Discord.Commands
     public class CommandService
     {
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<object, Module> _modules;
+        private readonly ConcurrentDictionary<Type, Module> _modules;
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
         private readonly CommandMap _map;
 
@@ -22,7 +22,7 @@ namespace Discord.Commands
         public CommandService()
         {
             _moduleLock = new SemaphoreSlim(1, 1);
-            _modules = new ConcurrentDictionary<object, Module>();
+            _modules = new ConcurrentDictionary<Type, Module>();
             _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
@@ -100,7 +100,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (_modules.ContainsKey(moduleInstance))
+                if (_modules.ContainsKey(moduleInstance.GetType()))
                     throw new ArgumentException($"This module has already been loaded.");
 
                 var typeInfo = moduleInstance.GetType().GetTypeInfo();
@@ -117,11 +117,11 @@ namespace Discord.Commands
         }
         private Module LoadInternal(object moduleInstance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
         {
-            if (_modules.Any(m => m.Key.GetType().GetTypeInfo() == typeInfo))
-                return _modules.FirstOrDefault(m => m.Key.GetType().GetTypeInfo() == typeInfo).Value;
+            if (_modules.ContainsKey(moduleInstance.GetType()))
+                return _modules[moduleInstance.GetType()];
 
             var loadedModule = new Module(this, moduleInstance, moduleAttr, typeInfo);
-            _modules[moduleInstance] = loadedModule;
+            _modules[moduleInstance.GetType()] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)
                 _map.AddCommand(cmd);
@@ -179,7 +179,7 @@ namespace Discord.Commands
         private bool UnloadInternal(object module)
         {
             Module unloadedModule;
-            if (_modules.TryRemove(module, out unloadedModule))
+            if (_modules.TryRemove(module.GetType(), out unloadedModule))
             {
                 foreach (var cmd in unloadedModule.Commands)
                     _map.RemoveCommand(cmd);
