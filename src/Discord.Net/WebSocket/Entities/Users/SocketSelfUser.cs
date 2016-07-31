@@ -6,7 +6,7 @@ using Model = Discord.API.User;
 
 namespace Discord
 {
-    internal class SocketSelfUser : SelfUser, ISocketUser
+    internal class SocketSelfUser : SelfUser, ISocketUser, ISelfUser
     {
         internal override bool IsAttached => true;
 
