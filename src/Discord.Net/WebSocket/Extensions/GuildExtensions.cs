@@ -12,7 +12,7 @@ namespace Discord.WebSocket.Extensions
         public static IGuildChannel GetChannel(this IGuild guild, ulong id) =>
             GetSocketGuild(guild).GetChannel(id);
 
-        public static IEnumerable<IGuildChannel> GetChannels(this IGuild guild) =>
+        public static IReadOnlyCollection<IGuildChannel> GetChannels(this IGuild guild) =>
             GetSocketGuild(guild).Channels;
 
         public static ITextChannel GetTextChannel(this IGuild guild, ulong id) =>
