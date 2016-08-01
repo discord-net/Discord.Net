@@ -45,8 +45,9 @@ namespace Discord
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, Id,
                 (audioMode & AudioMode.Incoming) == 0, 
                 (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
-            return null;
-            //TODO: Block and return
+
+            await Guild.AudioConnectPromise.ConfigureAwait(false);
+            return Guild.AudioClient;
         }
 
         public SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
