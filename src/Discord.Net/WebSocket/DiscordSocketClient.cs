@@ -1402,12 +1402,17 @@ namespace Discord.WebSocket
                                                 {
                                                     before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
                                                     after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                    if (data.UserId == _currentUser.Id)
+                                                    {
+                                                        var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
                                                     after = new VoiceState(null, data);
                                                 }
+
                                                 user = guild.GetUser(data.UserId);
                                             }
                                             else
@@ -1460,7 +1465,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
-                                        var _ = guild.ConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
+                                        var _ = guild.FinishConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
                                     }
                                     else
                                     {

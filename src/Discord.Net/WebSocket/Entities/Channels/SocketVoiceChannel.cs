@@ -41,13 +41,10 @@ namespace Discord
             var audioMode = Discord.AudioMode;
             if (audioMode == AudioMode.Disabled)
                 throw new InvalidOperationException($"Audio is not enabled on this client, {nameof(DiscordSocketConfig.AudioMode)} in {nameof(DiscordSocketConfig)} must be set.");
-
-            await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, Id,
-                (audioMode & AudioMode.Incoming) == 0, 
+                        
+            return await Guild.ConnectAudioAsync(Id,
+                (audioMode & AudioMode.Incoming) == 0,
                 (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
-
-            await Guild.AudioConnectPromise.ConfigureAwait(false);
-            return Guild.AudioClient;
         }
 
         public SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
