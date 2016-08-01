@@ -357,6 +357,12 @@ namespace Discord.API
 
             await SendAsync("DELETE", $"channels/{channelId}/pins/{messageId}", options: options).ConfigureAwait(false);
         }
+        public async Task<IReadOnlyCollection<Message>> GetPinsAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            return await SendAsync<IReadOnlyCollection<Message>>("GET", $"channels/{channelId}/pins", options: options).ConfigureAwait(false);
+        }
 
         //Channel Recipients
         public async Task AddGroupRecipientAsync(ulong channelId, ulong userId, RequestOptions options = null)
