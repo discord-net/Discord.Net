@@ -23,6 +23,8 @@ namespace Discord
         Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch);
         /// <summary> Gets a collection of messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch);
+        /// <summary> Gets a collection of pinned messages in this channel. </summary>
+        Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync();
         /// <summary> Bulk deletes multiple messages. </summary>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages);        
 
