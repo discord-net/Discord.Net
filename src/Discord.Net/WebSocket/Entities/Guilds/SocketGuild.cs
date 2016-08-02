@@ -60,7 +60,7 @@ namespace Discord
             _audioLock = new SemaphoreSlim(1, 1);
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
-			_audioConnectPromise = new TaskCompletionSource<bool>();
+            _audioConnectPromise = new TaskCompletionSource<bool>();
             Update(model, UpdateSource.Creation, dataStore);
         }
 
