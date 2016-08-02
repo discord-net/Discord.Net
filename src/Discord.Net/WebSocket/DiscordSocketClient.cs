@@ -181,19 +181,18 @@ namespace Discord.WebSocket
             }
         }
         /// <inheritdoc />
-        public async Task DisconnectAsync()
+        public Task DisconnectAsync() => DisconnectAsync(null, false);
+        private async Task DisconnectAsync(Exception ex = null, bool isReconnecting = false)
         {
-            if (_connectTask?.TrySetCanceled() ?? false) return;
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
+            if (ex == null)
             {
-                await DisconnectInternalAsync(null, false).ConfigureAwait(false);
+                if (_connectTask?.TrySetCanceled() ?? false) return;
             }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task DisconnectAsync(Exception ex, bool isReconnecting)
-        {
-            if (_connectTask?.TrySetException(ex) ?? false) return;
+            else
+            {
+                if (_connectTask?.TrySetException(ex) ?? false) return;
+            }
+
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
