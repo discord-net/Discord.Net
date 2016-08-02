@@ -181,22 +181,13 @@ namespace Discord.WebSocket
             }
         }
         /// <inheritdoc />
-        public Task DisconnectAsync() => DisconnectAsync(null, false);
-        private async Task DisconnectAsync(Exception ex = null, bool isReconnecting = false)
+        public async Task DisconnectAsync()
         {
-            if (ex == null)
-            {
-                if (_connectTask?.TrySetCanceled() ?? false) return;
-            }
-            else
-            {
-                if (_connectTask?.TrySetException(ex) ?? false) return;
-            }
-
+            if (_connectTask?.TrySetCanceled() ?? false) return;
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(ex, isReconnecting).ConfigureAwait(false);
+                await DisconnectInternalAsync(null, false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -269,7 +260,14 @@ namespace Discord.WebSocket
         }
         private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
         {
-            await DisconnectAsync(null, true).ConfigureAwait(false);
+            if (ex == null)
+            {
+                if (_connectTask?.TrySetCanceled() ?? false) return;
+            }
+            else
+            {
+                if (_connectTask?.TrySetException(ex) ?? false) return;
+            }
 
             try
             {
@@ -579,7 +577,7 @@ namespace Discord.WebSocket
                                     }
                                     catch (Exception ex)
                                     {
-                                        await DisconnectAsync(new Exception("Processing READY failed", ex), false);
+                                        _connectTask.TrySetException(new Exception("Processing READY failed", ex));
                                         return;
                                     }
 
