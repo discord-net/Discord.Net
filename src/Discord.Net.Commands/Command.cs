@@ -103,7 +103,7 @@ namespace Discord.Commands
                     throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
 
                 string name = parameter.Name;
-                string description = typeInfo.GetCustomAttribute<DescriptionAttribute>()?.Text;
+                string description = parameter.GetCustomAttribute<DescriptionAttribute>()?.Text;
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
