@@ -7,5 +7,9 @@
   href: logging.md
 - name: Commands
   href: commands.md
+- name: Voice
+  href: voice.md
+- name: Events
+  href: events.md
 - name: Code Samples
   href: samples.md
