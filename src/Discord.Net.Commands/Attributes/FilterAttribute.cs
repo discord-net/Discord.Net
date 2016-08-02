@@ -7,6 +7,6 @@ namespace Discord.Commands
 {
     public abstract class FilterAttribute : Attribute
     {
-		public abstract void OnCommandExecuting(CommandExecutionContext context);
+        public abstract void OnCommandExecuting(CommandExecutionContext context);
     }
 }

@@ -19,8 +19,8 @@ namespace Discord.Commands
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
-		public IReadOnlyList<FilterAttribute> Filters { get; }
-        
+        public IReadOnlyList<FilterAttribute> Filters { get; }
+
         internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
             Module = module;
@@ -38,7 +38,7 @@ namespace Discord.Commands
                 Synopsis = synopsis.Text;
 
             Parameters = BuildParameters(methodInfo);
-			Filters = BuildFilters(methodInfo);
+            Filters = BuildFilters(methodInfo);
             _action = BuildAction(methodInfo);
         }
 
@@ -54,13 +54,13 @@ namespace Discord.Commands
             if (!parseResult.IsSuccess)
                 return ExecuteResult.FromError(parseResult);
 
-			var context = new CommandExecutionContext(this, parseResult, msg);
-			foreach (FilterAttribute filter in Filters)
-			{
-				filter.OnCommandExecuting(context);
-				if (context.Handled)
-					return ExecuteResult.FromError(CommandError.InvalidPermissions, $"Permission check for {filter.GetType().FullName} failed");
-			}
+            var context = new CommandExecutionContext(this, parseResult, msg);
+            foreach (FilterAttribute filter in Filters)
+            {
+                filter.OnCommandExecuting(context);
+                if (context.Handled)
+                    return ExecuteResult.FromError(CommandError.InvalidPermissions, $"Permission check for {filter.GetType().FullName} failed");
+            }
 
             try
             {
@@ -73,10 +73,10 @@ namespace Discord.Commands
             }
         }
 
-		private IReadOnlyList<FilterAttribute> BuildFilters(MethodInfo methodInfo)
-		{
-			return methodInfo.GetCustomAttributes<FilterAttribute>().ToImmutableArray();
-		}
+        private IReadOnlyList<FilterAttribute> BuildFilters(MethodInfo methodInfo)
+        {
+            return methodInfo.GetCustomAttributes<FilterAttribute>().ToImmutableArray();
+        }
 
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
         {
@@ -130,7 +130,7 @@ namespace Discord.Commands
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");
-            
+
             return (msg, args) =>
             {
                 object[] newArgs = new object[args.Count + 1];
