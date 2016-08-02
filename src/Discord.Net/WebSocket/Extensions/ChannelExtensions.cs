@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Discord.WebSocket.Extensions
+namespace Discord.WebSocket
 {
     public static class ChannelExtensions
     {
