@@ -25,6 +25,7 @@ namespace Discord
 
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
+        private TaskCompletionSource<AudioClient> _audioConnectPromise;
         private ConcurrentHashSet<ulong> _channels;
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, VoiceState> _voiceStates;
@@ -260,38 +261,99 @@ namespace Discord
             return null;
         }
 
-        public async Task ConnectAudio(int id, string url, string token)
+        public async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute)
         {
-            AudioClient audioClient;
-            await _audioLock.WaitAsync().ConfigureAwait(false);
-            var voiceState = GetVoiceState(CurrentUser.Id).Value;
             try
             {
-                audioClient = AudioClient;
-                if (audioClient == null)
+                TaskCompletionSource<AudioClient> promise;
+
+                await _audioLock.WaitAsync().ConfigureAwait(false);
+                try
                 {
-                    audioClient = new AudioClient(this, id);
+                    await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                    promise = new TaskCompletionSource<AudioClient>();
+                    _audioConnectPromise = promise;
+                    await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _audioLock.Release();
+                }
+
+                var timeoutTask = Task.Delay(15000);
+                if (await Task.WhenAny(promise.Task, timeoutTask) == timeoutTask)
+                    throw new TimeoutException();
+                return await promise.Task.ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
+        public async Task DisconnectAudioAsync(AudioClient client = null)
+        {
+            await _audioLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectAudioInternalAsync(client).ConfigureAwait(false);
+            }
+            finally
+            {
+                _audioLock.Release();
+            }
+        }
+        private async Task DisconnectAudioInternalAsync(AudioClient client = null)
+        {
+            var oldClient = AudioClient;
+            if (oldClient != null)
+            {
+                if (client == null || oldClient == client)
+                {
+                    _audioConnectPromise?.TrySetCanceledAsync(); //Cancel any previous audio connection
+                    _audioConnectPromise = null;
+                }
+                if (oldClient == client)
+                {
+                    AudioClient = null;
+                    await oldClient.DisconnectAsync().ConfigureAwait(false);
+                }
+            }
+        }
+        public async Task FinishConnectAudio(int id, string url, string token)
+        {
+            var voiceState = GetVoiceState(CurrentUser.Id).Value;
+
+            await _audioLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (AudioClient == null)
+                {
+                    var audioClient = new AudioClient(this, id);
                     audioClient.Disconnected += async ex =>
                     {
                         await _audioLock.WaitAsync().ConfigureAwait(false);
                         try
                         {
-                            if (ex != null)
+                            if (AudioClient == audioClient) //Only reconnect if we're still assigned as this guild's audio client
                             {
-                                //Reconnect if we still have channel info.
-                                //TODO: Is this threadsafe? Could channel data be deleted before we access it?
-                                var voiceState2 = GetVoiceState(CurrentUser.Id);
-                                if (voiceState2.HasValue)
+                                if (ex != null)
                                 {
-                                    var voiceChannelId = voiceState2.Value.VoiceChannel?.Id;
-                                    if (voiceChannelId != null)
-                                        await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, voiceChannelId, voiceState2.Value.IsSelfDeafened, voiceState2.Value.IsSelfMuted);
+                                    //Reconnect if we still have channel info.
+                                    //TODO: Is this threadsafe? Could channel data be deleted before we access it?
+                                    var voiceState2 = GetVoiceState(CurrentUser.Id);
+                                    if (voiceState2.HasValue)
+                                    {
+                                        var voiceChannelId = voiceState2.Value.VoiceChannel?.Id;
+                                        if (voiceChannelId != null)
+                                            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, voiceChannelId, voiceState2.Value.IsSelfDeafened, voiceState2.Value.IsSelfMuted);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                try { AudioClient.Dispose(); } catch { }
-                                AudioClient = null;
+                                else
+                                {
+                                    try { AudioClient.Dispose(); } catch { }
+                                    AudioClient = null;
+                                }
                             }
                         }
                         finally
@@ -301,12 +363,35 @@ namespace Discord
                     };
                     AudioClient = audioClient;
                 }
+                await AudioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+                await _audioConnectPromise.TrySetResultAsync(AudioClient).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                await DisconnectAudioAsync();
+            }
+            catch (Exception e)
+            {
+                await _audioConnectPromise.SetExceptionAsync(e).ConfigureAwait(false);
+                await DisconnectAudioAsync();
             }
             finally
             {
                 _audioLock.Release();
             }
-            await audioClient.ConnectAsync(url, CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+        }
+        public async Task FinishJoinAudioChannel()
+        {
+            await _audioLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (AudioClient != null)
+                    await _audioConnectPromise.TrySetResultAsync(AudioClient).ConfigureAwait(false);
+            }
+            finally
+            {
+                _audioLock.Release();
+            }
         }
 
         public SocketGuild Clone() => MemberwiseClone() as SocketGuild;

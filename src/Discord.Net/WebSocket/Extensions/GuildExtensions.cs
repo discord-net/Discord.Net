@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord.WebSocket.Extensions
+namespace Discord.WebSocket
 {
     // Todo: Docstrings
     public static class GuildExtensions

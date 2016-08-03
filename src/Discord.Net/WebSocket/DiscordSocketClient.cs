@@ -191,16 +191,6 @@ namespace Discord.WebSocket
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task DisconnectAsync(Exception ex, bool isReconnecting)
-        {
-            if (_connectTask?.TrySetException(ex) ?? false) return;
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(ex, isReconnecting).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
         private async Task DisconnectInternalAsync(Exception ex, bool isReconnecting)
         {
             if (!isReconnecting)
@@ -270,7 +260,14 @@ namespace Discord.WebSocket
         }
         private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
         {
-            await DisconnectAsync(null, true).ConfigureAwait(false);
+            if (ex == null)
+            {
+                if (_connectTask?.TrySetCanceled() ?? false) return;
+            }
+            else
+            {
+                if (_connectTask?.TrySetException(ex) ?? false) return;
+            }
 
             try
             {
@@ -580,7 +577,7 @@ namespace Discord.WebSocket
                                     }
                                     catch (Exception ex)
                                     {
-                                        await DisconnectAsync(new Exception("Processing READY failed", ex), false);
+                                        _connectTask.TrySetException(new Exception("Processing READY failed", ex));
                                         return;
                                     }
 
@@ -1402,12 +1399,17 @@ namespace Discord.WebSocket
                                                 {
                                                     before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
                                                     after = guild.AddOrUpdateVoiceState(data, DataStore);
+                                                    if (data.UserId == _currentUser.Id)
+                                                    {
+                                                        var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
                                                     after = new VoiceState(null, data);
                                                 }
+
                                                 user = guild.GetUser(data.UserId);
                                             }
                                             else
@@ -1460,7 +1462,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
-                                        var _ = guild.ConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
+                                        var _ = guild.FinishConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
                                     }
                                     else
                                     {

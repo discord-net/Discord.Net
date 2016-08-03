@@ -60,3 +60,42 @@ In the constructor of your module, any parameters will be filled in by the @Disc
 >If you accept `CommandService` or `IDependencyMap`  as a parameter in your constructor, these parameters will be filled by the CommandService the module was loaded from, and the DependencyMap passed into it, respectively. 
 
 [!code-csharp[DependencyMap in Modules](samples/dependency_module.cs)]
+
+## Type Readers
+
+Type Readers allow you to parse different types of arguments in your commands.
+
+By default, the following Types are supported arguments:
+
+- string
+- sbyte/byte
+- ushort/short
+- uint/int
+- ulong/long
+- float, double, decimal
+- DateTime/DateTimeOffset
+- IUser/IGuildUser
+- IChannel/IGuildChannel/ITextChannel/IVoiceChannel/IGroupChannel
+- IRole
+- IMessage
+
+### Creating a Type Readers
+
+To create a TypeReader, create a new class that imports @Discord and @Discord.Commands . Ensure your class inherits from @Discord.Commands.TypeReader
+
+Next, satisfy the `TypeReader` class by overriding `Task<TypeReaderResult> Read(IMessage context, string input)`.
+
+>[!NOTE]
+>In many cases, Visual Stuido can fill this in for you, using the "Implement Abstract Class" IntelliSense hint.
+
+Inside this task, add whatever logic you need to parse the input string.
+
+Finally, return a `TypeReaderResult`. If you were able to successfully parse the input, return `TypeReaderResult.FromSuccess(parsedInput)`. Otherwise, return `TypeReaderResult.FromError`.
+
+#### Sample
+
+[!code-csharp[TypeReaders](samples/typereader.cs)]
+
+### Installing TypeReaders
+
+TypeReaders are not automatically discovered by the Command Service, and must be explicitly added. To install a TypeReader, invoke [CommandService.AddTypeReader](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_).

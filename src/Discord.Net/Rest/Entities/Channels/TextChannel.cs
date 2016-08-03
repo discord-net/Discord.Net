@@ -102,7 +102,12 @@ namespace Discord
         {
             await Discord.ApiClient.DeleteMessagesAsync(Guild.Id, Id, new DeleteMessagesParams { MessageIds = messages.Select(x => x.Id) }).ConfigureAwait(false);
         }
-        
+        public async Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync()
+        {
+            var models = await Discord.ApiClient.GetPinsAsync(Id);
+            return models.Select(x => new Message(this, new User(x.Author.Value), x)).ToImmutableArray();
+        }
+
         public async Task TriggerTypingAsync()
         {
             await Discord.ApiClient.TriggerTypingIndicatorAsync(Id).ConfigureAwait(false);

@@ -1,8 +1,8 @@
 ---
-title: Frequently Asked Questions
+title: Samples
 ---
 
-# Frequently Asked Questions
+# Samples
 
 >[!NOTE]
 >All of these samples assume you have `_client` defined as a `DiscordSocketClient`.

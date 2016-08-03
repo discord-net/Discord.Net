@@ -115,20 +115,11 @@ namespace Discord.Rpc
         /// <inheritdoc />
         public async Task DisconnectAsync()
         {
+            if (_connectTask?.TrySetCanceled() ?? false) return;
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await DisconnectInternalAsync(null, false).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task DisconnectAsync(Exception ex, bool isReconnecting)
-        {
-            if (_connectTask?.TrySetException(ex) ?? false) return;
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(ex, isReconnecting).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
@@ -173,7 +164,14 @@ namespace Discord.Rpc
         }
         private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
         {
-            await DisconnectAsync(null, true).ConfigureAwait(false);
+            if (ex == null)
+            {
+                if (_connectTask?.TrySetCanceled() ?? false) return;
+            }
+            else
+            {
+                if (_connectTask?.TrySetException(ex) ?? false) return;
+            }
 
             try
             {
