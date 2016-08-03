@@ -200,3 +200,4 @@ project.lock.json
 /test/Discord.Net.Tests/config.json
 /docs/_build
 *.pyc
+/.editorconfig

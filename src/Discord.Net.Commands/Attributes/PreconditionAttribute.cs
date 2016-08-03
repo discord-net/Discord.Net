@@ -7,6 +7,6 @@ namespace Discord.Commands
 {
     public abstract class PreconditionAttribute : Attribute
     {
-        public abstract void CheckPermissions(PreconditionContext context);
+        public abstract Task<PreconditionResult> CheckPermissions(IMessage context);
     }
 }

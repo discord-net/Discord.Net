@@ -208,16 +208,19 @@ namespace Discord.Commands
             if (!searchResult.IsSuccess)
                 return searchResult;
 
-            // TODO: this logic is for users who don't manually search/execute: should we keep it?
-            
-            IReadOnlyList<Command> commands = searchResult.Commands
-                .Where(x => x.MeetsPreconditions(message)).ToImmutableArray();
-
-            if (commands.Count == 0 && searchResult.Commands.Count > 0)
-                return ParseResult.FromError(CommandError.UnmetPrecondition, "Unmet precondition");
+            var commands = searchResult.Commands;
 
             for (int i = commands.Count - 1; i >= 0; i--)
             {
+                var preconditionResult = await commands[i].CheckPreconditions(message);
+                if (!preconditionResult.IsSuccess)
+                {
+                    if (commands.Count == 1)
+                        return preconditionResult;
+                    else
+                        continue;
+                }
+
                 var parseResult = await commands[i].Parse(message, searchResult);
                 if (!parseResult.IsSuccess)
                 {

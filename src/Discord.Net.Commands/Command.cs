@@ -19,7 +19,7 @@ namespace Discord.Commands
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
-        public IReadOnlyList<PreconditionAttribute> Permissions { get; }
+        public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
         internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
@@ -38,22 +38,20 @@ namespace Discord.Commands
                 Synopsis = synopsis.Text;
 
             Parameters = BuildParameters(methodInfo);
-            Permissions = BuildPermissions(methodInfo);
+            Preconditions = BuildPreconditions(methodInfo);
             _action = BuildAction(methodInfo);
         }
 
-        public bool MeetsPreconditions(IMessage message)
+        public async Task<PreconditionResult> CheckPreconditions(IMessage context)
         {
-            var context = new PreconditionContext(this, message);
-
-            foreach (PreconditionAttribute permission in Permissions)
+            foreach (PreconditionAttribute permission in Preconditions)
             {
-                permission.CheckPermissions(context);
-                if (context.Handled)
-                    return false;
+                var result = await permission.CheckPermissions(context).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
             }
 
-            return true;
+            return PreconditionResult.FromSuccess();
         }
 
         public async Task<ParseResult> Parse(IMessage msg, SearchResult searchResult)
@@ -68,8 +66,9 @@ namespace Discord.Commands
             if (!parseResult.IsSuccess)
                 return ExecuteResult.FromError(parseResult);
 
-            if (!MeetsPreconditions(msg)) // TODO: should we have to check this here, or leave it entirely to the bot dev?
-                return ExecuteResult.FromError(CommandError.UnmetPrecondition, "Permissions check failed");
+            var precondition = await CheckPreconditions(msg).ConfigureAwait(false);
+            if (!precondition.IsSuccess) // TODO: should we have to check this here, or leave it entirely to the bot dev?
+                return ExecuteResult.FromError(precondition);
 
             try
             {
@@ -82,7 +81,7 @@ namespace Discord.Commands
             }
         }
 
-        private IReadOnlyList<PreconditionAttribute> BuildPermissions(MethodInfo methodInfo)
+        private IReadOnlyList<PreconditionAttribute> BuildPreconditions(MethodInfo methodInfo)
         {
             return methodInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
