@@ -16,6 +16,6 @@
 
         //Execute
         Exception,
-        InvalidPermissions
+        UnmetPrecondition
     }
 }

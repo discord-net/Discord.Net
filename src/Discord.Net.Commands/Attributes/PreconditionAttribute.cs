@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    public abstract class PermissionAttribute : Attribute
+    public abstract class PreconditionAttribute : Attribute
     {
-        public abstract void CheckPermissions(PermissionsContext context);
+        public abstract void CheckPermissions(PreconditionContext context);
     }
 }

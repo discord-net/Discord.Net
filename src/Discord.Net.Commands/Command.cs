@@ -19,7 +19,7 @@ namespace Discord.Commands
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
-        public IReadOnlyList<PermissionAttribute> Permissions { get; }
+        public IReadOnlyList<PreconditionAttribute> Permissions { get; }
 
         internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
@@ -42,11 +42,11 @@ namespace Discord.Commands
             _action = BuildAction(methodInfo);
         }
 
-        public bool CanExecute(IMessage message)
+        public bool MeetsPreconditions(IMessage message)
         {
-            var context = new PermissionsContext(this, message);
+            var context = new PreconditionContext(this, message);
 
-            foreach (PermissionAttribute permission in Permissions)
+            foreach (PreconditionAttribute permission in Permissions)
             {
                 permission.CheckPermissions(context);
                 if (context.Handled)
@@ -68,8 +68,8 @@ namespace Discord.Commands
             if (!parseResult.IsSuccess)
                 return ExecuteResult.FromError(parseResult);
 
-            if (!CanExecute(msg)) // TODO: should we have to check this here, or leave it entirely to the bot dev?
-                return ExecuteResult.FromError(CommandError.InvalidPermissions, "Permissions check failed");
+            if (!MeetsPreconditions(msg)) // TODO: should we have to check this here, or leave it entirely to the bot dev?
+                return ExecuteResult.FromError(CommandError.UnmetPrecondition, "Permissions check failed");
 
             try
             {
@@ -82,9 +82,9 @@ namespace Discord.Commands
             }
         }
 
-        private IReadOnlyList<PermissionAttribute> BuildPermissions(MethodInfo methodInfo)
+        private IReadOnlyList<PreconditionAttribute> BuildPermissions(MethodInfo methodInfo)
         {
-            return methodInfo.GetCustomAttributes<PermissionAttribute>().ToImmutableArray();
+            return methodInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
 
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)

@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    public class PermissionsContext
+    public class PreconditionContext
     {
-        public Command ExecutingCommand { get; internal set; }
+        public Command Command { get; internal set; }
         public IMessage Message { get; internal set; }
 
         public bool Handled { get; set; }
 
-        internal PermissionsContext(Command command, IMessage message)
+        internal PreconditionContext(Command command, IMessage message)
         {
-            ExecutingCommand = command;
+            Command = command;
             Message = message;
 
             Handled = false;

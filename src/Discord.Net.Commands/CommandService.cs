@@ -211,10 +211,10 @@ namespace Discord.Commands
             // TODO: this logic is for users who don't manually search/execute: should we keep it?
             
             IReadOnlyList<Command> commands = searchResult.Commands
-                .Where(x => x.CanExecute(message)).ToImmutableArray();
+                .Where(x => x.MeetsPreconditions(message)).ToImmutableArray();
 
             if (commands.Count == 0 && searchResult.Commands.Count > 0)
-                return ParseResult.FromError(CommandError.InvalidPermissions, "Invalid permissions");
+                return ParseResult.FromError(CommandError.UnmetPrecondition, "Unmet precondition");
 
             for (int i = commands.Count - 1; i >= 0; i--)
             {
