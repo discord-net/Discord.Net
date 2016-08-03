@@ -2,8 +2,8 @@
 
 namespace Discord.Commands
 {
-    // Full summary of method/parameter
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter)]
+    // Full summary of method
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class DescriptionAttribute : Attribute
     {
         public string Text { get; }
@@ -13,8 +13,8 @@ namespace Discord.Commands
         }
     }
 
-    // Brief summary of method/module
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+    // Brief summary of method/module/parameter
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Parameter)]
     public class SynopsisAttribute : Attribute
     {
         public string Text { get; }
