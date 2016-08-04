@@ -44,9 +44,16 @@ namespace Discord.Commands
 
         public async Task<PreconditionResult> CheckPreconditions(IMessage context)
         {
-            foreach (PreconditionAttribute permission in Preconditions)
+            foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
-                var result = await permission.CheckPermissions(context).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
+            }
+
+            foreach (PreconditionAttribute precondition in Preconditions)
+            {
+                var result = await precondition.CheckPermissions(context).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }

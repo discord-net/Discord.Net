@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class RequireGuildAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissions(IMessage context)

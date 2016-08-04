@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -12,6 +13,8 @@ namespace Discord.Commands
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
 
+        public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+
         internal Module(CommandService service, object instance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
         {
             Service = service;
@@ -21,6 +24,8 @@ namespace Discord.Commands
             List<Command> commands = new List<Command>();
             SearchClass(instance, commands, typeInfo, moduleAttr.Prefix ?? "");
             Commands = commands;
+
+            Preconditions = BuildPreconditions(typeInfo);
         }
 
         private void SearchClass(object instance, List<Command> commands, TypeInfo typeInfo, string groupPrefix)
@@ -46,6 +51,11 @@ namespace Discord.Commands
                     SearchClass(ReflectionUtils.CreateObject(type, Service), commands, type, nextGroupPrefix);
                 }
             }
+        }
+
+        private IReadOnlyList<PreconditionAttribute> BuildPreconditions(TypeInfo typeInfo)
+        {
+            return typeInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
 
         public override string ToString() => Name;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireRoleAttribute : RequireGuildAttribute
     {
         public string Role { get; set; }
