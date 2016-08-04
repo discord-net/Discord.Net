@@ -46,14 +46,14 @@ namespace Discord.Commands
         {
             foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
-                var result = await precondition.CheckPermissions(context).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
 
             foreach (PreconditionAttribute precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }

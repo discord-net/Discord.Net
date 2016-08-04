@@ -23,9 +23,9 @@ namespace Discord.Commands.Attributes.Preconditions
             GuildPermission = null;
         }
 
-        public override async Task<PreconditionResult> CheckPermissions(IMessage context)
+        public override async Task<PreconditionResult> CheckPermissions(IMessage context, Command executingCommand, object moduleInstance)
         {
-            var result = await base.CheckPermissions(context).ConfigureAwait(false);
+            var result = await base.CheckPermissions(context, executingCommand, moduleInstance).ConfigureAwait(false);
 
             if (!result.IsSuccess)
                 return result;

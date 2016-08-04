@@ -8,7 +8,7 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class RequireDMAttribute : PreconditionAttribute
     {
-        public override Task<PreconditionResult> CheckPermissions(IMessage context)
+        public override Task<PreconditionResult> CheckPermissions(IMessage context, Command executingCommand, object moduleInstance)
         {
             if (context.Channel is IGuildChannel)
                 return Task.FromResult(PreconditionResult.FromError("Command must be used in a DM"));
