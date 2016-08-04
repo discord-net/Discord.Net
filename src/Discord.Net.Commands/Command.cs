@@ -73,10 +73,6 @@ namespace Discord.Commands
             if (!parseResult.IsSuccess)
                 return ExecuteResult.FromError(parseResult);
 
-            var precondition = await CheckPreconditions(msg).ConfigureAwait(false);
-            if (!precondition.IsSuccess) // TODO: should we have to check this here, or leave it entirely to the bot dev?
-                return ExecuteResult.FromError(precondition);
-
             try
             {
                 await _action.Invoke(msg, parseResult.Values);//Note: This code may need context
