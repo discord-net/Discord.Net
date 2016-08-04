@@ -5,7 +5,7 @@ using Discord.API.Rest;
 
 namespace Discord
 {
-    public interface IRole : IDeletable, ISnowflakeEntity
+    public interface IRole : IDeletable, ISnowflakeEntity, IEquatable<IRole>
     {
         /// <summary> Gets the color given to users of this role. </summary>
         Color Color { get; }

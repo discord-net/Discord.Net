@@ -57,6 +57,20 @@ namespace Discord
             await Discord.ApiClient.DeleteGuildRoleAsync(Guild.Id, Id).ConfigureAwait(false);
         }
 
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+            Role otherAsRole = other as Role;
+            if (otherAsRole == null) return false;
+            else return Equals(otherAsRole);
+        }
+
+        public bool Equals(Role other)
+        {
+            if (other == null) return false;
+            else return (Id.Equals(other.Id));
+        }
+
         public Role Clone() => MemberwiseClone() as Role;
         
         public override string ToString() => Name;
