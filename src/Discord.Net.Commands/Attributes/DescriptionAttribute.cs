@@ -15,10 +15,10 @@ namespace Discord.Commands
 
     // Brief summary of method/module/parameter
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Parameter)]
-    public class SynopsisAttribute : Attribute
+    public class SummaryAttribute : Attribute
     {
         public string Text { get; }
-        public SynopsisAttribute(string text)
+        public SummaryAttribute(string text)
         {
             Text = text;
         }

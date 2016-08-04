@@ -15,7 +15,7 @@ namespace Discord.Commands
 
         public string Name { get; }
         public string Description { get; }
-        public string Synopsis { get; }
+        public string Summary { get; }
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
@@ -32,9 +32,9 @@ namespace Discord.Commands
             if (description != null)
                 Description = description.Text;
 
-            var synopsis = methodInfo.GetCustomAttribute<SynopsisAttribute>();
-            if (synopsis != null)
-                Synopsis = synopsis.Text;
+            var summary = methodInfo.GetCustomAttribute<SummaryAttribute>();
+            if (summary != null)
+                Summary = summary.Text;
 
             Parameters = BuildParameters(methodInfo);
             _action = BuildAction(methodInfo);

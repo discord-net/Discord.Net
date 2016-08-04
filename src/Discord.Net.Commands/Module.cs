@@ -9,7 +9,7 @@ namespace Discord.Commands
     {
         public CommandService Service { get; }
         public string Name { get; }
-        public string Synopsis { get; }
+        public string Summary { get; }
         public string Description { get; }
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
@@ -20,9 +20,9 @@ namespace Discord.Commands
             Name = typeInfo.Name;
             Instance = instance;
 
-            var synopsisAttr = typeInfo.GetCustomAttribute<SynopsisAttribute>();
-            if (synopsisAttr != null)
-                Synopsis = synopsisAttr.Text;
+            var summaryAttr = typeInfo.GetCustomAttribute<SummaryAttribute>();
+            if (summaryAttr != null)
+                Summary = summaryAttr.Text;
 
             var descriptionAttr = typeInfo.GetCustomAttribute<DescriptionAttribute>();
             if (descriptionAttr != null)
