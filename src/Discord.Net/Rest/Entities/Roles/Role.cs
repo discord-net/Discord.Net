@@ -65,10 +65,15 @@ namespace Discord
             else return Equals(otherAsRole);
         }
 
-        public bool Equals(Role other)
+        public bool Equals(IRole other)
         {
             if (other == null) return false;
             else return (Id.Equals(other.Id));
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public Role Clone() => MemberwiseClone() as Role;
