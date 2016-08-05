@@ -8,7 +8,6 @@ namespace Discord.Commands
     [Flags]
     public enum ContextType
     {
-        Invalid = 0, // 00
         Guild = 1, // 01
         DM = 2 // 10
     }
@@ -22,17 +21,11 @@ namespace Discord.Commands
         public RequireContextAttribute(ContextType context)
         {
             Context = context;
-
-            if (Context == ContextType.Invalid)
-                throw new ArgumentException("Context must be a bitfield of ContextType.Guild and ContextType.DM", "context");
         }
 
         public override Task<PreconditionResult> CheckPermissions(IMessage context, Command executingCommand, object moduleInstance)
         {
             var validContext = false;
-
-            if (Context == ContextType.Invalid)
-                throw new InvalidOperationException("Invalid ContextType");
 
             if (Context.HasFlag(ContextType.Guild))
                 validContext = validContext || context.Channel is IGuildChannel;
