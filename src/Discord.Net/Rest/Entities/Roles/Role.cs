@@ -73,7 +73,7 @@ namespace Discord
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public Role Clone() => MemberwiseClone() as Role;
