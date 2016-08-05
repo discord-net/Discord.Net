@@ -19,6 +19,15 @@
     "xmlDoc": true
   },
 
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "nowarn": [ "CS1573", "CS1591" ]
+      }
+    }
+  },
+
   "dependencies": {
     "Discord.Net": "1.0.0-*"
   },
