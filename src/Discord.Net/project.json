@@ -15,7 +15,8 @@
 
   "buildOptions": {
     "allowUnsafe": true,
-    "warningsAsErrors": false
+    "warningsAsErrors": false,
+    "xmlDoc": true
   },
 
   "dependencies": {
