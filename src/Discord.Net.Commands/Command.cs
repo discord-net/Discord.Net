@@ -15,7 +15,7 @@ namespace Discord.Commands
 
         public string Name { get; }
         public string Description { get; }
-        public string Synopsis { get; }
+        public string Summary { get; }
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
@@ -33,9 +33,9 @@ namespace Discord.Commands
             if (description != null)
                 Description = description.Text;
 
-            var synopsis = methodInfo.GetCustomAttribute<SynopsisAttribute>();
-            if (synopsis != null)
-                Synopsis = synopsis.Text;
+            var summary = methodInfo.GetCustomAttribute<SummaryAttribute>();
+            if (summary != null)
+                Summary = summary.Text;
 
             Parameters = BuildParameters(methodInfo);
             Preconditions = BuildPreconditions(methodInfo);
@@ -129,11 +129,11 @@ namespace Discord.Commands
                     throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
 
                 string name = parameter.Name;
-                string description = typeInfo.GetCustomAttribute<DescriptionAttribute>()?.Text;
+                string summary = parameter.GetCustomAttribute<DescriptionAttribute>()?.Text;
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
-                paramBuilder.Add(new CommandParameter(name, description, type, reader, isOptional, isRemainder, isMultiple, defaultValue));
+                paramBuilder.Add(new CommandParameter(name, summary, type, reader, isOptional, isRemainder, isMultiple, defaultValue));
             }
             return paramBuilder.ToImmutable();
         }

@@ -10,6 +10,8 @@ namespace Discord.Commands
     {
         public CommandService Service { get; }
         public string Name { get; }
+        public string Summary { get; }
+        public string Description { get; }
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
 
@@ -20,6 +22,14 @@ namespace Discord.Commands
             Service = service;
             Name = typeInfo.Name;
             Instance = instance;
+
+            var summaryAttr = typeInfo.GetCustomAttribute<SummaryAttribute>();
+            if (summaryAttr != null)
+                Summary = summaryAttr.Text;
+
+            var descriptionAttr = typeInfo.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttr != null)
+                Description = descriptionAttr.Text;
 
             List<Command> commands = new List<Command>();
             SearchClass(instance, commands, typeInfo, moduleAttr.Prefix ?? "");

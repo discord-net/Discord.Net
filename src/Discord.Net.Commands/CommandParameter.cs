@@ -10,17 +10,17 @@ namespace Discord.Commands
         private readonly TypeReader _reader;
 
         public string Name { get; }
-        public string Description { get; }
+        public string Summary { get; }
         public bool IsOptional { get; }
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
         public Type Type { get; }
         internal object DefaultValue { get; }
 
-        public CommandParameter(string name, string description, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
+        public CommandParameter(string name, string summary, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
         {
             Name = name;
-            Description = description;
+            Summary = summary;
             Type = type;
             _reader = reader;
             IsOptional = isOptional;
