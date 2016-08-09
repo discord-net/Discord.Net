@@ -24,9 +24,7 @@ namespace Discord.WebSocket
                 return new GuildEmbed(guild.IsEmbeddable, guild.EmbedChannelId);
             return null;
         }
-
-        public static IReadOnlyCollection<IUserGuild> GetGuildSummaries(this DiscordSocketClient client) =>
-            client.Guilds;
+        
         public static IReadOnlyCollection<IGuild> GetGuilds(this DiscordSocketClient client) =>
             client.Guilds;
 
