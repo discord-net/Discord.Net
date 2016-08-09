@@ -20,13 +20,11 @@ namespace Discord.Commands
             ErrorReason = errorReason;
         }
 
-        internal static ParseResult FromSuccess(IReadOnlyList<object> values)
+        public static ParseResult FromSuccess(IReadOnlyList<object> values)
             => new ParseResult(values, null, null);
-        internal static ParseResult FromError(CommandError error, string reason)
+        public static ParseResult FromError(CommandError error, string reason)
             => new ParseResult(null, error, reason);
-        internal static ParseResult FromError(SearchResult result)
-            => new ParseResult(null, result.Error, result.ErrorReason);
-        internal static ParseResult FromError(TypeReaderResult result)
+        public static ParseResult FromError(IResult result)
             => new ParseResult(null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

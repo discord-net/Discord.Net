@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Discord.Commands
 {
@@ -24,6 +23,8 @@ namespace Discord.Commands
             => new TypeReaderResult(value, null, null);
         public static TypeReaderResult FromError(CommandError error, string reason)
             => new TypeReaderResult(null, error, reason);
+        public static TypeReaderResult FromError(IResult result)
+            => new TypeReaderResult(null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? $"Success ({Value})" : $"{Error}: {ErrorReason}";

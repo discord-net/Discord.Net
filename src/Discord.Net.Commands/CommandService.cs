@@ -209,7 +209,6 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
-
             for (int i = commands.Count - 1; i >= 0; i--)
             {
                 var preconditionResult = await commands[i].CheckPreconditions(message);
@@ -221,7 +220,7 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var parseResult = await commands[i].Parse(message, searchResult);
+                var parseResult = await commands[i].Parse(message, searchResult, preconditionResult);
                 if (!parseResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -229,6 +228,7 @@ namespace Discord.Commands
                     else
                         continue;
                 }
+
                 var executeResult = await commands[i].Execute(message, parseResult);
                 return executeResult;
             }

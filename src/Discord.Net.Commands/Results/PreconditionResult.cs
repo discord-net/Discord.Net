@@ -16,10 +16,12 @@ namespace Discord.Commands
             ErrorReason = errorReason;
         }
 
-        internal static PreconditionResult FromSuccess()
+        public static PreconditionResult FromSuccess()
             => new PreconditionResult(null, null);
-        internal static PreconditionResult FromError(string reason)
+        public static PreconditionResult FromError(string reason)
             => new PreconditionResult(CommandError.UnmetPrecondition, reason);
+        public static PreconditionResult FromError(IResult result)
+            => new PreconditionResult(result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

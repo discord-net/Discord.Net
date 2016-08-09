@@ -20,15 +20,13 @@ namespace Discord.Commands
             ErrorReason = errorReason;
         }
 
-        internal static ExecuteResult FromSuccess()
+        public static ExecuteResult FromSuccess()
             => new ExecuteResult(null, null, null);
-        internal static ExecuteResult FromError(CommandError error, string reason)
+        public static ExecuteResult FromError(CommandError error, string reason)
             => new ExecuteResult(null, error, reason);
-        internal static ExecuteResult FromError(Exception ex)
+        public static ExecuteResult FromError(Exception ex)
             => new ExecuteResult(ex, CommandError.Exception, ex.Message);
-        internal static ExecuteResult FromError(ParseResult result)
-            => new ExecuteResult(null, result.Error, result.ErrorReason);
-        internal static ExecuteResult FromError(PreconditionResult result)
+        public static ExecuteResult FromError(IResult result)
             => new ExecuteResult(null, result.Error, result.ErrorReason);
         
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
