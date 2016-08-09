@@ -19,7 +19,8 @@ namespace Discord.Commands
         public string Text { get; }
         public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
-        
+        public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+
         internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
         {
             Module = module;
@@ -37,7 +38,27 @@ namespace Discord.Commands
                 Synopsis = synopsis.Text;
 
             Parameters = BuildParameters(methodInfo);
+            Preconditions = BuildPreconditions(methodInfo);
             _action = BuildAction(methodInfo);
+        }
+
+        public async Task<PreconditionResult> CheckPreconditions(IMessage context)
+        {
+            foreach (PreconditionAttribute precondition in Module.Preconditions)
+            {
+                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
+            }
+
+            foreach (PreconditionAttribute precondition in Preconditions)
+            {
+                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
+            }
+
+            return PreconditionResult.FromSuccess();
         }
 
         public async Task<ParseResult> Parse(IMessage msg, SearchResult searchResult)
@@ -61,6 +82,11 @@ namespace Discord.Commands
             {
                 return ExecuteResult.FromError(ex);
             }
+        }
+
+        private IReadOnlyList<PreconditionAttribute> BuildPreconditions(MethodInfo methodInfo)
+        {
+            return methodInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
 
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
@@ -115,7 +141,7 @@ namespace Discord.Commands
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");
-            
+
             return (msg, args) =>
             {
                 object[] newArgs = new object[args.Count + 1];

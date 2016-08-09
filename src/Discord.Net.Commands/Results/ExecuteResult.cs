@@ -28,6 +28,8 @@ namespace Discord.Commands
             => new ExecuteResult(ex, CommandError.Exception, ex.Message);
         internal static ExecuteResult FromError(ParseResult result)
             => new ExecuteResult(null, result.Error, result.ErrorReason);
+        internal static ExecuteResult FromError(PreconditionResult result)
+            => new ExecuteResult(null, result.Error, result.ErrorReason);
         
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

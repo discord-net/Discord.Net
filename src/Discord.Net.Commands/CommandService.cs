@@ -209,8 +209,18 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
+
             for (int i = commands.Count - 1; i >= 0; i--)
             {
+                var preconditionResult = await commands[i].CheckPreconditions(message);
+                if (!preconditionResult.IsSuccess)
+                {
+                    if (commands.Count == 1)
+                        return preconditionResult;
+                    else
+                        continue;
+                }
+
                 var parseResult = await commands[i].Parse(message, searchResult);
                 if (!parseResult.IsSuccess)
                 {

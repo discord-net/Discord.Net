@@ -16,5 +16,6 @@
 
         //Execute
         Exception,
+        UnmetPrecondition
     }
 }
