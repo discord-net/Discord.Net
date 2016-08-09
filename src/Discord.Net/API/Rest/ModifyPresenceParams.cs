@@ -1,4 +1,5 @@
-﻿namespace Discord.API.Rest
+﻿#pragma warning disable CS1591
+namespace Discord.API.Rest
 {
     public class ModifyPresenceParams
     {

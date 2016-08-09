@@ -1,10 +1,9 @@
-﻿using Discord.API.Gateway;
+﻿#pragma warning disable CS1591
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
-using Discord.Net.WebSockets;
 using Discord.Rest;
 using Newtonsoft.Json;
 using System;
@@ -13,7 +12,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;

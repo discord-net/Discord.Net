@@ -1,4 +1,5 @@
-﻿namespace Discord.API.Gateway
+﻿#pragma warning disable CS1591
+namespace Discord.API.Gateway
 {
     public enum GatewayOpCode : byte
     {

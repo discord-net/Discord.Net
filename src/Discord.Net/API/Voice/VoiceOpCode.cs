@@ -1,4 +1,5 @@
-﻿namespace Discord.API.Voice
+﻿#pragma warning disable CS1591
+namespace Discord.API.Voice
 {
     public enum VoiceOpCode : byte
     {

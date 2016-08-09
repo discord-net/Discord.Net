@@ -1,4 +1,5 @@
-﻿using Discord.API.Rpc;
+﻿#pragma warning disable CS1591
+using Discord.API.Rpc;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;

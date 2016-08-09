@@ -1,4 +1,5 @@
-﻿using Discord.Net.Rest;
+﻿#pragma warning disable CS1591
+using Discord.Net.Rest;
 using System.Collections.Generic;
 using System.IO;
 
