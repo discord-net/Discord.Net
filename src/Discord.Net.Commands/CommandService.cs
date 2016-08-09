@@ -16,7 +16,8 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
         private readonly CommandMap _map;
 
-        public ILookup<Module, Command> Commands => _modules.SelectMany(x => x.Value.Commands).ToLookup(x => x.Module);
+        public IEnumerable<Module> Modules => _modules.Select(x => x.Value);
+        public IEnumerable<Command> Commands => _modules.SelectMany(x => x.Value.Commands);
 
         public CommandService()
         {
