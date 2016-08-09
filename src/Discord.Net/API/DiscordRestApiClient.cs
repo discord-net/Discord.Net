@@ -440,11 +440,11 @@ namespace Discord.API
         }
 
         //Guild Bans
-        public async Task<IReadOnlyCollection<User>> GetGuildBansAsync(ulong guildId, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Ban>> GetGuildBansAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
-            return await SendAsync<IReadOnlyCollection<User>>("GET", $"guilds/{guildId}/bans", options: options).ConfigureAwait(false);
+            return await SendAsync<IReadOnlyCollection<Ban>>("GET", $"guilds/{guildId}/bans", options: options).ConfigureAwait(false);
         }
         public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {

@@ -157,10 +157,10 @@ namespace Discord
             await Discord.ApiClient.DeleteGuildAsync(Id).ConfigureAwait(false);
         }
         
-        public async Task<IReadOnlyCollection<IUser>> GetBansAsync()
+        public async Task<IReadOnlyCollection<Ban>> GetBansAsync()
         {
             var models = await Discord.ApiClient.GetGuildBansAsync(Id).ConfigureAwait(false);
-            return models.Select(x => new User(x)).ToImmutableArray();
+            return models.Select(x => new Ban(new User(x.User), x.Reason)).ToImmutableArray();
         }
         public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user, pruneDays);
         public async Task AddBanAsync(ulong userId, int pruneDays = 0)

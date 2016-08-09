@@ -61,7 +61,7 @@ namespace Discord
         Task LeaveAsync();
 
         /// <summary> Gets a collection of all users banned on this guild. </summary>
-        Task<IReadOnlyCollection<IUser>> GetBansAsync();
+        Task<IReadOnlyCollection<Ban>> GetBansAsync();
         /// <summary> Bans the provided user from this guild and optionally prunes their recent messages. </summary>
         Task AddBanAsync(IUser user, int pruneDays = 0);
         /// <summary> Bans the provided user id from this guild and optionally prunes their recent messages. </summary>
