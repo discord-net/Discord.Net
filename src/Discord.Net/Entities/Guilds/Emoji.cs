@@ -1,8 +1,10 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Model = Discord.API.Emoji;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Emoji
     {
         public ulong Id { get; }
@@ -19,5 +21,8 @@ namespace Discord
             RequireColons = model.RequireColons;
             RoleIds = ImmutableArray.Create(model.Roles);
         }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

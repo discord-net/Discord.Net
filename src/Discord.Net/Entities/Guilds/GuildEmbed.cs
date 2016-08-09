@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.GuildEmbed;
+﻿using System.Diagnostics;
+using Model = Discord.API.GuildEmbed;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct GuildEmbed
     {
         public bool IsEnabled { get; private set; }
@@ -14,5 +16,8 @@ namespace Discord
         }
         internal GuildEmbed(Model model)
             : this(model.Enabled, model.ChannelId) { }
+
+        public override string ToString() => ChannelId?.ToString();
+        private string DebuggerDisplay => $"{ChannelId} ({(IsEnabled ? "Enabled" : "Disabled")})";
     }
 }
