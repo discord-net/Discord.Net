@@ -129,7 +129,9 @@ namespace Discord
             => new GuildPermissions(RawValue, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, readMessages,
                   sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, connect, speak, muteMembers, deafenMembers,
                   moveMembers, useVoiceActivation, changeNickname, manageNicknames, manageRoles);
-        
+
+        public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
+
         public List<GuildPermission> ToList()
         {
             var perms = new List<GuildPermission>();
