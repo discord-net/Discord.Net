@@ -10,12 +10,12 @@ namespace Discord.WebSocket
 
         public static IDMChannel GetDMChannel(this DiscordSocketClient client, ulong id)
             => client.GetPrivateChannelAsync(id) as IDMChannel;
-        public static IEnumerable<IDMChannel> GetDMChannels(this DiscordSocketClient client, ulong id)
+        public static IEnumerable<IDMChannel> GetDMChannels(this DiscordSocketClient client)
             => client.GetPrivateChannels().Select(x => x as IDMChannel).Where(x => x != null);
 
         public static IGroupChannel GetGroupChannel(this DiscordSocketClient client, ulong id)
             => client.GetPrivateChannel(id) as IGroupChannel;
-        public static IEnumerable<IGroupChannel> GetGroupChannels(this DiscordSocketClient client, ulong id)
+        public static IEnumerable<IGroupChannel> GetGroupChannels(this DiscordSocketClient client)
             => client.GetPrivateChannels().Select(x => x as IGroupChannel).Where(x => x != null);
         
         public static IVoiceRegion GetVoiceRegion(this DiscordSocketClient client, string id)
