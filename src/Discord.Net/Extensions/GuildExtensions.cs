@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -6,8 +8,13 @@ namespace Discord
     {
         public static async Task<ITextChannel> GetTextChannelAsync(this IGuild guild, ulong id)
             => await guild.GetChannelAsync(id).ConfigureAwait(false) as ITextChannel;
+        public static async Task<IEnumerable<ITextChannel>> GetTextChannelsAsync(this IGuild guild)
+            => (await guild.GetChannelsAsync().ConfigureAwait(false)).Select(x => x as ITextChannel).Where(x => x != null);
+
         public static async Task<IVoiceChannel> GetVoiceChannelAsync(this IGuild guild, ulong id)
             => await guild.GetChannelAsync(id).ConfigureAwait(false) as IVoiceChannel;
+        public static async Task<IEnumerable<IVoiceChannel>> GetVoiceChannelsAsync(this IGuild guild)
+            => (await guild.GetChannelsAsync().ConfigureAwait(false)).Select(x => x as IVoiceChannel).Where(x => x != null);
 
         public static async Task<IVoiceChannel> GetAFKChannelAsync(this IGuild guild)
         {
