@@ -169,14 +169,14 @@ namespace Discord
             return ClientAPI.Token;
         }
         /// <summary> Connects to the Discord server with the provided token. </summary>
-        public async Task Connect(string token)
+        public async Task Connect(string token, TokenType tokenType)
         {
             if (token == null) throw new ArgumentNullException(token);
 
-            await BeginConnect(null, null, token).ConfigureAwait(false);
+            await BeginConnect(null, null, token, tokenType).ConfigureAwait(false);
         }
 
-        private async Task BeginConnect(string email, string password, string token = null)
+        private async Task BeginConnect(string email, string password, string token = null, TokenType tokenType = TokenType.User)
         {
             try
             {
@@ -198,6 +198,20 @@ namespace Discord
                     CancelToken = cancelSource.Token;
                     ClientAPI.CancelToken = CancelToken;
                     StatusAPI.CancelToken = CancelToken;
+
+                    switch (tokenType)
+                    {
+                        case TokenType.Bot:
+                            token = $"Bot {token}";
+                            break;
+                        case TokenType.Bearer:
+                            token = $"Bearer {token}";
+                            break;
+                        case TokenType.User:
+                            break;
+                        default:
+                            throw new ArgumentException("Unknown oauth token type", nameof(tokenType));
+                    }
 
                     await Login(email, password, token).ConfigureAwait(false);
                     await GatewaySocket.Connect(ClientAPI, CancelToken).ConfigureAwait(false);
