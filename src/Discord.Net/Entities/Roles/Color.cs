@@ -40,7 +40,7 @@ using System.Diagnostics;
         
         public override string ToString() =>
             $"#{Convert.ToString(RawValue, 16)}";
-        private string DebuggerDisplay() =>
+        private string DebuggerDisplay =>
             $"#{Convert.ToString(RawValue, 16)} ({RawValue})";
     }
 }
