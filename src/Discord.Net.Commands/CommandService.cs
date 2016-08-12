@@ -120,7 +120,7 @@ namespace Discord.Commands
             if (_modules.ContainsKey(moduleInstance.GetType()))
                 return _modules[moduleInstance.GetType()];
 
-            var loadedModule = new Module(this, moduleInstance, moduleAttr, typeInfo);
+            var loadedModule = new Module(typeInfo, this, moduleInstance, moduleAttr);
             _modules[moduleInstance.GetType()] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)

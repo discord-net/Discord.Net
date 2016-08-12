@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -9,19 +10,21 @@ namespace Discord.Commands
     {
         private readonly TypeReader _reader;
 
+        public ParameterInfo Source { get; }
         public string Name { get; }
         public string Summary { get; }
         public bool IsOptional { get; }
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
-        public Type Type { get; }
+        public Type ElementType { get; }
         internal object DefaultValue { get; }
 
-        public CommandParameter(string name, string summary, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
+        public CommandParameter(ParameterInfo source, string name, string summary, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
         {
+            Source = source;
             Name = name;
             Summary = summary;
-            Type = type;
+            ElementType = type;
             _reader = reader;
             IsOptional = isOptional;
             IsRemainder = isRemainder;

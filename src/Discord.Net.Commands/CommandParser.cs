@@ -123,9 +123,9 @@ namespace Discord.Commands
 
                         if (curPos == endPos)
                         {
-                            Array realParams = Array.CreateInstance(curParam.Type, paramsList.Count);
+                            Array realParams = Array.CreateInstance(curParam.ElementType, paramsList.Count);
                             for (int i = 0; i < paramsList.Count; i++)
-                                realParams.SetValue(Convert.ChangeType(paramsList[i], curParam.Type), i);
+                                realParams.SetValue(Convert.ChangeType(paramsList[i], curParam.ElementType), i);
 
                             argList.Add(realParams);
 

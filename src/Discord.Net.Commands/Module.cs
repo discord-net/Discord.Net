@@ -8,6 +8,7 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Module
     {
+        public TypeInfo Source { get; }
         public CommandService Service { get; }
         public string Name { get; }
         public string Summary { get; }
@@ -17,38 +18,39 @@ namespace Discord.Commands
 
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal Module(CommandService service, object instance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
+        internal Module(TypeInfo source, CommandService service, object instance, ModuleAttribute moduleAttr)
         {
+            Source = source;
             Service = service;
-            Name = typeInfo.Name;
+            Name = source.Name;
             Instance = instance;
 
-            var summaryAttr = typeInfo.GetCustomAttribute<SummaryAttribute>();
+            var summaryAttr = source.GetCustomAttribute<SummaryAttribute>();
             if (summaryAttr != null)
                 Summary = summaryAttr.Text;
 
-            var descriptionAttr = typeInfo.GetCustomAttribute<DescriptionAttribute>();
+            var descriptionAttr = source.GetCustomAttribute<DescriptionAttribute>();
             if (descriptionAttr != null)
                 Description = descriptionAttr.Text;
 
             List<Command> commands = new List<Command>();
-            SearchClass(instance, commands, typeInfo, moduleAttr.Prefix ?? "");
+            SearchClass(source, instance, commands, moduleAttr.Prefix ?? "");
             Commands = commands;
 
-            Preconditions = BuildPreconditions(typeInfo);
+            Preconditions = BuildPreconditions();
         }
 
-        private void SearchClass(object instance, List<Command> commands, TypeInfo typeInfo, string groupPrefix)
+        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix)
         {
             if (groupPrefix != "")
                 groupPrefix += " ";
-            foreach (var method in typeInfo.DeclaredMethods)
+            foreach (var method in parentType.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
                 if (cmdAttr != null)
-                    commands.Add(new Command(this, instance, cmdAttr, method, groupPrefix));
+                    commands.Add(new Command(method, this, instance, cmdAttr, groupPrefix));
             }
-            foreach (var type in typeInfo.DeclaredNestedTypes)
+            foreach (var type in parentType.DeclaredNestedTypes)
             {
                 var groupAttrib = type.GetCustomAttribute<GroupAttribute>();
                 if (groupAttrib != null)
@@ -58,14 +60,14 @@ namespace Discord.Commands
                         nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
                     else
                         nextGroupPrefix = groupPrefix;
-                    SearchClass(ReflectionUtils.CreateObject(type, Service), commands, type, nextGroupPrefix);
+                    SearchClass(type, ReflectionUtils.CreateObject(type, Service), commands, nextGroupPrefix);
                 }
             }
         }
 
-        private IReadOnlyList<PreconditionAttribute> BuildPreconditions(TypeInfo typeInfo)
+        private IReadOnlyList<PreconditionAttribute> BuildPreconditions()
         {
-            return typeInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
+            return Source.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
 
         public override string ToString() => Name;

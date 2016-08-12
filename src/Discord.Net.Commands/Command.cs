@@ -13,6 +13,7 @@ namespace Discord.Commands
         private readonly object _instance;
         private readonly Func<IMessage, IReadOnlyList<object>, Task> _action;
 
+        public MethodInfo Source { get; }
         public string Name { get; }
         public string Description { get; }
         public string Summary { get; }
@@ -21,25 +22,26 @@ namespace Discord.Commands
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal Command(Module module, object instance, CommandAttribute attribute, MethodInfo methodInfo, string groupPrefix)
+        internal Command(MethodInfo source, Module module, object instance, CommandAttribute attribute, string groupPrefix)
         {
+            Source = source;
             Module = module;
             _instance = instance;
 
-            Name = methodInfo.Name;
+            Name = source.Name;
             Text = groupPrefix + attribute.Text;
 
-            var description = methodInfo.GetCustomAttribute<DescriptionAttribute>();
+            var description = source.GetCustomAttribute<DescriptionAttribute>();
             if (description != null)
                 Description = description.Text;
 
-            var summary = methodInfo.GetCustomAttribute<SummaryAttribute>();
+            var summary = source.GetCustomAttribute<SummaryAttribute>();
             if (summary != null)
                 Summary = summary.Text;
 
-            Parameters = BuildParameters(methodInfo);
-            Preconditions = BuildPreconditions(methodInfo);
-            _action = BuildAction(methodInfo);
+            Parameters = BuildParameters(source);
+            Preconditions = BuildPreconditions(source);
+            _action = BuildAction(source);
         }
 
         public async Task<PreconditionResult> CheckPreconditions(IMessage context)
@@ -135,7 +137,7 @@ namespace Discord.Commands
                 bool isOptional = parameter.IsOptional;
                 object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
 
-                paramBuilder.Add(new CommandParameter(name, summary, type, reader, isOptional, isRemainder, isMultiple, defaultValue));
+                paramBuilder.Add(new CommandParameter(parameters[i], name, summary, type, reader, isOptional, isRemainder, isMultiple, defaultValue));
             }
             return paramBuilder.ToImmutable();
         }
