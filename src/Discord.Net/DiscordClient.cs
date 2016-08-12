@@ -204,9 +204,6 @@ namespace Discord
                         case TokenType.Bot:
                             token = $"Bot {token}";
                             break;
-                        case TokenType.Bearer:
-                            token = $"Bearer {token}";
-                            break;
                         case TokenType.User:
                             break;
                         default:
