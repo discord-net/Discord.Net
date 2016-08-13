@@ -34,15 +34,15 @@ namespace Discord.Commands
                 Description = descriptionAttr.Text;
 
             List<Command> commands = new List<Command>();
-            SearchClass(source, instance, commands, moduleAttr.Prefix ?? "", moduleAttr.ForceWhitespace);
+            SearchClass(source, instance, commands, moduleAttr.Prefix ?? "", moduleAttr.AppendSpace);
             Commands = commands;
 
             Preconditions = BuildPreconditions();
         }
 
-        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, bool forceWhitespace)
+        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, bool appendWhitespace)
         {
-            if (groupPrefix != "" && forceWhitespace)
+            if (groupPrefix != "" && appendWhitespace)
                 groupPrefix += " ";
             foreach (var method in parentType.DeclaredMethods)
             {
@@ -60,7 +60,7 @@ namespace Discord.Commands
                         nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
                     else
                         nextGroupPrefix = groupPrefix;
-                    SearchClass(type, ReflectionUtils.CreateObject(type, Service), commands, nextGroupPrefix, forceWhitespace);
+                    SearchClass(type, ReflectionUtils.CreateObject(type, Service), commands, nextGroupPrefix, appendWhitespace);
                 }
             }
         }
