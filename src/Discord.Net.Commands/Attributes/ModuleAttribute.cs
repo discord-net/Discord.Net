@@ -7,15 +7,15 @@ namespace Discord.Commands
     {
         public string Prefix { get; }
         public bool AutoLoad { get; set; }
-        public ModuleAttribute()
-        {
-            Prefix = null;
-            AutoLoad = true;
-        }
-        public ModuleAttribute(string prefix)
+        public bool AppendSpace { get; set; }
+
+        public ModuleAttribute() : this(null) { }
+
+        public ModuleAttribute(string prefix = null)
         {
             Prefix = prefix;
             AutoLoad = true;
+            AppendSpace = true;
         }
     }
 }
