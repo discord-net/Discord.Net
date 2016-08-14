@@ -161,19 +161,23 @@ namespace Discord
             await Discord.ApiClient.RemovePinAsync(Channel.Id, Id).ConfigureAwait(false);
         }
         
-        public string Resolve(int startIndex, int length, UserResolveMode userMode = UserResolveMode.NameOnly)
-            => Resolve(Content.Substring(startIndex, length), userMode);
-        public string Resolve(UserResolveMode userMode = UserResolveMode.NameOnly)
-            => Resolve(Content, userMode);
+        public string Resolve(int startIndex, int length, UserMentionHandling userHandling, ChannelMentionHandling channelHandling,
+            RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
+            => Resolve(Content.Substring(startIndex, length), userHandling, channelHandling, roleHandling, everyoneHandling);
+        public string Resolve(UserMentionHandling userHandling, ChannelMentionHandling channelHandling, 
+            RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
+            => Resolve(Content, userHandling, channelHandling, roleHandling, everyoneHandling);
         
-        private string Resolve(string text, UserResolveMode userMode = UserResolveMode.NameOnly)
+        private string Resolve(string text, UserMentionHandling userHandling, ChannelMentionHandling channelHandling,
+            RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
         {
             var guild = (Channel as IGuildChannel)?.Guild;
-            text = MentionUtils.ResolveUserMentions(text, Channel, MentionedUsers, userMode);
+            text = MentionUtils.ResolveUserMentions(text, Channel, MentionedUsers, userHandling);
             if (guild != null)
             {
-                text = MentionUtils.ResolveChannelMentions(text, guild);
-                text = MentionUtils.ResolveRoleMentions(text, guild, MentionedRoles);
+                text = MentionUtils.ResolveChannelMentions(text, guild, channelHandling);
+                text = MentionUtils.ResolveRoleMentions(text, guild, MentionedRoles, roleHandling);
+                text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
             }
             return text;
         }
