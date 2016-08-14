@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
@@ -154,8 +155,10 @@ namespace Discord
             return builder.ToImmutable();
         }
         
-        internal static string ResolveUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> mentions, UserResolveMode mode)
+        internal static string ResolveUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> mentions, UserMentionHandling mode)
         {
+            if (mode == UserMentionHandling.Ignore) return text;
+
             return _userRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
@@ -183,10 +186,12 @@ namespace Discord
 
                         switch (mode)
                         {
-                            case UserResolveMode.NameOnly:
+                            case UserMentionHandling.Remove:
                             default:
+                                return "";
+                            case UserMentionHandling.Name:
                                 return $"@{name}";
-                            case UserResolveMode.NameAndDiscriminator:
+                            case UserMentionHandling.NameAndDiscriminator:
                                 return $"@{name}#{user.Discriminator}";
                         }
                     }
@@ -194,8 +199,10 @@ namespace Discord
                 return e.Value;
             }));
         }
-        internal static string ResolveChannelMentions(string text, IGuild guild)
+        internal static string ResolveChannelMentions(string text, IGuild guild, ChannelMentionHandling mode)
         {
+            if (mode == ChannelMentionHandling.Ignore) return text;
+
             if (guild.IsAttached) //It's too expensive to do a channel lookup in REST mode
             {
                 return _channelRegex.Replace(text, new MatchEvaluator(e =>
@@ -203,37 +210,68 @@ namespace Discord
                     ulong id;
                     if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                     {
-                        IGuildChannel channel = null;
-                        channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
-                        if (channel != null)
-                            return '#' + channel.Name;
+                        switch (mode)
+                        {
+                            case ChannelMentionHandling.Remove:
+                                return "";
+                            case ChannelMentionHandling.Name:
+                                IGuildChannel channel = null;
+                                channel = guild?.GetChannel(id);
+                                if (channel != null)
+                                    return $"#{channel.Name}";
+                                else
+                                    return $"#deleted-channel";
+                        }
                     }
                     return e.Value;
                 }));
             }
             return text;
         }
-        internal static string ResolveRoleMentions(string text, IGuild guild, IReadOnlyCollection<IRole> mentions)
+        internal static string ResolveRoleMentions(string text, IReadOnlyCollection<IRole> mentions, RoleMentionHandling mode)
         {
+            if (mode == RoleMentionHandling.Ignore) return text;
+            
             return _roleRegex.Replace(text, new MatchEvaluator(e =>
             {
                 ulong id;
                 if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    IRole role = null;
-                    foreach (var mention in mentions)
+                    switch (mode)
                     {
-                        if (mention.Id == id)
-                        {
-                            role = mention;
-                            break;
-                        }
+                        case RoleMentionHandling.Remove:
+                            return "";
+                        case RoleMentionHandling.Name:
+                            IRole role = null;
+                            foreach (var mention in mentions)
+                            {
+                                if (mention.Id == id)
+                                {
+                                    role = mention;
+                                    break;
+                                }
+                            }
+                            if (role != null)
+                                return $"@{role.Name}";
+                            else
+                                return $"@deleted-role";
                     }
-                    if (role != null)
-                        return '@' + role.Name;
                 }
                 return e.Value;
             }));
+        }
+        internal static string ResolveEveryoneMentions(string text, EveryoneMentionHandling mode)
+        {
+            if (mode == EveryoneMentionHandling.Ignore) return text;
+            
+            switch (mode)
+            {
+                case EveryoneMentionHandling.Sanitize:
+                    return text.Replace("@everyone", "@\x200beveryone").Replace("@here", "@\x200bhere");
+                case EveryoneMentionHandling.Remove:
+                default:
+                    return text.Replace("@everyone", "").Replace("@here", "");
+            }
         }
     }
 }

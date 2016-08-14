@@ -43,8 +43,16 @@ namespace Discord
         Task UnpinAsync();
 
         /// <summary> Transforms this message's text into a human readable form, resolving things like mentions to that object's name. </summary>
-        string Resolve(int startIndex, int length, UserResolveMode userMode = UserResolveMode.NameOnly);
+        string Resolve(int startIndex, int length, 
+            UserMentionHandling userHandling = UserMentionHandling.Name,
+            ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
+            RoleMentionHandling roleHandling = RoleMentionHandling.Name,
+            EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore);
         /// <summary> Transforms this message's text into a human readable form, resolving things like mentions to that object's name. </summary>
-        string Resolve(UserResolveMode userMode = UserResolveMode.NameOnly);
+        string Resolve(
+            UserMentionHandling userHandling = UserMentionHandling.Name,
+            ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
+            RoleMentionHandling roleHandling = RoleMentionHandling.Name,
+            EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore);
     }
 }
