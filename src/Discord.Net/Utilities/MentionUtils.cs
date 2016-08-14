@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
@@ -215,7 +216,7 @@ namespace Discord
                                 return "";
                             case ChannelMentionHandling.Name:
                                 IGuildChannel channel = null;
-                                channel = guild.GetChannelAsync(id).GetAwaiter().GetResult();
+                                channel = guild?.GetChannel(id);
                                 if (channel != null)
                                     return $"#{channel.Name}";
                                 else
@@ -227,7 +228,7 @@ namespace Discord
             }
             return text;
         }
-        internal static string ResolveRoleMentions(string text, IGuild guild, IReadOnlyCollection<IRole> mentions, RoleMentionHandling mode)
+        internal static string ResolveRoleMentions(string text, IReadOnlyCollection<IRole> mentions, RoleMentionHandling mode)
         {
             if (mode == RoleMentionHandling.Ignore) return text;
             

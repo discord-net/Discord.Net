@@ -171,14 +171,10 @@ namespace Discord
         private string Resolve(string text, UserMentionHandling userHandling, ChannelMentionHandling channelHandling,
             RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
         {
-            var guild = (Channel as IGuildChannel)?.Guild;
             text = MentionUtils.ResolveUserMentions(text, Channel, MentionedUsers, userHandling);
-            if (guild != null)
-            {
-                text = MentionUtils.ResolveChannelMentions(text, guild, channelHandling);
-                text = MentionUtils.ResolveRoleMentions(text, guild, MentionedRoles, roleHandling);
-                text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
-            }
+            text = MentionUtils.ResolveChannelMentions(text, (Channel as IGuildChannel)?.Guild, channelHandling);
+            text = MentionUtils.ResolveRoleMentions(text, MentionedRoles, roleHandling);
+            text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
             return text;
         }
 

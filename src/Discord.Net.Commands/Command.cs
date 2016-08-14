@@ -14,11 +14,11 @@ namespace Discord.Commands
         private readonly Func<IMessage, IReadOnlyList<object>, Task> _action;
 
         public MethodInfo Source { get; }
+        public Module Module { get; }
         public string Name { get; }
         public string Description { get; }
         public string Summary { get; }
         public string Text { get; }
-        public Module Module { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
