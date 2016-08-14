@@ -1,13 +1,12 @@
 ﻿using Discord.API.Rest;
 using Discord.Rest;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class MessageManager
     {

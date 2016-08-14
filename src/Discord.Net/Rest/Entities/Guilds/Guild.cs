@@ -12,7 +12,7 @@ using EmbedModel = Discord.API.GuildEmbed;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class Guild : SnowflakeEntity, IGuild

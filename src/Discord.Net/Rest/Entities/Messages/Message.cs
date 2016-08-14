@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class Message : SnowflakeEntity, IMessage

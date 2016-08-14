@@ -1,11 +1,11 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketDMChannel : DMChannel, IDMChannel, ISocketChannel, ISocketMessageChannel, ISocketPrivateChannel
     {

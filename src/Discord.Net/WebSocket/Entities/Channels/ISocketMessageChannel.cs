@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MessageModel = Discord.API.Message;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal interface ISocketMessageChannel : ISocketChannel, IMessageChannel
     {

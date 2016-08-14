@@ -1,7 +1,7 @@
 ﻿using System;
 using Model = Discord.API.VoiceState;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
     internal struct VoiceState : IVoiceState

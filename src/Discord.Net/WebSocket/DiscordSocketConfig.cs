@@ -2,7 +2,7 @@
 using Discord.Net.WebSockets;
 using Discord.Rest;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     public class DiscordSocketConfig : DiscordRestConfig
     {

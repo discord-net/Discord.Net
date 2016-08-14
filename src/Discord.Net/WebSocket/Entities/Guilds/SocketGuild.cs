@@ -1,5 +1,5 @@
 ﻿using Discord.Audio;
-using Discord.WebSocket;
+using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
 using VoiceStateModel = Discord.API.VoiceState;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketGuild : Guild, IGuild, IUserGuild
     {

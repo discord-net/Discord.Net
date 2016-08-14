@@ -3,7 +3,7 @@ using Discord.Rest;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class GroupUser : IGroupUser
     {

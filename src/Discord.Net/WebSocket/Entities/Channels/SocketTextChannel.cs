@@ -1,5 +1,4 @@
 ﻿using Discord.Rest;
-using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketTextChannel : TextChannel, ISocketGuildChannel, ISocketMessageChannel
     {

@@ -1,4 +1,4 @@
-﻿namespace Discord
+﻿namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
     internal struct Presence : IPresence

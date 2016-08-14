@@ -2,7 +2,7 @@
 using System;
 using Model = Discord.API.InviteMetadata;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class InviteMetadata : Invite, IInviteMetadata
     {

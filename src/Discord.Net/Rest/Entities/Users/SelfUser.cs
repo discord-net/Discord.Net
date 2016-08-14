@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class SelfUser : User, ISelfUser
     {

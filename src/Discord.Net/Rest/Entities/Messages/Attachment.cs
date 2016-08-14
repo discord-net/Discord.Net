@@ -1,6 +1,6 @@
 ﻿using Model = Discord.API.Attachment;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class Attachment : IAttachment
     {

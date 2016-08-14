@@ -1,6 +1,6 @@
 ﻿using Discord.Rest;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal abstract class Entity<T> : IEntity<T>
     {

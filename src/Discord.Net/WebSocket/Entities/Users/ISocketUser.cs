@@ -1,4 +1,4 @@
-﻿namespace Discord
+﻿namespace Discord.WebSocket
 {
     internal interface ISocketUser : IUser, IEntity<ulong>
     {

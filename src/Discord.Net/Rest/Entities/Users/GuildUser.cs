@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class GuildUser : IGuildUser, ISnowflakeEntity

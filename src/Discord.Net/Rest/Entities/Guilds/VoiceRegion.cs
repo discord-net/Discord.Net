@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Model = Discord.API.VoiceRegion;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class VoiceRegion : IVoiceRegion

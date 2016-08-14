@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal abstract class SnowflakeEntity : Entity<ulong>, ISnowflakeEntity
     {

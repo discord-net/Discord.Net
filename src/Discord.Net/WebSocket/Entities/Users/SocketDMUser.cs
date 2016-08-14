@@ -1,9 +1,8 @@
-﻿using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Diagnostics;
 using PresenceModel = Discord.API.Presence;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class SocketDMUser : ISocketUser

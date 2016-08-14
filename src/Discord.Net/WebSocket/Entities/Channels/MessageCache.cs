@@ -1,13 +1,11 @@
-﻿using Discord.Rest;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class MessageCache : MessageManager
     {

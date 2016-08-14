@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using Discord.Audio;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class VoiceChannel : GuildChannel, IVoiceChannel

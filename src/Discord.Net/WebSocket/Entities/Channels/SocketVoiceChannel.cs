@@ -1,5 +1,5 @@
 ﻿using Discord.Audio;
-using Discord.WebSocket;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketVoiceChannel : VoiceChannel, ISocketGuildChannel
     {

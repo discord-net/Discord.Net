@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class Role : SnowflakeEntity, IRole, IMentionable

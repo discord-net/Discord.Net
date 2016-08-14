@@ -1,8 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketGuildUser : GuildUser, ISocketUser
     {

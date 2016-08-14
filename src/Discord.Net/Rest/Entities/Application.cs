@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Application;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class Application : SnowflakeEntity, IApplication
     {

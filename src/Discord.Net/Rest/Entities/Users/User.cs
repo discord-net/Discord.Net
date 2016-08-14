@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class User : SnowflakeEntity, IUser

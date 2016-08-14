@@ -1,7 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
 using Model = Discord.API.Message;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketMessage : Message
     {

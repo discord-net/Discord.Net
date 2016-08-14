@@ -1,7 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
 using System.Diagnostics;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class SocketGroupUser : GroupUser, ISocketUser

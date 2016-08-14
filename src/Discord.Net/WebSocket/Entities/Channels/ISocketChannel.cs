@@ -1,6 +1,6 @@
 ﻿using Model = Discord.API.Channel;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal interface ISocketChannel : IChannel
     {

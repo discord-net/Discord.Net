@@ -1,6 +1,6 @@
 ﻿using Model = Discord.API.Embed;
 
-namespace Discord
+namespace Discord.Rest
 {
     internal class Embed : IEmbed
     {

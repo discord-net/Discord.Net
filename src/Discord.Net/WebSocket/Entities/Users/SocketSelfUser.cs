@@ -1,10 +1,10 @@
 ﻿using Discord.API.Rest;
-using Discord.WebSocket;
+using Discord.Rest;
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketSelfUser : SelfUser, ISocketUser, ISelfUser
     {

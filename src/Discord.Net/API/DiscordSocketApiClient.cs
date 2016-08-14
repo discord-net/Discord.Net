@@ -4,6 +4,7 @@ using Discord.API.Rest;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -9,7 +9,7 @@ using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class SocketGroupChannel : GroupChannel, IGroupChannel, ISocketChannel, ISocketMessageChannel, ISocketPrivateChannel
     {

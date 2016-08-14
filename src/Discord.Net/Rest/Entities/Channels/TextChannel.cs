@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class TextChannel : GuildChannel, ITextChannel

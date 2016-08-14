@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord
+namespace Discord.WebSocket
 {
     internal class DataStore
     {
