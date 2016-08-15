@@ -159,6 +159,8 @@ namespace Discord.API
         private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload,
             BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
         {
+            CheckState();
+
             //TODO: Add ETF
             byte[] bytes = null;
             payload = new WebSocketMessage { Operation = (int)opCode, Payload = payload };

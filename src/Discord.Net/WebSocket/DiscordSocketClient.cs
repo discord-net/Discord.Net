@@ -144,7 +144,7 @@ namespace Discord.WebSocket
         private async Task ConnectInternalAsync(bool isReconnecting)
         {
             if (LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");
+                throw new InvalidOperationException("Client is not logged in.");
 
             if (!isReconnecting && _reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
                 _reconnectCancelToken.Cancel();

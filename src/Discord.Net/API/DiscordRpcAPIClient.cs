@@ -140,7 +140,7 @@ namespace Discord.API
         internal override async Task ConnectInternalAsync()
         {
             /*if (LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");*/
+                throw new InvalidOperationException("Client is not logged in.");*/
 
             ConnectionState = ConnectionState.Connecting;
             try
@@ -207,17 +207,20 @@ namespace Discord.API
 
         //Core
         public Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, GlobalBucket bucket = GlobalBucket.GeneralRpc, 
-            Optional<string> evt = default(Optional<string>), RequestOptions options = null)
+            Optional<string> evt = default(Optional<string>), bool ignoreState = false, RequestOptions options = null)
             where TResponse : class
-            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Global, (int)bucket, 0, evt, options);
+            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Global, (int)bucket, 0, evt, ignoreState, options);
         public Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, GuildBucket bucket, ulong guildId, 
-            Optional<string> evt = default(Optional<string>), RequestOptions options = null)
+            Optional<string> evt = default(Optional<string>), bool ignoreState = false, RequestOptions options = null)
             where TResponse : class
-            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Guild, (int)bucket, guildId, evt, options);
+            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Guild, (int)bucket, guildId, evt, ignoreState, options);
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, BucketGroup group, int bucketId, ulong guildId, 
-            Optional<string> evt, RequestOptions options)
+            Optional<string> evt, bool ignoreState, RequestOptions options)
             where TResponse : class
         {
+            if (!ignoreState)
+                CheckState();
+
             byte[] bytes = null;
             var guid = Guid.NewGuid();
             payload = new API.Rpc.RpcMessage { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };
@@ -242,7 +245,7 @@ namespace Discord.API
             {
                 AccessToken = _authToken
             };
-            return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, ignoreState: true, options: options).ConfigureAwait(false);
         }
         public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
@@ -256,7 +259,7 @@ namespace Discord.API
                 options = new RequestOptions();
             if (options.Timeout == null)
                 options.Timeout = 60000; //This requires manual input on the user's end, lets give them more time
-            return await SendRpcAsync<AuthorizeResponse>("AUTHORIZE", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<AuthorizeResponse>("AUTHORIZE", msg, ignoreState: true, options: options).ConfigureAwait(false);
         }
 
         public async Task<GetGuildsResponse> SendGetGuildsAsync(RequestOptions options = null)
