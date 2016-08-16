@@ -108,13 +108,13 @@ namespace Discord.Rest
         
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms)
         {
-            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
+            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue, Type = "member" };
             await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, user.Id, args).ConfigureAwait(false);
             _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User }));
         }
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms)
         {
-            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue };
+            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue, Type = "role" };
             await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, role.Id, args).ConfigureAwait(false);
             _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role }));
         }
