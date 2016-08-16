@@ -14,10 +14,15 @@ namespace Discord
         private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
         private static readonly Regex _roleRegex = new Regex(@"<@&([0-9]+)>", RegexOptions.Compiled);
 
-        //Unsure the system can be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
+        //If the system can't be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
         internal static string Mention(IUser user, bool useNickname = true) => useNickname ? $"<@!{user.Id}>" : $"<@{user.Id}>";
+        public static string MentionUser(ulong id) => $"<@!{id}>";
+
         internal static string Mention(IChannel channel) => $"<#{channel.Id}>";
-        internal static string Mention(IRole role) => $"<&{role.Id}>";
+        public static string MentionChannel(ulong id) => $"<#{id}>";
+
+        internal static string Mention(IRole role) => $"<@&{role.Id}>";
+        public static string MentionRole(ulong id) => $"<@&{id}>";
 
         /// <summary> Parses a provided user mention string. </summary>
         public static ulong ParseUser(string mentionText)
