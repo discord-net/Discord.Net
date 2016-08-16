@@ -41,6 +41,7 @@ namespace Discord.WebSocket
         //Helpers
         internal static SocketGuild GetSocketGuild(IGuild guild)
         {
+            Preconditions.NotNull(guild, nameof(guild));
             var socketGuild = guild as SocketGuild;
             if (socketGuild == null)
                 throw new InvalidOperationException("This extension method is only valid on WebSocket Entities");

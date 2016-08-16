@@ -31,6 +31,7 @@ namespace Discord.WebSocket
 
         internal static SocketDMChannel GetSocketDMChannel(IDMChannel channel)
         {
+            Preconditions.NotNull(channel, nameof(channel));
             var socketChannel = channel as SocketDMChannel;
             if (socketChannel == null)
                 throw new InvalidOperationException("This extension method is only valid on WebSocket Entities");
@@ -38,6 +39,7 @@ namespace Discord.WebSocket
         }
         internal static SocketGroupChannel GetSocketGroupChannel(IGroupChannel channel)
         {
+            Preconditions.NotNull(channel, nameof(channel));
             var socketChannel = channel as SocketGroupChannel;
             if (socketChannel == null)
                 throw new InvalidOperationException("This extension method is only valid on WebSocket Entities");
@@ -45,6 +47,7 @@ namespace Discord.WebSocket
         }
         internal static SocketTextChannel GetSocketTextChannel(ITextChannel channel)
         {
+            Preconditions.NotNull(channel, nameof(channel));
             var socketChannel = channel as SocketTextChannel;
             if (socketChannel == null)
                 throw new InvalidOperationException("This extension method is only valid on WebSocket Entities");
@@ -52,6 +55,7 @@ namespace Discord.WebSocket
         }
         internal static SocketVoiceChannel GetSocketVoiceChannel(IVoiceChannel channel)
         {
+            Preconditions.NotNull(channel, nameof(channel));
             var socketChannel = channel as SocketVoiceChannel;
             if (socketChannel == null)
                 throw new InvalidOperationException("This extension method is only valid on WebSocket Entities");
