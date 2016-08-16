@@ -208,30 +208,30 @@ namespace Discord
         {
             if (mode == ChannelMentionHandling.Ignore) return text;
 
-            if (guild.IsAttached) //It's too expensive to do a channel lookup in REST mode
+            return _channelRegex.Replace(text, new MatchEvaluator(e =>
             {
-                return _channelRegex.Replace(text, new MatchEvaluator(e =>
+                ulong id;
+                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
                 {
-                    ulong id;
-                    if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                    switch (mode)
                     {
-                        switch (mode)
-                        {
-                            case ChannelMentionHandling.Remove:
-                                return "";
-                            case ChannelMentionHandling.Name:
+                        case ChannelMentionHandling.Remove:
+                            return "";
+                        case ChannelMentionHandling.Name:
+                            if (guild != null && guild.IsAttached) //It's too expensive to do a channel lookup in REST mode
+                            {
                                 IGuildChannel channel = null;
-                                channel = guild?.GetChannel(id);
+                                channel = guild.GetChannel(id);
                                 if (channel != null)
                                     return $"#{channel.Name}";
                                 else
                                     return $"#deleted-channel";
-                        }
+                            }
+                            break;
                     }
-                    return e.Value;
-                }));
-            }
-            return text;
+                }
+                return e.Value;
+            }));
         }
         internal static string ResolveRoleMentions(string text, IReadOnlyCollection<IRole> mentions, RoleMentionHandling mode)
         {
