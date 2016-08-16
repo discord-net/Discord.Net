@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class RequirePermission : PreconditionAttribute
+    public class RequirePermissionAttribute : PreconditionAttribute
     {
         public GuildPermission? GuildPermission { get; }
         public ChannelPermission? ChannelPermission { get; }
 
-        public RequirePermission(GuildPermission permission)
+        public RequirePermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
         }
-        public RequirePermission(ChannelPermission permission)
+        public RequirePermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;
