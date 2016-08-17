@@ -14,8 +14,10 @@
         ObjectNotFound,
         MultipleMatches,
 
+        //Preconditions
+        UnmetPrecondition,
+
         //Execute
-        Exception,
-        UnmetPrecondition
+        Exception
     }
 }

@@ -233,7 +233,7 @@ namespace Discord.Commands
                 return executeResult;
             }
             
-            return ParseResult.FromError(CommandError.ParseFailed, "This input does not match any overload.");
+            return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
         }
     }
 }
