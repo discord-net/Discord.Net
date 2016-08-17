@@ -51,7 +51,7 @@ namespace Discord.Net.WebSockets
 
         public async Task ConnectAsync(string host)
         {
-            await _sendLock.WaitAsync(_cancelToken).ConfigureAwait(false);
+            await _sendLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await ConnectInternalAsync(host);
@@ -83,7 +83,7 @@ namespace Discord.Net.WebSockets
 
         public async Task DisconnectAsync()
         {
-            await _sendLock.WaitAsync(_cancelToken).ConfigureAwait(false);
+            await _sendLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await DisconnectInternalAsync();
@@ -118,7 +118,7 @@ namespace Discord.Net.WebSockets
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
         {
-            await _sendLock.WaitAsync(_cancelToken).ConfigureAwait(false);
+            await _sendLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_client == null) return;
