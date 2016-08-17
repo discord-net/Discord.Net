@@ -84,9 +84,7 @@ namespace Discord.WebSocket
             }
 
             base.Update(model as Model, source);
-
-            MemberCount = model.MemberCount;
-            
+                        
             var channels = new ConcurrentHashSet<ulong>(1, (int)(model.Channels.Length * 1.05));
             {
                 for (int i = 0; i < model.Channels.Length; i++)
@@ -110,7 +108,8 @@ namespace Discord.WebSocket
                     AddOrUpdateUser(model.Presences[i], dataStore, members);
             }
             _members = members;
-            
+            MemberCount = model.MemberCount;
+
             var voiceStates = new ConcurrentDictionary<ulong, VoiceState>(1, (int)(model.VoiceStates.Length * 1.05));
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
