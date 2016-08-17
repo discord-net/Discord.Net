@@ -229,7 +229,10 @@ namespace Discord.WebSocket
             MemberCount--;
             SocketGuildUser member;
             if (_members.TryRemove(id, out member))
+            {
+                DownloadedMemberCount--;
                 return member;
+            }
             return null;
         }
         public override async Task DownloadUsersAsync()
