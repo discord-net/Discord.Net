@@ -5,32 +5,32 @@ An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
 Check out the [documentation](http://rtd.discord.foxbot.me/en/docs-dev/index.html) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
 
-### Installation 
-#### Stable (NuGet)
+## Installation 
+### Stable (NuGet)
 Our stable builds are available from NuGet:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
-#### Unstable (MyGet)
-Bleeding edge builds are available using our `https://www.myget.org/F/discord-net/api/v3/index.json` feed. These builds may break at any time - use with caution.
+### Unstable (MyGet)
+Bleeding edge builds are available using our MyGet feed (`https://www.myget.org/F/discord-net/api/v3/index.json`). These builds may break at any time - use with caution.
 
-### Compiling
+## Compiling
 In order to compile Discord.Net, you require the following:
 
-#### Using Visual Studio 2015
+### Using Visual Studio 2015
 - [VS2015 Update 3](https://www.microsoft.com/net/core#windows)
 - [.Net Core 1.0 VS Plugin](https://www.microsoft.com/net/core#windows)
 
-#### Using CLI
+### Using CLI
 - [.Net Core 1.0 SDK](https://www.microsoft.com/net/core)
 
-### Known Issues
+## Known Issues
 
-#### WebSockets
+### WebSockets
 The current stable .Net Core websocket package does not support Linux, or pre-Win8.
 
-##### Linux
-Get the latest version of `System.Net.WebSockets.Client` from the .Net Core MyGet feed: `https://dotnet.myget.org/F/dotnet-core/api/v3/index.json`.
+#### Linux
+Add the latest version of `System.Net.WebSockets.Client` from the .Net Core MyGet feed (`https://dotnet.myget.org/F/dotnet-core/api/v3/index.json`) to your project.
 
-##### Windows 7 and earlier
+#### Windows 7 and earlier
 There is currently no workaround, track the issue [here](https://github.com/dotnet/corefx/issues/9503).
