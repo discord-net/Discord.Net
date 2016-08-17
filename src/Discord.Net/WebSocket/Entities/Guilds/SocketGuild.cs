@@ -186,6 +186,7 @@ namespace Discord.WebSocket
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
         public SocketGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, SocketGuildUser> members = null)
         {
+            MemberCount++;
             members = members ?? _members;
 
             SocketGuildUser member;
@@ -225,6 +226,7 @@ namespace Discord.WebSocket
         }
         public SocketGuildUser RemoveUser(ulong id)
         {
+            MemberCount--;
             SocketGuildUser member;
             if (_members.TryRemove(id, out member))
                 return member;
