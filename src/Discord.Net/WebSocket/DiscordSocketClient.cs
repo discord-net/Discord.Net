@@ -92,7 +92,7 @@ namespace Discord.WebSocket
             {
                 if (ex != null)
                 {
-                    await _gatewayLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
+                    await _gatewayLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
                     await StartReconnectAsync(ex).ConfigureAwait(false);
                 }
                 else

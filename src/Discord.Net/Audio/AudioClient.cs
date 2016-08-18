@@ -86,7 +86,7 @@ namespace Discord.Audio
             ApiClient.Disconnected += async ex =>
             {
                 if (ex != null)
-                    await _audioLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
+                    await _audioLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
                 else
                     await _audioLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };

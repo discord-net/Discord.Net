@@ -47,7 +47,7 @@ namespace Discord.Rpc
             {
                 if (ex != null)
                 {
-                    await _rpcLogger.WarningAsync($"Connection Closed: {ex.Message}").ConfigureAwait(false);
+                    await _rpcLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
                     await StartReconnectAsync(ex).ConfigureAwait(false);
                 }
                 else
