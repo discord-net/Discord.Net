@@ -99,7 +99,7 @@ namespace Discord.Rest
         }
         public virtual async Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
         {
-            var args = new GetChannelMessagesParams { Limit = limit };
+            var args = new GetChannelMessagesParams { Limit = limit, RelativeMessageId = fromMessageId, RelativeDirection = dir };
             var models = await Discord.ApiClient.GetChannelMessagesAsync(Id, args).ConfigureAwait(false);
             return models.Select(x => new Message(this, new User(x.Author.Value), x)).ToImmutableArray();
         }
