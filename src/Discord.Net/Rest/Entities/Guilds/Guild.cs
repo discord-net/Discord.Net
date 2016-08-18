@@ -162,7 +162,7 @@ namespace Discord.Rest
             var models = await Discord.ApiClient.GetGuildBansAsync(Id).ConfigureAwait(false);
             return models.Select(x => new Ban(new User(x.User), x.Reason)).ToImmutableArray();
         }
-        public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user, pruneDays);
+        public Task AddBanAsync(IUser user, int pruneDays = 0) => AddBanAsync(user.Id, pruneDays);
         public async Task AddBanAsync(ulong userId, int pruneDays = 0)
         {
             var args = new CreateGuildBanParams() { DeleteMessageDays = pruneDays };
