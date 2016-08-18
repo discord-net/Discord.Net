@@ -7,6 +7,7 @@ namespace Discord.Commands
     public class NameAttribute : Attribute
     {
         public string Text { get; }
+
         public NameAttribute(string text)
         {
             Text = text;

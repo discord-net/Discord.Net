@@ -5,7 +5,7 @@ namespace Discord
     internal static class Permissions
     {
         public const int MaxBits = 53;
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static PermValue GetValue(ulong allow, ulong deny, ChannelPermission bit)
             => GetValue(allow, deny, (byte)bit);

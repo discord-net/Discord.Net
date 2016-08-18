@@ -6,7 +6,7 @@ namespace Discord.Commands
     public class ModuleAttribute : Attribute
     {
         public string Prefix { get; }
-        public bool AutoLoad { get; }
+        public bool AutoLoad { get; set; }
 
         public ModuleAttribute()
         {
