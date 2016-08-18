@@ -88,11 +88,18 @@ namespace Discord
 
         public static ulong ResolveGuild(IGuildUser user)
         {
-            var roles = user.Roles;
-            ulong newPermissions = 0;
-            foreach (var role in roles)
-                newPermissions |= role.Permissions.RawValue;
-            return newPermissions;
+            ulong resolvedPermissions = 0;
+            
+            if (user.Id == user.Guild.OwnerId)
+                resolvedPermissions = GuildPermissions.All.RawValue; //Owners always have all permissions
+            else
+            {
+                foreach (var role in user.Roles)
+                    resolvedPermissions |= role.Permissions.RawValue;
+                if (GetValue(resolvedPermissions, GuildPermission.Administrator))
+                    resolvedPermissions = GuildPermissions.All.RawValue; //Administrators always have all permissions
+            }
+            return resolvedPermissions;
         }
 
         /*public static ulong ResolveChannel(IGuildUser user, IGuildChannel channel)
@@ -104,7 +111,7 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (user.Id == user.Guild.OwnerId || GetValue(guildPermissions, GuildPermission.Administrator))
+            if (/*user.Id == user.Guild.OwnerId || */GetValue(guildPermissions, GuildPermission.Administrator))
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
