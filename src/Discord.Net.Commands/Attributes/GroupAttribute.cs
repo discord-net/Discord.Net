@@ -6,6 +6,7 @@ namespace Discord.Commands
     public class GroupAttribute : Attribute
     {
         public string Prefix { get; }
+
         public GroupAttribute()
         {
             Prefix = null;
