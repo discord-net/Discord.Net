@@ -25,6 +25,10 @@ namespace Discord.Commands
             Name = source.Name;
             Instance = instance;
 
+            var nameAttr = source.GetCustomAttribute<NameAttribute>();
+            if (nameAttr != null)
+                Name = nameAttr.Text;
+
             var summaryAttr = source.GetCustomAttribute<SummaryAttribute>();
             if (summaryAttr != null)
                 Summary = summaryAttr.Text;

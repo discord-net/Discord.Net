@@ -31,6 +31,10 @@ namespace Discord.Commands
             Name = source.Name;
             Text = groupPrefix + attribute.Text;
 
+            var nameAttr = source.GetCustomAttribute<NameAttribute>();
+            if (nameAttr != null)
+                Name = nameAttr.Text;
+
             var description = source.GetCustomAttribute<DescriptionAttribute>();
             if (description != null)
                 Description = description.Text;
