@@ -27,13 +27,16 @@ namespace Discord.Commands
         {
             var guildUser = context.Author as IGuildUser;
 
-            if (Fuzzy)
+            if (guildUser != null)
             {
-                if (guildUser.Id == guildUser.Guild.OwnerId)
-                    return Task.FromResult(PreconditionResult.FromSuccess());
+                if (Fuzzy)
+                {
+                    if (guildUser.Id == guildUser.Guild.OwnerId)
+                        return Task.FromResult(PreconditionResult.FromSuccess());
 
-                if (guildUser.GuildPermissions.Administrator)
-                    return Task.FromResult(PreconditionResult.FromSuccess());
+                    if (guildUser.GuildPermissions.Administrator)
+                        return Task.FromResult(PreconditionResult.FromSuccess());
+                }
             }
 
             if (GuildPermission.HasValue)
