@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
-    // Full summary of method
+    // Override public name of command/module
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class NameAttribute : Attribute
     {
