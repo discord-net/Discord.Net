@@ -8,10 +8,10 @@ namespace Discord
     public struct ChannelPermissions
     {
         //TODO: C#7 Candidate for binary literals
-        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000000011100110000000000", 2));
-        private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000011001", 2));
-        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000000111111110000011001", 2));
-        private static ChannelPermissions _allGroup { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000000111111110000011001", 2));
+        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64(   "00000000000000011100110000000000", 2));
+        private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000010001", 2));
+        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64( "00010000000000111111110000010001", 2));
+        private static ChannelPermissions _allGroup { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000000111110110000000000", 2));
 
         /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
         public static ChannelPermissions None { get; } = new ChannelPermissions();
