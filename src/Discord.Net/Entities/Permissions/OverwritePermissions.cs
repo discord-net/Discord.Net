@@ -20,43 +20,43 @@ namespace Discord
         /// <summary> Gets a packed value representing all the denied permissions in this OverwritePermissions. </summary>
         public ulong DenyValue { get; }
 
-        /// <summary> If True, a user may create invites. </summary>
+        /// <summary> If Allowed, a user may create invites. </summary>
         public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateInstantInvite);
-        /// <summary> If True, a user may create, delete and modify this channel. </summary>
+        /// <summary> If Allowed, a user may create, delete and modify this channel. </summary>
         public PermValue ManageChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageChannel);
-        /// <summary> If True, a user may join channels. </summary>
+        /// <summary> If Allowed, a user may join channels. </summary>
         public PermValue ReadMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessages);
-        /// <summary> If True, a user may send messages. </summary>
+        /// <summary> If Allowed, a user may send messages. </summary>
         public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);
-        /// <summary> If True, a user may send text-to-speech messages. </summary>
+        /// <summary> If Allowed, a user may send text-to-speech messages. </summary>
         public PermValue SendTTSMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendTTSMessages);
-        /// <summary> If True, a user may delete messages. </summary>
+        /// <summary> If Allowed, a user may delete messages. </summary>
         public PermValue ManageMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageMessages);
-        /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
+        /// <summary> If Allowed, Discord will auto-embed links sent by this user. </summary>
         public PermValue EmbedLinks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.EmbedLinks);
-        /// <summary> If True, a user may send files. </summary>
+        /// <summary> If Allowed, a user may send files. </summary>
         public PermValue AttachFiles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AttachFiles);
-        /// <summary> If True, a user may read previous messages. </summary>
+        /// <summary> If Allowed, a user may read previous messages. </summary>
         public PermValue ReadMessageHistory => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessageHistory);
-        /// <summary> If True, a user may mention @everyone. </summary>
+        /// <summary> If Allowed, a user may mention @everyone. </summary>
         public PermValue MentionEveryone => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MentionEveryone);
-        /// <summary> If True, a user may use custom emoji from other guilds. </summary>
+        /// <summary> If Allowed, a user may use custom emoji from other guilds. </summary>
         public PermValue UseExternalEmojis => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalEmojis);
 
-        /// <summary> If True, a user may connect to a voice channel. </summary>
+        /// <summary> If Allowed, a user may connect to a voice channel. </summary>
         public PermValue Connect => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Connect);
-        /// <summary> If True, a user may speak in a voice channel. </summary>
+        /// <summary> If Allowed, a user may speak in a voice channel. </summary>
         public PermValue Speak => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Speak);
-        /// <summary> If True, a user may mute users. </summary>
+        /// <summary> If Allowed, a user may mute users. </summary>
         public PermValue MuteMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MuteMembers);
-        /// <summary> If True, a user may deafen users. </summary>
+        /// <summary> If Allowed, a user may deafen users. </summary>
         public PermValue DeafenMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.DeafenMembers);
-        /// <summary> If True, a user may move other users between voice channels. </summary>
+        /// <summary> If Allowed, a user may move other users between voice channels. </summary>
         public PermValue MoveMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MoveMembers);
-        /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        /// <summary> If Allowed, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseVAD);
 
-        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
+        /// <summary> If Allowed, a user may adjust permissions. This also implictly grants all other permissions. </summary>
         public PermValue ManagePermissions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManagePermissions);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
