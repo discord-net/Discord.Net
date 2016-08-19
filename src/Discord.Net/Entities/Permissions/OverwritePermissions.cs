@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -41,6 +40,8 @@ namespace Discord
         public PermValue ReadMessageHistory => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessageHistory);
         /// <summary> If True, a user may mention @everyone. </summary>
         public PermValue MentionEveryone => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MentionEveryone);
+        /// <summary> If True, a user may use custom emoji from other guilds. </summary>
+        public PermValue UseExternalEmojis => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalEmojis);
 
         /// <summary> If True, a user may connect to a voice channel. </summary>
         public PermValue Connect => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Connect);
@@ -68,8 +69,8 @@ namespace Discord
         private OverwritePermissions(ulong allowValue, ulong denyValue, PermValue? createInstantInvite = null, PermValue? manageChannel = null, 
             PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
             PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
-            PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
-            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null)
+            PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, 
+            PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null)
         {
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannel);
@@ -81,6 +82,7 @@ namespace Discord
             Permissions.SetValue(ref allowValue, ref denyValue, attachFiles, ChannelPermission.AttachFiles);
             Permissions.SetValue(ref allowValue, ref denyValue, readMessageHistory, ChannelPermission.ReadMessageHistory);
             Permissions.SetValue(ref allowValue, ref denyValue, mentionEveryone, ChannelPermission.MentionEveryone);
+            Permissions.SetValue(ref allowValue, ref denyValue, useExternalEmojis, ChannelPermission.UseExternalEmojis);
             Permissions.SetValue(ref allowValue, ref denyValue, connect, ChannelPermission.Connect);
             Permissions.SetValue(ref allowValue, ref denyValue, speak, ChannelPermission.Speak);
             Permissions.SetValue(ref allowValue, ref denyValue, muteMembers, ChannelPermission.MuteMembers);
@@ -96,21 +98,21 @@ namespace Discord
         /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
         public OverwritePermissions(PermValue createInstantInvite = PermValue.Inherit, PermValue manageChannel = PermValue.Inherit, 
             PermValue readMessages = PermValue.Inherit, PermValue sendMessages = PermValue.Inherit, PermValue sendTTSMessages = PermValue.Inherit, PermValue manageMessages = PermValue.Inherit, 
-            PermValue embedLinks = PermValue.Inherit, PermValue attachFiles = PermValue.Inherit, PermValue readMessageHistory = PermValue.Inherit, PermValue mentionEveryone = PermValue.Inherit, 
-            PermValue connect = PermValue.Inherit, PermValue speak = PermValue.Inherit, PermValue muteMembers = PermValue.Inherit, PermValue deafenMembers = PermValue.Inherit,
+            PermValue embedLinks = PermValue.Inherit, PermValue attachFiles = PermValue.Inherit, PermValue readMessageHistory = PermValue.Inherit, PermValue mentionEveryone = PermValue.Inherit,
+            PermValue useExternalEmojis = PermValue.Inherit, PermValue connect = PermValue.Inherit, PermValue speak = PermValue.Inherit, PermValue muteMembers = PermValue.Inherit, PermValue deafenMembers = PermValue.Inherit,
             PermValue moveMembers = PermValue.Inherit, PermValue useVoiceActivation = PermValue.Inherit, PermValue managePermissions = PermValue.Inherit)
             : this(0, 0, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages, 
-                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
+                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                   moveMembers, useVoiceActivation, managePermissions) { }
 
         /// <summary> Creates a new OverwritePermissions from this one, changing the provided non-null permissions. </summary>
         public OverwritePermissions Modify(PermValue? createInstantInvite = null, PermValue? manageChannel = null, 
             PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
             PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
-            PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
+            PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
             PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null)
             => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages, 
-                embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers, 
+                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, managePermissions);
 
         public List<ChannelPermission> ToAllowList()

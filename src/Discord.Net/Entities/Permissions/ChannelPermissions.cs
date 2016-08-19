@@ -8,10 +8,10 @@ namespace Discord
     public struct ChannelPermissions
     {
         //TODO: C#7 Candidate for binary literals
-        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64(   "00000000000000011100110000000000", 2));
+        private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000001011100110000000000", 2));
         private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000010001", 2));
-        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64( "00010000000000111111110000010001", 2));
-        private static ChannelPermissions _allGroup { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000000111110110000000000", 2));
+        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000001111111110000010001", 2));
+        private static ChannelPermissions _allGroup { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000001111110110000000000", 2));
 
         /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
         public static ChannelPermissions None { get; } = new ChannelPermissions();
@@ -51,6 +51,8 @@ namespace Discord
         public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
         /// <summary> If True, a user may mention @everyone. </summary>
         public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
+        /// <summary> If True, a user may use custom emoji from other guilds. </summary>
+        public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.UseExternalEmojis);
 
         /// <summary> If True, a user may connect to a voice channel. </summary>
         public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
@@ -74,7 +76,7 @@ namespace Discord
         private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
         {
             ulong value = initialValue;
@@ -89,6 +91,7 @@ namespace Discord
             Permissions.SetValue(ref value, attachFiles, ChannelPermission.AttachFiles);
             Permissions.SetValue(ref value, readMessageHistory, ChannelPermission.ReadMessageHistory);
             Permissions.SetValue(ref value, mentionEveryone, ChannelPermission.MentionEveryone);
+            Permissions.SetValue(ref value, useExternalEmojis, ChannelPermission.UseExternalEmojis);
             Permissions.SetValue(ref value, connect, ChannelPermission.Connect);
             Permissions.SetValue(ref value, speak, ChannelPermission.Speak);
             Permissions.SetValue(ref value, muteMembers, ChannelPermission.MuteMembers);
@@ -104,21 +107,22 @@ namespace Discord
         public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false,
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
-            bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
+            bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
             bool moveMembers = false, bool useVoiceActivation = false, bool managePermissions = false)
             : this(0, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
-                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers,
-                  moveMembers, useVoiceActivation, managePermissions) { }
+                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, 
+                  speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
+        { }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
         public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool useExternalEmojis = false, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
             => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
-                embedLinks, attachFiles, readMessageHistory, mentionEveryone, connect, speak, muteMembers, deafenMembers,
-                moveMembers, useVoiceActivation, managePermissions);
+                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, 
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 

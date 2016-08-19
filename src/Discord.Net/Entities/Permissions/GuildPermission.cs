@@ -19,6 +19,7 @@
         AttachFiles = 15,
         ReadMessageHistory = 16,
         MentionEveryone = 17,
+        UseExternalEmojis = 18,
 
         //Voice
         Connect = 20,
