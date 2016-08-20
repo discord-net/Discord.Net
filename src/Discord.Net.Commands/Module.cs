@@ -19,7 +19,7 @@ namespace Discord.Commands
 
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal Module(TypeInfo source, CommandService service, object instance, ModuleAttribute moduleAttr)
+        internal Module(TypeInfo source, CommandService service, object instance, ModuleAttribute moduleAttr, IDependencyMap dependencyMap)
         {
             Source = source;
             Service = service;
@@ -40,13 +40,13 @@ namespace Discord.Commands
                 Description = descriptionAttr.Text;
 
             List<Command> commands = new List<Command>();
-            SearchClass(source, instance, commands, Prefix);
+            SearchClass(source, instance, commands, Prefix, dependencyMap);
             Commands = commands;
 
             Preconditions = BuildPreconditions();
         }
 
-        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix)
+        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, IDependencyMap dependencyMap)
         {
             if (groupPrefix != "")
                 groupPrefix += " ";
@@ -66,7 +66,7 @@ namespace Discord.Commands
                         nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
                     else
                         nextGroupPrefix = groupPrefix;
-                    SearchClass(type, ReflectionUtils.CreateObject(type, Service), commands, nextGroupPrefix);
+                    SearchClass(type, ReflectionUtils.CreateObject(type, Service, dependencyMap), commands, nextGroupPrefix, dependencyMap);
                 }
             }
         }
