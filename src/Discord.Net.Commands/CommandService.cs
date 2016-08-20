@@ -108,19 +108,19 @@ namespace Discord.Commands
                 if (moduleAttr == null)
                     throw new ArgumentException($"Modules must be marked with ModuleAttribute.");
 
-                return LoadInternal(moduleInstance, moduleAttr, typeInfo);
+                return LoadInternal(moduleInstance, moduleAttr, typeInfo, null);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private Module LoadInternal(object moduleInstance, ModuleAttribute moduleAttr, TypeInfo typeInfo)
+        private Module LoadInternal(object moduleInstance, ModuleAttribute moduleAttr, TypeInfo typeInfo, IDependencyMap dependencyMap)
         {
             if (_modules.ContainsKey(moduleInstance.GetType()))
                 return _modules[moduleInstance.GetType()];
 
-            var loadedModule = new Module(typeInfo, this, moduleInstance, moduleAttr);
+            var loadedModule = new Module(typeInfo, this, moduleInstance, moduleAttr, dependencyMap);
             _modules[moduleInstance.GetType()] = loadedModule;
 
             foreach (var cmd in loadedModule.Commands)
@@ -141,7 +141,7 @@ namespace Discord.Commands
                     if (moduleAttr != null && moduleAttr.AutoLoad)
                     {
                         var moduleInstance = ReflectionUtils.CreateObject(typeInfo, this, dependencyMap);
-                        modules.Add(LoadInternal(moduleInstance, moduleAttr, typeInfo));
+                        modules.Add(LoadInternal(moduleInstance, moduleAttr, typeInfo, dependencyMap));
                     }
                 }
                 return modules.ToImmutable();
