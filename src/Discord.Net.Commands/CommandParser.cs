@@ -1,8 +1,10 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
 
 namespace Discord.Commands
 {
@@ -14,6 +16,9 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
+
+        private static readonly MethodInfo _convertArrayMethod = typeof(CommandParser).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
+        private static readonly ConcurrentDictionary<Type, Func<List<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<List<object>, object>>();
         
         public static async Task<ParseResult> ParseArgs(Command command, IMessage context, string input, int startPos)
         {
@@ -122,11 +127,12 @@ namespace Discord.Commands
 
                         if (curPos == endPos)
                         {
-                            Array realParams = Array.CreateInstance(curParam.ElementType, paramsList.Count);
-                            for (int i = 0; i < paramsList.Count; i++)
-                                realParams.SetValue(Convert.ChangeType(paramsList[i], curParam.ElementType), i);
-
-                            argList.Add(realParams);
+                            var func = _arrayConverters.GetOrAdd(curParam.ElementType, t =>
+                            {
+                                var method = _convertArrayMethod.MakeGenericMethod(t);
+                                return (Func<List<object>, object>)method.CreateDelegate(typeof(Func<List<object>, object>));
+                            });
+                            argList.Add(func.Invoke(paramsList));
 
                             curParam = null;
                             curPart = ParserPart.None;
@@ -168,6 +174,14 @@ namespace Discord.Commands
             }
 
             return ParseResult.FromSuccess(argList.ToImmutable());
+        }
+
+        private static T[] ConvertParamsList<T>(List<object> paramsList)
+        {
+            var array = new T[paramsList.Count];
+            for (int i = 0; i < array.Length; i++)
+                array[i] = (T)paramsList[i];
+            return array;
         }
     }
 }
