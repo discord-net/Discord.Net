@@ -1,36 +1,46 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    internal class RoleTypeReader : TypeReader
+    internal class RoleTypeReader<T> : TypeReader
+        where T : class, IRole
     {
         public override Task<TypeReaderResult> Read(IMessage context, string input)
         {
-            IGuildChannel guildChannel = context.Channel as IGuildChannel;
+            var guild = (context.Channel as IGuildChannel)?.Guild;
+            ulong id;
 
-            if (guildChannel != null)
+            if (guild != null)
             {
-                //By Id
-                ulong id;
-                if (MentionUtils.TryParseRole(input, out id) || ulong.TryParse(input, out id))
-                {
-                    var channel = guildChannel.Guild.GetRole(id);
-                    if (channel != null)
-                        return Task.FromResult(TypeReaderResult.FromSuccess(channel));
-                }
+                var results = new Dictionary<ulong, TypeReaderValue>();
+                var roles = guild.Roles;
 
-                //By Name
-                var roles = guildChannel.Guild.Roles;
-                var filteredRoles = roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)).ToArray();
-                if (filteredRoles.Length > 1)
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.MultipleMatches, "Multiple roles found."));
-                else if (filteredRoles.Length == 1)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(filteredRoles[0]));
+                //By Mention (1.0)
+                if (MentionUtils.TryParseRole(input, out id))
+                    AddResult(results, guild.GetRole(id) as T, 1.00f);
+
+                //By Id (0.9)
+                if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                     AddResult(results, guild.GetRole(id) as T, 0.90f);
+
+                //By Name (0.7-0.8)
+                foreach (var role in roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
+                    AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
+
+                if (results.Count > 0)
+                    return Task.FromResult(TypeReaderResult.FromSuccess(results));
             }
-            
             return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
+        }
+
+        private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)
+        {
+            if (role != null && !results.ContainsKey(role.Id))
+                results.Add(role.Id, new TypeReaderValue(role, score));
         }
     }
 }

@@ -7,18 +7,17 @@ namespace Discord.Commands
     {
         public override Task<TypeReaderResult> Read(IMessage context, string input)
         {
-            //By Id
             ulong id;
+
+            //By Id (1.0)
             if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
             {
                 var msg = context.Channel.GetCachedMessage(id);
-                if (msg == null)
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Message not found."));
-                else
+                if (msg != null)
                     return Task.FromResult(TypeReaderResult.FromSuccess(msg));
             }
 
-            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse Message Id."));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Message not found."));
         }
     }
 }

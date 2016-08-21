@@ -40,16 +40,8 @@ namespace Discord.Commands
                 [typeof(decimal)] = new SimpleTypeReader<decimal>(),
                 [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
                 [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
-
-                //TODO: Do we want to support any other interfaces?
-
-                //[typeof(IMentionable)] = new GeneralTypeReader(),
-                //[typeof(ISnowflakeEntity)] = new GeneralTypeReader(),
-                //[typeof(IEntity<ulong>)] = new GeneralTypeReader(),
-
+                
                 [typeof(IMessage)] = new MessageTypeReader(),
-                //[typeof(IAttachment)] = new xxx(),
-                //[typeof(IEmbed)] = new xxx(),
 
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
                 [typeof(IDMChannel)] = new ChannelTypeReader<IDMChannel>(),
@@ -61,10 +53,8 @@ namespace Discord.Commands
                 [typeof(IVoiceChannel)] = new ChannelTypeReader<IVoiceChannel>(),
 
                 //[typeof(IGuild)] = new GuildTypeReader<IGuild>(),
-                //[typeof(IUserGuild)] = new GuildTypeReader<IUserGuild>(),
-                //[typeof(IGuildIntegration)] = new xxx(),
 
-                [typeof(IRole)] = new RoleTypeReader(),
+                [typeof(IRole)] = new RoleTypeReader<IRole>(),
 
                 //[typeof(IInvite)] = new InviteTypeReader<IInvite>(),
                 //[typeof(IInviteMetadata)] = new InviteTypeReader<IInviteMetadata>(),
@@ -72,10 +62,6 @@ namespace Discord.Commands
                 [typeof(IUser)] = new UserTypeReader<IUser>(),
                 [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
-                //[typeof(ISelfUser)] = new UserTypeReader<ISelfUser>(),
-                //[typeof(IPresence)] = new UserTypeReader<IPresence>(),
-                //[typeof(IVoiceState)] = new UserTypeReader<IVoiceState>(),
-                //[typeof(IConnection)] = new xxx(),
             };
         }
 
@@ -201,8 +187,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(IMessage message, int argPos) => Execute(message, message.Content.Substring(argPos));
-        public async Task<IResult> Execute(IMessage message, string input)
+        public Task<IResult> Execute(IMessage message, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+            => Execute(message, message.Content.Substring(argPos), multiMatchHandling);
+        public async Task<IResult> Execute(IMessage message, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             var searchResult = Search(message, input);
             if (!searchResult.IsSuccess)
@@ -223,14 +210,29 @@ namespace Discord.Commands
                 var parseResult = await commands[i].Parse(message, searchResult, preconditionResult);
                 if (!parseResult.IsSuccess)
                 {
-                    if (commands.Count == 1)
-                        return parseResult;
-                    else
-                        continue;
+                    if (parseResult.Error == CommandError.MultipleMatches)
+                    {
+                        TypeReaderValue[] argList, paramList;
+                        switch (multiMatchHandling)
+                        {
+                            case MultiMatchHandling.Best:
+                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
+                                paramList = parseResult.ParamValues?.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
+                                parseResult = ParseResult.FromSuccess(argList, paramList);
+                                break;
+                        }
+                    }
+
+                    if (!parseResult.IsSuccess)
+                    {
+                        if (commands.Count == 1)
+                            return parseResult;
+                        else
+                            continue;
+                    }
                 }
 
-                var executeResult = await commands[i].Execute(message, parseResult);
-                return executeResult;
+                return await commands[i].Execute(message, parseResult);
             }
             
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");

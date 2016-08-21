@@ -16,8 +16,7 @@ namespace Discord.Commands
             T value;
             if (_tryParse(input, out value))
                 return Task.FromResult(TypeReaderResult.FromSuccess(value));
-            else
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Failed to parse {typeof(T).Name}"));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Failed to parse {typeof(T).Name}"));
         }
     }
 }

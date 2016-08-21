@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -10,6 +12,9 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Command
     {
+        private static readonly MethodInfo _convertParamsMethod = typeof(Command).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
+        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
+
         private readonly object _instance;
         private readonly Func<IMessage, IReadOnlyList<object>, Task> _action;
 
@@ -19,6 +24,7 @@ namespace Discord.Commands
         public string Description { get; }
         public string Summary { get; }
         public string Text { get; }
+        public bool HasVarArgs { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
@@ -42,8 +48,9 @@ namespace Discord.Commands
             var summary = source.GetCustomAttribute<SummaryAttribute>();
             if (summary != null)
                 Summary = summary.Text;
-
+            
             Parameters = BuildParameters(source);
+            HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
             Preconditions = BuildPreconditions(source);
             _action = BuildAction(source);
         }
@@ -76,14 +83,38 @@ namespace Discord.Commands
 
             return await CommandParser.ParseArgs(this, msg, searchResult.Text.Substring(Text.Length), 0).ConfigureAwait(false);
         }
-        public async Task<ExecuteResult> Execute(IMessage msg, ParseResult parseResult)
+        public Task<ExecuteResult> Execute(IMessage msg, ParseResult parseResult)
         {
             if (!parseResult.IsSuccess)
-                return ExecuteResult.FromError(parseResult);
+                return Task.FromResult(ExecuteResult.FromError(parseResult));
 
+            var argList = new object[parseResult.ArgValues.Count];
+            for (int i = 0; i < parseResult.ArgValues.Count; i++)
+            {
+                if (!parseResult.ArgValues[i].IsSuccess)
+                    return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
+                argList[i] = parseResult.ArgValues[i].Values.First().Value;
+            }
+
+            object[] paramList = null;
+            if (parseResult.ParamValues != null)
+            {
+                paramList = new object[parseResult.ParamValues.Count];
+                for (int i = 0; i < parseResult.ParamValues.Count; i++)
+                {
+                    if (!parseResult.ParamValues[i].IsSuccess)
+                        return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                    paramList[i] = parseResult.ParamValues[i].Values.First().Value;
+                }
+            }
+
+            return Execute(msg, argList, paramList);
+        }
+        public async Task<ExecuteResult> Execute(IMessage msg, IEnumerable<object> argList, IEnumerable<object> paramList)
+        {
             try
             {
-                await _action.Invoke(msg, parseResult.Values);//Note: This code may need context
+                await _action.Invoke(msg, GenerateArgs(argList, paramList)).ConfigureAwait(false);//Note: This code may need context
                 return ExecuteResult.FromSuccess();
             }
             catch (Exception ex)
@@ -108,7 +139,7 @@ namespace Discord.Commands
             {
                 var parameter = parameters[i];
                 var type = parameter.ParameterType;
-                
+
                 //Detect 'params'
                 bool isMultiple = parameter.GetCustomAttribute<ParamArrayAttribute>() != null;
                 if (isMultiple)
@@ -155,6 +186,39 @@ namespace Discord.Commands
                 return result as Task ?? Task.CompletedTask;
             };
         }
+
+        private object[] GenerateArgs(IEnumerable<object> argList, IEnumerable<object> paramsList)
+        {
+            int argCount = Parameters.Count;
+            var array = new object[Parameters.Count];
+            if (HasVarArgs)
+                argCount--;
+
+            int i = 0;
+            foreach (var arg in argList)
+            {
+                if (i == argCount)
+                    throw new InvalidOperationException("Command was invoked with too many parameters");
+                array[i++] = arg;
+            }
+            if (i < argCount)
+                throw new InvalidOperationException("Command was invoked with too few parameters");
+
+            if (HasVarArgs)
+            {
+                var func = _arrayConverters.GetOrAdd(Parameters[Parameters.Count - 1].ElementType, t =>
+                {
+                    var method = _convertParamsMethod.MakeGenericMethod(t);
+                    return (Func<IEnumerable<object>, object>)method.CreateDelegate(typeof(Func<IEnumerable<object>, object>));
+                });
+                array[i] = func(paramsList);
+            }
+
+            return array;
+        }
+
+        private static T[] ConvertParamsList<T>(IEnumerable<object> paramsList)
+            => paramsList.Cast<T>().ToArray();
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Module.Name}.{Name} ({Text})";

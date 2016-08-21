@@ -17,7 +17,7 @@ namespace Discord.Commands
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
         public Type ElementType { get; }
-        internal object DefaultValue { get; }
+        public object DefaultValue { get; }
 
         public CommandParameter(ParameterInfo source, string name, string summary, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
         {

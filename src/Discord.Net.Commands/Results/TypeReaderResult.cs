@@ -1,32 +1,56 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct TypeReaderResult : IResult
+    public struct TypeReaderValue
     {
         public object Value { get; }
+        public float Score { get; }
+
+        public TypeReaderValue(object value, float score)
+        {
+            Value = value;
+            Score = score;
+        }
+
+        public override string ToString() => Value?.ToString();
+        private string DebuggerDisplay => $"[{Value}, {Math.Round(Score, 2)}]";
+    }
+
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    public struct TypeReaderResult : IResult
+    {
+        public IReadOnlyCollection<TypeReaderValue> Values { get; }
 
         public CommandError? Error { get; }
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
 
-        private TypeReaderResult(object value, CommandError? error, string errorReason)
+        private TypeReaderResult(IReadOnlyCollection<TypeReaderValue> values, CommandError? error, string errorReason)
         {
-            Value = value;
+            Values = values;
             Error = error;
             ErrorReason = errorReason;
         }
 
         public static TypeReaderResult FromSuccess(object value)
-            => new TypeReaderResult(value, null, null);
+            => new TypeReaderResult(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), null, null);
+        public static TypeReaderResult FromSuccess(TypeReaderValue value)
+            => new TypeReaderResult(ImmutableArray.Create(value), null, null);
+        public static TypeReaderResult FromSuccess(IReadOnlyCollection<TypeReaderValue> values)
+            => new TypeReaderResult(values, null, null);
         public static TypeReaderResult FromError(CommandError error, string reason)
             => new TypeReaderResult(null, error, reason);
         public static TypeReaderResult FromError(IResult result)
             => new TypeReaderResult(null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
-        private string DebuggerDisplay => IsSuccess ? $"Success ({Value})" : $"{Error}: {ErrorReason}";
+        private string DebuggerDisplay => IsSuccess ? $"Success ({string.Join(", ", Values)})" : $"{Error}: {ErrorReason}";
     }
 }

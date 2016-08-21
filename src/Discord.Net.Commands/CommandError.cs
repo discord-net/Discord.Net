@@ -3,14 +3,14 @@
     public enum CommandError
     {
         //Search
-        UnknownCommand,
+        UnknownCommand = 1,
 
         //Parse
         ParseFailed,
         BadArgCount,
 
         //Parse (Type Reader)
-        CastFailed,
+        //CastFailed,
         ObjectNotFound,
         MultipleMatches,
 

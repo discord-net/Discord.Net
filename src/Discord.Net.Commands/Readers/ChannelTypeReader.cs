@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,40 +11,37 @@ namespace Discord.Commands
     {
         public override async Task<TypeReaderResult> Read(IMessage context, string input)
         {
-            IGuildChannel guildChannel = context.Channel as IGuildChannel;
-            IChannel result = null;
+            var guild = (context.Channel as IGuildChannel)?.Guild;
 
-            if (guildChannel != null)
+            if (guild != null)
             {
-                //By Id
+                var results = new Dictionary<ulong, TypeReaderValue>();
+                var channels = await guild.GetChannelsAsync().ConfigureAwait(false);
                 ulong id;
-                if (MentionUtils.TryParseChannel(input, out id) || ulong.TryParse(input, out id))
-                {
-                    var channel = await guildChannel.Guild.GetChannelAsync(id).ConfigureAwait(false);
-                    if (channel != null)
-                        result = channel;
-                }
 
-                //By Name
-                if (result == null)
-                {
-                    var channels = await guildChannel.Guild.GetChannelsAsync().ConfigureAwait(false);
-                    var filteredChannels = channels.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)).ToArray();
-                    if (filteredChannels.Length > 1)
-                        return TypeReaderResult.FromError(CommandError.MultipleMatches, "Multiple channels found.");
-                    else if (filteredChannels.Length == 1)
-                        result = filteredChannels[0];
-                }
+                //By Mention (1.0)
+                if (MentionUtils.TryParseChannel(input, out id))
+                    AddResult(results, await guild.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+
+                //By Id (0.9)
+                if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                    AddResult(results, await guild.GetChannelAsync(id).ConfigureAwait(false) as T, 0.90f);
+
+                //By Name (0.7-0.8)
+                foreach (var channel in channels.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
+                    AddResult(results, channel as T, channel.Name == input ? 0.80f : 0.70f);
+
+                if (results.Count > 0)
+                    return TypeReaderResult.FromSuccess(results.Values);
             }
 
-            if (result == null)
-                return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Channel not found.");
+            return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Channel not found.");
+        }
 
-            T castResult = result as T;
-            if (castResult == null)
-                return TypeReaderResult.FromError(CommandError.CastFailed, $"Channel is not a {typeof(T).Name}.");
-            else
-                return TypeReaderResult.FromSuccess(castResult);
+        private void AddResult(Dictionary<ulong, TypeReaderValue> results, T channel, float score)
+        {
+            if (channel != null && !results.ContainsKey(channel.Id))
+                results.Add(channel.Id, new TypeReaderValue(channel, score));
         }
     }
 }
