@@ -41,9 +41,13 @@ namespace Discord.Commands
             var argList = new TypeReaderResult[argValues.Count];
             for (int i = 0; i < argValues.Count; i++)
                 argList[i] = TypeReaderResult.FromSuccess(argValues[i]);
-            var paramList = new TypeReaderResult[paramValues.Count];
-            for (int i = 0; i < paramValues.Count; i++)
-                paramList[i] = TypeReaderResult.FromSuccess(paramValues[i]);
+            TypeReaderResult[] paramList = null;
+            if (paramValues != null)
+            {
+                paramList = new TypeReaderResult[paramValues.Count];
+                for (int i = 0; i < paramValues.Count; i++)
+                    paramList[i] = TypeReaderResult.FromSuccess(paramValues[i]);
+            }
             return new ParseResult(argList, paramList, null, null);
         }
 

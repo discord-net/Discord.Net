@@ -156,7 +156,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete");
             
             //Add missing optionals
-            for (int i = paramList.Count; i < command.Parameters.Count; i++)
+            for (int i = argList.Count; i < command.Parameters.Count; i++)
             {
                 var param = command.Parameters[i];
                 if (!param.IsOptional)
