@@ -23,7 +23,8 @@
     "Release": {
       "buildOptions": {
         "define": [ "RELEASE" ],
-        "nowarn": [ "CS1573", "CS1591" ]
+        "nowarn": [ "CS1573", "CS1591" ],
+        "optimize": true
       }
     }
   },
