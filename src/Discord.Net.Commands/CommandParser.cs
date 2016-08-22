@@ -22,7 +22,7 @@ namespace Discord.Commands
             var curPart = ParserPart.None;
             int lastArgEndPos = int.MinValue;
             var argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
-            ImmutableArray<TypeReaderResult>.Builder paramList = null;
+            ImmutableArray<TypeReaderResult>.Builder paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
             bool hasMultipleMatches = false;
             char c;
@@ -121,8 +121,6 @@ namespace Discord.Commands
 
                     if (curParam.IsMultiple)
                     {
-                        if (paramList == null)
-                            paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
                         paramList.Add(typeReaderResult);
 
                         if (curPos == endPos)
