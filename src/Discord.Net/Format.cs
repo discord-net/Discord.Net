@@ -1,5 +1,6 @@
 ﻿namespace Discord
 {
+    /// <summary> Contains common macros for formatting text using Markdown </summary>
     public static class Format
     {
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
