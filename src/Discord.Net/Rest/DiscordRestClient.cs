@@ -15,15 +15,19 @@ using Discord.WebSocket;
 
 namespace Discord.Rest
 {
+    /// <summary> A client which invokes Discord's REST API. </summary>
     public class DiscordRestClient : IDiscordClient
     {
         private readonly object _eventLock = new object();
 
+        /// <summary> Fired whenever a message is logged. </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         private readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
+        /// <summary> Fired whenever the client logs in. </summary>
         public event Func<Task> LoggedIn { add { _loggedInEvent.Add(value); } remove { _loggedInEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedInEvent = new AsyncEvent<Func<Task>>();
+        /// <summary> Fired whenever the client logs out. </summary>
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
@@ -33,12 +37,15 @@ namespace Discord.Rest
         private bool _isFirstLogSub;
         internal bool _isDisposed;
 
+        /// <summary> The API client used for making API calls. </summary>
         public API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
+        /// <summary> The current login state of the client. </summary>
         public LoginState LoginState { get; private set; }
 
         /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
+        /// <summary> Creates a new REST-only discord client. </summary>
         public DiscordRestClient(DiscordRestConfig config) : this(config, CreateApiClient(config)) { }
         /// <summary> Creates a new REST-only discord client. </summary>
         internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient client)
@@ -103,6 +110,7 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
+        /// <summary> Validates a token with the given type. </summary>
         protected virtual async Task ValidateTokenAsync(TokenType tokenType, string token)
         {
             try
@@ -121,6 +129,7 @@ namespace Discord.Rest
                 throw new ArgumentException("Token validation failed", nameof(token), ex);
             }
         }
+        /// <summary> A Promise for when the client successfully logs in. </summary>
         protected virtual Task OnLoginAsync(TokenType tokenType, string token) => Task.CompletedTask;
 
 
@@ -149,6 +158,7 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
+        /// <summary> A Promise for when the client successfully logs out. </summary>
         protected virtual Task OnLogoutAsync() => Task.CompletedTask;
 
         /// <inheritdoc />
