@@ -58,27 +58,28 @@ namespace Discord.Net.Rest
             Dispose(true);
         }
 
-        /// <summary> Sets a header to be used in REST requests. </summary>
+        /// <inheritdoc/>
         public void SetHeader(string key, string value)
         {
             _client.DefaultRequestHeaders.Remove(key);
             if (value != null)
                 _client.DefaultRequestHeaders.Add(key, value);
         }
-        /// <summary> Sets the global cancellation token for any requests made by this instance. </summary>
+        /// <inheritdoc/>
         public void SetCancelToken(CancellationToken cancelToken)
         {
             _parentToken = cancelToken;
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        /// <summary> Sends a request with no body to the given endpoint. </summary>
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
                 return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
         }
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, string json, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
@@ -88,6 +89,7 @@ namespace Discord.Net.Rest
                 return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
