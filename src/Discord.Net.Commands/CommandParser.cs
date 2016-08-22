@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,9 +21,8 @@ namespace Discord.Commands
             var curPart = ParserPart.None;
             int lastArgEndPos = int.MinValue;
             var argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
-            ImmutableArray<TypeReaderResult>.Builder paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
+            var paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
-            bool hasMultipleMatches = false;
             char c;
 
             for (int curPos = startPos; curPos <= endPos; curPos++)
@@ -111,13 +109,8 @@ namespace Discord.Commands
                         return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
 
                     var typeReaderResult = await curParam.Parse(context, argString).ConfigureAwait(false);
-                    if (!typeReaderResult.IsSuccess)
-                    {
-                        if (typeReaderResult.Error == CommandError.MultipleMatches)
-                            hasMultipleMatches = true;
-                        else
-                            return ParseResult.FromError(typeReaderResult);
-                    }
+                    if (!typeReaderResult.IsSuccess && typeReaderResult.Error != CommandError.MultipleMatches)
+                        return ParseResult.FromError(typeReaderResult);
 
                     if (curParam.IsMultiple)
                     {
@@ -162,7 +155,7 @@ namespace Discord.Commands
                 argList.Add(TypeReaderResult.FromSuccess(param.DefaultValue));
             }
             
-            return ParseResult.FromSuccess(argList.ToImmutable(), paramList?.ToImmutable());
+            return ParseResult.FromSuccess(argList.ToImmutable(), paramList.ToImmutable());
         }
     }
 }

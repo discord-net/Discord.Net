@@ -217,7 +217,7 @@ namespace Discord.Commands
                         {
                             case MultiMatchHandling.Best:
                                 argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
-                                paramList = parseResult.ParamValues?.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
+                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
                                 parseResult = ParseResult.FromSuccess(argList, paramList);
                                 break;
                         }

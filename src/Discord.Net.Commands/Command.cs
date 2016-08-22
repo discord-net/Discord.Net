@@ -95,17 +95,13 @@ namespace Discord.Commands
                     return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
                 argList[i] = parseResult.ArgValues[i].Values.First().Value;
             }
-
-            object[] paramList = null;
-            if (parseResult.ParamValues != null)
+            
+            var paramList = new object[parseResult.ParamValues.Count];
+            for (int i = 0; i < parseResult.ParamValues.Count; i++)
             {
-                paramList = new object[parseResult.ParamValues.Count];
-                for (int i = 0; i < parseResult.ParamValues.Count; i++)
-                {
-                    if (!parseResult.ParamValues[i].IsSuccess)
-                        return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
-                    paramList[i] = parseResult.ParamValues[i].Values.First().Value;
-                }
+                if (!parseResult.ParamValues[i].IsSuccess)
+                    return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
             return Execute(msg, argList, paramList);

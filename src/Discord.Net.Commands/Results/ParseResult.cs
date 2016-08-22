@@ -57,6 +57,6 @@ namespace Discord.Commands
             => new ParseResult(null, null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
-        private string DebuggerDisplay => IsSuccess ? $"Success ({ArgValues.Count}{(ParamValues != null ? $" +{ParamValues.Count} Values" : "")})" : $"{Error}: {ErrorReason}";
+        private string DebuggerDisplay => IsSuccess ? $"Success ({ArgValues.Count}{(ParamValues.Count > 0 ? $" +{ParamValues.Count} Values" : "")})" : $"{Error}: {ErrorReason}";
     }
 }
