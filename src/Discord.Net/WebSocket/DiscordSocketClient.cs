@@ -1513,7 +1513,6 @@ namespace Discord.WebSocket
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken, ILogger logger)
         {
-            //Clean this up when Discord's session patch is live
             try
             {
                 await logger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
@@ -1529,8 +1528,15 @@ namespace Discord.WebSocket
                         }
                     }
 
-                    await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
-                    _heartbeatTime = Environment.TickCount;
+                    try
+                    {
+                        await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
+                        _heartbeatTime = Environment.TickCount;
+                    }
+                    catch (Exception ex)
+                    {
+                        await logger.WarningAsync("Heartbeat Errored", ex).ConfigureAwait(false);
+                    }
 
                     await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
                 }
