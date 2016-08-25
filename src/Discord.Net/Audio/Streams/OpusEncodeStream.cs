@@ -1,8 +1,11 @@
 ﻿namespace Discord.Audio
 {
+    /// <summary> A stream which encodes Opus frames as raw PCM data is written. </summary>
     public class OpusEncodeStream : RTPWriteStream
     {
-        public int SampleRate = 48000;
+        /// <summary> The sample rate of the Opus stream. </summary>
+        public int SampleRate = 48000; // TODO: shouldn't these be readonly?
+        /// <summary> The number of channels of the Opus stream. </summary>
         public int Channels = 2;
         
         private readonly OpusEncoder _encoder;
@@ -18,12 +21,14 @@
                 _encoder.SetBitrate(bitrate.Value);
         }
 
+        /// <summary> Writes Opus-encoded PCM data to the stream. </summary>
         public override void Write(byte[] buffer, int offset, int count)
         {
             count = _encoder.EncodeFrame(buffer, offset, count, _buffer, 0);
             base.Write(_buffer, 0, count);
         }
 
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

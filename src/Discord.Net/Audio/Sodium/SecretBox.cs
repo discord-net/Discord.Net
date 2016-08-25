@@ -3,13 +3,14 @@ using System.Runtime.InteropServices;
 
 namespace Discord.Audio
 {
-    public unsafe static class SecretBox
+    public unsafe static class SecretBox // TODO: should this be public?
     {
         [DllImport("libsodium", EntryPoint = "crypto_secretbox_easy", CallingConvention = CallingConvention.Cdecl)]
         private static extern int SecretBoxEasy(byte* output, byte* input, long inputLength, byte[] nonce, byte[] secret);
         [DllImport("libsodium", EntryPoint = "crypto_secretbox_open_easy", CallingConvention = CallingConvention.Cdecl)]
         private static extern int SecretBoxOpenEasy(byte* output, byte* input, long inputLength, byte[] nonce, byte[] secret);
 
+        /// <summary> Encrypts a payload with the given nonce and secret. </summary>
         public static int Encrypt(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, byte[] nonce, byte[] secret)
         {
             fixed (byte* inPtr = input)
@@ -21,6 +22,7 @@ namespace Discord.Audio
                 return inputLength + 16;
             }
         }
+        /// <summary> Decrypts a payload with the given nonce and secret. </summary>
         public static int Decrypt(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, byte[] nonce, byte[] secret)
         {
             fixed (byte* inPtr = input)
