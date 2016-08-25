@@ -6,7 +6,6 @@ using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,8 +20,12 @@ namespace Discord.Rpc
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _reconnectTask;
         private bool _canReconnect;
+        private int _connectionTimeout;
 
         public ConnectionState ConnectionState { get; private set; }
+
+        //From DiscordRpcConfig
+        internal int ConnectionTimeout { get; private set; }
 
         public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
 
@@ -32,6 +35,7 @@ namespace Discord.Rpc
         public DiscordRpcClient(DiscordRpcConfig config)
             : base(config, CreateApiClient(config))
         {
+            ConnectionTimeout = config.ConnectionTimeout;
             _rpcLogger = LogManager.CreateLogger("RPC");
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
@@ -95,8 +99,17 @@ namespace Discord.Rpc
             await _rpcLogger.InfoAsync("Connecting").ConfigureAwait(false);
             try
             {
-                _connectTask = new TaskCompletionSource<bool>();
+                var connectTask = new TaskCompletionSource<bool>();
+                _connectTask = connectTask;
                 _cancelToken = new CancellationTokenSource();
+
+                //Abort connection on timeout
+                Task.Run(async () =>
+                {
+                    await Task.Delay(_connectionTimeout);
+                    connectTask.TrySetException(new TimeoutException());
+                });
+
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 

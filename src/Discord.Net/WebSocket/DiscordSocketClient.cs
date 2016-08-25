@@ -51,6 +51,7 @@ namespace Discord.WebSocket
         internal int LargeThreshold { get; private set; }
         internal AudioMode AudioMode { get; private set; }
         internal DataStore DataStore { get; private set; }
+        internal int ConnectionTimeout { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
 
         public new API.DiscordSocketApiClient ApiClient => base.ApiClient as API.DiscordSocketApiClient;
@@ -70,6 +71,7 @@ namespace Discord.WebSocket
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
+            ConnectionTimeout = config.ConnectionTimeout;
 
             DataStore = new DataStore(0, 0);
             _nextAudioId = 1;
@@ -158,8 +160,17 @@ namespace Discord.WebSocket
             
             try
             {
-                _connectTask = new TaskCompletionSource<bool>();
+                var connectTask = new TaskCompletionSource<bool>();
+                _connectTask = connectTask;
                 _cancelToken = new CancellationTokenSource();
+
+                //Abort connection on timeout
+                Task.Run(async () =>
+                {
+                    await Task.Delay(ConnectionTimeout);
+                    connectTask.TrySetException(new TimeoutException());
+                });
+
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
@@ -249,6 +260,15 @@ namespace Discord.WebSocket
 
         private async Task StartReconnectAsync(Exception ex)
         {
+            if (ex == null)
+            {
+                if (_connectTask?.TrySetCanceled() ?? false) return;
+            }
+            else
+            {
+                if (_connectTask?.TrySetException(ex) ?? false) return;
+            }
+
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -260,15 +280,6 @@ namespace Discord.WebSocket
         }
         private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
         {
-            if (ex == null)
-            {
-                if (_connectTask?.TrySetCanceled() ?? false) return;
-            }
-            else
-            {
-                if (_connectTask?.TrySetException(ex) ?? false) return;
-            }
-
             try
             {
                 Random jitter = new Random();

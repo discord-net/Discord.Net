@@ -8,6 +8,9 @@ namespace Discord.WebSocket
     {
         public const string GatewayEncoding = "json";
 
+        /// <summary> Gets or sets the time, in milliseconds, to wait for a connection to complete before aborting. </summary>
+        public int ConnectionTimeout { get; set; } = 30000;
+
         /// <summary> Gets or sets the id for this shard. Must be less than TotalShards. </summary>
         public int ShardId { get; set; } = 0;
         /// <summary> Gets or sets the total number of shards for this application. </summary>
@@ -16,8 +19,7 @@ namespace Discord.WebSocket
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 0;
         /// <summary> 
-        /// Gets or sets the max number of users a guild may have for offline users to be included in the READY packet. Max is 250. 
-        /// Decreasing this may reduce CPU usage while increasing login time and network usage. 
+        /// Gets or sets the max number of users a guild may have for offline users to be included in the READY packet. Max is 250.
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
 
