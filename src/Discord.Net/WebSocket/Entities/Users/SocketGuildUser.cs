@@ -1,10 +1,11 @@
-﻿using Discord.Rest;
+﻿using System;
+using Discord.Rest;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
-    internal class SocketGuildUser : GuildUser, ISocketUser
+    internal class SocketGuildUser : GuildUser, ISocketUser, IVoiceState
     {
         internal override bool IsAttached => true;
 
@@ -16,11 +17,74 @@ namespace Discord.WebSocket
         public override Game Game => Presence.Game;
         public override UserStatus Status => Presence.Status;
 
-        public VoiceState? VoiceState => Guild.GetVoiceState(Id);
-        public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
-        public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
-        public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public VoiceState? VoiceState
+        {
+            get
+            {
+                return Guild.GetVoiceState(Id);
+            }
+        }
+
+        public bool IsSelfDeafened
+        {
+            get
+            {
+                return VoiceState?.IsSelfDeafened ?? false;
+            }
+        }
+        public bool IsSelfMuted
+        {
+            get
+            {
+                return VoiceState?.IsSelfMuted ?? false;
+            }
+        }
+        public bool IsSuppressed
+        {
+            get
+            {
+                return VoiceState?.IsSuppressed ?? false;
+            }
+        }
+        public VoiceChannel VoiceChannel
+        {
+            get
+            {
+                return VoiceState?.VoiceChannel;
+            }
+        }
+
+        public bool IsDeafened
+        {
+            get
+            {
+                return VoiceState?.IsDeafened ?? false;
+            }
+        }
+
+        public bool IsMuted
+        {
+            get
+            {
+                return VoiceState?.IsMuted ?? false;
+            }
+        }
+
+        IVoiceChannel IVoiceState.VoiceChannel
+        {
+            get
+            {
+                return VoiceState?.VoiceChannel;
+            }
+        }
+
+        public string VoiceSessionId
+        {
+            get
+            {
+                return VoiceState?.VoiceSessionId ?? "";
+            }
+        }
 
         public SocketGuildUser(SocketGuild guild, SocketGlobalUser user, Model model) 
             : base(guild, user, model)
