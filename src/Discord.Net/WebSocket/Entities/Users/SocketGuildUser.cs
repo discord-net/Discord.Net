@@ -1,5 +1,4 @@
-﻿using System;
-using Discord.Rest;
+﻿using Discord.Rest;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
