@@ -359,10 +359,13 @@ namespace Discord.WebSocket
         internal SocketGuild RemoveGuild(ulong id)
         {
             var guild = DataStore.RemoveGuild(id);
-            foreach (var channel in guild.Channels)
-                guild.RemoveChannel(channel.Id);
-            foreach (var user in guild.Members)
-                guild.RemoveUser(user.Id);
+            if (guild != null)
+            {
+                foreach (var channel in guild.Channels)
+                    guild.RemoveChannel(channel.Id);
+                foreach (var user in guild.Members)
+                    guild.RemoveUser(user.Id);
+            }
             return guild;
         }
         
@@ -401,8 +404,11 @@ namespace Discord.WebSocket
         internal ISocketChannel RemovePrivateChannel(ulong id)
         {
             var channel = DataStore.RemoveChannel(id) as ISocketPrivateChannel;
-            foreach (var recipient in channel.Recipients)
-                recipient.User.RemoveRef(this);
+            if (channel != null)
+            {
+                foreach (var recipient in channel.Recipients)
+                    recipient.User.RemoveRef(this);
+            }
             return channel;
         }
 
