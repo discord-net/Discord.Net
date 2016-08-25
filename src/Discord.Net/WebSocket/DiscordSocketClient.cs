@@ -762,9 +762,9 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
-                                        var guild = DataStore.GetGuild(data.Id);
+                                        var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
                                             foreach (var member in guild.Members)
@@ -774,7 +774,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                            await _gatewayLogger.WarningAsync($"GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
                                     }
