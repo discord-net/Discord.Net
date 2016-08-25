@@ -65,6 +65,9 @@
     "template": [
       "default"
     ],
+    "globalMetadata": {
+      "_appFooter": "Discord.Net (c) 2015-2016"
+    },
     "noLangKeyword": false
   }
 }

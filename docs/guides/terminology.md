@@ -1,3 +1,8 @@
+---
+uid: Terminology
+title: Terminology
+---
+
 # Terminology
 
 ## Preface

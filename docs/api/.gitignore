@@ -3,3 +3,4 @@
 #  temp file  #
 ###############
 *.yml
+.manifest
