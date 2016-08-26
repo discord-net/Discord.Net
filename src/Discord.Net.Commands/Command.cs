@@ -25,6 +25,7 @@ namespace Discord.Commands
         public string Summary { get; }
         public string Text { get; }
         public bool HasVarArgs { get; }
+        public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
@@ -36,6 +37,16 @@ namespace Discord.Commands
 
             Name = source.Name;
             Text = groupPrefix + attribute.Text;
+
+            var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
+
+            aliasesBuilder.Add(Text);
+
+            var aliasesAttr = source.GetCustomAttribute<AliasAttribute>();
+            if (aliasesAttr != null)
+                aliasesBuilder.AddRange(aliasesAttr.Aliases.Select(x => groupPrefix + x));
+
+            Aliases = aliasesBuilder.ToImmutable();
 
             var nameAttr = source.GetCustomAttribute<NameAttribute>();
             if (nameAttr != null)
@@ -81,7 +92,19 @@ namespace Discord.Commands
             if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
                 return ParseResult.FromError(preconditionResult.Value);
 
-            return await CommandParser.ParseArgs(this, context, searchResult.Text.Substring(Text.Length), 0).ConfigureAwait(false);
+            string input = searchResult.Text;
+            var matchingAliases = Aliases.Where(alias => input.StartsWith(alias));
+            
+            string matchingAlias = "";
+            foreach (string alias in matchingAliases)
+            {
+                if (alias.Length > matchingAlias.Length)
+                    matchingAlias = alias;
+            }
+            
+            input = input.Substring(matchingAlias.Length);
+
+            return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
         public Task<ExecuteResult> Execute(IUserMessage context, ParseResult parseResult)
         {
