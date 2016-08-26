@@ -4,7 +4,7 @@ using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
-    internal class SocketGuildUser : GuildUser, ISocketUser
+    internal class SocketGuildUser : GuildUser, ISocketUser, IVoiceState
     {
         internal override bool IsAttached => true;
 
@@ -20,7 +20,11 @@ namespace Discord.WebSocket
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public VoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public bool IsDeafened => VoiceState?.IsDeafened ?? false;
+        public bool IsMuted => VoiceState?.IsMuted ?? false;
+        public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
+        IVoiceChannel IVoiceState.VoiceChannel => VoiceState?.VoiceChannel;
 
         public SocketGuildUser(SocketGuild guild, SocketGlobalUser user, Model model) 
             : base(guild, user, model)
