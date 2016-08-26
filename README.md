@@ -1,5 +1,7 @@
-# Discord.Net v1.0.0-dev
-[![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg?maxAge=2592000)](https://www.myget.org/feed/Packages/discord-net) [![AppVeyor](https://img.shields.io/appveyor/ci/foxbot/discord-net.svg?maxAge=2592000?style=plastic)](https://ci.appveyor.com/project/foxbot/discord-net/) [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
+# Discord.Net v1.0.0-beta
+[![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net) 
+[![MyGet Build Status](https://www.myget.org/BuildSource/Badge/discord-net?identifier=15bf7c42-22dd-4406-93e5-3cafc62bbc85)](https://www.myget.org/)
+[![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
 
 An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
 
