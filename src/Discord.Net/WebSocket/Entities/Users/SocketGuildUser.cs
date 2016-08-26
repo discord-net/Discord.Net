@@ -20,11 +20,10 @@ namespace Discord.WebSocket
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public VoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
-        IVoiceChannel IVoiceState.VoiceChannel => VoiceState?.VoiceChannel;
 
         public SocketGuildUser(SocketGuild guild, SocketGlobalUser user, Model model) 
             : base(guild, user, model)
@@ -45,6 +44,8 @@ namespace Discord.WebSocket
 
             User.Update(model, source);
         }
+
+        IVoiceChannel IVoiceState.VoiceChannel => VoiceState?.VoiceChannel;
 
         public SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
         ISocketUser ISocketUser.Clone() => Clone();
