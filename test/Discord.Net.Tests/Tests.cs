@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Discord.Tests
 {
-    //TODO: Tests are massively incomplete and out of date, needing a full rewrite
+    //  these tests are really bad
+    // we're never going to look at them again
+    // but in case i do decide to look at them again they are still here
 
+    /*
     [TestClass]
     public class Tests
     {
@@ -311,184 +314,186 @@ namespace Discord.Tests
                 async () => await _targetBot.CurrentUser.Modify(TargetPassword, name),
                 x => _obGuildBot.UserUpdated += x,
                 x => _obGuildBot.UserUpdated -= x,
-                (s, e) => e.After.Username == name);*/
-        }
-        [TestMethod]
-        public void TestSetStatus()
-        {
-            AssertEvent<UserUpdatedEventArgs>(
-                "UserUpdated never fired",
-                async () => await SetStatus(_targetBot, UserStatus.Idle),
-                x => _observerBot.UserUpdated += x,
-                x => _observerBot.UserUpdated -= x,
-                (s, e) => e.After.Status == UserStatus.Idle);
-        }
-        private Task SetStatus(DiscordClient _client, UserStatus status)
-        {
-            throw new NotImplementedException();
-            /*_client.SetStatus(status);
-            await Task.Delay(50);*/
-        }
-        [TestMethod]
-        public void TestSetGame()
-        {
-            AssertEvent<UserUpdatedEventArgs>(
-                "UserUpdated never fired",
-                async () => await SetGame(_targetBot, "test game"),
-                x => _observerBot.UserUpdated += x,
-                x => _observerBot.UserUpdated -= x,
-                (s, e) => _targetBot.CurrentUser.CurrentGame == "test game");
-
-        }
-        private Task SetGame(DiscordClient _client, string game)
-        {
-            throw new NotImplementedException();
-            //_client.SetGame(game);
-            //await Task.Delay(5);
-        }
-
-        #endregion
-
-        #region Permission Tests
-
-        // Permissions
-        [TestMethod]
-        public async Task Test_AddGet_PermissionsRule()
-        {
-            var channel = await _testGuild.CreateTextChannel(GetRandomText());
-            var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
-            var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
-            await channel.UpdatePermissionOverwrite(user, perms);
-            var resultPerms = channel.GetPermissionOverwrite(user);
-            Assert.IsNotNull(resultPerms, "Perms retrieved from Guild were null.");
-        }
-        [TestMethod]
-        public async Task Test_AddRemove_PermissionsRule()
-        {
-            var channel = await _testGuild.CreateTextChannel(GetRandomText());
-            var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
-            var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
-            await channel.UpdatePermissionOverwrite(user, perms);
-            await channel.RemovePermissionOverwrite(user);
-            await Task.Delay(200);
-            Assert.AreEqual(PermValue.Inherit, channel.GetPermissionOverwrite(user)?.SendMessages);
-        }
-        [TestMethod]
-        public async Task Test_Permissions_Event()
-        {
-            var channel = await _testGuild.CreateTextChannel(GetRandomText());
-            var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
-            var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
-            AssertEvent<ChannelUpdatedEventArgs>
-                ("ChannelUpdatedEvent never fired.",
-                async () => await channel.UpdatePermissionOverwrite(user, perms),
-                x => _targetBot.ChannelUpdated += x,
-                x => _targetBot.ChannelUpdated -= x,
-                (s, e) => e.Channel == channel && (e.After as GuildChannel).PermissionOverwrites.Count() != (e.Before as GuildChannel).PermissionOverwrites.Count());
-        }
-        [TestMethod]
-        [ExpectedException(typeof(Net.HttpException))]
-        public async Task Test_Affect_Permissions_Invalid_Channel()
-        {
-            var channel = await _testGuild.CreateTextChannel(GetRandomText());
-            var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
-            var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
-            await channel.Delete();
-            await channel.UpdatePermissionOverwrite(user, perms);
-        }
-
-        #endregion
-
-
-        [ClassCleanup]
-        public static async Task Cleanup()
-        {
-            WaitMany(
-                (await _hostBot.GetGuilds()).Select(x => x.Owner.Id == _hostBot.CurrentUser.Id ? x.Delete() : x.Leave()),
-                (await _targetBot.GetGuilds()).Select(x => x.Owner.Id == _targetBot.CurrentUser.Id ? x.Delete() : x.Leave()),
-                (await _observerBot.GetGuilds()).Select(x => x.Owner.Id == _observerBot.CurrentUser.Id ? x.Delete() : x.Leave()));
-
-            WaitAll(
-                _hostBot.Disconnect(),
-                _targetBot.Disconnect(),
-                _observerBot.Disconnect());
-        }
-
-        #region Helpers
-
-        // Task Helpers
-
-        private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
-        {
-            AssertEvent(msg, action, addEvent, removeEvent, test, true);
-        }
-        private static void AssertNoEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
-        {
-            AssertEvent(msg, action, addEvent, removeEvent, test, false);
-        }
-        private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
-        {
-            ManualResetEventSlim trigger = new ManualResetEventSlim(false);
-            bool result = false;
-
-            EventHandler<TArgs> handler = (s, e) =>
-            {
-                if (test != null)
-                {
-                    result |= test(s, e);
-                    trigger.Set();
-                }
-                else
-                    result = true;
-            };
-
-            addEvent(handler);
-            var task = action();
-            trigger.Wait(EventTimeout);
-            task.Wait();
-            removeEvent(handler);
-
-            Assert.AreEqual(assertTrue, result, msg);
-        }
-
-        private static void AssertEvent(string msg, Func<Task> action, Action<EventHandler> addEvent, Action<EventHandler> removeEvent, Func<object, bool> test, bool assertTrue)
-        {
-            ManualResetEventSlim trigger = new ManualResetEventSlim(false);
-            bool result = false;
-
-            EventHandler handler = (s, e) =>
-            {
-                if (test != null)
-                {
-                    result |= test(s);
-                    trigger.Set();
-                }
-                else
-                    result = true;
-            };
-
-            addEvent(handler);
-            var task = action();
-            trigger.Wait(EventTimeout);
-            task.Wait();
-            removeEvent(handler);
-
-            Assert.AreEqual(assertTrue, result, msg);
-        }
-
-        private static void WaitAll(params Task[] tasks)
-        {
-            Task.WaitAll(tasks);
-        }
-        private static void WaitAll(IEnumerable<Task> tasks)
-        {
-            Task.WaitAll(tasks.ToArray());
-        }
-        private static void WaitMany(params IEnumerable<Task>[] tasks)
-        {
-            Task.WaitAll(tasks.Where(x => x != null).SelectMany(x => x).ToArray());
-        }
-
-        #endregion
+                (s, e) => e.After.Username == name);
+        }*/
+    /*
+    [TestMethod]
+    public void TestSetStatus()
+    {
+        AssertEvent<UserUpdatedEventArgs>(
+            "UserUpdated never fired",
+            async () => await SetStatus(_targetBot, UserStatus.Idle),
+            x => _observerBot.UserUpdated += x,
+            x => _observerBot.UserUpdated -= x,
+            (s, e) => e.After.Status == UserStatus.Idle);
     }
+    private Task SetStatus(DiscordClient _client, UserStatus status)
+    {
+        throw new NotImplementedException();
+        /*_client.SetStatus(status);
+        await Task.Delay(50);
+    }*/
+    /*
+    [TestMethod]
+    public void TestSetGame()
+    {
+        AssertEvent<UserUpdatedEventArgs>(
+            "UserUpdated never fired",
+            async () => await SetGame(_targetBot, "test game"),
+            x => _observerBot.UserUpdated += x,
+            x => _observerBot.UserUpdated -= x,
+            (s, e) => _targetBot.CurrentUser.CurrentGame == "test game");
+
+    }
+    private Task SetGame(DiscordClient _client, string game)
+    {
+        throw new NotImplementedException();
+        //_client.SetGame(game);
+        //await Task.Delay(5);
+    }
+
+    #endregion
+
+    #region Permission Tests
+
+    // Permissions
+    [TestMethod]
+    public async Task Test_AddGet_PermissionsRule()
+    {
+        var channel = await _testGuild.CreateTextChannel(GetRandomText());
+        var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
+        var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
+        await channel.UpdatePermissionOverwrite(user, perms);
+        var resultPerms = channel.GetPermissionOverwrite(user);
+        Assert.IsNotNull(resultPerms, "Perms retrieved from Guild were null.");
+    }
+    [TestMethod]
+    public async Task Test_AddRemove_PermissionsRule()
+    {
+        var channel = await _testGuild.CreateTextChannel(GetRandomText());
+        var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
+        var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
+        await channel.UpdatePermissionOverwrite(user, perms);
+        await channel.RemovePermissionOverwrite(user);
+        await Task.Delay(200);
+        Assert.AreEqual(PermValue.Inherit, channel.GetPermissionOverwrite(user)?.SendMessages);
+    }
+    [TestMethod]
+    public async Task Test_Permissions_Event()
+    {
+        var channel = await _testGuild.CreateTextChannel(GetRandomText());
+        var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
+        var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
+        AssertEvent<ChannelUpdatedEventArgs>
+            ("ChannelUpdatedEvent never fired.",
+            async () => await channel.UpdatePermissionOverwrite(user, perms),
+            x => _targetBot.ChannelUpdated += x,
+            x => _targetBot.ChannelUpdated -= x,
+            (s, e) => e.Channel == channel && (e.After as GuildChannel).PermissionOverwrites.Count() != (e.Before as GuildChannel).PermissionOverwrites.Count());
+    }
+    [TestMethod]
+    [ExpectedException(typeof(Net.HttpException))]
+    public async Task Test_Affect_Permissions_Invalid_Channel()
+    {
+        var channel = await _testGuild.CreateTextChannel(GetRandomText());
+        var user = _testGuild.GetUser(_targetBot.CurrentUser.Id);
+        var perms = new OverwritePermissions(sendMessages: PermValue.Deny);
+        await channel.Delete();
+        await channel.UpdatePermissionOverwrite(user, perms);
+    }
+
+    #endregion
+
+
+    [ClassCleanup]
+    public static async Task Cleanup()
+    {
+        WaitMany(
+            (await _hostBot.GetGuilds()).Select(x => x.Owner.Id == _hostBot.CurrentUser.Id ? x.Delete() : x.Leave()),
+            (await _targetBot.GetGuilds()).Select(x => x.Owner.Id == _targetBot.CurrentUser.Id ? x.Delete() : x.Leave()),
+            (await _observerBot.GetGuilds()).Select(x => x.Owner.Id == _observerBot.CurrentUser.Id ? x.Delete() : x.Leave()));
+
+        WaitAll(
+            _hostBot.Disconnect(),
+            _targetBot.Disconnect(),
+            _observerBot.Disconnect());
+    }
+
+    #region Helpers
+
+    // Task Helpers
+
+    private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+    {
+        AssertEvent(msg, action, addEvent, removeEvent, test, true);
+    }
+    private static void AssertNoEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test = null)
+    {
+        AssertEvent(msg, action, addEvent, removeEvent, test, false);
+    }
+    private static void AssertEvent<TArgs>(string msg, Func<Task> action, Action<EventHandler<TArgs>> addEvent, Action<EventHandler<TArgs>> removeEvent, Func<object, TArgs, bool> test, bool assertTrue)
+    {
+        ManualResetEventSlim trigger = new ManualResetEventSlim(false);
+        bool result = false;
+
+        EventHandler<TArgs> handler = (s, e) =>
+        {
+            if (test != null)
+            {
+                result |= test(s, e);
+                trigger.Set();
+            }
+            else
+                result = true;
+        };
+
+        addEvent(handler);
+        var task = action();
+        trigger.Wait(EventTimeout);
+        task.Wait();
+        removeEvent(handler);
+
+        Assert.AreEqual(assertTrue, result, msg);
+    }
+
+    private static void AssertEvent(string msg, Func<Task> action, Action<EventHandler> addEvent, Action<EventHandler> removeEvent, Func<object, bool> test, bool assertTrue)
+    {
+        ManualResetEventSlim trigger = new ManualResetEventSlim(false);
+        bool result = false;
+
+        EventHandler handler = (s, e) =>
+        {
+            if (test != null)
+            {
+                result |= test(s);
+                trigger.Set();
+            }
+            else
+                result = true;
+        };
+
+        addEvent(handler);
+        var task = action();
+        trigger.Wait(EventTimeout);
+        task.Wait();
+        removeEvent(handler);
+
+        Assert.AreEqual(assertTrue, result, msg);
+    }
+
+    private static void WaitAll(params Task[] tasks)
+    {
+        Task.WaitAll(tasks);
+    }
+    private static void WaitAll(IEnumerable<Task> tasks)
+    {
+        Task.WaitAll(tasks.ToArray());
+    }
+    private static void WaitMany(params IEnumerable<Task>[] tasks)
+    {
+        Task.WaitAll(tasks.Where(x => x != null).SelectMany(x => x).ToArray());
+    }
+
+    #endregion
+}*/
 }

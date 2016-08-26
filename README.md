@@ -3,9 +3,9 @@
 [![MyGet Build Status](https://www.myget.org/BuildSource/Badge/discord-net?identifier=15bf7c42-22dd-4406-93e5-3cafc62bbc85)](https://www.myget.org/)
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
 
-An unofficial .Net API Wrapper for the Discord client (http://discordapp.com).
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net) [![AppVeyor](https://img.shields.io/appveyor/ci/foxbot/discord-net.svg?maxAge=2592000?style=plastic)](https://ci.appveyor.com/project/foxbot/discord-net/) [![Discord](https://discordapp.com/api/servers/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
 
-Check out the [documentation](http://rtd.discord.foxbot.me/en/docs-dev/index.html) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
+Discord.Net is an API wrapper for [Discord](http://discordapp.com) written in C#.
 
 ## Installation 
 ### Stable (NuGet)
