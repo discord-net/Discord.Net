@@ -1566,11 +1566,11 @@ namespace Discord.WebSocket
                             return;
                         }
                     }
+                    _heartbeatTime = Environment.TickCount;
 
                     try
                     {
                         await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
-                        _heartbeatTime = Environment.TickCount;
                     }
                     catch (Exception ex)
                     {
