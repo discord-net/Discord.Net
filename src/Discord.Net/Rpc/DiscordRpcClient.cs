@@ -20,7 +20,6 @@ namespace Discord.Rpc
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _reconnectTask;
         private bool _canReconnect;
-        private int _connectionTimeout;
 
         public ConnectionState ConnectionState { get; private set; }
 
@@ -104,9 +103,9 @@ namespace Discord.Rpc
                 _cancelToken = new CancellationTokenSource();
 
                 //Abort connection on timeout
-                Task.Run(async () =>
+                var _ = Task.Run(async () =>
                 {
-                    await Task.Delay(_connectionTimeout);
+                    await Task.Delay(ConnectionTimeout);
                     connectTask.TrySetException(new TimeoutException());
                 });
 

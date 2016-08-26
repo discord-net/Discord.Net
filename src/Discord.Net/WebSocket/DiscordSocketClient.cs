@@ -165,7 +165,7 @@ namespace Discord.WebSocket
                 _cancelToken = new CancellationTokenSource();
 
                 //Abort connection on timeout
-                Task.Run(async () =>
+                var _ = Task.Run(async () =>
                 {
                     await Task.Delay(ConnectionTimeout);
                     connectTask.TrySetException(new TimeoutException());
