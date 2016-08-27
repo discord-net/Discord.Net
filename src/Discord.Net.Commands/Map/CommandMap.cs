@@ -17,40 +17,44 @@ namespace Discord.Commands
 
         public void AddCommand(Command command)
         {
-            string text = command.Text;
-            int nextSpace = NextWhitespace(text);
-            string name;
-
-            if (nextSpace == -1)
-                name = command.Text;
-            else
-                name = command.Text.Substring(0, nextSpace);
-
-            lock (this)
+            foreach (string text in command.Aliases)
             {
-                var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
-                nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                int nextSpace = NextWhitespace(text);
+                string name;
+
+                if (nextSpace == -1)
+                    name = command.Text;
+                else
+                    name = command.Text.Substring(0, nextSpace);
+
+                lock (this)
+                {
+                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
+                    nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                }
             }
         }
         public void RemoveCommand(Command command)
         {
-            string text = command.Text;
-            int nextSpace = NextWhitespace(text);
-            string name;
-
-            if (nextSpace == -1)
-                name = command.Text;
-            else
-                name = command.Text.Substring(0, nextSpace);
-
-            lock (this)
+            foreach (string text in command.Aliases)
             {
-                CommandMapNode nextNode;
-                if (_nodes.TryGetValue(name, out nextNode))
+                int nextSpace = NextWhitespace(text);
+                string name;
+
+                if (nextSpace == -1)
+                    name = command.Text;
+                else
+                    name = command.Text.Substring(0, nextSpace);
+
+                lock (this)
                 {
-                    nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
-                    if (nextNode.IsEmpty)
-                        _nodes.TryRemove(name, out nextNode);
+                    CommandMapNode nextNode;
+                    if (_nodes.TryGetValue(name, out nextNode))
+                    {
+                        nextNode.RemoveCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                        if (nextNode.IsEmpty)
+                            _nodes.TryRemove(name, out nextNode);
+                    }
                 }
             }
         }
