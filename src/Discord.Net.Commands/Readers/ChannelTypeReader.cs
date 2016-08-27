@@ -21,7 +21,7 @@ namespace Discord.Commands
 
                 //By Mention (1.0)
                 if (MentionUtils.TryParseChannel(input, out id))
-                    AddResult(results, await guild.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await guild.GetChannelAsync(id).ConfigureAwait(false) as T, 1.00f);
 
                 //By Id (0.9)
                 if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
