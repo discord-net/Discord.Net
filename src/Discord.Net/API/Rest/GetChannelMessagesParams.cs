@@ -1,6 +1,4 @@
 ﻿#pragma warning disable CS1591
-using Discord.Rest;
-
 namespace Discord.API.Rest
 {
     public class GetChannelMessagesParams

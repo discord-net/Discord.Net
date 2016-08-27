@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
@@ -13,8 +14,8 @@ namespace Discord.WebSocket
         private readonly DiscordSocketClient _discord;
         private readonly ISocketMessageChannel _channel;
 
-        public virtual IReadOnlyCollection<SocketMessage> Messages
-            => ImmutableArray.Create<SocketMessage>();
+        public virtual IReadOnlyCollection<ISocketMessage> Messages
+            => ImmutableArray.Create<ISocketMessage>();
 
         public MessageManager(DiscordSocketClient discord, ISocketMessageChannel channel)
         {
@@ -22,25 +23,25 @@ namespace Discord.WebSocket
             _channel = channel;
         }
 
-        public virtual void Add(SocketMessage message) { }
-        public virtual SocketMessage Remove(ulong id) => null;
-        public virtual SocketMessage Get(ulong id) => null;
+        public virtual void Add(ISocketMessage message) { }
+        public virtual ISocketMessage Remove(ulong id) => null;
+        public virtual ISocketMessage Get(ulong id) => null;
 
-        public virtual IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ImmutableArray.Create<SocketMessage>();
+        public virtual IImmutableList<ISocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+            => ImmutableArray.Create<ISocketMessage>();
 
-        public virtual async Task<SocketMessage> DownloadAsync(ulong id)
+        public virtual async Task<ISocketMessage> DownloadAsync(ulong id)
         {
             var model = await _discord.ApiClient.GetChannelMessageAsync(_channel.Id, id).ConfigureAwait(false);
             if (model != null)
-                return new SocketMessage(_channel, new User(model.Author.Value), model);
+                return Create(new User(model.Author.Value), model);
             return null;
         }
-        public async Task<IReadOnlyCollection<SocketMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
+        public async Task<IReadOnlyCollection<ISocketMessage>> DownloadAsync(ulong? fromId, Direction dir, int limit)
         {
             //TODO: Test heavily, especially the ordering of messages
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
-            if (limit == 0) return ImmutableArray<SocketMessage>.Empty;
+            if (limit == 0) return ImmutableArray<ISocketMessage>.Empty;
 
             var cachedMessages = GetMany(fromId, dir, limit);
             if (cachedMessages.Count == limit)
@@ -75,9 +76,17 @@ namespace Discord.WebSocket
                         else
                             user = newUser;
                     }
-                    return new SocketMessage(_channel, user, x);
+                    return Create(user, x);
                 })).ToImmutableArray();
             }
+        }
+
+        public ISocketMessage Create(IUser author, Model model)
+        {
+            if (model.Type == MessageType.Default)
+                return new SocketUserMessage(_channel, author, model);
+            else
+                return new SocketSystemMessage(_channel, author, model);
         }
     }
 }

@@ -1247,7 +1247,7 @@ namespace Discord.WebSocket
                                         }
 
                                         IMessage before = null, after = null;
-                                        SocketMessage cachedMsg = channel.GetMessage(data.Id);
+                                        ISocketMessage cachedMsg = channel.GetMessage(data.Id);
                                         if (cachedMsg != null)
                                         {
                                             before = cachedMsg.Clone();
@@ -1259,7 +1259,7 @@ namespace Discord.WebSocket
                                             //Edited message isnt in cache, create a detached one
                                             var author = channel.GetUser(data.Author.Value.Id, true);
                                             if (author != null)
-                                                after = new Message(channel, author, data);
+                                                after = channel.CreateMessage(author, data);
                                         }
                                         if (after != null)
                                             await _messageUpdatedEvent.InvokeAsync(Optional.Create(before), after).ConfigureAwait(false);
