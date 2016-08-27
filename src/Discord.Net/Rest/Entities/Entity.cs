@@ -1,8 +1,10 @@
-﻿using Discord.Rest;
+﻿using System;
+using Discord.Rest;
 
 namespace Discord.Rest
 {
     internal abstract class Entity<T> : IEntity<T>
+        where T : IEquatable<T>
     {
         public T Id { get; }
 
