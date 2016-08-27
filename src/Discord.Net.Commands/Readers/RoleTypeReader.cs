@@ -32,7 +32,7 @@ namespace Discord.Commands
                     AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(results));
+                    return Task.FromResult(TypeReaderResult.FromSuccess(results.Values));
             }
             return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
         }
