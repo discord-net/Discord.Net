@@ -31,7 +31,9 @@ public class Sample
 	// ~sample userinfo Khionu#8708 --> Khionu#8708
 	// ~sample userinfo Khionu --> Khionu#8708
 	// ~sample userinfo 96642168176807936 --> Khionu#8708
+    // ~sample whois 96642168176807936 --> Khionu#8708
 	[Command("userinfo"), Description("Returns info about the current user, or the user parameter, if one passed.")]
+    [Alias("user", "whois")]
     public async Task UserInfo(IMessage msg,
         [Description("The (optional) user to get info for")] IUser user = null)
     {
