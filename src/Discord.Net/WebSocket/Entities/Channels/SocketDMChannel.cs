@@ -52,17 +52,21 @@ namespace Discord.WebSocket
         {
             return await _messages.DownloadAsync(fromMessageId, dir, limit).ConfigureAwait(false);
         }
-        public SocketMessage AddMessage(ISocketUser author, MessageModel model)
+        public ISocketMessage CreateMessage(ISocketUser author, MessageModel model)
         {
-            var msg = new SocketMessage(this, author, model);
+            return _messages.Create(author, model);
+        }
+        public ISocketMessage AddMessage(ISocketUser author, MessageModel model)
+        {
+            var msg = _messages.Create(author, model);
             _messages.Add(msg);
             return msg;
         }
-        public SocketMessage GetMessage(ulong id)
+        public ISocketMessage GetMessage(ulong id)
         {
             return _messages.Get(id);
         }
-        public SocketMessage RemoveMessage(ulong id)
+        public ISocketMessage RemoveMessage(ulong id)
         {
             return _messages.Remove(id);
         }

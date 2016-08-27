@@ -20,7 +20,7 @@ namespace Discord.Commands
             GuildPermission = null;
         }
         
-        public override Task<PreconditionResult> CheckPermissions(IMessage context, Command executingCommand, object moduleInstance)
+        public override Task<PreconditionResult> CheckPermissions(IUserMessage context, Command executingCommand, object moduleInstance)
         {
             var guildUser = context.Author as IGuildUser;
 

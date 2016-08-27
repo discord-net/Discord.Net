@@ -7,9 +7,10 @@ namespace Discord.WebSocket
     {
         IReadOnlyCollection<ISocketUser> Users { get; }
 
-        SocketMessage AddMessage(ISocketUser author, MessageModel model);
-        SocketMessage GetMessage(ulong id);
-        SocketMessage RemoveMessage(ulong id);
+        ISocketMessage CreateMessage(ISocketUser author, MessageModel model);
+        ISocketMessage AddMessage(ISocketUser author, MessageModel model);
+        ISocketMessage GetMessage(ulong id);
+        ISocketMessage RemoveMessage(ulong id);
 
         ISocketUser GetUser(ulong id, bool skipCheck = false);
     }

@@ -9,51 +9,51 @@ namespace Discord.WebSocket
 {
     internal class MessageCache : MessageManager
     {
-        private readonly ConcurrentDictionary<ulong, SocketMessage> _messages;
+        private readonly ConcurrentDictionary<ulong, ISocketMessage> _messages;
         private readonly ConcurrentQueue<ulong> _orderedMessages;
         private readonly int _size;
 
-        public override IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
+        public override IReadOnlyCollection<ISocketMessage> Messages => _messages.ToReadOnlyCollection();
 
         public MessageCache(DiscordSocketClient discord, ISocketMessageChannel channel)
             : base(discord, channel)
         {
             _size = discord.MessageCacheSize;
-            _messages = new ConcurrentDictionary<ulong, SocketMessage>(1, (int)(_size * 1.05));
+            _messages = new ConcurrentDictionary<ulong, ISocketMessage>(1, (int)(_size * 1.05));
             _orderedMessages = new ConcurrentQueue<ulong>();
         }
 
-        public override void Add(SocketMessage message)
+        public override void Add(ISocketMessage message)
         {
             if (_messages.TryAdd(message.Id, message))
             {
                 _orderedMessages.Enqueue(message.Id);
 
                 ulong msgId;
-                SocketMessage msg;
+                ISocketMessage msg;
                 while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out msgId))
                     _messages.TryRemove(msgId, out msg);
             }
         }
 
-        public override SocketMessage Remove(ulong id)
+        public override ISocketMessage Remove(ulong id)
         {
-            SocketMessage msg;
+            ISocketMessage msg;
             _messages.TryRemove(id, out msg);
             return msg;
         }
 
-        public override SocketMessage Get(ulong id)
+        public override ISocketMessage Get(ulong id)
         {
-            SocketMessage result;
+            ISocketMessage result;
             if (_messages.TryGetValue(id, out result))
                 return result;
             return null;
         }
-        public override IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public override IImmutableList<ISocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
-            if (limit == 0) return ImmutableArray<SocketMessage>.Empty;
+            if (limit == 0) return ImmutableArray<ISocketMessage>.Empty;
 
             IEnumerable<ulong> cachedMessageIds;
             if (fromMessageId == null)
@@ -67,7 +67,7 @@ namespace Discord.WebSocket
                 .Take(limit)
                 .Select(x =>
                 {
-                    SocketMessage msg;
+                    ISocketMessage msg;
                     if (_messages.TryGetValue(x, out msg))
                         return msg;
                     return null;
@@ -76,7 +76,7 @@ namespace Discord.WebSocket
                 .ToImmutableArray();
         }
 
-        public override async Task<SocketMessage> DownloadAsync(ulong id)
+        public override async Task<ISocketMessage> DownloadAsync(ulong id)
         {
             var msg = Get(id);
             if (msg != null)

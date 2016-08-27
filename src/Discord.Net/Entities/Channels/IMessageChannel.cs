@@ -10,11 +10,11 @@ namespace Discord
         IReadOnlyCollection<IMessage> CachedMessages { get; }
 
         /// <summary> Sends a message to this message channel. </summary>
-        Task<IMessage> SendMessageAsync(string text, bool isTTS = false);
+        Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false);
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
-        Task<IMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false);
+        Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false);
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
-        Task<IMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false);
+        Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false);
         /// <summary> Gets a message from this message channel with the given id, or null if not found. </summary>
         Task<IMessage> GetMessageAsync(ulong id);
         /// <summary> Gets the message from this channel's cache with the given id, or null if not found. </summary>
