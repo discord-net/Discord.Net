@@ -32,7 +32,7 @@ namespace Discord.WebSocket
         internal bool _available;
 
         public bool Available => _available && Discord.ConnectionState == ConnectionState.Connected;
-        public int MemberCount { get; private set; }
+        public int MemberCount { get; set; }
         public int DownloadedMemberCount { get; private set; }
         public AudioClient AudioClient { get; private set; }
 
@@ -91,12 +91,12 @@ namespace Discord.WebSocket
                     AddChannel(model.Channels[i], dataStore, channels);
             }
             _channels = channels;
-            
+
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(1, (int)(model.Presences.Length * 1.05));
             {
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
-                    AddUser(model.Members[i], dataStore, members);
+                    AddOrUpdateUser(model.Members[i], dataStore, members);
                 if (Discord.ApiClient.AuthTokenType != TokenType.User)
                 {
                     var _ = _syncPromise.TrySetResultAsync(true);
@@ -125,7 +125,7 @@ namespace Discord.WebSocket
             {
                 DownloadedMemberCount = 0;
                 for (int i = 0; i < model.Members.Length; i++)
-                    AddUser(model.Members[i], dataStore, members);
+                    AddOrUpdateUser(model.Members[i], dataStore, members);
                 var _ = _syncPromise.TrySetResultAsync(true);
                 if (!model.Large)
                     _ = _downloaderPromise.TrySetResultAsync(true);
@@ -183,9 +183,8 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(CurrentUser);
         public override Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync() 
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Members);
-        public SocketGuildUser AddUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, SocketGuildUser> members = null)
+        public SocketGuildUser AddOrUpdateUser(MemberModel model, DataStore dataStore, ConcurrentDictionary<ulong, SocketGuildUser> members = null)
         {
-            MemberCount++;
             members = members ?? _members;
 
             SocketGuildUser member;
@@ -225,13 +224,13 @@ namespace Discord.WebSocket
         }
         public SocketGuildUser RemoveUser(ulong id)
         {
-            MemberCount--;
             SocketGuildUser member;
             if (_members.TryRemove(id, out member))
             {
                 DownloadedMemberCount--;
                 return member;
             }
+            member.User.RemoveRef(Discord);
             return null;
         }
         public override async Task DownloadUsersAsync()

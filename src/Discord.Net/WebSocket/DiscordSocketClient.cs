@@ -362,9 +362,9 @@ namespace Discord.WebSocket
             if (guild != null)
             {
                 foreach (var channel in guild.Channels)
-                    guild.RemoveChannel(channel.Id);
+                    DataStore.RemoveChannel(id);
                 foreach (var user in guild.Members)
-                    guild.RemoveUser(user.Id);
+                    user.User.RemoveRef(this);
             }
             return guild;
         }
@@ -451,6 +451,7 @@ namespace Discord.WebSocket
             var cachedGuilds = guilds.ToArray();
             if (cachedGuilds.Length == 0) return;
 
+            //Wait for unsynced guilds to sync first.
             var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToArray();
             if (unsyncedGuilds.Length > 0)
                 await Task.WhenAll(unsyncedGuilds);
@@ -767,8 +768,6 @@ namespace Discord.WebSocket
                                         var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
-                                            foreach (var member in guild.Members)
-                                                member.User.RemoveRef(this);
                                             await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                             await _leftGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
@@ -887,7 +886,8 @@ namespace Discord.WebSocket
                                     var guild = DataStore.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
-                                        var user = guild.AddUser(data, DataStore);
+                                        var user = guild.AddOrUpdateUser(data, DataStore);
+                                        guild.MemberCount++;
 
                                         if (!guild.IsSynced)
                                         {
@@ -954,6 +954,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         var user = guild.RemoveUser(data.User.Id);
+                                        guild.MemberCount--;
 
                                         if (!guild.IsSynced)
                                         {
@@ -994,7 +995,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         foreach (var memberModel in data.Members)
-                                            guild.AddUser(memberModel, DataStore);
+                                            guild.AddOrUpdateUser(memberModel, DataStore);
 
                                         if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
                                         {
