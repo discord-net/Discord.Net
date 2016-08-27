@@ -16,7 +16,7 @@ namespace Discord.Commands
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
         private readonly object _instance;
-        private readonly Func<IMessage, IReadOnlyList<object>, Task> _action;
+        private readonly Func<IUserMessage, IReadOnlyList<object>, Task> _action;
 
         public MethodInfo Source { get; }
         public Module Module { get; }
@@ -66,7 +66,7 @@ namespace Discord.Commands
             _action = BuildAction(source);
         }
 
-        public async Task<PreconditionResult> CheckPreconditions(IMessage context)
+        public async Task<PreconditionResult> CheckPreconditions(IUserMessage context)
         {
             foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
@@ -85,7 +85,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> Parse(IMessage msg, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> Parse(IUserMessage context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
@@ -104,9 +104,9 @@ namespace Discord.Commands
             
             input = input.Substring(matchingAlias.Length);
 
-            return await CommandParser.ParseArgs(this, msg, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
-        public Task<ExecuteResult> Execute(IMessage msg, ParseResult parseResult)
+        public Task<ExecuteResult> Execute(IUserMessage context, ParseResult parseResult)
         {
             if (!parseResult.IsSuccess)
                 return Task.FromResult(ExecuteResult.FromError(parseResult));
@@ -127,13 +127,13 @@ namespace Discord.Commands
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
-            return Execute(msg, argList, paramList);
+            return Execute(context, argList, paramList);
         }
-        public async Task<ExecuteResult> Execute(IMessage msg, IEnumerable<object> argList, IEnumerable<object> paramList)
+        public async Task<ExecuteResult> Execute(IUserMessage context, IEnumerable<object> argList, IEnumerable<object> paramList)
         {
             try
             {
-                await _action.Invoke(msg, GenerateArgs(argList, paramList)).ConfigureAwait(false);//Note: This code may need context
+                await _action.Invoke(context, GenerateArgs(argList, paramList)).ConfigureAwait(false);//Note: This code may need context
                 return ExecuteResult.FromSuccess();
             }
             catch (Exception ex)
@@ -150,8 +150,8 @@ namespace Discord.Commands
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
-            if (parameters.Length == 0 || parameters[0].ParameterType != typeof(IMessage))
-                throw new InvalidOperationException("The first parameter of a command must be IMessage.");
+            if (parameters.Length == 0 || parameters[0].ParameterType != typeof(IUserMessage))
+                throw new InvalidOperationException($"The first parameter of a command must be {nameof(IUserMessage)}.");
 
             var paramBuilder = ImmutableArray.CreateBuilder<CommandParameter>(parameters.Length - 1);
             for (int i = 1; i < parameters.Length; i++)
@@ -190,7 +190,7 @@ namespace Discord.Commands
             }
             return paramBuilder.ToImmutable();
         }
-        private Func<IMessage, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
+        private Func<IUserMessage, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");

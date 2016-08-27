@@ -41,8 +41,9 @@ namespace Discord.Commands
                 [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
                 [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
                 
-                [typeof(IMessage)] = new MessageTypeReader(),
-
+                [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
+                [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
+                //[typeof(ISystemMessage)] = new MessageTypeReader<ISystemMessage>(),
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
                 [typeof(IDMChannel)] = new ChannelTypeReader<IDMChannel>(),
                 [typeof(IGroupChannel)] = new ChannelTypeReader<IGroupChannel>(),
@@ -175,8 +176,8 @@ namespace Discord.Commands
                 return false;
         }
 
-        public SearchResult Search(IMessage message, int argPos) => Search(message, message.Content.Substring(argPos));
-        public SearchResult Search(IMessage message, string input)
+        public SearchResult Search(IUserMessage message, int argPos) => Search(message, message.Content.Substring(argPos));
+        public SearchResult Search(IUserMessage message, string input)
         {
             string lowerInput = input.ToLowerInvariant();
             var matches = _map.GetCommands(input).ToImmutableArray();
@@ -187,9 +188,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(IMessage message, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+        public Task<IResult> Execute(IUserMessage message, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
             => Execute(message, message.Content.Substring(argPos), multiMatchHandling);
-        public async Task<IResult> Execute(IMessage message, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public async Task<IResult> Execute(IUserMessage message, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             var searchResult = Search(message, input);
             if (!searchResult.IsSuccess)

@@ -2,7 +2,7 @@
 {
     public static class MessageExtensions
     {
-        public static bool HasCharPrefix(this IMessage msg, char c, ref int argPos)
+        public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
             var text = msg.Content;
             if (text.Length > 0 && text[0] == c)
@@ -12,7 +12,7 @@
             }
             return false;
         }
-        public static bool HasStringPrefix(this IMessage msg, string str, ref int argPos)
+        public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos)
         {
             var text = msg.Content;
             if (text.StartsWith(str))
@@ -22,7 +22,7 @@
             }
             return false;
         }
-        public static bool HasMentionPrefix(this IMessage msg, IUser user, ref int argPos)
+        public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
             if (text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
