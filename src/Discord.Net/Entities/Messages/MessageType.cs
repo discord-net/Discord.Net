@@ -7,6 +7,7 @@
         RecipientRemove = 2,
         Call = 3,
         ChannelNameChange = 4,
-        ChannelIconChange = 5
+        ChannelIconChange = 5,
+        ChannelPinnedMessage = 6
     }
 }
