@@ -1514,6 +1514,9 @@ namespace Discord.WebSocket
                                 return;
 
                             //Ignored (User only)
+                            case "CHANNEL_PINS_ACK":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)");
+                                break;
                             case "CHANNEL_PINS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)");
                                 break;
