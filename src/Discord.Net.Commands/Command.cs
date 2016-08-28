@@ -31,39 +31,46 @@ namespace Discord.Commands
 
         internal Command(MethodInfo source, Module module, object instance, CommandAttribute attribute, string groupPrefix)
         {
-            Source = source;
-            Module = module;
-            _instance = instance;
+            try
+            {
+                Source = source;
+                Module = module;
+                _instance = instance;
 
-            Name = source.Name;
-            Text = groupPrefix + attribute.Text;
+                Name = source.Name;
+                Text = groupPrefix + attribute.Text;
 
-            var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
+                var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
 
-            aliasesBuilder.Add(Text);
+                aliasesBuilder.Add(Text);
 
-            var aliasesAttr = source.GetCustomAttribute<AliasAttribute>();
-            if (aliasesAttr != null)
-                aliasesBuilder.AddRange(aliasesAttr.Aliases.Select(x => groupPrefix + x));
+                var aliasesAttr = source.GetCustomAttribute<AliasAttribute>();
+                if (aliasesAttr != null)
+                    aliasesBuilder.AddRange(aliasesAttr.Aliases.Select(x => groupPrefix + x));
 
-            Aliases = aliasesBuilder.ToImmutable();
+                Aliases = aliasesBuilder.ToImmutable();
 
-            var nameAttr = source.GetCustomAttribute<NameAttribute>();
-            if (nameAttr != null)
-                Name = nameAttr.Text;
+                var nameAttr = source.GetCustomAttribute<NameAttribute>();
+                if (nameAttr != null)
+                    Name = nameAttr.Text;
 
-            var description = source.GetCustomAttribute<DescriptionAttribute>();
-            if (description != null)
-                Description = description.Text;
+                var description = source.GetCustomAttribute<DescriptionAttribute>();
+                if (description != null)
+                    Description = description.Text;
 
-            var summary = source.GetCustomAttribute<SummaryAttribute>();
-            if (summary != null)
-                Summary = summary.Text;
-            
-            Parameters = BuildParameters(source);
-            HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
-            Preconditions = BuildPreconditions(source);
-            _action = BuildAction(source);
+                var summary = source.GetCustomAttribute<SummaryAttribute>();
+                if (summary != null)
+                    Summary = summary.Text;
+
+                Parameters = BuildParameters(source);
+                HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
+                Preconditions = BuildPreconditions(source);
+                _action = BuildAction(source);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to build command {source.DeclaringType.FullName}.{source.Name}", ex);
+            }
         }
 
         public async Task<PreconditionResult> CheckPreconditions(IUserMessage context)
