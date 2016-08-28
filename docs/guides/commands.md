@@ -21,7 +21,7 @@ attributes.
 All commands belong to a Module. (See the below section for creating modules.)
 
 All commands in a module must be defined as an `Task`, with at least one argument,
-being the @Discord.IMessage representing the context of the command. 
+being the @Discord.IUserMessage representing the context of the command. 
 
 To add parameters to your command, add additional arguments to the `Task` of the command.
 You are _not_ required to accept all arguments as `String`, they will be automatically parsed 
@@ -149,13 +149,13 @@ By default, the following Types are supported arguments:
 - IUser/IGuildUser
 - IChannel/IGuildChannel/ITextChannel/IVoiceChannel/IGroupChannel
 - IRole
-- IMessage
+- IMessage/IUserMessage
 
 ### Creating a Type Readers
 
 To create a TypeReader, create a new class that imports @Discord and @Discord.Commands . Ensure your class inherits from @Discord.Commands.TypeReader
 
-Next, satisfy the `TypeReader` class by overriding `Task<TypeReaderResult> Read(IMessage context, string input)`.
+Next, satisfy the `TypeReader` class by overriding `Task<TypeReaderResult> Read(IUserMessage context, string input)`.
 
 >[!NOTE]
 >In many cases, Visual Studio can fill this in for you, using the "Implement Abstract Class" IntelliSense hint.

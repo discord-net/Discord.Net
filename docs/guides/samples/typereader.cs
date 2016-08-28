@@ -3,7 +3,7 @@ using Discord.Commands;
 
 public class BooleanTypeReader : TypeReader
 {
-    public override Task<TypeReaderResult> Read(IMessage context, string input)
+    public override Task<TypeReaderResult> Read(IUserMessage context, string input)
     {
         bool result;
         if (bool.TryParse(input, out result))

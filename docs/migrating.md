@@ -36,7 +36,7 @@ Below is a table that compares most common 0.9 entities to their 1.0 counterpart
 | ChannelType.Voice | @Discord.IVoiceChannel | This applies only to Voice Channels in Guilds
 | User | @Discord.IGuildUser | This applies only to users belonging to a Guild*
 | Profile | @Discord.ISelfUser
-| Message | @Discord.IMessage
+| Message | @Discord.IUserMessage
 
 \* To retrieve an @Discord.IGuildUser, you must retrieve the user from an @Discord.IGuild.
 [IDiscordClient.GetUserAsync](xref:Discord.IDiscordClient#Discord_IDiscordClient_GetUserAsync_System_UInt64_) 

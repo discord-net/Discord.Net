@@ -3,7 +3,7 @@ private IAudioClient _audio;
 
 // Create a Join command, that will join the parameter or the user's current voice channel
 [Command("join")]
-public async Task JoinChannel(IMessage msg,
+public async Task JoinChannel(IUserMessage msg,
     IVoiceChannel channel = null)
 {
     // Get the audio channel

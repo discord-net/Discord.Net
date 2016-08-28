@@ -33,8 +33,11 @@ public class Program
 		// Discover all of the commands in this assembly and load them.
         await commands.LoadAssembly(Assembly.GetEntryAssembly());
     }
-    public async Task HandleCommand(IMessage msg)
+    public async Task HandleCommand(IMessage paramMessage)
 	{
+        // Cast paramMessage to an IUserMessage, return if the message was a System message.
+        var msg = paramMessage as IUserMessage;
+        if (msg == null) return;
 		// Internal integer, marks where the command begins
 		int argPos = 0;
 		// Get the current user (used for Mention parsing)
