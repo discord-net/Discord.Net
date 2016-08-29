@@ -7,6 +7,7 @@ namespace Discord.Commands
     internal class CommandMap
     {
         static readonly char[] _whitespaceChars = new char[] { ' ', '\r', '\n' };
+        private readonly object _lockObj = new object();
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
 
@@ -27,7 +28,7 @@ namespace Discord.Commands
                 else
                     name = text.Substring(0, nextSpace);
 
-                lock (this)
+                lock (_lockObj)
                 {
                     var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
                     nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
@@ -46,7 +47,7 @@ namespace Discord.Commands
                 else
                     name = text.Substring(0, nextSpace);
 
-                lock (this)
+                lock (_lockObj)
                 {
                     CommandMapNode nextNode;
                     if (_nodes.TryGetValue(name, out nextNode))
@@ -69,7 +70,7 @@ namespace Discord.Commands
             else
                 name = text.Substring(0, nextSpace);
 
-            lock (this)
+            lock (_lockObj)
             {
                 CommandMapNode nextNode;
                 if (_nodes.TryGetValue(name, out nextNode))
