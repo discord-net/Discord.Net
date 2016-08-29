@@ -23,9 +23,9 @@ namespace Discord.Commands
                 string name;
 
                 if (nextSpace == -1)
-                    name = command.Text;
+                    name = text;
                 else
-                    name = command.Text.Substring(0, nextSpace);
+                    name = text.Substring(0, nextSpace);
 
                 lock (this)
                 {
@@ -42,9 +42,9 @@ namespace Discord.Commands
                 string name;
 
                 if (nextSpace == -1)
-                    name = command.Text;
+                    name = text;
                 else
-                    name = command.Text.Substring(0, nextSpace);
+                    name = text.Substring(0, nextSpace);
 
                 lock (this)
                 {
