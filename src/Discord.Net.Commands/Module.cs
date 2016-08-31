@@ -63,8 +63,9 @@ namespace Discord.Commands
                     if (groupAttrib.Prefix != null)
                     {
                         if (groupPrefix != "")
-                            groupPrefix += " ";
-                        nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
+                            nextGroupPrefix = groupPrefix + " " + groupAttrib.Prefix ?? type.Name;
+                        else
+                            nextGroupPrefix = groupAttrib.Prefix ?? type.Name;
                     }
                     else
                     {
