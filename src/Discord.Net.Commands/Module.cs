@@ -48,8 +48,6 @@ namespace Discord.Commands
 
         private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, IDependencyMap dependencyMap)
         {
-            if (groupPrefix != "")
-                groupPrefix += " ";
             foreach (var method in parentType.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
@@ -63,9 +61,15 @@ namespace Discord.Commands
                 {
                     string nextGroupPrefix;
                     if (groupAttrib.Prefix != null)
+                    {
+                        if (groupPrefix != "")
+                            groupPrefix += " ";
                         nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
+                    }
                     else
+                    {
                         nextGroupPrefix = groupPrefix;
+                    }
                     SearchClass(type, ReflectionUtils.CreateObject(type, Service, dependencyMap), commands, nextGroupPrefix, dependencyMap);
                 }
             }
