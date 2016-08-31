@@ -60,17 +60,12 @@ namespace Discord.Commands
                 if (groupAttrib != null)
                 {
                     string nextGroupPrefix;
-                    if (groupAttrib.Prefix != null)
-                    {
-                        if (groupPrefix != "")
-                            nextGroupPrefix = groupPrefix + " " + groupAttrib.Prefix ?? type.Name;
-                        else
-                            nextGroupPrefix = groupAttrib.Prefix ?? type.Name;
-                    }
+
+                    if (groupPrefix != "")
+                        nextGroupPrefix = groupPrefix + " " + (groupAttrib.Prefix ?? type.Name.ToLowerInvariant());
                     else
-                    {
-                        nextGroupPrefix = groupPrefix;
-                    }
+                        nextGroupPrefix = groupAttrib.Prefix ?? type.Name.ToLowerInvariant();
+
                     SearchClass(type, ReflectionUtils.CreateObject(type, Service, dependencyMap), commands, nextGroupPrefix, dependencyMap);
                 }
             }
