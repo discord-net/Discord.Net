@@ -38,7 +38,15 @@ namespace Discord.Commands
                 _instance = instance;
 
                 Name = source.Name;
-                Text = groupPrefix + attribute.Text;
+
+                if (attribute.Text == null)
+                    Text = groupPrefix;
+
+                if (groupPrefix != "")
+                    groupPrefix += " ";
+
+                if (attribute.Text != null)
+                    Text = groupPrefix + attribute.Text;
 
                 var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
 
