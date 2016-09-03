@@ -16,7 +16,8 @@
   "buildOptions": {
     "allowUnsafe": true,
     "warningsAsErrors": false,
-    "xmlDoc": true
+    "xmlDoc": true,
+    "optimize": true
   },
 
   "configurations": {
