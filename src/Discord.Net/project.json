@@ -16,15 +16,15 @@
   "buildOptions": {
     "allowUnsafe": true,
     "warningsAsErrors": false,
-    "xmlDoc": true,
-    "optimize": true
+    "xmlDoc": true
   },
 
   "configurations": {
     "Release": {
       "buildOptions": {
         "define": [ "RELEASE" ],
-        "nowarn": [ "CS1573", "CS1591" ]
+        "nowarn": [ "CS1573", "CS1591" ],
+		"optimize": true
       }
     }
   },
