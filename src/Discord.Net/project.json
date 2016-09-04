@@ -24,7 +24,7 @@
       "buildOptions": {
         "define": [ "RELEASE" ],
         "nowarn": [ "CS1573", "CS1591" ],
-		"optimize": true
+        "optimize": true
       }
     }
   },
