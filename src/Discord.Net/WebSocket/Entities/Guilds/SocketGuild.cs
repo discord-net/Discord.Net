@@ -148,11 +148,12 @@ namespace Discord.WebSocket
 
         public override Task<IGuildChannel> GetChannelAsync(ulong id) => Task.FromResult<IGuildChannel>(GetChannel(id));
         public override Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync() => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
-        public void AddChannel(ChannelModel model, DataStore dataStore, ConcurrentHashSet<ulong> channels = null)
+        public ISocketGuildChannel AddChannel(ChannelModel model, DataStore dataStore, ConcurrentHashSet<ulong> channels = null)
         {
             var channel = ToChannel(model);
             (channels ?? _channels).TryAdd(model.Id);
             dataStore.AddChannel(channel);
+            return channel;
         }
         public ISocketGuildChannel GetChannel(ulong id)
         {
