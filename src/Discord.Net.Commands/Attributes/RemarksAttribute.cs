@@ -2,13 +2,13 @@
 
 namespace Discord.Commands
 {
-    // Full summary of method
+    // Extension of the Cosmetic Summary, for Groups and Commands
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public class DescriptionAttribute : Attribute
+    public class RemarksAttribute : Attribute
     {
         public string Text { get; }
 
-        public DescriptionAttribute(string text)
+        public RemarksAttribute(string text)
         {
             Text = text;
         }
