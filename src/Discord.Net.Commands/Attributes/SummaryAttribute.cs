@@ -2,7 +2,7 @@
 
 namespace Discord.Commands
 {
-    // Cosmetic Description for Groups, Commands, and Parameters
+    // Brief summary of method/module/parameter
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Parameter)]
     public class SummaryAttribute : Attribute
     {

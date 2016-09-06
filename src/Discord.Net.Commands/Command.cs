@@ -21,8 +21,8 @@ namespace Discord.Commands
         public MethodInfo Source { get; }
         public Module Module { get; }
         public string Name { get; }
+        public string Description { get; }
         public string Summary { get; }
-        public string Remarks { get; }
         public string Text { get; }
         public bool HasVarArgs { get; }
         public IReadOnlyList<string> Aliases { get; }
@@ -62,13 +62,13 @@ namespace Discord.Commands
                 if (nameAttr != null)
                     Name = nameAttr.Text;
 
+                var description = source.GetCustomAttribute<DescriptionAttribute>();
+                if (description != null)
+                    Description = description.Text;
+
                 var summary = source.GetCustomAttribute<SummaryAttribute>();
                 if (summary != null)
                     Summary = summary.Text;
-
-                var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
-                if (remarksAttr != null)
-                    Remarks = remarksAttr.Text;
 
                 Parameters = BuildParameters(source);
                 HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;

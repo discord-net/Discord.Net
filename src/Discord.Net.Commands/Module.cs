@@ -13,7 +13,7 @@ namespace Discord.Commands
         public string Name { get; }
         public string Prefix { get; }
         public string Summary { get; }
-        public string Remarks { get; }
+        public string Description { get; }
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
 
@@ -35,9 +35,9 @@ namespace Discord.Commands
             if (summaryAttr != null)
                 Summary = summaryAttr.Text;
 
-            var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
-            if (remarksAttr != null)
-                Remarks = remarksAttr.Text;
+            var descriptionAttr = source.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttr != null)
+                Description = descriptionAttr.Text;
 
             List<Command> commands = new List<Command>();
             SearchClass(source, instance, commands, Prefix, dependencyMap);
