@@ -793,6 +793,7 @@ namespace Discord.WebSocket
                                         if (guild != null)
                                         {
                                             guild.AddChannel(data, DataStore);
+                                            channel = DataStore.GetChannel(data.Id);
 
                                             if (!guild.IsSynced)
                                             {
