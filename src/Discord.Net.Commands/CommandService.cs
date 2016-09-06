@@ -176,12 +176,16 @@ namespace Discord.Commands
                 return false;
         }
 
-        public SearchResult Search(IUserMessage message, int argPos) => Search(message, message.Content.Substring(argPos));
-        public SearchResult Search(IUserMessage message, string input)
+        public SearchResult Search(IUserMessage message, int argPos, bool caseInsensitive = true) => Search(message, message.Content.Substring(argPos), caseInsensitive);
+        public SearchResult Search(IUserMessage message, string input, bool caseInsensitive = true)
         {
-            string lowerInput = input.ToLowerInvariant();
-            var matches = _map.GetCommands(input).ToImmutableArray();
-            
+            ImmutableArray<Command> matches;
+
+            if (caseInsensitive)
+                matches = _map.GetCommands(input.ToLowerInvariant()).ToImmutableArray();
+            else
+                matches = _map.GetCommands(input).ToImmutableArray();
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
