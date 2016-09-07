@@ -380,6 +380,12 @@ namespace Discord
             }
             return channel;
         }
+
+        public ConcurrentDictionary<ulong, Channel> GetChannels()
+        {
+            return _channels;
+        }
+
         public Channel GetChannel(ulong id)
         {
             Channel channel;
