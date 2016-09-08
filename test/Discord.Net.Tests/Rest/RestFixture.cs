@@ -10,15 +10,16 @@ namespace Discord.Tests.Rest
 {
     public class RestFixture
     {
-        public DiscordRestClient Client { get; set; }
-
-        public RestFixture()
+        public DiscordRestClient Client
         {
-            var Config = new DiscordRestConfig()
+            get
             {
-                RestClientProvider = new RestClientProvider(baseUrl => new MockRestClient(baseUrl))
-            };
-            Client = new DiscordRestClient();
+                var Config = new DiscordRestConfig()
+                {
+                    RestClientProvider = new RestClientProvider(baseUrl => new MockRestClient(baseUrl))
+                };
+                return new DiscordRestClient(Config);
+            }
         }
     }
 }
