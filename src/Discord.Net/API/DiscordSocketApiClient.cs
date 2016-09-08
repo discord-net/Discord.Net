@@ -191,7 +191,7 @@ namespace Discord.API
             };
             var msg = new IdentifyParams()
             {
-                Token = _authToken,
+                Token = GetPrefixedToken(AuthTokenType, _authToken),
                 Properties = props,
                 LargeThreshold = largeThreshold,
                 UseCompression = useCompression,
