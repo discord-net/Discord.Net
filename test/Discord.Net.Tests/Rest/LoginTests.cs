@@ -31,5 +31,29 @@ namespace Discord.Tests.Rest
             var client = fixture.Client;
             await Assert.ThrowsAsync<ArgumentException>(async () => await client.LoginAsync(TokenType.User, "token.invalid"));
         }
+        [Fact]
+        public async Task LoginAsBot()
+        {
+            var client = fixture.Client;
+            await client.LoginAsync(TokenType.Bot, Routes.BotToken);
+        }
+        [Fact]
+        public async Task LoginAsBotWithInvalidToken()
+        {
+            var client = fixture.Client;
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.LoginAsync(TokenType.Bot, "token.invalid"));
+        }
+        [Fact]
+        public async Task LoginAsBearer()
+        {
+            var client = fixture.Client;
+            await client.LoginAsync(TokenType.Bearer, Routes.BearerToken);
+        }
+        [Fact]
+        public async Task LoginAsBearerWithInvalidToken()
+        {
+            var client = fixture.Client;
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.LoginAsync(TokenType.Bearer, "token.invalid"));
+        }
     }
 }

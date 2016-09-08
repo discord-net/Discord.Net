@@ -16,8 +16,14 @@ namespace Discord.Tests.Framework.Routes
         public static object Me(string json, IReadOnlyDictionary<string, string> requestHeaders)
         {
             if (!requestHeaders.ContainsKey("authorization")) throw new HttpException(HttpStatusCode.Forbidden);
-            if (requestHeaders["authorization"] != UserToken) throw new HttpException(HttpStatusCode.Forbidden);
-            return UserMocks.SelfUser;
+            if (requestHeaders["authorization"] != UserToken 
+                && requestHeaders["authorization"] != $"Bot {BotToken}" 
+                && requestHeaders["authorization"] != $"Bearer {BearerToken}") throw new HttpException(HttpStatusCode.Forbidden);
+
+            if (requestHeaders["authorization"] == UserToken || requestHeaders["authorization"] == $"Bearer {BearerToken}")
+                return UserMocks.SelfUser;
+            else
+                return UserMocks.BotSelfUser;
         }
     }
 }

@@ -14,5 +14,17 @@ namespace Discord.Tests.Framework.Mocks.Rest
             Verified = true,
             Avatar = "cdd7ae679ef37ce03e097221c70aeed6"
         };
+
+        public static User BotSelfUser => new User()
+        {
+            Id = 145584102551060480,
+            Username = "foxboat",
+            Discriminator = "8888",
+            Email = null,
+            MfaEnabled = true,
+            Verified = true,
+            Avatar = "5f0be46cea584d2225e6c15e8418fb52",
+            Bot = true
+        };
     }
 }
