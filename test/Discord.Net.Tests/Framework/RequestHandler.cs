@@ -18,7 +18,9 @@ namespace Discord.Tests.Framework
 
         internal Dictionary<string, Response> Routes = new Dictionary<string, Response>()
         {
-            ["GET users/@me"] = new Response(UserRoutes.Me)
+            ["GET users/@me"] = new Response(UserRoutes.Me),
+            ["GET users/66078337084162048"] = new Response(UserRoutes.Public),
+            ["GET users/1"] = new Response(UserRoutes.InvalidPublic)
         };
 
         internal Stream GetMock(string method, string endpoint, string json, IReadOnlyDictionary<string, string> requestHeaders)

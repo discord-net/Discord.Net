@@ -26,5 +26,13 @@ namespace Discord.Tests.Framework.Mocks.Rest
             Avatar = "5f0be46cea584d2225e6c15e8418fb52",
             Bot = true
         };
+
+        public static User PublicUser => new User()
+        {
+            Id = 66078337084162048,
+            Username = "foxbot",
+            Discriminator = "0282",
+            Avatar = "cdd7ae679ef37ce03e097221c70aeed6"
+        };
     }
 }

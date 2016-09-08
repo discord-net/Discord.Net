@@ -6,6 +6,7 @@ using Xunit;
 using Discord;
 using Discord.Rest;
 using Routes = Discord.Tests.Framework.Routes.Users;
+using Contracts = Discord.Tests.Framework.Routes.Contracts;
 using Discord.Net;
 
 namespace Discord.Tests.Rest
@@ -23,7 +24,7 @@ namespace Discord.Tests.Rest
         public async Task LoginAsUser()
         {
             var client = fixture.Client;
-            await client.LoginAsync(TokenType.User, Routes.UserToken);
+            await client.LoginAsync(TokenType.User, Contracts.UserToken);
         }
         [Fact]
         public async Task LoginAsUserWithInvalidToken()
@@ -35,7 +36,7 @@ namespace Discord.Tests.Rest
         public async Task LoginAsBot()
         {
             var client = fixture.Client;
-            await client.LoginAsync(TokenType.Bot, Routes.BotToken);
+            await client.LoginAsync(TokenType.Bot, Contracts.BotToken);
         }
         [Fact]
         public async Task LoginAsBotWithInvalidToken()
@@ -47,7 +48,7 @@ namespace Discord.Tests.Rest
         public async Task LoginAsBearer()
         {
             var client = fixture.Client;
-            await client.LoginAsync(TokenType.Bearer, Routes.BearerToken);
+            await client.LoginAsync(TokenType.Bearer, Contracts.BearerToken);
         }
         [Fact]
         public async Task LoginAsBearerWithInvalidToken()
