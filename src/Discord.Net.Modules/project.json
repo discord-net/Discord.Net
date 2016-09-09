@@ -19,8 +19,8 @@
   },
 
   "dependencies": {
-    "Discord.Net": "0.9.4",
-    "Discord.Net.Commands": "0.9.4"
+    "Discord.Net": "0.9.5",
+    "Discord.Net.Commands": "0.9.5"
   },
 
   "frameworks": {
