@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord
+﻿namespace Discord
 {
     public enum TokenType
     {

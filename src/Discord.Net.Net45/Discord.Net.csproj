@@ -418,6 +418,9 @@
     <Compile Include="..\Discord.Net\Enums\ConnectionState.cs">
       <Link>Enums\ConnectionState.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net\Enums\GameType.cs">
+      <Link>Enums\GameType.cs</Link>
+    </Compile>
     <Compile Include="..\Discord.Net\Enums\ImageType.cs">
       <Link>Enums\ImageType.cs</Link>
     </Compile>
@@ -438,6 +441,9 @@
     </Compile>
     <Compile Include="..\Discord.Net\Enums\StringEnum.cs">
       <Link>Enums\StringEnum.cs</Link>
+    </Compile>
+    <Compile Include="..\Discord.Net\Enums\TokenType.cs">
+      <Link>Enums\TokenType.cs</Link>
     </Compile>
     <Compile Include="..\Discord.Net\Enums\UserStatus.cs">
       <Link>Enums\UserStatus.cs</Link>
@@ -610,8 +616,6 @@
     <Compile Include="..\Discord.Net\TaskManager.cs">
       <Link>TaskManager.cs</Link>
     </Compile>
-    <Compile Include="Enums\GameType.cs" />
-    <Compile Include="Enums\TokenType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

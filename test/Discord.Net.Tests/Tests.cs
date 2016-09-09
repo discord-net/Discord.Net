@@ -54,7 +54,7 @@ namespace Discord.Tests
             _targetBot = new DiscordClient();
             _observerBot = new DiscordClient();
 
-            await _hostClient.Connect(HostBotToken);
+            await _hostClient.Connect(HostBotToken, TokenType.Bot);
 
             await Task.Delay(3000);
 
@@ -79,7 +79,7 @@ namespace Discord.Tests
         {
             AssertEvent(
                 "READY never received",
-                async () => await _observerBot.Connect(ObserverBotToken),
+                async () => await _observerBot.Connect(ObserverBotToken, TokenType.Bot),
                 x => _observerBot.Ready += x,
                 x => _observerBot.Ready -= x,
                 null,
