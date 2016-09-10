@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xunit;
-using Discord;
 using Discord.Rest;
 using Contracts = Discord.Tests.Framework.Routes.Contracts;
 using Mocks = Discord.Tests.Framework.Mocks.Rest.Users;
-using Discord.Net;
 
 namespace Discord.Tests.Rest
 {
@@ -34,7 +29,7 @@ namespace Discord.Tests.Rest
             Assert.Equal(Mocks.BotSelfUser.Verified.GetValueOrDefault(), user.IsVerified);
         }
         [Fact]
-        public async Task GetUser()
+        public async Task GetUserById()
         {
             var user = await _client.GetUserAsync(66078337084162048);
             Assert.Equal(Mocks.PublicUser.Id, user.Id);
@@ -42,9 +37,23 @@ namespace Discord.Tests.Rest
             Assert.Equal(Mocks.PublicUser.Discriminator.GetValueOrDefault(), user.Discriminator);
         }
         [Fact]
-        public async Task GetInvalidUser()
+        public async Task GetInvalidUserById()
         {
             var user = await _client.GetUserAsync(1);
+            Assert.Null(user);
+        }
+        [Fact]
+        public async Task GetUserByTag()
+        {
+            var user = await _client.GetUserAsync("foxbot", "0282");
+            Assert.Equal(Mocks.PublicUser.Id, user.Id);
+            Assert.Equal(Mocks.PublicUser.Username.GetValueOrDefault(), user.Username);
+            Assert.Equal(Mocks.PublicUser.Discriminator.GetValueOrDefault(), user.Discriminator);
+        }
+        [Fact]
+        public async Task GetInvalidUserByTag()
+        {
+            var user = await _client.GetUserAsync("Voltana", "8252");
             Assert.Null(user);
         }
     }
