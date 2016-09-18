@@ -50,7 +50,7 @@ namespace Discord.Net.WebSockets
             Host = url;
             await BeginConnect(parentCancelToken).ConfigureAwait(false);
             if (SessionId == null)
-                SendIdentify(_rest.Token);
+                SendIdentify(_rest.Token, _rest.ShardId, _rest.TotalShards);
             else
                 SendResume();
         }
@@ -148,7 +148,7 @@ namespace Discord.Net.WebSockets
 			}
 		}
 
-        public void SendIdentify(string token)
+        public void SendIdentify(string token, int shardId = 0, int totalShards = 1)
         {
             var props = new Dictionary<string, string>
             {
@@ -159,9 +159,11 @@ namespace Discord.Net.WebSockets
                 Token = token,
                 Properties = props, 
                 LargeThreshold = _config.LargeThreshold,
-                UseCompression = true
+                UseCompression = true,
+                ShardingParams = new int[] { shardId, totalShards },
             };
-			QueueMessage(msg);
+
+            QueueMessage(msg);
 		}
 
         public void SendResume()
