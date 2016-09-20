@@ -180,7 +180,7 @@ namespace Discord.Commands
         public SearchResult Search(IUserMessage message, string input)
         {
             string lowerInput = input.ToLowerInvariant();
-            var matches = _map.GetCommands(input).ToImmutableArray();
+            var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
             
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);

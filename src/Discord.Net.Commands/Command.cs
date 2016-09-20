@@ -24,6 +24,7 @@ namespace Discord.Commands
         public string Summary { get; }
         public string Remarks { get; }
         public string Text { get; }
+        public int Priority { get; }
         public bool HasVarArgs { get; }
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
@@ -69,6 +70,9 @@ namespace Discord.Commands
                 var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
                 if (remarksAttr != null)
                     Remarks = remarksAttr.Text;
+
+                var priorityAttr = source.GetCustomAttribute<PriorityAttribute>();
+                Priority = priorityAttr?.Priority ?? 0;
 
                 Parameters = BuildParameters(source);
                 HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
