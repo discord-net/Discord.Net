@@ -51,6 +51,9 @@ namespace Discord.Net.Rest
             }
         }
 
+        public int ShardId => _config.ShardId;
+        public int TotalShards => _config.TotalShards;
+
         protected RestClient(DiscordConfig config, string baseUrl, ILogger logger = null)
 		{
 			_config = config;

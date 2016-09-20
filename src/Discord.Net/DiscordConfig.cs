@@ -47,6 +47,11 @@ namespace Discord
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
 
+        /// <summary> Gets or sets the id for this shard. Must be less than TotalShards. </summary>
+        public int ShardId { get; set; } = 0;
+        /// <summary> Gets or sets the total number of shards for this application. </summary>
+        public int TotalShards { get; set; } = 1;
+
         //Events
 
         /// <summary> Gets or sets a handler for all log messages. </summary>
@@ -89,6 +94,9 @@ namespace Discord
         public bool UsePermissionsCache { get; }
         public bool EnablePreUpdateEvents { get; }
 
+        public int ShardId { get; }
+        public int TotalShards { get; }
+
         internal DiscordConfig(DiscordConfigBuilder builder)
         {
             LogLevel = builder.LogLevel;
@@ -106,6 +114,8 @@ namespace Discord
             MessageCacheSize = builder.MessageCacheSize;
             UsePermissionsCache = builder.UsePermissionsCache;
             EnablePreUpdateEvents = builder.EnablePreUpdateEvents;
+            ShardId = builder.ShardId;
+            TotalShards = builder.TotalShards;
         }
 
         private static string GetUserAgent(DiscordConfigBuilder builder)
