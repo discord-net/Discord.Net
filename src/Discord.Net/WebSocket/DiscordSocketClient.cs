@@ -1262,10 +1262,12 @@ namespace Discord.WebSocket
                                                 after = channel.CreateMessage(author, data);
                                         }
                                         if (after != null)
+                                        {
                                             if (before == null)
                                                 await _messageUpdatedEvent.InvokeAsync(Optional.Create<IMessage>(), after).ConfigureAwait(false);
                                             else
                                                 await _messageUpdatedEvent.InvokeAsync(Optional.Create<IMessage>(before), after).ConfigureAwait(false);
+                                        }
                                     }
                                     else
                                     {
