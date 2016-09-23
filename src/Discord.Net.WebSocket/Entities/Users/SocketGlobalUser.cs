@@ -8,6 +8,7 @@ namespace Discord.WebSocket
     internal class SocketGlobalUser : User, ISocketUser
     {
         internal override bool IsAttached => true;
+        private readonly object _lockObj = new object();
 
         private ushort _references;
 
@@ -25,13 +26,13 @@ namespace Discord.WebSocket
         {
             checked
             {
-                lock (this)
+                lock (_lockObj)
                     _references++;
             }
         }
         public void RemoveRef(DiscordSocketClient discord)
         {
-            lock (this)
+            lock (_lockObj)
             {
                 if (--_references == 0)
                     discord.RemoveUser(Id);
@@ -40,16 +41,16 @@ namespace Discord.WebSocket
 
         public override void Update(Model model)
         {
-            lock (this)
+            lock (_lockObj)
                 base.Update(model, source);
         }
         public void Update(PresenceModel model)
         {
             //Race conditions are okay here. Multiple shards racing already cant guarantee presence in order.
-
-            //lock (this)
+            
+            //lock (_lockObj)
             //{
-                var game = model.Game != null ? new Game(model.Game) : null;
+            var game = model.Game != null ? new Game(model.Game) : null;
                 Presence = new Presence(game, model.Status);
             //}
         }

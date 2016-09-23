@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private bool _canReconnect;
 
-        /// <summary> Gets the shard if of this client. </summary>
+        /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
         public ConnectionState ConnectionState { get; private set; }
@@ -793,6 +793,7 @@ namespace Discord.WebSocket
                                         if (guild != null)
                                         {
                                             guild.AddChannel(data, DataStore);
+                                            channel = guild.AddChannel(data, DataStore);
 
                                             if (!guild.IsSynced)
                                             {
@@ -1263,6 +1264,12 @@ namespace Discord.WebSocket
                                         }
                                         if (after != null)
                                             await _messageUpdatedEvent.InvokeAsync(Optional.Create(before), after).ConfigureAwait(false);
+                                        {
+                                            if (before != null)
+                                                await _messageUpdatedEvent.InvokeAsync(Optional.Create<IMessage>(before), after).ConfigureAwait(false);
+                                            else
+                                                await _messageUpdatedEvent.InvokeAsync(Optional.Create<IMessage>(), after).ConfigureAwait(false);
+                                        }
                                     }
                                     else
                                     {

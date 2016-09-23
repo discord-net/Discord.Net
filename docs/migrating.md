@@ -1,6 +1,6 @@
 # Migrating from 0.9
 
-**1.0.0 is the biggest breaking change the library has gone through, do to massive
+**1.0.0 is the biggest breaking change the library has gone through, due to massive
 changes in the design of the library.**
 
 >A medium to advanced understanding is recommended when working with this library.

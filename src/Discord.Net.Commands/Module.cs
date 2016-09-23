@@ -13,7 +13,7 @@ namespace Discord.Commands
         public string Name { get; }
         public string Prefix { get; }
         public string Summary { get; }
-        public string Description { get; }
+        public string Remarks { get; }
         public IEnumerable<Command> Commands { get; }
         internal object Instance { get; }
 
@@ -35,9 +35,9 @@ namespace Discord.Commands
             if (summaryAttr != null)
                 Summary = summaryAttr.Text;
 
-            var descriptionAttr = source.GetCustomAttribute<DescriptionAttribute>();
-            if (descriptionAttr != null)
-                Description = descriptionAttr.Text;
+            var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
+            if (remarksAttr != null)
+                Remarks = remarksAttr.Text;
 
             List<Command> commands = new List<Command>();
             SearchClass(source, instance, commands, Prefix, dependencyMap);
@@ -48,8 +48,6 @@ namespace Discord.Commands
 
         private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, IDependencyMap dependencyMap)
         {
-            if (groupPrefix != "")
-                groupPrefix += " ";
             foreach (var method in parentType.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
@@ -62,10 +60,12 @@ namespace Discord.Commands
                 if (groupAttrib != null)
                 {
                     string nextGroupPrefix;
-                    if (groupAttrib.Prefix != null)
-                        nextGroupPrefix = groupPrefix + groupAttrib.Prefix ?? type.Name;
+
+                    if (groupPrefix != "")
+                        nextGroupPrefix = groupPrefix + " " + (groupAttrib.Prefix ?? type.Name.ToLowerInvariant());
                     else
-                        nextGroupPrefix = groupPrefix;
+                        nextGroupPrefix = groupAttrib.Prefix ?? type.Name.ToLowerInvariant();
+
                     SearchClass(type, ReflectionUtils.CreateObject(type, Service, dependencyMap), commands, nextGroupPrefix, dependencyMap);
                 }
             }

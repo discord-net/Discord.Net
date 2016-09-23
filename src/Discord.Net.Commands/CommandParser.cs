@@ -150,6 +150,8 @@ namespace Discord.Commands
             for (int i = argList.Count; i < command.Parameters.Count; i++)
             {
                 var param = command.Parameters[i];
+                if (param.IsMultiple)
+                    continue;
                 if (!param.IsOptional)
                     return ParseResult.FromError(CommandError.BadArgCount, "The input text has too few parameters.");
                 argList.Add(TypeReaderResult.FromSuccess(param.DefaultValue));

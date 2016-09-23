@@ -21,9 +21,10 @@ namespace Discord.Commands
         public MethodInfo Source { get; }
         public Module Module { get; }
         public string Name { get; }
-        public string Description { get; }
         public string Summary { get; }
+        public string Remarks { get; }
         public string Text { get; }
+        public int Priority { get; }
         public bool HasVarArgs { get; }
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
@@ -38,7 +39,15 @@ namespace Discord.Commands
                 _instance = instance;
 
                 Name = source.Name;
-                Text = groupPrefix + attribute.Text;
+
+                if (attribute.Text == null)
+                    Text = groupPrefix;
+
+                if (groupPrefix != "")
+                    groupPrefix += " ";
+
+                if (attribute.Text != null)
+                    Text = groupPrefix + attribute.Text;
 
                 var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
 
@@ -54,13 +63,16 @@ namespace Discord.Commands
                 if (nameAttr != null)
                     Name = nameAttr.Text;
 
-                var description = source.GetCustomAttribute<DescriptionAttribute>();
-                if (description != null)
-                    Description = description.Text;
-
                 var summary = source.GetCustomAttribute<SummaryAttribute>();
                 if (summary != null)
                     Summary = summary.Text;
+
+                var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
+                if (remarksAttr != null)
+                    Remarks = remarksAttr.Text;
+
+                var priorityAttr = source.GetCustomAttribute<PriorityAttribute>();
+                Priority = priorityAttr?.Priority ?? 0;
 
                 Parameters = BuildParameters(source);
                 HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
