@@ -1,11 +1,10 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.0-beta2-*",
 
   "buildOptions": {
     "compile": {
       "include": [ "../Discord.Net.Utils/**.cs" ]
-    },
-    "define": [ "REST" ]
+    }
   },
 
   "configurations": {
