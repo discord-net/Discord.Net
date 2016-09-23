@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0-*",
+
+  "buildOptions": {
+    "compile": {
+      "include": [ "../Discord.Net.Utils/**.cs" ]
+    },
+    "define": [ "REST" ]
+  },
+
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "nowarn": [ "CS1573", "CS1591" ],
+        "optimize": true,
+        "warningsAsErrors": true,
+        "xmlDoc": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "Discord.Net.Core": {
+      "target": "project"
+    },
+    "NETStandard.Library": "1.6.0"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": [
+        "dotnet5.4",
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    }
+  }
+}

@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>496db20a-a455-4d01-b6bc-90fe6d7c6b81</ProjectGuid>
-    <RootNamespace>Discord.Net</RootNamespace>
+    <ProjectGuid>bfc6dc28-0351-4573-926a-d4124244c04f</ProjectGuid>
+    <RootNamespace>Discord.Rest</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

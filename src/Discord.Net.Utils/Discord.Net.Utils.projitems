@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2b75119c-9893-4aaa-8d38-6176eeb09060</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Discord</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConcurrentHashSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DateTimeUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\CollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TaskCompletionSourceExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\LogManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MentionsHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Paging\Page.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Paging\PagedEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Paging\PageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Permissions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Preconditions.cs" />
+  </ItemGroup>
+</Project>
