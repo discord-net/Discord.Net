@@ -21,6 +21,8 @@ namespace Discord.Net.Converters
                     return UserStatus.Idle;
                 case "offline":
                     return UserStatus.Offline;
+                case "dnd":
+                    return UserStatus.DoNotDisturb;
                 default:
                     throw new JsonSerializationException("Unknown user status");
             }
@@ -38,6 +40,9 @@ namespace Discord.Net.Converters
                     break;
                 case UserStatus.Offline:
                     writer.WriteValue("offline");
+                    break;
+                case UserStatus.DoNotDisturb:
+                    writer.WriteValue("dnd");
                     break;
                 default:
                     throw new JsonSerializationException("Invalid user status");
