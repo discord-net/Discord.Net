@@ -3,6 +3,7 @@ using System.IO;
 
 namespace Discord.Audio
 {
+    /// <summary> A stream used for writing raw audio data to Discord. </summary>
     public class RTPWriteStream : Stream
     {
         private readonly AudioClient _audioClient;
@@ -10,10 +11,14 @@ namespace Discord.Audio
         private int _samplesPerFrame;
         private uint _ssrc, _timestamp = 0;
 
+        /// <summary> The current output buffer. </summary>
         protected readonly byte[] _buffer;
 
+        /// <inheritdoc/>
         public override bool CanRead => false;
+        /// <inheritdoc/>
         public override bool CanSeek => false;
+        /// <inheritdoc/>
         public override bool CanWrite => true;
 
         internal RTPWriteStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
@@ -32,6 +37,7 @@ namespace Discord.Audio
             _nonce[11] = (byte)(_ssrc >> 0);
         }
 
+        /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)
         {
             unchecked
@@ -51,17 +57,23 @@ namespace Discord.Audio
             _audioClient.Send(_buffer, count + 12);
         }
 
+        /// <inheritdoc/>
         public override void Flush() { }
 
+        /// <inheritdoc/>
         public override long Length { get { throw new NotSupportedException(); } }
+        /// <inheritdoc/>
         public override long Position
         {
             get { throw new NotSupportedException(); }
             set { throw new NotSupportedException(); }
         }
 
+        /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
+        /// <inheritdoc/>
         public override void SetLength(long value) { throw new NotSupportedException(); }
+        /// <inheritdoc/>
         public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
     }
 }

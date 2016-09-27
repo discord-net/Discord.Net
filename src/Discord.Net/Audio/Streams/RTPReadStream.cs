@@ -4,14 +4,18 @@ using System.IO;
 
 namespace Discord.Audio
 {
+    /// <summary> A stream used for reading raw audio data from Discord. </summary>
     public class RTPReadStream : Stream
     {
         private readonly BlockingCollection<byte[]> _queuedData; //TODO: Replace with max-length ring buffer
         private readonly AudioClient _audioClient;
         private readonly byte[] _buffer, _nonce, _secretKey;
 
+        /// <inheritdoc/>
         public override bool CanRead => true;
+        /// <inheritdoc/>
         public override bool CanSeek => false;
+        /// <inheritdoc/>
         public override bool CanWrite => true;
 
         internal RTPReadStream(AudioClient audioClient, byte[] secretKey, int bufferSize = 4000)
@@ -23,12 +27,14 @@ namespace Discord.Audio
             _nonce = new byte[24];
         }
 
+        /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
             var queuedData = _queuedData.Take();
             Buffer.BlockCopy(queuedData, 0, buffer, offset, Math.Min(queuedData.Length, count));
             return queuedData.Length;
         }
+        /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)
         {
             Buffer.BlockCopy(buffer, 0, _nonce, 0, 12);
@@ -38,16 +44,21 @@ namespace Discord.Audio
             _queuedData.Add(newBuffer);
         }
 
+        /// <inheritdoc/>
         public override void Flush() { throw new NotSupportedException(); }
 
+        /// <inheritdoc/>
         public override long Length { get { throw new NotSupportedException(); } }
+        /// <inheritdoc/>
         public override long Position
         {
             get { throw new NotSupportedException(); }
             set { throw new NotSupportedException(); }
         }
 
+        /// <inheritdoc/>
         public override void SetLength(long value) { throw new NotSupportedException(); }
+        /// <inheritdoc/>
         public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
     }
 }

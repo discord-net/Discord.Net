@@ -24,7 +24,9 @@ namespace Discord.Audio
         /// <summary> Produces PCM samples from Opus-encoded audio. </summary>
         /// <param name="input">PCM samples to decode.</param>
         /// <param name="inputOffset">Offset of the frame in input.</param>
+        /// <param name="inputCount">Number of bytes of the frame in input.</param>
         /// <param name="output">Buffer to store the decoded frame.</param>
+        /// <param name="outputOffset">Zero-based offset for the output.</param> 
         public unsafe int DecodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output, int outputOffset)
         {
             int result = 0;

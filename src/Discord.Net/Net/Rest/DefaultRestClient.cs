@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
+    ///<summary> A default implementation of a <see cref="IRestClient"/> </summary>
     public sealed class DefaultRestClient : IRestClient
     {
         private const int HR_SECURECHANNELFAILED = -2146233079;
@@ -24,6 +25,7 @@ namespace Discord.Net.Rest
         private CancellationToken _cancelToken, _parentToken;
         private bool _isDisposed;
 
+        /// <summary> Creates a new instance of <see cref="DefaultRestClient"/> </summary>
         public DefaultRestClient(string baseUrl)
         {
             _baseUrl = baseUrl;
@@ -50,29 +52,34 @@ namespace Discord.Net.Rest
                 _isDisposed = true;
             }
         }
+        /// <summary> Disposes any resources allocated by this instance. </summary>
         public void Dispose()
         {
             Dispose(true);
         }
 
+        /// <inheritdoc/>
         public void SetHeader(string key, string value)
         {
             _client.DefaultRequestHeaders.Remove(key);
             if (value != null)
                 _client.DefaultRequestHeaders.Add(key, value);
         }
+        /// <inheritdoc/>
         public void SetCancelToken(CancellationToken cancelToken)
         {
             _parentToken = cancelToken;
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
                 return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
         }
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, string json, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
@@ -82,6 +89,7 @@ namespace Discord.Net.Rest
                 return await SendInternalAsync(restRequest, headerOnly).ConfigureAwait(false);
             }
         }
+        /// <inheritdoc/>
         public async Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
