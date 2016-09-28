@@ -4,6 +4,7 @@ using Discord.API.Rest;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,8 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
-            : base(restClientProvider, serializer, requestQueue)
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, string userAgent, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+            : base(restClientProvider, userAgent, serializer, requestQueue)
         {            
             _gatewayClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)

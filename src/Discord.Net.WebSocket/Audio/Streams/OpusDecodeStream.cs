@@ -1,6 +1,6 @@
 ﻿namespace Discord.Audio
 {
-    public class OpusDecodeStream : RTPReadStream
+    internal class OpusDecodeStream : RTPReadStream
     {
         private readonly byte[] _buffer;
         private readonly OpusDecoder _decoder;

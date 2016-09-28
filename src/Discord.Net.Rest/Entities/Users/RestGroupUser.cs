@@ -6,11 +6,11 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGroupUser : RestUser, IGroupUser
     {
-        internal RestGroupUser(DiscordRestClient discord, ulong id)
+        internal RestGroupUser(DiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal new static RestGroupUser Create(DiscordRestClient discord, Model model)
+        internal new static RestGroupUser Create(DiscordClient discord, Model model)
         {
             var entity = new RestGroupUser(discord, model.Id);
             entity.Update(model);

@@ -14,7 +14,7 @@ namespace Discord
         public bool RequireColons { get; }
         public IReadOnlyList<ulong> RoleIds { get; }
 
-        public Emoji(ulong id, string name, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds)
+        private Emoji(ulong id, string name, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds)
         {
             Id = id;
             Name = name;
@@ -22,7 +22,7 @@ namespace Discord
             RequireColons = requireColons;
             RoleIds = roleIds;
         }
-        public static Emoji Create(Model model)
+        internal static Emoji Create(Model model)
         {
             return new Emoji(model.Id, model.Name, model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
         }

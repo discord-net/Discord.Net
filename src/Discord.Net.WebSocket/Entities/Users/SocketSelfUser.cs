@@ -6,42 +6,39 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
-    internal class SocketSelfUser : SelfUser, ISocketUser, ISelfUser
+    public class SocketSelfUser : SocketUser, ISelfUser
     {
-        internal override bool IsAttached => true;
+        public string Email { get; private set; }
+        public bool IsVerified { get; private set; }
+        public bool IsMfaEnabled { get; private set; }
 
-        public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        SocketGlobalUser ISocketUser.User { get { throw new NotSupportedException(); } }
-
-        public SocketSelfUser(DiscordSocketClient discord, Model model) 
-            : base(discord, model)
+        internal SocketSelfUser(DiscordSocketClient discord, ulong id)
+            : base(discord, id)
         {
         }
-
-        public async Task ModifyStatusAsync(Action<ModifyPresenceParams> func)
+        internal new static SocketSelfUser Create(DiscordSocketClient discord, Model model)
         {
-            if (func == null) throw new NullReferenceException(nameof(func));
+            var entity = new SocketSelfUser(discord, model.Id);
+            entity.Update(model);
+            return entity;
+        }
+        internal override void Update(Model model)
+        {
+            base.Update(model);
 
-            var args = new ModifyPresenceParams();
-            func(args);
-
-            var game = args._game.GetValueOrDefault(_game);
-            var status = args._status.GetValueOrDefault(_status);
-
-            long idleSince = _idleSince;
-            if (status == UserStatus.Idle && _status != UserStatus.Idle)
-                idleSince = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            var apiGame = game != null ? new API.Game { Name = game.Name, StreamType = game.StreamType, StreamUrl = game.StreamUrl } : null;
-
-            await Discord.ApiClient.SendStatusUpdateAsync(status == UserStatus.Idle ? _idleSince : (long?)null, apiGame).ConfigureAwait(false);
-
-            //Save values
-            _idleSince = idleSince;
-            _game = game;
-            _status = status;
+            if (model.Email.IsSpecified)
+                Email = model.Email.Value;
+            if (model.Verified.IsSpecified)
+                IsVerified = model.Verified.Value;
+            if (model.MfaEnabled.IsSpecified)
+                IsMfaEnabled = model.MfaEnabled.Value;
         }
 
-        public SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
-        ISocketUser ISocketUser.Clone() => Clone();
+        public override async Task UpdateAsync()
+            => Update(await UserHelper.GetAsync(this, Discord));
+        public Task ModifyAsync(Action<ModifyCurrentUserParams> func)
+            => UserHelper.ModifyAsync(this, Discord, func);
+
+        Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func) { throw new NotSupportedException(); }
     }
 }

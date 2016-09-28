@@ -3,6 +3,7 @@ using Discord.API.Rpc;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
+using Discord.Rpc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -66,8 +67,8 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordRpcApiClient(string clientId, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
-            : base(restClientProvider, serializer, requestQueue)
+        public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+            : base(restClientProvider, userAgent, serializer, requestQueue)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;

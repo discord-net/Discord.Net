@@ -10,28 +10,31 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestDMChannel : RestEntity<ulong>, IDMChannel, IUpdateable
+    public class RestDMChannel : RestChannel, IDMChannel, IUpdateable
     {
-        public RestUser Recipient { get; }
+        public RestUser CurrentUser { get; private set; }
+        public RestUser Recipient { get; private set; }
 
-        public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(Discord.CurrentUser, Recipient);
+        public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
 
-        internal RestDMChannel(DiscordRestClient discord, ulong id)
+        internal RestDMChannel(DiscordClient discord, ulong id, ulong recipientId)
             : base(discord, id)
         {
+            Recipient = new RestUser(Discord, recipientId);
+            CurrentUser = new RestUser(Discord, discord.CurrentUser.Id);
         }
-        internal static RestDMChannel Create(DiscordRestClient discord, Model model)
+        internal new static RestDMChannel Create(DiscordClient discord, Model model)
         {
-            var entity = new RestDMChannel(discord, model.Id);
+            var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
             entity.Update(model);
             return entity;
         }
-        internal void Update(Model model)
+        internal override void Update(Model model)
         {
             Recipient.Update(model.Recipients.Value[0]);
         }
 
-        public async Task UpdateAsync()
+        public override async Task UpdateAsync()
             => Update(await ChannelHelper.GetAsync(this, Discord));
         public Task CloseAsync()
             => ChannelHelper.DeleteAsync(this, Discord);
@@ -41,7 +44,7 @@ namespace Discord.Rest
             if (id == Recipient.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
-                return Discord.CurrentUser;
+                return CurrentUser;
             else
                 return null;
         }

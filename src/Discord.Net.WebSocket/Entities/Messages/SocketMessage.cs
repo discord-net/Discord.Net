@@ -5,15 +5,15 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class RestMessage : RestEntity<ulong>, IMessage, IUpdateable
+    public abstract class SocketMessage : SocketEntity<ulong>, IMessage, IUpdateable
     {
         private long _timestampTicks;
 
         public ulong ChannelId { get; }
-        public IUser Author { get; }
+        public SocketUser Author { get; }
 
         public string Content { get; private set; }
 
@@ -29,17 +29,18 @@ namespace Discord.Rest
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(DiscordClient discord, ulong id, ulong channelId)
+        internal SocketMessage(DiscordSocketClient discord, ulong id, ulong channelId, SocketUser author)
             : base(discord, id)
         {
             ChannelId = channelId;
+            Author = author;
         }
-        internal static RestMessage Create(DiscordClient discord, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, SocketUser author, Model model)
         {
             if (model.Type == MessageType.Default)
-                return RestUserMessage.Create(discord, model);
+                return SocketUserMessage.Create(discord, author, model);
             else
-                return RestSystemMessage.Create(discord, model);
+                return SocketSystemMessage.Create(discord, author, model);
         }
         internal virtual void Update(Model model)
         {
@@ -56,6 +57,8 @@ namespace Discord.Rest
             Update(model);
         }
 
+        //IMessage
+        IUser IMessage.Author => Author;
         MessageType IMessage.Type => MessageType.Default;
     }
 }

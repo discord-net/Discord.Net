@@ -17,11 +17,11 @@ namespace Discord.Rest
 
         public string IconUrl => API.CDN.GetApplicationIconUrl(Id, _iconId);
 
-        internal RestApplication(DiscordRestClient discord, ulong id)
+        internal RestApplication(DiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestApplication Create(DiscordRestClient discord, Model model)
+        internal static RestApplication Create(DiscordClient discord, Model model)
         {
             var entity = new RestApplication(discord, model.Id);
             entity.Update(model);

@@ -2,6 +2,7 @@
 
 namespace Discord
 {
+    //TODO: Rename to Attachment?
     public class RestAttachment : IAttachment
     {
         public ulong Id { get; }

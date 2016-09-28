@@ -1,4 +1,5 @@
-﻿using Discord.API.Gateway;
+﻿using Discord.API;
+using Discord.API.Gateway;
 using Discord.Audio;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -11,24 +12,22 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
-    public partial class DiscordSocketClient : DiscordRestClient, IDiscordClient
+    public partial class DiscordSocketClient : DiscordClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
-        private readonly ILogger _gatewayLogger;
-#if BENCHMARK
-        private readonly ILogger _benchmarkLogger;
-#endif
+        private readonly Logger _gatewayLogger;
         private readonly JsonSerializer _serializer;
 
         private string _sessionId;
         private int _lastSeq;
-        private ImmutableDictionary<string, VoiceRegion> _voiceRegions;
+        private ImmutableDictionary<string, RestVoiceRegion> _voiceRegions;
         private TaskCompletionSource<bool> _connectTask;
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _heartbeatTask, _guildDownloadTask, _reconnectTask;
@@ -54,16 +53,17 @@ namespace Discord.WebSocket
         internal int ConnectionTimeout { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
 
-        public new API.DiscordSocketApiClient ApiClient => base.ApiClient as API.DiscordSocketApiClient;
-        internal SocketSelfUser CurrentUser => _currentUser as SocketSelfUser;
+        public new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        public new SocketSelfUser CurrentUser => base.CurrentUser as SocketSelfUser;
+        public IReadOnlyCollection<IPrivateChannel> PrivateChannels => DataStore.PrivateChannels;
         internal IReadOnlyCollection<SocketGuild> Guilds => DataStore.Guilds;
-        internal IReadOnlyCollection<VoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public DiscordSocketClient(DiscordSocketConfig config)
-            : base(config, CreateApiClient(config))
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config)) { }
+        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client)
+            : base(config, client)
         {
             ShardId = config.ShardId;
             TotalShards = config.TotalShards;
@@ -72,14 +72,10 @@ namespace Discord.WebSocket
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
             ConnectionTimeout = config.ConnectionTimeout;
-
             DataStore = new DataStore(0, 0);
+            
             _nextAudioId = 1;
-
             _gatewayLogger = LogManager.CreateLogger("Gateway");
-#if BENCHMARK
-            _benchmarkLogger = _log.CreateLogger("Benchmark");
-#endif
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -107,25 +103,25 @@ namespace Discord.WebSocket
             GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
             LatencyUpdated += async (old, val) => await _gatewayLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
 
-            _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
+            _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
-
+            => new API.DiscordSocketApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, config.WebSocketProvider, requestQueue: new RequestQueue());
+        
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var voiceRegions = await ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
-            _voiceRegions = voiceRegions.Select(x => new VoiceRegion(x)).ToImmutableDictionary(x => x.Id);
+            _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
         }
         protected override async Task OnLogoutAsync()
         {
             if (ConnectionState != ConnectionState.Disconnected)
                 await DisconnectInternalAsync(null, false).ConfigureAwait(false);
 
-            _voiceRegions = ImmutableDictionary.Create<string, VoiceRegion>();
+            _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
         }
-
+        
         /// <inheritdoc />
         public async Task ConnectAsync(bool waitForGuilds = true)
         {
@@ -319,127 +315,55 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override Task<IVoiceRegion> GetVoiceRegionAsync(string id)
+        public Task<RestApplication> GetApplicationInfoAsync()
+            => ClientHelper.GetApplicationInfoAsync(this);
+
+
+        /// <inheritdoc />
+        public SocketGuild GetGuild(ulong id)
         {
-            VoiceRegion region;
+            return DataStore.GetGuild(id);
+        }
+        /// <inheritdoc />
+        public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
+            => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon);
+
+        /// <inheritdoc />
+        public IChannel GetChannel(ulong id)
+        {
+            return DataStore.GetChannel(id);
+        }
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
+            => ClientHelper.GetConnectionsAsync(this);
+
+        /// <inheritdoc />
+        public Task<RestInvite> GetInviteAsync(string inviteId)
+            => ClientHelper.GetInviteAsync(this, inviteId);
+
+        /// <inheritdoc />
+        public IUser GetUser(ulong id)
+        {
+            return DataStore.GetUser(id);
+        }
+        /// <inheritdoc />
+        public IUser GetUser(string username, string discriminator)
+        {
+            return DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault();
+        }
+
+        /// <inheritdoc />
+        public RestVoiceRegion GetVoiceRegion(string id)
+        {
+            RestVoiceRegion region;
             if (_voiceRegions.TryGetValue(id, out region))
-                return Task.FromResult<IVoiceRegion>(region);
-            return Task.FromResult<IVoiceRegion>(null);
-        }
-
-        /// <inheritdoc />
-        public override Task<IGuild> GetGuildAsync(ulong id)
-        {
-            return Task.FromResult<IGuild>(DataStore.GetGuild(id));
-        }
-        public override Task<GuildEmbed?> GetGuildEmbedAsync(ulong id)
-        {
-            var guild = DataStore.GetGuild(id);
-            if (guild != null)
-                return Task.FromResult<GuildEmbed?>(new GuildEmbed(guild.IsEmbeddable, guild.EmbedChannelId));
-            else
-                return Task.FromResult<GuildEmbed?>(null);
-        }
-        public override Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync()
-        {
-            return Task.FromResult<IReadOnlyCollection<IUserGuild>>(Guilds);
-        }
-        public override Task<IReadOnlyCollection<IGuild>> GetGuildsAsync()
-        {
-            return Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
-        }
-        internal SocketGuild AddGuild(ExtendedGuild model, DataStore dataStore)
-        {
-            var guild = new SocketGuild(this, model, dataStore);
-            dataStore.AddGuild(guild);
-            if (model.Large)
-                _largeGuilds.Enqueue(model.Id);
-            return guild;
-        }
-        internal SocketGuild RemoveGuild(ulong id)
-        {
-            var guild = DataStore.RemoveGuild(id);
-            if (guild != null)
-            {
-                foreach (var channel in guild.Channels)
-                    DataStore.RemoveChannel(id);
-                foreach (var user in guild.Members)
-                    user.User.RemoveRef(this);
-            }
-            return guild;
-        }
-        
-        /// <inheritdoc />
-        public override Task<IChannel> GetChannelAsync(ulong id)
-        {
-            return Task.FromResult<IChannel>(DataStore.GetChannel(id));
-        }
-        public override Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
-        {
-            return Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(DataStore.PrivateChannels);
-        }
-        internal ISocketChannel AddPrivateChannel(API.Channel model, DataStore dataStore)
-        {
-            switch (model.Type)
-            {
-                case ChannelType.DM:
-                    {
-                        var recipients = model.Recipients.Value;
-                        var user = GetOrAddUser(recipients[0], dataStore);
-                        var channel = new SocketDMChannel(this, new SocketDMUser(user), model);
-                        dataStore.AddChannel(channel);
-                        return channel;
-                    }
-                case ChannelType.Group:
-                    {
-                        var channel = new SocketGroupChannel(this, model);
-                        channel.UpdateUsers(model.Recipients.Value, dataStore);
-                        dataStore.AddChannel(channel);
-                        return channel;
-                    }
-                default:
-                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
-            }
-        }
-        internal ISocketChannel RemovePrivateChannel(ulong id)
-        {
-            var channel = DataStore.RemoveChannel(id) as ISocketPrivateChannel;
-            if (channel != null)
-            {
-                foreach (var recipient in channel.Recipients)
-                    recipient.User.RemoveRef(this);
-            }
-            return channel;
-        }
-
-        /// <inheritdoc />
-        public override Task<IUser> GetUserAsync(ulong id)
-        {
-            return Task.FromResult<IUser>(DataStore.GetUser(id));
-        }
-        /// <inheritdoc />
-        public override Task<IUser> GetUserAsync(string username, string discriminator)
-        {
-            return Task.FromResult<IUser>(DataStore.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault());
-        }
-        /// <inheritdoc />
-        public override Task<ISelfUser> GetCurrentUserAsync()
-        {
-            return Task.FromResult<ISelfUser>(_currentUser);
-        }
-        internal SocketGlobalUser GetOrAddUser(API.User model, DataStore dataStore)
-        {
-            var user = dataStore.GetOrAddUser(model.Id, _ => new SocketGlobalUser(model));
-            user.AddRef();
-            return user;
-        }
-        internal SocketGlobalUser RemoveUser(ulong id)
-        {
-            return DataStore.RemoveUser(id);
+                return region;
+            return null;
         }
 
         /// <summary> Downloads the users list for all large guilds. </summary>
-        public Task DownloadAllUsersAsync() 
+        /*public Task DownloadAllUsersAsync() 
             => DownloadUsersAsync(DataStore.Guilds.Where(x => !x.HasAllMembers));
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
         public Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
@@ -490,20 +414,10 @@ namespace Discord.WebSocket
                 else
                     await Task.WhenAll(batchTasks).ConfigureAwait(false);
             }
-        }
+        }*/
 
-        public override Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync()
-        {
-            return Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(_voiceRegions.ToReadOnlyCollection());
-        }
-        
         private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
         {
-#if BENCHMARK
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            try
-            {
-#endif
             if (seq != null)
                 _lastSeq = seq.Value;
             try
@@ -516,7 +430,7 @@ namespace Discord.WebSocket
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
                             _heartbeatTime = 0;
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, _clientLogger);
+                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, LogManager.ClientLogger);
                         }
                         break;
                     case GatewayOpCode.Heartbeat:
@@ -574,9 +488,9 @@ namespace Discord.WebSocket
                                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
                                         var dataStore = new DataStore(data.Guilds.Length, data.PrivateChannels.Length);
 
-                                        var currentUser = new SocketSelfUser(this, data.User);
+                                        var currentUser = SocketSelfUser.Create(this, data.User);
                                         int unavailableGuilds = 0;
-                                        for (int i = 0; i < data.Guilds.Length; i++)
+                                        /*for (int i = 0; i < data.Guilds.Length; i++)
                                         {
                                             var model = data.Guilds[i];
                                             var guild = AddGuild(model, dataStore);
@@ -586,10 +500,10 @@ namespace Discord.WebSocket
                                                 await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
                                         for (int i = 0; i < data.PrivateChannels.Length; i++)
-                                            AddPrivateChannel(data.PrivateChannels[i], dataStore);
+                                            AddPrivateChannel(data.PrivateChannels[i], dataStore);*/
 
                                         _sessionId = data.SessionId;
-                                        _currentUser = currentUser;
+                                        base.CurrentUser = currentUser;
                                         _unavailableGuilds = unavailableGuilds;
                                         DataStore = dataStore;
                                     }
@@ -603,7 +517,7 @@ namespace Discord.WebSocket
                                         await SyncGuildsAsync().ConfigureAwait(false);
 
                                     _lastGuildAvailableTime = Environment.TickCount;
-                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _clientLogger);
+                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, LogManager.ClientLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
 
@@ -611,7 +525,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
                                 break;
-                            case "RESUMED":
+                            /*case "RESUMED":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
 
@@ -1366,7 +1280,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            before = new Presence(null, UserStatus.Offline);
+                                            before = new SocketPresence(null, UserStatus.Offline);
                                             user = guild.AddOrUpdateUser(data, DataStore);
                                         }
 
@@ -1430,7 +1344,7 @@ namespace Discord.WebSocket
                                     if (data.GuildId.HasValue)
                                     {
                                         ISocketUser user;
-                                        VoiceState before, after;
+                                        SocketVoiceState before, after;
                                         if (data.GuildId != null)
                                         {
                                             var guild = DataStore.GetGuild(data.GuildId.Value);
@@ -1444,7 +1358,7 @@ namespace Discord.WebSocket
 
                                                 if (data.ChannelId != null)
                                                 {
-                                                    before = guild.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    before = guild.GetVoiceState(data.UserId)?.Clone() ?? new SocketVoiceState(null, null, false, false, false);
                                                     after = guild.AddOrUpdateVoiceState(data, DataStore);
                                                     if (data.UserId == _currentUser.Id)
                                                     {
@@ -1453,8 +1367,8 @@ namespace Discord.WebSocket
                                                 }
                                                 else
                                                 {
-                                                    before = guild.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
-                                                    after = new VoiceState(null, data);
+                                                    before = guild.RemoveVoiceState(data.UserId) ?? new SocketVoiceState(null, null, false, false, false);
+                                                    after = new SocketVoiceState(null, data);
                                                 }
 
                                                 user = guild.GetUser(data.UserId);
@@ -1472,13 +1386,13 @@ namespace Discord.WebSocket
                                             {
                                                 if (data.ChannelId != null)
                                                 {
-                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? new VoiceState(null, null, false, false, false);
+                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? new SocketVoiceState(null, null, false, false, false);
                                                     after = groupChannel.AddOrUpdateVoiceState(data, DataStore);
                                                 }
                                                 else
                                                 {
-                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? new VoiceState(null, null, false, false, false);
-                                                    after = new VoiceState(null, data);
+                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? new SocketVoiceState(null, null, false, false, false);
+                                                    after = new SocketVoiceState(null, data);
                                                 }
                                                 user = groupChannel.GetUser(data.UserId);
                                             }
@@ -1518,7 +1432,7 @@ namespace Discord.WebSocket
                                     }
                                 }
 
-                                return;
+                                return;*/
 
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
@@ -1550,18 +1464,9 @@ namespace Discord.WebSocket
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
                 return;
             }
-#if BENCHMARK
-            }
-            finally
-            {
-                stopwatch.Stop();
-                double millis = Math.Round(stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-                await _benchmarkLogger.DebugAsync($"{millis} ms").ConfigureAwait(false);
-            }
-#endif
         }
 
-        private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken, ILogger logger)
+        private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken, Logger logger)
         {
             try
             {
@@ -1601,7 +1506,7 @@ namespace Discord.WebSocket
                 await logger.ErrorAsync("Heartbeat Errored", ex).ConfigureAwait(false);
             }
         }
-        private async Task WaitForGuildsAsync(CancellationToken cancelToken, ILogger logger)
+        private async Task WaitForGuildsAsync(CancellationToken cancelToken, Logger logger)
         {
             //Wait for GUILD_AVAILABLEs
             try
@@ -1626,5 +1531,42 @@ namespace Discord.WebSocket
             if (guildIds.Length > 0)
                 await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }
+
+        //IDiscordClient
+        DiscordRestApiClient IDiscordClient.ApiClient => ApiClient;
+
+        Task IDiscordClient.ConnectAsync()
+            => ConnectAsync();
+
+        async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
+            => await GetApplicationInfoAsync().ConfigureAwait(false);
+
+        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id)
+            => Task.FromResult<IChannel>(GetChannel(id));
+        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync()
+            => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
+
+        async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
+            => await GetConnectionsAsync();
+
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
+            => await GetInviteAsync(inviteId);
+
+        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id)
+            => Task.FromResult<IGuild>(GetGuild(id));
+        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync()
+            => Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
+        async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon)
+            => await CreateGuildAsync(name, region, jpegIcon);
+
+        Task<IUser> IDiscordClient.GetUserAsync(ulong id)
+            => Task.FromResult<IUser>(GetUser(id));
+        Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator)
+            => Task.FromResult<IUser>(GetUser(username, discriminator));
+
+        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync()
+            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(_voiceRegions.ToReadOnlyCollection());
+        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id)
+            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
     }
 }

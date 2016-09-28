@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace Discord.Rest
+namespace Discord.Rpc
 {
-    public abstract class RestEntity<T> : IEntity<T>
+    public abstract class RpcEntity<T> : IEntity<T>
         where T : IEquatable<T>
     {
-        public DiscordClient Discord { get; }
+        public DiscordRpcClient Discord { get; }
         public T Id { get; }
 
-        internal RestEntity(DiscordClient discord, T id)
+        internal RpcEntity(DiscordRpcClient discord, T id)
         {
             Discord = discord;
             Id = id;

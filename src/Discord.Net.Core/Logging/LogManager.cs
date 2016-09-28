@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Discord.Logging
@@ -6,6 +7,7 @@ namespace Discord.Logging
     internal class LogManager
     {
         public LogSeverity Level { get; }
+        public Logger ClientLogger { get; }
 
         public event Func<LogMessage, Task> Message { add { _messageEvent.Add(value); } remove { _messageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<LogMessage, Task>> _messageEvent = new AsyncEvent<Func<LogMessage, Task>>();
@@ -13,6 +15,7 @@ namespace Discord.Logging
         public LogManager(LogSeverity minSeverity)
         {
             Level = minSeverity;
+            ClientLogger = new Logger(this, "Discord");
         }
 
         public async Task LogAsync(LogSeverity severity, string source, string message, Exception ex = null)
@@ -67,5 +70,21 @@ namespace Discord.Logging
             => LogAsync(LogSeverity.Debug, source, ex);
 
         public Logger CreateLogger(string name) => new Logger(this, name);
+
+        public async Task WriteInitialLog()
+        {
+            await ClientLogger.InfoAsync($"Discord.Net v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
+            await ClientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
+            await ClientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
+        }
+        private static string ToArchString(Architecture arch)
+        {
+            switch (arch)
+            {
+                case Architecture.X64: return "x64";
+                case Architecture.X86: return "x86";
+                default: return arch.ToString();
+            }
+        }
     }
 }

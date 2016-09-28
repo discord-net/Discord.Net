@@ -9,14 +9,14 @@ namespace Discord
         public int? Height { get; }
         public int? Width { get; }
 
-        public EmbedThumbnail(string url, string proxyUrl, int? height, int? width)
+        private EmbedThumbnail(string url, string proxyUrl, int? height, int? width)
         {
             Url = url;
             ProxyUrl = proxyUrl;
             Height = height;
             Width = width;
         }
-        public static EmbedThumbnail Create(Model model)
+        internal static EmbedThumbnail Create(Model model)
         {
             return new EmbedThumbnail(model.Url, model.ProxyUrl,
                   model.Height.IsSpecified ? model.Height.Value : (int?)null,

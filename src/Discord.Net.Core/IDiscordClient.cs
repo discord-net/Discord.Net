@@ -26,14 +26,12 @@ namespace Discord
 
         Task<IGuild> GetGuildAsync(ulong id);
         Task<IReadOnlyCollection<IGuild>> GetGuildsAsync();
-        Task<IReadOnlyCollection<IUserGuild>> GetGuildSummariesAsync();
         Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
         
         Task<IInvite> GetInviteAsync(string inviteId);
 
         Task<IUser> GetUserAsync(ulong id);
         Task<IUser> GetUserAsync(string username, string discriminator);
-        Task<IReadOnlyCollection<IUser>> QueryUsersAsync(string query, int limit);
 
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync();
         Task<IVoiceRegion> GetVoiceRegionAsync(string id);

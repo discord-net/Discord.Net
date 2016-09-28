@@ -12,37 +12,37 @@ namespace Discord.WebSocket
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
         private const double CollectionMultiplier = 1.05; //Add 5% buffer to handle growth
 
-        private readonly ConcurrentDictionary<ulong, ISocketChannel> _channels;
+        private readonly ConcurrentDictionary<ulong, SocketChannel> _channels;
         private readonly ConcurrentDictionary<ulong, SocketDMChannel> _dmChannels;
         private readonly ConcurrentDictionary<ulong, SocketGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
         private readonly ConcurrentHashSet<ulong> _groupChannels;
 
-        internal IReadOnlyCollection<ISocketChannel> Channels => _channels.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketChannel> Channels => _channels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
 
-        internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
-            _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
-                _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
+        internal IReadOnlyCollection<IPrivateChannel> PrivateChannels =>
+            _dmChannels.Select(x => x.Value as IPrivateChannel).Concat(
+                _groupChannels.Select(x => GetChannel(x) as IPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
         public DataStore(int guildCount, int dmChannelCount)
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
-            _channels = new ConcurrentDictionary<ulong, ISocketChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
+            _channels = new ConcurrentDictionary<ulong, SocketChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
             _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(CollectionConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
-        internal ISocketChannel GetChannel(ulong id)
+        internal SocketChannel GetChannel(ulong id)
         {
-            ISocketChannel channel;
+            SocketChannel channel;
             if (_channels.TryGetValue(id, out channel))
                 return channel;
             return null;
@@ -54,7 +54,7 @@ namespace Discord.WebSocket
                 return channel;
             return null;
         }
-        internal void AddChannel(ISocketChannel channel)
+        internal void AddChannel(SocketChannel channel)
         {
             _channels[channel.Id] = channel;
 
@@ -68,9 +68,9 @@ namespace Discord.WebSocket
                     _groupChannels.TryAdd(groupChannel.Id);
             }
         }
-        internal ISocketChannel RemoveChannel(ulong id)
+        internal SocketChannel RemoveChannel(ulong id)
         {
-            ISocketChannel channel;
+            SocketChannel channel;
             if (_channels.TryRemove(id, out channel))
             {
                 var dmChannel = channel as SocketDMChannel;

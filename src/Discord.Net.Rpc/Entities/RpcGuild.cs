@@ -4,7 +4,7 @@ using Model = Discord.API.Rpc.RpcUserGuild;
 
 namespace Discord.Rpc
 {
-    /*internal class RemoteUserGuild : IRemoteUserGuild, ISnowflakeEntity
+    /*internal class RemoteUserGuild : RpcEntity, IRemoteUserGuild, ISnowflakeEntity
     {
         public ulong Id { get; }
         public DiscordRestClient Discord { get; }
@@ -12,7 +12,7 @@ namespace Discord.Rpc
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
 
-        public RemoteUserGuild(DiscordRestClient discord, Model model)
+        internal RemoteUserGuild(DiscordRestClient discord, Model model)
         {
             Id = model.Id;
             Discord = discord;

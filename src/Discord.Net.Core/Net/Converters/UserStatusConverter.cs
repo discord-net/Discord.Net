@@ -19,6 +19,10 @@ namespace Discord.Net.Converters
                     return UserStatus.Online;
                 case "idle":
                     return UserStatus.Idle;
+                case "dnd":
+                    return UserStatus.DoNotDisturb;
+                case "invisible":
+                    return UserStatus.Invisible; //Should never happen
                 case "offline":
                     return UserStatus.Offline;
                 default:
@@ -35,6 +39,12 @@ namespace Discord.Net.Converters
                     break;
                 case UserStatus.Idle:
                     writer.WriteValue("idle");
+                    break;
+                case UserStatus.DoNotDisturb:
+                    writer.WriteValue("dnd");
+                    break;
+                case UserStatus.Invisible:
+                    writer.WriteValue("invisible");
                     break;
                 case UserStatus.Offline:
                     writer.WriteValue("offline");

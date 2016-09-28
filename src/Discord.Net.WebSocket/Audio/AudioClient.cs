@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -34,10 +35,7 @@ namespace Discord.Audio
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
 
-        private readonly ILogger _audioLogger;
-#if BENCHMARK
-        private readonly ILogger _benchmarkLogger;
-#endif
+        private readonly Logger _audioLogger;
         internal readonly SemaphoreSlim _connectionLock;
         private readonly JsonSerializer _serializer;
 
@@ -63,9 +61,6 @@ namespace Discord.Audio
             Guild = guild;
 
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{id}");
-#if BENCHMARK
-            _benchmarkLogger = logManager.CreateLogger("Benchmark");
-#endif
 
             _connectionLock = new SemaphoreSlim(1, 1);
 
@@ -181,11 +176,11 @@ namespace Discord.Audio
             ApiClient.SendAsync(data, count).ConfigureAwait(false);
         }
 
-        public RTPWriteStream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000)
+        public Stream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000)
         {
             return new RTPWriteStream(this, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
         }
-        public OpusEncodeStream CreatePCMStream(int samplesPerFrame, int? bitrate = null,
+        public Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null,
             OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
         {
             return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, bitrate, application, bufferSize);
@@ -193,11 +188,6 @@ namespace Discord.Audio
 
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
         {
-#if BENCHMARK
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            try
-            {
-#endif
             try
             {
                 switch (opCode)
@@ -262,15 +252,6 @@ namespace Discord.Audio
                 await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
                 return;
             }
-#if BENCHMARK
-            }
-            finally
-            {
-                stopwatch.Stop();
-                double millis = Math.Round(stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-                await _benchmarkLogger.DebugAsync($"{millis} ms").ConfigureAwait(false);
-            }
-#endif
         }
         private async Task ProcessPacketAsync(byte[] packet)
         {

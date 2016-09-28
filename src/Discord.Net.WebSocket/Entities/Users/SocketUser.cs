@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
+﻿using Discord.Rest;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestUser : RestEntity<ulong>, IUser, IUpdateable
+    public class SocketUser : SocketEntity<ulong>, IUser
     {
         public bool IsBot { get; private set; }
         public string Username { get; private set; }
@@ -18,13 +17,13 @@ namespace Discord.Rest
         public virtual Game? Game => null;
         public virtual UserStatus Status => UserStatus.Unknown;
 
-        internal RestUser(DiscordClient discord, ulong id)
+        internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestUser Create(DiscordClient discord, Model model)
+        internal static SocketUser Create(DiscordSocketClient discord, Model model)
         {
-            var entity = new RestUser(discord, model.Id);
+            var entity = new SocketUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }

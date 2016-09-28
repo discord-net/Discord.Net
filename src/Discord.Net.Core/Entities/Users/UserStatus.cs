@@ -5,6 +5,8 @@
         Unknown,
         Online,
         Idle,
+        DoNotDisturb,
+        Invisible,
         Offline
     }
 }

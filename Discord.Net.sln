@@ -15,8 +15,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Core", "src\Dis
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Impls", "Impls", "{288C363D-A636-4EAE-9AC1-4698B641B26E}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Discord.Net.Utils", "src\Discord.Net.Utils\Discord.Net.Utils.shproj", "{2B75119C-9893-4AAA-8D38-6176EEB09060}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Rest", "src\Discord.Net.Rest\Discord.Net.Rest.xproj", "{BFC6DC28-0351-4573-926A-D4124244C04F}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.WebSocket", "src\Discord.Net.WebSocket\Discord.Net.WebSocket.xproj", "{22AB6C66-536C-4AC2-BBDB-A8BC4EB6B14D}"
@@ -24,9 +22,6 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Discord.Net.Rpc", "src\Discord.Net.Rpc\Discord.Net.Rpc.xproj", "{5688A353-121E-40A1-8BFA-B17B91FB48FB}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Discord.Net.Utils\Discord.Net.Utils.projitems*{2b75119c-9893-4aaa-8d38-6176eeb09060}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

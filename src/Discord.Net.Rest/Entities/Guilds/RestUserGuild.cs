@@ -15,11 +15,11 @@ namespace Discord.Rest
 
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
-        internal RestUserGuild(DiscordRestClient discord, ulong id)
+        internal RestUserGuild(DiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestUserGuild Create(DiscordRestClient discord, Model model)
+        internal static RestUserGuild Create(DiscordClient discord, Model model)
         {
             var entity = new RestUserGuild(discord, model.Id);
             entity.Update(model);

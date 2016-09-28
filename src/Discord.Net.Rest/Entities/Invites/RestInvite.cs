@@ -16,11 +16,11 @@ namespace Discord.Rest
         public string Code => Id;
         public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
 
-        internal RestInvite(DiscordRestClient discord, string id)
+        internal RestInvite(DiscordClient discord, string id)
             : base(discord, id)
         {
         }
-        internal static RestInvite Create(DiscordRestClient discord, Model model)
+        internal static RestInvite Create(DiscordClient discord, Model model)
         {
             var entity = new RestInvite(discord, model.Code);
             entity.Update(model);

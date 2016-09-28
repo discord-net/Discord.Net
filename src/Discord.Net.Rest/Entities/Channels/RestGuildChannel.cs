@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class RestGuildChannel : RestEntity<ulong>, IGuildChannel, IUpdateable
+    public abstract class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
     {
         private ImmutableArray<Overwrite> _overwrites;
 
@@ -21,12 +21,12 @@ namespace Discord.Rest
         public string Name { get; private set; }
         public int Position { get; private set; }
 
-        internal RestGuildChannel(DiscordRestClient discord, ulong id, ulong guildId)
+        internal RestGuildChannel(DiscordClient discord, ulong id, ulong guildId)
             : base(discord, id)
         {
             GuildId = guildId;
         }
-        internal static RestGuildChannel Create(DiscordRestClient discord, Model model)
+        internal new static RestGuildChannel Create(DiscordClient discord, Model model)
         {
             switch (model.Type)
             {
@@ -38,7 +38,7 @@ namespace Discord.Rest
                     throw new InvalidOperationException("Unknown guild channel type");
             }
         }
-        internal virtual void Update(Model model)
+        internal override void Update(Model model)
         {
             Name = model.Name.Value;
             Position = model.Position.Value;
@@ -50,7 +50,7 @@ namespace Discord.Rest
             _overwrites = newOverwrites.ToImmutable();
         }
 
-        public async Task UpdateAsync()
+        public override async Task UpdateAsync()
             => Update(await ChannelHelper.GetAsync(this, Discord));
         public Task ModifyAsync(Action<ModifyGuildChannelParams> func)
             => ChannelHelper.ModifyAsync(this, Discord, func);

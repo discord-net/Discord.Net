@@ -1,6 +1,6 @@
 ﻿namespace Discord.Audio
 {
-    public class OpusEncodeStream : RTPWriteStream
+    internal class OpusEncodeStream : RTPWriteStream
     {
         public int SampleRate = 48000;
         public int Channels = 2;

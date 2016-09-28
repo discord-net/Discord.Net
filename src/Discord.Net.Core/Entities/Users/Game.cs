@@ -16,9 +16,9 @@ namespace Discord
             StreamUrl = streamUrl;
             StreamType = type;
         }
-        public Game(string name)
+        private Game(string name)
             : this(name, null, StreamType.NotStreaming) { }
-        public static Game Create(Model model)
+        internal static Game Create(Model model)
         {
             return new Game(model.Name, 
                 model.StreamUrl.GetValueOrDefault(null), 

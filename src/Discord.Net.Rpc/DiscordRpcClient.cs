@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Rpc
 {
-    public partial class DiscordRpcClient : DiscordRestClient
+    public partial class DiscordRpcClient : DiscordClient
     {
-        private readonly ILogger _rpcLogger;
+        private readonly Logger _rpcLogger;
         private readonly JsonSerializer _serializer;
 
         private TaskCompletionSource<bool> _connectTask;
@@ -58,18 +58,7 @@ namespace Discord.Rpc
             };
         }
         private static API.DiscordRpcApiClient CreateApiClient(DiscordRpcConfig config)
-            => new API.DiscordRpcApiClient(config.ClientId, config.Origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
-
-        internal override void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-                ApiClient.Dispose();
-        }
-
-        protected override Task ValidateTokenAsync(TokenType tokenType, string token)
-        {
-            return Task.CompletedTask; //Validation is done in DiscordRpcAPIClient
-        }
+            => new API.DiscordRpcApiClient(config.ClientId, DiscordRestConfig.UserAgent, config.Origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
 
         /// <inheritdoc />
         public Task ConnectAsync() => ConnectAsync(false);
@@ -371,20 +360,20 @@ namespace Discord.Rpc
                             //Messages
                             case "MESSAGE_CREATE":
                                 {
-                                    await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
+                                    /*await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
                                     var msg = new RpcMessage(this, data.Message);
 
-                                    await _messageReceivedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
+                                    await _messageReceivedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);*/
                                 }
                                 break;
                             case "MESSAGE_UPDATE":
                                 {
-                                    await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
+                                    /*await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
                                     var msg = new RpcMessage(this, data.Message);
 
-                                    await _messageUpdatedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);
+                                    await _messageUpdatedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);*/
                                 }
                                 break;
                             case "MESSAGE_DELETE":

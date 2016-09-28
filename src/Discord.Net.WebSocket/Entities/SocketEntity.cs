@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
-    public abstract class RestEntity<T> : IEntity<T>
+    public abstract class SocketEntity<T> : IEntity<T>
         where T : IEquatable<T>
     {
-        public DiscordClient Discord { get; }
+        public DiscordSocketClient Discord { get; }
         public T Id { get; }
 
-        internal RestEntity(DiscordClient discord, T id)
+        internal SocketEntity(DiscordSocketClient discord, T id)
         {
             Discord = discord;
             Id = id;

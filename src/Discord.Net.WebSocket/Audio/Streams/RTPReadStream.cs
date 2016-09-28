@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Discord.Audio
 {
-    public class RTPReadStream : Stream
+    internal class RTPReadStream : Stream
     {
         private readonly BlockingCollection<byte[]> _queuedData; //TODO: Replace with max-length ring buffer
         private readonly AudioClient _audioClient;

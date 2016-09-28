@@ -1,4 +1,5 @@
 ﻿using Discord.API.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,89 +8,59 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    internal abstract class SocketGuildChannel : ISnowflakeEntity, IGuildChannel
+    public abstract class SocketGuildChannel : SocketChannel, IGuildChannel
     {
-        private List<Overwrite> _overwrites; //TODO: Is maintaining a list here too expensive? Is this threadsafe?
+        private ImmutableArray<Overwrite> _overwrites;
+
+        public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
+
+        public ulong GuildId { get; }
 
         public string Name { get; private set; }
         public int Position { get; private set; }
 
-        public Guild Guild { get; private set; }
-
-        public override DiscordRestClient Discord => Guild.Discord;
-
-        public GuildChannel(Guild guild, Model model)
-            : base(model.Id)
+        internal SocketGuildChannel(DiscordSocketClient discord, ulong id, ulong guildId)
+            : base(discord, id)
         {
-            Guild = guild;
-
-            Update(model);
+            GuildId = guildId;
         }
-        public virtual void Update(Model model)
+        internal new static SocketGuildChannel Create(DiscordSocketClient discord, Model model)
         {
-            if (source == UpdateSource.Rest && IsAttached) return;
-
+            switch (model.Type)
+            {
+                case ChannelType.Text:
+                    return SocketTextChannel.Create(discord, model);
+                case ChannelType.Voice:
+                    return SocketVoiceChannel.Create(discord, model);
+                default:
+                    throw new InvalidOperationException("Unknown guild channel type");
+            }
+        }
+        internal virtual void Update(Model model)
+        {
             Name = model.Name.Value;
             Position = model.Position.Value;
 
             var overwrites = model.PermissionOverwrites.Value;
-            var newOverwrites = new List<Overwrite>(overwrites.Length);
+            var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
                 newOverwrites.Add(new Overwrite(overwrites[i]));
-            _overwrites = newOverwrites;
+            _overwrites = newOverwrites.ToImmutable();
         }
 
         public async Task UpdateAsync()
-        {
-            if (IsAttached) throw new NotSupportedException();
-
-            var model = await Discord.ApiClient.GetChannelAsync(Id).ConfigureAwait(false);
-            Update(model, UpdateSource.Rest);
-        }
-        public async Task ModifyAsync(Action<ModifyGuildChannelParams> func)
-        {
-            if (func == null) throw new NullReferenceException(nameof(func));
-
-            var args = new ModifyGuildChannelParams();
-            func(args);
-
-            if (!args._name.IsSpecified)
-                args._name = Name;
-
-            var model = await Discord.ApiClient.ModifyGuildChannelAsync(Id, args).ConfigureAwait(false);
-            Update(model, UpdateSource.Rest);
-        }
-        public async Task DeleteAsync()
-        {
-            await Discord.ApiClient.DeleteChannelAsync(Id).ConfigureAwait(false);
-        }
-
-        public abstract Task<IGuildUser> GetUserAsync(ulong id);
-        public abstract Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
-
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync()
-        {
-            var models = await Discord.ApiClient.GetChannelInvitesAsync(Id).ConfigureAwait(false);
-            return models.Select(x => new InviteMetadata(Discord, x)).ToImmutableArray();
-        }
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary)
-        {
-            var args = new CreateChannelInviteParams
-            {
-                MaxAge = maxAge ?? 0,
-                MaxUses = maxUses ?? 0,
-                Temporary = isTemporary
-            };
-            var model = await Discord.ApiClient.CreateChannelInviteAsync(Id, args).ConfigureAwait(false);
-            return new InviteMetadata(Discord, model);
-        }
+            => Update(await ChannelHelper.GetAsync(this, Discord));
+        public Task ModifyAsync(Action<ModifyGuildChannelParams> func)
+            => ChannelHelper.ModifyAsync(this, Discord, func);
+        public Task DeleteAsync()
+            => ChannelHelper.DeleteAsync(this, Discord);
 
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
-            for (int i = 0; i < _overwrites.Count; i++)
+            for (int i = 0; i < _overwrites.Length; i++)
             {
                 if (_overwrites[i].TargetId == user.Id)
                     return _overwrites[i].Permissions;
@@ -98,60 +69,91 @@ namespace Discord.Rest
         }
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
-            for (int i = 0; i < _overwrites.Count; i++)
+            for (int i = 0; i < _overwrites.Length; i++)
             {
                 if (_overwrites[i].TargetId == role.Id)
                     return _overwrites[i].Permissions;
             }
             return null;
         }
-        
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms)
         {
-            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue, Type = "member" };
-            await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, user.Id, args).ConfigureAwait(false);
-            _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User }));
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms).ConfigureAwait(false);
+            _overwrites = _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User }));
         }
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms)
         {
-            var args = new ModifyChannelPermissionsParams { Allow = perms.AllowValue, Deny = perms.DenyValue, Type = "role" };
-            await Discord.ApiClient.ModifyChannelPermissionsAsync(Id, role.Id, args).ConfigureAwait(false);
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms).ConfigureAwait(false);
             _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role }));
         }
         public async Task RemovePermissionOverwriteAsync(IUser user)
         {
-            await Discord.ApiClient.DeleteChannelPermissionAsync(Id, user.Id).ConfigureAwait(false);
+            await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, user).ConfigureAwait(false);
 
-            for (int i = 0; i < _overwrites.Count; i++)
+            for (int i = 0; i < _overwrites.Length; i++)
             {
                 if (_overwrites[i].TargetId == user.Id)
                 {
-                    _overwrites.RemoveAt(i);
+                    _overwrites = _overwrites.RemoveAt(i);
                     return;
                 }
             }
         }
         public async Task RemovePermissionOverwriteAsync(IRole role)
         {
-            await Discord.ApiClient.DeleteChannelPermissionAsync(Id, role.Id).ConfigureAwait(false);
+            await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, role).ConfigureAwait(false);
 
-            for (int i = 0; i < _overwrites.Count; i++)
+            for (int i = 0; i < _overwrites.Length; i++)
             {
                 if (_overwrites[i].TargetId == role.Id)
                 {
-                    _overwrites.RemoveAt(i);
+                    _overwrites = _overwrites.RemoveAt(i);
                     return;
                 }
             }
         }
-        
-        public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id})";
-        
-        IGuild IGuildChannel.Guild => Guild;
-        IReadOnlyCollection<Overwrite> IGuildChannel.PermissionOverwrites => _overwrites.AsReadOnly();
 
-        async Task<IUser> IChannel.GetUserAsync(ulong id) => await GetUserAsync(id).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync() => await GetUsersAsync().ConfigureAwait(false);
+        public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync()
+            => await ChannelHelper.GetInvitesAsync(this, Discord);
+        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = true)
+            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary);
+
+        //IGuildChannel
+        async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync()
+            => await GetInvitesAsync();
+        async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary)
+            => await CreateInviteAsync(maxAge, maxUses, isTemporary);
+
+        OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IRole role)
+            => GetPermissionOverwrite(role);
+        OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)
+            => GetPermissionOverwrite(user);
+        async Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions)
+            => await AddPermissionOverwriteAsync(role, permissions);
+        async Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions)
+            => await AddPermissionOverwriteAsync(user, permissions);
+        async Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role)
+            => await RemovePermissionOverwriteAsync(role);
+        async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user)
+            => await RemovePermissionOverwriteAsync(user);
+
+        IReadOnlyCollection<IGuildUser> IGuildChannel.CachedUsers
+            => ImmutableArray.Create<IGuildUser>();
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync()
+            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id)
+            => Task.FromResult<IGuildUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
+        IGuildUser IGuildChannel.GetCachedUser(ulong id)
+            => null;
+
+        //IChannel
+        IReadOnlyCollection<IUser> IChannel.CachedUsers
+            => ImmutableArray.Create<IUser>();
+        IUser IChannel.GetCachedUser(ulong id)
+            => null;
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
+            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+        Task<IUser> IChannel.GetUserAsync(ulong id)
+            => Task.FromResult<IUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
     }
 }

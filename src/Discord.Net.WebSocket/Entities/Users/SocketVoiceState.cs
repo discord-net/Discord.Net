@@ -4,7 +4,7 @@ using Model = Discord.API.VoiceState;
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
-    internal struct VoiceState : IVoiceState
+    public struct SocketVoiceState : IVoiceState
     {
         [Flags]
         private enum Flags : byte
@@ -28,9 +28,7 @@ namespace Discord.WebSocket
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
 
-        public VoiceState(SocketVoiceChannel voiceChannel, Model model) 
-            : this(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress) { }
-        public VoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
@@ -44,8 +42,12 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.Suppressed;
             _voiceStates = voiceStates;
         }
+        internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
+        {
+            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
+        }
 
-        public VoiceState Clone() => this;
+        public SocketVoiceState Clone() => this;
 
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

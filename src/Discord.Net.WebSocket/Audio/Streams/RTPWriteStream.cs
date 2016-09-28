@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Discord.Audio
 {
-    public class RTPWriteStream : Stream
+    internal class RTPWriteStream : Stream
     {
         private readonly AudioClient _audioClient;
         private readonly byte[] _nonce, _secretKey;

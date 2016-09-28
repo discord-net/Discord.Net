@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-beta2-*",
-  "description": "An unofficial .Net API wrapper for the Discord service.",
+  "description": "An aynchronous API wrapper for Discord using .NET. This package includes all of the optional Discord.Net components",
   "authors": [ "RogueException" ],
 
   "packOptions": {
@@ -13,38 +13,22 @@
     }
   },
 
-  "buildOptions": {
-    "allowUnsafe": true,
-    "warningsAsErrors": false,
-    "xmlDoc": true
-  },
-
-  "configurations": {
-    "Release": {
-      "buildOptions": {
-        "define": [ "RELEASE" ],
-        "nowarn": [ "CS1573", "CS1591" ],
-        "optimize": true
-      }
-    }
-  },
-
   "dependencies": {
-    "Microsoft.Win32.Primitives": "4.0.1",
-    "Newtonsoft.Json": "8.0.3",
-    "System.Collections.Concurrent": "4.0.12",
-    "System.Collections.Immutable": "1.2.0",
-    "System.IO.Compression": "4.1.0",
-    "System.IO.FileSystem": "4.0.1",
-    "System.Net.Http": "4.1.0",
-    "System.Net.NameResolution": "4.0.0",
-    "System.Net.Sockets": "4.1.0",
-    "System.Net.WebSockets.Client": "4.0.0",
-    "System.Reflection.Extensions": "4.0.1",
-    "System.Runtime.InteropServices": "4.1.0",
-    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
-    "System.Runtime.Serialization.Primitives": "4.1.1",
-    "System.Text.RegularExpressions": "4.1.0"
+    "Discord.Net.Core": {
+      "target": "project"
+    },
+    "Discord.Net.Rest": {
+      "target": "project"
+    },
+    "Discord.Net.WebSocket": {
+      "target": "project"
+    }
+    //"Discord.Net.Rpc": {
+    //  "target": "project"
+    //},
+    //"Discord.Net.Commands": {
+    //  "target": "project"
+    //}
   },
 
   "frameworks": {

@@ -3,18 +3,25 @@ using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
-    internal class SocketSystemMessage : SystemMessage, ISocketMessage
+    internal class SocketSystemMessage : SocketMessage, ISystemMessage
     {
-        internal override bool IsAttached => true;
+        public MessageType Type { get; private set; }
 
-        public new DiscordSocketClient Discord => base.Discord as DiscordSocketClient;
-        public new ISocketMessageChannel Channel => base.Channel as ISocketMessageChannel;
-
-        public SocketSystemMessage(ISocketMessageChannel channel, IUser author, Model model) 
-            : base(channel, author, model)
+        internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ulong channelId, SocketUser author)
+            : base(discord, id, channelId, author)
         {
         }
+        internal new static SocketSystemMessage Create(DiscordSocketClient discord, SocketUser author, Model model)
+        {
+            var entity = new SocketSystemMessage(discord, model.Id, model.ChannelId, author);
+            entity.Update(model);
+            return entity;
+        }
+        internal override void Update(Model model)
+        {
+            base.Update(model);
 
-        public ISocketMessage Clone() => MemberwiseClone() as ISocketMessage;
+            Type = model.Type;
+        }
     }
 }

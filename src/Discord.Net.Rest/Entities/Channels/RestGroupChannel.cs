@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestGroupChannel : RestEntity<ulong>, IGroupChannel, IUpdateable
+    public class RestGroupChannel : RestChannel, IGroupChannel, IUpdateable
     {
         private string _iconId;
         private ImmutableDictionary<ulong, RestGroupUser> _users;
@@ -21,17 +21,17 @@ namespace Discord.Rest
         public IReadOnlyCollection<RestGroupUser> Recipients 
             => _users.Select(x => x.Value).Where(x => x.Id != Discord.CurrentUser.Id).ToReadOnlyCollection(() => _users.Count - 1);
 
-        internal RestGroupChannel(DiscordRestClient discord, ulong id)
+        internal RestGroupChannel(DiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestGroupChannel Create(DiscordRestClient discord, Model model)
+        internal new static RestGroupChannel Create(DiscordClient discord, Model model)
         {
             var entity = new RestGroupChannel(discord, model.Id);
             entity.Update(model);
             return entity;
         }
-        internal void Update(Model model)
+        internal override void Update(Model model)
         {
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
@@ -49,7 +49,7 @@ namespace Discord.Rest
             _users = users.ToImmutable();
         }
 
-        public async Task UpdateAsync()
+        public override async Task UpdateAsync()
             => Update(await ChannelHelper.GetAsync(this, Discord));
         public Task LeaveAsync()
             => ChannelHelper.DeleteAsync(this, Discord);
