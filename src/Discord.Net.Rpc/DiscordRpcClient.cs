@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Rpc
 {
-    public partial class DiscordRpcClient : DiscordClient
+    public partial class DiscordRpcClient : BaseDiscordClient
     {
         private readonly Logger _rpcLogger;
         private readonly JsonSerializer _serializer;

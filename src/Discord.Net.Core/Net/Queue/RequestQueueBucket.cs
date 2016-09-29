@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    internal class RequestQueueBucket
+    public class RequestQueueBucket
     {
         private readonly RequestQueue _queue;
         private readonly SemaphoreSlim _semaphore;
@@ -15,16 +15,15 @@ namespace Discord.Net.Queue
         private int _pauseEndTick;
         private TaskCompletionSource<byte> _resumeNotifier;
 
-        public Bucket Definition { get; }
+        public string Id { get; }
         public RequestQueueBucket Parent { get; }
-        public Task _resetTask { get; }
+        public int WindowSeconds { get; }
 
-        public RequestQueueBucket(RequestQueue queue, Bucket definition, RequestQueueBucket parent = null)
+        public RequestQueueBucket(RequestQueue queue, string id, RequestQueueBucket parent = null)
         {
             _queue = queue;
-            Definition = definition;
-            if (definition.WindowCount != 0)
-                _semaphore = new SemaphoreSlim(definition.WindowCount, definition.WindowCount);
+            Id = id;
+            _semaphore = new SemaphoreSlim(5, 5);
             Parent = parent;
 
             _pauseLock = new object();
@@ -44,12 +43,8 @@ namespace Discord.Net.Queue
                 {
                     //When a 429 occurs, we drop all our locks. 
                     //This is generally safe though since 429s actually occuring should be very rare.
-                    RequestQueueBucket bucket;
-                    bool success = FindBucket(ex.BucketId, out bucket);
-
-                    await _queue.RaiseRateLimitTriggered(ex.BucketId, success ? bucket.Definition : null, ex.RetryAfterMilliseconds).ConfigureAwait(false);
-
-                    bucket.Pause(ex.RetryAfterMilliseconds);
+                    await _queue.RaiseRateLimitTriggered(Id, this, ex.RetryAfterMilliseconds).ConfigureAwait(false);
+                    Pause(ex.RetryAfterMilliseconds);
                 }
             }
         }
@@ -107,24 +102,7 @@ namespace Discord.Net.Queue
                     QueueExitAsync();
             }
         }
-
-        private bool FindBucket(string id, out RequestQueueBucket bucket)
-        {
-            //Keep going up until we find a bucket with matching id or we're at the topmost bucket
-            if (Definition.Id == id)
-            {
-                bucket = this;
-                return true;
-            }
-            else if (Parent == null)
-            {
-                bucket = this;
-                return false;
-            }
-            else
-                return Parent.FindBucket(id, out bucket);
-        }
-
+        
         private void Pause(int milliseconds)
         {
             lock (_pauseLock)
@@ -151,13 +129,22 @@ namespace Discord.Net.Queue
                 int millis = unchecked(endTick.Value - Environment.TickCount);
                 if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
                     throw new TimeoutException();
+
+                if (!await _semaphore.WaitAsync(0))
+                {
+                    await _queue.RaiseRateLimitTriggered(Id, this, null).ConfigureAwait(false);
+
+                    millis = unchecked(endTick.Value - Environment.TickCount);
+                    if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
+                        throw new TimeoutException();
+                }
             }
             else
                 await _semaphore.WaitAsync().ConfigureAwait(false);
         }
         private async Task QueueExitAsync()
         {
-            await Task.Delay(Definition.WindowSeconds * 1000).ConfigureAwait(false);
+            await Task.Delay(WindowSeconds * 1000).ConfigureAwait(false);
             _semaphore.Release();
         }
     }

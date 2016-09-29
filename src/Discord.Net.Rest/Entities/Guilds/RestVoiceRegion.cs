@@ -13,11 +13,11 @@ namespace Discord
         public string SampleHostname { get; private set; }
         public int SamplePort { get; private set; }
 
-        internal RestVoiceRegion(DiscordClient client, string id)
+        internal RestVoiceRegion(BaseDiscordClient client, string id)
             : base(client, id)
         {
         }
-        internal static RestVoiceRegion Create(DiscordClient client, Model model)
+        internal static RestVoiceRegion Create(BaseDiscordClient client, Model model)
         {
             var entity = new RestVoiceRegion(client, model.Id);
             entity.Update(model);

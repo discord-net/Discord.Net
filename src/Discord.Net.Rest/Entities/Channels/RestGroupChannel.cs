@@ -21,11 +21,11 @@ namespace Discord.Rest
         public IReadOnlyCollection<RestGroupUser> Recipients 
             => _users.Select(x => x.Value).Where(x => x.Id != Discord.CurrentUser.Id).ToReadOnlyCollection(() => _users.Count - 1);
 
-        internal RestGroupChannel(DiscordClient discord, ulong id)
+        internal RestGroupChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal new static RestGroupChannel Create(DiscordClient discord, Model model)
+        internal new static RestGroupChannel Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestGroupChannel(discord, model.Id);
             entity.Update(model);

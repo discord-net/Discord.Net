@@ -8,11 +8,11 @@ namespace Discord.Rest
     {
         public MessageType Type { get; private set; }
 
-        internal RestSystemMessage(DiscordClient discord, ulong id, ulong channelId)
+        internal RestSystemMessage(BaseDiscordClient discord, ulong id, ulong channelId)
             : base(discord, id, channelId)
         {
         }
-        internal new static RestSystemMessage Create(DiscordClient discord, Model model)
+        internal new static RestSystemMessage Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestSystemMessage(discord, model.Id, model.ChannelId);
             entity.Update(model);

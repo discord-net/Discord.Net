@@ -156,8 +156,9 @@ namespace Discord.API
         }
 
         //Core
-        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload,
-            BucketGroup group, int bucketId, ulong guildId, RequestOptions options)
+        public Task SendGatewayAsync(GatewayOpCode opCode, object payload, RequestOptions options = null)
+            => SendGatewayInternalAsync(opCode, payload, options);
+        private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload, RequestOptions options)
         {
             CheckState();
 
@@ -166,25 +167,19 @@ namespace Discord.API
             payload = new WebSocketMessage { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options), group, bucketId, guildId).ConfigureAwait(false);
+            await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
         //Gateway
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
-            GlobalBucket bucket = GlobalBucket.GeneralGateway, RequestOptions options = null)
-            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Global, (int)bucket, 0, options);
-
-        public Task SendGatewayAsync(GatewayOpCode opCode, object payload,
-            GuildBucket bucket, ulong guildId, RequestOptions options = null)
-            => SendGatewayInternalAsync(opCode, payload, BucketGroup.Guild, (int)bucket, guildId, options);
-
         public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             return await SendAsync<GetGatewayResponse>("GET", "gateway", options: options).ConfigureAwait(false);
         }
         public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
             {
                 ["$device"] = "Discord.Net"
@@ -203,6 +198,7 @@ namespace Discord.API
         }
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new ResumeParams()
             {
                 Token = _authToken,
@@ -213,10 +209,12 @@ namespace Discord.API
         }
         public async Task SendHeartbeatAsync(int lastSeq, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
         public async Task SendStatusUpdateAsync(long? idleSince, Game game, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var args = new StatusUpdateParams
             {
                 IdleSince = idleSince,
@@ -226,10 +224,12 @@ namespace Discord.API
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
         }
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var payload = new VoiceStateUpdateParams
             {
                 GuildId = guildId,
@@ -241,6 +241,7 @@ namespace Discord.API
         }
         public async Task SendGuildSyncAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.GuildSync, guildIds, options: options).ConfigureAwait(false);
         }
     }

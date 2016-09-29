@@ -18,11 +18,11 @@ namespace Discord.Rest
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
-        internal RestInviteMetadata(DiscordClient discord, string id)
+        internal RestInviteMetadata(BaseDiscordClient discord, string id)
             : base(discord, id)
         {
         }
-        internal static RestInviteMetadata Create(DiscordClient discord, Model model)
+        internal static RestInviteMetadata Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestInviteMetadata(discord, model.Code);
             entity.Update(model);

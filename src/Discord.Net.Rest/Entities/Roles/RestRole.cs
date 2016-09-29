@@ -21,11 +21,11 @@ namespace Discord.Rest
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.MentionRole(Id);
 
-        internal RestRole(DiscordClient discord, ulong id)
+        internal RestRole(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestRole Create(DiscordClient discord, Model model)
+        internal static RestRole Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestRole(discord, model.Id);
             entity.Update(model);

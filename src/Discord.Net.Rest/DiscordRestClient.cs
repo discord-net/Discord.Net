@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest
 {
-    public class DiscordRestClient : DiscordClient, IDiscordClient
+    public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
@@ -15,10 +15,10 @@ namespace Discord.Rest
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, requestQueue: new RequestQueue());
 
-        protected override async Task OnLoginAsync(TokenType tokenType, string token)
+        protected override Task OnLoginAsync(TokenType tokenType, string token)
         {
-            await ApiClient.LoginAsync(tokenType, token).ConfigureAwait(false);
             base.CurrentUser = RestSelfUser.Create(this, ApiClient.CurrentUser);
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />

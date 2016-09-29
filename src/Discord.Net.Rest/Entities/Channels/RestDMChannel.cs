@@ -17,13 +17,13 @@ namespace Discord.Rest
 
         public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
 
-        internal RestDMChannel(DiscordClient discord, ulong id, ulong recipientId)
+        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong recipientId)
             : base(discord, id)
         {
             Recipient = new RestUser(Discord, recipientId);
             CurrentUser = new RestUser(Discord, discord.CurrentUser.Id);
         }
-        internal new static RestDMChannel Create(DiscordClient discord, Model model)
+        internal new static RestDMChannel Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
             entity.Update(model);

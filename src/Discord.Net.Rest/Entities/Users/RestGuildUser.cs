@@ -21,11 +21,11 @@ namespace Discord.Rest
         
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
-        internal RestGuildUser(DiscordClient discord, ulong id)
+        internal RestGuildUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestGuildUser Create(DiscordClient discord, Model model)
+        internal static RestGuildUser Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestGuildUser(discord, model.User.Id);
             entity.Update(model);

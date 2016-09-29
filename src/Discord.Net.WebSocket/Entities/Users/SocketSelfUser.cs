@@ -15,6 +15,7 @@ namespace Discord.WebSocket
         internal SocketSelfUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
+            Status = UserStatus.Online;
         }
         internal new static SocketSelfUser Create(DiscordSocketClient discord, Model model)
         {

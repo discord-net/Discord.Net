@@ -10,13 +10,13 @@ namespace Discord.Rest
     internal static class ClientHelper
     {
         //Applications
-        public static async Task<RestApplication> GetApplicationInfoAsync(DiscordClient client)
+        public static async Task<RestApplication> GetApplicationInfoAsync(BaseDiscordClient client)
         {
             var model = await client.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
             return RestApplication.Create(client, model);
         }
 
-        public static async Task<RestChannel> GetChannelAsync(DiscordClient client, 
+        public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client, 
             ulong id)
         {
             var model = await client.ApiClient.GetChannelAsync(id).ConfigureAwait(false);
@@ -24,19 +24,19 @@ namespace Discord.Rest
                 return RestChannel.Create(client, model);
             return null;
         }
-        public static async Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(DiscordClient client)
+        public static async Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
             return models.Select(x => RestDMChannel.Create(client, x)).ToImmutableArray();
         }
         
-        public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(DiscordClient client)
+        public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync().ConfigureAwait(false);
             return models.Select(x => RestConnection.Create(x)).ToImmutableArray();
         }
         
-        public static async Task<RestInvite> GetInviteAsync(DiscordClient client,
+        public static async Task<RestInvite> GetInviteAsync(BaseDiscordClient client,
             string inviteId)
         {
             var model = await client.ApiClient.GetInviteAsync(inviteId).ConfigureAwait(false);
@@ -45,7 +45,7 @@ namespace Discord.Rest
             return null;
         }
         
-        public static async Task<RestGuild> GetGuildAsync(DiscordClient client,
+        public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
             ulong id)
         {
             var model = await client.ApiClient.GetGuildAsync(id).ConfigureAwait(false);
@@ -53,7 +53,7 @@ namespace Discord.Rest
                 return RestGuild.Create(client, model);
             return null;
         }
-        public static async Task<RestGuildEmbed?> GetGuildEmbedAsync(DiscordClient client,
+        public static async Task<RestGuildEmbed?> GetGuildEmbedAsync(BaseDiscordClient client,
             ulong id)
         {
             var model = await client.ApiClient.GetGuildEmbedAsync(id).ConfigureAwait(false);
@@ -61,12 +61,12 @@ namespace Discord.Rest
                 return RestGuildEmbed.Create(model);
             return null;
         }
-        public static async Task<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(DiscordClient client)
+        public static async Task<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetMyGuildsAsync().ConfigureAwait(false);
             return models.Select(x => RestUserGuild.Create(client, x)).ToImmutableArray();
         }
-        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(DiscordClient client)
+        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client)
         {
             var summaryModels = await client.ApiClient.GetMyGuildsAsync().ConfigureAwait(false);
             var guilds = ImmutableArray.CreateBuilder<RestGuild>(summaryModels.Count);
@@ -78,7 +78,7 @@ namespace Discord.Rest
             }
             return guilds.ToImmutable();
         }
-        public static async Task<RestGuild> CreateGuildAsync(DiscordClient client,
+        public static async Task<RestGuild> CreateGuildAsync(BaseDiscordClient client,
             string name, IVoiceRegion region, Stream jpegIcon = null)
         {
             var args = new CreateGuildParams(name, region.Id);
@@ -86,7 +86,7 @@ namespace Discord.Rest
             return RestGuild.Create(client, model);
         }
         
-        public static async Task<RestUser> GetUserAsync(DiscordClient client,
+        public static async Task<RestUser> GetUserAsync(BaseDiscordClient client,
             ulong id)
         {
             var model = await client.ApiClient.GetUserAsync(id).ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace Discord.Rest
                 return RestUser.Create(client, model);
             return null;
         }
-        public static async Task<RestUser> GetUserAsync(DiscordClient client,
+        public static async Task<RestUser> GetUserAsync(BaseDiscordClient client,
             string username, string discriminator)
         {
             var model = await client.ApiClient.GetUserAsync(username, discriminator).ConfigureAwait(false);
@@ -103,12 +103,12 @@ namespace Discord.Rest
             return null;
         }
 
-        public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(DiscordClient client)
+        public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
             return models.Select(x => RestVoiceRegion.Create(client, x)).ToImmutableArray();
         }
-        public static async Task<RestVoiceRegion> GetVoiceRegionAsync(DiscordClient client,
+        public static async Task<RestVoiceRegion> GetVoiceRegionAsync(BaseDiscordClient client,
             string id)
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);

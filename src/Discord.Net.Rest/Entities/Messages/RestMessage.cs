@@ -29,12 +29,12 @@ namespace Discord.Rest
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(DiscordClient discord, ulong id, ulong channelId)
+        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId)
             : base(discord, id)
         {
             ChannelId = channelId;
         }
-        internal static RestMessage Create(DiscordClient discord, Model model)
+        internal static RestMessage Create(BaseDiscordClient discord, Model model)
         {
             if (model.Type == MessageType.Default)
                 return RestUserMessage.Create(discord, model);

@@ -18,11 +18,11 @@ namespace Discord.Rest
         public virtual Game? Game => null;
         public virtual UserStatus Status => UserStatus.Unknown;
 
-        internal RestUser(DiscordClient discord, ulong id)
+        internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestUser Create(DiscordClient discord, Model model)
+        internal static RestUser Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestUser(discord, model.Id);
             entity.Update(model);

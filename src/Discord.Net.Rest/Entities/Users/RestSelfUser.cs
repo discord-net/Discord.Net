@@ -13,11 +13,11 @@ namespace Discord.Rest
         public bool IsVerified { get; private set; }
         public bool IsMfaEnabled { get; private set; }
 
-        internal RestSelfUser(DiscordClient discord, ulong id)
+        internal RestSelfUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal new static RestSelfUser Create(DiscordClient discord, Model model)
+        internal new static RestSelfUser Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestSelfUser(discord, model.Id);
             entity.Update(model);

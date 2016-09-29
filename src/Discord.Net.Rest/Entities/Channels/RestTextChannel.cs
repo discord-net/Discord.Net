@@ -16,11 +16,11 @@ namespace Discord.Rest
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
-        internal RestTextChannel(DiscordClient discord, ulong id, ulong guildId)
+        internal RestTextChannel(BaseDiscordClient discord, ulong id, ulong guildId)
             : base(discord, id, guildId)
         {
         }
-        internal new static RestTextChannel Create(DiscordClient discord, Model model)
+        internal new static RestTextChannel Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestTextChannel(discord, model.Id, model.GuildId.Value);
             entity.Update(model);

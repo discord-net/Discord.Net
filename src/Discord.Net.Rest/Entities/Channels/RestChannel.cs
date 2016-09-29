@@ -11,11 +11,11 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
-        internal RestChannel(DiscordClient discord, ulong id)
+        internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestChannel Create(DiscordClient discord, Model model)
+        internal static RestChannel Create(BaseDiscordClient discord, Model model)
         {
             switch (model.Type)
             {

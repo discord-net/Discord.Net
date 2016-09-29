@@ -4,13 +4,13 @@ namespace Discord.Net
 {
     public class HttpRateLimitException : HttpException
     {
-        public string BucketId { get; }
+        public string Id { get; }
         public int RetryAfterMilliseconds { get; }
 
         public HttpRateLimitException(string bucketId, int retryAfterMilliseconds, string reason)
             : base((HttpStatusCode)429, reason)
         {
-            BucketId = bucketId;
+            Id = bucketId;
             RetryAfterMilliseconds = retryAfterMilliseconds;
         }
     }

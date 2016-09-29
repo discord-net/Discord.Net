@@ -22,7 +22,5 @@ namespace Discord.Rpc
         {
             Name = model.Name;
         }
-
-        bool IEntity<ulong>.IsAttached => false;
     }*/
 }

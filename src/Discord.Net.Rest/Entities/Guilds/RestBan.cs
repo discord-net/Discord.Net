@@ -14,7 +14,7 @@ namespace Discord.Rest
             User = user;
             Reason = reason;
         }
-        internal static RestBan Create(DiscordClient client, Model model)
+        internal static RestBan Create(BaseDiscordClient client, Model model)
         {
             return new RestBan(RestUser.Create(client, model.User), model.Reason);
         }

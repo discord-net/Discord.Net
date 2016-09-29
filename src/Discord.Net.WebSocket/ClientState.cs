@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord.WebSocket
 {
-    internal class DataStore
+    internal class ClientState
     {
         private const int CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
@@ -29,7 +29,7 @@ namespace Discord.WebSocket
                 _groupChannels.Select(x => GetChannel(x) as IPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
-        public DataStore(int guildCount, int dmChannelCount)
+        public ClientState(int guildCount, int dmChannelCount)
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;

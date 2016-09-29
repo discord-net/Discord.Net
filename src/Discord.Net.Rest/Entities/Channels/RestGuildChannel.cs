@@ -21,12 +21,12 @@ namespace Discord.Rest
         public string Name { get; private set; }
         public int Position { get; private set; }
 
-        internal RestGuildChannel(DiscordClient discord, ulong id, ulong guildId)
+        internal RestGuildChannel(BaseDiscordClient discord, ulong id, ulong guildId)
             : base(discord, id)
         {
             GuildId = guildId;
         }
-        internal new static RestGuildChannel Create(DiscordClient discord, Model model)
+        internal new static RestGuildChannel Create(BaseDiscordClient discord, Model model)
         {
             switch (model.Type)
             {

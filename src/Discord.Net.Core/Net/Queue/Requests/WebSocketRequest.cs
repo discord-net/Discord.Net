@@ -13,16 +13,17 @@ namespace Discord.Net.Queue
         public bool IsText { get; }
         public int? TimeoutTick { get; }
         public TaskCompletionSource<Stream> Promise { get; }
-        public CancellationToken CancelToken { get; set; }
-        
+        public RequestOptions Options { get; }
+        public CancellationToken CancelToken { get; internal set; }
+
         public WebSocketRequest(IWebSocketClient client, byte[] data, bool isText, RequestOptions options)
         {
-            if (options == null)
-                options = RequestOptions.Default;
+            Preconditions.NotNull(options, nameof(options));
 
             Client = client;
             Data = data;
             IsText = isText;
+            Options = options;
             TimeoutTick = options.Timeout.HasValue ? (int?)unchecked(Environment.TickCount + options.Timeout.Value) : null;
             Promise = new TaskCompletionSource<Stream>();
         }

@@ -39,11 +39,11 @@ namespace Discord.Rest
         public IReadOnlyCollection<Emoji> Emojis => _emojis;
         public IReadOnlyCollection<string> Features => _features;
 
-        internal RestGuild(DiscordClient client, ulong id)
+        internal RestGuild(BaseDiscordClient client, ulong id)
             : base(client, id)
         {
         }
-        internal static RestGuild Create(DiscordClient discord, Model model)
+        internal static RestGuild Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestGuild(discord, model.Id);
             entity.Update(model);

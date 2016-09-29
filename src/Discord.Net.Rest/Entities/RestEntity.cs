@@ -5,10 +5,10 @@ namespace Discord.Rest
     public abstract class RestEntity<T> : IEntity<T>
         where T : IEquatable<T>
     {
-        public DiscordClient Discord { get; }
+        public BaseDiscordClient Discord { get; }
         public T Id { get; }
 
-        internal RestEntity(DiscordClient discord, T id)
+        internal RestEntity(BaseDiscordClient discord, T id)
         {
             Discord = discord;
             Id = id;

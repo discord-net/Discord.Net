@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 
 namespace Discord.Rest
 {
-    public abstract class DiscordClient : IDiscordClient
+    public abstract class BaseDiscordClient : IDiscordClient
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         private readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
@@ -29,7 +29,7 @@ namespace Discord.Rest
         public ISelfUser CurrentUser { get; protected set; }
         
         /// <summary> Creates a new REST-only discord client. </summary>
-        internal DiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
+        internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
         {
             ApiClient = client;
             LogManager = new LogManager(config.LogLevel);
@@ -73,6 +73,7 @@ namespace Discord.Rest
 
             try
             {
+                await ApiClient.LoginAsync(tokenType, token).ConfigureAwait(false);
                 await OnLoginAsync(tokenType, token).ConfigureAwait(false);
                 LoginState = LoginState.LoggedIn;
             }

@@ -206,19 +206,16 @@ namespace Discord.API
         }
 
         //Core
-        public Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, GlobalBucket bucket = GlobalBucket.GeneralRpc, 
-            Optional<string> evt = default(Optional<string>), bool ignoreState = false, RequestOptions options = null)
-            where TResponse : class
-            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Global, (int)bucket, 0, evt, ignoreState, options);
-        public Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, GuildBucket bucket, ulong guildId, 
-            Optional<string> evt = default(Optional<string>), bool ignoreState = false, RequestOptions options = null)
-            where TResponse : class
-            => SendRpcAsyncInternal<TResponse>(cmd, payload, BucketGroup.Guild, (int)bucket, guildId, evt, ignoreState, options);
-        private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, BucketGroup group, int bucketId, ulong guildId, 
-            Optional<string> evt, bool ignoreState, RequestOptions options)
+        public async Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, Optional<string> evt = default(Optional<string>), RequestOptions options = null)
             where TResponse : class
         {
-            if (!ignoreState)
+            options.IgnoreState = false;
+            return await SendRpcAsyncInternal<TResponse>(cmd, payload, evt, options).ConfigureAwait(false);
+        }
+        private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
+            where TResponse : class
+        {
+            if (!options.IgnoreState)
                 CheckState();
 
             byte[] bytes = null;
@@ -233,7 +230,7 @@ namespace Discord.API
             var requestTracker = new RpcRequest<TResponse>(options);
             _requests[guid] = requestTracker;
 
-            await _requestQueue.SendAsync(new WebSocketRequest(_webSocketClient, bytes, true, options), group, bucketId, guildId).ConfigureAwait(false);
+            await _requestQueue.SendAsync(new WebSocketRequest(_webSocketClient, bytes, true, options)).ConfigureAwait(false);
             await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
             return await requestTracker.Promise.Task.ConfigureAwait(false);
         }
@@ -241,33 +238,37 @@ namespace Discord.API
         //Rpc
         public async Task<AuthenticateResponse> SendAuthenticateAsync(RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new AuthenticateParams
             {
                 AccessToken = _authToken
             };
-            return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, ignoreState: true, options: options).ConfigureAwait(false);
+            options.IgnoreState = true;
+            return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, options: options).ConfigureAwait(false);
         }
         public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new AuthorizeParams
             {
                 ClientId = _clientId,
                 Scopes = scopes,
                 RpcToken = rpcToken != null ? rpcToken : Optional.Create<string>()
             };
-            if (options == null)
-                options = new RequestOptions();
             if (options.Timeout == null)
                 options.Timeout = 60000; //This requires manual input on the user's end, lets give them more time
-            return await SendRpcAsync<AuthorizeResponse>("AUTHORIZE", msg, ignoreState: true, options: options).ConfigureAwait(false);
+            options.IgnoreState = true;
+            return await SendRpcAsync<AuthorizeResponse>("AUTHORIZE", msg, options: options).ConfigureAwait(false);
         }
 
         public async Task<GetGuildsResponse> SendGetGuildsAsync(RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             return await SendRpcAsync<GetGuildsResponse>("GET_GUILDS", null, options: options).ConfigureAwait(false);
         }
         public async Task<RpcGuild> SendGetGuildAsync(ulong guildId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new GetGuildParams
             {
                 GuildId = guildId
@@ -276,6 +277,7 @@ namespace Discord.API
         }
         public async Task<GetChannelsResponse> SendGetChannelsAsync(ulong guildId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new GetChannelsParams
             {
                 GuildId = guildId
@@ -284,6 +286,7 @@ namespace Discord.API
         }
         public async Task<RpcChannel> SendGetChannelAsync(ulong channelId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new GetChannelParams
             {
                 ChannelId = channelId
@@ -293,6 +296,7 @@ namespace Discord.API
 
         public async Task<SetLocalVolumeResponse> SendSetLocalVolumeAsync(int volume, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new SetLocalVolumeParams
             {
                 Volume = volume
@@ -301,6 +305,7 @@ namespace Discord.API
         }
         public async Task<RpcChannel> SendSelectVoiceChannelAsync(ulong channelId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new SelectVoiceChannelParams
             {
                 ChannelId = channelId
@@ -310,6 +315,7 @@ namespace Discord.API
 
         public async Task<SubscriptionResponse> SendChannelSubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new ChannelSubscriptionParams
             {
                 ChannelId = channelId
@@ -318,6 +324,7 @@ namespace Discord.API
         }
         public async Task<SubscriptionResponse> SendChannelUnsubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new ChannelSubscriptionParams
             {
                 ChannelId = channelId
@@ -327,6 +334,7 @@ namespace Discord.API
 
         public async Task<SubscriptionResponse> SendGuildSubscribeAsync(string evt, ulong guildId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new GuildSubscriptionParams
             {
                 GuildId = guildId
@@ -335,6 +343,7 @@ namespace Discord.API
         }
         public async Task<SubscriptionResponse> SendGuildUnsubscribeAsync(string evt, ulong guildId, RequestOptions options = null)
         {
+            options = RequestOptions.CreateOrClone(options);
             var msg = new GuildSubscriptionParams
             {
                 GuildId = guildId

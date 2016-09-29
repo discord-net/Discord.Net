@@ -11,8 +11,8 @@ namespace Discord.Net.Rest
         void SetHeader(string key, string value);
         void SetCancelToken(CancellationToken cancelToken);
 
-        Task<Stream> SendAsync(string method, string endpoint, bool headerOnly = false);
-        Task<Stream> SendAsync(string method, string endpoint, string json, bool headerOnly = false);
-        Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, bool headerOnly = false);
+        Task<Stream> SendAsync(string method, string endpoint, RequestOptions options);
+        Task<Stream> SendAsync(string method, string endpoint, string json, RequestOptions options);
+        Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, RequestOptions options);
     }
 }

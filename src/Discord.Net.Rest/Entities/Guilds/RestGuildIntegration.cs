@@ -25,11 +25,11 @@ namespace Discord.Rest
 
         public DateTimeOffset SyncedAt => DateTimeUtils.FromTicks(_syncedAtTicks);
 
-        internal RestGuildIntegration(DiscordClient discord, ulong id)
+        internal RestGuildIntegration(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static RestGuildIntegration Create(DiscordClient discord, Model model)
+        internal static RestGuildIntegration Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestGuildIntegration(discord, model.Id);
             entity.Update(model);
