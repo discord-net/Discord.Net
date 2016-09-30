@@ -14,6 +14,11 @@ namespace Discord
             => new ConcurrentDictionaryWrapper<TValue>(query, () => source.Count);
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue>(this IEnumerable<TValue> query, Func<int> countFunc)
             => new ConcurrentDictionaryWrapper<TValue>(query, countFunc);
+
+        public static bool ContainsId<T>(this IEnumerable<IEntity<T>> roles, T id) where T : IEquatable<T>
+        {
+            return roles.Any(x => x.Id.Equals(id));
+        }
     }
 
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
