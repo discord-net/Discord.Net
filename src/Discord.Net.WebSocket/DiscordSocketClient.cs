@@ -1159,7 +1159,7 @@ namespace Discord.WebSocket
 
                                         if (author != null)
                                         {
-                                            var msg = SocketMessage.Create(this, State, author, data);
+                                            var msg = SocketMessage.Create(this, State, author, channel, data);
                                             SocketChannelHelper.AddMessage(channel, this, msg);
                                             await _messageReceivedEvent.InvokeAsync(msg).ConfigureAwait(false);
                                         }
@@ -1210,7 +1210,7 @@ namespace Discord.WebSocket
                                             if (author == null)
                                                 author = SocketSimpleUser.Create(this, State, data.Author.Value);
 
-                                            after = SocketMessage.Create(this, State, author, data);
+                                            after = SocketMessage.Create(this, State, author, channel, data);
                                         }
                                         if (before != null)
                                             await _messageUpdatedEvent.InvokeAsync(before, after).ConfigureAwait(false);
