@@ -28,13 +28,13 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<IRole> MentionedRoles => _mentionedRoles;
         public override IReadOnlyCollection<IUser> MentionedUsers => _mentionedUsers;
 
-        internal SocketUserMessage(DiscordSocketClient discord, ulong id, ulong channelId, SocketUser author)
-            : base(discord, id, channelId, author)
+        internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
+            : base(discord, id, channel, author)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
+        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            var entity = new SocketUserMessage(discord, model.Id, model.ChannelId, author);
+            var entity = new SocketUserMessage(discord, model.Id, channel, author);
             entity.Update(state, model);
             return entity;
         }

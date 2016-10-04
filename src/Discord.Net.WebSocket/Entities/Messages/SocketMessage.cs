@@ -10,9 +10,9 @@ namespace Discord.WebSocket
     public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
         private long _timestampTicks;
-
-        public ulong ChannelId { get; }
+        
         public SocketUser Author { get; }
+        public ISocketMessageChannel Channel { get; }
 
         public string Content { get; private set; }
 
@@ -28,18 +28,18 @@ namespace Discord.WebSocket
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal SocketMessage(DiscordSocketClient discord, ulong id, ulong channelId, SocketUser author)
+        internal SocketMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id)
         {
-            ChannelId = channelId;
+            Channel = channel;
             Author = author;
         }
-        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             if (model.Type == MessageType.Default)
-                return SocketUserMessage.Create(discord, state, author, model);
+                return SocketUserMessage.Create(discord, state, author, channel, model);
             else
-                return SocketSystemMessage.Create(discord, state, author, model);
+                return SocketSystemMessage.Create(discord, state, author, channel, model);
         }
         internal virtual void Update(ClientState state, Model model)
         {
@@ -55,5 +55,7 @@ namespace Discord.WebSocket
         //IMessage
         IUser IMessage.Author => Author;
         MessageType IMessage.Type => MessageType.Default;
+
+        ulong IMessage.ChannelId => Channel.Id;
     }
 }

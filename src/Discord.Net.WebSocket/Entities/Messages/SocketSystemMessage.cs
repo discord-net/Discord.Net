@@ -6,13 +6,13 @@ namespace Discord.WebSocket
     {
         public MessageType Type { get; private set; }
 
-        internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ulong channelId, SocketUser author)
-            : base(discord, id, channelId, author)
+        internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
+            : base(discord, id, channel, author)
         {
         }
-        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
+        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            var entity = new SocketSystemMessage(discord, model.Id, model.ChannelId, author);
+            var entity = new SocketSystemMessage(discord, model.Id, channel, author);
             entity.Update(state, model);
             return entity;
         }
