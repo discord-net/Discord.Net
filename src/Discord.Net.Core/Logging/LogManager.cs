@@ -74,17 +74,6 @@ namespace Discord.Logging
         public async Task WriteInitialLog()
         {
             await ClientLogger.InfoAsync($"Discord.Net v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})").ConfigureAwait(false);
-            await ClientLogger.VerboseAsync($"Runtime: {RuntimeInformation.FrameworkDescription.Trim()} ({ToArchString(RuntimeInformation.ProcessArchitecture)})").ConfigureAwait(false);
-            await ClientLogger.VerboseAsync($"OS: {RuntimeInformation.OSDescription.Trim()} ({ToArchString(RuntimeInformation.OSArchitecture)})").ConfigureAwait(false);
-        }
-        private static string ToArchString(Architecture arch)
-        {
-            switch (arch)
-            {
-                case Architecture.X64: return "x64";
-                case Architecture.X86: return "x86";
-                default: return arch.ToString();
-            }
         }
     }
 }
