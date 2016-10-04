@@ -78,6 +78,7 @@ namespace Discord.WebSocket
         internal SocketGuild(DiscordSocketClient client, ulong id)
             : base(client, id)
         {
+            _audioLock = new SemaphoreSlim(1, 1);
             _emojis = ImmutableArray.Create<Emoji>();
             _features = ImmutableArray.Create<string>();
         }
