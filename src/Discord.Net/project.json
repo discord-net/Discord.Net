@@ -22,13 +22,13 @@
     },
     "Discord.Net.WebSocket": {
       "target": "project"
+    },
+    "Discord.Net.Rpc": {
+      "target": "project"
+    },
+    "Discord.Net.Commands": {
+      "target": "project"
     }
-    //"Discord.Net.Rpc": {
-    //  "target": "project"
-    //},
-    //"Discord.Net.Commands": {
-    //  "target": "project"
-    //}
   },
 
   "frameworks": {
