@@ -7,7 +7,7 @@
         public IUser User { get; }
         public IUserMessage Message { get; }
 
-        internal CommandContext(IGuild guild, IMessageChannel channel, IUser user, IUserMessage msg)
+        public CommandContext(IGuild guild, IMessageChannel channel, IUser user, IUserMessage msg)
         {
             Guild = guild;
             Channel = channel;
