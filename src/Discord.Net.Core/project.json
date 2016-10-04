@@ -13,12 +13,6 @@
     }
   },
 
-  "buildOptions": {
-    "compile": {
-      "include": [ "../Discord.Net.Utils/**.cs" ]
-    }
-  },
-
   "configurations": {
     "Release": {
       "buildOptions": {
@@ -33,20 +27,15 @@
 
   "dependencies": {
     "Microsoft.Win32.Primitives": "4.0.1",
-    "Newtonsoft.Json": "8.0.3",
+    "Newtonsoft.Json": "9.0.1",
     "System.Collections.Concurrent": "4.0.12",
     "System.Collections.Immutable": "1.2.0",
     "System.Interactive.Async": "3.0.0",
-    "System.IO.Compression": "4.1.0",
-    "System.IO.FileSystem": "4.0.1",
     "System.Net.Http": "4.1.0",
-    "System.Net.NameResolution": "4.0.0",
-    "System.Net.Sockets": "4.1.0",
-    "System.Net.WebSockets.Client": "4.0.0",
-    "System.Reflection.Extensions": "4.0.1",
-    "System.Runtime.InteropServices": "4.1.0",
-    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
-    "System.Runtime.Serialization.Primitives": "4.1.1",
+    "System.Net.WebSockets.Client": {
+      "version": "4.0.0",
+      "type": "build"
+    },
     "System.Text.RegularExpressions": "4.1.0"
   },
 
