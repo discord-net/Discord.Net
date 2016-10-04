@@ -169,8 +169,8 @@ namespace Discord.Commands
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
-            if (parameters.Length == 0 || parameters[0].ParameterType != typeof(IUserMessage))
-                throw new InvalidOperationException($"The first parameter of a command must be {nameof(IUserMessage)}.");
+            if (parameters.Length == 0 || parameters[0].ParameterType != typeof(CommandContext))
+                throw new InvalidOperationException($"The first parameter of a command must be {nameof(CommandContext)}.");
 
             var paramBuilder = ImmutableArray.CreateBuilder<CommandParameter>(parameters.Length - 1);
             for (int i = 1; i < parameters.Length; i++)
