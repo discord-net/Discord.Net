@@ -1,10 +1,10 @@
 ﻿using Discord.API.Rest;
-using System.IO;
-using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest

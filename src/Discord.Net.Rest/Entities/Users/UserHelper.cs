@@ -1,8 +1,8 @@
 ﻿using Discord.API.Rest;
-using System.Threading.Tasks;
-using Model = Discord.API.User;
-using MemberModel = Discord.API.GuildMember;
 using System;
+using System.Threading.Tasks;
+using MemberModel = Discord.API.GuildMember;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {

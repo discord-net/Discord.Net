@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Discord.API.Rest;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.API.Rest;
 
 namespace Discord
 {

@@ -1,5 +1,4 @@
 ﻿using Model = Discord.API.User;
-using System.Collections.Concurrent;
 
 namespace Discord.WebSocket
 {

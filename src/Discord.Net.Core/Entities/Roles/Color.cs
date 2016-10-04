@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-﻿namespace Discord
+namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color

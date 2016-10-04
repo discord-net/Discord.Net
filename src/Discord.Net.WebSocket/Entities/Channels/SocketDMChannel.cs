@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket

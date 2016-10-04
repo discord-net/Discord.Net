@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
-using System.Collections.Immutable;
+﻿using Discord.API.Rest;
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Discord.API.Rest;
-using Model = Discord.API.Guild;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Model = Discord.API.Guild;
 
 namespace Discord.Rest
 {

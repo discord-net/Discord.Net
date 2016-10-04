@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Discord
+﻿namespace Discord
 {
     public interface IGroupUser : IUser, IVoiceState
     {

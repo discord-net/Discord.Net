@@ -9,11 +9,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Sockets;
-using System.Net;
 
 namespace Discord.Audio
 {

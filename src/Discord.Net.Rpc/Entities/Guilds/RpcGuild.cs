@@ -1,8 +1,4 @@
-﻿using Discord.Rest;
-using System;
-using Model = Discord.API.Rpc.RpcUserGuild;
-
-namespace Discord.Rpc
+﻿namespace Discord.Rpc
 {
     /*internal class RemoteUserGuild : RpcEntity, IRemoteUserGuild, ISnowflakeEntity
     {

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Discord.Logging;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.Logging;
-using System.Collections.Immutable;
 
 namespace Discord.Rest
 {

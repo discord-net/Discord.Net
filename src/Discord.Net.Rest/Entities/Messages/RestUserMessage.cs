@@ -1,11 +1,10 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
-using Discord.API;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Discord.Rest
 {

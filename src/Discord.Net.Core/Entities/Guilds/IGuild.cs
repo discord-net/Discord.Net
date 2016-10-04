@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Discord.API.Rest;
+using Discord.Audio;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.API.Rest;
-using Discord.Audio;
 
 namespace Discord
 {

@@ -1,12 +1,12 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model = Discord.API.Guild;
-using EmbedModel = Discord.API.GuildEmbed;
-using RoleModel = Discord.API.Role;
-using System.Linq;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
+using EmbedModel = Discord.API.GuildEmbed;
+using Model = Discord.API.Guild;
+using RoleModel = Discord.API.Role;
 
 namespace Discord.Rest
 {
