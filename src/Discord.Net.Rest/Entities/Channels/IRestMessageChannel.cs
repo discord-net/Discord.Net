@@ -19,6 +19,8 @@ namespace Discord.Rest
         IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch);
         /// <summary> Gets a collection of messages in this channel. </summary>
         IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch);
+        /// <summary> Gets a collection of messages in this channel. </summary>
+        IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch);
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         new Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync();
     }

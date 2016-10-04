@@ -42,6 +42,6 @@ namespace Discord.WebSocket
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(null); //Overridden
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overridden
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
     }
 }

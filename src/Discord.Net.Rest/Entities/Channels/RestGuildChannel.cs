@@ -138,13 +138,13 @@ namespace Discord.Rest
             => await RemovePermissionOverwriteAsync(user);
         
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overriden //Overriden in Text/Voice //TODO: Does this actually override?
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuildUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
 
         //IChannel
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overriden in Text/Voice //TODO: Does this actually override?
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
     }

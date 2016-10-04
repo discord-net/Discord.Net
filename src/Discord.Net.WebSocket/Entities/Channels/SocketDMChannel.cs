@@ -51,12 +51,12 @@ namespace Discord.WebSocket
                 msg = await ChannelHelper.GetMessageAsync(this, Discord, id);
             return msg;
         }
-        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
-            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit);
-        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit);
-        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit);
+        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload);
+        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload);
+        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, CacheMode.AllowDownload);
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync()
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord);
 
@@ -115,19 +115,9 @@ namespace Discord.WebSocket
                 return GetCachedMessage(id);
         }
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode)
-        {
-            if (mode == CacheMode.AllowDownload)
-                return SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit);
-            else
-                return ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit);
-        }
+            => SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, mode);
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode)
-        {
-            if (mode == CacheMode.AllowDownload)
-                return SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit);
-            else
-                return ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit);
-        }
+            => SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, mode);
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync()
             => await GetPinnedMessagesAsync().ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS)

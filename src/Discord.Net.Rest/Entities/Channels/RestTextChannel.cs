@@ -80,7 +80,7 @@ namespace Discord.Rest
             if (mode == CacheMode.AllowDownload)
                 return GetUsersAsync();
             else
-                return ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable();
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overriden
         }
 
         //IMessageChannel
@@ -96,14 +96,14 @@ namespace Discord.Rest
             if (mode == CacheMode.AllowDownload)
                 return GetMessagesAsync(limit);
             else
-                return ImmutableArray.Create<IReadOnlyCollection<IMessage>>().ToAsyncEnumerable();
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode)
         {
             if (mode == CacheMode.AllowDownload)
                 return GetMessagesAsync(fromMessageId, dir, limit);
             else
-                return ImmutableArray.Create<IReadOnlyCollection<IMessage>>().ToAsyncEnumerable();
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync() 
             => await GetPinnedMessagesAsync();

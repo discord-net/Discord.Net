@@ -162,11 +162,31 @@ namespace Discord.Rest
         {
             return await GetUserAsync(guild, client, client.CurrentUser.Id).ConfigureAwait(false);
         }
-        public static async Task<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuild guild, BaseDiscordClient client)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuild guild, BaseDiscordClient client,
+            ulong? fromUserId = null, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
-            var args = new GetGuildMembersParams();
-            var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args).ConfigureAwait(false);
-            return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
+            return new PagedAsyncEnumerable<RestGuildUser>(
+                DiscordConfig.MaxMessagesPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetGuildMembersParams
+                    {
+                        Limit = info.PageSize
+                    };
+                    if (info.Position != null)
+                        args.AfterUserId = info.Position.Value;
+                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args);
+                    return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    info.Position = lastPage.Max(x => x.Id);
+                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                        info.Remaining = 0;
+                },
+                start: fromUserId,
+                count: (uint)limit
+            );
         }
         public static async Task<int> PruneUsersAsync(IGuild guild, BaseDiscordClient client,
             int days = 30, bool simulate = false)

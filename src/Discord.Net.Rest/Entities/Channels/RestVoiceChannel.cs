@@ -44,6 +44,6 @@ namespace Discord.Rest
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuildUser>(null);
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable();
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
     }
 }

@@ -162,7 +162,7 @@ namespace Discord.Rest
 
         //Users
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync()
-            => GuildHelper.GetUsersAsync(this, Discord).ToAsyncEnumerable();
+            => GuildHelper.GetUsersAsync(this, Discord);
         public Task<RestGuildUser> GetUserAsync(ulong id)
             => GuildHelper.GetUserAsync(this, Discord, id);
         public Task<RestGuildUser> GetCurrentUserAsync()
