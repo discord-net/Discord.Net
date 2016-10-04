@@ -1473,13 +1473,16 @@ namespace Discord.WebSocket
                             case "CHANNEL_PINS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)");
                                 break;
-                            case "MESSAGE_ACK":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
-                                return;
                             case "GUILD_INTEGRATIONS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
                                 return;
+                            case "MESSAGE_ACK":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
+                                return;
                             case "USER_SETTINGS_UPDATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
+                                return;
+                            case "WEBHOOKS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
                                 return;
 
