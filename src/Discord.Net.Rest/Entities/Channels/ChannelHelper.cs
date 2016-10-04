@@ -99,7 +99,7 @@ namespace Discord.Rest
                         info.Remaining = 0;
                 },
                 start: fromMessageId,
-                count: (uint)limit
+                count: limit
             );
         }
         public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client)
@@ -176,7 +176,7 @@ namespace Discord.Rest
             return user;
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
-            ulong? froUserId = null, uint? limit = DiscordConfig.MaxUsersPerBatch)
+            ulong? froUserId = null, int? limit = DiscordConfig.MaxUsersPerBatch)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
                 DiscordConfig.MaxUsersPerBatch,

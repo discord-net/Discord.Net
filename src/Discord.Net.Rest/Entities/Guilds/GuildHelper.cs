@@ -185,7 +185,7 @@ namespace Discord.Rest
                         info.Remaining = 0;
                 },
                 start: fromUserId,
-                count: (uint)limit
+                count: limit
             );
         }
         public static async Task<int> PruneUsersAsync(IGuild guild, BaseDiscordClient client,
