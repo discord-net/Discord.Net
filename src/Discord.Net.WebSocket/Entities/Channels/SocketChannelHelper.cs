@@ -58,9 +58,9 @@ namespace Discord.WebSocket
             if (channel is SocketDMChannel)
                 (channel as SocketDMChannel).AddMessage(msg);
             else if (channel is SocketGroupChannel)
-                (channel as SocketDMChannel).AddMessage(msg);
+                (channel as SocketGroupChannel).AddMessage(msg);
             else if (channel is SocketTextChannel)
-                (channel as SocketDMChannel).AddMessage(msg);
+                (channel as SocketTextChannel).AddMessage(msg);
             else
                 throw new NotSupportedException("Unexpected ISocketMessageChannel type");
         }
@@ -71,9 +71,9 @@ namespace Discord.WebSocket
             if (channel is SocketDMChannel)
                 return (channel as SocketDMChannel).RemoveMessage(id);
             else if (channel is SocketGroupChannel)
-                return (channel as SocketDMChannel).RemoveMessage(id);
+                return (channel as SocketGroupChannel).RemoveMessage(id);
             else if (channel is SocketTextChannel)
-                return (channel as SocketDMChannel).RemoveMessage(id);
+                return (channel as SocketTextChannel).RemoveMessage(id);
             else
                 throw new NotSupportedException("Unexpected ISocketMessageChannel type");
         }
