@@ -30,6 +30,7 @@ namespace Discord.Rest
         public string VoiceRegionId { get; private set; }
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
+        internal bool Available { get; private set; }
 
         public ulong DefaultChannelId => Id;
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
@@ -87,6 +88,8 @@ namespace Discord.Rest
                     roles[model.Roles[i].Id] = RestRole.Create(Discord, model.Roles[i]);
             }
             _roles = roles.ToImmutable();
+
+            Available = true;
         }
 
         //General
@@ -169,7 +172,7 @@ namespace Discord.Rest
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate);
 
         //IGuild
-        bool IGuild.Available => true;
+        bool IGuild.Available => Available;
         IAudioClient IGuild.AudioClient => null;
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;

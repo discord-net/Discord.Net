@@ -17,13 +17,13 @@ namespace Discord.Rest
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
-        internal RestTextChannel(BaseDiscordClient discord, ulong id, ulong guildId)
-            : base(discord, id, guildId)
+        internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
+            : base(discord, guild, id)
         {
         }
-        internal new static RestTextChannel Create(BaseDiscordClient discord, Model model)
+        internal new static RestTextChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestTextChannel(discord, model.Id, model.GuildId.Value);
+            var entity = new RestTextChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -39,9 +39,9 @@ namespace Discord.Rest
             => ChannelHelper.ModifyAsync(this, Discord, func);
 
         public Task<RestGuildUser> GetUserAsync(ulong id)
-            => ChannelHelper.GetUserAsync(this, Discord, id);
+            => ChannelHelper.GetUserAsync(this, Guild, Discord, id);
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync()
-            => ChannelHelper.GetUsersAsync(this, Discord);
+            => ChannelHelper.GetUsersAsync(this, Guild, Discord);
 
         public Task<RestMessage> GetMessageAsync(ulong id)
             => ChannelHelper.GetMessageAsync(this, Discord, id);

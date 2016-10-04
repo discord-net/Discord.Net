@@ -1,5 +1,6 @@
 ﻿using Discord.Net.Queue;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -60,8 +61,8 @@ namespace Discord.Rest
         public Task<RestUser> GetUserAsync(ulong id)
             => ClientHelper.GetUserAsync(this, id);
         /// <inheritdoc />
-        public Task<RestUser> GetUserAsync(string username, string discriminator)
-            => ClientHelper.GetUserAsync(this, username, discriminator);
+        public Task<RestGuildUser> GetGuildUserAsync(ulong guildId, ulong id)
+            => ClientHelper.GetGuildUserAsync(this, guildId, id);
 
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync()
@@ -74,10 +75,20 @@ namespace Discord.Rest
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
-        async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id)
-            => await GetChannelAsync(id);
-        async Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync()
-            => await GetPrivateChannelsAsync();
+        async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetChannelAsync(id);
+            else
+                return null;
+        }
+        async Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetPrivateChannelsAsync();
+            else
+                return ImmutableArray.Create<IPrivateChannel>();
+        }
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
             => await GetConnectionsAsync().ConfigureAwait(false);
@@ -85,17 +96,30 @@ namespace Discord.Rest
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
             => await GetInviteAsync(inviteId).ConfigureAwait(false);
 
-        async Task<IGuild> IDiscordClient.GetGuildAsync(ulong id)
-            => await GetGuildAsync(id).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync()
-            => await GetGuildsAsync().ConfigureAwait(false);
+        async Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetGuildAsync(id).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetGuildsAsync().ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IGuild>();
+        }
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon)
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
-        async Task<IUser> IDiscordClient.GetUserAsync(ulong id)
-            => await GetUserAsync(id).ConfigureAwait(false);
-        async Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator)
-            => await GetUserAsync(username, discriminator).ConfigureAwait(false);
+        async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetUserAsync(id).ConfigureAwait(false);
+            else
+                return null;
+        }
 
         async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync()
             => await GetVoiceRegionsAsync().ConfigureAwait(false);

@@ -32,7 +32,7 @@ namespace Discord.Commands
             DefaultValue = defaultValue;
         }
 
-        public async Task<TypeReaderResult> Parse(IUserMessage context, string input)
+        public async Task<TypeReaderResult> Parse(CommandContext context, string input)
         {
             return await _reader.Read(context, input).ConfigureAwait(false);
         }

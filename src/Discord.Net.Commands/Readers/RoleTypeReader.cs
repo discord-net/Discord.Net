@@ -9,23 +9,22 @@ namespace Discord.Commands
     internal class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override Task<TypeReaderResult> Read(IUserMessage context, string input)
+        public override Task<TypeReaderResult> Read(CommandContext context, string input)
         {
-            var guild = (context.Channel as IGuildChannel)?.Guild;
             ulong id;
 
-            if (guild != null)
+            if (context.Guild != null)
             {
                 var results = new Dictionary<ulong, TypeReaderValue>();
-                var roles = guild.Roles;
+                var roles = context.Guild.Roles;
 
                 //By Mention (1.0)
                 if (MentionUtils.TryParseRole(input, out id))
-                    AddResult(results, guild.GetRole(id) as T, 1.00f);
+                    AddResult(results, context.Guild.GetRole(id) as T, 1.00f);
 
                 //By Id (0.9)
                 if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                     AddResult(results, guild.GetRole(id) as T, 0.90f);
+                     AddResult(results, context.Guild.GetRole(id) as T, 0.90f);
 
                 //By Name (0.7-0.8)
                 foreach (var role in roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))

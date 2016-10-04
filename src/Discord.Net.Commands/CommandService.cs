@@ -176,8 +176,8 @@ namespace Discord.Commands
                 return false;
         }
 
-        public SearchResult Search(IUserMessage message, int argPos) => Search(message, message.Content.Substring(argPos));
-        public SearchResult Search(IUserMessage message, string input)
+        public SearchResult Search(CommandContext context, int argPos) => Search(context, context.Message.Content.Substring(argPos));
+        public SearchResult Search(CommandContext context, string input)
         {
             string lowerInput = input.ToLowerInvariant();
             var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
@@ -188,18 +188,18 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(IUserMessage message, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
-            => Execute(message, message.Content.Substring(argPos), multiMatchHandling);
-        public async Task<IResult> Execute(IUserMessage message, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> Execute(CommandContext context, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+            => Execute(context, context.Message.Content.Substring(argPos), multiMatchHandling);
+        public async Task<IResult> Execute(CommandContext context, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
-            var searchResult = Search(message, input);
+            var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;
 
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditions(message);
+                var preconditionResult = await commands[i].CheckPreconditions(context);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -208,7 +208,7 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var parseResult = await commands[i].Parse(message, searchResult, preconditionResult);
+                var parseResult = await commands[i].Parse(context, searchResult, preconditionResult);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)
@@ -233,7 +233,7 @@ namespace Discord.Commands
                     }
                 }
 
-                return await commands[i].Execute(message, parseResult);
+                return await commands[i].Execute(context, parseResult);
             }
             
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");

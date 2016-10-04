@@ -19,18 +19,18 @@ namespace Discord
 
         Task<IApplication> GetApplicationInfoAsync();
 
-        Task<IChannel> GetChannelAsync(ulong id);
-        Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync();
+        Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 
-        Task<IGuild> GetGuildAsync(ulong id);
-        Task<IReadOnlyCollection<IGuild>> GetGuildsAsync();
+        Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload);
         Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null);
         
         Task<IInvite> GetInviteAsync(string inviteId);
 
-        Task<IUser> GetUserAsync(ulong id);
+        Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         Task<IUser> GetUserAsync(string username, string discriminator);
 
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync();

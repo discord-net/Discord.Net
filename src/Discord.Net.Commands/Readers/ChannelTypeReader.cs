@@ -9,23 +9,21 @@ namespace Discord.Commands
     internal class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async Task<TypeReaderResult> Read(IUserMessage context, string input)
+        public override async Task<TypeReaderResult> Read(CommandContext context, string input)
         {
-            var guild = (context.Channel as IGuildChannel)?.Guild;
-
-            if (guild != null)
+            if (context.Guild != null)
             {
                 var results = new Dictionary<ulong, TypeReaderValue>();
-                var channels = await guild.GetChannelsAsync().ConfigureAwait(false);
+                var channels = await context.Guild.GetChannelsAsync().ConfigureAwait(false);
                 ulong id;
 
                 //By Mention (1.0)
                 if (MentionUtils.TryParseChannel(input, out id))
-                    AddResult(results, await guild.GetChannelAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await context.Guild.GetChannelAsync(id).ConfigureAwait(false) as T, 1.00f);
 
                 //By Id (0.9)
                 if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                    AddResult(results, await guild.GetChannelAsync(id).ConfigureAwait(false) as T, 0.90f);
+                    AddResult(results, await context.Guild.GetChannelAsync(id).ConfigureAwait(false) as T, 0.90f);
 
                 //By Name (0.7-0.8)
                 foreach (var channel in channels.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))

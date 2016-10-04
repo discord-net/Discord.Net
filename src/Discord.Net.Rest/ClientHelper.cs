@@ -94,12 +94,12 @@ namespace Discord.Rest
                 return RestUser.Create(client, model);
             return null;
         }
-        public static async Task<RestUser> GetUserAsync(BaseDiscordClient client,
-            string username, string discriminator)
+        public static async Task<RestGuildUser> GetGuildUserAsync(BaseDiscordClient client,
+            ulong guildId, ulong id)
         {
-            var model = await client.ApiClient.GetUserAsync(username, discriminator).ConfigureAwait(false);
+            var model = await client.ApiClient.GetGuildMemberAsync(guildId, id).ConfigureAwait(false);
             if (model != null)
-                return RestUser.Create(client, model);
+                return RestGuildUser.Create(client, new RestGuild(client, guildId), model);
             return null;
         }
 

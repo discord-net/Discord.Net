@@ -13,7 +13,7 @@ namespace Discord.Commands
             QuotedParameter
         }
         
-        public static async Task<ParseResult> ParseArgs(Command command, IUserMessage context, string input, int startPos)
+        public static async Task<ParseResult> ParseArgs(Command command, CommandContext context, string input, int startPos)
         {
             CommandParameter curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);

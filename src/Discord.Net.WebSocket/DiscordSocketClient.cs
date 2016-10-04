@@ -1612,9 +1612,9 @@ namespace Discord.WebSocket
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
-        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id)
+        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
             => Task.FromResult<IChannel>(GetChannel(id));
-        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync()
+        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
@@ -1623,14 +1623,14 @@ namespace Discord.WebSocket
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
             => await GetInviteAsync(inviteId);
 
-        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id)
+        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuild>(GetGuild(id));
-        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync()
+        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon)
             => await CreateGuildAsync(name, region, jpegIcon);
 
-        Task<IUser> IDiscordClient.GetUserAsync(ulong id)
+        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(GetUser(id));
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator)
             => Task.FromResult<IUser>(GetUser(username, discriminator));

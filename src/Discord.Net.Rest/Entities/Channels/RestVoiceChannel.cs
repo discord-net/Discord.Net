@@ -16,13 +16,13 @@ namespace Discord.Rest
         public int Bitrate { get; private set; }
         public int UserLimit { get; private set; }
 
-        internal RestVoiceChannel(BaseDiscordClient discord, ulong id, ulong guildId)
-            : base(discord, id, guildId)
+        internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
+            : base(discord, guild, id)
         {
         }
-        internal new static RestVoiceChannel Create(BaseDiscordClient discord, Model model)
+        internal new static RestVoiceChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestVoiceChannel(discord, model.Id, model.GuildId.Value);
+            var entity = new RestVoiceChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }

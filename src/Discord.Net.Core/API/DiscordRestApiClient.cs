@@ -856,27 +856,6 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
         }
-        public async Task<User> GetUserAsync(string username, string discriminator, RequestOptions options = null)
-        {
-            Preconditions.NotNullOrEmpty(username, nameof(username));
-            Preconditions.NotNullOrEmpty(discriminator, nameof(discriminator));
-            options = RequestOptions.CreateOrClone(options);
-
-            try
-            {
-                var models = await QueryUsersAsync($"{username}#{discriminator}", 1, options: options).ConfigureAwait(false);
-                return models.FirstOrDefault();
-            }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
-        }
-        public async Task<IReadOnlyCollection<User>> QueryUsersAsync(string query, int limit, RequestOptions options = null)
-        {
-            Preconditions.NotNullOrEmpty(query, nameof(query));
-            Preconditions.AtLeast(limit, 0, nameof(limit));
-            options = RequestOptions.CreateOrClone(options);
-
-            return await SendAsync<IReadOnlyCollection<User>>("GET", $"users?q={Uri.EscapeDataString(query)}&limit={limit}", options: options).ConfigureAwait(false);
-        }
 
         //Current User/DMs
         public async Task<User> GetMyUserAsync(RequestOptions options = null)

@@ -163,19 +163,19 @@ namespace Discord.Rest
         }
 
         //Users
-        public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong id)
         {
             var model = await client.ApiClient.GetGuildMemberAsync(channel.GuildId, id);
             if (model == null)
                 return null;
-            var user = RestGuildUser.Create(client, model);
+            var user = RestGuildUser.Create(client, guild, model);
             if (!user.GetPermissions(channel).ReadMessages)
                 return null;
 
             return user;
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong? froUserId = null, uint? limit = DiscordConfig.MaxUsersPerBatch)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
@@ -188,8 +188,11 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await client.ApiClient.GetGuildMembersAsync(channel.GuildId, args);
-                    return models.Select(x => RestGuildUser.Create(client, x)).ToImmutableArray(); ;
+                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args);
+                    return models
+                        .Select(x => RestGuildUser.Create(client, guild, x))
+                        .Where(x => x.GetPermissions(channel).ReadMessages)
+                        .ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
                 {

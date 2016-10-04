@@ -23,6 +23,7 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         public IReadOnlyCollection<ulong> RoleIds => _roleIds;
 
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);

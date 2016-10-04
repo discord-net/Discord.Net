@@ -16,24 +16,25 @@ namespace Discord.Rest
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
 
-        public ulong GuildId { get; }
+        internal IGuild Guild { get; }
+        public ulong GuildId => Guild.Id;
 
         public string Name { get; private set; }
         public int Position { get; private set; }
 
-        internal RestGuildChannel(BaseDiscordClient discord, ulong id, ulong guildId)
+        internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
         {
-            GuildId = guildId;
+            Guild = guild;
         }
-        internal new static RestGuildChannel Create(BaseDiscordClient discord, Model model)
+        internal static RestGuildChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
             switch (model.Type)
             {
                 case ChannelType.Text:
-                    return RestTextChannel.Create(discord, model);
+                    return RestTextChannel.Create(discord, guild, model);
                 case ChannelType.Voice:
-                    return RestVoiceChannel.Create(discord, model);
+                    return RestVoiceChannel.Create(discord, guild, model);
                 default:
                     throw new InvalidOperationException("Unknown guild channel type");
             }

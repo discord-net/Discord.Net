@@ -16,7 +16,7 @@ namespace Discord.Commands
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
         private readonly object _instance;
-        private readonly Func<IUserMessage, IReadOnlyList<object>, Task> _action;
+        private readonly Func<CommandContext, IReadOnlyList<object>, Task> _action;
 
         public MethodInfo Source { get; }
         public Module Module { get; }
@@ -85,7 +85,7 @@ namespace Discord.Commands
             }
         }
 
-        public async Task<PreconditionResult> CheckPreconditions(IUserMessage context)
+        public async Task<PreconditionResult> CheckPreconditions(CommandContext context)
         {
             foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
@@ -104,7 +104,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> Parse(IUserMessage context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> Parse(CommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
@@ -125,7 +125,7 @@ namespace Discord.Commands
 
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
-        public Task<ExecuteResult> Execute(IUserMessage context, ParseResult parseResult)
+        public Task<ExecuteResult> Execute(CommandContext context, ParseResult parseResult)
         {
             if (!parseResult.IsSuccess)
                 return Task.FromResult(ExecuteResult.FromError(parseResult));
@@ -148,7 +148,7 @@ namespace Discord.Commands
 
             return Execute(context, argList, paramList);
         }
-        public async Task<ExecuteResult> Execute(IUserMessage context, IEnumerable<object> argList, IEnumerable<object> paramList)
+        public async Task<ExecuteResult> Execute(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList)
         {
             try
             {
@@ -209,7 +209,7 @@ namespace Discord.Commands
             }
             return paramBuilder.ToImmutable();
         }
-        private Func<IUserMessage, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
+        private Func<CommandContext, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");

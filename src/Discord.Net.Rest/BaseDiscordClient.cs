@@ -129,9 +129,9 @@ namespace Discord.Rest
 
         Task<IApplication> IDiscordClient.GetApplicationInfoAsync() { throw new NotSupportedException(); }
 
-        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id)
+        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
             => Task.FromResult<IChannel>(null);
-        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync()
+        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(ImmutableArray.Create<IPrivateChannel>());
 
         Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
@@ -140,13 +140,13 @@ namespace Discord.Rest
         Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
             => Task.FromResult<IInvite>(null);
 
-        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id)
+        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuild>(null);
-        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync()
+        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(ImmutableArray.Create<IGuild>());
         Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon) { throw new NotSupportedException(); }
 
-        Task<IUser> IDiscordClient.GetUserAsync(ulong id)
+        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(null);
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator)
             => Task.FromResult<IUser>(null);
