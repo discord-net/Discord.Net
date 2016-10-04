@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Message;
+﻿using System.Diagnostics;
+using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class SocketSystemMessage : SocketMessage, ISystemMessage
     {
         public MessageType Type { get; private set; }
@@ -22,8 +24,7 @@ namespace Discord.WebSocket
 
             Type = model.Type;
         }
-
-        public override string ToString() => Content;
+        
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";
         internal new SocketSystemMessage Clone() => MemberwiseClone() as SocketSystemMessage;
     }

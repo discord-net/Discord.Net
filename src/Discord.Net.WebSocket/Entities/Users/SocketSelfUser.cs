@@ -1,11 +1,13 @@
 ﻿using Discord.API.Rest;
 using Discord.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSelfUser : SocketUser, ISelfUser
     {
         public string Email { get; private set; }

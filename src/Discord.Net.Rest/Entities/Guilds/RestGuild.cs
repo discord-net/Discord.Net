@@ -171,6 +171,9 @@ namespace Discord.Rest
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate);
 
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
+
         //IGuild
         bool IGuild.Available => Available;
         IAudioClient IGuild.AudioClient => null;

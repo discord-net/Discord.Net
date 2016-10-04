@@ -2,14 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
     {
         private ImmutableArray<Overwrite> _overwrites;
@@ -117,7 +115,9 @@ namespace Discord.Rest
             => await ChannelHelper.GetInvitesAsync(this, Discord);
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = true)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary);
-        
+
+        public override string ToString() => Name;
+
         //IGuildChannel
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync()
             => await GetInvitesAsync();

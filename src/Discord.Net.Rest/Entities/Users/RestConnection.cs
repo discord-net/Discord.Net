@@ -30,6 +30,6 @@ namespace Discord
         }
 
         public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id}, Type = {Type}{(IsRevoked ? ", Revoked" : "")})";
+        private string DebuggerDisplay => $"{Name} ({Id}, {Type}{(IsRevoked ? ", Revoked" : "")})";
     }
 }

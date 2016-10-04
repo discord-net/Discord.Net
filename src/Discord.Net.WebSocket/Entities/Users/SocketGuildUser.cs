@@ -3,12 +3,14 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser
     {
         private long? _joinedAtTicks;

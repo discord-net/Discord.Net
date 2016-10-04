@@ -46,6 +46,9 @@ namespace Discord.Rest
         public Task DeleteAsync()
             => RoleHelper.DeleteAsync(this, Discord);
 
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
+
         //IRole
         IGuild IRole.Guild => Guild;
     }

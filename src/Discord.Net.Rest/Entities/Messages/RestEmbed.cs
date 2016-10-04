@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Embed;
+﻿using System.Diagnostics;
+using Model = Discord.API.Embed;
 
 namespace Discord
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestEmbed : IEmbed
     {
         public string Description { get; }
@@ -26,5 +28,8 @@ namespace Discord
                 model.Provider.IsSpecified ? EmbedProvider.Create(model.Provider.Value) : (EmbedProvider?)null,
                 model.Thumbnail.IsSpecified ? EmbedThumbnail.Create(model.Thumbnail.Value) : (EmbedThumbnail?)null);
         }
+
+        public override string ToString() => Title;
+        private string DebuggerDisplay => $"{Title} ({Type})";
     }
 }

@@ -1,8 +1,9 @@
-﻿using Model = Discord.API.Attachment;
+﻿using System.Diagnostics;
+using Model = Discord.API.Attachment;
 
 namespace Discord
 {
-    //TODO: Rename to Attachment?
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestAttachment : IAttachment
     {
         public ulong Id { get; }
@@ -29,5 +30,8 @@ namespace Discord
                 model.Height.IsSpecified ? model.Height.Value : (int?)null,
                 model.Width.IsSpecified ? model.Width.Value : (int?)null);
         }
+
+        public override string ToString() => Filename;
+        private string DebuggerDisplay => $"{Filename} ({Size} bytes)";
     }
 }

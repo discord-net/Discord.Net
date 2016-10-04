@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSimpleUser : SocketUser
     {
         public override bool IsBot { get; internal set; }

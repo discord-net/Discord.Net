@@ -130,5 +130,7 @@ namespace Discord.Rest
             text = MentionsHelper.ResolveEveryoneMentions(text, everyoneHandling);
             return text;
         }
+
+        private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")}";
     }
 }

@@ -4,7 +4,6 @@ using Model = Discord.API.InviteMetadata;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestInviteMetadata : RestInvite, IInviteMetadata
     {
         private long _createdAtTicks;

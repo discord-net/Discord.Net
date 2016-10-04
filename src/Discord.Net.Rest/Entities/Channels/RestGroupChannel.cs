@@ -86,6 +86,9 @@ namespace Discord.Rest
         public IDisposable EnterTypingState()
             => ChannelHelper.EnterTypingState(this, Discord);
 
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, Group)";
+
         //ISocketPrivateChannel
         IReadOnlyCollection<RestUser> IRestPrivateChannel.Recipients => Recipients;
 

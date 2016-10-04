@@ -22,6 +22,7 @@ namespace Discord.Rest
         public override string ToString() => User.ToString();
         private string DebuggerDisplay => $"{User}: {Reason}";
 
+        //IBan
         IUser IBan.User => User;
     }
 }

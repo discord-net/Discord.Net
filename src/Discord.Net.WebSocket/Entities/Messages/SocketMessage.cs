@@ -6,7 +6,6 @@ using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
         private long _timestampTicks;
@@ -49,7 +48,8 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
                 Content = model.Content.Value;
         }
-        
+
+        public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
 
         //IMessage

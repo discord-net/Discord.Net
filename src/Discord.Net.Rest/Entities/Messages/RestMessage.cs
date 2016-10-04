@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RestMessage : RestEntity<ulong>, IMessage, IUpdateable
     {
         private long _timestampTicks;
@@ -55,6 +53,8 @@ namespace Discord.Rest
             var model = await Discord.ApiClient.GetChannelMessageAsync(ChannelId, Id).ConfigureAwait(false);
             Update(model);
         }
+
+        public override string ToString() => Content;
 
         MessageType IMessage.Type => MessageType.Default;
     }

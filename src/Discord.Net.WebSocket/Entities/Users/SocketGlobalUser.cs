@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.User;
+﻿using System.Diagnostics;
+using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class SocketGlobalUser : SocketUser
     {
         public override bool IsBot { get; internal set; }

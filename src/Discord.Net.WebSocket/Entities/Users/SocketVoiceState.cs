@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
 using Model = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketVoiceState : IVoiceState
     {
         [Flags]
         private enum Flags : byte
         {
-            None = 0x00,
+            Normal = 0x00,
             Suppressed = 0x01,
             Muted = 0x02,
             Deafened = 0x04,
@@ -33,7 +35,7 @@ namespace Discord.WebSocket
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
 
-            Flags voiceStates = Flags.None;
+            Flags voiceStates = Flags.Normal;
             if (isSelfMuted)
                 voiceStates |= Flags.SelfMuted;
             if (isSelfDeafened)
@@ -47,6 +49,8 @@ namespace Discord.WebSocket
             return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
         }
 
+        public override string ToString() => VoiceChannel?.Name ?? "Unknown";
+        internal string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
         internal SocketVoiceState Clone() => this;
 
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;

@@ -2,7 +2,6 @@
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,6 +35,8 @@ namespace Discord.Rest
 
         public Task ModifyAsync(Action<ModifyVoiceChannelParams> func)
             => ChannelHelper.ModifyAsync(this, Discord, func);
+
+        private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
         //IVoiceChannel
         Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }

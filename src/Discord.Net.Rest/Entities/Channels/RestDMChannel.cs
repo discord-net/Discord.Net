@@ -76,7 +76,6 @@ namespace Discord.Rest
         public override string ToString() => $"@{Recipient}";
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
 
-
         //IDMChannel            
         IUser IDMChannel.Recipient => Recipient;
 

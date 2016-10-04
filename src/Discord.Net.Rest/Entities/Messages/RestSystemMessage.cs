@@ -24,5 +24,7 @@ namespace Discord.Rest
 
             Type = model.Type;
         }
+
+        private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";
     }
 }

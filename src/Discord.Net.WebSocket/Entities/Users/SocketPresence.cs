@@ -1,8 +1,10 @@
-﻿using Model = Discord.API.Presence;
+﻿using System.Diagnostics;
+using Model = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketPresence : IPresence
     {
         public Game? Game { get; }
@@ -17,6 +19,9 @@ namespace Discord.WebSocket
         {
             return new SocketPresence(model.Game != null ? Discord.Game.Create(model.Game) : (Game?)null, model.Status);
         }
+
+        public override string ToString() => Status.ToString();
+        internal string DebuggerDisplay => $"{Status}{(Game != null ? $", {Game.Value.Name} ({Game.Value.StreamType})" : "")}";
 
         internal SocketPresence Clone() => this;
     }

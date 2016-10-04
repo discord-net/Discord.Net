@@ -1,7 +1,6 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -66,6 +65,8 @@ namespace Discord.Rest
 
         public IDisposable EnterTypingState()
             => ChannelHelper.EnterTypingState(this, Discord);
+
+        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
         //IGuildChannel
         async Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)

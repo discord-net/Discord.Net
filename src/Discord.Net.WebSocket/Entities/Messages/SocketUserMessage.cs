@@ -3,11 +3,13 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
@@ -131,7 +133,6 @@ namespace Discord.WebSocket
             return text;
         }
 
-        public override string ToString() => Content;
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")}";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
     }

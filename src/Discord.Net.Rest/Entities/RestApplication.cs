@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Application;
 
 namespace Discord.Rest
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestApplication : RestEntity<ulong>, IApplication
     {
         protected string _iconId;
@@ -27,7 +29,6 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
-
         internal void Update(Model model)
         {            
             Description = model.Description;
@@ -45,5 +46,8 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to update this object from a different application token.");
             Update(response);
         }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

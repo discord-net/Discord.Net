@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
         internal RestChannel(BaseDiscordClient discord, ulong id)
