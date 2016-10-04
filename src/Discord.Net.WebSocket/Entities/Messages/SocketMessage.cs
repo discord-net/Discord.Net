@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class SocketMessage : SocketEntity<ulong>, IMessage, IUpdateable
+    public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
         private long _timestampTicks;
 
@@ -35,14 +34,14 @@ namespace Discord.WebSocket
             ChannelId = channelId;
             Author = author;
         }
-        internal static SocketMessage Create(DiscordSocketClient discord, SocketUser author, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
         {
             if (model.Type == MessageType.Default)
-                return SocketUserMessage.Create(discord, author, model);
+                return SocketUserMessage.Create(discord, state, author, model);
             else
-                return SocketSystemMessage.Create(discord, author, model);
+                return SocketSystemMessage.Create(discord, state, author, model);
         }
-        internal virtual void Update(Model model)
+        internal virtual void Update(ClientState state, Model model)
         {
             if (model.Timestamp.IsSpecified)
                 _timestampTicks = model.Timestamp.Value.UtcTicks;
@@ -50,12 +49,8 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
                 Content = model.Content.Value;
         }
-
-        public async Task UpdateAsync()
-        {
-            var model = await Discord.ApiClient.GetChannelMessageAsync(ChannelId, Id).ConfigureAwait(false);
-            Update(model);
-        }
+        
+        internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
 
         //IMessage
         IUser IMessage.Author => Author;

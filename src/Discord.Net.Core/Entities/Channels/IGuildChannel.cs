@@ -14,7 +14,8 @@ namespace Discord
 
         /// <summary> Gets the id of the guild this channel is a member of. </summary>
         ulong GuildId { get; }
-        new IReadOnlyCollection<IGuildUser> CachedUsers { get; }
+        /// <summary> Gets a collection of permission overwrites for this channel. </summary>
+        IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
 
         /// <summary> Creates a new invite to this channel. </summary>
         /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
@@ -23,9 +24,6 @@ namespace Discord
         Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false);
         /// <summary> Returns a collection of all invites to this channel. </summary>
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync();
-
-        /// <summary> Gets a collection of permission overwrites for this channel. </summary>
-        IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
         
         /// <summary> Modifies this guild channel. </summary>
         Task ModifyAsync(Action<ModifyGuildChannelParams> func);
@@ -44,9 +42,8 @@ namespace Discord
         Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions);
 
         /// <summary> Gets a collection of all users in this channel. </summary>
-        new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
+        new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Gets a user in this channel with the provided id.</summary>
-        new Task<IGuildUser> GetUserAsync(ulong id);
-        new IGuildUser GetCachedUser(ulong id);
+        new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
     }
 }

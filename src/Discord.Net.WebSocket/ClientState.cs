@@ -24,9 +24,9 @@ namespace Discord.WebSocket
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
 
-        internal IReadOnlyCollection<IPrivateChannel> PrivateChannels =>
-            _dmChannels.Select(x => x.Value as IPrivateChannel).Concat(
-                _groupChannels.Select(x => GetChannel(x) as IPrivateChannel))
+        internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
+            _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
+                _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
             .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
         public ClientState(int guildCount, int dmChannelCount)

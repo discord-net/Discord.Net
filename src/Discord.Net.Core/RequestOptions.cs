@@ -11,7 +11,7 @@
 
         internal bool IgnoreState { get; set; }
         
-        public static RequestOptions CreateOrClone(RequestOptions options)
+        internal static RequestOptions CreateOrClone(RequestOptions options)
         {
             if (options == null)
                 return new RequestOptions();

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
@@ -42,10 +43,13 @@ namespace Discord.Rest
 
         public virtual async Task UpdateAsync()
             => Update(await UserHelper.GetAsync(this, Discord));
-
-        public Task<IDMChannel> CreateDMChannelAsync()
+        
+        public Task<RestDMChannel> CreateDMChannelAsync()
             => UserHelper.CreateDMChannelAsync(this, Discord);
 
-        IDMChannel IUser.GetCachedDMChannel() => null;
+        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode)
+            => Task.FromResult<IDMChannel>(null);
+        async Task<IDMChannel> IUser.CreateDMChannelAsync()
+            => await CreateDMChannelAsync();
     }
 }

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestTextChannel : RestGuildChannel, ITextChannel
+    public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
     {
         public string Topic { get; private set; }
 
@@ -67,22 +68,43 @@ namespace Discord.Rest
             => ChannelHelper.EnterTypingState(this, Discord);
 
         //IGuildChannel
-        async Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id)
-            => await GetUserAsync(id);
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync()
-            => GetUsersAsync();
+        async Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetUserAsync(id);
+            else
+                return null;
+        }
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return GetUsersAsync();
+            else
+                return ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable();
+        }
 
         //IMessageChannel
-        IReadOnlyCollection<IMessage> IMessageChannel.CachedMessages 
-            => ImmutableArray.Create<IMessage>();
-        IMessage IMessageChannel.GetCachedMessage(ulong id) 
-            => null;
-        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id) 
-            => await GetMessageAsync(id);
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit) 
-            => GetMessagesAsync(limit);
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit) 
-            => GetMessagesAsync(fromMessageId, dir, limit);
+        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetMessageAsync(id);
+            else
+                return null;
+        }
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return GetMessagesAsync(limit);
+            else
+                return ImmutableArray.Create<IReadOnlyCollection<IMessage>>().ToAsyncEnumerable();
+        }
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return GetMessagesAsync(fromMessageId, dir, limit);
+            else
+                return ImmutableArray.Create<IReadOnlyCollection<IMessage>>().ToAsyncEnumerable();
+        }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync() 
             => await GetPinnedMessagesAsync();
 

@@ -135,24 +135,16 @@ namespace Discord.Rest
             => await RemovePermissionOverwriteAsync(role);
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user) 
             => await RemovePermissionOverwriteAsync(user);
-
-        IReadOnlyCollection<IGuildUser> IGuildChannel.CachedUsers 
-            => ImmutableArray.Create<IGuildUser>();
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync()
+        
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id)
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuildUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
-        IGuildUser IGuildChannel.GetCachedUser(ulong id) 
-            => null;
 
         //IChannel
-        IReadOnlyCollection<IUser> IChannel.CachedUsers 
-            => ImmutableArray.Create<IUser>();
-        IUser IChannel.GetCachedUser(ulong id) 
-            => null;
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
-        Task<IUser> IChannel.GetUserAsync(ulong id)
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
     }
 }

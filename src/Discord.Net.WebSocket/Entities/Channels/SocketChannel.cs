@@ -11,35 +11,37 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
+        public IReadOnlyCollection<SocketUser> Users => GetUsersInternal();
+
         internal SocketChannel(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static SocketChannel Create(DiscordSocketClient discord, Model model)
+        internal static ISocketPrivateChannel CreatePrivate(DiscordSocketClient discord, ClientState state, Model model)
         {
             switch (model.Type)
             {
-                case ChannelType.Text:
-                    return SocketTextChannel.Create(discord, model);
-                case ChannelType.Voice:
-                    return SocketVoiceChannel.Create(discord, model);
                 case ChannelType.DM:
-                    return SocketDMChannel.Create(discord, model);
+                    return SocketDMChannel.Create(discord, state, model);
                 case ChannelType.Group:
-                    return SocketGroupChannel.Create(discord, model);
+                    return SocketGroupChannel.Create(discord, state, model);
                 default:
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
         }
+        internal abstract void Update(ClientState state, Model model);
 
-        //IChannel
-        IReadOnlyCollection<IUser> IChannel.CachedUsers => ImmutableArray.Create<IUser>();
+        //User
+        public SocketUser GetUser(ulong id) => GetUserInternal(id);
+        internal abstract SocketUser GetUserInternal(ulong id);
+        internal abstract IReadOnlyCollection<SocketUser> GetUsersInternal();
 
-        IUser IChannel.GetCachedUser(ulong id)
-            => null;
-        Task<IUser> IChannel.GetUserAsync(ulong id)
-            => Task.FromResult<IUser>(null);
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable();
+        internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
+
+        //IChannel        
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
+            => Task.FromResult<IUser>(null); //Overridden
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
+            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overridden
     }
 }

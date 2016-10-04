@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using MessageModel = Discord.API.Message;
 using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
@@ -15,7 +14,7 @@ using VoiceStateModel = Discord.API.VoiceState;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketGroupChannel : SocketChannel, IGroupChannel
+    public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
         private readonly MessageCache _messages;
 
@@ -25,7 +24,8 @@ namespace Discord.WebSocket
 
         public string Name { get; private set; }
 
-        public IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
+        public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
+        public new IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketGroupUser> Recipients
             => _users.Select(x => x.Value).Where(x => x.Id != Discord.CurrentUser.Id).ToReadOnlyCollection(() => _users.Count - 1);
 
@@ -37,13 +37,13 @@ namespace Discord.WebSocket
             _voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(1, 5);
             _users = new ConcurrentDictionary<ulong, SocketGroupUser>(1, 5);
         }
-        internal new static SocketGroupChannel Create(DiscordSocketClient discord, Model model)
+        internal static SocketGroupChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
             var entity = new SocketGroupChannel(discord, model.Id);
-            entity.Update(model);
+            entity.Update(state, model);
             return entity;
         }
-        internal void Update(Model model)
+        internal override void Update(ClientState state, Model model)
         {
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
@@ -51,37 +51,35 @@ namespace Discord.WebSocket
                 _iconId = model.Icon.Value;
 
             if (model.Recipients.IsSpecified)
-                UpdateUsers(model.Recipients.Value);
+                UpdateUsers(state, model.Recipients.Value);
         }
-        internal virtual void UpdateUsers(API.User[] models)
+        internal virtual void UpdateUsers(ClientState state, UserModel[] models)
         {
             var users = new ConcurrentDictionary<ulong, SocketGroupUser>(1, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
-                users[models[i].Id] = SocketGroupUser.Create(Discord, models[i]);
+                users[models[i].Id] = SocketGroupUser.Create(this, state, models[i]);
             _users = users;
         }
-
-        public async Task UpdateAsync()
-            => Update(await ChannelHelper.GetAsync(this, Discord));
+        
         public Task LeaveAsync()
             => ChannelHelper.DeleteAsync(this, Discord);
 
-        public SocketGroupUser GetUser(ulong id)
+        //Messages
+        public SocketMessage GetCachedMessage(ulong id)
+            => _messages?.Get(id);
+        public async Task<IMessage> GetMessageAsync(ulong id)
         {
-            SocketGroupUser user;
-            if (_users.TryGetValue(id, out user))
-                return user;
-            return null;
+            IMessage msg = _messages?.Get(id);
+            if (msg == null)
+                msg = await ChannelHelper.GetMessageAsync(this, Discord, id);
+            return msg;
         }
-
-        public Task<RestMessage> GetMessageAsync(ulong id)
-            => ChannelHelper.GetMessageAsync(this, Discord, id);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, limit: limit);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit);
+        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit);
+        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit);
+        public Task<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+            => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit);
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync()
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord);
 
@@ -98,20 +96,101 @@ namespace Discord.WebSocket
         public IDisposable EnterTypingState()
             => ChannelHelper.EnterTypingState(this, Discord);
 
+        internal void AddMessage(SocketMessage msg)
+            => _messages.Add(msg);
+        internal SocketMessage RemoveMessage(ulong id)
+            => _messages.Remove(id);
+
+        //Users
+        public new SocketGroupUser GetUser(ulong id)
+        {
+            SocketGroupUser user;
+            if (_users.TryGetValue(id, out user))
+                return user;
+            return null;
+        }
+        internal SocketGroupUser AddUser(UserModel model)
+        {
+            SocketGroupUser user;
+            if (_users.TryGetValue(model.Id, out user))
+                return user as SocketGroupUser;
+            else
+            {
+                var privateUser = SocketGroupUser.Create(this, Discord.State, model);
+                _users[privateUser.Id] = privateUser;
+                return privateUser;
+            }
+        }
+        internal SocketGroupUser RemoveUser(ulong id)
+        {
+            SocketGroupUser user;
+            if (_users.TryRemove(id, out user))
+            {
+                user.GlobalUser.RemoveRef(Discord);
+                return user as SocketGroupUser;
+            }
+            return null;
+        }
+
+        //Voice States
+        internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
+        {
+            var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
+            var voiceState = SocketVoiceState.Create(voiceChannel, model);
+            _voiceStates[model.UserId] = voiceState;
+            return voiceState;
+        }
+        internal SocketVoiceState? GetVoiceState(ulong id)
+        {
+            SocketVoiceState voiceState;
+            if (_voiceStates.TryGetValue(id, out voiceState))
+                return voiceState;
+            return null;
+        }
+        internal SocketVoiceState? RemoveVoiceState(ulong id)
+        {
+            SocketVoiceState voiceState;
+            if (_voiceStates.TryRemove(id, out voiceState))
+                return voiceState;
+            return null;
+        }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, Group)";
+        internal new SocketGroupChannel Clone() => MemberwiseClone() as SocketGroupChannel;
+
+        //SocketChannel
+        internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
+        internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+
+        //ISocketPrivateChannel
+        IReadOnlyCollection<SocketUser> ISocketPrivateChannel.Recipients => Recipients;
+
         //IPrivateChannel
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
 
         //IMessageChannel
-        IReadOnlyCollection<IMessage> IMessageChannel.CachedMessages => ImmutableArray.Create<IMessage>();
-
-        IMessage IMessageChannel.GetCachedMessage(ulong id)
-            => null;
-        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id)
-            => await GetMessageAsync(id);
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit)
-            => GetMessagesAsync(limit);
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit)
-            => GetMessagesAsync(fromMessageId, dir, limit);
+        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetMessageAsync(id);
+            else
+                return GetCachedMessage(id);
+        }
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit);
+            else
+                return ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit);
+        }
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return SocketChannelHelper.PagedGetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit);
+            else
+                return ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit);
+        }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync()
             => await GetPinnedMessagesAsync();
 
@@ -124,14 +203,10 @@ namespace Discord.WebSocket
         IDisposable IMessageChannel.EnterTypingState()
             => EnterTypingState();
 
-        //IChannel
-        IReadOnlyCollection<IUser> IChannel.CachedUsers => Users;
-
-        IUser IChannel.GetCachedUser(ulong id)
-            => GetUser(id);
-        Task<IUser> IChannel.GetUserAsync(ulong id)
+        //IChannel        
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(GetUser(id));
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
     }
 }

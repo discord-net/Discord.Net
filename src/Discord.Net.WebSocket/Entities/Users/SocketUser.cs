@@ -1,33 +1,30 @@
 ﻿using Discord.Rest;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
+using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
-    public class SocketUser : SocketEntity<ulong>, IUser
+    public abstract class SocketUser : SocketEntity<ulong>, IUser
     {
-        public bool IsBot { get; private set; }
-        public string Username { get; private set; }
-        public ushort DiscriminatorValue { get; private set; }
-        public string AvatarId { get; private set; }
+        public abstract bool IsBot { get; internal set; }
+        public abstract string Username { get; internal set; }
+        public abstract ushort DiscriminatorValue { get; internal set; }
+        public abstract string AvatarId { get; internal set; }
+        internal abstract SocketGlobalUser GlobalUser { get; }
+        internal abstract SocketPresence Presence { get; set; }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, AvatarId);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
-        public virtual Game? Game => null;
-        public virtual UserStatus Status { get; internal set; }
+        public Game? Game => Presence.Game;
+        public UserStatus Status => Presence.Status;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
         }
-        internal static SocketUser Create(DiscordSocketClient discord, Model model)
-        {
-            var entity = new SocketUser(discord, model.Id);
-            entity.Update(model);
-            return entity;
-        }
-        internal virtual void Update(Model model)
+        internal virtual void Update(ClientState state, Model model)
         {
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
@@ -38,13 +35,22 @@ namespace Discord.WebSocket
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
         }
+        internal virtual void Update(ClientState state, PresenceModel model)
+        {
+            Presence = SocketPresence.Create(model);
+        }
 
-        public virtual async Task UpdateAsync()
-            => Update(await UserHelper.GetAsync(this, Discord));
-
-        public Task<IDMChannel> CreateDMChannelAsync()
+        public Task<RestDMChannel> CreateDMChannelAsync()
             => UserHelper.CreateDMChannelAsync(this, Discord);
 
-        IDMChannel IUser.GetCachedDMChannel() => null;
+        public override string ToString() => $"{Username}#{Discriminator}";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} (Id{(IsBot ? ", Bot" : "")})";
+        internal SocketUser Clone() => MemberwiseClone() as SocketUser;
+
+        //IUser
+        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode)
+            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
+        async Task<IDMChannel> IUser.CreateDMChannelAsync()
+            => await CreateDMChannelAsync();
     }
 }

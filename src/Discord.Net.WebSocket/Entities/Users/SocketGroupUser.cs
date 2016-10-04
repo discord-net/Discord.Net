@@ -1,5 +1,4 @@
-﻿using Discord.Rest;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
@@ -7,16 +6,29 @@ namespace Discord.WebSocket
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SocketGroupUser : SocketUser, IGroupUser
     {
-        internal SocketGroupUser(DiscordSocketClient discord, ulong id)
-            : base(discord, id)
+        public SocketGroupChannel Channel { get; }
+        internal override SocketGlobalUser GlobalUser { get; }
+
+        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
+        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
+        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
+        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+
+        internal SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser globalUser)
+            : base(channel.Discord, globalUser.Id)
         {
+            Channel = channel;
+            GlobalUser = globalUser;
         }
-        internal new static SocketGroupUser Create(DiscordSocketClient discord, Model model)
+        internal static SocketGroupUser Create(SocketGroupChannel channel, ClientState state, Model model)
         {
-            var entity = new SocketGroupUser(discord, model.Id);
-            entity.Update(model);
+            var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model));
+            entity.Update(state, model);
             return entity;
         }
+
+        internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
 
         //IVoiceState
         bool IVoiceState.IsDeafened => false;

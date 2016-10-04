@@ -3,7 +3,7 @@
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
-    internal struct SocketPresence : IPresence
+    public struct SocketPresence : IPresence
     {
         public Game? Game { get; }
         public UserStatus Status { get; }
@@ -13,11 +13,11 @@ namespace Discord.WebSocket
             Game = game;
             Status = status;
         }
-        internal SocketPresence Create(Model model)
+        internal static SocketPresence Create(Model model)
         {
             return new SocketPresence(model.Game != null ? Discord.Game.Create(model.Game) : (Game?)null, model.Status);
         }
 
-        public SocketPresence Clone() => this;
+        internal SocketPresence Clone() => this;
     }
 }

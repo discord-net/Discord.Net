@@ -11,21 +11,28 @@ namespace Discord.WebSocket
         public string Email { get; private set; }
         public bool IsVerified { get; private set; }
         public bool IsMfaEnabled { get; private set; }
+        internal override SocketGlobalUser GlobalUser { get; }
 
-        internal SocketSelfUser(DiscordSocketClient discord, ulong id)
-            : base(discord, id)
+        public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
+        public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
+        public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
+        public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+
+        internal SocketSelfUser(DiscordSocketClient discord, SocketGlobalUser globalUser)
+            : base(discord, globalUser.Id)
         {
-            Status = UserStatus.Online;
+            GlobalUser = globalUser;
         }
-        internal new static SocketSelfUser Create(DiscordSocketClient discord, Model model)
+        internal static SocketSelfUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketSelfUser(discord, model.Id);
-            entity.Update(model);
+            var entity = new SocketSelfUser(discord, discord.GetOrCreateSelfUser(state, model));
+            entity.Update(state, model);
             return entity;
         }
-        internal override void Update(Model model)
+        internal override void Update(ClientState state, Model model)
         {
-            base.Update(model);
+            base.Update(state, model);
 
             if (model.Email.IsSpecified)
                 Email = model.Email.Value;
@@ -34,12 +41,13 @@ namespace Discord.WebSocket
             if (model.MfaEnabled.IsSpecified)
                 IsMfaEnabled = model.MfaEnabled.Value;
         }
-
-        public override async Task UpdateAsync()
-            => Update(await UserHelper.GetAsync(this, Discord));
+        
         public Task ModifyAsync(Action<ModifyCurrentUserParams> func)
             => UserHelper.ModifyAsync(this, Discord, func);
 
+        internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
+
+        //ISelfUser
         Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func) { throw new NotSupportedException(); }
     }
 }

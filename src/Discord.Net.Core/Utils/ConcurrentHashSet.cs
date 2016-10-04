@@ -9,6 +9,11 @@ namespace Discord
 {
     //Based on https://github.com/dotnet/corefx/blob/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent/ConcurrentDictionary.cs
     //Copyright (c) .NET Foundation and Contributors
+    public static class ConcurrentHashSet
+    {
+        public static int DefaultConcurrencyLevel => PlatformHelper.ProcessorCount;
+    }
+
     [DebuggerDisplay("Count = {Count}")]
     internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
     {

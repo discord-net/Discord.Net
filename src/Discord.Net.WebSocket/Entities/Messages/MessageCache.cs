@@ -1,11 +1,8 @@
-﻿using Discord.Rest;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord.WebSocket
 {
@@ -51,7 +48,7 @@ namespace Discord.WebSocket
                 return result;
             return null;
         }
-        public IImmutableList<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+        public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0) return ImmutableArray<SocketMessage>.Empty;

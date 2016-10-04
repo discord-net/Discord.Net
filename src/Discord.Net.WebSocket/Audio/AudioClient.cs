@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    internal class AudioClient : IAudioClient, IDisposable
+    public class AudioClient : IAudioClient, IDisposable
     {
         public event Func<Task> Connected
         {
@@ -56,7 +56,7 @@ namespace Discord.Audio
         private DiscordSocketClient Discord => Guild.Discord;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public AudioClient(SocketGuild guild, int id)
+        internal AudioClient(SocketGuild guild, int id)
         {
             Guild = guild;
 
@@ -90,7 +90,7 @@ namespace Discord.Audio
         }
 
         /// <inheritdoc />
-        public async Task ConnectAsync(string url, ulong userId, string sessionId, string token)
+        internal async Task ConnectAsync(string url, ulong userId, string sessionId, string token)
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try

@@ -44,7 +44,7 @@ namespace Discord.Rest
             await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id);
         }
 
-        public static async Task<IDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client)
+        public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client)
         {
             var args = new CreateDMChannelParams(user.Id);
             return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args));

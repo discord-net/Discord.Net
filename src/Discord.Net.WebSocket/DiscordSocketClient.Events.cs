@@ -33,170 +33,170 @@ namespace Discord.WebSocket
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
 
         //Channels
-        public event Func<IChannel, Task> ChannelCreated
+        public event Func<SocketChannel, Task> ChannelCreated
         {
             add { _channelCreatedEvent.Add(value); }
             remove { _channelCreatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IChannel, Task>> _channelCreatedEvent = new AsyncEvent<Func<IChannel, Task>>();
-        public event Func<IChannel, Task> ChannelDestroyed
+        private readonly AsyncEvent<Func<SocketChannel, Task>> _channelCreatedEvent = new AsyncEvent<Func<SocketChannel, Task>>();
+        public event Func<SocketChannel, Task> ChannelDestroyed
         {
             add { _channelDestroyedEvent.Add(value); }
             remove { _channelDestroyedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IChannel, Task>> _channelDestroyedEvent = new AsyncEvent<Func<IChannel, Task>>();
-        public event Func<IChannel, IChannel, Task> ChannelUpdated
+        private readonly AsyncEvent<Func<SocketChannel, Task>> _channelDestroyedEvent = new AsyncEvent<Func<SocketChannel, Task>>();
+        public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated
         {
             add { _channelUpdatedEvent.Add(value); }
             remove { _channelUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IChannel, IChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<IChannel, IChannel, Task>>();
+        private readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
 
         //Messages
-        public event Func<IMessage, Task> MessageReceived
+        public event Func<SocketMessage, Task> MessageReceived
         {
             add { _messageReceivedEvent.Add(value); }
             remove { _messageReceivedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<IMessage, Task>>();
-        public event Func<ulong, Optional<IMessage>, Task> MessageDeleted
+        private readonly AsyncEvent<Func<SocketMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<SocketMessage, Task>>();
+        public event Func<ulong, Optional<SocketMessage>, Task> MessageDeleted
         {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, Optional<IMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, Optional<IMessage>, Task>>();
-        public event Func<Optional<IMessage>, IMessage, Task> MessageUpdated
+        private readonly AsyncEvent<Func<ulong, Optional<SocketMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, Optional<SocketMessage>, Task>>();
+        public event Func<Optional<SocketMessage>, SocketMessage, Task> MessageUpdated
         {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Optional<IMessage>, IMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Optional<IMessage>, IMessage, Task>>();
+        private readonly AsyncEvent<Func<Optional<SocketMessage>, SocketMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Optional<SocketMessage>, SocketMessage, Task>>();
 
         //Roles
-        public event Func<IRole, Task> RoleCreated
+        public event Func<SocketRole, Task> RoleCreated
         {
             add { _roleCreatedEvent.Add(value); }
             remove { _roleCreatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IRole, Task>> _roleCreatedEvent = new AsyncEvent<Func<IRole, Task>>();
-        public event Func<IRole, Task> RoleDeleted
+        private readonly AsyncEvent<Func<SocketRole, Task>> _roleCreatedEvent = new AsyncEvent<Func<SocketRole, Task>>();
+        public event Func<SocketRole, Task> RoleDeleted
         {
             add { _roleDeletedEvent.Add(value); }
             remove { _roleDeletedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IRole, Task>> _roleDeletedEvent = new AsyncEvent<Func<IRole, Task>>();
-        public event Func<IRole, IRole, Task> RoleUpdated
+        private readonly AsyncEvent<Func<SocketRole, Task>> _roleDeletedEvent = new AsyncEvent<Func<SocketRole, Task>>();
+        public event Func<SocketRole, SocketRole, Task> RoleUpdated
         {
             add { _roleUpdatedEvent.Add(value); }
             remove { _roleUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IRole, IRole, Task>> _roleUpdatedEvent = new AsyncEvent<Func<IRole, IRole, Task>>();
+        private readonly AsyncEvent<Func<SocketRole, SocketRole, Task>> _roleUpdatedEvent = new AsyncEvent<Func<SocketRole, SocketRole, Task>>();
 
         //Guilds
-        public event Func<IGuild, Task> JoinedGuild
+        public event Func<SocketGuild, Task> JoinedGuild
         {
             add { _joinedGuildEvent.Add(value); }
             remove { _joinedGuildEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _joinedGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> LeftGuild
+        private AsyncEvent<Func<SocketGuild, Task>> _joinedGuildEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+        public event Func<SocketGuild, Task> LeftGuild
         {
             add { _leftGuildEvent.Add(value); }
             remove { _leftGuildEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _leftGuildEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildAvailable
+        private AsyncEvent<Func<SocketGuild, Task>> _leftGuildEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+        public event Func<SocketGuild, Task> GuildAvailable
         {
             add { _guildAvailableEvent.Add(value); }
             remove { _guildAvailableEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _guildAvailableEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildUnavailable
+        private AsyncEvent<Func<SocketGuild, Task>> _guildAvailableEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+        public event Func<SocketGuild, Task> GuildUnavailable
         {
             add { _guildUnavailableEvent.Add(value); }
             remove { _guildUnavailableEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _guildUnavailableEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, Task> GuildMembersDownloaded
+        private AsyncEvent<Func<SocketGuild, Task>> _guildUnavailableEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+        public event Func<SocketGuild, Task> GuildMembersDownloaded
         {
             add { _guildMembersDownloadedEvent.Add(value); }
             remove { _guildMembersDownloadedEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, Task>> _guildMembersDownloadedEvent = new AsyncEvent<Func<IGuild, Task>>();
-        public event Func<IGuild, IGuild, Task> GuildUpdated
+        private AsyncEvent<Func<SocketGuild, Task>> _guildMembersDownloadedEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+        public event Func<SocketGuild, SocketGuild, Task> GuildUpdated
         {
             add { _guildUpdatedEvent.Add(value); }
             remove { _guildUpdatedEvent.Remove(value); }
         }
-        private AsyncEvent<Func<IGuild, IGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<IGuild, IGuild, Task>>();
+        private AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
 
         //Users
-        public event Func<IGuildUser, Task> UserJoined
+        public event Func<SocketGuildUser, Task> UserJoined
         {
             add { _userJoinedEvent.Add(value); }
             remove { _userJoinedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, Task>> _userJoinedEvent = new AsyncEvent<Func<IGuildUser, Task>>();
-        public event Func<IGuildUser, Task> UserLeft
+        private readonly AsyncEvent<Func<SocketGuildUser, Task>> _userJoinedEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
+        public event Func<SocketGuildUser, Task> UserLeft
         {
             add { _userLeftEvent.Add(value); }
             remove { _userLeftEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, Task>> _userLeftEvent = new AsyncEvent<Func<IGuildUser, Task>>();
-        public event Func<IUser, IGuild, Task> UserBanned
+        private readonly AsyncEvent<Func<SocketGuildUser, Task>> _userLeftEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
+        public event Func<SocketUser, SocketGuild, Task> UserBanned
         {
             add { _userBannedEvent.Add(value); }
             remove { _userBannedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userBannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
-        public event Func<IUser, IGuild, Task> UserUnbanned
+        private readonly AsyncEvent<Func<SocketUser, SocketGuild, Task>> _userBannedEvent = new AsyncEvent<Func<SocketUser, SocketGuild, Task>>();
+        public event Func<SocketUser, SocketGuild, Task> UserUnbanned
         {
             add { _userUnbannedEvent.Add(value); }
             remove { _userUnbannedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IUser, IGuild, Task>> _userUnbannedEvent = new AsyncEvent<Func<IUser, IGuild, Task>>();
-        public event Func<IGuildUser, IGuildUser, Task> UserUpdated
+        private readonly AsyncEvent<Func<SocketUser, SocketGuild, Task>> _userUnbannedEvent = new AsyncEvent<Func<SocketUser, SocketGuild, Task>>();
+        public event Func<SocketGuildUser, SocketGuildUser, Task> UserUpdated
         {
             add { _userUpdatedEvent.Add(value); }
             remove { _userUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, IGuildUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<IGuildUser, IGuildUser, Task>>();
-        public event Func<IGuildUser, IPresence, IPresence, Task> UserPresenceUpdated
+        private readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
+        public event Func<SocketUser, SocketPresence, SocketPresence, Task> UserPresenceUpdated
         {
             add { _userPresenceUpdatedEvent.Add(value); }
             remove { _userPresenceUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<IGuildUser, IPresence, IPresence, Task>>();
-        public event Func<IUser, IVoiceState, IVoiceState, Task> UserVoiceStateUpdated
+        private readonly AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>>();
+        public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated
         {
             add { _userVoiceStateUpdatedEvent.Add(value); }
             remove { _userVoiceStateUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<IUser, IVoiceState, IVoiceState, Task>>();
-        public event Func<ISelfUser, ISelfUser, Task> CurrentUserUpdated
+        private readonly AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>>();
+        public event Func<SocketSelfUser, SocketSelfUser, Task> CurrentUserUpdated
         {
             add { _selfUpdatedEvent.Add(value); }
             remove { _selfUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ISelfUser, ISelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<ISelfUser, ISelfUser, Task>>();
-        public event Func<IUser, IChannel, Task> UserIsTyping
+        private readonly AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>>();
+        public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping
         {
             add { _userIsTypingEvent.Add(value); }
             remove { _userIsTypingEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IUser, IChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<IUser, IChannel, Task>>();
-        public event Func<IGroupUser, Task> RecipientAdded
+        private readonly AsyncEvent<Func<SocketUser, ISocketMessageChannel, Task>> _userIsTypingEvent = new AsyncEvent<Func<SocketUser, ISocketMessageChannel, Task>>();
+        public event Func<SocketGroupUser, Task> RecipientAdded
         {
             add { _recipientAddedEvent.Add(value); }
             remove { _recipientAddedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientAddedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
-        public event Func<IGroupUser, Task> RecipientRemoved
+        private readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientAddedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
+        public event Func<SocketGroupUser, Task> RecipientRemoved
         {
             add { _recipientRemovedEvent.Add(value); }
             remove { _recipientRemovedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<IGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<IGroupUser, Task>>();
+        private readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
 
         //TODO: Add PresenceUpdated? VoiceStateUpdated?, VoiceConnected, VoiceDisconnected;
     }

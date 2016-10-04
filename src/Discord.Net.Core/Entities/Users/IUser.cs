@@ -17,8 +17,8 @@ namespace Discord
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
 
-        /// <summary> Returns a private message channel to this user, returning null if one does not exist or is not cached. </summary>
-        IDMChannel GetCachedDMChannel();
+        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
+        Task<IDMChannel> GetDMChannelAsync(CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
         Task<IDMChannel> CreateDMChannelAsync();
     }

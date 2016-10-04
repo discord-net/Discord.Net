@@ -30,7 +30,9 @@
   },
 
   "dependencies": {
-    "Discord.Net": "1.0.0-*"
+    "Discord.Net.Core": {
+      "target": "project"
+    }
   },
 
   "frameworks": {

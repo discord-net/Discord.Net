@@ -47,7 +47,7 @@ namespace Discord.WebSocket
             return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
         }
 
-        public SocketVoiceState Clone() => this;
+        internal SocketVoiceState Clone() => this;
 
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

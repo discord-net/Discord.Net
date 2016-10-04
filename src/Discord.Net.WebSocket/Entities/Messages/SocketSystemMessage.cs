@@ -1,5 +1,4 @@
-﻿using Discord.Rest;
-using Model = Discord.API.Message;
+﻿using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
@@ -11,17 +10,21 @@ namespace Discord.WebSocket
             : base(discord, id, channelId, author)
         {
         }
-        internal new static SocketSystemMessage Create(DiscordSocketClient discord, SocketUser author, Model model)
+        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
         {
             var entity = new SocketSystemMessage(discord, model.Id, model.ChannelId, author);
-            entity.Update(model);
+            entity.Update(state, model);
             return entity;
         }
-        internal override void Update(Model model)
+        internal override void Update(ClientState state, Model model)
         {
-            base.Update(model);
+            base.Update(state, model);
 
             Type = model.Type;
         }
+
+        public override string ToString() => Content;
+        private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";
+        internal new SocketSystemMessage Clone() => MemberwiseClone() as SocketSystemMessage;
     }
 }

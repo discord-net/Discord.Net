@@ -41,7 +41,6 @@ namespace Discord
         ulong OwnerId { get; }
         /// <summary> Gets the id of the region hosting this guild's voice channels. </summary>
         string VoiceRegionId { get; }
-
         /// <summary> Gets the IAudioClient currently associated with this guild. </summary>
         IAudioClient AudioClient { get; }
         /// <summary> Gets the built-in role containing all users in this guild. </summary>
@@ -52,7 +51,6 @@ namespace Discord
         IReadOnlyCollection<string> Features { get; }
         /// <summary> Gets a collection of all roles in this guild. </summary>
         IReadOnlyCollection<IRole> Roles { get; }
-        IReadOnlyCollection<IGuildUser> CachedUsers { get; }
 
         /// <summary> Modifies this guild. </summary>
         Task ModifyAsync(Action<ModifyGuildParams> func);
@@ -77,10 +75,9 @@ namespace Discord
         Task RemoveBanAsync(ulong userId);
 
         /// <summary> Gets a collection of all channels in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync();
+        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildChannel> GetChannelAsync(ulong id);
-        IGuildChannel GetCachedChannel(ulong id);
+        Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Creates a new text channel. </summary>
         Task<ITextChannel> CreateTextChannelAsync(string name);
         /// <summary> Creates a new voice channel. </summary>
@@ -98,12 +95,11 @@ namespace Discord
         Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false);
 
         /// <summary> Gets a collection of all users in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync();
+        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload); //TODO: shouldnt this be paged?
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildUser> GetUserAsync(ulong id);
-        IGuildUser GetCachedUser(ulong id);
+        Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Gets the current user for this guild. </summary>
-        Task<IGuildUser> GetCurrentUserAsync();
+        Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload);
         /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>

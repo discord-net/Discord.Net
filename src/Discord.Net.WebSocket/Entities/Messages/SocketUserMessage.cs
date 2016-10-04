@@ -8,7 +8,7 @@ using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
-    internal class SocketUserMessage : SocketMessage, IUserMessage
+    public class SocketUserMessage : SocketMessage, IUserMessage
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
@@ -32,16 +32,16 @@ namespace Discord.WebSocket
             : base(discord, id, channelId, author)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, SocketUser author, Model model)
+        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, model.ChannelId, author);
-            entity.Update(model);
+            entity.Update(state, model);
             return entity;
         }
 
-        internal override void Update(Model model)
+        internal override void Update(ClientState state, Model model)
         {
-            base.Update(model);
+            base.Update(state, model);
 
             if (model.IsTextToSpeech.IsSpecified)
                 _isTTS = model.IsTextToSpeech.Value;
@@ -129,5 +129,9 @@ namespace Discord.WebSocket
             text = MentionsHelper.ResolveEveryoneMentions(text, everyoneHandling);
             return text;
         }
+
+        public override string ToString() => Content;
+        private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")}";
+        internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
     }
 }

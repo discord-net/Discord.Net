@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.API.Rest;
 using Model = Discord.API.Guild;
+using System.Linq;
 
 namespace Discord.Rest
 {
@@ -149,7 +150,7 @@ namespace Discord.Rest
             return null;
         }
 
-        public async Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?), bool isHoisted = false)
+        public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?), bool isHoisted = false)
         {
             var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted);
             _roles = _roles.Add(role.Id, role);
@@ -157,8 +158,8 @@ namespace Discord.Rest
         }
 
         //Users
-        public Task<IReadOnlyCollection<RestGuildUser>> GetUsersAsync()
-            => GuildHelper.GetUsersAsync(this, Discord);
+        public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync()
+            => GuildHelper.GetUsersAsync(this, Discord).ToAsyncEnumerable();
         public Task<RestGuildUser> GetUserAsync(ulong id)
             => GuildHelper.GetUserAsync(this, Discord, id);
         public Task<RestGuildUser> GetCurrentUserAsync()
@@ -170,19 +171,26 @@ namespace Discord.Rest
         //IGuild
         bool IGuild.Available => true;
         IAudioClient IGuild.AudioClient => null;
-        IReadOnlyCollection<IGuildUser> IGuild.CachedUsers => ImmutableArray.Create<IGuildUser>();
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync()
             => await GetBansAsync();
 
-        async Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync()
-            => await GetChannelsAsync();
-        async Task<IGuildChannel> IGuild.GetChannelAsync(ulong id)
-            => await GetChannelAsync(id);
-        IGuildChannel IGuild.GetCachedChannel(ulong id)
-            => null;
+        async Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetChannelsAsync();
+            else
+                return ImmutableArray.Create<IGuildChannel>();
+        }
+        async Task<IGuildChannel> IGuild.GetChannelAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetChannelAsync(id);
+            else
+                return null;
+        }
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name)
             => await CreateTextChannelAsync(name);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name)
@@ -198,15 +206,30 @@ namespace Discord.Rest
 
         IRole IGuild.GetRole(ulong id) 
             => GetRole(id);
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted)
+            => await CreateRoleAsync(name, permissions, color, isHoisted);
 
-        async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync()
-            => await GetUsersAsync();
-        async Task<IGuildUser> IGuild.GetUserAsync(ulong id)
-            => await GetUserAsync(id);
-        IGuildUser IGuild.GetCachedUser(ulong id)
-            => null;
-        async Task<IGuildUser> IGuild.GetCurrentUserAsync()
-            => await GetCurrentUserAsync();
+        async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetUserAsync(id);
+            else
+                return null;
+        }
+        async Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetCurrentUserAsync();
+            else
+                return null;
+        }
+        async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return (await GetUsersAsync().Flatten()).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IGuildUser>();
+        }
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
     }
 }

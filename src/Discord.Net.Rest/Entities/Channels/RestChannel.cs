@@ -24,6 +24,17 @@ namespace Discord.Rest
                 case ChannelType.Voice:
                     return RestVoiceChannel.Create(discord, model);
                 case ChannelType.DM:
+                case ChannelType.Group:
+                    return CreatePrivate(discord, model) as RestChannel;
+                default:
+                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
+            }
+        }
+        internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
+        {
+            switch (model.Type)
+            {
+                case ChannelType.DM:
                     return RestDMChannel.Create(discord, model);
                 case ChannelType.Group:
                     return RestGroupChannel.Create(discord, model);
@@ -35,14 +46,10 @@ namespace Discord.Rest
 
         public abstract Task UpdateAsync();
 
-        //IChannel
-        IReadOnlyCollection<IUser> IChannel.CachedUsers => ImmutableArray.Create<IUser>();
-
-        IUser IChannel.GetCachedUser(ulong id)
-            => null;
-        Task<IUser> IChannel.GetUserAsync(ulong id)
-            => Task.FromResult<IUser>(null);
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable();
+        //IChannel        
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
+            => Task.FromResult<IUser>(null); //Overriden
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
+            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overriden
     }
 }

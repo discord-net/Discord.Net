@@ -15,31 +15,31 @@ namespace Discord.WebSocket
     {
         private ImmutableArray<Overwrite> _overwrites;
 
-        public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
-
-        public ulong GuildId { get; }
-
+        public SocketGuild Guild { get; }
         public string Name { get; private set; }
         public int Position { get; private set; }
 
-        internal SocketGuildChannel(DiscordSocketClient discord, ulong id, ulong guildId)
+        public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
+        public new abstract IReadOnlyCollection<SocketGuildUser> Users { get; }
+
+        internal SocketGuildChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id)
         {
-            GuildId = guildId;
+            Guild = guild;
         }
-        internal new static SocketGuildChannel Create(DiscordSocketClient discord, Model model)
+        internal static SocketGuildChannel Create(SocketGuild guild, ClientState state, Model model)
         {
             switch (model.Type)
             {
                 case ChannelType.Text:
-                    return SocketTextChannel.Create(discord, model);
+                    return SocketTextChannel.Create(guild, state, model);
                 case ChannelType.Voice:
-                    return SocketVoiceChannel.Create(discord, model);
+                    return SocketVoiceChannel.Create(guild, state, model);
                 default:
                     throw new InvalidOperationException("Unknown guild channel type");
             }
         }
-        internal virtual void Update(Model model)
+        internal override void Update(ClientState state, Model model)
         {
             Name = model.Name.Value;
             Position = model.Position.Value;
@@ -50,9 +50,7 @@ namespace Discord.WebSocket
                 newOverwrites.Add(new Overwrite(overwrites[i]));
             _overwrites = newOverwrites.ToImmutable();
         }
-
-        public async Task UpdateAsync()
-            => Update(await ChannelHelper.GetAsync(this, Discord));
+        
         public Task ModifyAsync(Action<ModifyGuildChannelParams> func)
             => ChannelHelper.ModifyAsync(this, Discord, func);
         public Task DeleteAsync()
@@ -118,7 +116,18 @@ namespace Discord.WebSocket
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = true)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary);
 
+        public new abstract SocketGuildUser GetUser(ulong id);
+
+        public override string ToString() => Name;
+        internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
+
+        //SocketChannel
+        internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
+        internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+
         //IGuildChannel
+        ulong IGuildChannel.GuildId => Guild.Id;
+
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync()
             => await GetInvitesAsync();
         async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary)
@@ -136,24 +145,16 @@ namespace Discord.WebSocket
             => await RemovePermissionOverwriteAsync(role);
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user)
             => await RemovePermissionOverwriteAsync(user);
-
-        IReadOnlyCollection<IGuildUser> IGuildChannel.CachedUsers
-            => ImmutableArray.Create<IGuildUser>();
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync()
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id)
-            => Task.FromResult<IGuildUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
-        IGuildUser IGuildChannel.GetCachedUser(ulong id)
-            => null;
+        
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
+            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
+            => Task.FromResult<IGuildUser>(GetUser(id));
 
         //IChannel
-        IReadOnlyCollection<IUser> IChannel.CachedUsers
-            => ImmutableArray.Create<IUser>();
-        IUser IChannel.GetCachedUser(ulong id)
-            => null;
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync()
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>().ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
-        Task<IUser> IChannel.GetUserAsync(ulong id)
-            => Task.FromResult<IUser>(null); //Overriden in Text/Voice //TODO: Does this actually override?
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
+            => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
+            => Task.FromResult<IUser>(GetUser(id)); //Overriden in Text/Voice //TODO: Does this actually override?
     }
 }

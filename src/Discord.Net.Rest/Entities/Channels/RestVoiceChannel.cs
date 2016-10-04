@@ -11,7 +11,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel
+    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
     {
         public int Bitrate { get; private set; }
         public int UserLimit { get; private set; }
@@ -41,9 +41,9 @@ namespace Discord.Rest
         Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id)
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuildUser>(null);
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync()
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>().ToAsyncEnumerable();
     }
 }

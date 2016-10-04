@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -34,7 +35,7 @@ namespace Discord
                     {
                         if (userMention.Id == id)
                         {
-                            user = channel?.GetCachedUser(id) as TUser;
+                            user = channel?.GetUserAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult() as TUser;
                             if (user == null) //User not found, fallback to basic mention info
                                 user = userMention;
                             break;
@@ -136,7 +137,7 @@ namespace Discord
                             return "";
                         case ChannelMentionHandling.Name:
                             IGuildChannel channel = null;
-                            channel = guild.GetCachedChannel(id);
+                            channel = guild.GetChannelAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
                             if (channel != null)
                                 return $"#{channel.Name}";
                             else
