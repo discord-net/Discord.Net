@@ -96,10 +96,11 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
+                var guild = (Channel as SocketGuildChannel)?.Guild;
 
-                _mentionedUsers = MentionsHelper.GetUserMentions(text, null, mentions);
-                _mentionedChannelIds = MentionsHelper.GetChannelMentions(text, null);
-                _mentionedRoles = MentionsHelper.GetRoleMentions<RestRole>(text, null);
+                _mentionedUsers = MentionsHelper.GetUserMentions(text, Channel, mentions);
+                _mentionedChannelIds = MentionsHelper.GetChannelMentions(text, guild);
+                _mentionedRoles = MentionsHelper.GetRoleMentions<RestRole>(text, guild);
                 model.Content = text;
             }
         }

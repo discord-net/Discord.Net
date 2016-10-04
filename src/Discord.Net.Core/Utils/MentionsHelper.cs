@@ -62,6 +62,9 @@ namespace Discord
         internal static ImmutableArray<TRole> GetRoleMentions<TRole>(string text, IGuild guild)
             where TRole : class, IRole
         {
+            if (guild == null)
+                return ImmutableArray.Create<TRole>();
+
             var matches = _roleRegex.Matches(text);
             var builder = ImmutableArray.CreateBuilder<TRole>(matches.Count);
             foreach (var match in matches.OfType<Match>())
