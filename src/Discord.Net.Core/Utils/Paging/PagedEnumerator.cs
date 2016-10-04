@@ -56,12 +56,4 @@ namespace Discord
             public void Dispose() { Current = null; }
         }
     }
-
-    public static class PagedAsyncEnumerable
-    {
-        public static async Task<IEnumerable<T>> Flatten<T>(this IAsyncEnumerable<IReadOnlyCollection<T>> source)
-        {
-            return (await source.ToArray().ConfigureAwait(false)).SelectMany(x => x);
-        }
-    }
 }
