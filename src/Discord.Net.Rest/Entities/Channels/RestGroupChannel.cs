@@ -117,6 +117,13 @@ namespace Discord.Rest
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return GetMessagesAsync(fromMessage, dir, limit);
+            else
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+        }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync() 
             => await GetPinnedMessagesAsync();
 

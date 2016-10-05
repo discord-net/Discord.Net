@@ -8,7 +8,7 @@ namespace Discord.WebSocket
 {
     internal static class SocketChannelHelper
     {
-        public static IAsyncEnumerable<IReadOnlyCollection<IMessage>> PagedGetMessagesAsync(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
+        public static IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
             ulong? fromMessageId, Direction dir, int limit, CacheMode mode)
         {
             IReadOnlyCollection<SocketMessage> cachedMessages;
@@ -21,7 +21,7 @@ namespace Discord.WebSocket
 
             result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
             limit -= cachedMessages.Count;
-            if (limit == 0 || mode == CacheMode.CacheOnly)
+            if (mode == CacheMode.CacheOnly || limit <= 0)
                 return result;
             
             if (dir == Direction.Before)
@@ -30,6 +30,14 @@ namespace Discord.WebSocket
                 fromMessageId = cachedMessages.Max(x => x.Id);
             var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit);
             return result.Concat(downloadedMessages);
+        }
+        public static IReadOnlyCollection<SocketMessage> GetCachedMessages(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
+            ulong? fromMessageId, Direction dir, int limit)
+        {
+            if (messages != null) //Cache enabled
+                return messages.GetMany(fromMessageId, dir, limit);
+            else
+                return ImmutableArray.Create<SocketMessage>();
         }
 
         public static void AddMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
