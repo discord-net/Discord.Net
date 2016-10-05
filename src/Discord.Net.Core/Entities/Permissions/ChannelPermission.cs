@@ -29,9 +29,11 @@
         MoveMembers = 24,
         UseVAD = 25,
 
-        //Nicknames
+        //General2
         //ChangeNickname = 26,
         //ManageNicknames = 27,
         ManagePermissions = 28,
+        //ManageWebhooks = 29,
+        //ManageEmojis = 30
     }
 }
