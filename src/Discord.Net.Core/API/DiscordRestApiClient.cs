@@ -416,7 +416,7 @@ namespace Discord.API
                     await DeleteMessageAsync(channelId, args.MessageIds[0]).ConfigureAwait(false);
                     break;
                 default:
-                    await SendJsonAsync("POST", $"channels/{channelId}/messages/bulk_delete", args, options: options).ConfigureAwait(false);
+                    await SendJsonAsync("POST", $"channels/{channelId}/messages/bulk-delete", args, options: options).ConfigureAwait(false);
                     break;
             }
         }
