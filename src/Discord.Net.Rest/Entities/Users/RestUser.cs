@@ -47,7 +47,7 @@ namespace Discord.Rest
             => UserHelper.CreateDMChannelAsync(this, Discord);
 
         public override string ToString() => $"{Username}#{Discriminator}";
-        internal string DebuggerDisplay => $"{Username}#{Discriminator} (Id{(IsBot ? ", Bot" : "")})";
+        internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode)
