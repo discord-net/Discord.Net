@@ -17,6 +17,7 @@ namespace Discord.Rest
 
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
+        public virtual bool IsWebhook => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
 
         public virtual IReadOnlyCollection<IAttachment> Attachments => ImmutableArray.Create<IAttachment>();

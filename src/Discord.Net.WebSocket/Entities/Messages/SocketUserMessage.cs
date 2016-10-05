@@ -20,8 +20,11 @@ namespace Discord.WebSocket
         private ImmutableArray<RestRole> _mentionedRoles;
         private ImmutableArray<RestUser> _mentionedUsers;
 
+        public ulong? WebhookId { get; private set; }
+
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
+        public override bool IsWebhook => WebhookId != null;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
 
         public override IReadOnlyCollection<IAttachment> Attachments => _attachments;
@@ -53,6 +56,8 @@ namespace Discord.WebSocket
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
+            if (model.WebhookId.IsSpecified)
+                WebhookId = model.WebhookId.Value;
 
             if (model.Attachments.IsSpecified)
             {
@@ -133,7 +138,7 @@ namespace Discord.WebSocket
             return text;
         }
 
-        private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")}";
+        private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
     }
 }

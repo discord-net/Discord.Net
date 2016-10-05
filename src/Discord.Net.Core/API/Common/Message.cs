@@ -12,6 +12,8 @@ namespace Discord.API
         public MessageType Type { get; set; }
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
+        [JsonProperty("webhook_id")]
+        public Optional<ulong> WebhookId { get; set; }
         [JsonProperty("author")]
         public Optional<User> Author { get; set; }
         [JsonProperty("content")]

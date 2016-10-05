@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
@@ -17,6 +16,7 @@ namespace Discord.WebSocket
 
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
+        public virtual bool IsWebhook => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
 
         public virtual IReadOnlyCollection<IAttachment> Attachments => ImmutableArray.Create<IAttachment>();
