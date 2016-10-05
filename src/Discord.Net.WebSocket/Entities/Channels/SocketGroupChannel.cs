@@ -34,8 +34,8 @@ namespace Discord.WebSocket
         {
             if (Discord.MessageCacheSize > 0)
                 _messages = new MessageCache(Discord, this);
-            _voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(1, 5);
-            _users = new ConcurrentDictionary<ulong, SocketGroupUser>(1, 5);
+            _voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
+            _users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
         }
         internal static SocketGroupChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         }
         internal virtual void UpdateUsers(ClientState state, UserModel[] models)
         {
-            var users = new ConcurrentDictionary<ulong, SocketGroupUser>(1, (int)(models.Length * 1.05));
+            var users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
                 users[models[i].Id] = SocketGroupUser.Create(this, state, models[i]);
             _users = users;
