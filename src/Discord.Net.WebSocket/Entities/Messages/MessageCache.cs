@@ -61,8 +61,10 @@ namespace Discord.WebSocket
             else
                 cachedMessageIds = _orderedMessages.Where(x => x > fromMessageId.Value);
 
+            if (dir == Direction.Before)
+                cachedMessageIds = cachedMessageIds.Reverse();
+
             return cachedMessageIds
-                .Take(limit)
                 .Select(x =>
                 {
                     SocketMessage msg;
@@ -71,6 +73,7 @@ namespace Discord.WebSocket
                     return null;
                 })
                 .Where(x => x != null)
+                .Take(limit)
                 .ToImmutableArray();
         }
     }
