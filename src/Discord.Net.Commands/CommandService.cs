@@ -26,6 +26,8 @@ namespace Discord.Commands
             _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
+                [typeof(bool)] = new SimpleTypeReader<bool>(),
+                [typeof(char)] = new SimpleTypeReader<char>(),
                 [typeof(string)] = new SimpleTypeReader<string>(),
                 [typeof(byte)] = new SimpleTypeReader<byte>(),
                 [typeof(sbyte)] = new SimpleTypeReader<sbyte>(),
