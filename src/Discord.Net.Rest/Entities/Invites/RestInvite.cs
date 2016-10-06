@@ -9,7 +9,6 @@ namespace Discord.Rest
     {
         public string ChannelName { get; private set; }
         public string GuildName { get; private set; }
-
         public ulong ChannelId { get; private set; }
         public ulong GuildId { get; private set; }
 

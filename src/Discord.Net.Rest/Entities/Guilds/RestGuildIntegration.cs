@@ -17,7 +17,6 @@ namespace Discord.Rest
         public bool IsSyncing { get; private set; }
         public ulong ExpireBehavior { get; private set; }
         public ulong ExpireGracePeriod { get; private set; }
-
         public ulong GuildId { get; private set; }
         public ulong RoleId { get; private set; }
         public RestUser User { get; private set; }

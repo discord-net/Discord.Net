@@ -832,7 +832,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var roles = args.ToArray();
+            var roles = args.ToImmutableArray();
             switch (roles.Length)
             {
                 case 0:

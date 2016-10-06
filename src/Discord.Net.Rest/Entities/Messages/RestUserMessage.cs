@@ -25,7 +25,6 @@ namespace Discord.Rest
         public override bool IsPinned => _isPinned;
         public override bool IsWebhook => WebhookId != null;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
-
         public override IReadOnlyCollection<IAttachment> Attachments => _attachments;
         public override IReadOnlyCollection<IEmbed> Embeds => _embeds;
         public override IReadOnlyCollection<ulong> MentionedChannelIds => _mentionedChannelIds;

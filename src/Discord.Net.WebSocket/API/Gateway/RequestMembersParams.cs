@@ -14,8 +14,6 @@ namespace Discord.API.Gateway
         public int Limit { get; set; }
 
         [JsonProperty("guild_id")]
-        private ulong[] _guildIds { get; set; }
-        public IEnumerable<ulong> GuildIds { set { _guildIds = value.ToArray(); } }
-        public IEnumerable<IGuild> Guilds { set { _guildIds = value.Select(x => x.Id).ToArray(); } }
+        private ulong[] GuildIds { get; set; }
     }
 }

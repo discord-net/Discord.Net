@@ -12,7 +12,6 @@ namespace Discord
         public string Type { get; }
         public string Name { get; }
         public bool IsRevoked { get; }
-
         public IReadOnlyCollection<ulong> IntegrationIds { get; }
 
         internal RestConnection(string id, string type, string name, bool isRevoked, IReadOnlyCollection<ulong> integrationIds)

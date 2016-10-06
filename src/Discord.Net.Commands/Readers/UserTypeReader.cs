@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,7 +75,7 @@ namespace Discord.Commands
             }
 
             if (results.Count > 0)
-                return TypeReaderResult.FromSuccess(results.Values.ToArray());
+                return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
             return TypeReaderResult.FromError(CommandError.ObjectNotFound, "User not found.");
         }
 

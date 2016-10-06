@@ -404,11 +404,11 @@ namespace Discord.WebSocket
             => DownloadUsersAsync(guilds.Select(x => x as SocketGuild).Where(x => x != null));
         private async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
         {
-            var cachedGuilds = guilds.ToArray();
+            var cachedGuilds = guilds.ToImmutableArray();
             if (cachedGuilds.Length == 0) return;
 
             //Wait for unsynced guilds to sync first.
-            var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToArray();
+            var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToImmutableArray();
             if (unsyncedGuilds.Length > 0)
                 await Task.WhenAll(unsyncedGuilds);
 
@@ -1565,7 +1565,7 @@ namespace Discord.WebSocket
         }
         private async Task SyncGuildsAsync()
         {
-            var guildIds = Guilds.Where(x => !x.IsSynced).Select(x => x.Id).ToArray();
+            var guildIds = Guilds.Where(x => !x.IsSynced).Select(x => x.Id).ToImmutableArray();
             if (guildIds.Length > 0)
                 await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }

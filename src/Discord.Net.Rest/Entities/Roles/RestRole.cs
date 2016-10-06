@@ -10,7 +10,6 @@ namespace Discord.Rest
     public class RestRole : RestEntity<ulong>, IRole
     {
         public RestGuild Guild { get; }
-
         public Color Color { get; private set; }
         public bool IsHoisted { get; private set; }
         public bool IsManaged { get; private set; }

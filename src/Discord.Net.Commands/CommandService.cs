@@ -213,12 +213,12 @@ namespace Discord.Commands
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)
                     {
-                        TypeReaderValue[] argList, paramList;
+                        IReadOnlyList<TypeReaderValue> argList, paramList;
                         switch (multiMatchHandling)
                         {
                             case MultiMatchHandling.Best:
-                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
-                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToArray();
+                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
                                 parseResult = ParseResult.FromSuccess(argList, paramList);
                                 break;
                         }

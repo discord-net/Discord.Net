@@ -15,10 +15,10 @@ namespace Discord.Rest
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
 
         internal IGuild Guild { get; }
-        public ulong GuildId => Guild.Id;
-
         public string Name { get; private set; }
         public int Position { get; private set; }
+
+        public ulong GuildId => Guild.Id;
 
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
