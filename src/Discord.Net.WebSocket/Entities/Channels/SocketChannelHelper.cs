@@ -11,25 +11,42 @@ namespace Discord.WebSocket
         public static IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
             ulong? fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
-            IReadOnlyCollection<SocketMessage> cachedMessages;
-            IAsyncEnumerable<IReadOnlyCollection<IMessage>> result;
+            if (dir == Direction.Around)
+                throw new NotImplementedException(); //TODO: Impl
 
-            if (messages != null) //Cache enabled
-                cachedMessages = messages.GetMany(fromMessageId, dir, limit);
-            else
-                cachedMessages = ImmutableArray.Create<SocketMessage>();
-
-            result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
-            limit -= cachedMessages.Count;
-            if (mode == CacheMode.CacheOnly || limit <= 0)
-                return result;
+            IReadOnlyCollection<SocketMessage> cachedMessages = null;
+            IAsyncEnumerable<IReadOnlyCollection<IMessage>> result = null;
             
+            if (dir == Direction.After && fromMessageId == null)
+                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+
+            if (dir == Direction.Before || mode == CacheMode.CacheOnly)
+            {
+                if (messages != null) //Cache enabled
+                    cachedMessages = messages.GetMany(fromMessageId, dir, limit);
+                else
+                    cachedMessages = ImmutableArray.Create<SocketMessage>();
+                result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
+            }
+
             if (dir == Direction.Before)
-                fromMessageId = cachedMessages.Min(x => x.Id);
+            {
+                limit -= cachedMessages.Count;
+                if (mode == CacheMode.CacheOnly || limit <= 0)
+                    return result;
+                
+                //Download remaining messages
+                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, cachedMessages.Min(x => x.Id), dir, limit, options);
+                return result.Concat(downloadedMessages);
+            }
             else
-                fromMessageId = cachedMessages.Max(x => x.Id);
-            var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit, options);
-            return result.Concat(downloadedMessages);
+            {
+                if (mode == CacheMode.CacheOnly)
+                    return result;
+
+                //Dont use cache in this case
+                return ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit, options);
+            }
         }
         public static IReadOnlyCollection<SocketMessage> GetCachedMessages(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
             ulong? fromMessageId, Direction dir, int limit)
