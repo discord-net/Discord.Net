@@ -11,7 +11,7 @@ namespace Discord.Rest
         private long _timestampTicks;
 
         public ulong ChannelId { get; }
-        public IUser Author { get; }
+        public RestUser Author { get; }
 
         public string Content { get; private set; }
 
@@ -28,10 +28,11 @@ namespace Discord.Rest
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId)
+        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author)
             : base(discord, id)
         {
             ChannelId = channelId;
+            Author = author;
         }
         internal static RestMessage Create(BaseDiscordClient discord, Model model)
         {
@@ -58,6 +59,7 @@ namespace Discord.Rest
         public override string ToString() => Content;
 
         MessageType IMessage.Type => MessageType.Default;
+        IUser IMessage.Author => Author;
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         IReadOnlyCollection<IRole> IMessage.MentionedRoles => MentionedRoles;

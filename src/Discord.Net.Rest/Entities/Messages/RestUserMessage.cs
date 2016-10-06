@@ -33,13 +33,13 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestRole> MentionedRoles => _mentionedRoles;
         public override IReadOnlyCollection<RestUser> MentionedUsers => _mentionedUsers;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId)
-            : base(discord, id, channelId)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author)
+            : base(discord, id, channelId, author)
         {
         }
         internal new static RestUserMessage Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id, model.ChannelId);
+            var entity = new RestUserMessage(discord, model.Id, model.ChannelId, RestUser.Create(discord, model.Author.Value));
             entity.Update(model);
             return entity;
         }
