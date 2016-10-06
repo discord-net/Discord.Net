@@ -45,7 +45,7 @@ namespace Discord.Rest
             {
                 ulong id;
                 if (ulong.TryParse(match.Groups[2].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                    builder.Add(new Emoji(id, match.Groups[1].Value, match.Index));
+                    builder.Add(new Emoji(id, match.Groups[1].Value, match.Index, match.Length));
             }
             return builder.ToImmutable();
         }
