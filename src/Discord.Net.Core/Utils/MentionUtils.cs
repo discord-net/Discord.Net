@@ -142,7 +142,7 @@ namespace Discord
                             return $"@unknown-user";
                     case TagHandling.FullName:
                         if (user != null)
-                            return $"@{guildUser?.Nickname ?? user?.Username}#{user.Discriminator}";
+                            return $"@{user.Username}#{user.Discriminator}";
                         else
                             return $"@unknown-user";
                     case TagHandling.Sanitize:
