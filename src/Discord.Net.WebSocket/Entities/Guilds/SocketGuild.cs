@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +30,6 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
-        private ConcurrentDictionary<ulong, PresenceModel> _cachedPresences;
         private ImmutableArray<Emoji> _emojis;
         private ImmutableArray<string> _features;
         internal bool _available;
@@ -127,20 +127,17 @@ namespace Discord.WebSocket
                     members.TryAdd(member.Id, member);
                 }
                 DownloadedMemberCount = members.Count;
-            }
-            var cachedPresences = new ConcurrentDictionary<ulong, PresenceModel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Presences.Length * 1.05));
-            {
+
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
                     SocketGuildUser member;
-                    if (_members.TryGetValue(model.Presences[i].User.Id, out member))
+                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
                         member.Update(state, model.Presences[i]);
                     else
-                        cachedPresences.TryAdd(model.Presences[i].User.Id, model.Presences[i]);
+                        Debug.Assert(false);
                 }
             }
             _members = members;
-            _cachedPresences = cachedPresences;
             MemberCount = model.MemberCount;
 
             var voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.VoiceStates.Length * 1.05));
@@ -216,20 +213,21 @@ namespace Discord.WebSocket
                     members.TryAdd(member.Id, member);
                 }
                 DownloadedMemberCount = members.Count;
-            }
-            var cachedPresences = new ConcurrentDictionary<ulong, PresenceModel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Presences.Length * 1.05));
-            {
+
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
                     SocketGuildUser member;
-                    if (_members.TryGetValue(model.Presences[i].User.Id, out member))
+                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
                         member.Update(state, model.Presences[i]);
                     else
-                        cachedPresences.TryAdd(model.Presences[i].User.Id, model.Presences[i]);
+                        Debug.Assert(false);
                 }
             }
             _members = members;
-            _cachedPresences = cachedPresences;
+
+            var _ = _syncPromise.TrySetResultAsync(true);
+            if (!model.Large)
+                _ = _downloaderPromise.TrySetResultAsync(true);
         }
 
         internal void Update(ClientState state, EmojiUpdateModel model)
