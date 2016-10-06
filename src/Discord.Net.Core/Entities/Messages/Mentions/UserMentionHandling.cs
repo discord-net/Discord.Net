@@ -5,6 +5,7 @@
         Ignore = 0,
         Remove,
         Name,
-        NameAndDiscriminator
+        NameAndDiscriminator,
+        Sanitize
     }
 }

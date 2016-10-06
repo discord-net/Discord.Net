@@ -102,9 +102,9 @@ namespace Discord.Rest
             {
                 var text = model.Content.Value;
                 
-                _mentionedUsers = MentionsHelper.GetUserMentions(text, null, mentions);
-                _mentionedChannelIds = MentionsHelper.GetChannelMentions(text, null);
-                _mentionedRoles = MentionsHelper.GetRoleMentions<RestRole>(text, null);
+                _mentionedUsers = MentionUtils.GetUserMentions(text, null, mentions);
+                _mentionedChannelIds = MentionUtils.GetChannelMentions(text, null);
+                _mentionedRoles = MentionUtils.GetRoleMentions<RestRole>(text, null);
                 model.Content = text;
             }
         }
@@ -128,10 +128,10 @@ namespace Discord.Rest
         public string Resolve(string text, UserMentionHandling userHandling, ChannelMentionHandling channelHandling, 
             RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
         {
-            text = MentionsHelper.ResolveUserMentions(text, null, MentionedUsers, userHandling);
-            text = MentionsHelper.ResolveChannelMentions(text, null, channelHandling);
-            text = MentionsHelper.ResolveRoleMentions(text, MentionedRoles, roleHandling);
-            text = MentionsHelper.ResolveEveryoneMentions(text, everyoneHandling);
+            text = MentionUtils.ResolveUserMentions(text, null, MentionedUsers, userHandling);
+            text = MentionUtils.ResolveChannelMentions(text, null, channelHandling);
+            text = MentionUtils.ResolveRoleMentions(text, MentionedRoles, roleHandling);
+            text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
             return text;
         }
 

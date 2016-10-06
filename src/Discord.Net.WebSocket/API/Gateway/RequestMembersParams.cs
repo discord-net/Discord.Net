@@ -1,7 +1,6 @@
 ﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.API.Gateway
 {
@@ -14,6 +13,6 @@ namespace Discord.API.Gateway
         public int Limit { get; set; }
 
         [JsonProperty("guild_id")]
-        private ulong[] GuildIds { get; set; }
+        public IEnumerable<ulong> GuildIds { get; set; }
     }
 }

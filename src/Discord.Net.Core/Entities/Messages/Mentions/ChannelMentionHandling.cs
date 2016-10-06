@@ -4,6 +4,7 @@
     {
         Ignore = 0,
         Remove,
-        Name
+        Name,
+        Sanitize
     }
 }
