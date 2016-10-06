@@ -30,7 +30,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
-        private ImmutableArray<Emoji> _emojis;
+        private ImmutableArray<GuildEmoji> _emojis;
         private ImmutableArray<string> _features;
         internal bool _available;
 
@@ -69,7 +69,7 @@ namespace Discord.WebSocket
                 return channels.Select(x => state.GetChannel(x) as SocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
-        public IReadOnlyCollection<Emoji> Emojis => _emojis;
+        public IReadOnlyCollection<GuildEmoji> Emojis => _emojis;
         public IReadOnlyCollection<string> Features => _features;
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
@@ -79,7 +79,7 @@ namespace Discord.WebSocket
             : base(client, id)
         {
             _audioLock = new SemaphoreSlim(1, 1);
-            _emojis = ImmutableArray.Create<Emoji>();
+            _emojis = ImmutableArray.Create<GuildEmoji>();
             _features = ImmutableArray.Create<string>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
@@ -179,13 +179,13 @@ namespace Discord.WebSocket
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
+                var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(Emoji.Create(model.Emojis[i]));
+                    emojis.Add(GuildEmoji.Create(model.Emojis[i]));
                 _emojis = emojis.ToImmutable();
             }
             else
-                _emojis = ImmutableArray.Create<Emoji>();
+                _emojis = ImmutableArray.Create<GuildEmoji>();
 
             if (model.Features != null)
                 _features = model.Features.ToImmutableArray();
@@ -232,9 +232,9 @@ namespace Discord.WebSocket
 
         internal void Update(ClientState state, EmojiUpdateModel model)
         {
-            var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
+            var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
-                emojis.Add(Emoji.Create(model.Emojis[i]));
+                emojis.Add(GuildEmoji.Create(model.Emojis[i]));
             _emojis = emojis.ToImmutable();
         }
 

@@ -6,7 +6,7 @@ using Model = Discord.API.Emoji;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct Emoji
+    public struct GuildEmoji
     {
         public ulong Id { get; }
         public string Name { get; }
@@ -14,7 +14,7 @@ namespace Discord
         public bool RequireColons { get; }
         public IReadOnlyList<ulong> RoleIds { get; }
 
-        private Emoji(ulong id, string name, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds)
+        private GuildEmoji(ulong id, string name, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds)
         {
             Id = id;
             Name = name;
@@ -22,9 +22,9 @@ namespace Discord
             RequireColons = requireColons;
             RoleIds = roleIds;
         }
-        internal static Emoji Create(Model model)
+        internal static GuildEmoji Create(Model model)
         {
-            return new Emoji(model.Id, model.Name, model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
+            return new GuildEmoji(model.Id, model.Name, model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
         }
 
         public override string ToString() => Name;

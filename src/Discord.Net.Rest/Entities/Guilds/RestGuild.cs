@@ -13,7 +13,7 @@ namespace Discord.Rest
     public class RestGuild : RestEntity<ulong>, IGuild, IUpdateable
     {
         private ImmutableDictionary<ulong, RestRole> _roles;
-        private ImmutableArray<Emoji> _emojis;
+        private ImmutableArray<GuildEmoji> _emojis;
         private ImmutableArray<string> _features;
 
         public string Name { get; private set; }
@@ -37,7 +37,7 @@ namespace Discord.Rest
 
         public RestRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
-        public IReadOnlyCollection<Emoji> Emojis => _emojis;
+        public IReadOnlyCollection<GuildEmoji> Emojis => _emojis;
         public IReadOnlyCollection<string> Features => _features;
 
         internal RestGuild(BaseDiscordClient client, ulong id)
@@ -67,13 +67,13 @@ namespace Discord.Rest
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<Emoji>(model.Emojis.Length);
+                var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(Emoji.Create(model.Emojis[i]));
+                    emojis.Add(GuildEmoji.Create(model.Emojis[i]));
                 _emojis = emojis.ToImmutableArray();
             }
             else
-                _emojis = ImmutableArray.Create<Emoji>();
+                _emojis = ImmutableArray.Create<GuildEmoji>();
 
             if (model.Features != null)
                 _features = model.Features.ToImmutableArray();
