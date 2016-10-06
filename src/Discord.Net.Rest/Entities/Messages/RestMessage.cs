@@ -19,11 +19,12 @@ namespace Discord.Rest
         public virtual bool IsPinned => false;
         public virtual bool IsWebhook => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
-        public virtual IReadOnlyCollection<IAttachment> Attachments => ImmutableArray.Create<IAttachment>();
-        public virtual IReadOnlyCollection<IEmbed> Embeds => ImmutableArray.Create<IEmbed>();
+        public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
+        public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
+        public virtual IReadOnlyCollection<Emoji> Emojis => ImmutableArray.Create<Emoji>();
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
-        public virtual IReadOnlyCollection<IRole> MentionedRoles => ImmutableArray.Create<IRole>();
-        public virtual IReadOnlyCollection<IUser> MentionedUsers => ImmutableArray.Create<IUser>();
+        public virtual IReadOnlyCollection<RestRole> MentionedRoles => ImmutableArray.Create<RestRole>();
+        public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -57,5 +58,9 @@ namespace Discord.Rest
         public override string ToString() => Content;
 
         MessageType IMessage.Type => MessageType.Default;
+        IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
+        IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+        IReadOnlyCollection<IRole> IMessage.MentionedRoles => MentionedRoles;
+        IReadOnlyCollection<IUser> IMessage.MentionedUsers => MentionedUsers;
     }
 }

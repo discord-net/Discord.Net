@@ -4,7 +4,7 @@ using Model = Discord.API.Attachment;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestAttachment : IAttachment
+    public class Attachment : IAttachment
     {
         public ulong Id { get; }
         public string Filename { get; }
@@ -14,7 +14,7 @@ namespace Discord
         public int? Height { get; }
         public int? Width { get; }
 
-        internal RestAttachment(ulong id, string filename, string url, string proxyUrl, int size, int? height, int? width)
+        internal Attachment(ulong id, string filename, string url, string proxyUrl, int size, int? height, int? width)
         {
             Id = id;
             Filename = filename;
@@ -24,9 +24,9 @@ namespace Discord
             Height = height;
             Width = width;
         }
-        internal static RestAttachment Create(Model model)
+        internal static Attachment Create(Model model)
         {
-            return new RestAttachment(model.Id, model.Filename, model.Url, model.ProxyUrl, model.Size,
+            return new Attachment(model.Id, model.Filename, model.Url, model.ProxyUrl, model.Size,
                 model.Height.IsSpecified ? model.Height.Value : (int?)null,
                 model.Width.IsSpecified ? model.Width.Value : (int?)null);
         }

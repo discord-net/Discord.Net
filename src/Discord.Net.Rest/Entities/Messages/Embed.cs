@@ -4,7 +4,7 @@ using Model = Discord.API.Embed;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestEmbed : IEmbed
+    public class Embed : IEmbed
     {
         public string Description { get; }
         public string Url { get; }
@@ -13,7 +13,7 @@ namespace Discord
         public EmbedProvider? Provider { get; }
         public EmbedThumbnail? Thumbnail { get; }
 
-        internal RestEmbed(string type, string title, string description, string url, EmbedProvider? provider, EmbedThumbnail? thumbnail)
+        internal Embed(string type, string title, string description, string url, EmbedProvider? provider, EmbedThumbnail? thumbnail)
         {
             Type = type;
             Title = title;
@@ -22,9 +22,9 @@ namespace Discord
             Provider = provider;
             Thumbnail = thumbnail;
         }
-        internal static RestEmbed Create(Model model)
+        internal static Embed Create(Model model)
         {
-            return new RestEmbed(model.Type, model.Title, model.Description, model.Url,
+            return new Embed(model.Type, model.Title, model.Description, model.Url,
                 model.Provider.IsSpecified ? EmbedProvider.Create(model.Provider.Value) : (EmbedProvider?)null,
                 model.Thumbnail.IsSpecified ? EmbedThumbnail.Create(model.Thumbnail.Value) : (EmbedThumbnail?)null);
         }

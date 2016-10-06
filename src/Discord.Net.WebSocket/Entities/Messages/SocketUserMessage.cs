@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -14,11 +15,12 @@ namespace Discord.WebSocket
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ImmutableArray<RestAttachment> _attachments;
-        private ImmutableArray<RestEmbed> _embeds;
-        private ImmutableArray<ulong> _mentionedChannelIds;
-        private ImmutableArray<RestRole> _mentionedRoles;
-        private ImmutableArray<RestUser> _mentionedUsers;
+        private ImmutableArray<Attachment> _attachments;
+        private ImmutableArray<Embed> _embeds;
+        private ImmutableArray<Emoji> _emojis;
+        private ImmutableArray<SocketGuildChannel> _mentionedChannels;
+        private ImmutableArray<SocketRole> _mentionedRoles;
+        private ImmutableArray<SocketUser> _mentionedUsers;
 
         public ulong? WebhookId { get; private set; }
 
@@ -27,11 +29,12 @@ namespace Discord.WebSocket
         public override bool IsWebhook => WebhookId != null;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
 
-        public override IReadOnlyCollection<IAttachment> Attachments => _attachments;
-        public override IReadOnlyCollection<IEmbed> Embeds => _embeds;
-        public override IReadOnlyCollection<ulong> MentionedChannelIds => _mentionedChannelIds;
-        public override IReadOnlyCollection<IRole> MentionedRoles => _mentionedRoles;
-        public override IReadOnlyCollection<IUser> MentionedUsers => _mentionedUsers;
+        public override IReadOnlyCollection<Attachment> Attachments => _attachments;
+        public override IReadOnlyCollection<Embed> Embeds => _embeds;
+        public override IReadOnlyCollection<Emoji> Emojis => _emojis;
+        public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => _mentionedChannels;
+        public override IReadOnlyCollection<SocketRole> MentionedRoles => _mentionedRoles;
+        public override IReadOnlyCollection<SocketUser> MentionedUsers => _mentionedUsers;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id, channel, author)
@@ -64,13 +67,13 @@ namespace Discord.WebSocket
                 var value = model.Attachments.Value;
                 if (value.Length > 0)
                 {
-                    var attachments = ImmutableArray.CreateBuilder<RestAttachment>(value.Length);
+                    var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        attachments.Add(RestAttachment.Create(value[i]));
+                        attachments.Add(Attachment.Create(value[i]));
                     _attachments = attachments.ToImmutable();
                 }
                 else
-                    _attachments = ImmutableArray.Create<RestAttachment>();
+                    _attachments = ImmutableArray.Create<Attachment>();
             }
 
             if (model.Embeds.IsSpecified)
@@ -78,24 +81,24 @@ namespace Discord.WebSocket
                 var value = model.Embeds.Value;
                 if (value.Length > 0)
                 {
-                    var embeds = ImmutableArray.CreateBuilder<RestEmbed>(value.Length);
+                    var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        embeds.Add(RestEmbed.Create(value[i]));
+                        embeds.Add(Embed.Create(value[i]));
                     _embeds = embeds.ToImmutable();
                 }
                 else
-                    _embeds = ImmutableArray.Create<RestEmbed>();
+                    _embeds = ImmutableArray.Create<Embed>();
             }
 
-            ImmutableArray<RestUser> mentions = ImmutableArray.Create<RestUser>();
+            ImmutableArray<SocketUser> mentions = ImmutableArray.Create<SocketUser>();
             if (model.Mentions.IsSpecified)
             {
                 var value = model.Mentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        newMentions.Add(RestUser.Create(Discord, value[i]));
+                        newMentions.Add(SocketSimpleUser.Create(Discord, Discord.State, value[i]));
                     mentions = newMentions.ToImmutable();
                 }
             }
@@ -106,8 +109,11 @@ namespace Discord.WebSocket
                 var guild = (Channel as SocketGuildChannel)?.Guild;
 
                 _mentionedUsers = MentionUtils.GetUserMentions(text, Channel, mentions);
-                _mentionedChannelIds = MentionUtils.GetChannelMentions(text, guild);
-                _mentionedRoles = MentionUtils.GetRoleMentions<RestRole>(text, guild);
+                _mentionedChannels = MentionUtils.GetChannelMentions(text, guild)
+                    .Select(x => guild?.GetChannel(x))
+                    .Where(x => x != null).ToImmutableArray();
+                _mentionedRoles = MentionUtils.GetRoleMentions<SocketRole>(text, guild);
+                _emojis = MessageHelper.GetEmojis(text);
                 model.Content = text;
             }
         }

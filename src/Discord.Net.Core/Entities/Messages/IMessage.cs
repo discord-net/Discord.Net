@@ -27,6 +27,8 @@ namespace Discord
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary> Returns a collection of all embeds included in this message. </summary>
         IReadOnlyCollection<IEmbed> Embeds { get; }
+        /// <summary> Returns a collection of all custom emoji included in this message. </summary>
+        IReadOnlyCollection<Emoji> Emojis { get; }
         /// <summary> Returns a collection of channel ids mentioned in this message. </summary>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
         /// <summary> Returns a collection of roles mentioned in this message. </summary>

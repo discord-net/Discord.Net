@@ -12,5 +12,7 @@
             => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
         public static string GetChannelIconUrl(ulong channelId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}channel-icons/{channelId}/{iconId}.jpg" : null;
+        public static string GetEmojiUrl(ulong emojiId)
+            => $"{DiscordConfig.CDNUrl}emojis/{emojiId}.png";
     }
 }

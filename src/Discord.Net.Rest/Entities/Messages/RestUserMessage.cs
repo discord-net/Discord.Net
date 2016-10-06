@@ -13,8 +13,9 @@ namespace Discord.Rest
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ImmutableArray<RestAttachment> _attachments;
-        private ImmutableArray<RestEmbed> _embeds;
+        private ImmutableArray<Attachment> _attachments;
+        private ImmutableArray<Embed> _embeds;
+        private ImmutableArray<Emoji> _emojis;
         private ImmutableArray<ulong> _mentionedChannelIds;
         private ImmutableArray<RestRole> _mentionedRoles;
         private ImmutableArray<RestUser> _mentionedUsers;
@@ -25,11 +26,12 @@ namespace Discord.Rest
         public override bool IsPinned => _isPinned;
         public override bool IsWebhook => WebhookId != null;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
-        public override IReadOnlyCollection<IAttachment> Attachments => _attachments;
-        public override IReadOnlyCollection<IEmbed> Embeds => _embeds;
+        public override IReadOnlyCollection<Attachment> Attachments => _attachments;
+        public override IReadOnlyCollection<Embed> Embeds => _embeds;
+        public override IReadOnlyCollection<Emoji> Emojis => _emojis;
         public override IReadOnlyCollection<ulong> MentionedChannelIds => _mentionedChannelIds;
-        public override IReadOnlyCollection<IRole> MentionedRoles => _mentionedRoles;
-        public override IReadOnlyCollection<IUser> MentionedUsers => _mentionedUsers;
+        public override IReadOnlyCollection<RestRole> MentionedRoles => _mentionedRoles;
+        public override IReadOnlyCollection<RestUser> MentionedUsers => _mentionedUsers;
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId)
             : base(discord, id, channelId)
@@ -62,13 +64,13 @@ namespace Discord.Rest
                 var value = model.Attachments.Value;
                 if (value.Length > 0)
                 {
-                    var attachments = ImmutableArray.CreateBuilder<RestAttachment>(value.Length);
+                    var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        attachments.Add(RestAttachment.Create(value[i]));
+                        attachments.Add(Attachment.Create(value[i]));
                     _attachments = attachments.ToImmutable();
                 }
                 else
-                    _attachments = ImmutableArray.Create<RestAttachment>();
+                    _attachments = ImmutableArray.Create<Attachment>();
             }
 
             if (model.Embeds.IsSpecified)
@@ -76,13 +78,13 @@ namespace Discord.Rest
                 var value = model.Embeds.Value;
                 if (value.Length > 0)
                 {
-                    var embeds = ImmutableArray.CreateBuilder<RestEmbed>(value.Length);
+                    var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        embeds.Add(RestEmbed.Create(value[i]));
+                        embeds.Add(Embed.Create(value[i]));
                     _embeds = embeds.ToImmutable();
                 }
                 else
-                    _embeds = ImmutableArray.Create<RestEmbed>();
+                    _embeds = ImmutableArray.Create<Embed>();
             }
 
             ImmutableArray<RestUser> mentions = ImmutableArray.Create<RestUser>();
@@ -105,6 +107,7 @@ namespace Discord.Rest
                 _mentionedUsers = MentionUtils.GetUserMentions(text, null, mentions);
                 _mentionedChannelIds = MentionUtils.GetChannelMentions(text, null);
                 _mentionedRoles = MentionUtils.GetRoleMentions<RestRole>(text, null);
+                _emojis = MessageHelper.GetEmojis(text);
                 model.Content = text;
             }
         }
