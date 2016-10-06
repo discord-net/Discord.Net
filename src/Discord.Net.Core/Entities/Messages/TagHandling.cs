@@ -1,11 +1,11 @@
 ﻿namespace Discord
 {
-    public enum UserMentionHandling
+    public enum TagHandling
     {
         Ignore = 0,
         Remove,
         Name,
-        NameAndDiscriminator,
+        FullName,
         Sanitize
     }
 }

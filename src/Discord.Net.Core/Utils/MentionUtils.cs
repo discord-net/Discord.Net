@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Discord
 {
     public static class MentionUtils
     {
         private const char SanitizeChar = '\x200b';
-
-        private static readonly Regex _userRegex = new Regex(@"<@!?([0-9]+)>", RegexOptions.Compiled);
-        private static readonly Regex _channelRegex = new Regex(@"<#([0-9]+)>", RegexOptions.Compiled);
-        private static readonly Regex _roleRegex = new Regex(@"<@&([0-9]+)>", RegexOptions.Compiled);
 
         //If the system can't be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
         internal static string MentionUser(string id, bool useNickname = true) => useNickname ? $"<@!{id}>" : $"<@{id}>";
@@ -24,25 +17,24 @@ namespace Discord
         public static string MentionRole(ulong id) => MentionRole(id.ToString());
 
         /// <summary> Parses a provided user mention string. </summary>
-        public static ulong ParseUser(string mentionText)
+        public static ulong ParseUser(string text)
         {
             ulong id;
-            if (TryParseUser(mentionText, out id))
+            if (TryParseUser(text, out id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(mentionText));
+            throw new ArgumentException("Invalid mention format", nameof(text));
         }
         /// <summary> Tries to parse a provided user mention string. </summary>
-        public static bool TryParseUser(string mentionText, out ulong userId)
+        public static bool TryParseUser(string text, out ulong userId)
         {
-            mentionText = mentionText.Trim();
-            if (mentionText.Length >= 3 && mentionText[0] == '<' && mentionText[1] == '@' && mentionText[mentionText.Length - 1] == '>')
+            if (text.Length >= 3 && text[0] == '<' && text[1] == '@' && text[text.Length - 1] == '>')
             {
-                if (mentionText.Length >= 4 && mentionText[2] == '!')
-                    mentionText = mentionText.Substring(3, mentionText.Length - 4); //<@!123>
+                if (text.Length >= 4 && text[2] == '!')
+                    text = text.Substring(3, text.Length - 4); //<@!123>
                 else
-                    mentionText = mentionText.Substring(2, mentionText.Length - 3); //<@123>
+                    text = text.Substring(2, text.Length - 3); //<@123>
                 
-                if (ulong.TryParse(mentionText, NumberStyles.None, CultureInfo.InvariantCulture, out userId))
+                if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out userId))
                     return true;
             }
             userId = 0;
@@ -50,22 +42,21 @@ namespace Discord
         }
 
         /// <summary> Parses a provided channel mention string. </summary>
-        public static ulong ParseChannel(string mentionText)
+        public static ulong ParseChannel(string text)
         {
             ulong id;
-            if (TryParseChannel(mentionText, out id))
+            if (TryParseChannel(text, out id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(mentionText));
+            throw new ArgumentException("Invalid mention format", nameof(text));
         }
         /// <summary>Tries to parse a provided channel mention string. </summary>
-        public static bool TryParseChannel(string mentionText, out ulong channelId)
+        public static bool TryParseChannel(string text, out ulong channelId)
         {
-            mentionText = mentionText.Trim();
-            if (mentionText.Length >= 3 && mentionText[0] == '<' && mentionText[1] == '#' && mentionText[mentionText.Length - 1] == '>')
+            if (text.Length >= 3 && text[0] == '<' && text[1] == '#' && text[text.Length - 1] == '>')
             {
-                mentionText = mentionText.Substring(2, mentionText.Length - 3); //<#123>
+                text = text.Substring(2, text.Length - 3); //<#123>
                 
-                if (ulong.TryParse(mentionText, NumberStyles.None, CultureInfo.InvariantCulture, out channelId))
+                if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out channelId))
                     return true;
             }
             channelId = 0;
@@ -73,212 +64,175 @@ namespace Discord
         }
 
         /// <summary> Parses a provided role mention string. </summary>
-        public static ulong ParseRole(string mentionText)
+        public static ulong ParseRole(string text)
         {
             ulong id;
-            if (TryParseRole(mentionText, out id))
+            if (TryParseRole(text, out id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(mentionText));
+            throw new ArgumentException("Invalid mention format", nameof(text));
         }
         /// <summary>Tries to parse a provided role mention string. </summary>
-        public static bool TryParseRole(string mentionText, out ulong roleId)
+        public static bool TryParseRole(string text, out ulong roleId)
         {
-            mentionText = mentionText.Trim();
-            if (mentionText.Length >= 4 && mentionText[0] == '<' && mentionText[1] == '@' && mentionText[2] == '&' && mentionText[mentionText.Length - 1] == '>')
+            if (text.Length >= 4 && text[0] == '<' && text[1] == '@' && text[2] == '&' && text[text.Length - 1] == '>')
             {
-                mentionText = mentionText.Substring(3, mentionText.Length - 4); //<@&123>
+                text = text.Substring(3, text.Length - 4); //<@&123>
                 
-                if (ulong.TryParse(mentionText, NumberStyles.None, CultureInfo.InvariantCulture, out roleId))
+                if (ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out roleId))
                     return true;
             }
             roleId = 0;
             return false;
         }
 
-        internal static ImmutableArray<TUser> GetUserMentions<TUser>(string text, IMessageChannel channel, IReadOnlyCollection<TUser> mentionedUsers)
-            where TUser : class, IUser
+        internal static string Resolve(IMessage msg, TagHandling userHandling, TagHandling channelHandling, TagHandling roleHandling, TagHandling everyoneHandling, TagHandling emojiHandling)
         {
-            var matches = _userRegex.Matches(text);
-            var builder = ImmutableArray.CreateBuilder<TUser>(matches.Count);
-            foreach (var match in matches.OfType<Match>())
+            var text = new StringBuilder(msg.Content);
+            var tags = msg.Tags;
+            int indexOffset = 0;
+
+            foreach (var tag in tags)
             {
-                ulong id;
-                if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                string newText = "";
+                switch (tag.Type)
                 {
-                    TUser user = null;
-
-                    //Verify this user was actually mentioned
-                    foreach (var userMention in mentionedUsers)
-                    {
-                        if (userMention.Id == id)
-                        {
-                            user = channel?.GetUserAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult() as TUser;
-                            if (user == null) //User not found, fallback to basic mention info
-                                user = userMention;
-                            break;
-                        }
-                    }
-
-                    if (user != null)
-                        builder.Add(user);
+                    case TagType.UserMention:
+                        if (userHandling == TagHandling.Ignore) continue;
+                        newText = ResolveUserMention(tag, userHandling);
+                        break;
+                    case TagType.ChannelMention:
+                        if (channelHandling == TagHandling.Ignore) continue;
+                        newText = ResolveChannelMention(tag, channelHandling);
+                        break;
+                    case TagType.RoleMention:
+                        if (roleHandling == TagHandling.Ignore) continue;
+                        newText = ResolveRoleMention(tag, roleHandling);
+                        break;
+                    case TagType.EveryoneMention:
+                        if (everyoneHandling == TagHandling.Ignore) continue;
+                        newText = ResolveEveryoneMention(tag, everyoneHandling);
+                        break;
+                    case TagType.HereMention:
+                        if (everyoneHandling == TagHandling.Ignore) continue;
+                        newText = ResolveHereMention(tag, everyoneHandling);
+                        break;
+                    case TagType.Emoji:
+                        if (emojiHandling == TagHandling.Ignore) continue;
+                        newText = ResolveEmoji(tag, emojiHandling);
+                        break;
+                }
+                text.Remove(tag.Index, tag.Length);
+                text.Insert(tag.Index, newText);
+                indexOffset += newText.Length - tag.Length;
+            }
+            return text.ToString();
+        }
+        internal static string ResolveUserMention(ITag tag, TagHandling mode)
+        {
+            if (mode != TagHandling.Remove)
+            {
+                var user = tag.Value as IUser;
+                switch (mode)
+                {
+                    case TagHandling.Name:
+                        if (user != null)
+                            return $"@{(user as IGuildUser)?.Nickname ?? user?.Username}";
+                        else
+                            return $"@unknown-user";
+                    case TagHandling.FullName:
+                        if (user != null)
+                            return $"@{(user as IGuildUser)?.Nickname ?? user?.Username}#{user.Discriminator}";
+                        else
+                            return $"@unknown-user";
+                    case TagHandling.Sanitize:
+                        return MentionUser($"{SanitizeChar}{tag.Key}");
                 }
             }
-            return builder.ToImmutable();
+            return "";
         }
-        internal static ImmutableArray<ulong> GetChannelMentions(string text, IGuild guild)
+        internal static string ResolveChannelMention(ITag tag, TagHandling mode)
         {
-            var matches = _channelRegex.Matches(text);
-            var builder = ImmutableArray.CreateBuilder<ulong>(matches.Count);
-            foreach (var match in matches.OfType<Match>())
+            if (mode != TagHandling.Remove)
             {
-                ulong id;
-                if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                    builder.Add(id);
-            }
-            return builder.ToImmutable();
-        }
-        internal static ImmutableArray<TRole> GetRoleMentions<TRole>(string text, IGuild guild)
-            where TRole : class, IRole
-        {
-            if (guild == null)
-                return ImmutableArray.Create<TRole>();
-
-            var matches = _roleRegex.Matches(text);
-            var builder = ImmutableArray.CreateBuilder<TRole>(matches.Count);
-            foreach (var match in matches.OfType<Match>())
-            {
-                ulong id;
-                if (ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                var channel = tag.Value as IChannel;
+                switch (mode)
                 {
-                    var role = guild.GetRole(id) as TRole;
-                    if (role != null)
-                        builder.Add(role);
+                    case TagHandling.Name:
+                    case TagHandling.FullName:
+                        if (channel != null)
+                            return $"#{channel.Name}";
+                        else
+                            return $"#deleted-channel";
+                    case TagHandling.Sanitize:
+                        return MentionChannel($"{SanitizeChar}{tag.Key}");
                 }
             }
-            return builder.ToImmutable();
+            return "";
         }
-
-        internal static string ResolveUserMentions(string text, IMessageChannel channel, IReadOnlyCollection<IUser> mentions, UserMentionHandling mode)
+        internal static string ResolveRoleMention(ITag tag, TagHandling mode)
         {
-            if (mode == UserMentionHandling.Ignore) return text;
-
-            return _userRegex.Replace(text, new MatchEvaluator(e =>
+            if (mode != TagHandling.Remove)
             {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                var role = tag.Value as IRole;
+                switch (mode)
                 {
-                    IUser user = null;
-                    foreach (var mention in mentions)
-                    {
-                        if (mention.Id == id)
-                        {
-                            user = mention;
-                            break;
-                        }
-                    }
-                    if (user != null)
-                    {
-                        string name = user.Username;
-
-                        var guildUser = user as IGuildUser;
-                        if (e.Value[2] == '!')
-                        {
-                            if (guildUser != null && guildUser.Nickname != null)
-                                name = guildUser.Nickname;
-                        }
-
-                        switch (mode)
-                        {
-                            case UserMentionHandling.Name:
-                                return $"@{name}";
-                            case UserMentionHandling.NameAndDiscriminator:
-                                return $"@{name}#{user.Discriminator}";
-                            case UserMentionHandling.Sanitize:
-                                return MentionUser($"{SanitizeChar}{id}");
-                            case UserMentionHandling.Remove:
-                            default:
-                                return "";
-                        }
-                    }
+                    case TagHandling.Name:
+                    case TagHandling.FullName:
+                        if (role != null)
+                            return $"@{role.Name}";
+                        else
+                            return $"@deleted-role";
+                    case TagHandling.Sanitize:
+                        return MentionRole($"{SanitizeChar}{tag.Key}");
                 }
-                return e.Value;
-            }));
-        }
-        internal static string ResolveChannelMentions(string text, IGuild guild, ChannelMentionHandling mode)
-        {
-            if (mode == ChannelMentionHandling.Ignore) return text;
-
-            return _channelRegex.Replace(text, new MatchEvaluator(e =>
-            {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                {
-                    switch (mode)
-                    {
-                        case ChannelMentionHandling.Name:
-                            IGuildChannel channel = null;
-                            channel = guild.GetChannelAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
-                            if (channel != null)
-                                return $"#{channel.Name}";
-                            else
-                                return $"#deleted-channel";
-                        case ChannelMentionHandling.Sanitize:
-                            return MentionChannel($"{SanitizeChar}{id}");
-                        case ChannelMentionHandling.Remove:
-                        default:
-                            return "";
-                    }
-                }
-                return e.Value;
-            }));
-        }
-        internal static string ResolveRoleMentions(string text, IReadOnlyCollection<IRole> mentions, RoleMentionHandling mode)
-        {
-            if (mode == RoleMentionHandling.Ignore) return text;
-
-            return _roleRegex.Replace(text, new MatchEvaluator(e =>
-            {
-                ulong id;
-                if (ulong.TryParse(e.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                {
-                    switch (mode)
-                    {
-                        case RoleMentionHandling.Name:
-                            IRole role = null;
-                            foreach (var mention in mentions)
-                            {
-                                if (mention.Id == id)
-                                {
-                                    role = mention;
-                                    break;
-                                }
-                            }
-                            if (role != null)
-                                return $"{role.Name}";
-                            else
-                                return $"deleted-role";
-                        case RoleMentionHandling.Sanitize:
-                            return MentionRole($"{SanitizeChar}{id}");
-                        case RoleMentionHandling.Remove:
-                        default:
-                            return "";
-                    }
-                }
-                return e.Value;
-            }));
-        }
-        internal static string ResolveEveryoneMentions(string text, EveryoneMentionHandling mode)
-        {
-            if (mode == EveryoneMentionHandling.Ignore) return text;
-
-            switch (mode)
-            {
-                case EveryoneMentionHandling.Sanitize:
-                    return text.Replace("@everyone", $"@{SanitizeChar}everyone").Replace("@here", $"@{SanitizeChar}here");
-                case EveryoneMentionHandling.Remove:
-                default:
-                    return text.Replace("@everyone", "").Replace("@here", "");
             }
+            return "";
+        }
+        internal static string ResolveEveryoneMention(ITag tag, TagHandling mode)
+        {
+            if (mode != TagHandling.Remove)
+            {
+                switch (mode)
+                {
+                    case TagHandling.Name:
+                    case TagHandling.FullName:
+                        return "@everyone";
+                    case TagHandling.Sanitize:
+                        return $"@{SanitizeChar}everyone";
+                }
+            }
+            return "";
+        }
+        internal static string ResolveHereMention(ITag tag, TagHandling mode)
+        {
+            if (mode != TagHandling.Remove)
+            {
+                switch (mode)
+                {
+                    case TagHandling.Name:
+                    case TagHandling.FullName:
+                        return "@everyone";
+                    case TagHandling.Sanitize:
+                        return $"@{SanitizeChar}everyone";
+                }
+            }
+            return "";
+        }
+        internal static string ResolveEmoji(ITag tag, TagHandling mode)
+        {
+            if (mode != TagHandling.Remove)
+            {
+                Emoji emoji = (Emoji)tag.Value;
+                switch (mode)
+                {
+                    case TagHandling.Name:
+                    case TagHandling.FullName:
+                        return $":{emoji.Name}:";
+                    case TagHandling.Sanitize:
+                        return $"<@{SanitizeChar}everyone";
+                }
+            }
+            return "";
         }
     }
 }

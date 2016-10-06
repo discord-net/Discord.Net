@@ -22,10 +22,10 @@ namespace Discord.WebSocket
 
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
-        public virtual IReadOnlyCollection<Emoji> Emojis => ImmutableArray.Create<Emoji>();
         public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
+        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 

@@ -63,13 +63,13 @@ namespace Discord.Rest
 
         //Messages
         public static async Task<RestMessage> GetMessageAsync(IChannel channel, BaseDiscordClient client, 
-            ulong id, RequestOptions options)
+            ulong id, IGuild guild, RequestOptions options)
         {
             var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
-            return RestMessage.Create(client, model);
+            return RestMessage.Create(client, guild, model);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IChannel channel, BaseDiscordClient client, 
-            ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
+            ulong? fromMessageId, Direction dir, int limit, IGuild guild, RequestOptions options)
         {
             //TODO: Test this with Around direction
             return new PagedAsyncEnumerable<RestMessage>(
@@ -84,7 +84,7 @@ namespace Discord.Rest
                     if (info.Position != null)
                         args.RelativeMessageId = info.Position.Value;
                     var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options);
-                    return models.Select(x => RestMessage.Create(client, x)).ToImmutableArray(); ;
+                    return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray(); ;
                 },
                 nextPage: (info, lastPage) =>
                 {
@@ -99,34 +99,34 @@ namespace Discord.Rest
                 count: limit
             );
         }
-        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client, 
-            RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client,
+            IGuild guild, RequestOptions options)
         {
             var models = await client.ApiClient.GetPinsAsync(channel.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestMessage.Create(client, x)).ToImmutableArray();
+            return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray();
         }
 
         public static async Task<RestUserMessage> SendMessageAsync(IChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, RequestOptions options)
+            string text, bool isTTS, IGuild guild, RequestOptions options)
         {
             var args = new CreateMessageParams(text) { IsTTS = isTTS };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
-            return RestUserMessage.Create(client, model);
+            return RestUserMessage.Create(client, guild, model);
         }
 
         public static Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, RequestOptions options)
+            string filePath, string text, bool isTTS, IGuild guild, RequestOptions options)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return SendFileAsync(channel, client, file, filename, text, isTTS, options);
+                return SendFileAsync(channel, client, file, filename, text, isTTS, guild, options);
         }
         public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, RequestOptions options)
+            Stream stream, string filename, string text, bool isTTS, IGuild guild, RequestOptions options)
         {
             var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
-            return RestUserMessage.Create(client, model);
+            return RestUserMessage.Create(client, guild, model);
         }
 
         public static async Task DeleteMessagesAsync(IChannel channel, BaseDiscordClient client, 

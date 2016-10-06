@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -17,10 +16,7 @@ namespace Discord.WebSocket
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
-        private ImmutableArray<Emoji> _emojis;
-        private ImmutableArray<SocketGuildChannel> _mentionedChannels;
-        private ImmutableArray<SocketRole> _mentionedRoles;
-        private ImmutableArray<SocketUser> _mentionedUsers;
+        private ImmutableArray<ITag> _tags;
 
         public ulong? WebhookId { get; private set; }
 
@@ -31,10 +27,10 @@ namespace Discord.WebSocket
 
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
-        public override IReadOnlyCollection<Emoji> Emojis => _emojis;
-        public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => _mentionedChannels;
-        public override IReadOnlyCollection<SocketRole> MentionedRoles => _mentionedRoles;
-        public override IReadOnlyCollection<SocketUser> MentionedUsers => _mentionedUsers;
+        public override IReadOnlyCollection<ITag> Tags => _tags;
+        public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
+        public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
+        public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id, channel, author)
@@ -90,13 +86,13 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            ImmutableArray<SocketUser> mentions = ImmutableArray.Create<SocketUser>();
+            ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
             if (model.Mentions.IsSpecified)
             {
                 var value = model.Mentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
+                    var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         newMentions.Add(SocketSimpleUser.Create(Discord, Discord.State, value[i]));
                     mentions = newMentions.ToImmutable();
@@ -107,13 +103,7 @@ namespace Discord.WebSocket
             {
                 var text = model.Content.Value;
                 var guild = (Channel as SocketGuildChannel)?.Guild;
-
-                _mentionedUsers = MentionUtils.GetUserMentions(text, Channel, mentions);
-                _mentionedChannels = MentionUtils.GetChannelMentions(text, guild)
-                    .Select(x => guild?.GetChannel(x))
-                    .Where(x => x != null).ToImmutableArray();
-                _mentionedRoles = MentionUtils.GetRoleMentions<SocketRole>(text, guild);
-                _emojis = MessageHelper.GetEmojis(text);
+                _tags = MessageHelper.ParseTags(text, Channel, guild, mentions);
                 model.Content = text;
             }
         }
@@ -128,21 +118,9 @@ namespace Discord.WebSocket
         public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
 
-        public string Resolve(UserMentionHandling userHandling = UserMentionHandling.Name, ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name, EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore)
-            => Resolve(Content, userHandling, channelHandling, roleHandling, everyoneHandling);
-        public string Resolve(int startIndex, int length, UserMentionHandling userHandling = UserMentionHandling.Name, ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name, EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore)
-            => Resolve(Content.Substring(startIndex, length), userHandling, channelHandling, roleHandling, everyoneHandling);
-        public string Resolve(string text, UserMentionHandling userHandling, ChannelMentionHandling channelHandling,
-            RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
-        {
-            text = MentionUtils.ResolveUserMentions(text, null, MentionedUsers, userHandling);
-            text = MentionUtils.ResolveChannelMentions(text, null, channelHandling);
-            text = MentionUtils.ResolveRoleMentions(text, MentionedRoles, roleHandling);
-            text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
-            return text;
-        }
+        public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
+            => MentionUtils.Resolve(this, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;

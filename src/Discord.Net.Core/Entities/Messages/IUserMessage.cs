@@ -12,18 +12,13 @@ namespace Discord
         Task PinAsync(RequestOptions options = null);
         /// <summary> Removes this message from its channel's pinned messages. </summary>
         Task UnpinAsync(RequestOptions options = null);
-
-        /// <summary> Transforms this message's text into a human readable form, resolving mentions to that object's name. </summary>
-        string Resolve(int startIndex, int length,
-            UserMentionHandling userHandling = UserMentionHandling.Name,
-            ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name,
-            EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore);
-        /// <summary> Transforms this message's text into a human readable form, resolving mentions to that object's name. </summary>
+        
+        /// <summary> Transforms this message's text into a human readable form by resolving its tags. </summary>
         string Resolve(
-            UserMentionHandling userHandling = UserMentionHandling.Name,
-            ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name,
-            EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore);
+            TagHandling userHandling = TagHandling.Name,
+            TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name,
+            TagHandling everyoneHandling = TagHandling.Ignore,
+            TagHandling emojiHandling = TagHandling.Name);
     }
 }

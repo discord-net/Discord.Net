@@ -43,7 +43,9 @@ namespace Discord.Rest
 
         public abstract Task UpdateAsync(RequestOptions options = null);
 
-        //IChannel        
+        //IChannel
+        string IChannel.Name => null;
+
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overriden
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)

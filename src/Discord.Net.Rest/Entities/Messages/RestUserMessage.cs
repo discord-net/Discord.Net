@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -15,10 +16,7 @@ namespace Discord.Rest
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
-        private ImmutableArray<Emoji> _emojis;
-        private ImmutableArray<ulong> _mentionedChannelIds;
-        private ImmutableArray<RestRole> _mentionedRoles;
-        private ImmutableArray<RestUser> _mentionedUsers;
+        private ImmutableArray<ITag> _tags;
 
         public ulong? WebhookId { get; private set; }
 
@@ -28,18 +26,18 @@ namespace Discord.Rest
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
-        public override IReadOnlyCollection<Emoji> Emojis => _emojis;
-        public override IReadOnlyCollection<ulong> MentionedChannelIds => _mentionedChannelIds;
-        public override IReadOnlyCollection<RestRole> MentionedRoles => _mentionedRoles;
-        public override IReadOnlyCollection<RestUser> MentionedUsers => _mentionedUsers;
+        public override IReadOnlyCollection<ulong> MentionedChannelIds => MessageHelper.FilterTagsByKey(TagType.ChannelMention, _tags);
+        public override IReadOnlyCollection<RestRole> MentionedRoles => MessageHelper.FilterTagsByValue<RestRole>(TagType.RoleMention, _tags);
+        public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
+        public override IReadOnlyCollection<ITag> Tags => _tags;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author)
-            : base(discord, id, channelId, author)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author, IGuild guild)
+            : base(discord, id, channelId, author, guild)
         {
         }
-        internal new static RestUserMessage Create(BaseDiscordClient discord, Model model)
+        internal new static RestUserMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id, model.ChannelId, RestUser.Create(discord, model.Author.Value));
+            var entity = new RestUserMessage(discord, model.Id, model.ChannelId, RestUser.Create(discord, model.Author.Value), guild);
             entity.Update(model);
             return entity;
         }
@@ -87,13 +85,13 @@ namespace Discord.Rest
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            ImmutableArray<RestUser> mentions = ImmutableArray.Create<RestUser>();
+            ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
             if (model.Mentions.IsSpecified)
             {
                 var value = model.Mentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
+                    var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         newMentions.Add(RestUser.Create(Discord, value[i]));
                     mentions = newMentions.ToImmutable();
@@ -103,11 +101,7 @@ namespace Discord.Rest
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                
-                _mentionedUsers = MentionUtils.GetUserMentions(text, null, mentions);
-                _mentionedChannelIds = MentionUtils.GetChannelMentions(text, null);
-                _mentionedRoles = MentionUtils.GetRoleMentions<RestRole>(text, null);
-                _emojis = MessageHelper.GetEmojis(text);
+                _tags = MessageHelper.ParseTags(text, null, _guild, mentions);
                 model.Content = text;
             }
         }
@@ -122,21 +116,9 @@ namespace Discord.Rest
         public Task UnpinAsync(RequestOptions options)
             => MessageHelper.UnpinAsync(this, Discord, options);
 
-        public string Resolve(UserMentionHandling userHandling = UserMentionHandling.Name, ChannelMentionHandling channelHandling = ChannelMentionHandling.Name, 
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name, EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore)
-            => Resolve(Content, userHandling, channelHandling, roleHandling, everyoneHandling);
-        public string Resolve(int startIndex, int length, UserMentionHandling userHandling = UserMentionHandling.Name, ChannelMentionHandling channelHandling = ChannelMentionHandling.Name,
-            RoleMentionHandling roleHandling = RoleMentionHandling.Name, EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore)
-            => Resolve(Content.Substring(startIndex, length), userHandling, channelHandling, roleHandling, everyoneHandling);
-        public string Resolve(string text, UserMentionHandling userHandling, ChannelMentionHandling channelHandling, 
-            RoleMentionHandling roleHandling, EveryoneMentionHandling everyoneHandling)
-        {
-            text = MentionUtils.ResolveUserMentions(text, null, MentionedUsers, userHandling);
-            text = MentionUtils.ResolveChannelMentions(text, null, channelHandling);
-            text = MentionUtils.ResolveRoleMentions(text, MentionedRoles, roleHandling);
-            text = MentionUtils.ResolveEveryoneMentions(text, everyoneHandling);
-            return text;
-        }
+        public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
+            => MentionUtils.Resolve(this, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
     }

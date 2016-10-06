@@ -7,8 +7,6 @@ namespace Discord
 {
     public interface IGuildChannel : IChannel, IDeletable
     {
-        /// <summary> Gets the name of this channel. </summary>
-        string Name { get; }
         /// <summary> Gets the position of this channel in the guild's channel list, relative to others of the same type. </summary>
         int Position { get; }
 

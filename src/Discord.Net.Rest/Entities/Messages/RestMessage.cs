@@ -8,6 +8,7 @@ namespace Discord.Rest
 {
     public abstract class RestMessage : RestEntity<ulong>, IMessage, IUpdateable
     {
+        internal readonly IGuild _guild;
         private long _timestampTicks;
 
         public ulong ChannelId { get; }
@@ -21,25 +22,26 @@ namespace Discord.Rest
         public virtual DateTimeOffset? EditedTimestamp => null;
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
-        public virtual IReadOnlyCollection<Emoji> Emojis => ImmutableArray.Create<Emoji>();
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestRole> MentionedRoles => ImmutableArray.Create<RestRole>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
+        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author)
+        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author, IGuild guild)
             : base(discord, id)
         {
             ChannelId = channelId;
             Author = author;
+            _guild = guild;
         }
-        internal static RestMessage Create(BaseDiscordClient discord, Model model)
+        internal static RestMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
             if (model.Type == MessageType.Default)
-                return RestUserMessage.Create(discord, model);
+                return RestUserMessage.Create(discord, guild, model);
             else
-                return RestSystemMessage.Create(discord, model);
+                return RestSystemMessage.Create(discord, guild, model);
         }
         internal virtual void Update(Model model)
         {

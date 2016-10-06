@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.EmbedThumbnail;
+﻿using System.Diagnostics;
+using Model = Discord.API.EmbedThumbnail;
 
 namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedThumbnail
     {
         public string Url { get; }
@@ -22,5 +24,8 @@ namespace Discord
                   model.Height.IsSpecified ? model.Height.Value : (int?)null,
                   model.Width.IsSpecified ? model.Width.Value : (int?)null);
         }
+
+        private string DebuggerDisplay => $"{ToString()} ({Url})";
+        public override string ToString() => Width != null && Height != null ? $"{Width}x{Height}" : "0x0";
     }
 }

@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.EmbedProvider;
+﻿using System.Diagnostics;
+using Model = Discord.API.EmbedProvider;
 
 namespace Discord
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedProvider
     {
         public string Name { get; }
@@ -16,5 +18,8 @@ namespace Discord
         {
             return new EmbedProvider(model.Name, model.Url);
         }
+
+        private string DebuggerDisplay => $"{Name} ({Url})";
+        public override string ToString() => Name;
     }
 }

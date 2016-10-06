@@ -35,8 +35,7 @@
     "System.Net.WebSockets.Client": {
       "version": "4.0.0",
       "type": "build"
-    },
-    "System.Text.RegularExpressions": "4.1.0"
+    }
   },
 
   "frameworks": {
