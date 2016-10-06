@@ -239,7 +239,7 @@ namespace Discord.WebSocket
         }
 
         //General
-        public Task DeleteAsync(RequestOptions options)
+        public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         public Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
