@@ -24,9 +24,9 @@ namespace Discord.WebSocket
         public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
-        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         public IReadOnlyCollection<ulong> RoleIds => _roleIds;
+        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
@@ -88,9 +88,7 @@ namespace Discord.WebSocket
             => UserHelper.KickAsync(this, Discord);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
-        {
-            throw new NotImplementedException(); //TODO: Impl
-        }
+            => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
 
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
 

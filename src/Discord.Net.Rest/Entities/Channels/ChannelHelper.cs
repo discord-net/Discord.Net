@@ -207,8 +207,6 @@ namespace Discord.Rest
 
         //Typing
         public static IDisposable EnterTypingState(IChannel channel, BaseDiscordClient client)
-        {
-            throw new NotImplementedException(); //TODO: Impl
-        }
+            => new TypingNotifier(client, channel);
     }
 }
