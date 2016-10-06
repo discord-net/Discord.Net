@@ -300,7 +300,7 @@ namespace Discord.Audio
             catch (OperationCanceledException) { }
         }
 
-        internal virtual void Dispose(bool disposing)
+        internal void Dispose(bool disposing)
         {
             if (!_isDisposed)
                 _isDisposed = true;

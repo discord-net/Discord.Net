@@ -41,7 +41,7 @@ namespace Discord.Rest
             if (model.Recipients.IsSpecified)
                 UpdateUsers(model.Recipients.Value);
         }
-        internal virtual void UpdateUsers(API.User[] models)
+        internal void UpdateUsers(API.User[] models)
         {
             var users = ImmutableDictionary.CreateBuilder<ulong, RestGroupUser>();
             for (int i = 0; i < models.Length; i++)

@@ -53,7 +53,7 @@ namespace Discord.WebSocket
             if (model.Recipients.IsSpecified)
                 UpdateUsers(state, model.Recipients.Value);
         }
-        internal virtual void UpdateUsers(ClientState state, UserModel[] models)
+        private void UpdateUsers(ClientState state, UserModel[] models)
         {
             var users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
