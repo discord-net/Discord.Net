@@ -30,7 +30,7 @@ namespace Discord.Rest
                         await _client.ApiClient.TriggerTypingIndicatorAsync(_channelId);
                     }
                     catch { }
-                    await Task.Delay(4500, token);
+                    await Task.Delay(9750, token);
                 }
             }
             catch (OperationCanceledException) { }
