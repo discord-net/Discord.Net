@@ -5,6 +5,7 @@
         Unknown,
         Online,
         Idle,
+        AFK,
         DoNotDisturb,
         Invisible,
         Offline

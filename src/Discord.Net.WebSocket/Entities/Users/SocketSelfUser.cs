@@ -3,6 +3,7 @@ using Discord.Rest;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using GameEntity = Discord.Game;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
@@ -10,6 +11,8 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSelfUser : SocketUser, ISelfUser
     {
+        private DateTimeOffset? _statusSince;
+
         public string Email { get; private set; }
         public bool IsVerified { get; private set; }
         public bool IsMfaEnabled { get; private set; }
@@ -44,12 +47,57 @@ namespace Discord.WebSocket
                 IsMfaEnabled = model.MfaEnabled.Value;
         }
         
-        public Task ModifyAsync(Action<ModifyCurrentUserParams> func)
-            => UserHelper.ModifyAsync(this, Discord, func);
+        public Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options = null)
+        {
+            var args = new ModifyPresenceParams();
+            func(args);            
+
+            UserStatus status;
+            if (args.Status.IsSpecified)
+            {
+                status = args.Status.Value;
+                if (status == UserStatus.AFK)
+                    _statusSince = DateTimeOffset.UtcNow;
+                else
+                    _statusSince = null;
+            }
+            else
+                status = Status;
+
+            GameEntity? game;
+            if (args.Game.IsSpecified)
+            {
+                var model = args.Game.Value;
+                if (model != null)
+                    game = GameEntity.Create(model);
+                else
+                    game = null;
+            }
+            else
+                game = Game;
+
+            Presence = new SocketPresence(status, game);
+
+            await SendStatus(status, game);
+        }
+        internal async Task SendStatus(UserStatus status, GameEntity? game)
+        {
+            var gameModel = game != null ? new API.Game
+            {
+                Name = game.Value.Name,
+                StreamType = game.Value.StreamType,
+                StreamUrl = game.Value.StreamUrl
+            } : null;
+
+            await Discord.ApiClient.SendStatusUpdateAsync(
+                status,
+                status == UserStatus.AFK,
+                _statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
+                gameModel);
+        }
 
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;
-
-        //ISelfUser
-        Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func) { throw new NotSupportedException(); }
     }
 }

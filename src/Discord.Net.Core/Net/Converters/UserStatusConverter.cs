@@ -38,6 +38,7 @@ namespace Discord.Net.Converters
                     writer.WriteValue("online");
                     break;
                 case UserStatus.Idle:
+                case UserStatus.AFK:
                     writer.WriteValue("idle");
                     break;
                 case UserStatus.DoNotDisturb:

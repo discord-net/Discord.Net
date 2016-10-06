@@ -12,7 +12,7 @@ namespace Discord.WebSocket
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
-        internal override SocketPresence Presence { get { return new SocketPresence(null, UserStatus.Offline); } set { } }
+        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null); } set { } }
 
         internal override SocketGlobalUser GlobalUser {  get { throw new NotSupportedException(); } }
 

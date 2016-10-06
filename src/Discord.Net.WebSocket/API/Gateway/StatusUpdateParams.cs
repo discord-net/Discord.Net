@@ -6,8 +6,12 @@ namespace Discord.API.Gateway
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class StatusUpdateParams
     {
-        [JsonProperty("idle_since"), Int53]
+        [JsonProperty("status")]
+        public UserStatus Status { get; set; }
+        [JsonProperty("since"), Int53]
         public long? IdleSince { get; set; }
+        [JsonProperty("afk")]
+        public bool IsAFK { get; set; }
         [JsonProperty("game")]
         public Game Game { get; set; }
     }

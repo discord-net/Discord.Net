@@ -376,7 +376,7 @@ namespace Discord.WebSocket
             {
                 var user = SocketGlobalUser.Create(this, state, model);
                 user.GlobalUser.AddRef();
-                user.Presence = new SocketPresence(null, UserStatus.Online);
+                user.Presence = new SocketPresence(UserStatus.Online, null);
                 return user;
             });
         }
@@ -1311,7 +1311,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            before = new SocketPresence(null, UserStatus.Offline);
+                                            before = new SocketPresence(UserStatus.Offline, null);
                                             user = guild.AddOrUpdateUser(data);
                                         }
 
