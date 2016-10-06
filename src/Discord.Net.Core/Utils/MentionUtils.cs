@@ -121,8 +121,8 @@ namespace Discord
                         newText = ResolveEmoji(tag, emojiHandling);
                         break;
                 }
-                text.Remove(tag.Index, tag.Length);
-                text.Insert(tag.Index, newText);
+                text.Remove(tag.Index + indexOffset, tag.Length);
+                text.Insert(tag.Index + indexOffset, newText);
                 indexOffset += newText.Length - tag.Length;
             }
             return text.ToString();
@@ -132,20 +132,24 @@ namespace Discord
             if (mode != TagHandling.Remove)
             {
                 var user = tag.Value as IUser;
+                var guildUser = user as IGuildUser;
                 switch (mode)
                 {
                     case TagHandling.Name:
                         if (user != null)
-                            return $"@{(user as IGuildUser)?.Nickname ?? user?.Username}";
+                            return $"@{guildUser?.Nickname ?? user?.Username}";
                         else
                             return $"@unknown-user";
                     case TagHandling.FullName:
                         if (user != null)
-                            return $"@{(user as IGuildUser)?.Nickname ?? user?.Username}#{user.Discriminator}";
+                            return $"@{guildUser?.Nickname ?? user?.Username}#{user.Discriminator}";
                         else
                             return $"@unknown-user";
                     case TagHandling.Sanitize:
-                        return MentionUser($"{SanitizeChar}{tag.Key}");
+                        if (guildUser != null && guildUser.Nickname == null)
+                            return MentionUser($"{SanitizeChar}{tag.Key}", false);
+                        else
+                            return MentionUser($"{SanitizeChar}{tag.Key}", true);
                 }
             }
             return "";
