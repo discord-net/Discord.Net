@@ -43,7 +43,7 @@ namespace Discord.WebSocket
         public static void AddMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             SocketMessage msg)
         {
-            //C#7 Candidate for pattern matching
+            //TODO: C#7 Candidate for pattern matching
             if (channel is SocketDMChannel)
                 (channel as SocketDMChannel).AddMessage(msg);
             else if (channel is SocketGroupChannel)
@@ -56,7 +56,7 @@ namespace Discord.WebSocket
         public static SocketMessage RemoveMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             ulong id)
         {
-            //C#7 Candidate for pattern matching
+            //TODO: C#7 Candidate for pattern matching
             if (channel is SocketDMChannel)
                 return (channel as SocketDMChannel).RemoveMessage(id);
             else if (channel is SocketGroupChannel)

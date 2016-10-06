@@ -30,7 +30,9 @@ namespace Discord
         /// <summary> Bulk deletes multiple messages. </summary>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);        
 
-        /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds.</summary>
+        /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds. </summary>
+        Task TriggerTypingAsync(RequestOptions options = null);
+        /// <summary> Continuously broadcasts the "user is typing" message to all users in this channel until the returned object is disposed. </summary>
         IDisposable EnterTypingState(RequestOptions options = null);
     }
 }

@@ -204,7 +204,12 @@ namespace Discord.Rest
         }
 
         //Typing
-        public static IDisposable EnterTypingState(IChannel channel, BaseDiscordClient client, 
+        public static async Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client,
+            RequestOptions options = null)
+        {
+            await client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options);
+        }
+        public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client, 
             RequestOptions options)
             => new TypingNotifier(client, channel, options);
     }

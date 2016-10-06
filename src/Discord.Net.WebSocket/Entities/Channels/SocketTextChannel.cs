@@ -82,6 +82,8 @@ namespace Discord.WebSocket
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
 
+        public Task TriggerTypingAsync(RequestOptions options = null)
+            => ChannelHelper.TriggerTypingAsync(this, Discord, options);
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
