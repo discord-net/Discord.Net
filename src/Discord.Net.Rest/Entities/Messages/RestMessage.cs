@@ -48,9 +48,9 @@ namespace Discord.Rest
                 Content = model.Content.Value;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(RequestOptions options)
         {
-            var model = await Discord.ApiClient.GetChannelMessageAsync(ChannelId, Id).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelMessageAsync(ChannelId, Id, options).ConfigureAwait(false);
             Update(model);
         }
 

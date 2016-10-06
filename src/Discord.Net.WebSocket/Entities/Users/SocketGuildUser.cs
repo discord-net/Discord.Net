@@ -82,10 +82,10 @@ namespace Discord.WebSocket
             _roleIds = roles.ToImmutable();
         }
         
-        public Task ModifyAsync(Action<ModifyGuildMemberParams> func)
-            => UserHelper.ModifyAsync(this, Discord, func);
-        public Task KickAsync()
-            => UserHelper.KickAsync(this, Discord);
+        public Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, func, options);
+        public Task KickAsync(RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, options);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
@@ -97,7 +97,7 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
 
         //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode) 
+        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
             => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
 
         //IVoiceState

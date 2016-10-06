@@ -40,10 +40,10 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public Task ModifyAsync(Action<ModifyGuildRoleParams> func)
-            => RoleHelper.ModifyAsync(this, Discord, func);
-        public Task DeleteAsync()
-            => RoleHelper.DeleteAsync(this, Discord);
+        public Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options)
+            => RoleHelper.ModifyAsync(this, Discord, func, options);
+        public Task DeleteAsync(RequestOptions options)
+            => RoleHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";

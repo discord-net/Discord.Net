@@ -34,13 +34,13 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
         
-        public async Task LeaveAsync()
+        public async Task LeaveAsync(RequestOptions options = null)
         {
-            await Discord.ApiClient.LeaveGuildAsync(Id).ConfigureAwait(false);
+            await Discord.ApiClient.LeaveGuildAsync(Id, options).ConfigureAwait(false);
         }
-        public async Task DeleteAsync()
+        public async Task DeleteAsync(RequestOptions options = null)
         {
-            await Discord.ApiClient.DeleteGuildAsync(Id).ConfigureAwait(false);
+            await Discord.ApiClient.DeleteGuildAsync(Id, options).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

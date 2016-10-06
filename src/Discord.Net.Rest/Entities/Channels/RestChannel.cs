@@ -41,12 +41,12 @@ namespace Discord.Rest
         }
         internal abstract void Update(Model model);
 
-        public abstract Task UpdateAsync();
+        public abstract Task UpdateAsync(RequestOptions options = null);
 
         //IChannel        
-        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overriden
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overriden
     }
 }

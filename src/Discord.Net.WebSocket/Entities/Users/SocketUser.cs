@@ -40,17 +40,17 @@ namespace Discord.WebSocket
             Presence = SocketPresence.Create(model);
         }
 
-        public Task<RestDMChannel> CreateDMChannelAsync()
-            => UserHelper.CreateDMChannelAsync(this, Discord);
+        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+            => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode)
+        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync()
-            => await CreateDMChannelAsync();
+        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
+            => await CreateDMChannelAsync(options);
     }
 }

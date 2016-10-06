@@ -13,7 +13,7 @@ namespace Discord
         /// <summary> Returns true if this user has enabled MFA on their account. </summary>
         bool IsMfaEnabled { get; }
 
-        Task ModifyAsync(Action<ModifyCurrentUserParams> func);
-        Task ModifyStatusAsync(Action<ModifyPresenceParams> func);
+        Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null);
+        Task ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options = null);
     }
 }

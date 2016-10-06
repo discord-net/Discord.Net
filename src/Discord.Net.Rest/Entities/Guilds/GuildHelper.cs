@@ -14,7 +14,7 @@ namespace Discord.Rest
     {
         //General
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
-            Action<ModifyGuildParams> func)
+            Action<ModifyGuildParams> func, RequestOptions options)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
@@ -26,116 +26,122 @@ namespace Discord.Rest
             if (args.Icon.IsSpecified && guild.IconId != null)
                 args.Icon = new API.Image(guild.IconId);
 
-            return await client.ApiClient.ModifyGuildAsync(guild.Id, args).ConfigureAwait(false);
+            return await client.ApiClient.ModifyGuildAsync(guild.Id, args, options).ConfigureAwait(false);
         }
         public static async Task<EmbedModel> ModifyEmbedAsync(IGuild guild, BaseDiscordClient client,
-            Action<ModifyGuildEmbedParams> func)
+            Action<ModifyGuildEmbedParams> func, RequestOptions options)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
             var args = new ModifyGuildEmbedParams();
             func(args);
-            return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, args).ConfigureAwait(false);
+            return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, args, options).ConfigureAwait(false);
         }
         public static async Task ModifyChannelsAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<ModifyGuildChannelsParams> args)
+            IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options)
         {
-            await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, args).ConfigureAwait(false);
+            await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, args, options).ConfigureAwait(false);
         }
         public static async Task<IReadOnlyCollection<RoleModel>> ModifyRolesAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<ModifyGuildRolesParams> args)
+            IEnumerable<ModifyGuildRolesParams> args, RequestOptions options)
         {
-            return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, args).ConfigureAwait(false);
+            return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, args, options).ConfigureAwait(false);
         }
-        public static async Task LeaveAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task LeaveAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            await client.ApiClient.LeaveGuildAsync(guild.Id).ConfigureAwait(false);
+            await client.ApiClient.LeaveGuildAsync(guild.Id, options).ConfigureAwait(false);
         }
-        public static async Task DeleteAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task DeleteAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            await client.ApiClient.DeleteGuildAsync(guild.Id).ConfigureAwait(false);
+            await client.ApiClient.DeleteGuildAsync(guild.Id, options).ConfigureAwait(false);
         }
 
         //Bans
-        public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildBansAsync(guild.Id);
+            var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options);
             return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
         }
         
         public static async Task AddBanAsync(IGuild guild, BaseDiscordClient client, 
-            ulong userId, int pruneDays)
+            ulong userId, int pruneDays, RequestOptions options)
         {
             var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays };
-            await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args);
+            await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options);
         }        
         public static async Task RemoveBanAsync(IGuild guild, BaseDiscordClient client, 
-            ulong userId)
+            ulong userId, RequestOptions options)
         {
-            await client.ApiClient.RemoveGuildBanAsync(guild.Id, userId);
+            await client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options);
         }
 
         //Channels
         public static async Task<RestGuildChannel> GetChannelAsync(IGuild guild, BaseDiscordClient client,
-            ulong id)
+            ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetChannelAsync(guild.Id, id).ConfigureAwait(false);
+            var model = await client.ApiClient.GetChannelAsync(guild.Id, id, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuildChannel.Create(client, guild, model);
             return null;
         }
-        public static async Task<IReadOnlyCollection<RestGuildChannel>> GetChannelsAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestGuildChannel>> GetChannelsAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildChannelsAsync(guild.Id).ConfigureAwait(false);
+            var models = await client.ApiClient.GetGuildChannelsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestGuildChannel.Create(client, guild, x)).ToImmutableArray();
         }
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name)
+            string name, RequestOptions options)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams(name, ChannelType.Text);
-            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name)
+            string name, RequestOptions options)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams(name, ChannelType.Voice);
-            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
 
         //Integrations
-        public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id).ConfigureAwait(false);
+            var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestGuildIntegration.Create(client, x)).ToImmutableArray();
         }
         public static async Task<RestGuildIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
-            ulong id, string type)
+            ulong id, string type, RequestOptions options)
         {
             var args = new CreateGuildIntegrationParams(id, type);
-            var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestGuildIntegration.Create(client, model);
         }
 
         //Invites
-        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildInvitesAsync(guild.Id).ConfigureAwait(false);
+            var models = await client.ApiClient.GetGuildInvitesAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, x)).ToImmutableArray();
         }
 
         //Roles
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false)
+            string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
             var role = RestRole.Create(client, model);
 
             await role.ModifyAsync(x =>
@@ -144,26 +150,27 @@ namespace Discord.Rest
                 x.Permissions = (permissions ?? role.Permissions).RawValue;
                 x.Color = (color ?? Color.Default).RawValue;
                 x.Hoist = isHoisted;
-            }).ConfigureAwait(false);
+            }, options).ConfigureAwait(false);
 
             return role;
         }
 
         //Users
         public static async Task<RestGuildUser> GetUserAsync(IGuild guild, BaseDiscordClient client,
-            ulong id)
+            ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildMemberAsync(guild.Id, id).ConfigureAwait(false);
+            var model = await client.ApiClient.GetGuildMemberAsync(guild.Id, id, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuildUser.Create(client, guild, model);
             return null;
         }
-        public static async Task<RestGuildUser> GetCurrentUserAsync(IGuild guild, BaseDiscordClient client)
+        public static async Task<RestGuildUser> GetCurrentUserAsync(IGuild guild, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            return await GetUserAsync(guild, client, client.CurrentUser.Id).ConfigureAwait(false);
+            return await GetUserAsync(guild, client, client.CurrentUser.Id, options).ConfigureAwait(false);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuild guild, BaseDiscordClient client,
-            ulong? fromUserId = null, int limit = DiscordConfig.MaxMessagesPerBatch)
+            ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
                 DiscordConfig.MaxMessagesPerBatch,
@@ -175,7 +182,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args);
+                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args, options);
                     return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
@@ -189,14 +196,14 @@ namespace Discord.Rest
             );
         }
         public static async Task<int> PruneUsersAsync(IGuild guild, BaseDiscordClient client,
-            int days = 30, bool simulate = false)
+            int days, bool simulate, RequestOptions options)
         {
             var args = new GuildPruneParams(days);
             GetGuildPruneCountResponse model;
             if (simulate)
-                model = await client.ApiClient.GetGuildPruneCountAsync(guild.Id, args).ConfigureAwait(false);
+                model = await client.ApiClient.GetGuildPruneCountAsync(guild.Id, args, options).ConfigureAwait(false);
             else
-                model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args).ConfigureAwait(false);
+                model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
         }
     }

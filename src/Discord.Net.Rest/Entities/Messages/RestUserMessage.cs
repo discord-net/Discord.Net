@@ -109,15 +109,15 @@ namespace Discord.Rest
             }
         }
 
-        public Task ModifyAsync(Action<ModifyMessageParams> func)
-            => MessageHelper.ModifyAsync(this, Discord, func);
-        public Task DeleteAsync()
-            => MessageHelper.DeleteAsync(this, Discord);
+        public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
+            => MessageHelper.ModifyAsync(this, Discord, func, options);
+        public Task DeleteAsync(RequestOptions options)
+            => MessageHelper.DeleteAsync(this, Discord, options);
 
-        public Task PinAsync()
-            => MessageHelper.PinAsync(this, Discord);
-        public Task UnpinAsync()
-            => MessageHelper.UnpinAsync(this, Discord);
+        public Task PinAsync(RequestOptions options)
+            => MessageHelper.PinAsync(this, Discord, options);
+        public Task UnpinAsync(RequestOptions options)
+            => MessageHelper.UnpinAsync(this, Discord, options);
 
         public string Resolve(UserMentionHandling userHandling = UserMentionHandling.Name, ChannelMentionHandling channelHandling = ChannelMentionHandling.Name, 
             RoleMentionHandling roleHandling = RoleMentionHandling.Name, EveryoneMentionHandling everyoneHandling = EveryoneMentionHandling.Ignore)

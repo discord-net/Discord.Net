@@ -49,12 +49,15 @@ namespace Discord.Rest
             _users = users.ToImmutable();
         }
 
-        public override async Task UpdateAsync()
-            => Update(await ChannelHelper.GetAsync(this, Discord));
-        public Task LeaveAsync()
-            => ChannelHelper.DeleteAsync(this, Discord);
+        public override async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetChannelAsync(Id, options);
+            Update(model);
+        }
+        public Task LeaveAsync(RequestOptions options = null)
+            => ChannelHelper.DeleteAsync(this, Discord, options);
 
-        public IUser GetUser(ulong id)
+        public RestUser GetUser(ulong id)
         {
             RestGroupUser user;
             if (_users.TryGetValue(id, out user))
@@ -62,29 +65,29 @@ namespace Discord.Rest
             return null;
         }
 
-        public Task<RestMessage> GetMessageAsync(ulong id)
-            => ChannelHelper.GetMessageAsync(this, Discord, id);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, limit: limit);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit);
-        public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync()
-            => ChannelHelper.GetPinnedMessagesAsync(this, Discord);
+        public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
+            => ChannelHelper.GetMessageAsync(this, Discord, id, options);
+        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+            => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, options);
+        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, options);
+        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, options);
+        public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
+            => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS)
-            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS);
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS);
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS);
+        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS, RequestOptions options = null)
+            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, options);
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options = null)
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options = null)
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
-        public Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages);
+        public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
 
-        public IDisposable EnterTypingState()
-            => ChannelHelper.EnterTypingState(this, Discord);
+        public IDisposable EnterTypingState(RequestOptions options = null)
+            => ChannelHelper.EnterTypingState(this, Discord, options);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Group)";
@@ -96,50 +99,50 @@ namespace Discord.Rest
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
 
         //IMessageChannel
-        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode)
+        async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetMessageAsync(id);
+                return await GetMessageAsync(id, options);
             else
                 return null;
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return GetMessagesAsync(limit);
+                return GetMessagesAsync(limit, options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return GetMessagesAsync(fromMessageId, dir, limit);
+                return GetMessagesAsync(fromMessageId, dir, limit, options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return GetMessagesAsync(fromMessage, dir, limit);
+                return GetMessagesAsync(fromMessage, dir, limit, options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
-        async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync() 
-            => await GetPinnedMessagesAsync();
+        async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
+            => await GetPinnedMessagesAsync(options);
 
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS) 
-            => await SendFileAsync(filePath, text, isTTS);
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS) 
-            => await SendFileAsync(stream, filename, text, isTTS);
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS) 
-            => await SendMessageAsync(text, isTTS);
-        IDisposable IMessageChannel.EnterTypingState() 
-            => EnterTypingState();
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
+            => await SendFileAsync(filePath, text, isTTS, options);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options)
+            => await SendFileAsync(stream, filename, text, isTTS, options);
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, RequestOptions options)
+            => await SendMessageAsync(text, isTTS, options);
+        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
+            => EnterTypingState(options);
 
         //IChannel        
-        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode)
-            => Task.FromResult(GetUser(id));
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode)
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IUser>(GetUser(id));
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
     }
 }

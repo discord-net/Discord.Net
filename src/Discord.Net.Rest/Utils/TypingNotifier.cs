@@ -9,12 +9,14 @@ namespace Discord.Rest
         private readonly BaseDiscordClient _client;
         private readonly CancellationTokenSource _cancelToken;
         private readonly ulong _channelId;
+        private readonly RequestOptions _options;
 
-        public TypingNotifier(BaseDiscordClient discord, IChannel channel)
+        public TypingNotifier(BaseDiscordClient discord, IChannel channel, RequestOptions options)
         {
             _client = discord;
             _cancelToken = new CancellationTokenSource();
             _channelId = channel.Id;
+            _options = options;
             var _ = Run();
         }
 

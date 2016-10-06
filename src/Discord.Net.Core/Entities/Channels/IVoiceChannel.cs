@@ -13,7 +13,7 @@ namespace Discord
         int UserLimit { get; }
 
         /// <summary> Modifies this voice channel. </summary>
-        Task ModifyAsync(Action<ModifyVoiceChannelParams> func);
+        Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null);
         /// <summary> Connects to this voice channel. </summary>
         Task<IAudioClient> ConnectAsync();
     }

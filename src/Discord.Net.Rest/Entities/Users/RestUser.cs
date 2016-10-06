@@ -39,20 +39,23 @@ namespace Discord.Rest
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
         }
-
-        public virtual async Task UpdateAsync()
-            => Update(await UserHelper.GetAsync(this, Discord));
         
-        public Task<RestDMChannel> CreateDMChannelAsync()
-            => UserHelper.CreateDMChannelAsync(this, Discord);
+        public virtual async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetUserAsync(Id, options);
+            Update(model);
+        }
+
+        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+            => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
         //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode)
+        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IDMChannel>(null);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync()
-            => await CreateDMChannelAsync();
+        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
+            => await CreateDMChannelAsync(options);
     }
 }

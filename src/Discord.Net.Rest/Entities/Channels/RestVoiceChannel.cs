@@ -33,8 +33,8 @@ namespace Discord.Rest
             UserLimit = model.UserLimit.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func)
-            => ChannelHelper.ModifyAsync(this, Discord, func);
+        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+            => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
@@ -42,9 +42,9 @@ namespace Discord.Rest
         Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null);
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
     }
 }

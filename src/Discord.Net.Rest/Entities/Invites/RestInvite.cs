@@ -32,14 +32,17 @@ namespace Discord.Rest
             GuildName = model.Guild.Name;
             ChannelName = model.Channel.Name;
         }
+        
+        public async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetInviteAsync(Code, options);
+            Update(model);
+        }
+        public Task DeleteAsync(RequestOptions options = null)
+            => InviteHelper.DeleteAsync(this, Discord, options);
 
-        public async Task UpdateAsync()
-            => Update(await InviteHelper.GetAsync(this, Discord).ConfigureAwait(false));        
-        public Task DeleteAsync()
-            => InviteHelper.DeleteAsync(this, Discord);
-
-        public Task AcceptAsync()
-            => InviteHelper.AcceptAsync(this, Discord);
+        public Task AcceptAsync(RequestOptions options = null)
+            => InviteHelper.AcceptAsync(this, Discord, options);
 
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";

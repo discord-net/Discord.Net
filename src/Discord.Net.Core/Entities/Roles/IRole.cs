@@ -1,4 +1,8 @@
-﻿namespace Discord
+﻿using Discord.API.Rest;
+using System;
+using System.Threading.Tasks;
+
+namespace Discord
 {
     public interface IRole : ISnowflakeEntity, IDeletable, IMentionable
     {
@@ -19,6 +23,6 @@
         int Position { get; }
 
         ///// <summary> Modifies this role. </summary>
-        //Task ModifyAsync(Action<ModifyGuildRoleParams> func);
+        Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null);
     }
 }

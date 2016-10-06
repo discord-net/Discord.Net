@@ -57,13 +57,16 @@ namespace Discord.Rest
                 roles.Add(roleIds[i]);
             _roleIds = roles.ToImmutable();
         }
-
-        public override async Task UpdateAsync()
-            => Update(await UserHelper.GetAsync(this, Discord));
-        public Task ModifyAsync(Action<ModifyGuildMemberParams> func)
-            => UserHelper.ModifyAsync(this, Discord, func);
-        public Task KickAsync()
-            => UserHelper.KickAsync(this, Discord);
+        
+        public override async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options);
+            Update(model);
+        }
+        public Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, func, options);
+        public Task KickAsync(RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, options);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {

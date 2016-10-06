@@ -9,7 +9,7 @@ namespace Discord.WebSocket
     internal static class SocketChannelHelper
     {
         public static IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,
-            ulong? fromMessageId, Direction dir, int limit, CacheMode mode)
+            ulong? fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             IReadOnlyCollection<SocketMessage> cachedMessages;
             IAsyncEnumerable<IReadOnlyCollection<IMessage>> result;
@@ -28,7 +28,7 @@ namespace Discord.WebSocket
                 fromMessageId = cachedMessages.Min(x => x.Id);
             else
                 fromMessageId = cachedMessages.Max(x => x.Id);
-            var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit);
+            var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, fromMessageId, dir, limit, options);
             return result.Concat(downloadedMessages);
         }
         public static IReadOnlyCollection<SocketMessage> GetCachedMessages(SocketChannel channel, DiscordSocketClient discord, MessageCache messages,

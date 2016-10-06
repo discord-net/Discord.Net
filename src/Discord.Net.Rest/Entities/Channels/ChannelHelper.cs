@@ -12,67 +12,64 @@ namespace Discord.Rest
     internal static class ChannelHelper
     {
         //General
-        public static async Task<Model> GetAsync(IGuildChannel channel, BaseDiscordClient client)
-        {
-            return await client.ApiClient.GetChannelAsync(channel.GuildId, channel.Id).ConfigureAwait(false);
-        }
-        public static async Task<Model> GetAsync(IPrivateChannel channel, BaseDiscordClient client)
-        {
-            return await client.ApiClient.GetChannelAsync(channel.Id).ConfigureAwait(false);
-        }
-        public static async Task DeleteAsync(IChannel channel, BaseDiscordClient client)
+        public static async Task DeleteAsync(IChannel channel, BaseDiscordClient client, 
+            RequestOptions options)
         { 
-            await client.ApiClient.DeleteChannelAsync(channel.Id).ConfigureAwait(false);
+            await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
         public static async Task ModifyAsync(IGuildChannel channel, BaseDiscordClient client, 
-            Action<ModifyGuildChannelParams> func)
+            Action<ModifyGuildChannelParams> func, 
+            RequestOptions options)
         {
             var args = new ModifyGuildChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args);
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
         public static async Task ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
-            Action<ModifyTextChannelParams> func)
+            Action<ModifyTextChannelParams> func, 
+            RequestOptions options)
         {
             var args = new ModifyTextChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args);
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
         public static async Task ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
-            Action<ModifyVoiceChannelParams> func)
+            Action<ModifyVoiceChannelParams> func, 
+            RequestOptions options)
         {
             var args = new ModifyVoiceChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args);
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
 
         //Invites
-        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IChannel channel, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IChannel channel, BaseDiscordClient client,
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id);
+            var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options);
             return models.Select(x => RestInviteMetadata.Create(client, x)).ToImmutableArray();
         }
         public static async Task<RestInviteMetadata> CreateInviteAsync(IChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary)
+            int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
         {
             var args = new CreateChannelInviteParams { IsTemporary = isTemporary };
             if (maxAge.HasValue)
                 args.MaxAge = maxAge.Value;
             if (maxUses.HasValue)
                 args.MaxUses = maxUses.Value;
-            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args);
+            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options);
             return RestInviteMetadata.Create(client, model);
         }
 
         //Messages
         public static async Task<RestMessage> GetMessageAsync(IChannel channel, BaseDiscordClient client, 
-            ulong id)
+            ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id).ConfigureAwait(false);
+            var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
             return RestMessage.Create(client, model);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IChannel channel, BaseDiscordClient client, 
-            ulong? fromMessageId = null, Direction dir = Direction.Before, int limit = DiscordConfig.MaxMessagesPerBatch)
+            ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
             //TODO: Test this with Around direction
             return new PagedAsyncEnumerable<RestMessage>(
@@ -86,7 +83,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.RelativeMessageId = info.Position.Value;
-                    var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args);
+                    var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options);
                     return models.Select(x => RestMessage.Create(client, x)).ToImmutableArray(); ;
                 },
                 nextPage: (info, lastPage) =>
@@ -102,71 +99,72 @@ namespace Discord.Rest
                 count: limit
             );
         }
-        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client, 
+            RequestOptions options)
         {
-            var models = await client.ApiClient.GetPinsAsync(channel.Id).ConfigureAwait(false);
+            var models = await client.ApiClient.GetPinsAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestMessage.Create(client, x)).ToImmutableArray();
         }
 
         public static async Task<RestUserMessage> SendMessageAsync(IChannel channel, BaseDiscordClient client,
-            string text, bool isTTS)
+            string text, bool isTTS, RequestOptions options)
         {
             var args = new CreateMessageParams(text) { IsTTS = isTTS };
-            var model = await client.ApiClient.CreateMessageAsync(channel.Id, args).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, model);
         }
 
         public static Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS)
+            string filePath, string text, bool isTTS, RequestOptions options)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return SendFileAsync(channel, client, file, filename, text, isTTS);
+                return SendFileAsync(channel, client, file, filename, text, isTTS, options);
         }
         public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS)
+            Stream stream, string filename, string text, bool isTTS, RequestOptions options)
         {
             var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
-            var model = await client.ApiClient.UploadFileAsync(channel.Id, args).ConfigureAwait(false);
+            var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, model);
         }
 
         public static async Task DeleteMessagesAsync(IChannel channel, BaseDiscordClient client, 
-            IEnumerable<IMessage> messages)
+            IEnumerable<IMessage> messages, RequestOptions options)
         {
             var args = new DeleteMessagesParams(messages.Select(x => x.Id).ToArray());
-            await client.ApiClient.DeleteMessagesAsync(channel.Id, args).ConfigureAwait(false);
+            await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
         }
 
         //Permission Overwrites
         public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
-            IUser user, OverwritePermissions perms)
+            IUser user, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams("member", perms.AllowValue, perms.DenyValue);
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args).ConfigureAwait(false);
+            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options).ConfigureAwait(false);
         }
         public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
-            IRole role, OverwritePermissions perms)
+            IRole role, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams("role", perms.AllowValue, perms.DenyValue);
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args).ConfigureAwait(false);
+            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options).ConfigureAwait(false);
         }
         public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
-            IUser user)
+            IUser user, RequestOptions options)
         {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id).ConfigureAwait(false);
+            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id, options).ConfigureAwait(false);
         }
         public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
-            IRole role)
+            IRole role, RequestOptions options)
         {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id).ConfigureAwait(false);
+            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options).ConfigureAwait(false);
         }
 
         //Users
         public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
-            ulong id)
+            ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildMemberAsync(channel.GuildId, id);
+            var model = await client.ApiClient.GetGuildMemberAsync(channel.GuildId, id, options);
             if (model == null)
                 return null;
             var user = RestGuildUser.Create(client, guild, model);
@@ -176,7 +174,7 @@ namespace Discord.Rest
             return user;
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
-            ulong? froUserId = null, int? limit = DiscordConfig.MaxUsersPerBatch)
+            ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
                 DiscordConfig.MaxUsersPerBatch,
@@ -188,7 +186,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args);
+                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args, options);
                     return models
                         .Select(x => RestGuildUser.Create(client, guild, x))
                         .Where(x => x.GetPermissions(channel).ReadMessages)
@@ -200,13 +198,14 @@ namespace Discord.Rest
                     if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
                         info.Remaining = 0;
                 },
-                start: froUserId,
+                start: fromUserId,
                 count: limit
             );
         }
 
         //Typing
-        public static IDisposable EnterTypingState(IChannel channel, BaseDiscordClient client)
-            => new TypingNotifier(client, channel);
+        public static IDisposable EnterTypingState(IChannel channel, BaseDiscordClient client, 
+            RequestOptions options)
+            => new TypingNotifier(client, channel, options);
     }
 }

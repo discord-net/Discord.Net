@@ -1,53 +1,37 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Threading.Tasks;
-using MemberModel = Discord.API.GuildMember;
-using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> GetAsync(IUser user, BaseDiscordClient client)
+        public static async Task ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func,
+            RequestOptions options)
         {
-            return await client.ApiClient.GetUserAsync(user.Id);
-        }
-        public static async Task<Model> GetAsync(ISelfUser user, BaseDiscordClient client)
-        {
-            var model = await client.ApiClient.GetMyUserAsync();
-            if (model.Id != user.Id)
-                throw new InvalidOperationException("Unable to update this object using a different token.");
-            return model;
-        }
-        public static async Task<MemberModel> GetAsync(IGuildUser user, BaseDiscordClient client)
-        {
-            return await client.ApiClient.GetGuildMemberAsync(user.GuildId, user.Id);
-        }
-        public static async Task ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func)
-        {
-            if (user.Id != client.CurrentUser.Id)
-                throw new InvalidOperationException("Unable to modify this object using a different token.");
-
             var args = new ModifyCurrentUserParams();
             func(args);
-            await client.ApiClient.ModifySelfAsync(args);
+            await client.ApiClient.ModifySelfAsync(args, options);
         }
-        public static async Task ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func)
+        public static async Task ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
+            RequestOptions options)
         {
             var args = new ModifyGuildMemberParams();
             func(args);
-            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args);
+            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args, options);
         }
 
-        public static async Task KickAsync(IGuildUser user, BaseDiscordClient client)
+        public static async Task KickAsync(IGuildUser user, BaseDiscordClient client,
+            RequestOptions options)
         {
-            await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id);
+            await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id, options);
         }
 
-        public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client)
+        public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client,
+            RequestOptions options)
         {
             var args = new CreateDMChannelParams(user.Id);
-            return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args));
+            return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args, options));
         }
     }
 }

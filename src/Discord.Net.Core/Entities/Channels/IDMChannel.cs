@@ -8,6 +8,6 @@ namespace Discord
         IUser Recipient { get; }
 
         /// <summary> Closes this private channel, removing it from your channel list. </summary>
-        Task CloseAsync();
+        Task CloseAsync(RequestOptions options = null);
     }
 }

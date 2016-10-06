@@ -5,6 +5,6 @@ namespace Discord
     public interface IGroupChannel : IMessageChannel, IPrivateChannel, IAudioChannel
     {
         /// <summary> Leaves this group. </summary>
-        Task LeaveAsync();
+        Task LeaveAsync(RequestOptions options = null);
     }
 }

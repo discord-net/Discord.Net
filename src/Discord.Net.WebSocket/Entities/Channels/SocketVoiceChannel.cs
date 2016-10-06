@@ -38,8 +38,8 @@ namespace Discord.WebSocket
             UserLimit = model.UserLimit.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func)
-            => ChannelHelper.ModifyAsync(this, Discord, func);
+        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+            => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         public override SocketGuildUser GetUser(ulong id)
         {
@@ -56,9 +56,9 @@ namespace Discord.WebSocket
         Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode)
+        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode)
+        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
     }
 }

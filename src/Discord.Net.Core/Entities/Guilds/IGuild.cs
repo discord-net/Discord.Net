@@ -53,56 +53,56 @@ namespace Discord
         IReadOnlyCollection<IRole> Roles { get; }
 
         /// <summary> Modifies this guild. </summary>
-        Task ModifyAsync(Action<ModifyGuildParams> func);
+        Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null);
         /// <summary> Modifies this guild's embed. </summary>
-        Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func);
+        Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null);
         /// <summary> Bulk modifies the channels of this guild. </summary>
-        Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args);
+        Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null);
         /// <summary> Bulk modifies the roles of this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args);
+        Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null);
         /// <summary> Leaves this guild. If you are the owner, use Delete instead. </summary>
-        Task LeaveAsync();
+        Task LeaveAsync(RequestOptions options = null);
 
         /// <summary> Gets a collection of all users banned on this guild. </summary>
-        Task<IReadOnlyCollection<IBan>> GetBansAsync();
+        Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
         /// <summary> Bans the provided user from this guild and optionally prunes their recent messages. </summary>
-        Task AddBanAsync(IUser user, int pruneDays = 0);
+        Task AddBanAsync(IUser user, int pruneDays = 0, RequestOptions options = null);
         /// <summary> Bans the provided user id from this guild and optionally prunes their recent messages. </summary>
-        Task AddBanAsync(ulong userId, int pruneDays = 0);
+        Task AddBanAsync(ulong userId, int pruneDays = 0, RequestOptions options = null);
         /// <summary> Unbans the provided user if it is currently banned. </summary>
-        Task RemoveBanAsync(IUser user);
+        Task RemoveBanAsync(IUser user, RequestOptions options = null);
         /// <summary> Unbans the provided user id if it is currently banned. </summary>
-        Task RemoveBanAsync(ulong userId);
+        Task RemoveBanAsync(ulong userId, RequestOptions options = null);
 
         /// <summary> Gets a collection of all channels in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
+        Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Creates a new text channel. </summary>
-        Task<ITextChannel> CreateTextChannelAsync(string name);
+        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
         /// <summary> Creates a new voice channel. </summary>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
 
-        Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync();
-        Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type);
+        Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
+        Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
 
         /// <summary> Gets a collection of all invites to this guild. </summary>
-        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync();
+        Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
 
         /// <summary> Gets the role in this guild with the provided id, or null if not found. </summary>
         IRole GetRole(ulong id);
         /// <summary> Creates a new role. </summary>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
 
         /// <summary> Gets a collection of all users in this guild. </summary>
-        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload); //TODO: shouldnt this be paged?
+        Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null); //TODO: shouldnt this be paged?
         /// <summary> Gets the user in this guild with the provided id, or null if not found. </summary>
-        Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
+        Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the current user for this guild. </summary>
-        Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
-        Task<int> PruneUsersAsync(int days = 30, bool simulate = false);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
     }
 }

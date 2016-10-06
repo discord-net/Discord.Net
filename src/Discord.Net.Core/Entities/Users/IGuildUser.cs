@@ -23,8 +23,8 @@ namespace Discord
         ChannelPermissions GetPermissions(IGuildChannel channel);
 
         /// <summary> Kicks this user from this guild. </summary>
-        Task KickAsync();
+        Task KickAsync(RequestOptions options = null);
         /// <summary> Modifies this user's properties in this guild. </summary>
-        Task ModifyAsync(Action<ModifyGuildMemberParams> func);
+        Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null);
     }
 }

@@ -7,17 +7,17 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketPresence : IPresence
     {
-        public Game? Game { get; }
         public UserStatus Status { get; }
+        public Game? Game { get; }
 
-        internal SocketPresence(Game? game, UserStatus status)
+        internal SocketPresence(UserStatus status, Game? game)
         {
-            Game = game;
             Status = status;
+            Game = game;
         }
         internal static SocketPresence Create(Model model)
         {
-            return new SocketPresence(model.Game != null ? Discord.Game.Create(model.Game) : (Game?)null, model.Status);
+            return new SocketPresence(model.Status, model.Game != null ? Discord.Game.Create(model.Game) : (Game?)null);
         }
 
         public override string ToString() => Status.ToString();

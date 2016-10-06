@@ -35,11 +35,21 @@ namespace Discord.Rest
                 IsMfaEnabled = model.MfaEnabled.Value;
         }
 
-        public override async Task UpdateAsync()
-            => Update(await UserHelper.GetAsync(this, Discord));
-        public Task ModifyAsync(Action<ModifyCurrentUserParams> func)
-            => UserHelper.ModifyAsync(this, Discord, func);
+        public override async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetMyUserAsync(options);
+            if (model.Id != Id)
+                throw new InvalidOperationException("Unable to update this object using a different token.");
+            Update(model);
+        }
 
-        Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func) { throw new NotSupportedException(); }
+        public async Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null)
+        {
+            if (Id != Discord.CurrentUser.Id)
+                throw new InvalidOperationException("Unable to modify this object using a different token.");
+            await UserHelper.ModifyAsync(this, Discord, func, options);
+        }
+
+        Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options) { throw new NotSupportedException(); }
     }
 }
