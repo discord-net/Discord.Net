@@ -48,7 +48,7 @@ namespace Discord.API
                     using (var reader = new StreamReader(decompressed))
                     using (var jsonReader = new JsonTextReader(reader))
                     {
-                        var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
+                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
                 }
@@ -58,7 +58,7 @@ namespace Discord.API
                 using (var reader = new StringReader(text))
                 using (var jsonReader = new JsonTextReader(reader))
                 {
-                    var msg = _serializer.Deserialize<WebSocketMessage>(jsonReader);
+                    var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                     await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
@@ -164,7 +164,7 @@ namespace Discord.API
 
             //TODO: Add ETF
             byte[] bytes = null;
-            payload = new WebSocketMessage { Operation = (int)opCode, Payload = payload };
+            payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
             await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options)).ConfigureAwait(false);

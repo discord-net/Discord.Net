@@ -68,14 +68,14 @@ namespace Discord.Audio
                     decompressed.Position = 0;
                     using (var reader = new StreamReader(decompressed))
                     {
-                        var msg = JsonConvert.DeserializeObject<WebSocketMessage>(reader.ReadToEnd());
+                        var msg = JsonConvert.DeserializeObject<SocketFrame>(reader.ReadToEnd());
                         await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                     }
                 }
             };
             _webSocketClient.TextMessage += async text =>
             {
-                var msg = JsonConvert.DeserializeObject<WebSocketMessage>(text);
+                var msg = JsonConvert.DeserializeObject<SocketFrame>(text);
                 await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
             };
             _webSocketClient.Closed += async ex =>
@@ -103,7 +103,7 @@ namespace Discord.Audio
         public async Task SendAsync(VoiceOpCode opCode, object payload, RequestOptions options = null)
         {
             byte[] bytes = null;
-            payload = new WebSocketMessage { Operation = (int)opCode, Payload = payload };
+            payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
             await _webSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);

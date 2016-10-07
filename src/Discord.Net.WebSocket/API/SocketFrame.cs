@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    public class WebSocketMessage
+    public class SocketFrame
     {
         [JsonProperty("op")]
         public int Operation { get; set; }
