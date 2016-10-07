@@ -19,7 +19,6 @@ namespace Discord.Rest
 
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
-        public virtual bool IsWebhook => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
@@ -27,6 +26,8 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        public virtual ulong? WebhookId => null;
+        public bool IsWebhook => WebhookId != null;
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 

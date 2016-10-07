@@ -14,17 +14,15 @@ namespace Discord.WebSocket
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
+        private ulong? _webhookId;
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
 
-        public ulong? WebhookId { get; private set; }
-
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
-        public override bool IsWebhook => WebhookId != null;
+        public override ulong? WebhookId => _webhookId;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
-
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
         public override IReadOnlyCollection<ITag> Tags => _tags;
@@ -56,7 +54,7 @@ namespace Discord.WebSocket
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
             if (model.WebhookId.IsSpecified)
-                WebhookId = model.WebhookId.Value;
+                _webhookId = model.WebhookId.Value;
 
             if (model.Attachments.IsSpecified)
             {

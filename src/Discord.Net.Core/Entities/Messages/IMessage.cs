@@ -11,6 +11,8 @@ namespace Discord
         bool IsTTS { get; }
         /// <summary> Returns true if this message was added to its channel's pinned messages. </summary>
         bool IsPinned { get; }
+        /// <summary> Returns true if this message was created using a webhook. </summary>
+        bool IsWebhook { get; }
         /// <summary> Returns the content for this message. </summary>
         string Content { get; }
         /// <summary> Gets the time this message was sent. </summary>
@@ -22,6 +24,8 @@ namespace Discord
         ulong ChannelId { get; }
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }
+        /// <summary> Gets the id of the webhook used to created this message, if any. </summary>
+        ulong? WebhookId { get; }
 
         /// <summary> Returns all attachments included in this message. </summary>
         IReadOnlyCollection<IAttachment> Attachments { get; }

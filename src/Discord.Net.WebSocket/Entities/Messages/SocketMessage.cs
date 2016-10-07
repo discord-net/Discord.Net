@@ -17,15 +17,15 @@ namespace Discord.WebSocket
 
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
-        public virtual bool IsWebhook => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
-
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
         public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        public virtual ulong? WebhookId => null;
+        public bool IsWebhook => WebhookId != null;
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
