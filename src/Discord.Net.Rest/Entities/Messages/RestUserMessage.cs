@@ -86,9 +86,9 @@ namespace Discord.Rest
             }
 
             ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
-            if (model.Mentions.IsSpecified)
+            if (model.UserMentions.IsSpecified)
             {
-                var value = model.Mentions.Value;
+                var value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
                     var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
