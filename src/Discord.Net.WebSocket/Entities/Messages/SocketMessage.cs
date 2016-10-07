@@ -56,12 +56,12 @@ namespace Discord.WebSocket
 
         //IMessage
         IUser IMessage.Author => Author;
+        IMessageChannel IMessage.Channel => Channel;
         MessageType IMessage.Type => MessageType.Default;
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-        ulong IMessage.ChannelId => Channel.Id;
     }
 }

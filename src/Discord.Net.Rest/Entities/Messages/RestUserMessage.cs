@@ -30,13 +30,15 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author, IGuild guild)
-            : base(discord, id, channelId, author, guild)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
+            : base(discord, id, channel, author, guild)
         {
         }
         internal new static RestUserMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id, model.ChannelId, RestUser.Create(discord, model.Author.Value), guild);
+            var entity = new RestUserMessage(discord, model.Id,
+                RestVirtualMessageChannel.Create(discord, model.ChannelId),
+                RestUser.Create(discord, model.Author.Value), guild);
             entity.Update(model);
             return entity;
         }

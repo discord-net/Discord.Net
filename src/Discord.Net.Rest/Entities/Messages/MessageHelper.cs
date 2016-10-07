@@ -15,23 +15,23 @@ namespace Discord.Rest
         {
             var args = new ModifyMessageParams();
             func(args);
-            await client.ApiClient.ModifyMessageAsync(msg.ChannelId, msg.Id, args, options);
+            await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, args, options);
         }
         public static async Task DeleteAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.DeleteMessageAsync(msg.ChannelId, msg.Id, options);
+            await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options);
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.AddPinAsync(msg.ChannelId, msg.Id, options);
+            await client.ApiClient.AddPinAsync(msg.Channel.Id, msg.Id, options);
         }
         public static async Task UnpinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.RemovePinAsync(msg.ChannelId, msg.Id, options);
+            await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options);
         }
 
         public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, ImmutableArray<IUser> userMentions)

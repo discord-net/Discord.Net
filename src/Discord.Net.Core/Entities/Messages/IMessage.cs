@@ -21,7 +21,7 @@ namespace Discord
         DateTimeOffset? EditedTimestamp { get; }
         
         /// <summary> Gets the id of the channel this message was sent to. </summary>
-        ulong ChannelId { get; }
+        IMessageChannel Channel { get; }
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }
         /// <summary> Gets the id of the webhook used to created this message, if any. </summary>

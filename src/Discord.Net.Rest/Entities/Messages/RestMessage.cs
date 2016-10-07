@@ -12,7 +12,7 @@ namespace Discord.Rest
         internal readonly IGuild _guild;
         private long _timestampTicks;
 
-        public ulong ChannelId { get; }
+        public IMessageChannel Channel { get; }
         public RestUser Author { get; }
 
         public string Content { get; private set; }
@@ -31,10 +31,10 @@ namespace Discord.Rest
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, ulong channelId, RestUser author, IGuild guild)
+        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
             : base(discord, id)
         {
-            ChannelId = channelId;
+            Channel = channel;
             Author = author;
             _guild = guild;
         }
@@ -56,7 +56,7 @@ namespace Discord.Rest
 
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetChannelMessageAsync(ChannelId, Id, options).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetChannelMessageAsync(Channel.Id, Id, options).ConfigureAwait(false);
             Update(model);
         }
 
