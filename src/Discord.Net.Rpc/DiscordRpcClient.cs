@@ -29,10 +29,11 @@ namespace Discord.Rpc
         public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
 
         /// <summary> Creates a new RPC discord client. </summary>
-        public DiscordRpcClient(string clientId, string origin) : this(new DiscordRpcConfig(clientId, origin)) { }
+        public DiscordRpcClient(string clientId, string origin) 
+            : this(clientId, origin, new DiscordRpcConfig()) { }
         /// <summary> Creates a new RPC discord client. </summary>
-        public DiscordRpcClient(DiscordRpcConfig config)
-            : base(config, CreateApiClient(config))
+        public DiscordRpcClient(string clientId, string origin, DiscordRpcConfig config)
+            : base(config, CreateApiClient(clientId, origin, config))
         {
             ConnectionTimeout = config.ConnectionTimeout;
             _rpcLogger = LogManager.CreateLogger("RPC");
@@ -57,8 +58,8 @@ namespace Discord.Rpc
                     await _rpcLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
         }
-        private static API.DiscordRpcApiClient CreateApiClient(DiscordRpcConfig config)
-            => new API.DiscordRpcApiClient(config.ClientId, DiscordRestConfig.UserAgent, config.Origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
+        private static API.DiscordRpcApiClient CreateApiClient(string clientId, string origin, DiscordRpcConfig config)
+            => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
 
         /// <inheritdoc />
         public Task ConnectAsync() => ConnectAsync(false);
