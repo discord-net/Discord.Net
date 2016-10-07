@@ -23,17 +23,17 @@ namespace Discord
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }
 
-        /// <summary> Returns a collection of all attachments included in this message. </summary>
+        /// <summary> Returns all attachments included in this message. </summary>
         IReadOnlyCollection<IAttachment> Attachments { get; }
-        /// <summary> Returns a collection of all embeds included in this message. </summary>
+        /// <summary> Returns all embeds included in this message. </summary>
         IReadOnlyCollection<IEmbed> Embeds { get; }
-        /// <summary> Returns a collection of all tags included in this message's content. </summary>
+        /// <summary> Returns all tags included in this message's content. </summary>
         IReadOnlyCollection<ITag> Tags { get; }
-        /// <summary> Returns a collection of channel ids mentioned in this message. </summary>
+        /// <summary> Returns the ids of channels mentioned in this message. </summary>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
-        /// <summary> Returns a collection of roles mentioned in this message. </summary>
-        IReadOnlyCollection<IRole> MentionedRoles { get; }
-        /// <summary> Returns a collection of users mentioned in this message. </summary>
-        IReadOnlyCollection<IUser> MentionedUsers { get; }
+        /// <summary> Returns the ids of roles mentioned in this message. </summary>
+        IReadOnlyCollection<ulong> MentionedRoleIds { get; }
+        /// <summary> Returns the ids of users mentioned in this message. </summary>
+        IReadOnlyCollection<ulong> MentionedUserIds { get; }
     }
 }

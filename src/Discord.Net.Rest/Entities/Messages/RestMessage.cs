@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -23,7 +24,7 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
-        public virtual IReadOnlyCollection<RestRole> MentionedRoles => ImmutableArray.Create<RestRole>();
+        public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
 
@@ -64,7 +65,6 @@ namespace Discord.Rest
         IUser IMessage.Author => Author;
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
-        IReadOnlyCollection<IRole> IMessage.MentionedRoles => MentionedRoles;
-        IReadOnlyCollection<IUser> IMessage.MentionedUsers => MentionedUsers;
+        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
     }
 }

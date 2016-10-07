@@ -27,7 +27,7 @@ namespace Discord.Rest
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
         public override IReadOnlyCollection<ulong> MentionedChannelIds => MessageHelper.FilterTagsByKey(TagType.ChannelMention, _tags);
-        public override IReadOnlyCollection<RestRole> MentionedRoles => MessageHelper.FilterTagsByValue<RestRole>(TagType.RoleMention, _tags);
+        public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
 

@@ -60,8 +60,8 @@ namespace Discord.WebSocket
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
-        IReadOnlyCollection<IRole> IMessage.MentionedRoles => MentionedRoles;
-        IReadOnlyCollection<IUser> IMessage.MentionedUsers => MentionedUsers;
+        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
+        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
         ulong IMessage.ChannelId => Channel.Id;
     }
 }
