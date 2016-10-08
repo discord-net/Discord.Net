@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    //TODO: Allow user-supplied canceltoken
-    //TODO: Allow specifying timeout via DiscordApiClient
     public interface IQueuedRequest
     {
         CancellationToken CancelToken { get; }

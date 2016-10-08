@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    //TODO: Add docstrings
-    //TODO: Docstrings should explain when REST requests are sent and how many
     public interface IDiscordClient : IDisposable
     {
         ConnectionState ConnectionState { get; }

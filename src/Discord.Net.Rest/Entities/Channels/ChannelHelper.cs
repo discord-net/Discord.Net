@@ -71,7 +71,9 @@ namespace Discord.Rest
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IChannel channel, BaseDiscordClient client, 
             ulong? fromMessageId, Direction dir, int limit, IGuild guild, RequestOptions options)
         {
-            //TODO: Test this with Around direction
+            if (dir == Direction.Around)
+                throw new NotImplementedException(); //TODO: Impl
+
             return new PagedAsyncEnumerable<RestMessage>(
                 DiscordConfig.MaxMessagesPerBatch,
                 async (info, ct) =>

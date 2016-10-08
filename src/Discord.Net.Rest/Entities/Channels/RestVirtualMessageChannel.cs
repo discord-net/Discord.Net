@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest
 {
-    //TODO: Review this class
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class RestVirtualMessageChannel : RestEntity<ulong>, IMessageChannel
     {

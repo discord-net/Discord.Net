@@ -153,8 +153,8 @@ namespace Discord.WebSocket
 
         //IChannel
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overriden in Text/Voice //TODO: Does this actually override?
+            => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overriden in Text/Voice
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IUser>(GetUser(id)); //Overriden in Text/Voice //TODO: Does this actually override?
+            => Task.FromResult<IUser>(GetUser(id)); //Overriden in Text/Voice
     }
 }

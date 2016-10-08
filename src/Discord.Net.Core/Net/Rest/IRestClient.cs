@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    //TODO: Add docstrings
     public interface IRestClient
     {
         void SetHeader(string key, string value);
