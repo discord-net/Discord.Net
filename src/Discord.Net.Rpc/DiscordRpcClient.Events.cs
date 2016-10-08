@@ -34,12 +34,18 @@ namespace Discord.Rpc
         private readonly AsyncEvent<Func<Task>> _guildUpdatedEvent = new AsyncEvent<Func<Task>>();
 
         //Voice
-        public event Func<Task> VoiceStateUpdated
+        public event Func<ulong, Task> SpeakingStarted
         {
-            add { _voiceStateUpdatedEvent.Add(value); }
-            remove { _voiceStateUpdatedEvent.Remove(value); }
+            add { _speakingStarted.Add(value); }
+            remove { _speakingStarted.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Task>> _voiceStateUpdatedEvent = new AsyncEvent<Func<Task>>();
+        private readonly AsyncEvent<Func<ulong, Task>> _speakingStarted = new AsyncEvent<Func<ulong, Task>>();
+        public event Func<ulong, Task> SpeakingStopped
+        {
+            add { _speakingStopped.Add(value); }
+            remove { _speakingStopped.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, Task>> _speakingStopped = new AsyncEvent<Func<ulong, Task>>();
 
         //Messages
         public event Func<RpcMessage, Task> MessageReceived

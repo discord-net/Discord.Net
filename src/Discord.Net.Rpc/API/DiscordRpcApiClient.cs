@@ -335,6 +335,15 @@ namespace Discord.API
             return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
         }
 
+        public async Task<SubscriptionResponse> SendGlobalSubscribeAsync(string evt, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            var msg = new ChannelSubscriptionParams
+            {
+            };
+            return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+        }
+
         public async Task<SubscriptionResponse> SendGuildSubscribeAsync(string evt, ulong guildId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
