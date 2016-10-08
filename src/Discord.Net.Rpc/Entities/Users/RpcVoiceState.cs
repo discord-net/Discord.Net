@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Model = Discord.API.Rpc.VoiceStateEvent;
+using Model = Discord.API.Rpc.ExtendedVoiceState;
 
 namespace Discord.Rpc
 {

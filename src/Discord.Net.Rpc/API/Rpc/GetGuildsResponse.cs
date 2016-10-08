@@ -6,6 +6,6 @@ namespace Discord.API.Rpc
     public class GetGuildsResponse
     {
         [JsonProperty("guilds")]
-        public RpcUserGuild[] Guilds { get; set; }
+        public GuildSummary[] Guilds { get; set; }
     }
 }

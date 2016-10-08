@@ -2,13 +2,11 @@
 
 namespace Discord.API.Rpc
 {
-    public class ChannelCreatedEvent
+    public class GuildSummary
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("type")]
-        public ChannelType Type { get; set; }
     }
 }

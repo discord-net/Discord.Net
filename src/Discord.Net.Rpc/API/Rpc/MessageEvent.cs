@@ -7,6 +7,6 @@ namespace Discord.API.Rpc
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
         [JsonProperty("message")]
-        public RpcMessage Message { get; set; }
+        public Message Message { get; set; }
     }
 }

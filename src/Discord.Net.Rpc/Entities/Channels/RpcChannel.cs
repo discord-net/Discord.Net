@@ -1,32 +1,40 @@
-﻿using System.Diagnostics;
-using Model = Discord.API.Rpc.ChannelCreatedEvent;
+﻿using System;
+
+using Model = Discord.API.Rpc.Channel;
 
 namespace Discord.Rpc
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RpcChannel
+    public class RpcChannel : RpcEntity<ulong>
     {
-        public ulong Id { get; }
-        public string Name { get; set; }
-        public ChannelType Type { get; set; }
+        public string Name { get; private set; }
 
-        internal RpcChannel(ulong id)
+        internal RpcChannel(DiscordRpcClient discord, ulong id)
+            : base(discord, id)
         {
-            Id = id;
         }
-        internal static RpcChannel Create(Model model)
+        internal static RpcChannel Create(DiscordRpcClient discord, Model model)
         {
-            var entity = new RpcChannel(model.Id);
-            entity.Update(model);
-            return entity;
+            if (model.GuildId.IsSpecified)
+                return RpcGuildChannel.Create(discord, model);
+            else
+                return CreatePrivate(discord, model);
         }
-        internal void Update(Model model)
+        internal static RpcChannel CreatePrivate(DiscordRpcClient discord, Model model)
         {
-            Name = model.Name;
-            Type = model.Type;
+            switch (model.Type)
+            {
+                case ChannelType.DM:
+                    return RpcDMChannel.Create(discord, model);
+                case ChannelType.Group:
+                    return RpcGroupChannel.Create(discord, model);
+                default:
+                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
+            }
         }
-
-        public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id}, {Type})";
+        internal virtual void Update(Model model)
+        {
+            if (model.Name.IsSpecified)
+                Name = model.Name.Value;
+        }
     }
 }

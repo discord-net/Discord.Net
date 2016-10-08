@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -265,6 +266,59 @@ namespace Discord.Rpc
                 await ApiClient.SendChannelUnsubscribeAsync(GetEventName(events[i]), channelId);
         }
 
+        public async Task<RpcGuild> GetRpcGuildAsync(ulong id)
+        {
+            var model = await ApiClient.SendGetGuildAsync(id).ConfigureAwait(false);
+            return RpcGuild.Create(this, model);
+        }
+        public async Task<IReadOnlyCollection<RpcGuildSummary>> GetRpcGuildsAsync()
+        {
+            var models = await ApiClient.SendGetGuildsAsync().ConfigureAwait(false);
+            return models.Guilds.Select(x => RpcGuildSummary.Create(x)).ToImmutableArray();
+        }
+        public async Task<RpcChannel> GetRpcChannelAsync(ulong id)
+        {
+            var model = await ApiClient.SendGetChannelAsync(id).ConfigureAwait(false);
+            return RpcChannel.Create(this, model);
+        }
+        public async Task<IReadOnlyCollection<RpcChannelSummary>> GetRpcChannelsAsync(ulong guildId)
+        {
+            var models = await ApiClient.SendGetChannelsAsync(guildId).ConfigureAwait(false);
+            return models.Channels.Select(x => RpcChannelSummary.Create(x)).ToImmutableArray();
+        }
+
+        public async Task<IMessageChannel> SelectTextChannelAsync(IChannel channel)
+        {
+            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IMessageChannel;
+        }
+        public async Task<IMessageChannel> SelectTextChannelAsync(RpcChannelSummary channel)
+        {
+            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IMessageChannel;
+        }
+        public async Task<IMessageChannel> SelectTextChannelAsync(ulong channelId)
+        {
+            var model = await ApiClient.SendSelectTextChannelAsync(channelId).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IMessageChannel;
+        }
+
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(IChannel channel, bool force = false)
+        {
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IRpcAudioChannel;
+        }
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(RpcChannelSummary channel, bool force = false)
+        {
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IRpcAudioChannel;
+        }
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(ulong channelId, bool force = false)
+        {
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channelId, force).ConfigureAwait(false);
+            return RpcChannel.Create(this, model) as IRpcAudioChannel;
+        }
+
         public async Task<VoiceSettings> GetVoiceSettingsAsync()
         {
             var model = await ApiClient.GetVoiceSettingsAsync().ConfigureAwait(false);
@@ -278,6 +332,12 @@ namespace Discord.Rpc
             settings.Mode = new VoiceMode();
             func(settings);
             await ApiClient.SetVoiceSettingsAsync(settings).ConfigureAwait(false);
+        }
+        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<API.Rpc.UserVoiceSettings> func)
+        {
+            var settings = new API.Rpc.UserVoiceSettings();
+            func(settings);
+            await ApiClient.SetUserVoiceSettingsAsync(userId, settings).ConfigureAwait(false);
         }
 
         private static string GetEventName(RpcGlobalEvent rpcEvent)
@@ -363,8 +423,8 @@ namespace Discord.Rpc
                             case "CHANNEL_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ChannelCreatedEvent>(_serializer);
-                                    var channel = RpcChannel.Create(data);
+                                    var data = (payload.Value as JToken).ToObject<ChannelSummary>(_serializer);
+                                    var channel = RpcChannelSummary.Create(data);
 
                                     await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
                                 }
@@ -374,8 +434,8 @@ namespace Discord.Rpc
                             case "GUILD_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<GuildCreatedEvent>(_serializer);
-                                    var guild = RpcGuild.Create(data);
+                                    var data = (payload.Value as JToken).ToObject<GuildSummary>(_serializer);
+                                    var guild = RpcGuildSummary.Create(data);
 
                                     await _guildCreatedEvent.InvokeAsync(guild).ConfigureAwait(false);
                                 }
@@ -394,7 +454,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateCreatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -403,7 +463,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateUpdatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -412,7 +472,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_DELETE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateDeletedEvent.InvokeAsync(voiceState).ConfigureAwait(false);

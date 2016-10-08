@@ -269,14 +269,14 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             return await SendRpcAsync<GetGuildsResponse>("GET_GUILDS", null, options: options).ConfigureAwait(false);
         }
-        public async Task<Rpc.RpcGuild> SendGetGuildAsync(ulong guildId, RequestOptions options = null)
+        public async Task<Rpc.Guild> SendGetGuildAsync(ulong guildId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new GetGuildParams
             {
                 GuildId = guildId
             };
-            return await SendRpcAsync<Rpc.RpcGuild>("GET_GUILD", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.Guild>("GET_GUILD", msg, options: options).ConfigureAwait(false);
         }
         public async Task<GetChannelsResponse> SendGetChannelsAsync(ulong guildId, RequestOptions options = null)
         {
@@ -287,33 +287,34 @@ namespace Discord.API
             };
             return await SendRpcAsync<GetChannelsResponse>("GET_CHANNELS", msg, options: options).ConfigureAwait(false);
         }
-        public async Task<Rpc.RpcChannel> SendGetChannelAsync(ulong channelId, RequestOptions options = null)
+        public async Task<Rpc.Channel> SendGetChannelAsync(ulong channelId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new GetChannelParams
             {
                 ChannelId = channelId
             };
-            return await SendRpcAsync<Rpc.RpcChannel>("GET_CHANNEL", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.Channel>("GET_CHANNEL", msg, options: options).ConfigureAwait(false);
         }
-
-        public async Task<SetLocalVolumeResponse> SendSetLocalVolumeAsync(int volume, RequestOptions options = null)
+        
+        public async Task<Rpc.Channel> SendSelectTextChannelAsync(ulong channelId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var msg = new SetLocalVolumeParams
-            {
-                Volume = volume
-            };
-            return await SendRpcAsync<SetLocalVolumeResponse>("SET_LOCAL_VOLUME", msg, options: options).ConfigureAwait(false);
-        }
-        public async Task<Rpc.RpcChannel> SendSelectVoiceChannelAsync(ulong channelId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-            var msg = new SelectVoiceChannelParams
+            var msg = new SelectChannelParams
             {
                 ChannelId = channelId
             };
-            return await SendRpcAsync<Rpc.RpcChannel>("SELECT_VOICE_CHANNEL", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.Channel>("SELECT_TEXT_CHANNEL", msg, options: options).ConfigureAwait(false);
+        }
+        public async Task<Rpc.Channel> SendSelectVoiceChannelAsync(ulong channelId, bool force = false, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            var msg = new SelectChannelParams
+            {
+                ChannelId = channelId,
+                Force = force
+            };
+            return await SendRpcAsync<Rpc.Channel>("SELECT_VOICE_CHANNEL", msg, options: options).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionResponse> SendGlobalSubscribeAsync(string evt, RequestOptions options = null)
@@ -370,10 +371,16 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             return await SendRpcAsync<API.Rpc.VoiceSettings>("GET_VOICE_SETTINGS", null, options: options).ConfigureAwait(false);
         }
-        public async Task<API.Rpc.VoiceSettings> SetVoiceSettingsAsync(API.Rpc.VoiceSettings settings, RequestOptions options = null)
+        public async Task SetVoiceSettingsAsync(API.Rpc.VoiceSettings settings, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendRpcAsync<API.Rpc.VoiceSettings>("SET_VOICE_SETTINGS", settings, options: options).ConfigureAwait(false);
+            await SendRpcAsync<API.Rpc.VoiceSettings>("SET_VOICE_SETTINGS", settings, options: options).ConfigureAwait(false);
+        }
+        public async Task SetUserVoiceSettingsAsync(ulong userId, API.Rpc.UserVoiceSettings settings, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            settings.UserId = userId;
+            await SendRpcAsync<API.Rpc.UserVoiceSettings>("SET_USER_VOICE_SETTINGS", settings, options: options).ConfigureAwait(false);
         }
 
         private bool ProcessMessage(API.Rpc.RpcFrame msg)

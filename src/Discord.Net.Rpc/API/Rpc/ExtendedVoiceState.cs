@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class VoiceStateEvent
+    public class ExtendedVoiceState
     {
         [JsonProperty("user")]
         public User User { get; set; }

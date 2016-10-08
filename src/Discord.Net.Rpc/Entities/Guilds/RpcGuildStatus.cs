@@ -6,12 +6,12 @@ namespace Discord.Rpc
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RpcGuildStatus
     {
-        public RpcGuild Guild { get; }
+        public RpcGuildSummary Guild { get; }
         public int Online { get; private set; }
 
         internal RpcGuildStatus(ulong guildId)
         {
-            Guild = new RpcGuild(guildId);
+            Guild = new RpcGuildSummary(guildId);
         }
         internal static RpcGuildStatus Create(Model model)
         {

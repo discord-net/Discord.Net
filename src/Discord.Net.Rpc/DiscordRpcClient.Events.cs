@@ -26,20 +26,20 @@ namespace Discord.Rpc
         private readonly AsyncEvent<Func<Task>> _readyEvent = new AsyncEvent<Func<Task>>();
 
         //Channel
-        public event Func<RpcChannel, Task> ChannelCreated
+        public event Func<RpcChannelSummary, Task> ChannelCreated
         {
             add { _channelCreatedEvent.Add(value); }
             remove { _channelCreatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<RpcChannel, Task>> _channelCreatedEvent = new AsyncEvent<Func<RpcChannel, Task>>();
+        private readonly AsyncEvent<Func<RpcChannelSummary, Task>> _channelCreatedEvent = new AsyncEvent<Func<RpcChannelSummary, Task>>();
 
         //Guild
-        public event Func<RpcGuild, Task> GuildCreated
+        public event Func<RpcGuildSummary, Task> GuildCreated
         {
             add { _guildCreatedEvent.Add(value); }
             remove { _guildCreatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<RpcGuild, Task>> _guildCreatedEvent = new AsyncEvent<Func<RpcGuild, Task>>();
+        private readonly AsyncEvent<Func<RpcGuildSummary, Task>> _guildCreatedEvent = new AsyncEvent<Func<RpcGuildSummary, Task>>();
         public event Func<RpcGuildStatus, Task> GuildStatusUpdated
         {
             add { _guildStatusUpdatedEvent.Add(value); }

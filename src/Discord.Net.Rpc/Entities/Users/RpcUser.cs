@@ -6,7 +6,7 @@ using Model = Discord.API.User;
 namespace Discord.Rpc
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RpcUser : RpcEntity<ulong>, IUser, IUpdateable
+    public class RpcUser : RpcEntity<ulong>, IUser
     {
         public bool IsBot { get; private set; }
         public string Username { get; private set; }
@@ -39,12 +39,6 @@ namespace Discord.Rpc
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
-        }
-        
-        public virtual async Task UpdateAsync(RequestOptions options = null)
-        {
-            var model = await Discord.ApiClient.GetUserAsync(Id, options);
-            Update(model);
         }
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)

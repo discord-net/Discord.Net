@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class RpcMessage : Message
+    public class Message : Discord.API.Message
     {
         [JsonProperty("blocked")]
         public Optional<bool> IsBlocked { get; }

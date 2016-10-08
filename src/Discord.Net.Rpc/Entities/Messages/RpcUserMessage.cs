@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = Discord.API.Rpc.RpcMessage;
+using Model = Discord.API.Rpc.Message;
 
 namespace Discord.Rpc
 {
