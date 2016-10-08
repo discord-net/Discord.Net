@@ -269,14 +269,14 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             return await SendRpcAsync<GetGuildsResponse>("GET_GUILDS", null, options: options).ConfigureAwait(false);
         }
-        public async Task<RpcGuild> SendGetGuildAsync(ulong guildId, RequestOptions options = null)
+        public async Task<Rpc.RpcGuild> SendGetGuildAsync(ulong guildId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new GetGuildParams
             {
                 GuildId = guildId
             };
-            return await SendRpcAsync<RpcGuild>("GET_GUILD", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.RpcGuild>("GET_GUILD", msg, options: options).ConfigureAwait(false);
         }
         public async Task<GetChannelsResponse> SendGetChannelsAsync(ulong guildId, RequestOptions options = null)
         {
@@ -287,14 +287,14 @@ namespace Discord.API
             };
             return await SendRpcAsync<GetChannelsResponse>("GET_CHANNELS", msg, options: options).ConfigureAwait(false);
         }
-        public async Task<RpcChannel> SendGetChannelAsync(ulong channelId, RequestOptions options = null)
+        public async Task<Rpc.RpcChannel> SendGetChannelAsync(ulong channelId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new GetChannelParams
             {
                 ChannelId = channelId
             };
-            return await SendRpcAsync<RpcChannel>("GET_CHANNEL", msg, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.RpcChannel>("GET_CHANNEL", msg, options: options).ConfigureAwait(false);
         }
 
         public async Task<SetLocalVolumeResponse> SendSetLocalVolumeAsync(int volume, RequestOptions options = null)
@@ -306,42 +306,27 @@ namespace Discord.API
             };
             return await SendRpcAsync<SetLocalVolumeResponse>("SET_LOCAL_VOLUME", msg, options: options).ConfigureAwait(false);
         }
-        public async Task<RpcChannel> SendSelectVoiceChannelAsync(ulong channelId, RequestOptions options = null)
+        public async Task<Rpc.RpcChannel> SendSelectVoiceChannelAsync(ulong channelId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new SelectVoiceChannelParams
             {
                 ChannelId = channelId
             };
-            return await SendRpcAsync<RpcChannel>("SELECT_VOICE_CHANNEL", msg, options: options).ConfigureAwait(false);
-        }
-
-        public async Task<SubscriptionResponse> SendChannelSubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-            var msg = new ChannelSubscriptionParams
-            {
-                ChannelId = channelId
-            };
-            return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
-        }
-        public async Task<SubscriptionResponse> SendChannelUnsubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-            var msg = new ChannelSubscriptionParams
-            {
-                ChannelId = channelId
-            };
-            return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<Rpc.RpcChannel>("SELECT_VOICE_CHANNEL", msg, options: options).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionResponse> SendGlobalSubscribeAsync(string evt, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var msg = new ChannelSubscriptionParams
-            {
-            };
+            var msg = new object();
             return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+        }
+        public async Task<SubscriptionResponse> SendGlobalUnsubscribeAsync(string evt, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            var msg = new object();
+            return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionResponse> SendGuildSubscribeAsync(string evt, ulong guildId, RequestOptions options = null)
@@ -359,6 +344,25 @@ namespace Discord.API
             var msg = new GuildSubscriptionParams
             {
                 GuildId = guildId
+            };
+            return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<SubscriptionResponse> SendChannelSubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            var msg = new ChannelSubscriptionParams
+            {
+                ChannelId = channelId
+            };
+            return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+        }
+        public async Task<SubscriptionResponse> SendChannelUnsubscribeAsync(string evt, ulong channelId, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            var msg = new ChannelSubscriptionParams
+            {
+                ChannelId = channelId
             };
             return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
         }

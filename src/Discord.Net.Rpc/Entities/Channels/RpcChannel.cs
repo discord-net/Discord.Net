@@ -1,25 +1,27 @@
-﻿using Model = Discord.API.Rpc.GuildCreatedEvent;
+﻿using Model = Discord.API.Rpc.ChannelCreatedEvent;
 
 namespace Discord.Rpc
 {
-    public class RpcGuild
+    public class RpcChannel
     {
         public ulong Id { get; }
         public string Name { get; set; }
+        public ChannelType Type { get; set; }
 
-        internal RpcGuild(ulong id)
+        internal RpcChannel(ulong id)
         {
             Id = id;
         }
-        internal static RpcGuild Create(Model model)
+        internal static RpcChannel Create(Model model)
         {
-            var entity = new RpcGuild(model.Id);
+            var entity = new RpcChannel(model.Id);
             entity.Update(model);
             return entity;
         }
         internal void Update(Model model)
         {
             Name = model.Name;
+            Type = model.Type;
         }
     }
 }

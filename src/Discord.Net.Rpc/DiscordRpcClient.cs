@@ -228,6 +228,18 @@ namespace Discord.Rpc
             return result.Code;
         }
 
+        public async Task SubscribeGlobal(params RpcGlobalEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendGlobalSubscribeAsync(GetEventName(events[i]));
+        }
+        public async Task UnsubscribeGlobal(params RpcGlobalEvent[] events)
+        {
+            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
+            for (int i = 0; i < events.Length; i++)
+                await ApiClient.SendGlobalUnsubscribeAsync(GetEventName(events[i]));
+        }
         public async Task SubscribeGuild(ulong guildId, params RpcChannelEvent[] events)
         {
             Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
@@ -253,6 +265,16 @@ namespace Discord.Rpc
                 await ApiClient.SendChannelUnsubscribeAsync(GetEventName(events[i]), channelId);
         }
 
+        private static string GetEventName(RpcGlobalEvent rpcEvent)
+        {
+            switch (rpcEvent)
+            {
+                case RpcGlobalEvent.ChannelCreated: return "CHANNEL_CREATE";
+                case RpcGlobalEvent.GuildCreated: return "GUILD_CREATE";
+                default:
+                    throw new InvalidOperationException($"Unknown RPC Global Event: {rpcEvent}");
+            }
+        }
         private static string GetEventName(RpcGuildEvent rpcEvent)
         {
             switch (rpcEvent)
@@ -266,14 +288,14 @@ namespace Discord.Rpc
         {
             switch (rpcEvent)
             {
-                case RpcChannelEvent.VoiceStateCreate: return "VOICE_STATE_CREATE";
-                case RpcChannelEvent.VoiceStateUpdate: return "VOICE_STATE_UPDATE";
-                case RpcChannelEvent.VoiceStateDelete: return "VOICE_STATE_DELETE";
-                case RpcChannelEvent.SpeakingStart: return "SPEAKING_START";
-                case RpcChannelEvent.SpeakingStop: return "SPEAKING_STOP";
                 case RpcChannelEvent.MessageCreate: return "MESSAGE_CREATE";
                 case RpcChannelEvent.MessageUpdate: return "MESSAGE_UPDATE";
                 case RpcChannelEvent.MessageDelete: return "MESSAGE_DELETE";
+                case RpcChannelEvent.SpeakingStart: return "SPEAKING_START";
+                case RpcChannelEvent.SpeakingStop: return "SPEAKING_STOP";
+                case RpcChannelEvent.VoiceStateCreate: return "VOICE_STATE_CREATE";
+                case RpcChannelEvent.VoiceStateUpdate: return "VOICE_STATE_UPDATE";
+                case RpcChannelEvent.VoiceStateDelete: return "VOICE_STATE_DELETE";
                 default:
                     throw new InvalidOperationException($"Unknown RPC Channel Event: {rpcEvent}");
             }
@@ -321,12 +343,34 @@ namespace Discord.Rpc
                                 }
                                 break;
 
+                            //Channels
+                            case "CHANNEL_CREATE":
+                                {
+                                    await _rpcLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<ChannelCreatedEvent>(_serializer);
+                                    var channel = RpcChannel.Create(data);
+
+                                    await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
+                                }
+                                break;
+
                             //Guilds
+                            case "GUILD_CREATE":
+                                {
+                                    await _rpcLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<GuildCreatedEvent>(_serializer);
+                                    var guild = RpcGuild.Create(data);
+
+                                    await _guildCreatedEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                }
+                                break;
                             case "GUILD_STATUS":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_STATUS)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<GuildStatusEvent>(_serializer);
+                                    var guildStatus = RpcGuildStatus.Create(data);
 
-                                    await _guildUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                    await _guildStatusUpdatedEvent.InvokeAsync(guildStatus).ConfigureAwait(false);
                                 }
                                 break;
 
