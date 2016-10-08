@@ -163,7 +163,7 @@ namespace Discord.WebSocket
                 //Abort connection on timeout
                 var _ = Task.Run(async () =>
                 {
-                    await Task.Delay(ConnectionTimeout);
+                    await Task.Delay(ConnectionTimeout).ConfigureAwait(false);
                     connectTask.TrySetException(new TimeoutException());
                 });
 
@@ -410,7 +410,7 @@ namespace Discord.WebSocket
             //Wait for unsynced guilds to sync first.
             var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToImmutableArray();
             if (unsyncedGuilds.Length > 0)
-                await Task.WhenAll(unsyncedGuilds);
+                await Task.WhenAll(unsyncedGuilds).ConfigureAwait(false);
 
             //Download offline members
             const short batchSize = 50;
@@ -1468,10 +1468,10 @@ namespace Discord.WebSocket
 
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)");
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
                                 break;
                             case "CHANNEL_PINS_UPDATE":
-                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)");
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)").ConfigureAwait(false);
                                 break;
                             case "GUILD_INTEGRATIONS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
@@ -1621,17 +1621,17 @@ namespace Discord.WebSocket
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
-            => await GetConnectionsAsync();
+            => await GetConnectionsAsync().ConfigureAwait(false);
 
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
-            => await GetInviteAsync(inviteId);
+            => await GetInviteAsync(inviteId).ConfigureAwait(false);
 
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode)
             => Task.FromResult<IGuild>(GetGuild(id));
         Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon)
-            => await CreateGuildAsync(name, region, jpegIcon);
+            => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
         Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode)
             => Task.FromResult<IUser>(GetUser(id));

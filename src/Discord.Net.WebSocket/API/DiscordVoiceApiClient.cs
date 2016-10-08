@@ -107,7 +107,7 @@ namespace Discord.Audio
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
             await _webSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
-            await _sentGatewayMessageEvent.InvokeAsync(opCode);
+            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
         public async Task SendAsync(byte[] data, int bytes)
         {
@@ -132,7 +132,7 @@ namespace Discord.Audio
                 UserId = userId,
                 SessionId = sessionId,
                 Token = token
-            });
+            }).ConfigureAwait(false);
         }
         public async Task SendSelectProtocol(string externalIp, int externalPort)
         {
@@ -145,7 +145,7 @@ namespace Discord.Audio
                     Port = externalPort,
                     Mode = Mode
                 }
-            });
+            }).ConfigureAwait(false);
         }
         public async Task SendSetSpeaking(bool value)
         {
@@ -153,7 +153,7 @@ namespace Discord.Audio
             {
                 IsSpeaking = value,
                 Delay = 0
-            });
+            }).ConfigureAwait(false);
         }
 
         public async Task ConnectAsync(string url)

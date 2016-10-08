@@ -130,7 +130,7 @@ namespace Discord.Net.Queue
                 if (millis <= 0 || !await _semaphore.WaitAsync(millis).ConfigureAwait(false))
                     throw new TimeoutException();
 
-                if (!await _semaphore.WaitAsync(0))
+                if (!await _semaphore.WaitAsync(0).ConfigureAwait(false))
                 {
                     await _queue.RaiseRateLimitTriggered(Id, this, null).ConfigureAwait(false);
 

@@ -45,7 +45,7 @@ namespace Discord
                 if (_info.Remaining == 0)
                     return false;
 
-                var data = await _source._getPage(_info, cancelToken);
+                var data = await _source._getPage(_info, cancelToken).ConfigureAwait(false);
                 Current = new Page<T>(_info, data);
 
                 _info.Page++;

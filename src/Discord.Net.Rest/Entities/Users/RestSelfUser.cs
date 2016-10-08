@@ -37,7 +37,7 @@ namespace Discord.Rest
 
         public override async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetMyUserAsync(options);
+            var model = await Discord.ApiClient.GetMyUserAsync(options).ConfigureAwait(false);
             if (model.Id != Id)
                 throw new InvalidOperationException("Unable to update this object using a different token.");
             Update(model);
@@ -47,7 +47,7 @@ namespace Discord.Rest
         {
             if (Id != Discord.CurrentUser.Id)
                 throw new InvalidOperationException("Unable to modify this object using a different token.");
-            var model = await UserHelper.ModifyAsync(this, Discord, func, options);
+            var model = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 

@@ -201,7 +201,7 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditions(context);
+                var preconditionResult = await commands[i].CheckPreconditions(context).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -210,7 +210,7 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var parseResult = await commands[i].Parse(context, searchResult, preconditionResult);
+                var parseResult = await commands[i].Parse(context, searchResult, preconditionResult).ConfigureAwait(false);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)
@@ -235,7 +235,7 @@ namespace Discord.Commands
                     }
                 }
 
-                return await commands[i].Execute(context, parseResult);
+                return await commands[i].Execute(context, parseResult).ConfigureAwait(false);
             }
             
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");

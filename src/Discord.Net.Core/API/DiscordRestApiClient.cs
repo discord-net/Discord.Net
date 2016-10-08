@@ -116,7 +116,7 @@ namespace Discord.API
                 _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
 
                 if (FetchCurrentUser)
-                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true });
+                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true }).ConfigureAwait(false);
 
                 LoginState = LoginState.LoggedIn;
             }

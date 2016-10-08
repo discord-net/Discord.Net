@@ -269,7 +269,7 @@ namespace Discord.Audio
                     catch { return; }
                     
                     await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
-                    await ApiClient.SendSelectProtocol(ip, port);
+                    await ApiClient.SendSelectProtocol(ip, port).ConfigureAwait(false);
                 }
             }
         }

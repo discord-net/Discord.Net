@@ -35,7 +35,7 @@ namespace Discord.Rest
         
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetInviteAsync(Code, options);
+            var model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)

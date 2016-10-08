@@ -71,7 +71,7 @@ namespace Discord.WebSocket
         {
             IMessage msg = _messages?.Get(id);
             if (msg == null)
-                msg = await ChannelHelper.GetMessageAsync(this, Discord, id, null, options);
+                msg = await ChannelHelper.GetMessageAsync(this, Discord, id, null, options).ConfigureAwait(false);
             return msg;
         }
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
@@ -181,7 +181,7 @@ namespace Discord.WebSocket
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetMessageAsync(id, options);
+                return await GetMessageAsync(id, options).ConfigureAwait(false);
             else
                 return GetCachedMessage(id);
         }
@@ -194,11 +194,11 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
-            => await SendFileAsync(filePath, text, isTTS, options);
+            => await SendFileAsync(filePath, text, isTTS, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options)
-            => await SendFileAsync(stream, filename, text, isTTS, options);
+            => await SendFileAsync(stream, filename, text, isTTS, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, RequestOptions options)
-            => await SendMessageAsync(text, isTTS, options);
+            => await SendMessageAsync(text, isTTS, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
 

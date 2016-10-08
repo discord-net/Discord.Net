@@ -80,7 +80,7 @@ namespace Discord.WebSocket
 
             Presence = new SocketPresence(status, game);
 
-            await SendStatus(status, game);
+            await SendStatus(status, game).ConfigureAwait(false);
         }
         internal async Task SendStatus(UserStatus status, GameEntity? game)
         {
@@ -95,7 +95,7 @@ namespace Discord.WebSocket
                 status,
                 status == UserStatus.AFK,
                 _statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
-                gameModel);
+                gameModel).ConfigureAwait(false);
         }
 
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;

@@ -18,7 +18,7 @@ namespace Discord.Rest
         {
             var args = new ModifyGuildRoleParams();
             func(args);
-            return await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, args, options);
+            return await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, args, options).ConfigureAwait(false);
         }
     }
 }

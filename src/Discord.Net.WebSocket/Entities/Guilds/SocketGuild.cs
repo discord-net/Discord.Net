@@ -387,7 +387,7 @@ namespace Discord.WebSocket
 
         public async Task DownloadUsersAsync()
         {
-            await Discord.DownloadUsersAsync(new[] { this });
+            await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
         }
         internal void CompleteDownloadUsers()
         {
@@ -495,12 +495,12 @@ namespace Discord.WebSocket
             }
             catch (OperationCanceledException)
             {
-                await DisconnectAudioAsync();
+                await DisconnectAudioAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 await _audioConnectPromise.SetExceptionAsync(e).ConfigureAwait(false);
-                await DisconnectAudioAsync();
+                await DisconnectAudioAsync().ConfigureAwait(false);
             }
             finally
             {
@@ -532,29 +532,29 @@ namespace Discord.WebSocket
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options);
+            => await GetBansAsync(options).ConfigureAwait(false);
 
         Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
         Task<IGuildChannel> IGuild.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(GetChannel(id));
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
-            => await CreateTextChannelAsync(name, options);
+            => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
-            => await CreateVoiceChannelAsync(name, options);
+            => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
-            => await GetIntegrationsAsync(options);
+            => await GetIntegrationsAsync(options).ConfigureAwait(false);
         async Task<IGuildIntegration> IGuild.CreateIntegrationAsync(ulong id, string type, RequestOptions options)
-            => await CreateIntegrationAsync(id, type, options);
+            => await CreateIntegrationAsync(id, type, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
-            => await GetInvitesAsync(options);
+            => await GetInvitesAsync(options).ConfigureAwait(false);
 
         IRole IGuild.GetRole(ulong id)
             => GetRole(id);
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
-            => await CreateRoleAsync(name, permissions, color, isHoisted, options);
+            => await CreateRoleAsync(name, permissions, color, isHoisted, options).ConfigureAwait(false);
 
         Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Users);

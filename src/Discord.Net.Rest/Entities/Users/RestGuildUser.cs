@@ -64,12 +64,12 @@ namespace Discord.Rest
         
         public override async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options);
+            var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
         public async Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
         { 
-            var args = await UserHelper.ModifyAsync(this, Discord, func, options);
+            var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)
                 IsDeafened = args.Deaf.Value;
             if (args.Mute.IsSpecified)

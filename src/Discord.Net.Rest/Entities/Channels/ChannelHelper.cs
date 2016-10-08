@@ -23,7 +23,7 @@ namespace Discord.Rest
         {
             var args = new ModifyGuildChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
             Action<ModifyTextChannelParams> func, 
@@ -31,7 +31,7 @@ namespace Discord.Rest
         {
             var args = new ModifyTextChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
             Action<ModifyVoiceChannelParams> func, 
@@ -39,14 +39,14 @@ namespace Discord.Rest
         {
             var args = new ModifyVoiceChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
         }
 
         //Invites
         public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IChannel channel, BaseDiscordClient client,
             RequestOptions options)
         {
-            var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options);
+            var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, x)).ToImmutableArray();
         }
         public static async Task<RestInviteMetadata> CreateInviteAsync(IChannel channel, BaseDiscordClient client,
@@ -57,7 +57,7 @@ namespace Discord.Rest
                 args.MaxAge = maxAge.Value;
             if (maxUses.HasValue)
                 args.MaxUses = maxUses.Value;
-            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options);
+            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, model);
         }
 
@@ -83,7 +83,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.RelativeMessageId = info.Position.Value;
-                    var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options);
+                    var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
                     return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray(); ;
                 },
                 nextPage: (info, lastPage) =>
@@ -164,7 +164,7 @@ namespace Discord.Rest
         public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildMemberAsync(channel.GuildId, id, options);
+            var model = await client.ApiClient.GetGuildMemberAsync(channel.GuildId, id, options).ConfigureAwait(false);
             if (model == null)
                 return null;
             var user = RestGuildUser.Create(client, guild, model);
@@ -186,7 +186,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args, options);
+                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args, options).ConfigureAwait(false);
                     return models
                         .Select(x => RestGuildUser.Create(client, guild, x))
                         .Where(x => x.GetPermissions(channel).ReadMessages)
@@ -207,7 +207,7 @@ namespace Discord.Rest
         public static async Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options = null)
         {
-            await client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options);
+            await client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options).ConfigureAwait(false);
         }
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client, 
             RequestOptions options)

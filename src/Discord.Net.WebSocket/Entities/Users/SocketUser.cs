@@ -51,6 +51,6 @@ namespace Discord.WebSocket
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
-            => await CreateDMChannelAsync(options);
+            => await CreateDMChannelAsync(options).ConfigureAwait(false);
     }
 }

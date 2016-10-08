@@ -62,7 +62,7 @@ namespace Discord.Rest
         public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client, 
             RequestOptions options)
         {
-            var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options);
+            var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
         }
         
@@ -70,12 +70,12 @@ namespace Discord.Rest
             ulong userId, int pruneDays, RequestOptions options)
         {
             var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays };
-            await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options);
+            await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options).ConfigureAwait(false);
         }        
         public static async Task RemoveBanAsync(IGuild guild, BaseDiscordClient client, 
             ulong userId, RequestOptions options)
         {
-            await client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options);
+            await client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);
         }
 
         //Channels

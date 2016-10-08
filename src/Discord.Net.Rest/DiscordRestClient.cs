@@ -78,14 +78,14 @@ namespace Discord.Rest
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetChannelAsync(id);
+                return await GetChannelAsync(id).ConfigureAwait(false);
             else
                 return null;
         }
         async Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetPrivateChannelsAsync();
+                return await GetPrivateChannelsAsync().ConfigureAwait(false);
             else
                 return ImmutableArray.Create<IPrivateChannel>();
         }

@@ -44,7 +44,7 @@ namespace Discord.Rest
 
         public async Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
         { 
-            var model = await RoleHelper.ModifyAsync(this, Discord, func, options);
+            var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)

@@ -29,10 +29,10 @@ namespace Discord.Rest
                 {
                     try
                     {
-                        await _channel.TriggerTypingAsync(_options);
+                        await _channel.TriggerTypingAsync(_options).ConfigureAwait(false);
                     }
                     catch { }
-                    await Task.Delay(9750, token);
+                    await Task.Delay(9750, token).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) { }

@@ -100,18 +100,18 @@ namespace Discord.Rest
 
         //General
         public async Task UpdateAsync(RequestOptions options = null)
-            => Update(await Discord.ApiClient.GetGuildAsync(Id, options));
+            => Update(await Discord.ApiClient.GetGuildAsync(Id, options).ConfigureAwait(false));
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         public async Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
         {
-            var model = await GuildHelper.ModifyAsync(this, Discord, func, options);
+            var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         public async Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
         { 
-            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
+            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
@@ -121,7 +121,7 @@ namespace Discord.Rest
         }
         public async Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
         {
-            var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options);
+            var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options).ConfigureAwait(false);
             foreach (var model in models)
             {
                 var role = GetRole(model.Id);
@@ -179,7 +179,7 @@ namespace Discord.Rest
         public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?), 
             bool isHoisted = false, RequestOptions options = null)
         {
-            var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, options);
+            var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, options).ConfigureAwait(false);
             _roles = _roles.Add(role.Id, role);
             return role;
         }
@@ -205,58 +205,58 @@ namespace Discord.Rest
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
-            => await GetBansAsync(options);
+            => await GetBansAsync(options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetChannelsAsync(options);
+                return await GetChannelsAsync(options).ConfigureAwait(false);
             else
                 return ImmutableArray.Create<IGuildChannel>();
         }
         async Task<IGuildChannel> IGuild.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetChannelAsync(id, options);
+                return await GetChannelAsync(id, options).ConfigureAwait(false);
             else
                 return null;
         }
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
-            => await CreateTextChannelAsync(name, options);
+            => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
-            => await CreateVoiceChannelAsync(name, options);
+            => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
-            => await GetIntegrationsAsync(options);
+            => await GetIntegrationsAsync(options).ConfigureAwait(false);
         async Task<IGuildIntegration> IGuild.CreateIntegrationAsync(ulong id, string type, RequestOptions options)
-            => await CreateIntegrationAsync(id, type, options);
+            => await CreateIntegrationAsync(id, type, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
-            => await GetInvitesAsync(options);
+            => await GetInvitesAsync(options).ConfigureAwait(false);
 
         IRole IGuild.GetRole(ulong id) 
             => GetRole(id);
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
-            => await CreateRoleAsync(name, permissions, color, isHoisted, options);
+            => await CreateRoleAsync(name, permissions, color, isHoisted, options).ConfigureAwait(false);
 
         async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetUserAsync(id, options);
+                return await GetUserAsync(id, options).ConfigureAwait(false);
             else
                 return null;
         }
         async Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetCurrentUserAsync(options);
+                return await GetCurrentUserAsync(options).ConfigureAwait(false);
             else
                 return null;
         }
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return (await GetUsersAsync(options).Flatten()).ToImmutableArray();
+                return (await GetUsersAsync(options).Flatten().ConfigureAwait(false)).ToImmutableArray();
             else
                 return ImmutableArray.Create<IGuildUser>();
         }

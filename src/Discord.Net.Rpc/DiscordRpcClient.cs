@@ -103,7 +103,7 @@ namespace Discord.Rpc
                 //Abort connection on timeout
                 var _ = Task.Run(async () =>
                 {
-                    await Task.Delay(ConnectionTimeout);
+                    await Task.Delay(ConnectionTimeout).ConfigureAwait(false);
                     connectTask.TrySetException(new TimeoutException());
                 });
 
@@ -231,27 +231,27 @@ namespace Discord.Rpc
 
         public async Task SubscribeGlobal(RpcGlobalEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendGlobalSubscribeAsync(GetEventName(evnt), options);
+            await ApiClient.SendGlobalSubscribeAsync(GetEventName(evnt), options).ConfigureAwait(false);
         }
         public async Task UnsubscribeGlobal(RpcGlobalEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendGlobalUnsubscribeAsync(GetEventName(evnt), options);
+            await ApiClient.SendGlobalUnsubscribeAsync(GetEventName(evnt), options).ConfigureAwait(false);
         }
         public async Task SubscribeGuild(ulong guildId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendGuildSubscribeAsync(GetEventName(evnt), guildId, options);
+            await ApiClient.SendGuildSubscribeAsync(GetEventName(evnt), guildId, options).ConfigureAwait(false);
         }
         public async Task UnsubscribeGuild(ulong guildId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendGuildUnsubscribeAsync(GetEventName(evnt), guildId, options);
+            await ApiClient.SendGuildUnsubscribeAsync(GetEventName(evnt), guildId, options).ConfigureAwait(false);
         }
         public async Task SubscribeChannel(ulong channelId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendChannelSubscribeAsync(GetEventName(evnt), channelId);
+            await ApiClient.SendChannelSubscribeAsync(GetEventName(evnt), channelId).ConfigureAwait(false);
         }
         public async Task UnsubscribeChannel(ulong channelId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            await ApiClient.SendChannelUnsubscribeAsync(GetEventName(evnt), channelId);
+            await ApiClient.SendChannelUnsubscribeAsync(GetEventName(evnt), channelId).ConfigureAwait(false);
         }
 
         public async Task<RpcGuild> GetRpcGuildAsync(ulong id, RequestOptions options = null)
