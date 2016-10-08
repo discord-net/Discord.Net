@@ -18,7 +18,7 @@ namespace Discord.Rpc
         }
         internal static VoiceShortcut Create(Model model)
         {
-            return new VoiceShortcut(model.Type, model.Code, model.Name);
+            return new VoiceShortcut(model.Type.Value, model.Code.Value, model.Name.Value);
         }
 
         public override string ToString() => $"{Name}";

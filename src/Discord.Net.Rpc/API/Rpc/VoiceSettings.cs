@@ -13,14 +13,14 @@ namespace Discord.API.Rpc
         [JsonProperty("mode")]
         public VoiceMode Mode { get; set; }
         [JsonProperty("automatic_gain_control")]
-        public bool AutomaticGainControl { get; set; }
+        public Optional<bool> AutomaticGainControl { get; set; }
         [JsonProperty("echo_cancellation")]
-        public bool EchoCancellation { get; set; }
+        public Optional<bool> EchoCancellation { get; set; }
         [JsonProperty("noise_suppression")]
-        public bool NoiseSuppression { get; set; }
+        public Optional<bool> NoiseSuppression { get; set; }
         [JsonProperty("qos")]
-        public bool QualityOfService { get; set; }
+        public Optional<bool> QualityOfService { get; set; }
         [JsonProperty("silence_warning")]
-        public bool SilenceWarning { get; set; }
+        public Optional<bool> SilenceWarning { get; set; }
     }
 }

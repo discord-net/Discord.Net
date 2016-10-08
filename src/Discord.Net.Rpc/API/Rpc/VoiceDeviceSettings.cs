@@ -5,10 +5,10 @@ namespace Discord.API.Rpc
     public class VoiceDeviceSettings
     {
         [JsonProperty("device_id")]
-        public string DeviceId { get; set; }
+        public Optional<string> DeviceId { get; set; }
         [JsonProperty("volume")]
-        public float Volume { get; set; }
+        public Optional<float> Volume { get; set; }
         [JsonProperty("available_devices")]
-        public VoiceDevice[] AvailableDevices { get; set; }
+        public Optional<VoiceDevice[]> AvailableDevices { get; set; }
     }
 }

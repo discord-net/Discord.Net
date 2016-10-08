@@ -6,10 +6,10 @@ namespace Discord.API.Rpc
     public class VoiceShortcut
     {
         [JsonProperty("type")]
-        public VoiceShortcutType Type { get; set; }
+        public Optional<VoiceShortcutType> Type { get; set; }
         [JsonProperty("code")]
-        public int Code { get; set; }
+        public Optional<int> Code { get; set; }
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public Optional<string> Name { get; set; }
     }
 }

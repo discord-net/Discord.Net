@@ -265,6 +265,21 @@ namespace Discord.Rpc
                 await ApiClient.SendChannelUnsubscribeAsync(GetEventName(events[i]), channelId);
         }
 
+        public async Task<VoiceSettings> GetVoiceSettingsAsync()
+        {
+            var model = await ApiClient.GetVoiceSettingsAsync().ConfigureAwait(false);
+            return VoiceSettings.Create(model);
+        }
+        public async Task SetVoiceSettingsAsync(Action<API.Rpc.VoiceSettings> func)
+        {
+            var settings = new API.Rpc.VoiceSettings();
+            settings.Input = new VoiceDeviceSettings();
+            settings.Output = new VoiceDeviceSettings();
+            settings.Mode = new VoiceMode();
+            func(settings);
+            await ApiClient.SetVoiceSettingsAsync(settings).ConfigureAwait(false);
+        }
+
         private static string GetEventName(RpcGlobalEvent rpcEvent)
         {
             switch (rpcEvent)

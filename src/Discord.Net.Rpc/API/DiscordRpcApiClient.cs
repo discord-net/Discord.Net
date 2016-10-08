@@ -319,14 +319,12 @@ namespace Discord.API
         public async Task<SubscriptionResponse> SendGlobalSubscribeAsync(string evt, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var msg = new object();
-            return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<SubscriptionResponse>("SUBSCRIBE", null, evt: evt, options: options).ConfigureAwait(false);
         }
         public async Task<SubscriptionResponse> SendGlobalUnsubscribeAsync(string evt, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var msg = new object();
-            return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+            return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", null, evt: evt, options: options).ConfigureAwait(false);
         }
 
         public async Task<SubscriptionResponse> SendGuildSubscribeAsync(string evt, ulong guildId, RequestOptions options = null)
@@ -365,6 +363,17 @@ namespace Discord.API
                 ChannelId = channelId
             };
             return await SendRpcAsync<SubscriptionResponse>("UNSUBSCRIBE", msg, evt: evt, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<API.Rpc.VoiceSettings> GetVoiceSettingsAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendRpcAsync<API.Rpc.VoiceSettings>("GET_VOICE_SETTINGS", null, options: options).ConfigureAwait(false);
+        }
+        public async Task<API.Rpc.VoiceSettings> SetVoiceSettingsAsync(API.Rpc.VoiceSettings settings, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendRpcAsync<API.Rpc.VoiceSettings>("SET_VOICE_SETTINGS", settings, options: options).ConfigureAwait(false);
         }
 
         private bool ProcessMessage(API.Rpc.RpcFrame msg)

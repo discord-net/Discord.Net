@@ -36,25 +36,41 @@ namespace Discord.Rpc
         }
         internal void Update(Model model)
         {
-            AutomaticGainControl = model.AutomaticGainControl;
-            EchoCancellation = model.EchoCancellation;
-            NoiseSuppression = model.NoiseSuppression;
-            QualityOfService = model.QualityOfService;
-            SilenceWarning = model.SilenceWarning;
+            if (model.AutomaticGainControl.IsSpecified)
+                AutomaticGainControl = model.AutomaticGainControl.Value;
+            if (model.EchoCancellation.IsSpecified)
+                EchoCancellation = model.EchoCancellation.Value;
+            if (model.NoiseSuppression.IsSpecified)
+                NoiseSuppression = model.NoiseSuppression.Value;
+            if (model.QualityOfService.IsSpecified)
+                QualityOfService = model.QualityOfService.Value;
+            if (model.SilenceWarning.IsSpecified)
+                SilenceWarning = model.SilenceWarning.Value;
 
-            InputDeviceId = model.Input.DeviceId;
-            InputVolume = model.Input.Volume;
-            AvailableInputDevices = model.Input.AvailableDevices.Select(x => VoiceDevice.Create(x)).ToImmutableArray();
+            if (model.Input.DeviceId.IsSpecified)
+                InputDeviceId = model.Input.DeviceId.Value;
+            if (model.Input.Volume.IsSpecified)
+                InputVolume = model.Input.Volume.Value;
+            if (model.Input.AvailableDevices.IsSpecified)
+                AvailableInputDevices = model.Input.AvailableDevices.Value.Select(x => VoiceDevice.Create(x)).ToImmutableArray();
 
-            OutputDeviceId = model.Output.DeviceId;
-            OutputVolume = model.Output.Volume;
-            AvailableInputDevices = model.Output.AvailableDevices.Select(x => VoiceDevice.Create(x)).ToImmutableArray();
+            if (model.Output.DeviceId.IsSpecified)
+                OutputDeviceId = model.Output.DeviceId.Value;
+            if (model.Output.Volume.IsSpecified)
+                OutputVolume = model.Output.Volume.Value;
+            if (model.Output.AvailableDevices.IsSpecified)
+                AvailableInputDevices = model.Output.AvailableDevices.Value.Select(x => VoiceDevice.Create(x)).ToImmutableArray();
 
-            ActivationMode = model.Mode.Type;
-            AutoThreshold = model.Mode.AutoThreshold;
-            Threshold = model.Mode.Threshold;
-            Shortcuts = model.Mode.Shortcut.Select(x => VoiceShortcut.Create(x)).ToImmutableArray();
-            Delay = model.Mode.Delay;
+            if (model.Mode.Type.IsSpecified)
+                ActivationMode = model.Mode.Type.Value;
+            if (model.Mode.AutoThreshold.IsSpecified)
+                AutoThreshold = model.Mode.AutoThreshold.Value;
+            if (model.Mode.Threshold.IsSpecified)
+                Threshold = model.Mode.Threshold.Value;
+            if (model.Mode.Shortcut.IsSpecified)
+                Shortcuts = model.Mode.Shortcut.Value.Select(x => VoiceShortcut.Create(x)).ToImmutableArray();
+            if (model.Mode.Delay.IsSpecified)
+                Delay = model.Mode.Delay.Value;
         }
     }
 }
