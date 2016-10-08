@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    public class PermissionTargetConverter : JsonConverter
+    internal class PermissionTargetConverter : JsonConverter
     {
         public static readonly PermissionTargetConverter Instance = new PermissionTargetConverter();
 

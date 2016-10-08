@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    public class ObjectOrIdConverter<T> : JsonConverter
+    internal class ObjectOrIdConverter<T> : JsonConverter
     {
         internal static ObjectOrIdConverter<T> Instance;
 

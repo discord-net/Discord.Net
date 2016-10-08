@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Discord.Net.Converters
 {
-    public class UInt64EntityConverter : JsonConverter
+    internal class UInt64EntityConverter : JsonConverter
     {
         public static readonly UInt64EntityConverter Instance = new UInt64EntityConverter();
 

@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    public class UserStatusConverter : JsonConverter
+    internal class UserStatusConverter : JsonConverter
     {
         public static readonly UserStatusConverter Instance = new UserStatusConverter();
 

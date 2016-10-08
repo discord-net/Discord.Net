@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    public class ImageConverter : JsonConverter
+    internal class ImageConverter : JsonConverter
     {
         public static readonly ImageConverter Instance = new ImageConverter();
 

@@ -3,7 +3,7 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    public class OptionalConverter<T> : JsonConverter
+    internal class OptionalConverter<T> : JsonConverter
     {
         internal static OptionalConverter<T> Instance;
 
