@@ -221,123 +221,111 @@ namespace Discord.Rpc
             }
         }
 
-        public async Task<string> AuthorizeAsync(string[] scopes, string rpcToken = null)
+        public async Task<string> AuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
             await ConnectAsync(true).ConfigureAwait(false);
-            var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken).ConfigureAwait(false);
+            var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken, options).ConfigureAwait(false);
             await DisconnectAsync().ConfigureAwait(false);
             return result.Code;
         }
 
-        public async Task SubscribeGlobal(params RpcGlobalEvent[] events)
+        public async Task SubscribeGlobal(RpcGlobalEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendGlobalSubscribeAsync(GetEventName(events[i]));
+            await ApiClient.SendGlobalSubscribeAsync(GetEventName(evnt), options);
         }
-        public async Task UnsubscribeGlobal(params RpcGlobalEvent[] events)
+        public async Task UnsubscribeGlobal(RpcGlobalEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendGlobalUnsubscribeAsync(GetEventName(events[i]));
+            await ApiClient.SendGlobalUnsubscribeAsync(GetEventName(evnt), options);
         }
-        public async Task SubscribeGuild(ulong guildId, params RpcChannelEvent[] events)
+        public async Task SubscribeGuild(ulong guildId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendGuildSubscribeAsync(GetEventName(events[i]), guildId);
+            await ApiClient.SendGuildSubscribeAsync(GetEventName(evnt), guildId, options);
         }
-        public async Task UnsubscribeGuild(ulong guildId, params RpcChannelEvent[] events)
+        public async Task UnsubscribeGuild(ulong guildId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendGuildUnsubscribeAsync(GetEventName(events[i]), guildId);
+            await ApiClient.SendGuildUnsubscribeAsync(GetEventName(evnt), guildId, options);
         }
-        public async Task SubscribeChannel(ulong channelId, params RpcChannelEvent[] events)
+        public async Task SubscribeChannel(ulong channelId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendChannelSubscribeAsync(GetEventName(events[i]), channelId);
+            await ApiClient.SendChannelSubscribeAsync(GetEventName(evnt), channelId);
         }
-        public async Task UnsubscribeChannel(ulong channelId, params RpcChannelEvent[] events)
+        public async Task UnsubscribeChannel(ulong channelId, RpcChannelEvent evnt, RequestOptions options = null)
         {
-            Preconditions.AtLeast(events?.Length ?? 0, 1, nameof(events));
-            for (int i = 0; i < events.Length; i++)
-                await ApiClient.SendChannelUnsubscribeAsync(GetEventName(events[i]), channelId);
+            await ApiClient.SendChannelUnsubscribeAsync(GetEventName(evnt), channelId);
         }
 
-        public async Task<RpcGuild> GetRpcGuildAsync(ulong id)
+        public async Task<RpcGuild> GetRpcGuildAsync(ulong id, RequestOptions options = null)
         {
-            var model = await ApiClient.SendGetGuildAsync(id).ConfigureAwait(false);
+            var model = await ApiClient.SendGetGuildAsync(id, options).ConfigureAwait(false);
             return RpcGuild.Create(this, model);
         }
-        public async Task<IReadOnlyCollection<RpcGuildSummary>> GetRpcGuildsAsync()
+        public async Task<IReadOnlyCollection<RpcGuildSummary>> GetRpcGuildsAsync(RequestOptions options = null)
         {
-            var models = await ApiClient.SendGetGuildsAsync().ConfigureAwait(false);
+            var models = await ApiClient.SendGetGuildsAsync(options).ConfigureAwait(false);
             return models.Guilds.Select(x => RpcGuildSummary.Create(x)).ToImmutableArray();
         }
-        public async Task<RpcChannel> GetRpcChannelAsync(ulong id)
+        public async Task<RpcChannel> GetRpcChannelAsync(ulong id, RequestOptions options = null)
         {
-            var model = await ApiClient.SendGetChannelAsync(id).ConfigureAwait(false);
+            var model = await ApiClient.SendGetChannelAsync(id, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model);
         }
-        public async Task<IReadOnlyCollection<RpcChannelSummary>> GetRpcChannelsAsync(ulong guildId)
+        public async Task<IReadOnlyCollection<RpcChannelSummary>> GetRpcChannelsAsync(ulong guildId, RequestOptions options = null)
         {
-            var models = await ApiClient.SendGetChannelsAsync(guildId).ConfigureAwait(false);
+            var models = await ApiClient.SendGetChannelsAsync(guildId, options).ConfigureAwait(false);
             return models.Channels.Select(x => RpcChannelSummary.Create(x)).ToImmutableArray();
         }
 
-        public async Task<IMessageChannel> SelectTextChannelAsync(IChannel channel)
+        public async Task<IMessageChannel> SelectTextChannelAsync(IChannel channel, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IMessageChannel;
         }
-        public async Task<IMessageChannel> SelectTextChannelAsync(RpcChannelSummary channel)
+        public async Task<IMessageChannel> SelectTextChannelAsync(RpcChannelSummary channel, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectTextChannelAsync(channel.Id, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IMessageChannel;
         }
-        public async Task<IMessageChannel> SelectTextChannelAsync(ulong channelId)
+        public async Task<IMessageChannel> SelectTextChannelAsync(ulong channelId, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectTextChannelAsync(channelId).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectTextChannelAsync(channelId, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IMessageChannel;
         }
 
-        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(IChannel channel, bool force = false)
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(IChannel channel, bool force = false, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IRpcAudioChannel;
         }
-        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(RpcChannelSummary channel, bool force = false)
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(RpcChannelSummary channel, bool force = false, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channel.Id, force, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IRpcAudioChannel;
         }
-        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(ulong channelId, bool force = false)
+        public async Task<IRpcAudioChannel> SelectVoiceChannelAsync(ulong channelId, bool force = false, RequestOptions options = null)
         {
-            var model = await ApiClient.SendSelectVoiceChannelAsync(channelId, force).ConfigureAwait(false);
+            var model = await ApiClient.SendSelectVoiceChannelAsync(channelId, force, options).ConfigureAwait(false);
             return RpcChannel.Create(this, model) as IRpcAudioChannel;
         }
 
-        public async Task<VoiceSettings> GetVoiceSettingsAsync()
+        public async Task<VoiceSettings> GetVoiceSettingsAsync(RequestOptions options = null)
         {
-            var model = await ApiClient.GetVoiceSettingsAsync().ConfigureAwait(false);
+            var model = await ApiClient.GetVoiceSettingsAsync(options).ConfigureAwait(false);
             return VoiceSettings.Create(model);
         }
-        public async Task SetVoiceSettingsAsync(Action<API.Rpc.VoiceSettings> func)
+        public async Task SetVoiceSettingsAsync(Action<API.Rpc.VoiceSettings> func, RequestOptions options = null)
         {
             var settings = new API.Rpc.VoiceSettings();
             settings.Input = new VoiceDeviceSettings();
             settings.Output = new VoiceDeviceSettings();
             settings.Mode = new VoiceMode();
             func(settings);
-            await ApiClient.SetVoiceSettingsAsync(settings).ConfigureAwait(false);
+            await ApiClient.SetVoiceSettingsAsync(settings, options).ConfigureAwait(false);
         }
-        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<API.Rpc.UserVoiceSettings> func)
+        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<API.Rpc.UserVoiceSettings> func, RequestOptions options = null)
         {
             var settings = new API.Rpc.UserVoiceSettings();
             func(settings);
-            await ApiClient.SetUserVoiceSettingsAsync(userId, settings).ConfigureAwait(false);
+            await ApiClient.SetUserVoiceSettingsAsync(userId, settings, options).ConfigureAwait(false);
         }
 
         private static string GetEventName(RpcGlobalEvent rpcEvent)
