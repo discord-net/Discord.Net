@@ -15,6 +15,8 @@ namespace Discord
         bool IsHoisted { get; }
         /// <summary> Returns true if this role is automatically managed by Discord. </summary>
         bool IsManaged { get; }
+        /// <summary> Returns true if this role may be mentioned in messages. </summary>
+        bool IsMentionable { get; }
         /// <summary> Gets the name of this role. </summary>
         string Name { get; }
         /// <summary> Gets the permissions granted to members of this role. </summary>

@@ -13,6 +13,8 @@ namespace Discord.API
         public uint Color { get; set; }
         [JsonProperty("hoist")]
         public bool Hoist { get; set; }
+        [JsonProperty("mentionable")]
+        public bool Mentionable { get; set; }
         [JsonProperty("position")]
         public int Position { get; set; }
         [JsonProperty("permissions"), Int53]

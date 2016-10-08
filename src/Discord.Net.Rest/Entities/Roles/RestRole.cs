@@ -13,6 +13,7 @@ namespace Discord.Rest
         public Color Color { get; private set; }
         public bool IsHoisted { get; private set; }
         public bool IsManaged { get; private set; }
+        public bool IsMentionable { get; private set; }
         public string Name { get; private set; }
         public GuildPermissions Permissions { get; private set; }
         public int Position { get; private set; }
@@ -35,6 +36,7 @@ namespace Discord.Rest
             Name = model.Name;
             IsHoisted = model.Hoist;
             IsManaged = model.Managed;
+            IsMentionable = model.Mentionable;
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
