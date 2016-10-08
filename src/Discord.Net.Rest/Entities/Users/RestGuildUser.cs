@@ -16,6 +16,8 @@ namespace Discord.Rest
 
         public string Nickname { get; private set; }
         internal IGuild Guild { get; private set; }
+        public bool IsDeafened { get; private set; }
+        public bool IsMuted { get; private set; }
 
         public ulong GuildId => Guild.Id;
         public GuildPermissions GuildPermissions
@@ -47,6 +49,8 @@ namespace Discord.Rest
             _joinedAtTicks = model.JoinedAt.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            IsDeafened = model.Deaf;
+            IsMuted = model.Mute;
             UpdateRoles(model.Roles);
         }
         private void UpdateRoles(ulong[] roleIds)
@@ -63,8 +67,16 @@ namespace Discord.Rest
             var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options);
             Update(model);
         }
-        public Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+        { 
+            var args = await UserHelper.ModifyAsync(this, Discord, func, options);
+            if (args.Deaf.IsSpecified)
+                IsDeafened = args.Deaf.Value;
+            if (args.Mute.IsSpecified)
+                IsMuted = args.Mute.Value;
+            if (args.RoleIds.IsSpecified)
+                UpdateRoles(args.RoleIds.Value);
+        }
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
 
@@ -75,8 +87,6 @@ namespace Discord.Rest
         }
 
         //IVoiceState
-        bool IVoiceState.IsDeafened => false;
-        bool IVoiceState.IsMuted => false;
         bool IVoiceState.IsSelfDeafened => false;
         bool IVoiceState.IsSelfMuted => false;
         bool IVoiceState.IsSuppressed => false;
