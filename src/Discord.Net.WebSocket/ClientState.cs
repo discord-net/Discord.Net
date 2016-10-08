@@ -7,7 +7,6 @@ namespace Discord.WebSocket
 {
     internal class ClientState
     {
-        private const int CollectionConcurrencyLevel = 1; //WebSocket updater/event handler. //TODO: Needs profiling, increase to 2?
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
         private const double CollectionMultiplier = 1.05; //Add 5% buffer to handle growth
@@ -33,11 +32,11 @@ namespace Discord.WebSocket
         {
             double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
             double estimatedUsersCount = guildCount * AverageUsersPerGuild;
-            _channels = new ConcurrentDictionary<ulong, SocketChannel>(CollectionConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
-            _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(CollectionConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
-            _guilds = new ConcurrentDictionary<ulong, SocketGuild>(CollectionConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
-            _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(CollectionConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
-            _groupChannels = new ConcurrentHashSet<ulong>(CollectionConcurrencyLevel, (int)(10 * CollectionMultiplier));
+            _channels = new ConcurrentDictionary<ulong, SocketChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
+            _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
+            _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
+            _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
+            _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
         internal SocketChannel GetChannel(ulong id)
