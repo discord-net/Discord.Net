@@ -14,16 +14,16 @@ namespace Discord.Commands
             if (context.Guild != null)
             {
                 var results = new Dictionary<ulong, TypeReaderValue>();
-                var channels = await context.Guild.GetChannelsAsync().ConfigureAwait(false);
+                var channels = await context.Guild.GetChannelsAsync(CacheMode.CacheOnly).ConfigureAwait(false);
                 ulong id;
 
                 //By Mention (1.0)
                 if (MentionUtils.TryParseChannel(input, out id))
-                    AddResult(results, await context.Guild.GetChannelAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await context.Guild.GetChannelAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
 
                 //By Id (0.9)
                 if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                    AddResult(results, await context.Guild.GetChannelAsync(id).ConfigureAwait(false) as T, 0.90f);
+                    AddResult(results, await context.Guild.GetChannelAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
 
                 //By Name (0.7-0.8)
                 foreach (var channel in channels.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))

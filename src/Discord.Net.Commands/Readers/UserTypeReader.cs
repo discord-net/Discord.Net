@@ -13,29 +13,29 @@ namespace Discord.Commands
         public override async Task<TypeReaderResult> Read(CommandContext context, string input)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
-            IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync().Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
+            IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
             IReadOnlyCollection<IGuildUser> guildUsers = null;
             ulong id;
 
             if (context.Guild != null)
-                guildUsers = await context.Guild.GetUsersAsync().ConfigureAwait(false);
+                guildUsers = await context.Guild.GetUsersAsync(CacheMode.CacheOnly).ConfigureAwait(false);
 
             //By Mention (1.0)
             if (MentionUtils.TryParseUser(input, out id))
             {
                 if (context.Guild != null)
-                    AddResult(results, await context.Guild.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
                 else
-                    AddResult(results, await context.Channel.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
             }
 
             //By Id (0.9)
             if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
             {
                 if (context.Guild != null)
-                    AddResult(results, await context.Guild.GetUserAsync(id).ConfigureAwait(false) as T, 0.90f);
+                    AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
                 else
-                    AddResult(results, await context.Channel.GetUserAsync(id).ConfigureAwait(false) as T, 0.90f);
+                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
             }
 
             //By Username + Discriminator (0.7-0.85)
