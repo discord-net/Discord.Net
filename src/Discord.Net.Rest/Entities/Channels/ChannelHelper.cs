@@ -17,29 +17,29 @@ namespace Discord.Rest
         { 
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
-        public static async Task ModifyAsync(IGuildChannel channel, BaseDiscordClient client, 
+        public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client, 
             Action<ModifyGuildChannelParams> func, 
             RequestOptions options)
         {
             var args = new ModifyGuildChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
-        public static async Task ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
+        public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
             Action<ModifyTextChannelParams> func, 
             RequestOptions options)
         {
             var args = new ModifyTextChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
-        public static async Task ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
+        public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
             Action<ModifyVoiceChannelParams> func, 
             RequestOptions options)
         {
             var args = new ModifyVoiceChannelParams();
             func(args);
-            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options);
         }
 
         //Invites

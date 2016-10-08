@@ -54,8 +54,11 @@ namespace Discord.Rest
             var model = await Discord.ApiClient.GetChannelAsync(GuildId, Id, options);
             Update(model);
         }
-        public Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null)
+        {
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
         

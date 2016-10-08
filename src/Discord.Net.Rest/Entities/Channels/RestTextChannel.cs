@@ -33,9 +33,11 @@ namespace Discord.Rest
             Topic = model.Topic.Value;
         }
 
-
-        public Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)
+        {
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
 
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);

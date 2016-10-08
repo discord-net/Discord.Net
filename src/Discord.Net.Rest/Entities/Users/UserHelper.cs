@@ -1,24 +1,26 @@
 ﻿using Discord.API.Rest;
 using System;
 using System.Threading.Tasks;
+using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func,
+        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func,
             RequestOptions options)
         {
             var args = new ModifyCurrentUserParams();
             func(args);
-            await client.ApiClient.ModifySelfAsync(args, options);
+            return await client.ApiClient.ModifySelfAsync(args, options);
         }
-        public static async Task ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
+        public static async Task<ModifyGuildMemberParams> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
             RequestOptions options)
         {
             var args = new ModifyGuildMemberParams();
             func(args);
             await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args, options);
+            return args;
         }
 
         public static async Task KickAsync(IGuildUser user, BaseDiscordClient client,

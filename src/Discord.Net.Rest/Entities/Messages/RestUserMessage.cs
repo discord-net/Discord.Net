@@ -111,8 +111,11 @@ namespace Discord.Rest
             }
         }
 
-        public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
-            => MessageHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
+        {
+            var model = await MessageHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
         public Task DeleteAsync(RequestOptions options)
             => MessageHelper.DeleteAsync(this, Discord, options);
 

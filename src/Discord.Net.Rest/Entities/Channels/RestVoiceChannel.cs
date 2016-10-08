@@ -33,8 +33,11 @@ namespace Discord.Rest
             UserLimit = model.UserLimit.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        {
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 

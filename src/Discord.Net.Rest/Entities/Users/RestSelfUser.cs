@@ -47,7 +47,8 @@ namespace Discord.Rest
         {
             if (Id != Discord.CurrentUser.Id)
                 throw new InvalidOperationException("Unable to modify this object using a different token.");
-            await UserHelper.ModifyAsync(this, Discord, func, options);
+            var model = await UserHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
         }
 
         Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options) { throw new NotSupportedException(); }

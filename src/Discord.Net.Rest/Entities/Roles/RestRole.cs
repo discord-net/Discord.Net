@@ -40,8 +40,11 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
-            => RoleHelper.ModifyAsync(this, Discord, func, options);
+        public async Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
+        { 
+            var model = await RoleHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 

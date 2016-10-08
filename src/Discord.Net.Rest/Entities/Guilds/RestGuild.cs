@@ -6,6 +6,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Guild;
+using EmbedModel = Discord.API.GuildEmbed;
+using System.Linq;
 
 namespace Discord.Rest
 {
@@ -90,6 +92,11 @@ namespace Discord.Rest
 
             Available = true;
         }
+        internal void Update(EmbedModel model)
+        {
+            EmbedChannelId = model.ChannelId;
+            IsEmbeddable = model.Enabled;
+        }
 
         //General
         public async Task UpdateAsync(RequestOptions options = null)
@@ -97,14 +104,31 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
-        public Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
-            => GuildHelper.ModifyAsync(this, Discord, func, options);
-        public Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
-            => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
-        public Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
-            => GuildHelper.ModifyChannelsAsync(this, Discord, args, options);
-        public Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
-            => GuildHelper.ModifyRolesAsync(this, Discord, args, options);
+        public async Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
+        {
+            var model = await GuildHelper.ModifyAsync(this, Discord, func, options);
+            Update(model);
+        }
+        public async Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
+        { 
+            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
+            Update(model);
+        }
+        public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
+        {
+            var arr = args.ToArray();
+            await GuildHelper.ModifyChannelsAsync(this, Discord, arr, options);
+        }
+        public async Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
+        {
+            var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options);
+            foreach (var model in models)
+            {
+                var role = GetRole(model.Id);
+                if (role != null)
+                    role.Update(model);
+            }
+        }
 
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);
