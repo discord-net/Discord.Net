@@ -17,9 +17,8 @@ namespace Discord.Rest
             switch (model.Type)
             {
                 case ChannelType.Text:
-                    return RestTextChannel.Create(discord, model);
                 case ChannelType.Voice:
-                    return RestVoiceChannel.Create(discord, model);
+                    return RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
                 case ChannelType.DM:
                 case ChannelType.Group:
                     return CreatePrivate(discord, model) as RestChannel;
