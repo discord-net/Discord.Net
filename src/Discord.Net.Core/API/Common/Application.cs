@@ -11,13 +11,14 @@ namespace Discord.API
         public string[] RPCOrigins { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("flags"), Int53]
-        public ulong Flags { get; set; }
-        [JsonProperty("owner")]
-        public User Owner { get; set; }
         [JsonProperty("id")]
         public ulong Id { get; set; }
         [JsonProperty("icon")]
         public string Icon { get; set; }
+
+        [JsonProperty("flags"), Int53]
+        public Optional<ulong> Flags { get; set; }
+        [JsonProperty("owner")]
+        public Optional<User> Owner { get; set; }
     }
 }
