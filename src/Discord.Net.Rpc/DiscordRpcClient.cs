@@ -331,34 +331,40 @@ namespace Discord.Rpc
                                 break;
 
                             //Voice
-                            /*case "VOICE_STATE_CREATE":
+                            case "VOICE_STATE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_CREATE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var voiceState = RpcVoiceState.Create(this, data);
 
-                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                    await _voiceStateCreatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
                                 }
                                 break;
                             case "VOICE_STATE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var voiceState = RpcVoiceState.Create(this, data);
 
-                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                    await _voiceStateUpdatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
                                 }
                                 break;
                             case "VOICE_STATE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_DELETE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<VoiceStateEvent>(_serializer);
+                                    var voiceState = RpcVoiceState.Create(this, data);
 
-                                    await _voiceStateUpdatedEvent.InvokeAsync().ConfigureAwait(false);
+                                    await _voiceStateDeletedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
                                 }
-                                break;*/
+                                break;
 
                             case "SPEAKING_START":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_START)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<SpeakingEvent>(_serializer);
 
-                                    await _speakingStarted.InvokeAsync(data.UserId).ConfigureAwait(false);
+                                    await _speakingStartedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
                                 break;
                             case "SPEAKING_STOP":
@@ -366,7 +372,7 @@ namespace Discord.Rpc
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_STOP)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<SpeakingEvent>(_serializer);
 
-                                    await _speakingStopped.InvokeAsync(data.UserId).ConfigureAwait(false);
+                                    await _speakingStoppedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
                                 break;
 

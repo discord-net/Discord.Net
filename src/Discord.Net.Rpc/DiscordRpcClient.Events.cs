@@ -34,18 +34,39 @@ namespace Discord.Rpc
         private readonly AsyncEvent<Func<Task>> _guildUpdatedEvent = new AsyncEvent<Func<Task>>();
 
         //Voice
+        public event Func<RpcVoiceState, Task> VoiceStateCreated
+        {
+            add { _voiceStateCreatedEvent.Add(value); }
+            remove { _voiceStateCreatedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<RpcVoiceState, Task>> _voiceStateCreatedEvent = new AsyncEvent<Func<RpcVoiceState, Task>>();
+
+        public event Func<RpcVoiceState, Task> VoiceStateUpdated
+        {
+            add { _voiceStateUpdatedEvent.Add(value); }
+            remove { _voiceStateUpdatedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<RpcVoiceState, Task>> _voiceStateUpdatedEvent = new AsyncEvent<Func<RpcVoiceState, Task>>();
+
+        public event Func<RpcVoiceState, Task> VoiceStateDeleted
+        {
+            add { _voiceStateDeletedEvent.Add(value); }
+            remove { _voiceStateDeletedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<RpcVoiceState, Task>> _voiceStateDeletedEvent = new AsyncEvent<Func<RpcVoiceState, Task>>();
+
         public event Func<ulong, Task> SpeakingStarted
         {
-            add { _speakingStarted.Add(value); }
-            remove { _speakingStarted.Remove(value); }
+            add { _speakingStartedEvent.Add(value); }
+            remove { _speakingStartedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, Task>> _speakingStarted = new AsyncEvent<Func<ulong, Task>>();
+        private readonly AsyncEvent<Func<ulong, Task>> _speakingStartedEvent = new AsyncEvent<Func<ulong, Task>>();
         public event Func<ulong, Task> SpeakingStopped
         {
-            add { _speakingStopped.Add(value); }
-            remove { _speakingStopped.Remove(value); }
+            add { _speakingStoppedEvent.Add(value); }
+            remove { _speakingStoppedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, Task>> _speakingStopped = new AsyncEvent<Func<ulong, Task>>();
+        private readonly AsyncEvent<Func<ulong, Task>> _speakingStoppedEvent = new AsyncEvent<Func<ulong, Task>>();
 
         //Messages
         public event Func<RpcMessage, Task> MessageReceived
