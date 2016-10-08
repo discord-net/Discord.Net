@@ -7,13 +7,32 @@ using System.Threading;
 
 namespace Discord
 {
-    //Based on https://github.com/dotnet/corefx/blob/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent/ConcurrentDictionary.cs
+    //Based on https://github.com/dotnet/corefx/blob/d0dc5fc099946adc1035b34a8b1f6042eddb0c75/src/System.Threading.Tasks.Parallel/src/System/Threading/PlatformHelper.cs
     //Copyright (c) .NET Foundation and Contributors
     public static class ConcurrentHashSet
     {
-        public static int DefaultConcurrencyLevel => PlatformHelper.ProcessorCount;
+        private const int PROCESSOR_COUNT_REFRESH_INTERVAL_MS = 30000;
+        private static volatile int s_processorCount;
+        private static volatile int s_lastProcessorCountRefreshTicks;
+
+        public static int DefaultConcurrencyLevel
+        {
+            get
+            {
+                int now = Environment.TickCount;
+                if (s_processorCount == 0 || (now - s_lastProcessorCountRefreshTicks) >= PROCESSOR_COUNT_REFRESH_INTERVAL_MS)
+                {
+                    s_processorCount = Environment.ProcessorCount;
+                    s_lastProcessorCountRefreshTicks = now;
+                }
+
+                return s_processorCount;
+            }
+        }
     }
 
+    //Based on https://github.com/dotnet/corefx/blob/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent/ConcurrentDictionary.cs
+    //Copyright (c) .NET Foundation and Contributors
     [DebuggerDisplay("Count = {Count}")]
     internal class ConcurrentHashSet<T> : IReadOnlyCollection<T>
     {
@@ -57,7 +76,7 @@ namespace Discord
             bucketNo = (hashcode & 0x7fffffff) % bucketCount;
             lockNo = bucketNo % lockCount;
         }
-        private static int DefaultConcurrencyLevel => PlatformHelper.ProcessorCount;
+        private static int DefaultConcurrencyLevel => ConcurrentHashSet.DefaultConcurrencyLevel;
 
         private volatile Tables _tables;
         private readonly IEqualityComparer<T> _comparer; 
@@ -452,29 +471,5 @@ namespace Discord
             for (int i = fromInclusive; i < toExclusive; i++)
                 Monitor.Exit(_tables._locks[i]);
         }                
-    }
-
-    //https://github.com/dotnet/corefx/blob/d0dc5fc099946adc1035b34a8b1f6042eddb0c75/src/System.Threading.Tasks.Parallel/src/System/Threading/PlatformHelper.cs
-    //Copyright (c) .NET Foundation and Contributors
-    internal static class PlatformHelper
-    {
-        private const int PROCESSOR_COUNT_REFRESH_INTERVAL_MS = 30000;
-        private static volatile int s_processorCount;
-        private static volatile int s_lastProcessorCountRefreshTicks; 
-        
-        internal static int ProcessorCount
-        {
-            get
-            {
-                int now = Environment.TickCount;
-                if (s_processorCount == 0 || (now - s_lastProcessorCountRefreshTicks) >= PROCESSOR_COUNT_REFRESH_INTERVAL_MS)
-                {
-                    s_processorCount = Environment.ProcessorCount;
-                    s_lastProcessorCountRefreshTicks = now;
-                }
-
-                return s_processorCount;
-            }
-        }
     }
 }
