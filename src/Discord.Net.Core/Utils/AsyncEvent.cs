@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     internal class AsyncEvent<T>
+        where T : class
     {
         private readonly object _subLock = new object();
         internal ImmutableArray<T> _subscriptions;
@@ -19,11 +20,13 @@ namespace Discord
 
         public void Add(T subscriber)
         {
+            Preconditions.NotNull(subscriber, nameof(subscriber));
             lock (_subLock)
                 _subscriptions = _subscriptions.Add(subscriber);
         }
         public void Remove(T subscriber)
         {
+            Preconditions.NotNull(subscriber, nameof(subscriber));
             lock (_subLock)
                 _subscriptions = _subscriptions.Remove(subscriber);
         }
