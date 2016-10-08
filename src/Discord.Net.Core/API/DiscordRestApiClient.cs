@@ -38,6 +38,7 @@ namespace Discord.API
         public TokenType AuthTokenType { get; private set; }
         public User CurrentUser { get; private set; }
         public RequestQueue RequestQueue { get; private set; }
+        internal bool FetchCurrentUser { get; set; }
 
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, JsonSerializer serializer = null, RequestQueue requestQueue = null)
         {
@@ -45,6 +46,7 @@ namespace Discord.API
             _userAgent = userAgent;
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             RequestQueue = requestQueue;
+            FetchCurrentUser = true;
 
             _stateLock = new SemaphoreSlim(1, 1);
 
@@ -113,7 +115,8 @@ namespace Discord.API
                 _authToken = token;
                 _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
 
-                CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true });
+                if (FetchCurrentUser)
+                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true });
 
                 LoginState = LoginState.LoggedIn;
             }

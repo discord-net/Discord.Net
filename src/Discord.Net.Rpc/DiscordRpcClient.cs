@@ -6,6 +6,8 @@ using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,11 +24,15 @@ namespace Discord.Rpc
         private bool _canReconnect;
 
         public ConnectionState ConnectionState { get; private set; }
+        public IReadOnlyCollection<string> Scopes { get; private set; }
+        public DateTimeOffset TokenExpiresAt { get; private set; }
 
         //From DiscordRpcConfig
         internal int ConnectionTimeout { get; private set; }
 
         public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
+        public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
+        public RestApplication CurrentApplication { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
         public DiscordRpcClient(string clientId, string origin) 
@@ -58,6 +64,7 @@ namespace Discord.Rpc
                     await _rpcLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
         }
+
         private static API.DiscordRpcApiClient CreateApiClient(string clientId, string origin, DiscordRpcConfig config)
             => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
 
@@ -286,19 +293,21 @@ namespace Discord.Rpc
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<ReadyEvent>(_serializer);
-                                    var cancelToken = _cancelToken;
+
+                                    RequestOptions options = new RequestOptions
+                                    {
+                                        //CancellationToken = _cancelToken //TODO: Implement
+                                    };
 
                                     var _ = Task.Run(async () =>
                                     {
                                         try
                                         {
-                                            RequestOptions options = new RequestOptions
-                                            {
-                                                //CancellationToken = cancelToken //TODO: Implement
-                                            };
-
-                                            if (LoginState != LoginState.LoggedOut)
-                                                await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false); //Has bearer
+                                            var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
+                                            CurrentUser = RestSelfUser.Create(this, response.User);
+                                            CurrentApplication = RestApplication.Create(this, response.Application);
+                                            Scopes = response.Scopes;
+                                            TokenExpiresAt = response.Expires;
 
                                             var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
                                             await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -361,20 +370,20 @@ namespace Discord.Rpc
                             //Messages
                             case "MESSAGE_CREATE":
                                 {
-                                    /*await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
+                                    await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
-                                    var msg = new RpcMessage(this, data.Message);
+                                    var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
-                                    await _messageReceivedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);*/
+                                    await _messageReceivedEvent.InvokeAsync(msg).ConfigureAwait(false);
                                 }
                                 break;
                             case "MESSAGE_UPDATE":
                                 {
-                                    /*await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
+                                    await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
                                     var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
-                                    var msg = new RpcMessage(this, data.Message);
+                                    var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
-                                    await _messageUpdatedEvent.InvokeAsync(data.ChannelId, msg).ConfigureAwait(false);*/
+                                    await _messageUpdatedEvent.InvokeAsync(msg).ConfigureAwait(false);
                                 }
                                 break;
                             case "MESSAGE_DELETE":

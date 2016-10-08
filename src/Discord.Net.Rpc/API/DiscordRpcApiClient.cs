@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -67,12 +68,15 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+        public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, 
+                JsonSerializer serializer = null, RequestQueue requestQueue = null)
             : base(restClientProvider, userAgent, serializer, requestQueue)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;
             _origin = origin;
+
+            FetchCurrentUser = false;
 
             _requestQueue = requestQueue ?? new RequestQueue();
             _requests = new ConcurrentDictionary<Guid, RpcRequest>();
@@ -169,7 +173,7 @@ namespace Discord.API
 
                 if (!success)
                     throw new Exception("Unable to connect to the RPC server.");
-
+                
                 SetBaseUrl($"https://{uuid}.discordapp.io:{port}/");
                 ConnectionState = ConnectionState.Connected;
             }
@@ -209,7 +213,6 @@ namespace Discord.API
         public async Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, Optional<string> evt = default(Optional<string>), RequestOptions options = null)
             where TResponse : class
         {
-            options.IgnoreState = false;
             return await SendRpcAsyncInternal<TResponse>(cmd, payload, evt, options).ConfigureAwait(false);
         }
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
@@ -246,7 +249,7 @@ namespace Discord.API
             options.IgnoreState = true;
             return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, options: options).ConfigureAwait(false);
         }
-        public async Task<AuthorizeResponse> SendAuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
+        public async Task<AuthorizeResponse> SendAuthorizeAsync(IReadOnlyCollection<string> scopes, string rpcToken = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var msg = new AuthorizeParams

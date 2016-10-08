@@ -9,7 +9,7 @@ namespace Discord.Rpc
 
         public const int PortRangeStart = 6463;
         public const int PortRangeEnd = 6472;
-        
+
         /// <summary> Gets or sets the time, in milliseconds, to wait for a connection to complete before aborting. </summary>
         public int ConnectionTimeout { get; set; } = 30000;
 

@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API.Rpc
 {
@@ -8,7 +9,7 @@ namespace Discord.API.Rpc
         [JsonProperty("client_id")]
         public string ClientId { get; set; }
         [JsonProperty("scopes")]
-        public string[] Scopes { get; set; }
+        public IReadOnlyCollection<string> Scopes { get; set; }
         [JsonProperty("rpc_token")]
         public Optional<string> RpcToken { get; set; }
     }

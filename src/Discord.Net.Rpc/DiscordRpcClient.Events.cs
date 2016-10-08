@@ -42,18 +42,18 @@ namespace Discord.Rpc
         private readonly AsyncEvent<Func<Task>> _voiceStateUpdatedEvent = new AsyncEvent<Func<Task>>();
 
         //Messages
-        public event Func<ulong, IMessage, Task> MessageReceived
+        public event Func<RpcMessage, Task> MessageReceived
         {
             add { _messageReceivedEvent.Add(value); }
             remove { _messageReceivedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, IMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<ulong, IMessage, Task>>();
-        public event Func<ulong, IMessage, Task> MessageUpdated
+        private readonly AsyncEvent<Func<RpcMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<RpcMessage, Task>>();
+        public event Func<RpcMessage, Task> MessageUpdated
         {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, IMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<ulong, IMessage, Task>>();
+        private readonly AsyncEvent<Func<RpcMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<RpcMessage, Task>>();
         public event Func<ulong, ulong, Task> MessageDeleted
         {
             add { _messageDeletedEvent.Add(value); }
