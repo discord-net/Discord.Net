@@ -94,7 +94,11 @@ namespace Discord.Rest
                 {
                     var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        newMentions.Add(RestUser.Create(Discord, value[i]));
+                    {
+                        var val = value[i];
+                        if (val.Object != null)
+                            newMentions.Add(RestUser.Create(Discord, val.Object));
+                    }
                     mentions = newMentions.ToImmutable();
                 }
             }

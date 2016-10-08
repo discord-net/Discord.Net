@@ -24,8 +24,9 @@ namespace Discord.Net.Converters
             {
                 JsonConverter converter;
                 var type = propInfo.PropertyType;
+                Type genericType = type.IsConstructedGenericType ? type.GetGenericTypeDefinition() : null;
 
-                if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>))
+                if (genericType == typeof(Optional<>))
                 {
                     var typeInput = propInfo.DeclaringType;
                     var innerTypeOutput = type.GenericTypeArguments[0];
@@ -37,6 +38,20 @@ namespace Discord.Net.Converters
                     property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
 
                     var converterType = typeof(OptionalConverter<>).MakeGenericType(innerTypeOutput).GetTypeInfo();
+                    var instanceField = converterType.GetDeclaredField("Instance");
+                    converter = instanceField.GetValue(null) as JsonConverter;
+                    if (converter == null)
+                    {
+                        var innerConverter = GetConverter(propInfo, innerTypeOutput);
+                        converter = converterType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
+                        instanceField.SetValue(null, converter);
+                    }
+                }
+                else if (genericType == typeof(ObjectOrId<>))
+                {
+                    var innerTypeOutput = type.GenericTypeArguments[0];
+
+                    var converterType = typeof(ObjectOrIdConverter<>).MakeGenericType(innerTypeOutput).GetTypeInfo();
                     var instanceField = converterType.GetDeclaredField("Instance");
                     converter = instanceField.GetValue(null) as JsonConverter;
                     if (converter == null)

@@ -92,7 +92,11 @@ namespace Discord.WebSocket
                 {
                     var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        newMentions.Add(SocketSimpleUser.Create(Discord, Discord.State, value[i]));
+                    {
+                        var val = value[i];
+                        if (val.Object != null)
+                            newMentions.Add(SocketSimpleUser.Create(Discord, Discord.State, val.Object));
+                    }
                     mentions = newMentions.ToImmutable();
                 }
             }

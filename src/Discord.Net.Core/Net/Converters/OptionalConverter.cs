@@ -5,7 +5,7 @@ namespace Discord.Net.Converters
 {
     public class OptionalConverter<T> : JsonConverter
     {
-        public static OptionalConverter<T> Instance;
+        internal static OptionalConverter<T> Instance;
 
         private readonly JsonConverter _innerConverter;
 
