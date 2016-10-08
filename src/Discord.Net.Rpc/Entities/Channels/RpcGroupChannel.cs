@@ -78,7 +78,7 @@ namespace Discord.Rpc
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return GetMessagesAsync(limit, options).ConfigureAwait(false);
+                return GetMessagesAsync(limit, options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
