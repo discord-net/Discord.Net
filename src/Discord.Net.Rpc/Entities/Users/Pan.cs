@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Rpc.Pan;
+﻿using System.Diagnostics;
+using Model = Discord.API.Rpc.Pan;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Pan
     {
         public float Left { get; }
@@ -16,5 +18,8 @@ namespace Discord.Rpc
         {
             return new Pan(model.Left, model.Right);
         }
+
+        public override string ToString() => $"Left = {Left}, Right = {Right}";
+        private string DebuggerDisplay => $"Left = {Left}, Right = {Right}";
     }
 }

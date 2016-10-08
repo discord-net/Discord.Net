@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Rpc.GuildCreatedEvent;
+﻿using System.Diagnostics;
+using Model = Discord.API.Rpc.GuildCreatedEvent;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RpcGuild
     {
         public ulong Id { get; }
@@ -21,5 +23,8 @@ namespace Discord.Rpc
         {
             Name = model.Name;
         }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

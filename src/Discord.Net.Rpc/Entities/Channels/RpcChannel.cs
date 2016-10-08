@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Rpc.ChannelCreatedEvent;
+﻿using System.Diagnostics;
+using Model = Discord.API.Rpc.ChannelCreatedEvent;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RpcChannel
     {
         public ulong Id { get; }
@@ -23,5 +25,8 @@ namespace Discord.Rpc
             Name = model.Name;
             Type = model.Type;
         }
+
+        public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, {Type})";
     }
 }

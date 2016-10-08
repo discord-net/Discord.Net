@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Rpc.VoiceDevice;
+﻿using System.Diagnostics;
+using Model = Discord.API.Rpc.VoiceDevice;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct VoiceDevice
     {
         public string Id { get; }
@@ -16,5 +18,8 @@ namespace Discord.Rpc
         {
             return new VoiceDevice(model.Id, model.Name);
         }
+
+        public override string ToString() => $"{Name}";
+        internal string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

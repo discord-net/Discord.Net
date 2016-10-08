@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Rpc.VoiceShortcut;
+﻿using System.Diagnostics;
+using Model = Discord.API.Rpc.VoiceShortcut;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct VoiceShortcut
     {
         public VoiceShortcutType Type { get; }
@@ -18,5 +20,8 @@ namespace Discord.Rpc
         {
             return new VoiceShortcut(model.Type, model.Code, model.Name);
         }
+
+        public override string ToString() => $"{Name}";
+        internal string DebuggerDisplay => $"{Name} ({Code}, {Type})";
     }
 }
