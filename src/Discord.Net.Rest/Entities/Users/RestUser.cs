@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
@@ -13,6 +14,7 @@ namespace Discord.Rest
         public string AvatarId { get; private set; }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, AvatarId);
+        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
         public virtual Game? Game => null;

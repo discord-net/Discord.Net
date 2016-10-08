@@ -51,6 +51,7 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
 
+        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, SplashId);

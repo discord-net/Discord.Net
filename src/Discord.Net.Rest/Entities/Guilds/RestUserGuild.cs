@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
 
@@ -13,6 +14,7 @@ namespace Discord.Rest
         public bool IsOwner { get; private set; }
         public GuildPermissions Permissions { get; private set; }
 
+        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)

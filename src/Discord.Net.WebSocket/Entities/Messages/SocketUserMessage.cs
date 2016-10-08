@@ -18,7 +18,7 @@ namespace Discord.WebSocket
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
-
+        
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
         public override ulong? WebhookId => _webhookId;

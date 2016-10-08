@@ -1,4 +1,5 @@
 ﻿using Discord.Rest;
+using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
@@ -15,6 +16,7 @@ namespace Discord.WebSocket
         internal abstract SocketPresence Presence { get; set; }
 
         public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, AvatarId);
+        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
         public Game? Game => Presence.Game;
