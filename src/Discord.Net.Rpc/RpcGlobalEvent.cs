@@ -3,6 +3,7 @@
     public enum RpcGlobalEvent
     {
         ChannelCreated,
-        GuildCreated
+        GuildCreated,
+        VoiceSettingsUpdated
     }
 }

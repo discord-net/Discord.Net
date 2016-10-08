@@ -82,6 +82,13 @@ namespace Discord.Rpc
         }
         private readonly AsyncEvent<Func<ulong, Task>> _speakingStoppedEvent = new AsyncEvent<Func<ulong, Task>>();
 
+        public event Func<VoiceSettings, Task> VoiceSettingsUpdated
+        {
+            add { _voiceSettingsUpdated.Add(value); }
+            remove { _voiceSettingsUpdated.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<VoiceSettings, Task>> _voiceSettingsUpdated = new AsyncEvent<Func<VoiceSettings, Task>>();
+
         //Messages
         public event Func<RpcMessage, Task> MessageReceived
         {

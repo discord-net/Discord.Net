@@ -271,6 +271,7 @@ namespace Discord.Rpc
             {
                 case RpcGlobalEvent.ChannelCreated: return "CHANNEL_CREATE";
                 case RpcGlobalEvent.GuildCreated: return "GUILD_CREATE";
+                case RpcGlobalEvent.VoiceSettingsUpdated: return "VOICE_SETTINGS_UPDATE";
                 default:
                     throw new InvalidOperationException($"Unknown RPC Global Event: {rpcEvent}");
             }
@@ -417,6 +418,15 @@ namespace Discord.Rpc
                                     var data = (payload.Value as JToken).ToObject<SpeakingEvent>(_serializer);
 
                                     await _speakingStoppedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
+                                }
+                                break;
+                            case "VOICE_SETTINGS_UPDATE":
+                                {
+                                    await _rpcLogger.DebugAsync("Received Dispatch (VOICE_SETTINGS_UPDATE)").ConfigureAwait(false);
+                                    var data = (payload.Value as JToken).ToObject<API.Rpc.VoiceSettings>(_serializer);
+                                    var settings = VoiceSettings.Create(data);
+
+                                    await _voiceSettingsUpdated.InvokeAsync(settings).ConfigureAwait(false);
                                 }
                                 break;
 
