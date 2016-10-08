@@ -5,6 +5,7 @@ namespace Discord.API
     {
         Friend = 1,
         Blocked = 2,
-        Pending = 4
+        IncomingPending = 3,
+        OutgoingPending = 4
     }
 }
