@@ -9,9 +9,13 @@ namespace Discord.API.Client.GatewaySocket
         object IWebSocketMessage.Payload => this;
         bool IWebSocketMessage.IsPrivate => false;
 
-        [JsonProperty("idle_since")]
+        [JsonProperty("afk")]
+        public bool? Afk { get; set; }
+        [JsonProperty("since")]
         public long? IdleSince { get; set; }
         [JsonProperty("game")]
         public Game Game { get; set; }
+        [JsonProperty("status")]
+        public string Status { get; set; }
     }
 }

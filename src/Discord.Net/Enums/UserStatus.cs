@@ -8,6 +8,10 @@
 		public static UserStatus Idle { get; } = new UserStatus("idle");
 		/// <summary> User is offline. </summary>
 		public static UserStatus Offline { get; } = new UserStatus("offline");
+		/// <summary> User is busy. </summary>
+		public static UserStatus DoNotDisturb { get; } = new UserStatus("dnd");
+		/// <summary> User is invisible. </summary>
+		public static UserStatus Invisible { get; } = new UserStatus("invisible");
 
 		private UserStatus(string value)
 			: base(value) { }
@@ -24,6 +28,10 @@
 					return Idle;
 				case "offline":
 					return Offline;
+				case "dnd":
+					return DoNotDisturb;
+				case "invisible":
+					return Invisible;
 				default:
 					return new UserStatus(value);
 			}

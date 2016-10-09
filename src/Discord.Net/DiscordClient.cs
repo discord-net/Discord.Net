@@ -324,8 +324,8 @@ namespace Discord
         public void SetStatus(UserStatus status)
         {
             if (status == null) throw new ArgumentNullException(nameof(status));
-            if (status != UserStatus.Online && status != UserStatus.Idle)
-                throw new ArgumentException($"Invalid status, must be {UserStatus.Online} or {UserStatus.Idle}", nameof(status));
+            if (status != UserStatus.Online && status != UserStatus.Idle && status != UserStatus.DoNotDisturb && status != UserStatus.Invisible)
+                throw new ArgumentException($"Invalid status, must be {UserStatus.Online}, {UserStatus.Idle}, {UserStatus.DoNotDisturb} or {UserStatus.Invisible}", nameof(status));
 
             Status = status;
             SendStatus();
@@ -360,7 +360,7 @@ namespace Discord
             }
             var socket = GatewaySocket;
             if (socket != null)
-                socket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame);
+                socket.SendUpdateStatus(Status == UserStatus.Idle ? EpochTime.GetMilliseconds() - (10 * 60 * 1000) : (long?)null, CurrentGame, Status == UserStatus.Idle, Status);
         }
 
         #region Channels
