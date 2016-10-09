@@ -1,5 +1,5 @@
 {
-  "version": "0.9.5-r1",
+  "version": "0.9.6",
   "description": "A Discord.Net extension adding voice support.",
   "authors": [ "RogueException" ],
   
@@ -21,7 +21,7 @@
   },
 
   "dependencies": {
-    "Discord.Net": "0.9.5"
+    "Discord.Net": "0.9.6"
   },
 
   "frameworks": {
