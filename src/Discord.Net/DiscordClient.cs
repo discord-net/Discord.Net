@@ -324,8 +324,8 @@ namespace Discord
         public void SetStatus(UserStatus status)
         {
             if (status == null) throw new ArgumentNullException(nameof(status));
-            if (status != UserStatus.Online && status != UserStatus.Idle && status != UserStatus.DoNotDisturb)
-                throw new ArgumentException($"Invalid status, must be {UserStatus.Online}, {UserStatus.Idle} or {UserStatus.DoNotDisturb}", nameof(status));
+            if (status != UserStatus.Online && status != UserStatus.Idle && status != UserStatus.DoNotDisturb && status != UserStatus.Invisible)
+                throw new ArgumentException($"Invalid status, must be {UserStatus.Online}, {UserStatus.Idle}, {UserStatus.DoNotDisturb} or {UserStatus.Invisible}", nameof(status));
 
             Status = status;
             SendStatus();
