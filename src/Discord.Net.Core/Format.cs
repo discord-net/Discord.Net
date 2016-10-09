@@ -14,7 +14,7 @@
         /// <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
         public static string Strikethrough(string text) => $"~~{text}~~";
 
-        /// <summary> Returns a markdown-formatted string with strikeout formatting. </summary>
+        /// <summary> Returns a markdown-formatted string with codeblock formatting. </summary>
         public static string Code(string text, string language = null)
         {
             if (language != null || text.Contains("\n"))
