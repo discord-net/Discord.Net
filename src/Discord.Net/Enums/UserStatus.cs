@@ -8,6 +8,8 @@
 		public static UserStatus Idle { get; } = new UserStatus("idle");
 		/// <summary> User is offline. </summary>
 		public static UserStatus Offline { get; } = new UserStatus("offline");
+		/// <summary> User is busy. </summary>
+		public static UserStatus DoNotDisturb { get; } = new UserStatus("dnd");
 
 		private UserStatus(string value)
 			: base(value) { }
@@ -24,6 +26,8 @@
 					return Idle;
 				case "offline":
 					return Offline;
+				case "dnd":
+					return DoNotDisturb;
 				default:
 					return new UserStatus(value);
 			}
