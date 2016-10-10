@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
@@ -6,26 +7,31 @@ using System.Reflection;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Module
+    public class ModuleInfo
     {
+        internal readonly Func<ModuleBase> _builder;
+
         public TypeInfo Source { get; }
         public CommandService Service { get; }
         public string Name { get; }
         public string Prefix { get; }
         public string Summary { get; }
         public string Remarks { get; }
-        public IEnumerable<Command> Commands { get; }
-        internal object Instance { get; }
-
+        public IEnumerable<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal Module(TypeInfo source, CommandService service, object instance, ModuleAttribute moduleAttr, IDependencyMap dependencyMap)
+        internal ModuleInfo(TypeInfo source, CommandService service, IDependencyMap dependencyMap)
         {
             Source = source;
             Service = service;
             Name = source.Name;
-            Prefix = moduleAttr.Prefix ?? "";
-            Instance = instance;
+            _builder = ReflectionUtils.CreateBuilder<ModuleBase>(source, Service, dependencyMap);
+
+            var groupAttr = source.GetCustomAttribute<GroupAttribute>();
+            if (groupAttr != null)
+                Prefix = groupAttr.Prefix;
+            else
+                Prefix = "";
 
             var nameAttr = source.GetCustomAttribute<NameAttribute>();
             if (nameAttr != null)
@@ -39,20 +45,19 @@ namespace Discord.Commands
             if (remarksAttr != null)
                 Remarks = remarksAttr.Text;
 
-            List<Command> commands = new List<Command>();
-            SearchClass(source, instance, commands, Prefix, dependencyMap);
+            List<CommandInfo> commands = new List<CommandInfo>();
+            SearchClass(source, commands, Prefix, dependencyMap);
             Commands = commands;
 
-            Preconditions = BuildPreconditions();
+            Preconditions = Source.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
-
-        private void SearchClass(TypeInfo parentType, object instance, List<Command> commands, string groupPrefix, IDependencyMap dependencyMap)
+        private void SearchClass(TypeInfo parentType, List<CommandInfo> commands, string groupPrefix, IDependencyMap dependencyMap)
         {
             foreach (var method in parentType.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
                 if (cmdAttr != null)
-                    commands.Add(new Command(method, this, instance, cmdAttr, groupPrefix));
+                    commands.Add(new CommandInfo(method, this, cmdAttr, groupPrefix));
             }
             foreach (var type in parentType.DeclaredNestedTypes)
             {
@@ -66,15 +71,13 @@ namespace Discord.Commands
                     else
                         nextGroupPrefix = groupAttrib.Prefix ?? type.Name.ToLowerInvariant();
 
-                    SearchClass(type, ReflectionUtils.CreateObject(type, Service, dependencyMap), commands, nextGroupPrefix, dependencyMap);
+                    SearchClass(type, commands, nextGroupPrefix, dependencyMap);
                 }
             }
         }
 
-        private IReadOnlyList<PreconditionAttribute> BuildPreconditions()
-        {
-            return Source.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
-        }
+        internal ModuleBase CreateInstance()
+            => _builder();
 
         public override string ToString() => Name;
         private string DebuggerDisplay => Name;

@@ -7,14 +7,14 @@ namespace Discord.Commands
     public struct SearchResult : IResult
     {
         public string Text { get; }
-        public IReadOnlyList<Command> Commands { get; }
+        public IReadOnlyList<CommandInfo> Commands { get; }
 
         public CommandError? Error { get; }
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
 
-        private SearchResult(string text, IReadOnlyList<Command> commands, CommandError? error, string errorReason)
+        private SearchResult(string text, IReadOnlyList<CommandInfo> commands, CommandError? error, string errorReason)
         {
             Text = text;
             Commands = commands;
@@ -22,7 +22,7 @@ namespace Discord.Commands
             ErrorReason = errorReason;
         }
 
-        public static SearchResult FromSuccess(string text, IReadOnlyList<Command> commands)
+        public static SearchResult FromSuccess(string text, IReadOnlyList<CommandInfo> commands)
             => new SearchResult(text, commands, null, null);
         public static SearchResult FromError(CommandError error, string reason)
             => new SearchResult(null, null, error, reason);

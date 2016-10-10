@@ -9,7 +9,7 @@ namespace Discord
 {
     //Based on https://github.com/dotnet/corefx/blob/d0dc5fc099946adc1035b34a8b1f6042eddb0c75/src/System.Threading.Tasks.Parallel/src/System/Threading/PlatformHelper.cs
     //Copyright (c) .NET Foundation and Contributors
-    public static class ConcurrentHashSet
+    internal static class ConcurrentHashSet
     {
         private const int PROCESSOR_COUNT_REFRESH_INTERVAL_MS = 30000;
         private static volatile int s_processorCount;

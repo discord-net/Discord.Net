@@ -10,16 +10,15 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Command
+    public class CommandInfo
     {
-        private static readonly MethodInfo _convertParamsMethod = typeof(Command).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
+        private static readonly MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
-
-        private readonly object _instance;
-        private readonly Func<CommandContext, IReadOnlyList<object>, Task> _action;
+        
+        private readonly Func<CommandContext, object[], Task> _action;
 
         public MethodInfo Source { get; }
-        public Module Module { get; }
+        public ModuleInfo Module { get; }
         public string Name { get; }
         public string Summary { get; }
         public string Remarks { get; }
@@ -30,13 +29,12 @@ namespace Discord.Commands
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal Command(MethodInfo source, Module module, object instance, CommandAttribute attribute, string groupPrefix)
+        internal CommandInfo(MethodInfo source, ModuleInfo module, CommandAttribute attribute, string groupPrefix)
         {
             try
             {
                 Source = source;
                 Module = module;
-                _instance = instance;
 
                 Name = source.Name;
 
@@ -85,18 +83,18 @@ namespace Discord.Commands
             }
         }
 
-        public async Task<PreconditionResult> CheckPreconditions(CommandContext context)
+        public async Task<PreconditionResult> CheckPreconditions(CommandContext context, IDependencyMap map = null)
         {
             foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
 
             foreach (PreconditionAttribute precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, Module.Instance).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
@@ -169,11 +167,9 @@ namespace Discord.Commands
         private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
-            if (parameters.Length == 0 || parameters[0].ParameterType != typeof(CommandContext))
-                throw new InvalidOperationException($"The first parameter of a command must be {nameof(CommandContext)}.");
 
-            var paramBuilder = ImmutableArray.CreateBuilder<CommandParameter>(parameters.Length - 1);
-            for (int i = 1; i < parameters.Length; i++)
+            var paramBuilder = ImmutableArray.CreateBuilder<CommandParameter>(parameters.Length);
+            for (int i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
                 var type = parameter.ParameterType;
@@ -209,19 +205,23 @@ namespace Discord.Commands
             }
             return paramBuilder.ToImmutable();
         }
-        private Func<CommandContext, IReadOnlyList<object>, Task> BuildAction(MethodInfo methodInfo)
+        private Func<CommandContext, object[], Task> BuildAction(MethodInfo methodInfo)
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");
 
-            return (msg, args) =>
+            return (context, args) =>
             {
-                object[] newArgs = new object[args.Count + 1];
-                newArgs[0] = msg;
-                for (int i = 0; i < args.Count; i++)
-                    newArgs[i + 1] = args[i];
-                var result = methodInfo.Invoke(_instance, newArgs);
-                return result as Task ?? Task.CompletedTask;
+                var instance = Module.CreateInstance();
+                instance.Context = context;
+                try
+                {
+                    return methodInfo.Invoke(instance, args) as Task ?? Task.CompletedTask;
+                }
+                finally
+                {
+                    (instance as IDisposable)?.Dispose();
+                }
             };
         }
 

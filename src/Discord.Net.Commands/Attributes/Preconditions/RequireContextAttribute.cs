@@ -21,7 +21,7 @@ namespace Discord.Commands
             Contexts = contexts;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(CommandContext context, Command executingCommand, object moduleInstance)
+        public override Task<PreconditionResult> CheckPermissions(CommandContext context, CommandInfo command, IDependencyMap map)
         {
             bool isValid = false;
 

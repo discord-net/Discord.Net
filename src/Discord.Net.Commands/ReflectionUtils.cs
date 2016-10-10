@@ -6,7 +6,10 @@ namespace Discord.Commands
 {
     internal class ReflectionUtils
     {
-        internal static object CreateObject(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
+        internal static T CreateObject<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
+            => CreateBuilder<T>(typeInfo, service, map)();
+
+        internal static Func<T> CreateBuilder<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
         {
             var constructors = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
@@ -14,7 +17,7 @@ namespace Discord.Commands
             else if (constructors.Length > 1)
                 throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\"");
 
-            var constructor = constructors[0];            
+            var constructor = constructors[0];
             ParameterInfo[] parameters = constructor.GetParameters();
             object[] args = new object[parameters.Length];
 
@@ -34,14 +37,17 @@ namespace Discord.Commands
                 args[i] = arg;
             }
 
-            try
+            return () =>
             {
-                return constructor.Invoke(args);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to create \"{typeInfo.FullName}\"", ex);
-            }
+                try
+                {
+                    return (T)constructor.Invoke(args);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to create \"{typeInfo.FullName}\"", ex);
+                }
+            };
         }
     }
 }

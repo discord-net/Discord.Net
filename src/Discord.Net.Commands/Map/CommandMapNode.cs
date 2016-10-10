@@ -9,7 +9,7 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
         private readonly object _lockObj = new object();
-        private ImmutableArray<Command> _commands;
+        private ImmutableArray<CommandInfo> _commands;
 
         public bool IsEmpty => _commands.Length == 0 && _nodes.Count == 0;
 
@@ -17,10 +17,10 @@ namespace Discord.Commands
         {
             _name = name;
             _nodes = new ConcurrentDictionary<string, CommandMapNode>();
-            _commands = ImmutableArray.Create<Command>();
+            _commands = ImmutableArray.Create<CommandInfo>();
         }
 
-        public void AddCommand(string text, int index, Command command)
+        public void AddCommand(string text, int index, CommandInfo command)
         {
             int nextSpace = text.IndexOf(' ', index);
             string name;
@@ -41,7 +41,7 @@ namespace Discord.Commands
                 }
             }
         }
-        public void RemoveCommand(string text, int index, Command command)
+        public void RemoveCommand(string text, int index, CommandInfo command)
         {
             int nextSpace = text.IndexOf(' ', index);
             string name;
@@ -68,7 +68,7 @@ namespace Discord.Commands
             }
         }
 
-        public IEnumerable<Command> GetCommands(string text, int index)
+        public IEnumerable<CommandInfo> GetCommands(string text, int index)
         {
             int nextSpace = text.IndexOf(' ', index);
             string name;
