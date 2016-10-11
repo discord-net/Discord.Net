@@ -25,6 +25,7 @@ namespace Discord.Commands
         public string Text { get; }
         public int Priority { get; }
         public bool HasVarArgs { get; }
+        public RunMode RunMode { get; }
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
@@ -40,6 +41,7 @@ namespace Discord.Commands
 
                 if (attribute.Text == null)
                     Text = groupPrefix;
+                RunMode = attribute.RunMode;
 
                 if (groupPrefix != "")
                     groupPrefix += " ";
@@ -150,7 +152,19 @@ namespace Discord.Commands
         {
             try
             {
-                await _action.Invoke(context, GenerateArgs(argList, paramList)).ConfigureAwait(false);//Note: This code may need context
+                var args = GenerateArgs(argList, paramList);
+                switch (RunMode)
+                {
+                    case RunMode.Sync:
+                        await _action(context, args).ConfigureAwait(false);
+                        break;
+                    case RunMode.Async:
+                        var t1 = _action(context, args);
+                        break;
+                    case RunMode.FireAndForget:
+                        var t2 = Task.Run(() => _action(context, args));
+                        break;
+                }
                 return ExecuteResult.FromSuccess();
             }
             catch (Exception ex)

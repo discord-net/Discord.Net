@@ -6,6 +6,7 @@ namespace Discord.Commands
     public class CommandAttribute : Attribute
     {
         public string Text { get; }
+        public RunMode RunMode { get; set; } = RunMode.Sync;
 
         public CommandAttribute()
         {
