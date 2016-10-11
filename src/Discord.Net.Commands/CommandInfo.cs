@@ -155,13 +155,13 @@ namespace Discord.Commands
                 var args = GenerateArgs(argList, paramList);
                 switch (RunMode)
                 {
-                    case RunMode.Sync:
+                    case RunMode.Sync: //Always sync
                         await _action(context, args).ConfigureAwait(false);
                         break;
-                    case RunMode.Mixed:
+                    case RunMode.Mixed: //Sync until first await statement
                         var t1 = _action(context, args);
                         break;
-                    case RunMode.Async:
+                    case RunMode.Async: //Always async
                         var t2 = Task.Run(() => _action(context, args));
                         break;
                 }

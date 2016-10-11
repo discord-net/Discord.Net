@@ -385,25 +385,33 @@ namespace Discord.Rpc
                                         //CancellationToken = _cancelToken //TODO: Implement
                                     };
 
-                                    var _ = Task.Run(async () =>
+                                    if (ApiClient.LoginState == LoginState.LoggedIn)
                                     {
-                                        try
+                                        var _ = Task.Run(async () =>
                                         {
-                                            var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
-                                            CurrentUser = RestSelfUser.Create(this, response.User);
-                                            CurrentApplication = RestApplication.Create(this, response.Application);
-                                            Scopes = response.Scopes;
-                                            TokenExpiresAt = response.Expires;
+                                            try
+                                            {
+                                                var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
+                                                CurrentUser = RestSelfUser.Create(this, response.User);
+                                                CurrentApplication = RestApplication.Create(this, response.Application);
+                                                Scopes = response.Scopes;
+                                                TokenExpiresAt = response.Expires;
 
-                                            var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
-                                            await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt.IsSpecified ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
-                                            return;
-                                        }
-                                    });
+                                                var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                                await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                await _rpcLogger.ErrorAsync($"Error handling {cmd}{(evnt.IsSpecified ? $" ({evnt})" : "")}", ex).ConfigureAwait(false);
+                                                return;
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                        await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
+                                    }
                                 }
                                 break;
 
