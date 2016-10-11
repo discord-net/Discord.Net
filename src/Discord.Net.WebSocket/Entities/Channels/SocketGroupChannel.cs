@@ -105,9 +105,9 @@ namespace Discord.WebSocket
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
         internal void AddMessage(SocketMessage msg)
-            => _messages.Add(msg);
+            => _messages?.Add(msg);
         internal SocketMessage RemoveMessage(ulong id)
-            => _messages.Remove(id);
+            => _messages?.Remove(id);
 
         //Users
         public new SocketGroupUser GetUser(ulong id)
