@@ -3,7 +3,7 @@
     public enum RunMode
     {
         Sync,
-        Async,
-        FireAndForget
+        Mixed,
+        Async
     }
 }

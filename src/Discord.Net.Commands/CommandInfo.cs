@@ -158,10 +158,10 @@ namespace Discord.Commands
                     case RunMode.Sync:
                         await _action(context, args).ConfigureAwait(false);
                         break;
-                    case RunMode.Async:
+                    case RunMode.Mixed:
                         var t1 = _action(context, args);
                         break;
-                    case RunMode.FireAndForget:
+                    case RunMode.Async:
                         var t2 = Task.Run(() => _action(context, args));
                         break;
                 }
