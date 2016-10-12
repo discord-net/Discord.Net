@@ -34,9 +34,10 @@ namespace Discord.WebSocket
                 limit -= cachedMessages.Count;
                 if (mode == CacheMode.CacheOnly || limit <= 0)
                     return result;
-                
+
                 //Download remaining messages
-                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, cachedMessages.Min(x => x.Id), dir, limit, guild, options);
+                ulong? minId = cachedMessages.Count > 0 ? cachedMessages.Min(x => x.Id) : (ulong?)null;
+                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, minId, dir, limit, guild, options);
                 return result.Concat(downloadedMessages);
             }
             else
