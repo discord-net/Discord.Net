@@ -1065,16 +1065,16 @@ namespace Discord.API
             }
         }
 
-        private string GetEndpoint(Expression<Func<string>> endpointExpr)
+        private static string GetEndpoint(Expression<Func<string>> endpointExpr)
         {
             return endpointExpr.Compile()();
         }
-        private string GetBucketId(BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
+        private static string GetBucketId(BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
         {
             return _bucketIdGenerators.GetOrAdd(callingMethod, x => CreateBucketId(endpointExpr))(ids);
         }
 
-        private Func<BucketIds, string> CreateBucketId(Expression<Func<string>> endpoint)
+        private static Func<BucketIds, string> CreateBucketId(Expression<Func<string>> endpoint)
         {
             try
             {
