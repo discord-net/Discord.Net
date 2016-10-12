@@ -4,9 +4,9 @@ using System;
 
 namespace Discord.Net.Converters
 {
-    internal class ObjectOrIdConverter<T> : JsonConverter
+    internal class UInt64EntityOrIdConverter<T> : JsonConverter
     {
-        internal static ObjectOrIdConverter<T> Instance;
+        public static UInt64EntityOrIdConverter<T> Instance;
 
         private readonly JsonConverter _innerConverter;
 
@@ -14,7 +14,7 @@ namespace Discord.Net.Converters
         public override bool CanRead => true;
         public override bool CanWrite => false;
 
-        public ObjectOrIdConverter(JsonConverter innerConverter)
+        public UInt64EntityOrIdConverter(JsonConverter innerConverter)
         {
             _innerConverter = innerConverter;
         }
@@ -25,9 +25,14 @@ namespace Discord.Net.Converters
             {
                 case JsonToken.String:
                 case JsonToken.Integer:
-                    return new ObjectOrId<T>(ulong.Parse(reader.ReadAsString()));
+                    return new EntityOrId<T>(ulong.Parse(reader.ReadAsString()));
                 default:
-                    return new ObjectOrId<T>(serializer.Deserialize<T>(reader));
+                    T obj;
+                    if (_innerConverter != null)
+                        obj = (T)_innerConverter.ReadJson(reader, typeof(T), null, serializer);
+                    else
+                        obj = serializer.Deserialize<T>(reader);
+                    return new EntityOrId<T>(obj);
             }
         }
 

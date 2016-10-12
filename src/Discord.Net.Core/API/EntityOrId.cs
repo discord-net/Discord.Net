@@ -1,16 +1,16 @@
 ﻿namespace Discord.API
 {
-    public struct ObjectOrId<T>
+    public struct EntityOrId<T>
     {
         public ulong Id { get; }
         public T Object { get; }
 
-        public ObjectOrId(ulong id)
+        public EntityOrId(ulong id)
         {
             Id = id;
             Object = default(T);
         }
-        public ObjectOrId(T obj)
+        public EntityOrId(T obj)
         {
             Id = 0;
             Object = obj;
