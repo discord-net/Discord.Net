@@ -117,7 +117,6 @@ namespace Discord.API
                 _restClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
-                RequestQueue.TokenType = tokenType;
                 _authToken = token;
                 _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
 
@@ -165,60 +164,94 @@ namespace Discord.API
         internal virtual Task DisconnectInternalAsync() => Task.CompletedTask;
 
         //Core
-        public async Task SendAsync(string method, string endpoint, string bucketId, RequestOptions options)
+        internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task SendAsync(string method, string endpoint,
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null)
         {
+            options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            var request = new RestRequest(_restClient, method, endpoint, bucketId, options);
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
+            var request = new RestRequest(_restClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
-        public async Task SendJsonAsync(string method, string endpoint, string bucketId, object payload, RequestOptions options)
+
+        internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task SendJsonAsync(string method, string endpoint, object payload,
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null)
         {
+            options = options ?? new RequestOptions();
             options.HeaderOnly = true;
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
             var json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(_restClient, method, endpoint, bucketId, json, options);
+            var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
-        public async Task SendMultipartAsync(string method, string endpoint, string bucketId, IReadOnlyDictionary<string, object> multipartArgs, RequestOptions options)
+
+        internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null)
         {
+            options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            var request = new MultipartRestRequest(_restClient, method, endpoint, bucketId, multipartArgs, options);
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
+            var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
-        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint, string bucketId, RequestOptions options) where TResponse : class
+
+        internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null) where TResponse : class
         {
-            var request = new RestRequest(_restClient, method, endpoint, bucketId, options);
-            return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
-        }
-        public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, string bucketId, object payload, RequestOptions options) where TResponse : class
-        {
-            var json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(_restClient, method, endpoint, bucketId, json, options);
-            return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
-        }
-        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, string bucketId, IReadOnlyDictionary<string, object> multipartArgs, RequestOptions options)
-        {
-            var request = new MultipartRestRequest(_restClient, method, endpoint, bucketId, multipartArgs, options);
+            options = options ?? new RequestOptions();
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
+            var request = new RestRequest(_restClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
-        internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null)
-            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), options);
-        internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null)
-            => SendJsonAsync(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), payload, options);
-        internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), multipartArgs, options);
-        internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), options);
         internal Task<TResponse> SendJsonAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), payload, options);
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null) where TResponse : class
+        {
+            options = options ?? new RequestOptions();
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
+            var json = payload != null ? SerializeJson(payload) : null;
+            var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
+            return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
+        }
+
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
-            RequestOptions options, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), multipartArgs, options);
+             string clientBucketId = null, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucketId, options);
+        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, 
+            string bucketId = null, string clientBucketId = null, RequestOptions options = null)
+        {
+            options = options ?? new RequestOptions();
+            options.BucketId = bucketId;
+            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+
+            var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
+            return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
+        }
 
         private async Task<Stream> SendInternalAsync(string method, string endpoint, RestRequest request)
         {
@@ -412,7 +445,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucketId: ClientBucket.SendEditId, options: options).ConfigureAwait(false);
         }
         public async Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
@@ -431,7 +464,7 @@ namespace Discord.API
             }
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, options: options).ConfigureAwait(false);
+            return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucketId: ClientBucket.SendEditId, options: options).ConfigureAwait(false);
         }
         public async Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -477,7 +510,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucketId: ClientBucket.SendEditId, options: options).ConfigureAwait(false);
         }
         public async Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -1042,8 +1075,8 @@ namespace Discord.API
 
         internal class BucketIds
         {
-            public ulong GuildId { get; }
-            public ulong ChannelId { get; }
+            public ulong GuildId { get; internal set; }
+            public ulong ChannelId { get; internal set; }
 
             internal BucketIds(ulong guildId = 0, ulong channelId = 0)
             {
@@ -1069,7 +1102,7 @@ namespace Discord.API
         {
             return endpointExpr.Compile()();
         }
-        private static string GetBucketId(BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
+        private static string GetBucketId(BucketIds ids, Expression<Func<string>> endpointExpr, TokenType tokenType, string callingMethod)
         {
             return _bucketIdGenerators.GetOrAdd(callingMethod, x => CreateBucketId(endpointExpr))(ids);
         }

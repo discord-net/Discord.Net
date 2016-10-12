@@ -7,15 +7,15 @@ namespace Discord.Net.Queue
     {
         public string Json { get; }
 
-        public JsonRestRequest(IRestClient client, string method, string endpoint, string bucket, string json, RequestOptions options)
-            : base(client, method, endpoint, bucket, options)
+        public JsonRestRequest(IRestClient client, string method, string endpoint, string json, RequestOptions options)
+            : base(client, method, endpoint, options)
         {
             Json = json;
         }
 
         public override async Task<RestResponse> SendAsync()
         {
-            return await Client.SendAsync(Method, Endpoint, Json, Options).ConfigureAwait(false);
+            return await Client.SendAsync(Method, Endpoint, Json, CancelToken, Options.HeaderOnly).ConfigureAwait(false);
         }
     }
 }

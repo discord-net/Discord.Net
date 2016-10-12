@@ -20,15 +20,15 @@ namespace Discord.Net.Queue
         public int WindowCount { get; private set; }
         public DateTimeOffset LastAttemptAt { get; private set; }
 
-        public RequestBucket(RequestQueue queue, string id)
+        public RequestBucket(RequestQueue queue, RestRequest request, string id)
         {
             _queue = queue;
             Id = id;
 
             _lock = new object();
 
-            if (queue.TokenType == TokenType.User)
-                WindowCount = ClientBucket.Get(Id).WindowCount;
+            if (request.Options.ClientBucketId != null)
+                WindowCount = ClientBucket.Get(request.Options.ClientBucketId).WindowCount;
             else
                 WindowCount = 1; //Only allow one request until we get a header back
             _semaphore = WindowCount;
@@ -65,7 +65,7 @@ namespace Discord.Net.Queue
                             else
                             {
                                 Debug.WriteLine($"[{id}] (!) 429");
-                                Update(id, info, lag);
+                                UpdateRateLimit(id, request, info, lag, true);
                             }
                             await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
                             continue; //Retry
@@ -93,7 +93,7 @@ namespace Discord.Net.Queue
                 else
                 {
                     Debug.WriteLine($"[{id}] Success");
-                    Update(id, info, lag);
+                    UpdateRateLimit(id, request, info, lag, false);
                     Debug.WriteLine($"[{id}] Stop");
                     return response.Stream;
                 }
@@ -151,26 +151,23 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void Update(int id, RateLimitInfo info, TimeSpan lag)
+        private void UpdateRateLimit(int id, RestRequest request, RateLimitInfo info, TimeSpan lag, bool is429)
         {
+            if (WindowCount == 0)
+                return;
+
             lock (_lock)
             {
-                if (!info.Limit.HasValue && _queue.TokenType != TokenType.User)
-                {
-                    WindowCount = 0;
-                    return;
-                }
-
                 bool hasQueuedReset = _resetTick != null;
                 if (info.Limit.HasValue && WindowCount != info.Limit.Value)
                 {
                     WindowCount = info.Limit.Value;
                     _semaphore = info.Remaining.Value;
-                    Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount} ");
+                    Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
                 }
 
                 var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                DateTimeOffset resetTick;
+                DateTimeOffset? resetTick = null;
 
                 //Using X-RateLimit-Remaining causes a race condition
                 /*if (info.Remaining.HasValue)
@@ -187,26 +184,27 @@ namespace Discord.Net.Queue
                 else if (info.Reset.HasValue)
                 {
                     resetTick = info.Reset.Value.AddSeconds(/*1.0 +*/ lag.TotalSeconds);
-                    int diff = (int)(resetTick - DateTimeOffset.UtcNow).TotalMilliseconds;
+                    int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {lag.TotalMilliseconds} ms lag)");
                 }
-                else if (_queue.TokenType == TokenType.User)
+                else if (request.Options.ClientBucketId != null)
                 {
-                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(Id).WindowSeconds);
-                    Debug.WriteLine($"[{id}] Client Bucket: " + ClientBucket.Get(Id).WindowSeconds);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds);
+                    Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds * 1000} ms)");
                 }
 
                 if (resetTick == null)
                 {
-                    resetTick = DateTimeOffset.UtcNow.AddSeconds(1.0); //Forcibly reset in a second
-                    Debug.WriteLine($"[{id}] Unknown Retry Time!");
+                    WindowCount = 0; //No rate limit info, disable limits on this bucket (should only ever happen with a user token)
+                    Debug.WriteLine($"[{id}] Disabled Semaphore");
+                    return;
                 }
 
                 if (!hasQueuedReset || resetTick > _resetTick)
                 {
                     _resetTick = resetTick;
-                    LastAttemptAt = resetTick; //Make sure we dont destroy this until after its been reset
-                    Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).TotalMilliseconds)} ms");
+                    LastAttemptAt = resetTick.Value; //Make sure we dont destroy this until after its been reset
+                    Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
 
                     if (!hasQueuedReset)
                     {

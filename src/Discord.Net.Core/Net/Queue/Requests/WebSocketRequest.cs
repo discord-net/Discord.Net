@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    public class WebSocketRequest : IRequest
+    public class WebSocketRequest
     {
         public IWebSocketClient Client { get; }
         public string BucketId { get; }

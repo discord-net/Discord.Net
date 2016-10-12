@@ -66,22 +66,22 @@ namespace Discord.Net.Rest
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task<RestResponse> SendAsync(string method, string endpoint, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
-                return await SendInternalAsync(restRequest, options).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
         }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                return await SendInternalAsync(restRequest, options).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -109,19 +109,19 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                return await SendInternalAsync(restRequest, options).ConfigureAwait(false);
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
 
-        private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, RequestOptions options)
+        private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
             while (true)
             {
-                var cancelToken = _cancelToken; //It's okay if another thread changes this, causes a retry to abort
+                cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken).Token;
                 HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
                 
                 var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
-                var stream = !options.HeaderOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+                var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
 
                 return new RestResponse(response.StatusCode, headers, stream);
             }

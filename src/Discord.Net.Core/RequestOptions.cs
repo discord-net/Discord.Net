@@ -9,7 +9,9 @@
         public bool HeaderOnly { get; internal set; }
 
         internal bool IgnoreState { get; set; }
-        
+        internal string BucketId { get; set; }
+        internal string ClientBucketId { get; set; }
+
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {
             if (options == null)

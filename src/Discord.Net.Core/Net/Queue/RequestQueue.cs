@@ -12,8 +12,6 @@ namespace Discord.Net.Queue
     {
         public event Func<string, RateLimitInfo?, Task> RateLimitTriggered;
 
-        internal TokenType TokenType { get; set; }
-
         private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
         private readonly SemaphoreSlim _tokenLock;
         private CancellationTokenSource _clearToken;
@@ -66,7 +64,7 @@ namespace Discord.Net.Queue
         public async Task<Stream> SendAsync(RestRequest request)
         {
             request.CancelToken = _requestCancelToken;
-            var bucket = GetOrCreateBucket(request.BucketId);
+            var bucket = GetOrCreateBucket(request.Options.BucketId, request);
             return await bucket.SendAsync(request).ConfigureAwait(false);
         }
         public async Task SendAsync(WebSocketRequest request)
@@ -90,9 +88,9 @@ namespace Discord.Net.Queue
             _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + lag.TotalMilliseconds);
         }
 
-        private RequestBucket GetOrCreateBucket(string id)
+        private RequestBucket GetOrCreateBucket(string id, RestRequest request)
         {
-            return _buckets.GetOrAdd(id, x => new RequestBucket(this, x));
+            return _buckets.GetOrAdd(id, x => new RequestBucket(this, request, x));
         }
         internal async Task RaiseRateLimitTriggered(string bucketId, RateLimitInfo? info)
         {
