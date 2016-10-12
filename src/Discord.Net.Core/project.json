@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-beta2-*",
-  "description": "An unofficial .Net API wrapper for the Discord service.",
+  "description": "A .Net API wrapper and bot framework for Discord.",
   "authors": [ "RogueException" ],
 
   "packOptions": {

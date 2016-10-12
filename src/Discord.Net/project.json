@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-beta2-*",
-  "description": "An aynchronous API wrapper for Discord using .NET. This package includes all of the optional Discord.Net components",
+  "description": "An aynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.",
   "authors": [ "RogueException" ],
 
   "packOptions": {
