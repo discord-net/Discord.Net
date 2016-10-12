@@ -233,7 +233,7 @@ namespace Discord.API
             var requestTracker = new RpcRequest<TResponse>(options);
             _requests[guid] = requestTracker;
 
-            await _requestQueue.SendAsync(new WebSocketRequest(_webSocketClient, bytes, true, options)).ConfigureAwait(false);
+            await _requestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
             return await requestTracker.Promise.Task.ConfigureAwait(false);
         }

@@ -1,5 +1,4 @@
 ﻿using Discord.Net.Rest;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
@@ -8,13 +7,13 @@ namespace Discord.Net.Queue
     {
         public string Json { get; }
 
-        public JsonRestRequest(IRestClient client, string method, string endpoint, string json, RequestOptions options)
-            : base(client, method, endpoint, options)
+        public JsonRestRequest(IRestClient client, string method, string endpoint, string bucket, string json, RequestOptions options)
+            : base(client, method, endpoint, bucket, options)
         {
             Json = json;
         }
 
-        public override async Task<Stream> SendAsync()
+        public override async Task<RestResponse> SendAsync()
         {
             return await Client.SendAsync(Method, Endpoint, Json, Options).ConfigureAwait(false);
         }

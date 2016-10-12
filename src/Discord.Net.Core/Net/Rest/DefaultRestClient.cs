@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -67,13 +66,13 @@ namespace Discord.Net.Rest
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task<Stream> SendAsync(string method, string endpoint, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, RequestOptions options)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
                 return await SendInternalAsync(restRequest, options).ConfigureAwait(false);
         }
-        public async Task<Stream> SendAsync(string method, string endpoint, string json, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, RequestOptions options)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -82,7 +81,7 @@ namespace Discord.Net.Rest
                 return await SendInternalAsync(restRequest, options).ConfigureAwait(false);
             }
         }
-        public async Task<Stream> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, RequestOptions options)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, RequestOptions options)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -114,50 +113,17 @@ namespace Discord.Net.Rest
             }
         }
 
-        private async Task<Stream> SendInternalAsync(HttpRequestMessage request, RequestOptions options)
+        private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, RequestOptions options)
         {
             while (true)
             {
                 var cancelToken = _cancelToken; //It's okay if another thread changes this, causes a retry to abort
                 HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
+                
+                var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
+                var stream = !options.HeaderOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
 
-                int statusCode = (int)response.StatusCode;
-                if (statusCode < 200 || statusCode >= 300) //2xx = Success
-                {
-                    string reason = null;
-                    JToken content = null;
-                    if (response.Content.Headers.GetValues("content-type").FirstOrDefault() == "application/json")
-                    {
-                        try
-                        {
-                            using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                            using (var reader = new StreamReader(stream))
-                            using (var json = new JsonTextReader(reader))
-                            {
-                                content = _errorDeserializer.Deserialize<JToken>(json);
-                                reason = content.Value<string>("message");
-                                if (reason == null) //Occasionally an error message is given under a different key because reasons
-                                    reason = content.ToString(Formatting.None);
-                            }
-                        }
-                        catch { } //Might have been HTML Should we check for content-type?
-                    }
-
-                    if (statusCode == 429 && content != null)
-                    {
-                        //TODO: Include bucket info
-                        string bucketId = content.Value<string>("bucket");
-                        int retryAfterMillis = content.Value<int>("retry_after");
-                        throw new HttpRateLimitException(bucketId, retryAfterMillis, reason);
-                    }
-                    else
-                        throw new HttpException(response.StatusCode, reason);
-                }
-
-                if (options.HeaderOnly)
-                    return null;
-                else
-                    return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                return new RestResponse(response.StatusCode, headers, stream);
             }
         }
 

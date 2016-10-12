@@ -167,7 +167,7 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, bytes, true, options)).ConfigureAwait(false);
+            await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
@@ -175,7 +175,7 @@ namespace Discord.API
         public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<GetGatewayResponse>("GET", "gateway", options: options).ConfigureAwait(false);
+            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {

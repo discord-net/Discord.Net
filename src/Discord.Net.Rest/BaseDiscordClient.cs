@@ -40,11 +40,12 @@ namespace Discord.Rest
             _queueLogger = LogManager.CreateLogger("Queue");
             _isFirstLogin = true;
 
-            ApiClient.RequestQueue.RateLimitTriggered += async (id, bucket, millis) =>
+            ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
-                await _queueLogger.WarningAsync($"Rate limit triggered (id = \"{id ?? "null"}\")").ConfigureAwait(false);
-                if (bucket == null && id != null)
-                    await _queueLogger.WarningAsync($"Unknown rate limit bucket \"{id ?? "null"}\"").ConfigureAwait(false);
+                if (info == null)
+                    await _queueLogger.WarningAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                else
+                    await _queueLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }

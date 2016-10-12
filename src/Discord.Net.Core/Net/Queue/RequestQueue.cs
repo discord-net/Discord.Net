@@ -1,85 +1,127 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    public class RequestQueue
+    public class RequestQueue : IDisposable
     {
-        public event Func<string, RequestQueueBucket, int?, Task> RateLimitTriggered;
-        
-        private readonly SemaphoreSlim _lock;
-        private readonly ConcurrentDictionary<string, RequestQueueBucket> _buckets;
+        public event Func<string, RateLimitInfo?, Task> RateLimitTriggered;
+
+        internal TokenType TokenType { get; set; }
+
+        private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
+        private readonly SemaphoreSlim _tokenLock;
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
-        private CancellationToken _cancelToken;
+        private CancellationToken _requestCancelToken; //Parent token + Clear token
+        private CancellationTokenSource _cancelToken; //Dispose token
+        private DateTimeOffset _waitUntil;
+
+        private Task _cleanupTask;
         
         public RequestQueue()
         {
-            _lock = new SemaphoreSlim(1, 1);
+            _tokenLock = new SemaphoreSlim(1, 1);
 
             _clearToken = new CancellationTokenSource();
-            _cancelToken = CancellationToken.None;
+            _cancelToken = new CancellationTokenSource();
+            _requestCancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
+            
+            _buckets = new ConcurrentDictionary<string, RequestBucket>();
 
-            _buckets = new ConcurrentDictionary<string, RequestQueueBucket>();
+            _cleanupTask = RunCleanup();
         }
+
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
+            await _tokenLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _parentToken = cancelToken;
-                _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token).Token;
+                _requestCancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token).Token;
             }
-            finally { _lock.Release(); }
+            finally { _tokenLock.Release(); }
         }
-
-        public async Task<Stream> SendAsync(RestRequest request)
-        {
-            request.CancelToken = _cancelToken;
-            var bucket = GetOrCreateBucket(request.Options.BucketId);
-            return await bucket.SendAsync(request).ConfigureAwait(false);
-        }
-        public async Task<Stream> SendAsync(WebSocketRequest request)
-        {
-            request.CancelToken = _cancelToken;
-            var bucket = GetOrCreateBucket(request.Options.BucketId);
-            return await bucket.SendAsync(request).ConfigureAwait(false);
-        }
-        
-        private RequestQueueBucket GetOrCreateBucket(string id)
-        {
-            return new RequestQueueBucket(this, id, null);
-        }
-
-        public void DestroyBucket(string id)
-        {
-            //Assume this object is locked
-            RequestQueueBucket bucket;
-            _buckets.TryRemove(id, out bucket);
-        }
-
         public async Task ClearAsync()
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
+            await _tokenLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _clearToken?.Cancel();
                 _clearToken = new CancellationTokenSource();
                 if (_parentToken != null)
-                    _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken).Token;
+                    _requestCancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken).Token;
                 else
-                    _cancelToken = _clearToken.Token;
+                    _requestCancelToken = _clearToken.Token;
             }
-            finally { _lock.Release(); }
+            finally { _tokenLock.Release(); }
         }
 
-        internal async Task RaiseRateLimitTriggered(string id, RequestQueueBucket bucket, int? millis)
+        public async Task<Stream> SendAsync(RestRequest request)
         {
-            await RateLimitTriggered(id, bucket, millis).ConfigureAwait(false);
+            request.CancelToken = _requestCancelToken;
+            var bucket = GetOrCreateBucket(request.BucketId);
+            return await bucket.SendAsync(request).ConfigureAwait(false);
+        }
+        public async Task SendAsync(WebSocketRequest request)
+        {
+            //TODO: Re-impl websocket buckets
+            request.CancelToken = _requestCancelToken;
+            await request.SendAsync().ConfigureAwait(false);
+        }
+
+        internal async Task EnterGlobalAsync(int id, RestRequest request)
+        {
+            int millis = (int)Math.Ceiling((_waitUntil - DateTimeOffset.UtcNow).TotalMilliseconds);
+            if (millis > 0)
+            {
+                Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive) [Global]");
+                await Task.Delay(millis).ConfigureAwait(false);
+            }
+        }
+        internal void PauseGlobal(RateLimitInfo info, TimeSpan lag)
+        {
+            _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + lag.TotalMilliseconds);
+        }
+
+        private RequestBucket GetOrCreateBucket(string id)
+        {
+            return _buckets.GetOrAdd(id, x => new RequestBucket(this, x));
+        }
+        internal async Task RaiseRateLimitTriggered(string bucketId, RateLimitInfo? info)
+        {
+            await RateLimitTriggered(bucketId, info).ConfigureAwait(false);
+        }
+
+        private async Task RunCleanup()
+        {
+            try
+            {
+                while (!_cancelToken.IsCancellationRequested)
+                {
+                    var now = DateTimeOffset.UtcNow;
+                    foreach (var bucket in _buckets.Select(x => x.Value))
+                    {
+                        RequestBucket ignored;
+                        if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
+                            _buckets.TryRemove(bucket.Id, out ignored);
+                    }
+                    await Task.Delay(60000, _cancelToken.Token); //Runs each minute
+                }
+            }
+            catch (OperationCanceledException) { }
+            catch (ObjectDisposedException) { }
+        }
+
+        public void Dispose()
+        {
+            _cancelToken.Dispose();
         }
     }
 }
