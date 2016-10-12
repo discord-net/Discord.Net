@@ -4,6 +4,6 @@ namespace Discord.Commands
 {
     public abstract class TypeReader
     {
-        public abstract Task<TypeReaderResult> Read(IUserMessage context, string input);
+        public abstract Task<TypeReaderResult> Read(CommandContext context, string input);
     }
 }

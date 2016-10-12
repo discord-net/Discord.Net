@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,33 +10,32 @@ namespace Discord.Commands
     internal class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
-        public override async Task<TypeReaderResult> Read(IUserMessage context, string input)
+        public override async Task<TypeReaderResult> Read(CommandContext context, string input)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
-            var guild = (context.Channel as IGuildChannel)?.Guild;
-            IReadOnlyCollection<IUser> channelUsers = await context.Channel.GetUsersAsync().ConfigureAwait(false);
+            IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
             IReadOnlyCollection<IGuildUser> guildUsers = null;
             ulong id;
 
-            if (guild != null)
-                guildUsers = await guild.GetUsersAsync().ConfigureAwait(false);
+            if (context.Guild != null)
+                guildUsers = await context.Guild.GetUsersAsync(CacheMode.CacheOnly).ConfigureAwait(false);
 
             //By Mention (1.0)
             if (MentionUtils.TryParseUser(input, out id))
             {
-                if (guild != null)
-                    AddResult(results, await guild.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+                if (context.Guild != null)
+                    AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
                 else
-                    AddResult(results, await context.Channel.GetUserAsync(id).ConfigureAwait(false) as T, 1.00f);
+                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
             }
 
             //By Id (0.9)
             if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
             {
-                if (guild != null)
-                    AddResult(results, await guild.GetUserAsync(id).ConfigureAwait(false) as T, 0.90f);
+                if (context.Guild != null)
+                    AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
                 else
-                    AddResult(results, await context.Channel.GetUserAsync(id).ConfigureAwait(false) as T, 0.90f);
+                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
             }
 
             //By Username + Discriminator (0.7-0.85)
@@ -75,7 +75,7 @@ namespace Discord.Commands
             }
 
             if (results.Count > 0)
-                return TypeReaderResult.FromSuccess(results.Values.ToArray());
+                return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
             return TypeReaderResult.FromError(CommandError.ObjectNotFound, "User not found.");
         }
 

@@ -13,24 +13,22 @@
     }
   },
 
-  "buildOptions": {
-    "allowUnsafe": true,
-    "warningsAsErrors": false,
-    "xmlDoc": true
-  },
-
   "configurations": {
     "Release": {
       "buildOptions": {
         "define": [ "RELEASE" ],
         "nowarn": [ "CS1573", "CS1591" ],
-        "optimize": true
+        "optimize": true,
+        "warningsAsErrors": true,
+        "xmlDoc": true
       }
     }
   },
 
   "dependencies": {
-    "Discord.Net": "1.0.0-*"
+    "Discord.Net.Core": {
+      "target": "project"
+    }
   },
 
   "frameworks": {

@@ -11,7 +11,7 @@ namespace Discord.Commands
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override Task<TypeReaderResult> Read(IUserMessage context, string input)
+        public override Task<TypeReaderResult> Read(CommandContext context, string input)
         {
             T value;
             if (_tryParse(input, out value))

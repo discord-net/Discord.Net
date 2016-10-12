@@ -6,6 +6,6 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public abstract class PreconditionAttribute : Attribute
     {
-        public abstract Task<PreconditionResult> CheckPermissions(IUserMessage context, Command executingCommand, object moduleInstance);
+        public abstract Task<PreconditionResult> CheckPermissions(CommandContext context, CommandInfo command, IDependencyMap map);
     }
 }

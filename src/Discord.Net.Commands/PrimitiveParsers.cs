@@ -13,7 +13,7 @@ namespace Discord.Commands
         static PrimitiveParsers()
         {
             var parserBuilder = ImmutableDictionary.CreateBuilder<Type, Delegate>();
-            parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate(string str, out string value) { value = str; return true; };
+            parserBuilder[typeof(bool)] = (TryParseDelegate<bool>)bool.TryParse;
             parserBuilder[typeof(sbyte)] = (TryParseDelegate<sbyte>)sbyte.TryParse;
             parserBuilder[typeof(byte)] = (TryParseDelegate<byte>)byte.TryParse;
             parserBuilder[typeof(short)] = (TryParseDelegate<short>)short.TryParse;
@@ -27,6 +27,12 @@ namespace Discord.Commands
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
+            parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
+            parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate (string str, out string value)
+            {
+                value = str;
+                return true;
+            };
             _parsers = parserBuilder.ToImmutable();
         }
 

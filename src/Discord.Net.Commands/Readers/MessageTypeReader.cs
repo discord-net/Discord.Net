@@ -6,19 +6,19 @@ namespace Discord.Commands
     internal class MessageTypeReader<T> : TypeReader
         where T : class, IMessage
     {
-        public override Task<TypeReaderResult> Read(IUserMessage context, string input)
+        public override async Task<TypeReaderResult> Read(CommandContext context, string input)
         {
             ulong id;
 
             //By Id (1.0)
             if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
             {
-                var msg = context.Channel.GetCachedMessage(id) as T;
+                var msg = await context.Channel.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T;
                 if (msg != null)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(msg));
+                    return TypeReaderResult.FromSuccess(msg);
             }
 
-            return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Message not found."));
+            return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Message not found.");
         }
     }
 }

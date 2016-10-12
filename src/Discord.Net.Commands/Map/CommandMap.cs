@@ -16,7 +16,7 @@ namespace Discord.Commands
             _nodes = new ConcurrentDictionary<string, CommandMapNode>();
         }
 
-        public void AddCommand(Command command)
+        public void AddCommand(CommandInfo command)
         {
             foreach (string text in command.Aliases)
             {
@@ -35,7 +35,7 @@ namespace Discord.Commands
                 }
             }
         }
-        public void RemoveCommand(Command command)
+        public void RemoveCommand(CommandInfo command)
         {
             foreach (string text in command.Aliases)
             {
@@ -60,7 +60,7 @@ namespace Discord.Commands
             }
         }
 
-        public IEnumerable<Command> GetCommands(string text)
+        public IEnumerable<CommandInfo> GetCommands(string text)
         {
             int nextSpace = NextWhitespace(text);
             string name;
@@ -76,7 +76,7 @@ namespace Discord.Commands
                 if (_nodes.TryGetValue(name, out nextNode))
                     return nextNode.GetCommands(text, nextSpace + 1);
                 else
-                    return Enumerable.Empty<Command>();
+                    return Enumerable.Empty<CommandInfo>();
             }
         }
 
