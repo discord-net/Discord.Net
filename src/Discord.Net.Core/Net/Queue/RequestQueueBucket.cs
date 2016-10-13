@@ -125,8 +125,11 @@ namespace Discord.Net.Queue
                 DateTimeOffset? timeoutAt = request.TimeoutAt;
                 if (windowCount > 0 && Interlocked.Decrement(ref _semaphore) < 0)
                 {
-                    isRateLimited = true;
-                    await _queue.RaiseRateLimitTriggered(Id, null).ConfigureAwait(false);
+                    if (!isRateLimited)
+                    {
+                        isRateLimited = true;
+                        await _queue.RaiseRateLimitTriggered(Id, null).ConfigureAwait(false);
+                    }
                     if (resetAt.HasValue)
                     {
                         if (resetAt > timeoutAt)
