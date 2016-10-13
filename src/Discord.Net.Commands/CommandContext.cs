@@ -7,6 +7,8 @@
         public IUser User { get; }
         public IUserMessage Message { get; }
 
+        public bool IsPrivate => Channel is IPrivateChannel;
+
         public CommandContext(IGuild guild, IMessageChannel channel, IUser user, IUserMessage msg)
         {
             Guild = guild;
