@@ -1120,6 +1120,15 @@ namespace Discord.API
                 var methodArgs = methodCall.Arguments.ToArray();
                 string format = (methodArgs[0] as ConstantExpression).Value as string;
 
+                //Unpack the array, if one exists (happens with 4+ parameters)
+                if (methodArgs.Length > 1 && methodArgs[1].NodeType == ExpressionType.NewArrayInit)
+                {
+                    var arrayExpr = methodArgs[1] as NewArrayExpression;
+                    var elements = arrayExpr.Expressions.ToArray();
+                    Array.Resize(ref methodArgs, elements.Length + 1);
+                    Array.Copy(elements, 0, methodArgs, 1, elements.Length);
+                }
+
                 int endIndex = format.IndexOf('?'); //Dont include params
                 if (endIndex == -1)
                     endIndex = format.Length;
