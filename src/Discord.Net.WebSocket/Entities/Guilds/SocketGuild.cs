@@ -380,9 +380,9 @@ namespace Discord.WebSocket
             if (_members.TryRemove(id, out member))
             {
                 DownloadedMemberCount--;
+                member.GlobalUser.RemoveRef(Discord);
                 return member;
             }
-            member.GlobalUser.RemoveRef(Discord);
             return null;
         }
 
