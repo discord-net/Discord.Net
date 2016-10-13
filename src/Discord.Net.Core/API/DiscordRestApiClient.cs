@@ -1142,7 +1142,7 @@ namespace Discord.API
                         builder.Append(format, lastIndex, endIndex - lastIndex);
                         break;
                     }
-                    builder.Append(format, lastIndex, leftIndex);
+                    builder.Append(format, lastIndex, leftIndex - lastIndex);
                     int rightIndex = format.IndexOf("}", leftIndex);
 
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1));
@@ -1150,7 +1150,7 @@ namespace Discord.API
                     int? mappedId;
                     
                     mappedId = BucketIds.GetIndex(fieldName);
-                    if(!mappedId.HasValue && rightIndex != endIndex && format[rightIndex + 1] == '/') //Ignore the next slash
+                    if(!mappedId.HasValue && rightIndex != endIndex && format.Length > rightIndex + 1 && format[rightIndex + 1] == '/') //Ignore the next slash
                         rightIndex++;
 
                     if (mappedId.HasValue)
