@@ -4,7 +4,6 @@ namespace Discord.Commands
 {
     public abstract class ModuleBase
     {
-        public IDiscordClient Client { get; internal set; }
         public CommandContext Context { get; internal set; }
 
         protected virtual async Task ReplyAsync(string message, bool isTTS = false, RequestOptions options = null)
