@@ -13,7 +13,5 @@ namespace Discord.Rest
             Discord = discord;
             Id = id;
         }
-
-        IDiscordClient IEntity<T>.Discord => Discord;
     }
 }

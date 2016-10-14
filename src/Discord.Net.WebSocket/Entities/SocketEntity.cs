@@ -13,7 +13,5 @@ namespace Discord.WebSocket
             Discord = discord;
             Id = id;
         }
-
-        IDiscordClient IEntity<T>.Discord => Discord;
     }
 }

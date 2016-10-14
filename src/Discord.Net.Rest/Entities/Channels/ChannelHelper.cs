@@ -188,7 +188,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await guild.Discord.ApiClient.GetGuildMembersAsync(guild.Id, args, options).ConfigureAwait(false);
+                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args, options).ConfigureAwait(false);
                     return models
                         .Select(x => RestGuildUser.Create(client, guild, x))
                         .Where(x => x.GetPermissions(channel).ReadMessages)

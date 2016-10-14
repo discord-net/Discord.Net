@@ -13,7 +13,5 @@ namespace Discord.Rpc
             Discord = discord;
             Id = id;
         }
-
-        IDiscordClient IEntity<T>.Discord => Discord;
     }
 }
