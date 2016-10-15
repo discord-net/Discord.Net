@@ -65,7 +65,7 @@ namespace Discord.Commands
         }
 
         //Modules
-        public async Task<ModuleInfo> AddModule<T>(IDependencyMap dependencyMap = null)
+        public async Task<ModuleInfo> AddModule<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -80,14 +80,14 @@ namespace Discord.Commands
                 if (_moduleDefs.ContainsKey(typeof(T)))
                     throw new ArgumentException($"This module has already been added.");
 
-                return AddModuleInternal(typeInfo, dependencyMap);
+                return AddModuleInternal(typeInfo);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly, IDependencyMap dependencyMap = null)
+        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly)
         {
             var moduleDefs = ImmutableArray.CreateBuilder<ModuleInfo>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace Discord.Commands
                         {
                             var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
                             if (dontAutoLoad == null && !typeInfo.IsAbstract)
-                                moduleDefs.Add(AddModuleInternal(typeInfo, dependencyMap));
+                                moduleDefs.Add(AddModuleInternal(typeInfo));
                         }
                     }
                 }
@@ -113,9 +113,9 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo AddModuleInternal(TypeInfo typeInfo, IDependencyMap dependencyMap)
+        private ModuleInfo AddModuleInternal(TypeInfo typeInfo)
         {
-            var moduleDef = new ModuleInfo(typeInfo, this, dependencyMap);
+            var moduleDef = new ModuleInfo(typeInfo, this);
             _moduleDefs[typeInfo.AsType()] = moduleDef;
 
             foreach (var cmd in moduleDef.Commands)
@@ -236,7 +236,7 @@ namespace Discord.Commands
                     }
                 }
 
-                return await commands[i].Execute(context, parseResult).ConfigureAwait(false);
+                return await commands[i].Execute(context, parseResult, dependencyMap).ConfigureAwait(false);
             }
             
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");

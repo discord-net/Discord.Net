@@ -9,7 +9,7 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class ModuleInfo
     {
-        internal readonly Func<ModuleBase> _builder;
+        internal readonly Func<IDependencyMap, ModuleBase> _builder;
 
         public TypeInfo Source { get; }
         public CommandService Service { get; }
@@ -20,12 +20,12 @@ namespace Discord.Commands
         public IEnumerable<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal ModuleInfo(TypeInfo source, CommandService service, IDependencyMap dependencyMap)
+        internal ModuleInfo(TypeInfo source, CommandService service)
         {
             Source = source;
             Service = service;
             Name = source.Name;
-            _builder = ReflectionUtils.CreateBuilder<ModuleBase>(source, Service, dependencyMap);
+            _builder = ReflectionUtils.CreateBuilder<ModuleBase>(source, Service);
 
             var groupAttr = source.GetCustomAttribute<GroupAttribute>();
             if (groupAttr != null)
@@ -46,12 +46,12 @@ namespace Discord.Commands
                 Remarks = remarksAttr.Text;
 
             List<CommandInfo> commands = new List<CommandInfo>();
-            SearchClass(source, commands, Prefix, dependencyMap);
+            SearchClass(source, commands, Prefix);
             Commands = commands;
 
             Preconditions = Source.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
-        private void SearchClass(TypeInfo parentType, List<CommandInfo> commands, string groupPrefix, IDependencyMap dependencyMap)
+        private void SearchClass(TypeInfo parentType, List<CommandInfo> commands, string groupPrefix)
         {
             foreach (var method in parentType.DeclaredMethods)
             {
@@ -71,13 +71,13 @@ namespace Discord.Commands
                     else
                         nextGroupPrefix = groupAttrib.Prefix ?? type.Name.ToLowerInvariant();
 
-                    SearchClass(type, commands, nextGroupPrefix, dependencyMap);
+                    SearchClass(type, commands, nextGroupPrefix);
                 }
             }
         }
 
-        internal ModuleBase CreateInstance()
-            => _builder();
+        internal ModuleBase CreateInstance(IDependencyMap map)
+            => _builder(map);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => Name;

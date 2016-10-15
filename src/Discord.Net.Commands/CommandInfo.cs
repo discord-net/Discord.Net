@@ -15,7 +15,7 @@ namespace Discord.Commands
         private static readonly MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
         
-        private readonly Func<CommandContext, object[], Task> _action;
+        private readonly Func<CommandContext, object[], IDependencyMap, Task> _action;
 
         public MethodInfo Source { get; }
         public ModuleInfo Module { get; }
@@ -125,7 +125,7 @@ namespace Discord.Commands
 
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
-        public Task<ExecuteResult> Execute(CommandContext context, ParseResult parseResult)
+        public Task<ExecuteResult> Execute(CommandContext context, ParseResult parseResult, IDependencyMap map)
         {
             if (!parseResult.IsSuccess)
                 return Task.FromResult(ExecuteResult.FromError(parseResult));
@@ -146,9 +146,9 @@ namespace Discord.Commands
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
-            return Execute(context, argList, paramList);
+            return Execute(context, argList, paramList, map);
         }
-        public async Task<ExecuteResult> Execute(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList)
+        public async Task<ExecuteResult> Execute(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
         {
             try
             {
@@ -156,13 +156,13 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        await _action(context, args).ConfigureAwait(false);
+                        await _action(context, args, map).ConfigureAwait(false);
                         break;
                     case RunMode.Mixed: //Sync until first await statement
-                        var t1 = _action(context, args);
+                        var t1 = _action(context, args, map);
                         break;
                     case RunMode.Async: //Always async
-                        var t2 = Task.Run(() => _action(context, args));
+                        var t2 = Task.Run(() => _action(context, args, map));
                         break;
                 }
                 return ExecuteResult.FromSuccess();
@@ -219,14 +219,14 @@ namespace Discord.Commands
             }
             return paramBuilder.ToImmutable();
         }
-        private Func<CommandContext, object[], Task> BuildAction(MethodInfo methodInfo)
+        private Func<CommandContext, object[], IDependencyMap, Task> BuildAction(MethodInfo methodInfo)
         {
             if (methodInfo.ReturnType != typeof(Task))
                 throw new InvalidOperationException("Commands must return a non-generic Task.");
 
-            return (context, args) =>
+            return (context, args, map) =>
             {
-                var instance = Module.CreateInstance();
+                var instance = Module.CreateInstance(map);
                 instance.Context = context;
                 try
                 {

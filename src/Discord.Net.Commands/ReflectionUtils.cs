@@ -7,9 +7,9 @@ namespace Discord.Commands
     internal class ReflectionUtils
     {
         internal static T CreateObject<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
-            => CreateBuilder<T>(typeInfo, service, map)();
+            => CreateBuilder<T>(typeInfo, service)(map);
 
-        internal static Func<T> CreateBuilder<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
+        internal static Func<IDependencyMap, T> CreateBuilder<T>(TypeInfo typeInfo, CommandService service)
         {
             var constructors = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
@@ -19,26 +19,27 @@ namespace Discord.Commands
 
             var constructor = constructors[0];
             ParameterInfo[] parameters = constructor.GetParameters();
-            object[] args = new object[parameters.Length];
 
-            for (int i = 0; i < parameters.Length; i++)
+            return (map) =>
             {
-                var parameter = parameters[i];
-                object arg;
-                if (map == null || !map.TryGet(parameter.ParameterType, out arg))
+                object[] args = new object[parameters.Length];
+
+                for (int i = 0; i < parameters.Length; i++)
                 {
-                    if (parameter.ParameterType == typeof(CommandService))
-                        arg = service;
-                    else if (parameter.ParameterType == typeof(IDependencyMap))
-                        arg = map;
-                    else
-                        throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{parameter.ParameterType.Name}\" was not found.");
+                    var parameter = parameters[i];
+                    object arg;
+                    if (map == null || !map.TryGet(parameter.ParameterType, out arg))
+                    {
+                        if (parameter.ParameterType == typeof(CommandService))
+                            arg = service;
+                        else if (parameter.ParameterType == typeof(IDependencyMap))
+                            arg = map;
+                        else
+                            throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{parameter.ParameterType.Name}\" was not found.");
+                    }
+                    args[i] = arg;
                 }
-                args[i] = arg;
-            }
 
-            return () =>
-            {
                 try
                 {
                     return (T)constructor.Invoke(args);
