@@ -18,5 +18,13 @@
             User = user;
             Message = msg;
         }
+        public CommandContext(IDiscordClient client, IUserMessage msg)
+        {
+            Client = client;
+            Guild = (msg.Channel as IGuildChannel).Guild;
+            Channel = msg.Channel;
+            User = msg.Author;
+            Message = msg;
+        }
     }
 }
