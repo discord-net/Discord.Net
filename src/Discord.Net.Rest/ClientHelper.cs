@@ -41,7 +41,7 @@ namespace Discord.Rest
         {
             var model = await client.ApiClient.GetInviteAsync(inviteId).ConfigureAwait(false);
             if (model != null)
-                return RestInvite.Create(client, model);
+                return RestInvite.Create(client, null, null, model);
             return null;
         }
         

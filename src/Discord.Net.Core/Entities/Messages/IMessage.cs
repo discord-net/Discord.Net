@@ -20,7 +20,7 @@ namespace Discord
         /// <summary> Gets the time of this message's last edit, if any. </summary>
         DateTimeOffset? EditedTimestamp { get; }
         
-        /// <summary> Gets the id of the channel this message was sent to. </summary>
+        /// <summary> Gets the channel this message was sent to. </summary>
         IMessageChannel Channel { get; }
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }

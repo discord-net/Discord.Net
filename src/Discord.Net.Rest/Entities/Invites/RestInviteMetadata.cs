@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Model = Discord.API.InviteMetadata;
 
 namespace Discord.Rest
@@ -17,13 +16,13 @@ namespace Discord.Rest
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
-        internal RestInviteMetadata(BaseDiscordClient discord, string id)
-            : base(discord, id)
+        internal RestInviteMetadata(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
+            : base(discord, guild, channel, id)
         {
         }
-        internal static RestInviteMetadata Create(BaseDiscordClient discord, Model model)
+        internal static RestInviteMetadata Create(BaseDiscordClient discord, IGuild guild, IChannel channel, Model model)
         {
-            var entity = new RestInviteMetadata(discord, model.Code);
+            var entity = new RestInviteMetadata(discord, guild, channel, model.Code);
             entity.Update(model);
             return entity;
         }

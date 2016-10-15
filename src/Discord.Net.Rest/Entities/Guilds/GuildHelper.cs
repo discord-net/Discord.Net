@@ -117,14 +117,14 @@ namespace Discord.Rest
             RequestOptions options)
         {
             var models = await client.ApiClient.GetGuildIntegrationsAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestGuildIntegration.Create(client, x)).ToImmutableArray();
+            return models.Select(x => RestGuildIntegration.Create(client, guild, x)).ToImmutableArray();
         }
         public static async Task<RestGuildIntegration> CreateIntegrationAsync(IGuild guild, BaseDiscordClient client,
             ulong id, string type, RequestOptions options)
         {
             var args = new CreateGuildIntegrationParams(id, type);
             var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
-            return RestGuildIntegration.Create(client, model);
+            return RestGuildIntegration.Create(client, guild, model);
         }
 
         //Invites
@@ -132,7 +132,7 @@ namespace Discord.Rest
             RequestOptions options)
         {
             var models = await client.ApiClient.GetGuildInvitesAsync(guild.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestInviteMetadata.Create(client, x)).ToImmutableArray();
+            return models.Select(x => RestInviteMetadata.Create(client, guild, null, x)).ToImmutableArray();
         }
 
         //Roles

@@ -14,6 +14,8 @@ namespace Discord
         string Nickname { get; }
         GuildPermissions GuildPermissions { get; }
 
+        /// <summary> Gets the guild for this user. </summary>
+        IGuild Guild { get; }
         /// <summary> Gets the id of the guild for this user. </summary>
         ulong GuildId { get; }
         /// <summary> Returns a collection of the ids of the roles this user is a member of in this guild, including the guild's @everyone role. </summary>

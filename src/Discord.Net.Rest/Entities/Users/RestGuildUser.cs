@@ -86,6 +86,17 @@ namespace Discord.Rest
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
 
+        //IGuildUser
+        IGuild IGuildUser.Guild
+        {
+            get
+            {
+                if (Guild != null)
+                    return Guild;
+                throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+            }
+        }
+
         //IVoiceState
         bool IVoiceState.IsSelfDeafened => false;
         bool IVoiceState.IsSelfMuted => false;

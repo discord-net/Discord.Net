@@ -126,6 +126,7 @@ namespace Discord.WebSocket
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
 
         //IGuildChannel
+        IGuild IGuildChannel.Guild => Guild;
         ulong IGuildChannel.GuildId => Guild.Id;
 
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)

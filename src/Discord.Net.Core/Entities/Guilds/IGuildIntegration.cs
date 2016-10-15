@@ -14,6 +14,7 @@ namespace Discord
         DateTimeOffset SyncedAt { get; }
         IntegrationAccount Account { get; }
 
+        IGuild Guild { get; }
         ulong GuildId { get; }
         ulong RoleId { get; }
         IUser User { get; }

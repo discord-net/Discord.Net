@@ -125,6 +125,16 @@ namespace Discord.Rest
         public override string ToString() => Name;
 
         //IGuildChannel
+        IGuild IGuildChannel.Guild
+        {
+            get
+            {
+                if (Guild != null)
+                    return Guild;
+                throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+            }
+        }
+
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
         async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)

@@ -47,7 +47,7 @@ namespace Discord.Rest
             RequestOptions options)
         {
             var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestInviteMetadata.Create(client, x)).ToImmutableArray();
+            return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
         public static async Task<RestInviteMetadata> CreateInviteAsync(IChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
@@ -58,7 +58,7 @@ namespace Discord.Rest
             if (maxUses.HasValue)
                 args.MaxUses = maxUses.Value;
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
-            return RestInviteMetadata.Create(client, model);
+            return RestInviteMetadata.Create(client, null, channel, model);
         }
 
         //Messages

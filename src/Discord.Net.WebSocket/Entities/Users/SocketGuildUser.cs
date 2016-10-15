@@ -93,6 +93,7 @@ namespace Discord.WebSocket
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
 
         //IGuildUser
+        IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
 

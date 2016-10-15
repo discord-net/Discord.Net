@@ -21,16 +21,18 @@ namespace Discord.Rest
         public ulong RoleId { get; private set; }
         public RestUser User { get; private set; }
         public IntegrationAccount Account { get; private set; }
+        internal IGuild Guild { get; private set; }
 
         public DateTimeOffset SyncedAt => DateTimeUtils.FromTicks(_syncedAtTicks);
 
-        internal RestGuildIntegration(BaseDiscordClient discord, ulong id)
+        internal RestGuildIntegration(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)
         {
+            Guild = guild;
         }
-        internal static RestGuildIntegration Create(BaseDiscordClient discord, Model model)
+        internal static RestGuildIntegration Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestGuildIntegration(discord, model.Id);
+            var entity = new RestGuildIntegration(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -71,6 +73,15 @@ namespace Discord.Rest
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}{(IsEnabled ? ", Enabled" : "")})";
 
+        IGuild IGuildIntegration.Guild
+        {
+            get
+            {
+                if (Guild != null)
+                    return Guild;
+                throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+            }
+        }
         IUser IGuildIntegration.User => User;
     }
 }

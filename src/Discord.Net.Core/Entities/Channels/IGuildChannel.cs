@@ -10,6 +10,8 @@ namespace Discord
         /// <summary> Gets the position of this channel in the guild's channel list, relative to others of the same type. </summary>
         int Position { get; }
 
+        /// <summary> Gets the guild this channel is a member of. </summary>
+        IGuild Guild { get; }
         /// <summary> Gets the id of the guild this channel is a member of. </summary>
         ulong GuildId { get; }
         /// <summary> Gets a collection of permission overwrites for this channel. </summary>
