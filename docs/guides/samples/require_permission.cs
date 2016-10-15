@@ -1,7 +1,6 @@
-[Module]
-public class AdminModule
+public class AdminModule : ModuleBase
 {
     [Command("ban")]
     [RequirePermission(GuildPermission.BanMembers)]
-    public async Task Ban(IUserMessage msg) { }
+    public async Task Ban(IGuildUser target) { }
 }

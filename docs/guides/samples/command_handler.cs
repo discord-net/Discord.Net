@@ -33,21 +33,21 @@ public class Program
 		// Discover all of the commands in this assembly and load them.
         await commands.LoadAssembly(Assembly.GetEntryAssembly());
     }
-    public async Task HandleCommand(IMessage paramMessage)
+    public async Task HandleCommand(SocketMessage messageParam)
 	{
-        // Cast paramMessage to an IUserMessage, return if the message was a System message.
-        var msg = paramMessage as IUserMessage;
-        if (msg == null) return;
-		// Internal integer, marks where the command begins
+        // Don't process the command if it was a System Message
+        var message = messageParam as SocketUserMessage;
+        if (message == null) return;
+		// Create a number to track where the prefix ends and the command begins
 		int argPos = 0;
-		// Get the current user (used for Mention parsing)
-		var currentUser = await client.GetCurrentUserAsync();
 		// Determine if the message is a command, based on if it starts with '!' or a mention prefix
-		if (msg.HasCharPrefix('!', ref argPos) || msg.HasMentionPrefix(currentUser, ref argPos)) 
+		if (message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos)) 
 		{
-			// Execute the command. (result does not indicate a return value, 
+			// Create a Command Context
+            var context = new CommandContext(client, message);
+            // Execute the command. (result does not indicate a return value, 
 			// rather an object stating if the command executed succesfully)
-			var result = await _commands.Execute(msg, argPos);
+			var result = await _commands.Execute(context, argPos);
 			if (!result.IsSuccess)
 				await msg.Channel.SendMessageAsync(result.ErrorReason);
 		}

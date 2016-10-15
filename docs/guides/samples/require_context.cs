@@ -1,11 +1,10 @@
-[Module]
-public class InfoModule
+public class InfoModule : ModuleBase
 {
     // Constrain this command to Guilds
     [RequireContext(ContextType.Guild)]
-    public async Task Whois(IUserMessage msg, IGuildUser user) { }
+    public async Task Whois(IGuildUser user) { }
 
     // Constrain this command to either Guilds or DMs
     [RequireContext(ContextType.Guild | ContextType.DM)]
-    public async Task Info(IUserMessage msg) { }
+    public async Task Info() { }
 }

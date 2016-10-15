@@ -5,11 +5,6 @@ changes in the design of the library.**
 
 >A medium to advanced understanding is recommended when working with this library.
 
-One of the biggest major changes from `0.9.x` is the exclusive use of interfaces.
-For the most part, your usability will be very similar to the 0.9 approach of concrete
-classes. You **will** be required to cast some entities; this is outlined in a later
-section.
-
 It is recommended to familiarize yourself with the entities in 1.0 before continuing. 
 Feel free to look through the library's source directly, look through IntelliSense, or 
 look through our hosted [API Documentation](xref:Discord).
@@ -19,8 +14,7 @@ look through our hosted [API Documentation](xref:Discord).
 Most API models function _similarly_ to 0.9, however their names have been changed. 
 You should also keep in mind that we now separate different types of Channels and Users.
 
-Take a look at inheritance section of @Terminology for an example of how inheritance and interfaces
-work in 1.0
+Before proceeding, please read over @Terminology to understand the naming behind some objects.
 
 Below is a table that compares most common 0.9 entities to their 1.0 counterparts.
 
@@ -29,18 +23,16 @@ Below is a table that compares most common 0.9 entities to their 1.0 counterpart
 
 | 0.9 | 1.0 | Notice |
 | --- | --- | ------ |
-| Server | @Discord.IGuild |
-| Channel | @Discord.IGuildChannel | Applies only to channels that are members of a Guild |
-| Channel.IsPrivate | @Discord.IDMChannel
-| ChannelType.Text | @Discord.ITextChannel | This applies only to Text Channels in Guilds
-| ChannelType.Voice | @Discord.IVoiceChannel | This applies only to Voice Channels in Guilds
-| User | @Discord.IGuildUser | This applies only to users belonging to a Guild*
-| Profile | @Discord.ISelfUser
-| Message | @Discord.IUserMessage
+| Server | @Discord.WebSocket.SocketGuild |
+| Channel | @Discord.WebSocket.SocketGuildChannel | Applies only to channels that are members of a Guild |
+| Channel.IsPrivate | @Discord.WebSocket.SocketDMChannel
+| ChannelType.Text | @Discord.WebSocket.SocketTextChannel | This applies only to Text Channels in Guilds
+| ChannelType.Voice | @Discord.WebSocket.SocketVoiceChannel | This applies only to Voice Channels in Guilds
+| User | @Discord.WebSocket.SocketGuildUser | This applies only to users belonging to a Guild*
+| Profile | @Discord.WebSocket.SocketGuildUser
+| Message | @Discord.WebSocket.SocketUserMessage
 
-\* To retrieve an @Discord.IGuildUser, you must retrieve the user from an @Discord.IGuild.
-[IDiscordClient.GetUserAsync](xref:Discord.IDiscordClient#Discord_IDiscordClient_GetUserAsync_System_UInt64_) 
-returns a @Discord.IUser, which only contains the information that Discord exposes for public users.
+\* To retrieve an @Discord.WebSocket.SocketGuildUser, you must retrieve the user from an @Discord.WebSocket.SocketGuild.
 
 ## Event Registration
 
@@ -67,15 +59,3 @@ API docs before implementing it.
 ## Async
 
 Nearly everything in 1.0 is an async Task. You should always await any tasks you invoke.
-
-However, when using WebSockets, you may find this both inconvienent, and unnecessary, as many of the
-WebSocket implementations of the interfaces keep their own local cache of objects, rendering the use
-of async redundant. 
-
-**As of right now,** there are extension methods you can use, located in `Discord.WebSocket` that will
-provide java-esque, synchronus `GetXXX` methods to replace the asynchronus methods on WebSocket entities.
-
-This functionality may be changed at a later date, we are currently reviewing this implementation and
-alternative methods.
-
-For your reference, you may want to look through the extension classes located in @Discord.WebSocket

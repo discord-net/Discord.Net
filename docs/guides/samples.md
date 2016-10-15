@@ -18,7 +18,3 @@ title: Samples
 #### Sending a message to a channel
 
 [!code-csharp[Message to Channel](samples/faq/send_message.cs)]
-
-#### Retrieving an IGuild from an IUserMessage
-
-[!code-csharp[Message to Guild](samples/faq/guild_from_message.cs)]

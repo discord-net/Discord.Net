@@ -1,37 +1,60 @@
 # The Command Service
 
-[Discord.Commands](xref:Discord.Commands) provides an Attribute-based Command Parser.
+[Discord.Commands](xref:Discord.Commands) provides an Attribute-based
+ Command Parser.
 
 ### Setup
 
-To use Commands, you must create a [Commands Service](xref:Discord.Commands.CommandService) and a Command Handler.
+To use Commands, you must create a 
+[Commands Service](xref:Discord.Commands.CommandService) 
+and a Command Handler.
 
-Included below is a very bare-bones Command Handler. You can extend your Command Handler as much as you like, however the below is the bare minimum.
+Included below is a very bare-bones Command Handler. You can extend 
+your Command Handler as much as you like, however the below is the 
+bare minimum.
 
 [!code-csharp[Barebones Command Handler](samples/command_handler.cs)]
 
 ## Commands
 
-In 1.0, Commands are no longer implemented at runtime with a builder pattern. 
-While a builder pattern may be provided later, commands are created primarily with
-attributes.
+In 1.0, Commands are no longer implemented at runtime with a builder 
+pattern. While a builder pattern may be provided later, commands are 
+created primarily with attributes.
 
 ### Basic Structure
 
-All commands belong to a Module. (See the below section for creating modules.)
+All commands belong to a Module. (See the below section for creating 
+modules).
 
-All commands in a module must be defined as an `Task`, with at least one argument,
-being the @Discord.IUserMessage representing the context of the command. 
+All commands in a module must be defined as a `Task`. 
 
-To add parameters to your command, add additional arguments to the `Task` of the command.
-You are _not_ required to accept all arguments as `String`, they will be automatically parsed 
-into the type you specify for the arument. See the Example Module for an example of command parameters.
+To add parameters to your command, you simply need to add parameters 
+to the Task that represents the command. You are _not_ required to 
+accept all arguments as `String`, they will be automatically parsed  
+into the type you specify for the arument. See the Example Module 
+for an example of command parameters.
 
 ## Modules
 
-Modules serve as a host for commands you create. 
+Modules are an organizational pattern that allow you to write your 
+commands in different classes, and have them automatically loaded. 
 
-To create a module, create a class that you will place commands in. Flag this class with the `[Module]` attribute. You may optionally pass in a string to the `Module` attribute to set a prefix for all of the commands inside the module.
+Discord.Net's implementation of Modules is influenced heavily from
+ASP.Net Core's Controller pattern. This means that the lifetime of a
+module instance is only as long as the command being ran in it.
+
+**Avoid using long-running code** in your modules whereever possible. 
+You should **not** be implementing very much logic into your modules;
+outsource to a service for that.
+
+If you are unfamiliar with Inversion of Control, it is recommended to 
+read the MSDN article on [IoC] and [Dependency Injection]. 
+
+To create a module, create a class that inherits from 
+@Discord.Commands.ModuleBase.
+
+[IoC]: https://msdn.microsoft.com/en-us/library/ff921087.aspx
+[Dependency Injection]: https://msdn.microsoft.com/en-us/library/ff921152.aspx
 
 ### Example Module
 
@@ -39,68 +62,95 @@ To create a module, create a class that you will place commands in. Flag this cl
 
 #### Loading Modules Automatically
 
-The Command Service can automatically discover all classes in an Assembly that are flagged with the `Module` attribute, and load them.
+The Command Service can automatically discover all classes in an 
+Assembly that inherit @Discord.Commands.ModuleBase, and load them.
 
-To have a module opt-out of auto-loading, pass `autoload: false` in the Module attribute.
+To have a module opt-out of auto-loading, pass `autoload: false` in 
+the Module attribute.
 
-Invoke [CommandService.LoadAssembly](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_LoadAssembly) to discover modules and install them.
+Invoke [CommandService.AddModules] to discover modules and install them.
+
+[CommandService.AddModules]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModules
 
 #### Loading Modules Manually
 
-To manually load a module, invoke [CommandService.Load](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_Load), and pass in an instance of your module.
+To manually load a module, invoke [CommandService.AddModule], 
+by passing in the generic type of your module, and optionally 
+a dependency map.
+
+[CommandService.AddModule]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModule__1_Discord_Commands_IDependencyMap_
 
 ### Module Constructors
 
-When automatically loading modules, you are limited in your constructor. Using a constructor that accepts _no arguments_, or a constructor that accepts a @Discord.Commands.CommandService will always work.
-
-Alternatively, you can use an @Discord.Commands.IDependencyMap, as shown below.
+Modules are constructed using Dependency Injection. Any parameters 
+that are placed in the constructor must be injected into an 
+@Discord.Commands.IDependencyMap. Alternatively, you may accept an 
+IDependencyMap as an argument and extract services yourself.
 
 ### Command Groups
 
-Command groups function similarly to Modules, but they must be contained inside a module. Simply create a **public** class inside a module, and flag it with the @Discord.Commands.GroupAttribute
+Command Groups allow you to create a module where commands are prefixed. 
+To create a group, create a new module and flag it with the 
+@Discord.Commands.GroupAttribute.
+
+>![NOTE]
+>Groups do not _need_ to be modules. Only classes with commands should 
+>inherit from ModuleBase. If you plan on using a group for strictly 
+>organizational purposes, there is no reason to make it a module.
 
 [!code-csharp[Groups Sample](samples/groups.cs)]
 
 ## Dependency Injection
 
-The Commands Service includes a very basic implementation of Dependency Injection that allows you to have completely custom constructors, within certain limitations.
+The commands service is bundled with a very barebones Dependency 
+Injection service for your convienence. It is recommended that 
+you use DI when writing your modules.
 
 ### Setup
 
-First, you need to create an @Discord.Commands.IDependencyMap . The library includes @Discord.Commands.DependencyMap to help with this, however you may create your own IDependencyMap if you wish. 
+First, you need to create an @Discord.Commands.IDependencyMap. 
+The library includes @Discord.Commands.DependencyMap to help with 
+this, however you may create your own IDependencyMap if you wish. 
 
 Next, add the dependencies your modules will use to the map. 
 
-Finally, pass the map into the `LoadAssembly` method. Your modules will automatically be loaded with this dependency map.
+Finally, pass the map into the `LoadAssembly` method. 
+Your modules will automatically be loaded with this dependency map.
 
 [!code-csharp[DependencyMap Setup](samples/dependency_map_setup.cs)]
 
 ### Usage in Modules
 
-In the constructor of your module, any parameters will be filled in by the @Discord.Commands.IDependencyMap you pass into `LoadAssembly`.
+In the constructor of your module, any parameters will be filled in by 
+the @Discord.Commands.IDependencyMap you pass into `LoadAssembly`.
 
 >[!NOTE]
->If you accept `CommandService` or `IDependencyMap`  as a parameter in your constructor, these parameters will be filled by the CommandService the module was loaded from, and the DependencyMap passed into it, respectively. 
+>If you accept `CommandService` or `IDependencyMap`  as a parameter in 
+your constructor, these parameters will be filled by the 
+CommandService the module was loaded from, and the DependencyMap passed 
+into it, respectively. 
 
 [!code-csharp[DependencyMap in Modules](samples/dependency_module.cs)]
 
 # Preconditions
 
-Preconditions serve as a permissions system for your commands. Keep in mind, however, that they are
-not limited to _just_ permissions, and can be as complex as you want them to be.
+Preconditions serve as a permissions system for your commands. Keep in 
+mind, however, that they are not limited to _just_ permissions, and 
+can be as complex as you want them to be.
 
 >[!NOTE]
 >Preconditions can be applied to Modules, Groups, or Commands.
 
 ## Bundled Preconditions
 
-@Discord.Commands ships with two built-in preconditions, @Discord.Commands.RequireContextAttribute
-and @Discord.Commands.RequirePermissionAttribute.
+@Discord.Commands ships with two built-in preconditions, 
+@Discord.Commands.RequireContextAttribute and 
+@Discord.Commands.RequirePermissionAttribute.
 
 ### RequireContext 
 
-@Discord.Commands.RequireContextAttribute is a precondition that requires your command to be
-executed in the specified context. 
+@Discord.Commands.RequireContextAttribute is a precondition that 
+requires your command to be executed in the specified context. 
 
 You may require three different types of context:
 * Guild
@@ -113,29 +163,34 @@ Since these are `Flags`, you may OR them together.
 
 ### RequirePermission
 
-@Discord.Commands.RequirePermissionAttribute is a precondition that allows you to quickly
-specfiy that a user must poesess a permission to execute a command.
+@Discord.Commands.RequirePermissionAttribute is a precondition that 
+allows you to quickly specfiy that a user must poesess a permission 
+to execute a command.
 
-You may require either a @Discord.GuildPermission or @Discord.ChannelPermission
+You may require either a @Discord.GuildPermission or 
+@Discord.ChannelPermission
 
 [!code-csharp[RequireContext](samples/require_permission.cs)]
 
 ## Custom Preconditions
 
-To write your own preconditions, create a new class that inherits from @Discord.Commands.PreconditionAttribute
+To write your own preconditions, create a new class that inherits from
+ @Discord.Commands.PreconditionAttribute
 
-In order for your precondition to function, you will need to override `CheckPermissions`, 
-which is a `Task<PreconditionResult>`.
+In order for your precondition to function, you will need to override 
+`CheckPermissions`, which is a `Task<PreconditionResult>`.
 Your IDE should provide an option to fill this in for you.
 
-Return `PreconditionResult.FromSuccess()` if the context met the required parameters, otherwise 
-return `PreconditionResult.FromError()`, optionally including an error message.
+Return `PreconditionResult.FromSuccess()` if the context met the 
+required parameters, otherwise return `PreconditionResult.FromError()`, 
+optionally including an error message.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
 # Type Readers
 
-Type Readers allow you to parse different types of arguments in your commands.
+Type Readers allow you to parse different types of arguments in 
+your commands.
 
 By default, the following Types are supported arguments:
 
@@ -153,16 +208,20 @@ By default, the following Types are supported arguments:
 
 ### Creating a Type Readers
 
-To create a TypeReader, create a new class that imports @Discord and @Discord.Commands . Ensure your class inherits from @Discord.Commands.TypeReader
+To create a TypeReader, create a new class that imports @Discord and 
+@Discord.Commands. Ensure your class inherits from @Discord.Commands.TypeReader
 
-Next, satisfy the `TypeReader` class by overriding `Task<TypeReaderResult> Read(IUserMessage context, string input)`.
+Next, satisfy the `TypeReader` class by overriding `Task<TypeReaderResult> Read(CommandContext context, string input)`.
 
 >[!NOTE]
->In many cases, Visual Studio can fill this in for you, using the "Implement Abstract Class" IntelliSense hint.
+>In many cases, Visual Studio can fill this in for you, using the 
+>"Implement Abstract Class" IntelliSense hint.
 
 Inside this task, add whatever logic you need to parse the input string.
 
-Finally, return a `TypeReaderResult`. If you were able to successfully parse the input, return `TypeReaderResult.FromSuccess(parsedInput)`. Otherwise, return `TypeReaderResult.FromError`.
+Finally, return a `TypeReaderResult`. If you were able to successfully 
+parse the input, return `TypeReaderResult.FromSuccess(parsedInput)`. 
+Otherwise, return `TypeReaderResult.FromError`.
 
 #### Sample
 
@@ -170,4 +229,5 @@ Finally, return a `TypeReaderResult`. If you were able to successfully parse the
 
 ### Installing TypeReaders
 
-TypeReaders are not automatically discovered by the Command Service, and must be explicitly added. To install a TypeReader, invoke [CommandService.AddTypeReader](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_).
+TypeReaders are not automatically discovered by the Command Service, 
+and must be explicitly added. To install a TypeReader, invoke [CommandService.AddTypeReader](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_).

@@ -16,6 +16,8 @@ Bot accounts must be added to a server, you must use the [OAuth 2 Flow](https://
 
 You can install Discord.Net 1.0 from our [MyGet Feed](https://www.myget.org/feed/Packages/discord-net).
 
+**For most users writing bots, install only `Discord.Net.WebSocket`.**
+
 You may add the MyGet feed to Visual Studio directly from `https://www.myget.org/F/discord-net/api/v3/index.json`.
 
 You can also pull the latest source from [GitHub](https://github.com/RogueException/Discord.Net).
