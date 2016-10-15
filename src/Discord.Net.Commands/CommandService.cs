@@ -70,12 +70,15 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (_moduleDefs.ContainsKey(typeof(T)))
-                    throw new ArgumentException($"This module has already been added.");
-
                 var typeInfo = typeof(T).GetTypeInfo();
                 if (!_moduleTypeInfo.IsAssignableFrom(typeInfo))
                     throw new ArgumentException($"Modules must inherit ModuleBase.");
+
+                if (typeInfo.IsAbstract)
+                    throw new InvalidOperationException("Modules must not be abstract.");
+
+                if (_moduleDefs.ContainsKey(typeof(T)))
+                    throw new ArgumentException($"This module has already been added.");
 
                 return AddModuleInternal(typeInfo, dependencyMap);
             }
@@ -98,7 +101,7 @@ namespace Discord.Commands
                         if (_moduleTypeInfo.IsAssignableFrom(typeInfo))
                         {
                             var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
-                            if (dontAutoLoad == null)
+                            if (dontAutoLoad == null && !typeInfo.IsAbstract)
                                 moduleDefs.Add(AddModuleInternal(typeInfo, dependencyMap));
                         }
                     }
