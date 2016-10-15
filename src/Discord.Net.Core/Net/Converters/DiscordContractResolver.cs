@@ -104,14 +104,14 @@ namespace Discord.Net.Converters
         private static JsonConverter MakeGenericConverter(PropertyInfo propInfo, Type converterType, Type innerType)
         {
             var genericType = converterType.MakeGenericType(innerType).GetTypeInfo();
-            var instanceField = genericType.GetDeclaredField("Instance");
-            var converter = instanceField.GetValue(null) as JsonConverter;
-            if (converter == null)
-            {
+            //var instanceField = genericType.GetDeclaredField("Instance");
+            //var converter = instanceField.GetValue(null) as JsonConverter;
+            //if (converter == null)
+            //{
                 var innerConverter = GetConverter(propInfo, innerType);
-                converter = genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
-                instanceField.SetValue(null, converter);
-            }
+                var converter = genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
+                //instanceField.SetValue(null, converter);
+            //}
             return converter;
         }
     }

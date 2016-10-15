@@ -6,8 +6,6 @@ namespace Discord.Net.Converters
 {
     internal class ArrayConverter<T> : JsonConverter
     {
-        public static ArrayConverter<T> Instance;
-
         private readonly JsonConverter _innerConverter;
 
         public override bool CanConvert(Type objectType) => true;

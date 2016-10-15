@@ -6,8 +6,6 @@ namespace Discord.Net.Converters
 {
     internal class UInt64EntityOrIdConverter<T> : JsonConverter
     {
-        public static UInt64EntityOrIdConverter<T> Instance;
-
         private readonly JsonConverter _innerConverter;
 
         public override bool CanConvert(Type objectType) => true;

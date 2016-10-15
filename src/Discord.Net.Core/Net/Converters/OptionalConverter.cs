@@ -5,8 +5,6 @@ namespace Discord.Net.Converters
 {
     internal class OptionalConverter<T> : JsonConverter
     {
-        internal static OptionalConverter<T> Instance;
-
         private readonly JsonConverter _innerConverter;
 
         public override bool CanConvert(Type objectType) => true;
