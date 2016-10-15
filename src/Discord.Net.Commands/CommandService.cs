@@ -188,9 +188,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(CommandContext context, int argPos, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
-            => Execute(context, context.Message.Content.Substring(argPos), multiMatchHandling);
-        public async Task<IResult> Execute(CommandContext context, string input, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> Execute(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+            => Execute(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
+        public async Task<IResult> Execute(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
@@ -199,7 +199,7 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditions(context).ConfigureAwait(false);
+                var preconditionResult = await commands[i].CheckPreconditions(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
