@@ -93,7 +93,7 @@ Command Groups allow you to create a module where commands are prefixed.
 To create a group, create a new module and flag it with the 
 @Discord.Commands.GroupAttribute.
 
->![NOTE]
+>[!NOTE]
 >Groups do not _need_ to be modules. Only classes with commands should 
 >inherit from ModuleBase. If you plan on using a group for strictly 
 >organizational purposes, there is no reason to make it a module.
