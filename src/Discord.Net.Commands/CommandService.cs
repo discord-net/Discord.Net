@@ -116,7 +116,7 @@ namespace Discord.Commands
         private ModuleInfo AddModuleInternal(TypeInfo typeInfo, IDependencyMap dependencyMap)
         {
             var moduleDef = new ModuleInfo(typeInfo, this, dependencyMap);
-            _moduleDefs[typeInfo.BaseType] = moduleDef;
+            _moduleDefs[typeInfo.AsType()] = moduleDef;
 
             foreach (var cmd in moduleDef.Commands)
                 _map.AddCommand(cmd);
