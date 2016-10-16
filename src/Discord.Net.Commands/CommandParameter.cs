@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord.Commands.Attributes;
 
 namespace Discord.Commands
 {

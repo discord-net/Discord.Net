@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Discord.Commands.Attributes
+namespace Discord.Commands
 {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = true, Inherited = true)]
     public abstract class ParameterPreconditionAttribute : Attribute
