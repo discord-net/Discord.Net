@@ -270,7 +270,7 @@ namespace Discord
                 await Client.ClientAPI.Send(request).ConfigureAwait(false);
                 nickname = "";
             }
-            if (!isCurrentUser || isMuted != null || isDeafened != null | voiceChannel != null || roles != null)
+            if (!isCurrentUser || isMuted != null || isDeafened != null || voiceChannel != null || roles != null)
             {
                 //Swap "" and null. Our libs meanings and the API's are flipped.
                 if (nickname == null) nickname = "";
