@@ -183,7 +183,6 @@ namespace Discord.Modules
 		public void DisableAllServers()
 		{
 			if (!_useServerWhitelist) throw new InvalidOperationException("This module is not configured to use a server whitelist.");
-            if (!_useServerWhitelist) return;
 
             using (_lock.Lock())
             {
