@@ -187,9 +187,10 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    info.Position = lastPage.Max(x => x.Id);
                     if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
-                        info.Remaining = 0;
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
                 },
                 start: fromUserId,
                 count: limit

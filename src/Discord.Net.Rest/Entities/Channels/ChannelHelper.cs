@@ -86,16 +86,17 @@ namespace Discord.Rest
                     if (info.Position != null)
                         args.RelativeMessageId = info.Position.Value;
                     var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
-                    return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray(); ;
+                    return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
                 {
+                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                        return false;
                     if (dir == Direction.Before)
                         info.Position = lastPage.Min(x => x.Id);
                     else
                         info.Position = lastPage.Max(x => x.Id);
-                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
-                        info.Remaining = 0;
+                    return true;
                 },
                 start: fromMessageId,
                 count: limit
@@ -196,9 +197,10 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    info.Position = lastPage.Max(x => x.Id);
                     if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
-                        info.Remaining = 0;
+                        return false;
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
                 },
                 start: fromUserId,
                 count: limit

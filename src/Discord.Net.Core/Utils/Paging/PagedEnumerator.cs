@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,9 +12,9 @@ namespace Discord
         private readonly ulong? _start;
         private readonly int? _count;
         private readonly Func<PageInfo, CancellationToken, Task<IReadOnlyCollection<T>>> _getPage;
-        private readonly Action<PageInfo, IReadOnlyCollection<T>> _nextPage;
+        private readonly Func<PageInfo, IReadOnlyCollection<T>, bool> _nextPage;
 
-        public PagedAsyncEnumerable(int pageSize, Func<PageInfo, CancellationToken, Task<IReadOnlyCollection<T>>> getPage, Action<PageInfo, IReadOnlyCollection<T>> nextPage = null,
+        public PagedAsyncEnumerable(int pageSize, Func<PageInfo, CancellationToken, Task<IReadOnlyCollection<T>>> getPage, Func<PageInfo, IReadOnlyCollection<T>, bool> nextPage = null,
             ulong? start = null, int? count = null)
         {
             PageSize = pageSize;
@@ -64,7 +63,10 @@ namespace Discord
                 _info.PageSize = _info.Remaining != null ? (int)Math.Min(_info.Remaining.Value, _source.PageSize) : _source.PageSize;
 
                 if (_info.Remaining != 0)
-                    _source?._nextPage(_info, data);
+                {
+                    if (!_source._nextPage(_info, data))
+                        _info.Remaining = 0;
+                }
 
                 return true;
             }
