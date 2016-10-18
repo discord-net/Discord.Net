@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IUserMessage : IMessage, IDeletable
+    public interface IUserMessage : IMessage
     {
         /// <summary> Modifies this message. </summary>
         Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null);
