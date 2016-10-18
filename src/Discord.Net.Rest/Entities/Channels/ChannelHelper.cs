@@ -117,12 +117,12 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, guild, model);
         }
 
-        public static Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
+        public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, IGuild guild, RequestOptions options)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return SendFileAsync(channel, client, file, filename, text, isTTS, guild, options);
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, guild, options).ConfigureAwait(false);
         }
         public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, IGuild guild, RequestOptions options)
