@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord
 {
-    public interface IMessage : ISnowflakeEntity
+    public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary> Gets the type of this system message. </summary>
         MessageType Type { get; }
