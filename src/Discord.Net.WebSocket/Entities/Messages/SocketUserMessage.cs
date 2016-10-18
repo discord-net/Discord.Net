@@ -112,8 +112,6 @@ namespace Discord.WebSocket
 
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
-        public Task DeleteAsync(RequestOptions options = null)
-            => MessageHelper.DeleteAsync(this, Discord, options);
 
         public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);

@@ -116,8 +116,6 @@ namespace Discord.Rest
             var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public Task DeleteAsync(RequestOptions options)
-            => MessageHelper.DeleteAsync(this, Discord, options);
 
         public Task PinAsync(RequestOptions options)
             => MessageHelper.PinAsync(this, Discord, options);

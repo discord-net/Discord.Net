@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Model = Discord.API.Rpc.Message;
 
 namespace Discord.Rpc
@@ -55,6 +57,9 @@ namespace Discord.Rpc
             if (model.AuthorColor.IsSpecified)
                 AuthorColor = new Color(Convert.ToUInt32(model.AuthorColor.Value.Substring(1), 16));
         }
+
+        public Task DeleteAsync(RequestOptions options)
+            => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
 

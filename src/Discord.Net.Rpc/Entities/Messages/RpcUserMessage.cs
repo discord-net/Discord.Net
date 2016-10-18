@@ -100,8 +100,6 @@ namespace Discord.Rpc
 
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
-        public Task DeleteAsync(RequestOptions options)
-            => MessageHelper.DeleteAsync(this, Discord, options);
 
         public Task PinAsync(RequestOptions options)
             => MessageHelper.PinAsync(this, Discord, options);

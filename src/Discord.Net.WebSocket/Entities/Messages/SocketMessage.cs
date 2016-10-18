@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
@@ -51,6 +53,9 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
                 Content = model.Content.Value;
         }
+
+        public Task DeleteAsync(RequestOptions options)
+            => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
