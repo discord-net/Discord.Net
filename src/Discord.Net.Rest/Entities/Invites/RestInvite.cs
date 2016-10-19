@@ -16,7 +16,7 @@ namespace Discord.Rest
         internal IGuild Guild { get; private set; }
 
         public string Code => Id;
-        public string Url => $"{DiscordConfig.InviteUrl}/{Code}";
+        public string Url => $"{DiscordConfig.InviteUrl}{Code}";
 
         internal RestInvite(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
             : base(discord, id)
