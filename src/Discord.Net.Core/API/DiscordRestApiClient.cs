@@ -657,7 +657,7 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.Days, 0, nameof(args.Days));
+            Preconditions.AtLeast(args.Days, 1, nameof(args.Days));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
@@ -667,7 +667,7 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.AtLeast(args.Days, 0, nameof(args.Days));
+            Preconditions.AtLeast(args.Days, 1, nameof(args.Days));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
