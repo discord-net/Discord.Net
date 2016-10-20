@@ -54,7 +54,7 @@ namespace Discord.WebSocket
                 Content = model.Content.Value;
         }
 
-        public Task DeleteAsync(RequestOptions options)
+        public Task DeleteAsync(RequestOptions options = null)
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;

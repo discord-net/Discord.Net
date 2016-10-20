@@ -60,7 +60,7 @@ namespace Discord.Rest
             var model = await Discord.ApiClient.GetChannelMessageAsync(Channel.Id, Id, options).ConfigureAwait(false);
             Update(model);
         }
-        public Task DeleteAsync(RequestOptions options)
+        public Task DeleteAsync(RequestOptions options = null)
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;

@@ -58,7 +58,7 @@ namespace Discord.Rpc
                 AuthorColor = new Color(Convert.ToUInt32(model.AuthorColor.Value.Substring(1), 16));
         }
 
-        public Task DeleteAsync(RequestOptions options)
+        public Task DeleteAsync(RequestOptions options = null)
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
