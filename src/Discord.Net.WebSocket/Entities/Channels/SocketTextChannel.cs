@@ -72,11 +72,11 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, Guild, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, Guild, options);
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options = null)
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, Guild, options);
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options = null)
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, Guild, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
