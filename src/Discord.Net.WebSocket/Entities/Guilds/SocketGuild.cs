@@ -59,6 +59,16 @@ namespace Discord.WebSocket
         public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
+        public SocketGuildUser CurrentUser
+        {
+            get
+            {
+                SocketGuildUser member;
+                if (_members.TryGetValue(Discord.CurrentUser.Id, out member))
+                    return member;
+                return null;
+            }
+        }
 
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
@@ -338,13 +348,6 @@ namespace Discord.WebSocket
                 return member;
             return null;
         }
-        public SocketGuildUser GetCurrentUser()
-        {
-            SocketGuildUser member;
-            if (_members.TryGetValue(Discord.CurrentUser.Id, out member))
-                return member;
-            return null;
-        }
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
@@ -562,7 +565,7 @@ namespace Discord.WebSocket
         Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
         Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(GetCurrentUser());
+            => Task.FromResult<IGuildUser>(CurrentUser);
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
     }
 }
