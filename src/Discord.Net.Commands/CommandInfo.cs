@@ -87,6 +87,9 @@ namespace Discord.Commands
 
         public async Task<PreconditionResult> CheckPreconditions(CommandContext context, IDependencyMap map = null)
         {
+            if (map == null)
+                map = DependencyMap.Empty;
+
             foreach (PreconditionAttribute precondition in Module.Preconditions)
             {
                 var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
@@ -150,6 +153,9 @@ namespace Discord.Commands
         }
         public async Task<ExecuteResult> Execute(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
         {
+            if (map == null)
+                map = DependencyMap.Empty;
+
             try
             {
                 var args = GenerateArgs(argList, paramList);

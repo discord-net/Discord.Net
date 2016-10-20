@@ -7,6 +7,8 @@ namespace Discord.Commands
     {
         private Dictionary<Type, object> map;
 
+        public static DependencyMap Empty => new DependencyMap();
+
         public DependencyMap()
         {
             map = new Dictionary<Type, object>();

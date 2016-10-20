@@ -195,6 +195,8 @@ namespace Discord.Commands
             => Execute(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
         public async Task<IResult> Execute(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
+            dependencyMap = dependencyMap ?? DependencyMap.Empty;
+
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;
