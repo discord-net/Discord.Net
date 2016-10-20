@@ -671,7 +671,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune", args, ids, options: options).ConfigureAwait(false);
+            return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}", ids, options: options).ConfigureAwait(false);
         }
 
         //Guild Bans
