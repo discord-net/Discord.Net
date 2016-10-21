@@ -863,7 +863,7 @@ namespace Discord.WebSocket
                                         {
                                             var before = user.Clone();
                                             user.Update(State, data);
-                                            await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
+                                            await _guildMemberUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -1303,7 +1303,7 @@ namespace Discord.WebSocket
                                         }
 
                                         SocketPresence before;
-                                        SocketUser user = guild.GetUser(data.User.Id);
+                                        var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
                                             before = user.Presence.Clone();
@@ -1315,7 +1315,12 @@ namespace Discord.WebSocket
                                             user = guild.AddOrUpdateUser(data);
                                         }
 
-                                        await _userPresenceUpdatedEvent.InvokeAsync(user, before, user.Presence).ConfigureAwait(false);
+                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, before, user.Presence).ConfigureAwait(false);
+                                        if (data.User.Username.IsSpecified || data.Roles.IsSpecified)
+                                        {
+                                            var before2 = user.Clone();
+                                            await _guildMemberUpdatedEvent.InvokeAsync(before2, user).ConfigureAwait(false);
+                                        }
                                     }
                                     else
                                     {
@@ -1325,7 +1330,13 @@ namespace Discord.WebSocket
                                             var user = channel.GetUser(data.User.Id);
                                             var before = user.Presence.Clone();
                                             user.Update(State, data);
-                                            await _userPresenceUpdatedEvent.InvokeAsync(user, before, user.Presence).ConfigureAwait(false);
+
+                                            await _userPresenceUpdatedEvent.InvokeAsync(Optional.Create<SocketGuild>(), user, before, user.Presence).ConfigureAwait(false);
+                                            if (data.User.Username.IsSpecified)
+                                            {
+                                                var before2 = user.Clone();
+                                                await _userUpdatedEvent.InvokeAsync(before2, user).ConfigureAwait(false);
+                                            }                                            
                                         }
                                     }
                                 }

@@ -155,18 +155,24 @@ namespace Discord.WebSocket
             remove { _userUnbannedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<SocketUser, SocketGuild, Task>> _userUnbannedEvent = new AsyncEvent<Func<SocketUser, SocketGuild, Task>>();
-        public event Func<SocketGuildUser, SocketGuildUser, Task> UserUpdated
+        public event Func<SocketUser, SocketUser, Task> UserUpdated
         {
             add { _userUpdatedEvent.Add(value); }
             remove { _userUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
-        public event Func<SocketUser, SocketPresence, SocketPresence, Task> UserPresenceUpdated
+        private readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
+        public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated
+        {
+            add { _guildMemberUpdatedEvent.Add(value); }
+            remove { _guildMemberUpdatedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
+        public event Func<Optional<SocketGuild>, SocketUser, SocketPresence, SocketPresence, Task> UserPresenceUpdated
         {
             add { _userPresenceUpdatedEvent.Add(value); }
             remove { _userPresenceUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>>();
+        private readonly AsyncEvent<Func<Optional<SocketGuild>, SocketUser, SocketPresence, SocketPresence, Task>> _userPresenceUpdatedEvent = new AsyncEvent<Func<Optional<SocketGuild>, SocketUser, SocketPresence, SocketPresence, Task>>();
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated
         {
             add { _userVoiceStateUpdatedEvent.Add(value); }
