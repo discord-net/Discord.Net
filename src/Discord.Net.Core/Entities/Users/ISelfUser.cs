@@ -14,6 +14,5 @@ namespace Discord
         bool IsMfaEnabled { get; }
 
         Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null);
-        Task ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options = null);
     }
 }

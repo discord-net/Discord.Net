@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GameModel = Discord.API.Game;
 
 namespace Discord.WebSocket
 {
@@ -36,6 +37,7 @@ namespace Discord.WebSocket
         private long _lastGuildAvailableTime;
         private int _nextAudioId;
         private bool _canReconnect;
+        private DateTimeOffset? _statusSince;
 
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
@@ -43,6 +45,8 @@ namespace Discord.WebSocket
         public ConnectionState ConnectionState { get; private set; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
+        internal UserStatus Status { get; private set; }
+        internal Game? Game { get; private set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -183,8 +187,12 @@ namespace Discord.WebSocket
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                 }
 
-                await _gatewayLogger.DebugAsync("Raising Event").ConfigureAwait(false);
                 await _connectTask.Task.ConfigureAwait(false);
+
+                await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
+                await SendStatus().ConfigureAwait(false);
+
+                await _gatewayLogger.DebugAsync("Raising Event").ConfigureAwait(false);
                 if (!isReconnecting)
                     _canReconnect = true;
                 ConnectionState = ConnectionState.Connected;
@@ -446,6 +454,51 @@ namespace Discord.WebSocket
                 else
                     await Task.WhenAll(batchTasks).ConfigureAwait(false);
             }
+        }
+
+        public async Task SetStatus(UserStatus status)
+        {
+            Status = status;
+            if (status == UserStatus.AFK)
+                _statusSince = DateTimeOffset.UtcNow;
+            else
+                _statusSince = null;
+            await SendStatus().ConfigureAwait(false);
+        }
+        public async Task SetGame(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        {
+            if (name != null)
+                Game = new Game(name, streamUrl, streamType);
+            else
+                Game = null;
+            CurrentUser.Presence = new SocketPresence(Status, Game);
+            await SendStatus().ConfigureAwait(false);
+        }
+        private async Task SendStatus()
+        {
+            var game = Game;
+            var status = Status;
+            var statusSince = _statusSince;
+            CurrentUser.Presence = new SocketPresence(status, game);
+
+            GameModel gameModel;
+            if (game != null)
+            {
+                gameModel = new API.Game
+                {
+                    Name = game.Value.Name,
+                    StreamType = game.Value.StreamType,
+                    StreamUrl = game.Value.StreamUrl
+                };
+            }
+            else
+                gameModel = null;
+
+            await ApiClient.SendStatusUpdateAsync(
+                status,
+                status == UserStatus.AFK,
+                statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
+                gameModel).ConfigureAwait(false);
         }
 
         private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)

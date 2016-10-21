@@ -50,7 +50,5 @@ namespace Discord.Rest
             var model = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-
-        Task ISelfUser.ModifyStatusAsync(Action<ModifyPresenceParams> func, RequestOptions options) { throw new NotSupportedException(); }
     }
 }
