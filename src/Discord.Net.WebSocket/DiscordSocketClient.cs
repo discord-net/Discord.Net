@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         public ConnectionState ConnectionState { get; private set; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
-        internal UserStatus Status { get; private set; }
+        internal UserStatus Status { get; private set; } = UserStatus.Online;
         internal Game? Game { get; private set; }
 
         //From DiscordSocketConfig
