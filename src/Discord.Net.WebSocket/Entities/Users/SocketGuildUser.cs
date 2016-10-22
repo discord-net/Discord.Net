@@ -92,6 +92,10 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.User.Username.IsSpecified)
+                GlobalUser.Username = model.User.Username.Value;
+            if (model.User.Avatar.IsSpecified)
+                GlobalUser.AvatarId = model.User.Avatar.Value;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
