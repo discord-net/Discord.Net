@@ -1451,7 +1451,7 @@ namespace Discord.WebSocket
                                         }
 
                                         await _userPresenceUpdatedEvent.InvokeAsync(guild, user, before, user.Presence).ConfigureAwait(false);
-                                        if (data.User.Username.IsSpecified || data.Roles.IsSpecified)
+                                        if (data.User.Username.IsSpecified || data.Roles.IsSpecified || data.Nick.IsSpecified)
                                         {
                                             var before2 = user.Clone();
                                             await _guildMemberUpdatedEvent.InvokeAsync(before2, user).ConfigureAwait(false);
