@@ -1440,13 +1440,13 @@ namespace Discord.WebSocket
 
                                         SocketPresence beforePresence;
                                         SocketGuildUser beforeGuild;
-                                        SocketGlobalUser before;
+                                        SocketGlobalUser beforeGlobal;
                                         var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
 
                                             beforePresence = user.Presence.Clone();
-                                            before = user.GlobalUser.Clone();
+                                            beforeGlobal = user.GlobalUser.Clone();
                                             beforeGuild = user.Clone();
                                             user.Update(State, data);
                                         }
@@ -1454,7 +1454,7 @@ namespace Discord.WebSocket
                                         {
                                             beforePresence = new SocketPresence(UserStatus.Offline, null);
                                             user = guild.AddOrUpdateUser(data);
-                                            before = user.GlobalUser.Clone();
+                                            beforeGlobal = user.GlobalUser.Clone();
                                             beforeGuild = user.Clone();
                                         }
 
@@ -1466,7 +1466,7 @@ namespace Discord.WebSocket
 
                                         if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
                                         {
-                                            await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
+                                            await _userUpdatedEvent.InvokeAsync(beforeGlobal, user).ConfigureAwait(false);
                                         }
                                     }
                                     else
@@ -1476,7 +1476,7 @@ namespace Discord.WebSocket
                                         {
                                             var user = channel.GetUser(data.User.Id);
                                             var beforePresence = user.Presence.Clone();
-                                            var before = user.Clone();
+                                            var before = user.GlobalUser.Clone();
                                             user.Update(State, data);
 
                                             await _userPresenceUpdatedEvent.InvokeAsync(Optional.Create<SocketGuild>(), user, beforePresence, user.Presence).ConfigureAwait(false);
