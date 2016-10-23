@@ -6,9 +6,9 @@ namespace Discord.Commands
     {
         public CommandContext Context { get; internal set; }
 
-        protected virtual async Task ReplyAsync(string message, bool isTTS = false, RequestOptions options = null)
+        protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, RequestOptions options = null)
         {
-            await Context.Channel.SendMessageAsync(message, isTTS, options).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, options).ConfigureAwait(false);
         }
     }
 }
