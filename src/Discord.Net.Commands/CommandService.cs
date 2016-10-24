@@ -95,6 +95,16 @@ namespace Discord.Commands
             {
                 foreach (var type in assembly.ExportedTypes)
                 {
+                    //Ensure that we weren't declared as a submodule
+                    if (type.DeclaringType != null)
+                    {
+                        if (_moduleDefs.ContainsKey(type.DeclaringType))
+                            continue;
+
+                        var declaringTypeInfo = type.DeclaringType.GetTypeInfo();
+                        if (_moduleTypeInfo.IsAssignableFrom(declaringTypeInfo))
+                            continue;
+                    }
                     if (!_moduleDefs.ContainsKey(type))
                     {
                         var typeInfo = type.GetTypeInfo();
