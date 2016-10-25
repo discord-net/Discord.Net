@@ -96,6 +96,8 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+    
+        public int CompareTo(IGuildUser user) => this.Compare(user);
 
         //IVoiceState
         bool IVoiceState.IsSelfDeafened => false;
@@ -103,5 +105,6 @@ namespace Discord.Rest
         bool IVoiceState.IsSuppressed => false;
         IVoiceChannel IVoiceState.VoiceChannel => null;
         string IVoiceState.VoiceSessionId => null;
+
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IRole : ISnowflakeEntity, IDeletable, IMentionable
+    public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>
     {
         /// <summary> Gets the guild owning this role.</summary>
         IGuild Guild { get; }

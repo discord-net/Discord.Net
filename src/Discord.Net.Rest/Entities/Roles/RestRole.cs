@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
-namespace Discord.Rest
-{
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+namespace Discord.Rest { [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestRole : RestEntity<ulong>, IRole
     {
         public RestGuild Guild { get; }
@@ -51,10 +49,12 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
+
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
         //IRole
         IGuild IRole.Guild => Guild;
+        public int CompareTo(IRole role) => Position.CompareTo(role.Position);
     }
 }
