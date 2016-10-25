@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary> A Guild-User pairing. </summary>
-    public interface IGuildUser : IUser, IVoiceState, IComparable<IGuildUser>
+    public interface IGuildUser : IUser, IVoiceState, IComparable<IGuildUser>, IComparable<IRole>
     {
         /// <summary> Gets when this user joined this guild. </summary>
         DateTimeOffset? JoinedAt { get; }
