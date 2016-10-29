@@ -21,7 +21,7 @@ namespace Discord
             return user.RoleIds.Select(r => guild.GetRole(r));
         }
 
-        internal static int Compare(this IGuildUser u1, IGuildUser u2) {
+        public static int CompareRoles(this IGuildUser u1, IGuildUser u2) {
             // These should never be empty since the everyone role is always present
             var r1 = u1.GetRoles().Max();
             var r2 = u2.GetRoles().Max();
@@ -29,7 +29,7 @@ namespace Discord
             return result != 0 ? result : u1.Id.CompareTo(u2.Id);
         }
 
-        internal static int Compare(this IGuildUser user, IRole role) {
+        public static int Compare(this IGuildUser user, IRole role) {
             return user.GetRoles().Max().CompareTo(role);
         }
     }

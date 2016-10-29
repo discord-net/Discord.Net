@@ -97,7 +97,6 @@ namespace Discord.Rest
             }
         }
     
-        public int CompareTo(IGuildUser user) => this.Compare(user);
         public int CompareTo(IRole role) => this.Compare(role);
 
         //IVoiceState

@@ -96,7 +96,6 @@ namespace Discord.WebSocket
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
-        public int CompareTo(IGuildUser user) => this.Compare(user);
         public int CompareTo(IRole role) => this.Compare(role);
 
         //IUser
