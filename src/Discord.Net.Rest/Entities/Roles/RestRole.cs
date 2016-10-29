@@ -55,6 +55,6 @@ namespace Discord.Rest { [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 
         //IRole
         IGuild IRole.Guild => Guild;
-        public int CompareTo(IRole role) => Position.CompareTo(role.Position);
+        public int CompareTo(IRole role) => this.Compare(role);
     }
 }

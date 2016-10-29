@@ -57,6 +57,6 @@ namespace Discord.WebSocket
 
         //IRole
         IGuild IRole.Guild => Guild;
-        public int CompareTo(IRole role) => Position.CompareTo(role.Position);
+        public int CompareTo(IRole role) => this.CompareTo(role);
     }
 }
