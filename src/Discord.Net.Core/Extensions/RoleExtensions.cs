@@ -6,14 +6,16 @@ namespace Discord
 {
   public static class RoleExtensions
   {
-    internal static int Compare(this IRole r1, IRole r2) {
-      if(r2 == null)
+    internal static int Compare(this IRole left, IRole right) {
+      if(left == null)
+        return -1;
+      if(right == null)
         return 1;
-      var result = r1.Position.CompareTo(r2.Position);
+      var result = left.Position.CompareTo(right.Position);
       // As per Discord's documentation, a tie is broken by ID
       if(result != 0)
         return result;
-      return r1.Id.CompareTo(r2.Id);
+      return left.Id.CompareTo(right.Id);
     }
   }
 }
