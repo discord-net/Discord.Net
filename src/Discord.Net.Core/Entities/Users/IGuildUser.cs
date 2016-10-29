@@ -28,5 +28,10 @@ namespace Discord
         Task KickAsync(RequestOptions options = null);
         /// <summary> Modifies this user's properties in this guild. </summary>
         Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null);
+
+        /// <summary> The position of the user within the role hirearchy. </summary>
+        /// <remarks> The returned value equal to the position of the highest role the user has, 
+        /// or int.MaxValue if user is the server owner. </remarks>
+        int Hirearchy { get; }
     }
 }

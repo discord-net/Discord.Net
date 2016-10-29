@@ -21,15 +21,20 @@ namespace Discord
             return user.RoleIds.Select(r => guild.GetRole(r));
         }
 
-        public static int CompareRoles(this IGuildUser left, IGuildUser right) {
-            // These should never be empty since the everyone role is always present
-            var roleLeft = left.GetRoles().Max();
-            var roleRight= right.GetRoles().Max();
-            return roleLeft.CompareTo(roleRight);
+        internal static int GetHirearchy(this IGuildUser user) {
+            if(user == null)
+                return -1;
+            if(user.Id == user.Guild.OwnerId)
+                return int.MaxValue;
+            return user.GetRoles().Max(r => r.Position);
         }
 
-        public static int Compare(this IGuildUser user, IRole role) {
-            return user.GetRoles().Max().CompareTo(role);
+        internal static int CompareRole(this IGuildUser user, IRole role) {
+            if(user == null)
+                return -1;
+            if(role == null)
+                return 1;
+            return -user.Hirearchy.CompareTo(role.Position);
         }
     }
 }

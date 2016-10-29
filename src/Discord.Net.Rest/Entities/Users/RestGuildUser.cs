@@ -96,8 +96,8 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
-    
-        public int CompareTo(IRole role) => this.Compare(role);
+        public int Hirearchy => this.GetHirearchy();
+        public int CompareTo(IRole role) => this.CompareRole(role);
 
         //IVoiceState
         bool IVoiceState.IsSelfDeafened => false;

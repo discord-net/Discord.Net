@@ -96,7 +96,8 @@ namespace Discord.WebSocket
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
-        public int CompareTo(IRole role) => this.Compare(role);
+        public int CompareTo(IRole role) => this.CompareRole(role);
+        public int Hirearchy => this.GetHirearchy();
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
