@@ -23,6 +23,29 @@ namespace Discord.Rest
             await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
+        public static async Task AddReactionAsync(IMessage msg, Emoji emoji, BaseDiscordClient client, RequestOptions options)
+            => await AddReactionAsync(msg, $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
+        public static async Task AddReactionAsync(IMessage msg, string emoji, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emoji, options).ConfigureAwait(false);
+        }
+
+        public static async Task RemoveReactionAsync(IMessage msg, IUser user, Emoji emoji, BaseDiscordClient client, RequestOptions options)
+            => await RemoveReactionAsync(msg, user, $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
+        public static async Task RemoveReactionAsync(IMessage msg, IUser user, string emoji, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options);
+        }
+
+        public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, string emoji,
+            Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
+        {
+            var args = new GetReactionUsersParams();
+            func(args);
+            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => u as IUser).Where(u => u != null).ToImmutableArray();
+        }
+
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {

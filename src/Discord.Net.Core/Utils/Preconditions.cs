@@ -45,6 +45,7 @@ namespace Discord
                     throw new ArgumentException("Argument cannot be blank.", name);
             }
         }
+        
 
         //Numerics
         public static void NotEqual(sbyte obj, sbyte value, string name) { if (obj == value) throw new ArgumentOutOfRangeException(name); }

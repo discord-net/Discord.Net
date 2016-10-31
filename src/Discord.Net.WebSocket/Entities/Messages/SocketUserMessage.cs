@@ -113,6 +113,19 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
+        public Task AddReactionAsync(Emoji emoji, RequestOptions options)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+        public Task AddReactionAsync(string emoji, RequestOptions options)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+
+        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+        
+        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, Action<GetReactionUsersParams> func, RequestOptions options)
+            => MessageHelper.GetReactionUsersAsync(this, emoji, func, Discord, options);
+
         public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);
         public Task UnpinAsync(RequestOptions options = null)

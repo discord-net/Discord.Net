@@ -512,6 +512,48 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucketId: ClientBucket.SendEditId, options: options).ConfigureAwait(false);
         }
+        public async Task AddReactionAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+
+            await SendAsync("PUT", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/@me", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, string emoji, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+
+            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{userId}", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUsersPerBatch, nameof(args.Limit));
+            Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
+
+            var ids = new BucketIds(channelId: channelId);
+            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}";
+            return await SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+        }
         public async Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
