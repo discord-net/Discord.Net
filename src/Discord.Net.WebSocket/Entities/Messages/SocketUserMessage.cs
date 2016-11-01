@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Discord.API.Gateway;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
@@ -18,6 +19,7 @@ namespace Discord.WebSocket
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
+        private ImmutableArray<IReaction> _reactions;
         
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
@@ -29,6 +31,7 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
+        public override IReadOnlyCollection<IReaction> Reactions => _reactions;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id, channel, author)
@@ -99,6 +102,20 @@ namespace Discord.WebSocket
                     }
                     mentions = newMentions.ToImmutable();
                 }
+            }
+
+            if (model.Reactions.IsSpecified)
+            {
+                var value = model.Reactions.Value;
+                if (value.Length > 0)
+                {
+                    var reactions = ImmutableArray.CreateBuilder<IReaction>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        reactions.Add(new SocketReaction(value[i] as GatewayReaction));
+                    _reactions = reactions.ToImmutable();
+                }
+                else
+                    _reactions = ImmutableArray.Create<IReaction>();
             }
 
             if (model.Content.IsSpecified)

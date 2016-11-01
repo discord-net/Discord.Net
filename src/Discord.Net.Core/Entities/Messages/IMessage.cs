@@ -31,6 +31,8 @@ namespace Discord
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary> Returns all embeds included in this message. </summary>
         IReadOnlyCollection<IEmbed> Embeds { get; }
+        /// <summary> Returns all reactions included in this message. </summary>
+        IReadOnlyCollection<IReaction> Reactions { get; }
         /// <summary> Returns all tags included in this message's content. </summary>
         IReadOnlyCollection<ITag> Tags { get; }
         /// <summary> Returns the ids of channels mentioned in this message. </summary>

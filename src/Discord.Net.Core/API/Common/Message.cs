@@ -36,5 +36,7 @@ namespace Discord.API
         public Optional<Embed[]> Embeds { get; set; }
         [JsonProperty("pinned")]
         public Optional<bool> Pinned { get; set; }
+        [JsonProperty("reactions")]
+        public Optional<Reaction[]> Reactions { get; set; }
     }
 }

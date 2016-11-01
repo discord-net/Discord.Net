@@ -18,6 +18,7 @@ namespace Discord.Rest
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
+        private ImmutableArray<RestReaction> _reactions;
         
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
@@ -29,6 +30,7 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        public override IReadOnlyCollection<IReaction> Reactions => _reactions;
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
             : base(discord, id, channel, author, guild)
@@ -101,6 +103,20 @@ namespace Discord.Rest
                     }
                     mentions = newMentions.ToImmutable();
                 }
+            }
+
+            if (model.Reactions.IsSpecified)
+            {
+                var value = model.Reactions.Value;
+                if (value.Length > 0)
+                {
+                    var reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        reactions.Add(new RestReaction(value[i]));
+                    _reactions = reactions.ToImmutable();
+                }
+                else
+                    _reactions = ImmutableArray.Create<RestReaction>();
             }
 
             if (model.Content.IsSpecified)
