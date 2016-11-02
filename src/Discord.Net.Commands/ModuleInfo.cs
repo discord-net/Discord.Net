@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
+using Discord.Commands.Attributes;
 
 namespace Discord.Commands
 {
@@ -19,8 +20,9 @@ namespace Discord.Commands
         public string Remarks { get; }
         public IEnumerable<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public ImmutableDictionary<Type, TypeReader> OverridingTypeReaders { get; }
 
-        internal ModuleInfo(TypeInfo source, CommandService service)
+        internal ModuleInfo(TypeInfo source, CommandService service, IDependencyMap dependencyMap = null)
         {
             Source = source;
             Service = service;
@@ -45,19 +47,31 @@ namespace Discord.Commands
             if (remarksAttr != null)
                 Remarks = remarksAttr.Text;
 
+            var typeReaders = new Dictionary<Type, TypeReader>();
+
+            var trAttrs = source.GetCustomAttributes<TypeReaderAttribute>();
+            foreach (var trAttr in trAttrs)
+                typeReaders[trAttr.Type] = GetOverridingTypeReader(trAttr, dependencyMap);
+
+            OverridingTypeReaders = typeReaders.ToImmutableDictionary();
+
             List<CommandInfo> commands = new List<CommandInfo>();
-            SearchClass(source, commands, Prefix);
+            SearchClass(source, commands, Prefix, dependencyMap);
             Commands = commands;
 
             Preconditions = Source.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
-        private void SearchClass(TypeInfo parentType, List<CommandInfo> commands, string groupPrefix)
+
+        private TypeReader GetOverridingTypeReader(TypeReaderAttribute trAttr, IDependencyMap dependencyMap = null)
+            => ReflectionUtils.CreateObject<TypeReader>(trAttr.OverridingTypeReader, Service, dependencyMap);
+
+        private void SearchClass(TypeInfo parentType, List<CommandInfo> commands, string groupPrefix, IDependencyMap dependencyMap = null)
         {
             foreach (var method in parentType.DeclaredMethods)
             {
                 var cmdAttr = method.GetCustomAttribute<CommandAttribute>();
                 if (cmdAttr != null)
-                    commands.Add(new CommandInfo(method, this, cmdAttr, groupPrefix));
+                    commands.Add(new CommandInfo(method, this, cmdAttr, groupPrefix, dependencyMap));
             }
             foreach (var type in parentType.DeclaredNestedTypes)
             {
@@ -71,7 +85,7 @@ namespace Discord.Commands
                     else
                         nextGroupPrefix = groupAttrib.Prefix ?? type.Name.ToLowerInvariant();
 
-                    SearchClass(type, commands, nextGroupPrefix);
+                    SearchClass(type, commands, nextGroupPrefix, dependencyMap);
                 }
             }
         }

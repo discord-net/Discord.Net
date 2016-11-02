@@ -65,7 +65,7 @@ namespace Discord.Commands
         }
 
         //Modules
-        public async Task<ModuleInfo> AddModule<T>()
+        public async Task<ModuleInfo> AddModule<T>(IDependencyMap dependencyMap = null)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -80,14 +80,14 @@ namespace Discord.Commands
                 if (_moduleDefs.ContainsKey(typeof(T)))
                     throw new ArgumentException($"This module has already been added.");
 
-                return AddModuleInternal(typeInfo);
+                return AddModuleInternal(typeInfo, dependencyMap);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly)
+        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly, IDependencyMap dependencyMap = null)
         {
             var moduleDefs = ImmutableArray.CreateBuilder<ModuleInfo>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace Discord.Commands
                         {
                             var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
                             if (dontAutoLoad == null && !typeInfo.IsAbstract)
-                                moduleDefs.Add(AddModuleInternal(typeInfo));
+                                moduleDefs.Add(AddModuleInternal(typeInfo, dependencyMap));
                         }
                     }
                 }
@@ -113,9 +113,9 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo AddModuleInternal(TypeInfo typeInfo)
+        private ModuleInfo AddModuleInternal(TypeInfo typeInfo, IDependencyMap dependencyMap = null)
         {
-            var moduleDef = new ModuleInfo(typeInfo, this);
+            var moduleDef = new ModuleInfo(typeInfo, this, dependencyMap);
             _moduleDefs[typeInfo.AsType()] = moduleDef;
 
             foreach (var cmd in moduleDef.Commands)

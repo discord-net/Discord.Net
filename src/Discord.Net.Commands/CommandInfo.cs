@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord.Commands.Attributes;
 
 namespace Discord.Commands
 {
@@ -30,7 +31,7 @@ namespace Discord.Commands
         public IReadOnlyList<CommandParameter> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal CommandInfo(MethodInfo source, ModuleInfo module, CommandAttribute attribute, string groupPrefix)
+        internal CommandInfo(MethodInfo source, ModuleInfo module, CommandAttribute attribute, string groupPrefix, IDependencyMap dependencyMap = null)
         {
             try
             {
@@ -74,7 +75,7 @@ namespace Discord.Commands
                 var priorityAttr = source.GetCustomAttribute<PriorityAttribute>();
                 Priority = priorityAttr?.Priority ?? 0;
 
-                Parameters = BuildParameters(source);
+                Parameters = BuildParameters(source, dependencyMap);
                 HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
                 Preconditions = BuildPreconditions(source);
                 _action = BuildAction(source);
@@ -184,7 +185,7 @@ namespace Discord.Commands
             return methodInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
         }
 
-        private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
+        private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo, IDependencyMap dependencyMap = null)
         {
             var parameters = methodInfo.GetParameters();
 
@@ -199,7 +200,13 @@ namespace Discord.Commands
                 if (isMultiple)
                     type = type.GetElementType();
 
-                var reader = Module.Service.GetTypeReader(type);
+                var trAttr = parameter.GetCustomAttribute<TypeReaderAttribute>();
+
+                var reader = (trAttr != null && trAttr.Type == type) ?
+                    ReflectionUtils.CreateObject<TypeReader>(trAttr.OverridingTypeReader, Module.Service, dependencyMap) :
+                    (Module.OverridingTypeReaders.ContainsKey(type) ?
+                        Module.OverridingTypeReaders[type] :
+                        Module.Service.GetTypeReader(type));
                 var typeInfo = type.GetTypeInfo();
 
                 //Detect enums
