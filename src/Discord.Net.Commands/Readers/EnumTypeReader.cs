@@ -32,10 +32,12 @@ namespace Discord.Commands
             var byNameBuilder = ImmutableDictionary.CreateBuilder<string, object>();
             var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
             
-            foreach (var v in Enum.GetValues(_enumType))
+            foreach (var v in Enum.GetNames(_enumType))
             {
-                byNameBuilder.Add(v.ToString().ToLower(), v);
-                byValueBuilder.Add((T)v, v);
+                byNameBuilder.Add(v.ToLower(), v);
+                var parsedValue = (T)Enum.Parse(_enumType, v);
+                if (!byValueBuilder.ContainsKey(parsedValue))
+                    byValueBuilder.Add(parsedValue, v);
             }
 
             _enumsByName = byNameBuilder.ToImmutable();
@@ -59,7 +61,7 @@ namespace Discord.Commands
                 if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Name is not a {_enumType.Name}"));
             }
         }
     }
