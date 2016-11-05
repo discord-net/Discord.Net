@@ -27,7 +27,6 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        public virtual IReadOnlyCollection<IReaction> Reactions => ImmutableArray.Create<RestReaction>();
         public virtual ulong? WebhookId => null;
         public bool IsWebhook => WebhookId != null;
 
@@ -71,6 +70,5 @@ namespace Discord.Rest
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-        IReadOnlyCollection<IReaction> IMessage.Reactions => Reactions;
     }
 }

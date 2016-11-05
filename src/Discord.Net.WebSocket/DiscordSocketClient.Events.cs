@@ -71,6 +71,18 @@ namespace Discord.WebSocket
             remove { _messageUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<Optional<SocketMessage>, SocketMessage, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Optional<SocketMessage>, SocketMessage, Task>>();
+        public event Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task> ReactionAdded
+        {
+            add { _reactionAddedEvent.Add(value); }
+            remove { _reactionAddedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task>>();
+        public event Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task> ReactionRemoved
+        {
+            add { _reactionRemovedEvent.Add(value); }
+            remove { _reactionRemovedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<ulong, Optional<SocketUserMessage>, SocketReaction, Task>>();
 
         //Roles
         public event Func<SocketRole, Task> RoleCreated

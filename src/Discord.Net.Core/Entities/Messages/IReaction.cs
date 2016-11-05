@@ -7,6 +7,6 @@ namespace Discord
 {
     public interface IReaction
     {
-        API.Emoji Emoji { get; }
+        Emoji Emoji { get; }
     }
 }

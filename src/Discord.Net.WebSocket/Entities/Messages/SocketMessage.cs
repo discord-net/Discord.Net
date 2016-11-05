@@ -27,7 +27,6 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        public virtual IReadOnlyCollection<IReaction> Reactions => ImmutableArray.Create<IReaction>();
         public virtual ulong? WebhookId => null;
         public bool IsWebhook => WebhookId != null;
 

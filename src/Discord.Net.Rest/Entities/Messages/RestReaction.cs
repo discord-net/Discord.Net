@@ -10,17 +10,13 @@ namespace Discord
     {
         internal RestReaction(Model model)
         {
-            _emoji = model.Emoji;
-            _count = model.Count;
-
+            Emoji = Emoji.FromApi(model.Emoji);
+            Count = model.Count;
+            Me = model.Me;
         }
 
-        internal readonly API.Emoji _emoji;
-        internal readonly int _count;
-        internal readonly bool _me;
-
-        public API.Emoji Emoji => _emoji;
-        public int Count => _count;
-        public bool Me => _me;
+        public Emoji Emoji { get; private set; }
+        public int Count { get; private set; }
+        public bool Me { get; private set; } 
     }
 }

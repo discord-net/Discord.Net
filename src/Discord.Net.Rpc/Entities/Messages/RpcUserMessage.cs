@@ -30,6 +30,7 @@ namespace Discord.Rpc
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<ulong> MentionedUserIds => MessageHelper.FilterTagsByKey(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        public IReadOnlyDictionary<Emoji, int> Reactions => ImmutableDictionary.Create<Emoji, int>();
 
         internal RpcUserMessage(DiscordRpcClient discord, ulong id, IMessageChannel channel, RpcUser author)
             : base(discord, id, channel, author)

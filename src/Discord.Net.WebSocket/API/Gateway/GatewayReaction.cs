@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class GatewayReaction : Reaction
+    public class GatewayReaction
     {
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }
@@ -15,6 +15,6 @@ namespace Discord.API.Gateway
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
         [JsonProperty("emoji")]
-        public Discord.API.Emoji Emoji { get; set; }
+        public Emoji Emoji { get; set; }
     }
 }

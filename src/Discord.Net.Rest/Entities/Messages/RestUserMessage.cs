@@ -30,7 +30,7 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
-        public override IReadOnlyCollection<IReaction> Reactions => _reactions;
+        public IReadOnlyDictionary<Emoji, int> Reactions => _reactions.ToDictionary(x => x.Emoji, x => x.Count);
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
             : base(discord, id, channel, author, guild)

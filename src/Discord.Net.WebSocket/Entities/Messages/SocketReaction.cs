@@ -13,12 +13,12 @@ namespace Discord.WebSocket
             UserId = model.UserId;
             MessageId = model.MessageId;
             ChannelId = model.ChannelId;
-            Emoji = model.Emoji;
+            Emoji = Emoji.FromApi(model.Emoji);
         }
 
-        public ulong UserId { get; internal set; }
-        public ulong MessageId { get; internal set; }
-        public ulong ChannelId { get; internal set; }
-        public API.Emoji Emoji { get; internal set; }
+        public ulong UserId { get; private set; }
+        public ulong MessageId { get; private set; }
+        public ulong ChannelId { get; private set; }
+        public Emoji Emoji { get; private set; }
     }
 }

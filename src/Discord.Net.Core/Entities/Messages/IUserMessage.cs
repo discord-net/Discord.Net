@@ -14,6 +14,9 @@ namespace Discord
         /// <summary> Removes this message from its channel's pinned messages. </summary>
         Task UnpinAsync(RequestOptions options = null);
 
+        /// <summary> Returns all reactions included in this message. </summary>
+        IReadOnlyDictionary<Emoji, int> Reactions { get; }
+
         /// <summary> Adds a reaction to this message. </summary>
         Task AddReactionAsync(Emoji emoji, RequestOptions options = null);
         /// <summary> Adds a reaction to this message. </summary>

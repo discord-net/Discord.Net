@@ -28,7 +28,6 @@ namespace Discord.Rpc
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<ulong> MentionedUserIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        public virtual IReadOnlyCollection<IReaction> Reactions => ImmutableArray.Create<IReaction>();
         public virtual ulong? WebhookId => null;
         public bool IsWebhook => WebhookId != null;
 
