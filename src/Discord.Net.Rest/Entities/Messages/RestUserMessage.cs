@@ -143,8 +143,8 @@ namespace Discord.Rest
         public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
         
-        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, Action<GetReactionUsersParams> func, RequestOptions options)
-            => MessageHelper.GetReactionUsersAsync(this, emoji, func, Discord, options);
+        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
         
 
         public Task PinAsync(RequestOptions options)

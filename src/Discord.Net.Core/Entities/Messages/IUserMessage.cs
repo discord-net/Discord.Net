@@ -25,7 +25,7 @@ namespace Discord
         Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null);
         /// <summary> Removes a reaction from this message. </summary>
         Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null);
-        Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, Action<GetReactionUsersParams> func, RequestOptions options = null);
+        Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
 
         /// <summary> Transforms this message's text into a human readable form by resolving its tags. </summary>
         string Resolve(

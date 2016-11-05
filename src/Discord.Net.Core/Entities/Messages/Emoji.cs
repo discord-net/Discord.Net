@@ -21,7 +21,7 @@ namespace Discord
 
         internal static Emoji FromApi(API.Emoji emoji)
         {
-            return new Emoji(emoji.Id, emoji.Name);
+            return new Emoji(emoji.Id.GetValueOrDefault(), emoji.Name);
         }
 
         public static Emoji Parse(string text)
