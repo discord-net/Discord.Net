@@ -16,7 +16,7 @@ namespace Discord.Net.Converters
         {
             object value = reader.Value;
             if (value != null)
-                return ulong.Parse((string)value, NumberStyles.None, CultureInfo.InvariantCulture);
+                return ulong.Parse(value.ToString(), NumberStyles.None, CultureInfo.InvariantCulture);
             else
                 return null;
         }
