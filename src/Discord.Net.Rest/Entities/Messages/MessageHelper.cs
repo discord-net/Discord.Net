@@ -35,7 +35,7 @@ namespace Discord.Rest
         public static async Task RemoveReactionAsync(IMessage msg, IUser user, string emoji, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options);
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options).ConfigureAwait(false);
         }
 
         public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, string emoji,

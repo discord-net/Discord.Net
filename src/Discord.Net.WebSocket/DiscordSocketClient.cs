@@ -1313,7 +1313,9 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        SocketReaction reaction = new SocketReaction(data);
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
+
                                         if (cachedMsg != null)
                                         {
                                             cachedMsg.AddReaction(reaction);
@@ -1338,7 +1340,8 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        SocketReaction reaction = new SocketReaction(data);
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
                                         if (cachedMsg != null)
                                         {
                                             cachedMsg.RemoveReaction(reaction);
