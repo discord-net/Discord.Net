@@ -102,14 +102,14 @@ namespace Discord.Rpc
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
-        public Task AddReactionAsync(Emoji emoji, RequestOptions options)
+        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-        public Task AddReactionAsync(string emoji, RequestOptions options)
+        public Task AddReactionAsync(string emoji, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
 
-        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options)
+        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options)
+        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
         
         public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit, ulong? afterUserId, RequestOptions options = null)

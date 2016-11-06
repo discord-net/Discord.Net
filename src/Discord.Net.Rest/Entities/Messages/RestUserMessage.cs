@@ -133,14 +133,14 @@ namespace Discord.Rest
             Update(model);
         }
 
-        public Task AddReactionAsync(Emoji emoji, RequestOptions options)
+        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-        public Task AddReactionAsync(string emoji, RequestOptions options)
+        public Task AddReactionAsync(string emoji, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
 
-        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options)
+        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options)
+        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
         
         public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
