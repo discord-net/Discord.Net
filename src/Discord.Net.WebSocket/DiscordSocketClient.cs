@@ -1318,6 +1318,7 @@ namespace Discord.WebSocket
                                         {
                                             cachedMsg.AddReaction(reaction);
                                             await _reactionAddedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
+                                            return;
                                         }
                                         await _reactionAddedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
                                     }
@@ -1342,6 +1343,7 @@ namespace Discord.WebSocket
                                         {
                                             cachedMsg.RemoveReaction(reaction);
                                             await _reactionRemovedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
+                                            return;
                                         }
                                         await _reactionRemovedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
                                     }
