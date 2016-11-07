@@ -49,7 +49,9 @@ namespace Discord.Net.Queue
 
                 Debug.WriteLine($"[{id}] Sending...");
                 var response = await request.SendAsync().ConfigureAwait(false);
-                TimeSpan lag = DateTimeOffset.UtcNow - DateTimeOffset.Parse(response.Headers["Date"]);
+                string headerDate;
+                bool headerHasDate = response.Headers.TryGetValue("Date", out headerDate);
+                TimeSpan lag = DateTimeOffset.UtcNow - (headerHasDate ? DateTimeOffset.Parse(headerDate) : DateTimeOffset.UtcNow);
                 var info = new RateLimitInfo(response.Headers);
 
                 if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
