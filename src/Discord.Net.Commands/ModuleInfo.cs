@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
-using Discord.Commands.Attributes;
 
 namespace Discord.Commands
 {

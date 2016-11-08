@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Discord.Commands.Attributes
+namespace Discord.Commands
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, AllowMultiple = true)]
     public class TypeReaderAttribute : Attribute
