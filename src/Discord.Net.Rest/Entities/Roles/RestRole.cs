@@ -9,7 +9,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestRole : RestEntity<ulong>, IRole
     {
-        public RestGuild Guild { get; }
+        public IGuild Guild { get; }
         public Color Color { get; private set; }
         public bool IsHoisted { get; private set; }
         public bool IsManaged { get; private set; }
@@ -22,13 +22,14 @@ namespace Discord.Rest
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.MentionRole(Id);
 
-        internal RestRole(BaseDiscordClient discord, ulong id)
+        internal RestRole(IGuild guild, BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
+            Guild = guild;
         }
-        internal static RestRole Create(BaseDiscordClient discord, Model model)
+        internal static RestRole Create(IGuild guild, BaseDiscordClient discord, Model model)
         {
-            var entity = new RestRole(discord, model.Id);
+            var entity = new RestRole(guild, discord, model.Id);
             entity.Update(model);
             return entity;
         }
