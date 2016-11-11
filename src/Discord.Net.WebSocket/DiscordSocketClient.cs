@@ -1306,7 +1306,7 @@ namespace Discord.WebSocket
                                 break;
                             case "MESSAGE_REACTION_ADD":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Disbatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
@@ -1333,7 +1333,7 @@ namespace Discord.WebSocket
                                 }
                             case "MESSAGE_REACTION_REMOVE":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Disbatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
@@ -1355,6 +1355,31 @@ namespace Discord.WebSocket
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE referenced an unknown channel.").ConfigureAwait(false);
                                         return;
                                     }
+                                    break;
+                                }
+                            case "MESSAGE_REACTION_REMOVE_ALL":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_ALL)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RemoveAllReactionsEvent>(_serializer);
+                                    var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                    if (channel != null)
+                                    {
+                                        SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        if (cachedMsg != null)
+                                        {
+                                            cachedMsg.ClearReactions();
+                                            await _reactionsClearedEvent.InvokeAsync(data.MessageId, cachedMsg).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        await _reactionsClearedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>());
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+
                                     break;
                                 }
                             case "MESSAGE_DELETE_BULK":

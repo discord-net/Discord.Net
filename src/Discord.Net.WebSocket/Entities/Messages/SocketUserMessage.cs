@@ -122,6 +122,10 @@ namespace Discord.WebSocket
             if (_reactions.Contains(reaction))
                 _reactions.Remove(reaction);
         }
+        internal void ClearReactions()
+        {
+            _reactions.Clear();
+        }
 
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
