@@ -38,6 +38,11 @@ namespace Discord.Rest
             await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options).ConfigureAwait(false);
         }
 
+        public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
+        }
+
         public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, string emoji,
             Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
         {

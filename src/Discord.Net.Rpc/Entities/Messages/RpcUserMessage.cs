@@ -111,6 +111,9 @@ namespace Discord.Rpc
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
         public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
             => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+
+        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
         
         public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit, ulong? afterUserId, RequestOptions options = null)
             => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
