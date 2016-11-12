@@ -25,19 +25,39 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
-        public IReadOnlyCollection<ulong> RoleIds => _roleIds;
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
-        public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
-        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
-        public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
-
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
+        public IReadOnlyCollection<ulong> RoleIds => _roleIds;
+        public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
+        public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
+        public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
+
+        /// <summary> The position of the user within the role hirearchy. </summary>
+        /// <remarks> The returned value equal to the position of the highest role the user has, 
+        /// or int.MaxValue if user is the server owner. </remarks>
+        public int Hierarchy
+        {
+            get
+            {
+                if (Guild.OwnerId == Id)
+                    return int.MaxValue;
+
+                int maxPos = 0;
+                for (int i = 0; i < _roleIds.Length; i++)
+                {
+                    var role = Guild.GetRole(_roleIds[i]);
+                    if (role != null && role.Position > maxPos)
+                        maxPos = role.Position;
+                }
+                return maxPos;
+            }
+        }
 
         internal SocketGuildUser(SocketGuild guild, SocketGlobalUser globalUser)
             : base(guild.Discord, globalUser.Id)
