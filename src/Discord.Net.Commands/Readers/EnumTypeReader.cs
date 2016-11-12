@@ -61,7 +61,7 @@ namespace Discord.Commands
                 if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Name is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
             }
         }
     }
