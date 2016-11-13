@@ -439,7 +439,10 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            if (args.Content.GetValueOrDefault()?.Length > DiscordConfig.MaxMessageSize)
+            if (!args.Embed.IsSpecified || args.Embed.Value == null)
+                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+
+            if (args.Content.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
