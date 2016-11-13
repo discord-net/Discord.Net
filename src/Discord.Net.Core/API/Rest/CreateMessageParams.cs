@@ -8,7 +8,7 @@ namespace Discord.API.Rest
     public class CreateMessageParams
     {
         [JsonProperty("content")]
-        public string Content { get; }
+        public Optional<string> Content { get; }
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }
@@ -19,7 +19,10 @@ namespace Discord.API.Rest
 
         public CreateMessageParams(string content)
         {
-            Content = content;
+            if (string.IsNullOrEmpty(content))
+                Content = null;
+            else
+                Content = content;
         }
     }
 }
