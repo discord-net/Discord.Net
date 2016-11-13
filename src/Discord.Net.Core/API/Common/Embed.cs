@@ -14,7 +14,7 @@ namespace Discord.API
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("color")]
-        public uint Color { get; set; }
+        public uint? Color { get; set; }
         [JsonProperty("author")]
         public Optional<EmbedAuthor> Author { get; set; }
         [JsonProperty("footer")]
