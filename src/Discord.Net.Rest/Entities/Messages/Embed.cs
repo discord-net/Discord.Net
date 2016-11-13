@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Model = Discord.API.Embed;
@@ -12,7 +13,7 @@ namespace Discord
         public string Url { get; }
         public string Title { get; }
         public string Type { get; }
-        public uint? Color { get; }
+        public Color? Color { get; }
         public EmbedAuthor? Author { get; }
         public EmbedFooter? Footer { get; }
         public EmbedProvider? Provider { get; }
@@ -23,7 +24,7 @@ namespace Discord
             string title, 
             string description, 
             string url, 
-            uint? color, 
+            Color? color, 
             EmbedAuthor? author, 
             EmbedFooter? footer, 
             EmbedProvider? provider, 
@@ -34,12 +35,17 @@ namespace Discord
             Title = title;
             Description = description;
             Url = url;
+            Color = color;
+            Author = author;
+            Footer = footer;
             Provider = provider;
             Thumbnail = thumbnail;
+            Fields = fields;
         }
         internal static Embed Create(Model model)
         {
-            return new Embed(model.Type, model.Title, model.Description, model.Url, model.Color,
+            return new Embed(model.Type, model.Title, model.Description, model.Url,
+                model.Color.HasValue ? new Color(model.Color.Value) : (Color?)null,
                 model.Author.IsSpecified ? EmbedAuthor.Create(model.Author.Value) : (EmbedAuthor?)null,
                 model.Footer.IsSpecified ? EmbedFooter.Create(model.Footer.Value) : (EmbedFooter?)null,
                 model.Provider.IsSpecified ? EmbedProvider.Create(model.Provider.Value) : (EmbedProvider?)null,

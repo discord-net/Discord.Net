@@ -8,7 +8,7 @@ namespace Discord
         string Type { get; }
         string Title { get; }
         string Description { get; }
-        uint? Color { get; }
+        Color? Color { get; }
         EmbedAuthor? Author { get; }
         EmbedFooter? Footer { get; }
         EmbedProvider? Provider { get; }

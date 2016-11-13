@@ -116,6 +116,13 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, guild, model);
         }
+        public static async Task<RestUserMessage> SendRichMessageAsync(IChannel channel, BaseDiscordClient client,
+            string text, bool isTTS, API.Embed embed, IGuild guild, RequestOptions options)
+        {
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed };
+            var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
+            return RestUserMessage.Create(client, guild, model);
+        }
 
         public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, IGuild guild, RequestOptions options)
