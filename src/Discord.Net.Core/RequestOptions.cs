@@ -22,7 +22,7 @@
 
         public RequestOptions()
         {
-            Timeout = 30000;
+            Timeout = DiscordConfig.DefaultRequestTimeout;
         }
 
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;
