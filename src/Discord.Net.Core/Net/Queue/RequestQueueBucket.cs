@@ -29,8 +29,8 @@ namespace Discord.Net.Queue
 
             _lock = new object();
 
-            if (request.Options.ClientBucketId != null)
-                WindowCount = ClientBucket.Get(request.Options.ClientBucketId).WindowCount;
+            if (request.Options.IsClientBucket)
+                WindowCount = ClientBucket.Get(request.Options.BucketId).WindowCount;
             else
                 WindowCount = 1; //Only allow one request until we get a header back
             _semaphore = WindowCount;
@@ -218,11 +218,11 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {lag.TotalMilliseconds} ms lag)");
 #endif
                 }
-                else if (request.Options.ClientBucketId != null)
+                else if (request.Options.IsClientBucket && request.Options.BucketId != null)
                 {
-                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(request.Options.BucketId).WindowSeconds);
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds * 1000} ms)");
+                    Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
 #endif
                 }
 

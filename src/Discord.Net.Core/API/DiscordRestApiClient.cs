@@ -172,8 +172,8 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var request = new RestRequest(_restClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
@@ -187,8 +187,8 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
@@ -203,8 +203,8 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
@@ -217,8 +217,8 @@ namespace Discord.API
             string bucketId = null, string clientBucketId = null, RequestOptions options = null) where TResponse : class
         {
             options = options ?? new RequestOptions();
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var request = new RestRequest(_restClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
@@ -231,8 +231,8 @@ namespace Discord.API
             string bucketId = null, string clientBucketId = null, RequestOptions options = null) where TResponse : class
         {
             options = options ?? new RequestOptions();
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
@@ -246,8 +246,8 @@ namespace Discord.API
             string bucketId = null, string clientBucketId = null, RequestOptions options = null)
         {
             options = options ?? new RequestOptions();
-            options.BucketId = bucketId;
-            options.ClientBucketId = AuthTokenType == TokenType.User ? clientBucketId : null;
+            options.BucketId = AuthTokenType == TokenType.User ? clientBucketId : bucketId;
+            options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
