@@ -14,6 +14,7 @@ namespace Discord
         public const string CDNUrl = "https://discordcdn.com/";
         public const string InviteUrl = "https://discord.gg/";
 
+        public const int DefaultRequestTimeout = 15000;
         public const int MaxMessageSize = 2000;
         public const int MaxMessagesPerBatch = 100;
         public const int MaxUsersPerBatch = 1000;

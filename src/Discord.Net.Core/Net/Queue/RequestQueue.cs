@@ -79,7 +79,9 @@ namespace Discord.Net.Queue
             int millis = (int)Math.Ceiling((_waitUntil - DateTimeOffset.UtcNow).TotalMilliseconds);
             if (millis > 0)
             {
+#if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive) [Global]");
+#endif
                 await Task.Delay(millis).ConfigureAwait(false);
             }
         }
