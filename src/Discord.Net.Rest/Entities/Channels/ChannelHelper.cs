@@ -110,9 +110,9 @@ namespace Discord.Rest
         }
 
         public static async Task<RestUserMessage> SendMessageAsync(IChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, IGuild guild, RequestOptions options)
+            string text, bool isTTS, API.Embed embed, IGuild guild, RequestOptions options)
         {
-            var args = new CreateMessageParams(text) { IsTTS = isTTS };
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, guild, model);
         }

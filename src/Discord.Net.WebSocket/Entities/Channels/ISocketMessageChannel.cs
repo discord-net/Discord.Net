@@ -11,7 +11,7 @@ namespace Discord.WebSocket
         IReadOnlyCollection<SocketMessage> CachedMessages { get; }
 
         /// <summary> Sends a message to this message channel. </summary>
-        new Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, RequestOptions options = null);
+        new Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, API.Embed embed = null, RequestOptions options = null);
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, RequestOptions options = null);
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
