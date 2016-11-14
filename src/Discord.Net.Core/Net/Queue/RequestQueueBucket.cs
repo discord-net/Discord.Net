@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+#if DEBUG_LIMITS
 using System.Diagnostics;
+#endif
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -40,14 +42,18 @@ namespace Discord.Net.Queue
         public async Task<Stream> SendAsync(RestRequest request)
         {
             int id = Interlocked.Increment(ref nextId);
+#if DEBUG_LIMITS
             Debug.WriteLine($"[{id}] Start");
+#endif
             LastAttemptAt = DateTimeOffset.UtcNow;
             while (true)
             {
                 await _queue.EnterGlobalAsync(id, request).ConfigureAwait(false);
                 await EnterAsync(id, request).ConfigureAwait(false);
 
+#if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
+#endif
                 var response = await request.SendAsync().ConfigureAwait(false);
                 TimeSpan lag = DateTimeOffset.UtcNow - DateTimeOffset.Parse(response.Headers["Date"]);
                 var info = new RateLimitInfo(response.Headers);
@@ -59,18 +65,24 @@ namespace Discord.Net.Queue
                         case (HttpStatusCode)429:
                             if (info.IsGlobal)
                             {
+#if DEBUG_LIMITS
                                 Debug.WriteLine($"[{id}] (!) 429 [Global]");
+#endif
                                 _queue.PauseGlobal(info, lag);
                             }
                             else
                             {
+#if DEBUG_LIMITS
                                 Debug.WriteLine($"[{id}] (!) 429");
+#endif
                                 UpdateRateLimit(id, request, info, lag, true);
                             }
                             await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
                             continue; //Retry
                         case HttpStatusCode.BadGateway: //502
+#if DEBUG_LIMITS
                             Debug.WriteLine($"[{id}] (!) 502");
+#endif
                             continue; //Continue
                         default:
                             string reason = null;
@@ -92,9 +104,13 @@ namespace Discord.Net.Queue
                 }
                 else
                 {
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Success");
+#endif
                     UpdateRateLimit(id, request, info, lag, false);
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
+#endif
                     return response.Stream;
                 }
             }
@@ -135,7 +151,9 @@ namespace Discord.Net.Queue
                         if (resetAt > timeoutAt)
                             throw new RateLimitedException();
                         int millis = (int)Math.Ceiling((resetAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
+#if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive)");
+#endif
                         if (millis > 0)
                             await Task.Delay(millis, request.CancelToken).ConfigureAwait(false);
                     }
@@ -143,13 +161,17 @@ namespace Discord.Net.Queue
                     {
                         if ((timeoutAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds < 500.0)
                             throw new RateLimitedException();
+#if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping 500* ms (Pre-emptive)");
+#endif
                         await Task.Delay(500, request.CancelToken).ConfigureAwait(false);
                     }
                     continue;
                 }
+#if DEBUG_LIMITS
                 else
                     Debug.WriteLine($"[{id}] Entered Semaphore ({_semaphore}/{WindowCount} remaining)");
+#endif
                 break;
             }
         }
@@ -166,7 +188,9 @@ namespace Discord.Net.Queue
                 {
                     WindowCount = info.Limit.Value;
                     _semaphore = info.Remaining.Value;
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
+#endif
                 }
 
                 var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -182,24 +206,32 @@ namespace Discord.Net.Queue
                 {
                     //RetryAfter is more accurate than Reset, where available
                     resetTick = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value);
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
+#endif
                 }
                 else if (info.Reset.HasValue)
                 {
                     resetTick = info.Reset.Value.AddSeconds(/*1.0 +*/ lag.TotalSeconds);
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {lag.TotalMilliseconds} ms lag)");
+#endif
                 }
                 else if (request.Options.ClientBucketId != null)
                 {
                     resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds);
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.ClientBucketId).WindowSeconds * 1000} ms)");
+#endif
                 }
 
                 if (resetTick == null)
                 {
                     WindowCount = 0; //No rate limit info, disable limits on this bucket (should only ever happen with a user token)
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Disabled Semaphore");
+#endif
                     return;
                 }
 
@@ -207,7 +239,9 @@ namespace Discord.Net.Queue
                 {
                     _resetTick = resetTick;
                     LastAttemptAt = resetTick.Value; //Make sure we dont destroy this until after its been reset
+#if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
+#endif
 
                     if (!hasQueuedReset)
                     {
@@ -227,7 +261,9 @@ namespace Discord.Net.Queue
                     millis = (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
                     if (millis <= 0) //Make sure we havent gotten a more accurate reset time
                     {
+#if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] * Reset *");
+#endif
                         _semaphore = WindowCount;
                         _resetTick = null;
                         return;
