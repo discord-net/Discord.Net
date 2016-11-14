@@ -1059,19 +1059,6 @@ namespace Discord.API
             using (JsonReader reader = new JsonTextReader(text))
                 return _serializer.Deserialize<T>(reader);
         }
-        internal string GetBucketId(ulong guildId = 0, ulong channelId = 0, [CallerMemberName] string methodName = "")
-        {
-            if (guildId != 0)
-            {
-                if (channelId != 0)
-                    return $"{methodName}({guildId}/{channelId})";
-                else
-                    return $"{methodName}({guildId})";
-            }
-            else if (channelId != 0)
-                return $"{methodName}({channelId})";
-            return $"{methodName}()";
-        }
 
         internal class BucketIds
         {
