@@ -9,124 +9,74 @@ namespace Discord
 {
     public class EmbedBuilder
     {
-        private Embed embed = new Embed();
-        List<Field> fields = new List<Field>();
+        private Embed model = new Embed();
+        private List<Field> fields = new List<Field>();
 
         public EmbedBuilder()
         {
-            embed.Type = "rich";
+            model.Type = "rich";
         }
 
-        public EmbedBuilder Title(string title)
+        public string Title { get { return model.Title; }  set { model.Title = value; } }
+        public string Description { get { return model.Description; } set { model.Description = value; } }
+        public string Url { get { return model.Url; } set { model.Url = value; } }
+        public Color? Color { get { return model.Color.HasValue ? new Color(model.Color.Value) : (Color?)null; } set { model.Color = value?.RawValue; } }
+
+        public void SetAuthor(Action<EmbedBuilderAuthor> action)
         {
-            embed.Title = title;
-            return this;
+            var author = new EmbedBuilderAuthor();
+            action(author);
+            model.Author = author.ToModel();
         }
-        public EmbedBuilder Description(string description)
+        public void SetFooter(Action<EmbedBuilderFooter> action)
         {
-            embed.Description = description;
-            return this;
+            var footer = new EmbedBuilderFooter();
+            action(footer);
+            model.Footer = footer.ToModel();
         }
-        public EmbedBuilder Url(string url)
+        public void AddField(Action<EmbedBuilderField> action)
         {
-            embed.Url = url;
-            return this;
-        }
-        public EmbedBuilder Color(Color color)
-        {
-            embed.Color = color.RawValue;
-            return this;
-        }
-        public EmbedBuilder Field(Func<EmbedFieldBuilder, EmbedFieldBuilder> builder)
-        {
-            fields.Add(builder(new EmbedFieldBuilder()).Build());
-            return this;
-        }
-        public EmbedBuilder Author(Func<EmbedAuthorBuilder, EmbedAuthorBuilder> builder)
-        {
-            embed.Author = builder(new EmbedAuthorBuilder()).Build();
-            return this;
-        }
-        public EmbedBuilder Footer(Func<EmbedFooterBuilder, EmbedFooterBuilder> builder)
-        {
-            embed.Footer = builder(new EmbedFooterBuilder()).Build();
-            return this;
-        }
-        public Embed Build()
-        {
-            embed.Fields = fields.ToArray();
-            return embed;
+            var field = new EmbedBuilderField();
+            action(field);
+            fields.Add(field.ToModel());
         }
 
-    }
-
-    public class EmbedFieldBuilder
-    {
-        private Field embedField = new Field();
-
-        public EmbedFieldBuilder Name(string name)
+        internal Embed Build()
         {
-            embedField.Name = name;
-            return this;
-        }
-        public EmbedFieldBuilder Value(string value)
-        {
-            embedField.Value = value;
-            return this;
-        }
-        public EmbedFieldBuilder Inline(bool inline)
-        {
-            embedField.Inline = inline;
-            return this;
-        }
-        public Field Build()
-        {
-            return embedField;
+            model.Fields = fields.ToArray();
+            return model;
         }
     }
 
-    public class EmbedAuthorBuilder
+    public class EmbedBuilderField
     {
-        private Author author = new Author();
-        
-        public EmbedAuthorBuilder Name(string name)
-        {
-            author.Name = name;
-            return this;
-        }
-        public EmbedAuthorBuilder Url(string url)
-        {
-            author.Url = url;
-            return this;
-        }
-        public EmbedAuthorBuilder IconUrl(string iconUrl)
-        {
-            author.IconUrl = iconUrl;
-            return this;
-        }
-        public Author Build()
-        {
-            return author;
-        }
+        private Field model = new Field();
+
+        public string Name { get { return model.Name; } set { model.Name = value; } }
+        public string Value { get { return model.Value; } set { model.Value = value; } }
+        public bool IsInline { get { return model.Inline; } set { model.Inline = value; } }
+
+        internal Field ToModel() => model;
     }
 
-    public class EmbedFooterBuilder
+    public class EmbedBuilderAuthor
     {
-        private Footer footer = new Footer();
+        private Author model = new Author();
 
-        public EmbedFooterBuilder Text(string text)
-        {
-            footer.Text = text;
-            return this;
-        }
-        public EmbedFooterBuilder IconUrl(string iconUrl)
-        {
-            footer.IconUrl = iconUrl;
-            return this;
-        }
-        public Footer Build()
-        {
-            return footer;
-        }
+        public string Name { get { return model.Name; } set { model.Name = value; } }
+        public string Url { get { return model.Url; } set { model.Url = value; } }
+        public string IconUrl { get { return model.IconUrl; } set { model.IconUrl = value; } }
+
+        internal Author ToModel() => model;
+    }
+
+    public class EmbedBuilderFooter
+    {
+        private Footer model = new Footer();
+
+        public string Text { get { return model.Text; } set { model.Text = value; } }
+        public string IconUrl { get { return model.IconUrl; } set { model.IconUrl = value; } }
+
+        internal Footer ToModel() => model;
     }
 }
