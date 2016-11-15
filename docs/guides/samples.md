@@ -13,7 +13,7 @@ title: Samples
 
 #### Changing the bot's status
 
-[!code-sharp[Bot Status](samples/faq/status.cs)]
+[!code-csharp[Bot Status](samples/faq/status.cs)]
 
 #### Sending a message to a channel
 
