@@ -80,6 +80,9 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info, CommandService service)
         {
+            if (TypeReader == null)
+                TypeReader = service.GetTypeReader(ParameterType);
+
             return new ParameterInfo(this, info, service);
         }
     }
