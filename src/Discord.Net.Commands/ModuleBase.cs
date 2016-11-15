@@ -6,7 +6,7 @@ namespace Discord.Commands
     {
         public CommandContext Context { get; internal set; }
 
-        protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, API.Embed embed = null, RequestOptions options = null)
+        protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, EmbedBuilder embed = null, RequestOptions options = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
