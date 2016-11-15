@@ -1,8 +1,5 @@
 public async Task ModifyStatus()
 {
-    await (await _client.GetCurrentUserAsync()).ModifyStatusAsync(x =>
-    {
-        x.Status = UserStatus.Idle;
-        x.Game = new Game("Type !help for help");
-    });
+    await _client.SetStatus(UserStatus.Idle);
+    await _client.SetGame("Type !help for help");
 }
