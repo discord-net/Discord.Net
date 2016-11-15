@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Discord.Commands
+namespace Discord.Commands.Builders
 {
     public class ModuleBuilder
     {
         private List<CommandBuilder> commands;
         private List<ModuleBuilder> submodules;
+        private List<PreconditionAttribute> preconditions;
         private List<string> aliases;
-
 
         public ModuleBuilder()
             : this(null, null)
@@ -27,6 +27,7 @@ namespace Discord.Commands
         {
             commands = new List<CommandBuilder>();
             submodules = new List<ModuleBuilder>();
+            preconditions = new List<PreconditionAttribute>();
             aliases = new List<string>();
 
             if (prefix != null)
@@ -38,7 +39,6 @@ namespace Discord.Commands
             ParentModule = parent;
         }
 
-
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
@@ -46,8 +46,8 @@ namespace Discord.Commands
 
         public List<CommandBuilder> Commands => commands;
         public List<ModuleBuilder> Modules => submodules;
+        public List<PreconditionAttribute> Preconditions => preconditions;
         public List<string> Aliases => aliases;
-
 
         public ModuleBuilder SetName(string name)
         {
@@ -73,6 +73,12 @@ namespace Discord.Commands
             return this;
         }
 
+        public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
+        {
+            preconditions.Add(precondition);
+            return this;
+        }
+
         public CommandBuilder AddCommand() => AddCommand(null);
         public CommandBuilder AddCommand(string name)
         {
@@ -91,12 +97,9 @@ namespace Discord.Commands
             return builder;
         }
 
-        public ModuleBuilder Done()
+        public ModuleInfo Build(CommandService service)
         {
-            if (ParentModule == null)
-                throw new InvalidOperationException("Cannot finish a top-level module!");
-
-            return ParentModule;
+            return new ModuleInfo(this, service);
         }
     }
 }
