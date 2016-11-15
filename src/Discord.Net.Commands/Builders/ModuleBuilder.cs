@@ -12,29 +12,15 @@ namespace Discord.Commands.Builders
         private List<string> aliases;
 
         public ModuleBuilder()
-            : this(null, null)
-        { }
-
-        public ModuleBuilder(string prefix)
-            : this(null, prefix)
+            : this(null)
         { }
 
         internal ModuleBuilder(ModuleBuilder parent)
-            : this(parent, null)
-        { }
-
-        internal ModuleBuilder(ModuleBuilder parent, string prefix)
         {
             commands = new List<CommandBuilder>();
             submodules = new List<ModuleBuilder>();
             preconditions = new List<PreconditionAttribute>();
             aliases = new List<string>();
-
-            if (prefix != null)
-            {
-                aliases.Add(prefix);
-                Name = prefix;
-            }
             
             ParentModule = parent;
         }
@@ -67,9 +53,9 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleBuilder AddAlias(string alias)
+        public ModuleBuilder AddAliases(params string[] newAliases)
         {
-            aliases.Add(alias);
+            aliases.AddRange(newAliases);
             return this;
         }
 
@@ -79,22 +65,20 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public CommandBuilder AddCommand() => AddCommand(null);
-        public CommandBuilder AddCommand(string name)
+        public ModuleBuilder AddCommand(Action<CommandBuilder> createFunc)
         {
-            var builder = new CommandBuilder(this, name);
+            var builder = new CommandBuilder(this);
+            createFunc(builder);
             commands.Add(builder);
-
-            return builder;
+            return this;
         }
 
-        public ModuleBuilder AddSubmodule() => AddSubmodule(null);
-        public ModuleBuilder AddSubmodule(string prefix)
+        public ModuleBuilder AddSubmodule(Action<ModuleBuilder> createFunc)
         {
-            var builder = new ModuleBuilder(this, prefix);
+            var builder = new ModuleBuilder(this);
+            createFunc(builder);
             submodules.Add(builder);
-
-            return builder;
+            return this;
         }
 
         public ModuleInfo Build(CommandService service)

@@ -10,17 +10,11 @@ namespace Discord.Commands.Builders
         private List<ParameterBuilder> parameters;
         private List<string> aliases;
 
-        internal CommandBuilder(ModuleBuilder module, string prefix)
+        internal CommandBuilder(ModuleBuilder module)
         {
             preconditions = new List<PreconditionAttribute>();
             parameters = new List<ParameterBuilder>();
             aliases = new List<string>();
-
-            if (prefix != null)
-            {
-                aliases.Add(prefix);
-                Name = prefix;
-            }
 
             Module = module;
         }
@@ -65,15 +59,17 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public CommandBuilder AddParameter(ParameterBuilder parameter)
+        public CommandBuilder AddParameter(Action<ParameterBuilder> createFunc)
         {
-            parameters.Add(parameter);
+            var param = new ParameterBuilder();
+            createFunc(param);
+            parameters.Add(param);
             return this;
         }
 
-        public CommandBuilder AddAlias(string alias)
+        public CommandBuilder AddAliases(params string[] newAliases)
         {
-            aliases.Add(alias);
+            aliases.AddRange(newAliases);
             return this;
         }
 
