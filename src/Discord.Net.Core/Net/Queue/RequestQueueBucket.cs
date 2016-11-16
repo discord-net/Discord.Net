@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Net.Rest;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 #if DEBUG_LIMITS
@@ -54,64 +55,79 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
 #endif
-                var response = await request.SendAsync().ConfigureAwait(false);
-                TimeSpan lag = DateTimeOffset.UtcNow - DateTimeOffset.Parse(response.Headers["Date"]);
-                var info = new RateLimitInfo(response.Headers);
-
-                if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
+                TimeSpan lag = default(TimeSpan);
+                RateLimitInfo info = default(RateLimitInfo);
+                try
                 {
-                    switch (response.StatusCode)
+                    var response = await request.SendAsync().ConfigureAwait(false);
+                    lag = DateTimeOffset.UtcNow - DateTimeOffset.Parse(response.Headers["Date"]);
+                    info = new RateLimitInfo(response.Headers);
+
+                    if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
                     {
-                        case (HttpStatusCode)429:
-                            if (info.IsGlobal)
-                            {
-#if DEBUG_LIMITS
-                                Debug.WriteLine($"[{id}] (!) 429 [Global]");
-#endif
-                                _queue.PauseGlobal(info, lag);
-                            }
-                            else
-                            {
-#if DEBUG_LIMITS
-                                Debug.WriteLine($"[{id}] (!) 429");
-#endif
-                                UpdateRateLimit(id, request, info, lag, true);
-                            }
-                            await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
-                            continue; //Retry
-                        case HttpStatusCode.BadGateway: //502
-#if DEBUG_LIMITS
-                            Debug.WriteLine($"[{id}] (!) 502");
-#endif
-                            continue; //Continue
-                        default:
-                            string reason = null;
-                            if (response.Stream != null)
-                            {
-                                try
+                        switch (response.StatusCode)
+                        {
+                            case (HttpStatusCode)429:
+                                if (info.IsGlobal)
                                 {
-                                    using (var reader = new StreamReader(response.Stream))
-                                    using (var jsonReader = new JsonTextReader(reader))
-                                    {
-                                        var json = JToken.Load(jsonReader);
-                                        reason = json.Value<string>("message");
-                                    }
+#if DEBUG_LIMITS
+                                    Debug.WriteLine($"[{id}] (!) 429 [Global]");
+#endif
+                                    _queue.PauseGlobal(info, lag);
                                 }
-                                catch { }
-                            }
-                            throw new HttpException(response.StatusCode, reason);
+                                else
+                                {
+#if DEBUG_LIMITS
+                                    Debug.WriteLine($"[{id}] (!) 429");
+#endif
+                                    UpdateRateLimit(id, request, info, lag, true);
+                                }
+                                await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
+                                continue; //Retry
+                            case HttpStatusCode.BadGateway: //502
+#if DEBUG_LIMITS
+                                Debug.WriteLine($"[{id}] (!) 502");
+#endif
+                                continue; //Continue
+                            default:
+                                string reason = null;
+                                if (response.Stream != null)
+                                {
+                                    try
+                                    {
+                                        using (var reader = new StreamReader(response.Stream))
+                                        using (var jsonReader = new JsonTextReader(reader))
+                                        {
+                                            var json = JToken.Load(jsonReader);
+                                            reason = json.Value<string>("message");
+                                        }
+                                    }
+                                    catch { }
+                                }
+                                throw new HttpException(response.StatusCode, reason);
+                        }
+                    }
+                    else
+                    {
+#if DEBUG_LIMITS
+                        Debug.WriteLine($"[{id}] Success");
+#endif
+                        return response.Stream;
                     }
                 }
-                else
-                {
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] Success");
+                catch
+                {
+                    Debug.WriteLine($"[{id}] Error");
+                    throw;
+                }
 #endif
+                finally
+                {
                     UpdateRateLimit(id, request, info, lag, false);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
 #endif
-                    return response.Stream;
                 }
             }
         }
