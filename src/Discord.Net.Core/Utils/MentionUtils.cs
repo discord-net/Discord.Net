@@ -85,14 +85,17 @@ namespace Discord
             return false;
         }
 
-        internal static string Resolve(IMessage msg, TagHandling userHandling, TagHandling channelHandling, TagHandling roleHandling, TagHandling everyoneHandling, TagHandling emojiHandling)
+        internal static string Resolve(IMessage msg, int startIndex, TagHandling userHandling, TagHandling channelHandling, TagHandling roleHandling, TagHandling everyoneHandling, TagHandling emojiHandling)
         {
-            var text = new StringBuilder(msg.Content);
+            var text = new StringBuilder(msg.Content.Substring(startIndex));
             var tags = msg.Tags;
-            int indexOffset = 0;
+            int indexOffset = -startIndex;
 
             foreach (var tag in tags)
             {
+                if (tag.Index < startIndex)
+                    continue;
+
                 string newText = "";
                 switch (tag.Type)
                 {
@@ -139,12 +142,22 @@ namespace Discord
                         if (user != null)
                             return $"@{guildUser?.Nickname ?? user?.Username}";
                         else
-                            return $"@unknown-user";
+                            return $"";
+                    case TagHandling.NameNoPrefix:
+                        if (user != null)
+                            return $"{guildUser?.Nickname ?? user?.Username}";
+                        else
+                            return $"";
                     case TagHandling.FullName:
                         if (user != null)
                             return $"@{user.Username}#{user.Discriminator}";
                         else
-                            return $"@unknown-user";
+                            return $"";
+                    case TagHandling.FullNameNoPrefix:
+                        if (user != null)
+                            return $"{user.Username}#{user.Discriminator}";
+                        else
+                            return $"";
                     case TagHandling.Sanitize:
                         if (guildUser != null && guildUser.Nickname == null)
                             return MentionUser($"{SanitizeChar}{tag.Key}", false);
@@ -166,7 +179,13 @@ namespace Discord
                         if (channel != null)
                             return $"#{channel.Name}";
                         else
-                            return $"#deleted-channel";
+                            return $"";
+                    case TagHandling.NameNoPrefix:
+                    case TagHandling.FullNameNoPrefix:
+                        if (channel != null)
+                            return $"{channel.Name}";
+                        else
+                            return $"";
                     case TagHandling.Sanitize:
                         return MentionChannel($"{SanitizeChar}{tag.Key}");
                 }
@@ -185,7 +204,13 @@ namespace Discord
                         if (role != null)
                             return $"@{role.Name}";
                         else
-                            return $"@deleted-role";
+                            return $"";
+                    case TagHandling.NameNoPrefix:
+                    case TagHandling.FullNameNoPrefix:
+                        if (role != null)
+                            return $"{role.Name}";
+                        else
+                            return $"";
                     case TagHandling.Sanitize:
                         return MentionRole($"{SanitizeChar}{tag.Key}");
                 }
@@ -200,7 +225,9 @@ namespace Discord
                 {
                     case TagHandling.Name:
                     case TagHandling.FullName:
-                        return "@everyone";
+                    case TagHandling.NameNoPrefix:
+                    case TagHandling.FullNameNoPrefix:
+                        return "everyone";
                     case TagHandling.Sanitize:
                         return $"@{SanitizeChar}everyone";
                 }
@@ -215,9 +242,11 @@ namespace Discord
                 {
                     case TagHandling.Name:
                     case TagHandling.FullName:
-                        return "@everyone";
+                    case TagHandling.NameNoPrefix:
+                    case TagHandling.FullNameNoPrefix:
+                        return "here";
                     case TagHandling.Sanitize:
-                        return $"@{SanitizeChar}everyone";
+                        return $"@{SanitizeChar}here";
                 }
             }
             return "";
@@ -232,8 +261,11 @@ namespace Discord
                     case TagHandling.Name:
                     case TagHandling.FullName:
                         return $":{emoji.Name}:";
+                    case TagHandling.NameNoPrefix:
+                    case TagHandling.FullNameNoPrefix:
+                        return $"{emoji.Name}";
                     case TagHandling.Sanitize:
-                        return $"<@{SanitizeChar}everyone";
+                        return $"<{emoji.Id}{SanitizeChar}:{SanitizeChar}{emoji.Name}>";
                 }
             }
             return "";
