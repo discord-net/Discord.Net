@@ -31,14 +31,15 @@ namespace Discord.Commands
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
         }
 
-        private static List<string> BuildAliases(ModuleBuilder builder)
+        private static IEnumerable<string> BuildAliases(ModuleBuilder builder)
         {
             IEnumerable<string> result = null;
 
             Stack<ModuleBuilder> builderStack = new Stack<ModuleBuilder>();
+            builderStack.Push(builder);
 
-            ModuleBuilder parent = builder;
-            while (parent.ParentModule != null)
+            ModuleBuilder parent = builder.ParentModule;
+            while (parent != null)
             {
                 builderStack.Push(parent);
                 parent = parent.ParentModule;
@@ -49,11 +50,13 @@ namespace Discord.Commands
                 ModuleBuilder level = builderStack.Pop(); // get the topmost builder
                 if (result == null)
                     result = level.Aliases.ToList(); // create a shallow copy so we don't overwrite the builder unexpectedly
-                else
+                else if (result.Count() > level.Aliases.Count)
                     result = result.Permutate(level.Aliases, (first, second) => first + " " + second);
+                else
+                    result = level.Aliases.Permutate(result, (second, first) => first + " " + second);
             }
 
-            return result.ToList();
+            return result;
         }
 
         private static List<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)

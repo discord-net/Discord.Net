@@ -11,10 +11,8 @@ namespace Discord.Commands
 {
     public class CommandService
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(ModuleBase).GetTypeInfo();
-
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _moduleDefs;
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _moduleDefs; 
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
         private readonly CommandMap _map;
 
@@ -71,16 +69,18 @@ namespace Discord.Commands
             try
             {
                 var typeInfo = typeof(T).GetTypeInfo();
-                if (!_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                    throw new ArgumentException($"Modules must inherit ModuleBase.");
-
-                if (typeInfo.IsAbstract)
-                    throw new InvalidOperationException("Modules must not be abstract.");
 
                 if (_moduleDefs.ContainsKey(typeof(T)))
                     throw new ArgumentException($"This module has already been added.");
 
-                return AddModuleInternal(typeInfo);
+                var module = ModuleClassBuilder.Build(this, typeInfo).First();
+
+                _moduleDefs[typeof(T)] = module;
+
+                foreach (var cmd in module.Commands)
+                    _map.AddCommand(cmd);
+
+                return module;
             }
             finally
             {
@@ -93,35 +93,13 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                foreach (var type in assembly.ExportedTypes)
-                {
-                    if (!_moduleDefs.ContainsKey(type))
-                    {
-                        var typeInfo = type.GetTypeInfo();
-                        if (_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                        {
-                            var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
-                            if (dontAutoLoad == null && !typeInfo.IsAbstract)
-                                moduleDefs.Add(AddModuleInternal(typeInfo));
-                        }
-                    }
-                }
-                return moduleDefs.ToImmutable();
+                var types = ModuleClassBuilder.Search(assembly);
+                return ModuleClassBuilder.Build(types, this).ToImmutableArray();
             }
             finally
             {
                 _moduleLock.Release();
             }
-        }
-        private ModuleInfo AddModuleInternal(TypeInfo typeInfo)
-        {
-            var moduleDef = new ModuleInfo(typeInfo, this);
-            _moduleDefs[typeInfo.AsType()] = moduleDef;
-
-            foreach (var cmd in moduleDef.Commands)
-                _map.AddCommand(cmd);
-
-            return moduleDef;
         }
 
         public async Task<bool> RemoveModule(ModuleInfo module)
@@ -129,7 +107,11 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return RemoveModuleInternal(module.Source.BaseType);
+                var type = _moduleDefs.FirstOrDefault(x => x.Value == module);
+                if (default(KeyValuePair<Type, ModuleInfo>).Key == type.Key)
+                    throw new KeyNotFoundException($"Could not find the key for the module {module?.Name ?? module?.Aliases?.FirstOrDefault()}");
+
+                return RemoveModuleInternal(type.Key);
             }
             finally
             {

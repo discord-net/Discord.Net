@@ -12,16 +12,16 @@ namespace Discord.Commands.Builders
         private List<string> aliases;
 
         public ModuleBuilder()
-            : this(null)
-        { }
-
-        internal ModuleBuilder(ModuleBuilder parent)
         {
             commands = new List<CommandBuilder>();
             submodules = new List<ModuleBuilder>();
             preconditions = new List<PreconditionAttribute>();
             aliases = new List<string>();
-            
+        }
+
+        internal ModuleBuilder(ModuleBuilder parent)
+            : this()
+        {
             ParentModule = parent;
         }
 

@@ -39,6 +39,7 @@ namespace Discord.Commands.Builders
 
         public ParameterBuilder SetDefault<T>(T defaultValue)
         {
+            Optional = true;
             DefaultValue = defaultValue;
             ParameterType = typeof(T);
 

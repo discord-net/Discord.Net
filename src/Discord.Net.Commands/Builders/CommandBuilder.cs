@@ -22,7 +22,7 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
-        public Func<CommandContext, object[], Task> Callback { get; set; }
+        public Func<CommandContext, object[], IDependencyMap, Task> Callback { get; set; }
         public ModuleBuilder Module { get; }
 
         public List<PreconditionAttribute> Preconditions => preconditions;
@@ -47,7 +47,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public CommandBuilder SetCallback(Func<CommandContext, object[], Task> callback)
+        public CommandBuilder SetCallback(Func<CommandContext, object[], IDependencyMap, Task> callback)
         {
             Callback = callback;
             return this;
