@@ -1,6 +1,5 @@
 ﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
-  
   <PropertyGroup>
     <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
     <VersionPrefix>1.0.0-beta2</VersionPrefix>
@@ -14,49 +13,44 @@
     <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dotnet5.4;dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
     <EmbeddedResource Include="compiler\resources\**\*" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">
       <Version>1.0.0-alpha-20161104-2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="NETStandard.Library">
-      <Version>1.6.0</Version>
-    </PackageReference>
     <PackageReference Include="System.IO.Compression">
-      <Version>4.1.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.NameResolution">
-      <Version>4.0.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Sockets">
-      <Version>4.1.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.WebSockets.Client">
-      <Version>4.0.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.InteropServices">
-      <Version>4.1.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
-
+  <PropertyGroup Label="Configuration">
+    <SignAssembly>False</SignAssembly>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
     <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
     <WarningsAsErrors>true</WarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
