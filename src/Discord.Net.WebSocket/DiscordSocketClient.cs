@@ -1293,9 +1293,9 @@ namespace Discord.WebSocket
 
                                         var msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
                                         if (msg != null)
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel as SocketChannel, msg).ConfigureAwait(false);
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel, msg).ConfigureAwait(false);
                                         else
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel as SocketChannel, Optional.Create<SocketMessage>()).ConfigureAwait(false);
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel, Optional.Create<SocketMessage>()).ConfigureAwait(false);
                                     }
                                     else
                                     {
