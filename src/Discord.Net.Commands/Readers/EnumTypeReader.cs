@@ -32,12 +32,10 @@ namespace Discord.Commands
             var byNameBuilder = ImmutableDictionary.CreateBuilder<string, object>();
             var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
             
-            foreach (var v in Enum.GetNames(_enumType))
+            foreach (var v in Enum.GetValues(_enumType))
             {
-                byNameBuilder.Add(v.ToLower(), v);
-                var parsedValue = (T)Enum.Parse(_enumType, v);
-                if (!byValueBuilder.ContainsKey(parsedValue))
-                    byValueBuilder.Add(parsedValue, v);
+                byNameBuilder.Add(v.ToString().ToLower(), v);
+                byValueBuilder.Add((T)v, v);
             }
 
             _enumsByName = byNameBuilder.ToImmutable();
