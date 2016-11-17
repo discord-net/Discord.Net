@@ -30,4 +30,4 @@ The .NET Core and Docker (Preview) workload is required during Visual Studio ins
 ## Known Issues
 
 ### WebSockets (Win7 and earlier)
-The .Net Core 1.1 does not support WebSockets on Win7 and earlier. Track the issue [here](https://github.com/dotnet/corefx/issues/9503).
+.Net Core 1.1 does not support WebSockets on Win7 and earlier. Track the issue [here](https://github.com/dotnet/corefx/issues/9503).
