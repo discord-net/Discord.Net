@@ -37,7 +37,7 @@ namespace Discord.Commands
                 var parsedValue = Enum.Parse(_enumType, v);
                 byNameBuilder.Add(v.ToLower(), parsedValue);
                 if (!byValueBuilder.ContainsKey((T)parsedValue))
-                    byValueBuilder.Add((T)parsedValue, v);
+                    byValueBuilder.Add((T)parsedValue, parsedValue);
             }
 
             _enumsByName = byNameBuilder.ToImmutable();
