@@ -19,12 +19,13 @@ Bleeding edge builds are available using our MyGet feed (`https://www.myget.org/
 ## Compiling
 In order to compile Discord.Net, you require the following:
 
-### Using Visual Studio 2017
-- [VS2017 RC](https://www.microsoft.com/net/core#windows)
-- [.Net Core 1.1 VS Plugin](https://www.microsoft.com/net/core#windows)
+### Using Visual Studio
+- [Visual Studio 2017 RC](https://www.microsoft.com/net/core#windowsvs2017)
+
+The .NET Core and Docker (Preview) workload is required during Visual Studio installation.
 
 ### Using Command Line
-- [.Net Core 1.1 SDK](https://www.microsoft.com/net/core)
+- [.Net Core 1.1 SDK](https://www.microsoft.com/net/download/core)
 
 ## Known Issues
 
