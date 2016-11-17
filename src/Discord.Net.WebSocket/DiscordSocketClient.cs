@@ -1280,22 +1280,22 @@ namespace Discord.WebSocket
                             case "MESSAGE_DELETE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
-                                    
+
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
                                         if (!((channel as SocketGuildChannel)?.Guild.IsSynced ?? true))
-                                        { 
+                                        {
                                             await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE, guild is not synced yet.").ConfigureAwait(false);
                                             return;
                                         }
 
                                         var msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
                                         if (msg != null)
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, msg).ConfigureAwait(false);
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel as SocketChannel, msg).ConfigureAwait(false);
                                         else
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<SocketMessage>()).ConfigureAwait(false);
+                                            await _messageDeletedEvent.InvokeAsync(data.Id, channel as SocketChannel, Optional.Create<SocketMessage>()).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1322,9 +1322,9 @@ namespace Discord.WebSocket
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
                                             if (msg != null)
-                                                await _messageDeletedEvent.InvokeAsync(id, msg).ConfigureAwait(false);
+                                                await _messageDeletedEvent.InvokeAsync(id, channel as SocketChannel, msg).ConfigureAwait(false);
                                             else
-                                                await _messageDeletedEvent.InvokeAsync(id, Optional.Create<SocketMessage>()).ConfigureAwait(false);
+                                                await _messageDeletedEvent.InvokeAsync(id, channel as SocketChannel, Optional.Create<SocketMessage>()).ConfigureAwait(false);
                                         }
                                     }
                                     else

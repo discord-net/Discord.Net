@@ -59,12 +59,12 @@ namespace Discord.WebSocket
             remove { _messageReceivedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<SocketMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<SocketMessage, Task>>();
-        public event Func<ulong, Optional<SocketMessage>, Task> MessageDeleted
+        public event Func<ulong, SocketChannel, Optional<SocketMessage>, Task> MessageDeleted
         {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<ulong, Optional<SocketMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, Optional<SocketMessage>, Task>>();
+        private readonly AsyncEvent<Func<ulong, SocketChannel, Optional<SocketMessage>, Task>> _messageDeletedEvent = new AsyncEvent<Func<ulong, SocketChannel, Optional<SocketMessage>, Task>>();
         public event Func<Optional<SocketMessage>, SocketMessage, Task> MessageUpdated
         {
             add { _messageUpdatedEvent.Add(value); }
