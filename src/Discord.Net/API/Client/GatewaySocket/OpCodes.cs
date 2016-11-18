@@ -18,7 +18,13 @@
         Resume = 6,
         /// <summary> C←S - Used to notify a client that they must reconnect to another gateway. </summary>
         Reconnect = 7,
-        /// <summary> C→S - Used to request all members that were withheld by large_threshold </summary>
-        RequestGuildMembers = 8
+        /// <summary> C→S - Used to request all members that were withheld by large_threshold. </summary>
+        RequestGuildMembers = 8,
+        /// <summary> C←S - Used to notify the client of an invalid session id. </summary>
+        InvalidSession = 9,
+        /// <summary> C←S - Used to receive heartbeat_interval information and initiate the websocket connection. </summary>
+        Hello = 10,
+        /// <summary> C←S - Used to acknowledge a heartbeat by the client. </summary>
+        HeartbeatACK = 11
     }
 }
