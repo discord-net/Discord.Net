@@ -91,8 +91,9 @@ namespace Discord.Commands
                     builder.AddAliases((attribute as AliasAttribute).Aliases);
                 else if (attribute is GroupAttribute)
                 {
-                    builder.Name = builder.Name ?? (attribute as GroupAttribute).Prefix;
-                    builder.AddAliases((attribute as GroupAttribute).Prefix);
+                    var groupAttr = attribute as GroupAttribute;
+                    builder.Name = builder.Name ?? groupAttr.Prefix;
+                    builder.AddAliases(groupAttr.Prefix);
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
@@ -132,8 +133,6 @@ namespace Discord.Commands
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
                     builder.AddAliases((attribute as AliasAttribute).Aliases);
-                else if (attribute is GroupAttribute)
-                    builder.AddAliases((attribute as GroupAttribute).Prefix);
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
