@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
+using UserModel = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -68,7 +69,7 @@ namespace Discord.Rest
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? await (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).ConfigureAwait(false) : null;
             var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
-            var author = guild != null ? await guild.GetUserAsync(model.Author.Value.Id, CacheMode.CacheOnly).ConfigureAwait(false) : null;
+            var author = GetAuthor(client, guild, model.Author.Value);
             return RestMessage.Create(client, channel, author, model);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
@@ -96,7 +97,7 @@ namespace Discord.Rest
                     var builder = ImmutableArray.CreateBuilder<RestMessage>();
                     foreach (var model in models)
                     {
-                        var author = guild != null ? await guild.GetUserAsync(model.Author.Value.Id, CacheMode.CacheOnly).ConfigureAwait(false) : null;
+                        var author = GetAuthor(client, guild, model.Author.Value);
                         builder.Add(RestMessage.Create(client, channel, author, model));                        
                     }
                     return builder.ToImmutable();
@@ -124,7 +125,7 @@ namespace Discord.Rest
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
             foreach (var model in models)
             {
-                var author = guild != null ? await guild.GetUserAsync(model.Author.Value.Id, CacheMode.CacheOnly).ConfigureAwait(false) : null;
+                var author = GetAuthor(client, guild, model.Author.Value);
                 builder.Add(RestMessage.Create(client, channel, author, model));
             }
             return builder.ToImmutable();
@@ -237,5 +238,16 @@ namespace Discord.Rest
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client, 
             RequestOptions options)
             => new TypingNotifier(client, channel, options);
+
+        //Helpers
+        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model)
+        {
+            IUser author = null;
+            if (guild != null)
+                author = guild.GetUserAsync(model.Id, CacheMode.CacheOnly).Result;
+            if (author == null)
+                author = RestUser.Create(client, model);
+            return author;
+        }
     }
 }
