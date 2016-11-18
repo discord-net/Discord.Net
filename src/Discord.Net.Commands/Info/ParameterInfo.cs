@@ -16,11 +16,11 @@ namespace Discord.Commands
 
             Name = builder.Name;
             Summary = builder.Summary;
-            IsOptional = builder.Optional;
-            IsRemainder = builder.Remainder;
-            IsMultiple = builder.Multiple;
+            IsOptional = builder.IsOptional;
+            IsRemainder = builder.IsRemainder;
+            IsMultiple = builder.IsMultiple;
 
-            ParameterType = builder.ParameterType;
+            Type = builder.ParameterType;
             DefaultValue = builder.DefaultValue;
 
             _reader = builder.TypeReader;
@@ -32,7 +32,7 @@ namespace Discord.Commands
         public bool IsOptional { get; }
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
-        public Type ParameterType { get; }
+        public Type Type { get; }
         public object DefaultValue { get; }
 
         public async Task<TypeReaderResult> Parse(CommandContext context, string input)

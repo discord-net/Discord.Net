@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -41,11 +40,11 @@ namespace Discord.Commands
             Stack<ModuleBuilder> builderStack = new Stack<ModuleBuilder>();
             builderStack.Push(builder);
 
-            ModuleBuilder parent = builder.ParentModule;
+            ModuleBuilder parent = builder.Parent;
             while (parent != null)
             {
                 builderStack.Push(parent);
-                parent = parent.ParentModule;
+                parent = parent.Parent;
             }
 
             while (builderStack.Count() > 0)
@@ -82,7 +81,7 @@ namespace Discord.Commands
             while (parent != null)
             {
                 result.AddRange(parent.Preconditions);
-                parent = parent.ParentModule;
+                parent = parent.Parent;
             }
 
             return result;

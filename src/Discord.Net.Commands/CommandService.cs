@@ -67,12 +67,12 @@ namespace Discord.Commands
         }
 
         //Modules
-        public async Task<ModuleInfo> BuildModule(Action<ModuleBuilder> buildFunc)
+        public async Task<ModuleInfo> CreateModuleAsync(string primaryAlias, Action<ModuleBuilder> buildFunc)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var builder = new ModuleBuilder();
+                var builder = new ModuleBuilder(this, null, primaryAlias);
                 buildFunc(builder);
 
                 var module = builder.Build(this);
@@ -83,7 +83,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<ModuleInfo> AddModule<T>()
+        public async Task<ModuleInfo> AddModuleAsync<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -107,7 +107,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -141,7 +141,7 @@ namespace Discord.Commands
             return module;
         }
 
-        public async Task<bool> RemoveModule(ModuleInfo module)
+        public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -153,7 +153,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> RemoveModule<T>()
+        public async Task<bool> RemoveModuleAsync<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -217,9 +217,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
-            => Execute(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
-        public async Task<IResult> Execute(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
+        public async Task<IResult> ExecuteAsync(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             dependencyMap = dependencyMap ?? DependencyMap.Empty;
 
@@ -230,7 +230,7 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditions(context, dependencyMap).ConfigureAwait(false);
+                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -239,7 +239,7 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var parseResult = await commands[i].Parse(context, searchResult, preconditionResult).ConfigureAwait(false);
+                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)

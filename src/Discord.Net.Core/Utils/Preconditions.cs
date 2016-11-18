@@ -5,45 +5,49 @@ namespace Discord
     internal static class Preconditions
     {
         //Objects
-        public static void NotNull<T>(T obj, string name, string msg = null) where T : class { if (obj == null) throw new ArgumentNullException(name); }
-        public static void NotNull<T>(Optional<T> obj, string name, string msg = null) where T : class { if (obj.IsSpecified && obj.Value == null) throw new ArgumentNullException(name); }
+        public static void NotNull<T>(T obj, string name, string msg = null) where T : class { if (obj == null) throw CreateNotNullException(name, msg); }
+        public static void NotNull<T>(Optional<T> obj, string name, string msg = null) where T : class { if (obj.IsSpecified && obj.Value == null) throw CreateNotNullException(name, msg); }
+
+        private static ArgumentNullException CreateNotNullException(string name, string msg)
+        {
+            if (msg == null) return new ArgumentNullException(name);
+            else return new ArgumentNullException(name, msg);
+        }
 
         //Strings
-        public static void NotEmpty(string obj, string name, string msg = null) { if (obj.Length == 0) throw new ArgumentException("Argument cannot be empty.", name); }
-        public static void NotEmpty(Optional<string> obj, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length == 0) throw new ArgumentException("Argument cannot be empty.", name); }
+        public static void NotEmpty(string obj, string name, string msg = null) { if (obj.Length == 0) throw CreateNotEmptyException(name, msg); }
+        public static void NotEmpty(Optional<string> obj, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length == 0) throw CreateNotEmptyException(name, msg); }
         public static void NotNullOrEmpty(string obj, string name, string msg = null)
         {
-            if (obj == null)
-                throw new ArgumentNullException(name);
-            if (obj.Length == 0)
-                throw new ArgumentException("Argument cannot be empty.", name);
+            if (obj == null) throw CreateNotNullException(name, msg);
+            if (obj.Length == 0) throw CreateNotEmptyException(name, msg);
         }
         public static void NotNullOrEmpty(Optional<string> obj, string name, string msg = null)
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null)
-                    throw new ArgumentNullException(name);
-                if (obj.Value.Length == 0)
-                    throw new ArgumentException("Argument cannot be empty.", name);
+                if (obj.Value == null) throw CreateNotNullException(name, msg);
+                if (obj.Value.Length == 0) throw CreateNotEmptyException(name, msg);
             }
         }
         public static void NotNullOrWhitespace(string obj, string name, string msg = null)
         {
-            if (obj == null)
-                throw new ArgumentNullException(name);
-            if (obj.Trim().Length == 0)
-                throw new ArgumentException("Argument cannot be blank.", name);
+            if (obj == null) throw CreateNotNullException(name, msg);
+            if (obj.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
         }
         public static void NotNullOrWhitespace(Optional<string> obj, string name, string msg = null)
         {
             if (obj.IsSpecified)
             {
-                if (obj.Value == null)
-                    throw new ArgumentNullException(name);
-                if (obj.Value.Trim().Length == 0)
-                    throw new ArgumentException("Argument cannot be blank.", name);
+                if (obj.Value == null) throw CreateNotNullException(name, msg);
+                if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
             }
+        }
+
+        private static ArgumentException CreateNotEmptyException(string name, string msg)
+        {
+            if (msg == null) return new ArgumentException(name, "Argument cannot be blank.");
+            else return new ArgumentException(name, msg);
         }
 
         //Numerics
@@ -82,10 +86,8 @@ namespace Discord
 
         private static ArgumentException CreateNotEqualException<T>(string name, string msg, T value)
         {
-            if (msg == null)
-                throw new ArgumentException($"Value may not be equal to {value}", name);
-            else
-                throw new ArgumentException(msg, name);
+            if (msg == null) return new ArgumentException($"Value may not be equal to {value}", name);
+            else return new ArgumentException(msg, name);
         }
 
         public static void AtLeast(sbyte obj, sbyte value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
@@ -107,10 +109,8 @@ namespace Discord
 
         private static ArgumentException CreateAtLeastException<T>(string name, string msg, T value)
         {
-            if (msg == null)
-                throw new ArgumentException($"Value must be at least {value}", name);
-            else
-                throw new ArgumentException(msg, name);
+            if (msg == null) return new ArgumentException($"Value must be at least {value}", name);
+            else return new ArgumentException(msg, name);
         }
 
         public static void GreaterThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj <= value) throw CreateGreaterThanException(name, msg, value); }
@@ -132,10 +132,8 @@ namespace Discord
 
         private static ArgumentException CreateGreaterThanException<T>(string name, string msg, T value)
         {
-            if (msg == null)
-                throw new ArgumentException($"Value must be greater than {value}", name);
-            else
-                throw new ArgumentException(msg, name);
+            if (msg == null) return new ArgumentException($"Value must be greater than {value}", name);
+            else return new ArgumentException(msg, name);
         }
 
         public static void AtMost(sbyte obj, sbyte value, string name, string msg = null) { if (obj > value) throw CreateAtMostException(name, msg, value); }
@@ -157,10 +155,8 @@ namespace Discord
 
         private static ArgumentException CreateAtMostException<T>(string name, string msg, T value)
         {
-            if (msg == null)
-                throw new ArgumentException($"Value must be at most {value}", name);
-            else
-                throw new ArgumentException(msg, name);
+            if (msg == null) return new ArgumentException($"Value must be at most {value}", name);
+            else return new ArgumentException(msg, name);
         }
 
         public static void LessThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj >= value) throw CreateLessThanException(name, msg, value); }
@@ -182,10 +178,8 @@ namespace Discord
 
         private static ArgumentException CreateLessThanException<T>(string name, string msg, T value)
         {
-            if (msg == null)
-                throw new ArgumentException($"Value must be less than {value}", name);
-            else
-                throw new ArgumentException(msg, name);
+            if (msg == null) return new ArgumentException($"Value must be less than {value}", name);
+            else return new ArgumentException(msg, name);
         }
     }
 }

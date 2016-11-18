@@ -1,95 +1,39 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Discord.Commands
 {
     internal class CommandMap
     {
-        static readonly char[] _whitespaceChars = new char[] { ' ', '\r', '\n' };
-        private readonly object _lockObj = new object();
-
-        private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
+        private readonly CommandMapNode _root;
+        private static readonly string[] _blankAliases = new[] { "" };
 
         public CommandMap()
         {
-            _nodes = new ConcurrentDictionary<string, CommandMapNode>();
+            _root = new CommandMapNode("");
         }
 
         public void AddCommand(CommandInfo command)
         {
-            foreach (string text in command.Aliases)
-            {
-                int nextSpace = NextWhitespace(text);
-                string name;
-
-                if (nextSpace == -1)
-                    name = text;
-                else
-                    name = text.Substring(0, nextSpace);
-
-                lock (_lockObj)
-                {
-                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
-                    nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
-                }
-            }
+            foreach (string text in GetAliases(command))
+                _root.AddCommand(text, 0, command);
         }
         public void RemoveCommand(CommandInfo command)
         {
-            foreach (string text in command.Aliases)
-            {
-                int nextSpace = NextWhitespace(text);
-                string name;
-
-                if (nextSpace == -1)
-                    name = text;
-                else
-                    name = text.Substring(0, nextSpace);
-
-                lock (_lockObj)
-                {
-                    CommandMapNode nextNode;
-                    if (_nodes.TryGetValue(name, out nextNode))
-                    {
-                        nextNode.RemoveCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
-                        if (nextNode.IsEmpty)
-                            _nodes.TryRemove(name, out nextNode);
-                    }
-                }
-            }
+            foreach (string text in GetAliases(command))
+                _root.RemoveCommand(text, 0, command);
         }
 
         public IEnumerable<CommandInfo> GetCommands(string text)
         {
-            int nextSpace = NextWhitespace(text);
-            string name;
-
-            if (nextSpace == -1)
-                name = text;
-            else
-                name = text.Substring(0, nextSpace);
-
-            lock (_lockObj)
-            {
-                CommandMapNode nextNode;
-                if (_nodes.TryGetValue(name, out nextNode))
-                    return nextNode.GetCommands(text, nextSpace + 1);
-                else
-                    return Enumerable.Empty<CommandInfo>();
-            }
+            return _root.GetCommands(text, 0);
         }
 
-        private static int NextWhitespace(string text)
+        private IReadOnlyList<string> GetAliases(CommandInfo command)
         {
-            int lowest = int.MaxValue;
-            for (int i = 0; i < _whitespaceChars.Length; i++)
-            {
-                int index = text.IndexOf(_whitespaceChars[i]);
-                if (index != -1 && index < lowest)
-                    lowest = index;
-            }
-            return (lowest != int.MaxValue) ? lowest : -1;
+            var aliases = command.Aliases;
+            if (aliases.Count == 0)
+                return _blankAliases;
+            return aliases;
         }
     }
 }

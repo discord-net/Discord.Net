@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -6,6 +7,8 @@ namespace Discord.Commands
 {
     internal class CommandMapNode
     {
+        private static readonly char[] _whitespaceChars = new char[] { ' ', '\r', '\n' };
+
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
         private readonly object _lockObj = new object();
@@ -22,13 +25,17 @@ namespace Discord.Commands
 
         public void AddCommand(string text, int index, CommandInfo command)
         {
-            int nextSpace = text.IndexOf(' ', index);
+            int nextSpace = NextWhitespace(text, index);
             string name;
 
             lock (_lockObj)
             {
                 if (text == "")
+                {
+                    if (_name == "")
+                        throw new InvalidOperationException("Cannot add commands to the root node.");
                     _commands = _commands.Add(command);
+                }
                 else
                 {
                     if (nextSpace == -1)
@@ -43,7 +50,7 @@ namespace Discord.Commands
         }
         public void RemoveCommand(string text, int index, CommandInfo command)
         {
-            int nextSpace = text.IndexOf(' ', index);
+            int nextSpace = NextWhitespace(text, index);
             string name;
 
             lock (_lockObj)
@@ -70,7 +77,7 @@ namespace Discord.Commands
 
         public IEnumerable<CommandInfo> GetCommands(string text, int index)
         {
-            int nextSpace = text.IndexOf(' ', index);
+            int nextSpace = NextWhitespace(text, index);
             string name;
 
             var commands = _commands;
@@ -91,6 +98,18 @@ namespace Discord.Commands
                         yield return cmd;
                 }
             }
+        }
+
+        private static int NextWhitespace(string text, int startIndex)
+        {
+            int lowest = int.MaxValue;
+            for (int i = 0; i < _whitespaceChars.Length; i++)
+            {
+                int index = text.IndexOf(_whitespaceChars[i], startIndex);
+                if (index != -1 && index < lowest)
+                    lowest = index;
+            }
+            return (lowest != int.MaxValue) ? lowest : -1;
         }
     }
 }

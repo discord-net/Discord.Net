@@ -40,11 +40,11 @@ namespace Discord.Commands
 
             foreach (var typeInfo in topLevelGroups)
             {
-                // this shouldn't be the case; may be safe to remove?
+                // TODO: This shouldn't be the case; may be safe to remove?
                 if (result.ContainsKey(typeInfo.AsType()))
                     continue;
 
-                var module = new ModuleBuilder();
+                var module = new ModuleBuilder(service, null);
 
                 BuildModule(module, typeInfo, service);
                 BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
@@ -65,7 +65,7 @@ namespace Discord.Commands
                 if (builtTypes.Contains(typeInfo))
                     continue;
                 
-                builder.AddSubmodule((module) => {
+                builder.AddModule((module) => {
                     BuildModule(module, typeInfo, service);
                     BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
                 });
@@ -88,16 +88,19 @@ namespace Discord.Commands
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
-                    builder.AddAliases((attribute as AliasAttribute).Aliases);
+                    builder.AddAlias((attribute as AliasAttribute).Aliases);
                 else if (attribute is GroupAttribute)
                 {
                     var groupAttr = attribute as GroupAttribute;
                     builder.Name = builder.Name ?? groupAttr.Prefix;
-                    builder.AddAliases(groupAttr.Prefix);
+                    builder.AddAlias(groupAttr.Prefix);
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
+
+            if (builder.Name == null)
+                builder.Name = typeInfo.Name;
 
             var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
 
@@ -168,7 +171,7 @@ namespace Discord.Commands
 
             builder.Name = paramInfo.Name;
 
-            builder.Optional = paramInfo.IsOptional;
+            builder.IsOptional = paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.HasDefaultValue ? paramInfo.DefaultValue : null;
 
             foreach (var attribute in attributes)
@@ -178,7 +181,7 @@ namespace Discord.Commands
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is ParamArrayAttribute)
                 {
-                    builder.Multiple = true;
+                    builder.IsMultiple = true;
                     paramType = paramType.GetElementType();
                 }
                 else if (attribute is RemainderAttribute)
@@ -186,7 +189,7 @@ namespace Discord.Commands
                     if (position != count-1)
                         throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
                     
-                    builder.Remainder = true;
+                    builder.IsRemainder = true;
                 }
             }
 
