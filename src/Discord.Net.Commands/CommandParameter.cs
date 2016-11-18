@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -18,6 +20,7 @@ namespace Discord.Commands
         public bool IsMultiple { get; }
         public Type ElementType { get; }
         public object DefaultValue { get; }
+        public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
 
         public CommandParameter(ParameterInfo source, string name, string summary, Type type, TypeReader reader, bool isOptional, bool isRemainder, bool isMultiple, object defaultValue)
         {
@@ -30,11 +33,29 @@ namespace Discord.Commands
             IsRemainder = isRemainder;
             IsMultiple = isMultiple;
             DefaultValue = defaultValue;
+            Preconditions = BuildPreconditions(source);
         }
 
         public async Task<TypeReaderResult> Parse(CommandContext context, string input)
         {
             return await _reader.Read(context, input).ConfigureAwait(false);
+        }
+
+        public async Task<PreconditionResult> CheckPreconditions(CommandContext context, IDependencyMap map = null)
+        {
+            foreach (ParameterPreconditionAttribute precondition in Preconditions)
+            {
+                var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
+            }
+
+            return PreconditionResult.FromSuccess();
+        }
+
+        private IReadOnlyList<ParameterPreconditionAttribute> BuildPreconditions(ParameterInfo paramInfo)
+        {
+            return paramInfo.GetCustomAttributes<ParameterPreconditionAttribute>().ToImmutableArray();
         }
 
         public override string ToString() => Name;

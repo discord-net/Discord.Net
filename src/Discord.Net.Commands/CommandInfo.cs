@@ -104,6 +104,13 @@ namespace Discord.Commands
                     return result;
             }
 
+            foreach (CommandParameter parameter in Parameters)
+            {
+                var result = await parameter.CheckPreconditions(context, map).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return result;
+            }
+
             return PreconditionResult.FromSuccess();
         }
 
