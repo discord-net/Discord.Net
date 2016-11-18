@@ -157,10 +157,10 @@ namespace Discord.Net.WebSockets
             var msg = new IdentifyCommand()
             {
                 Token = token,
-                Properties = props, 
+                Properties = props,
                 LargeThreshold = _config.LargeThreshold,
                 UseCompression = true,
-                ShardingParams = new int[] { shardId, totalShards },
+                ShardingParams = token.StartsWith("Bot ") ? new int[] { shardId, totalShards } : null
             };
 
             QueueMessage(msg);
