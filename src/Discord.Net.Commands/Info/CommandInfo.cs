@@ -1,88 +1,52 @@
-﻿using System;
-using System.Collections.Concurrent;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using System.Reflection;
+
+using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class CommandInfo
     {
-        private static readonly MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
+        private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
-        
+
         private readonly Func<CommandContext, object[], IDependencyMap, Task> _action;
 
-        public MethodInfo Source { get; }
         public ModuleInfo Module { get; }
         public string Name { get; }
         public string Summary { get; }
         public string Remarks { get; }
-        public string Text { get; }
         public int Priority { get; }
         public bool HasVarArgs { get; }
         public RunMode RunMode { get; }
+
         public IReadOnlyList<string> Aliases { get; }
-        public IReadOnlyList<CommandParameter> Parameters { get; }
+        public IReadOnlyList<ParameterInfo> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
 
-        internal CommandInfo(MethodInfo source, ModuleInfo module, CommandAttribute attribute, string groupPrefix)
+        internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
         {
-            try
-            {
-                Source = source;
-                Module = module;
+            Module = module;
+            
+            Name = builder.Name;
+            Summary = builder.Summary;
+            Remarks = builder.Remarks;
 
-                Name = source.Name;
+            RunMode = builder.RunMode;
+            Priority = builder.Priority;
 
-                if (attribute.Text == null)
-                    Text = groupPrefix;
-                RunMode = attribute.RunMode;
+            Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => first + " " + second).ToImmutableArray();
+            Preconditions = builder.Preconditions.ToImmutableArray();
 
-                if (groupPrefix != "")
-                    groupPrefix += " ";
+            Parameters = builder.Parameters.Select(x => x.Build(this, service)).ToImmutableArray();
+            HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].Multiple : false;
 
-                if (attribute.Text != null)
-                    Text = groupPrefix + attribute.Text;
-
-                var aliasesBuilder = ImmutableArray.CreateBuilder<string>();
-
-                aliasesBuilder.Add(Text);
-
-                var aliasesAttr = source.GetCustomAttribute<AliasAttribute>();
-                if (aliasesAttr != null)
-                    aliasesBuilder.AddRange(aliasesAttr.Aliases.Select(x => groupPrefix + x));
-
-                Aliases = aliasesBuilder.ToImmutable();
-
-                var nameAttr = source.GetCustomAttribute<NameAttribute>();
-                if (nameAttr != null)
-                    Name = nameAttr.Text;
-
-                var summary = source.GetCustomAttribute<SummaryAttribute>();
-                if (summary != null)
-                    Summary = summary.Text;
-
-                var remarksAttr = source.GetCustomAttribute<RemarksAttribute>();
-                if (remarksAttr != null)
-                    Remarks = remarksAttr.Text;
-
-                var priorityAttr = source.GetCustomAttribute<PriorityAttribute>();
-                Priority = priorityAttr?.Priority ?? 0;
-
-                Parameters = BuildParameters(source);
-                HasVarArgs = Parameters.Count > 0 ? Parameters[Parameters.Count - 1].IsMultiple : false;
-                Preconditions = BuildPreconditions(source);
-                _action = BuildAction(source);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to build command {source.DeclaringType.FullName}.{source.Name}", ex);
-            }
+            _action = builder.Callback;
         }
 
         public async Task<PreconditionResult> CheckPreconditions(CommandContext context, IDependencyMap map = null)
@@ -128,6 +92,7 @@ namespace Discord.Commands
 
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
+
         public Task<ExecuteResult> Execute(CommandContext context, ParseResult parseResult, IDependencyMap map)
         {
             if (!parseResult.IsSuccess)
@@ -179,72 +144,6 @@ namespace Discord.Commands
             }
         }
 
-        private IReadOnlyList<PreconditionAttribute> BuildPreconditions(MethodInfo methodInfo)
-        {
-            return methodInfo.GetCustomAttributes<PreconditionAttribute>().ToImmutableArray();
-        }
-
-        private IReadOnlyList<CommandParameter> BuildParameters(MethodInfo methodInfo)
-        {
-            var parameters = methodInfo.GetParameters();
-
-            var paramBuilder = ImmutableArray.CreateBuilder<CommandParameter>(parameters.Length);
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                var parameter = parameters[i];
-                var type = parameter.ParameterType;
-
-                //Detect 'params'
-                bool isMultiple = parameter.GetCustomAttribute<ParamArrayAttribute>() != null;
-                if (isMultiple)
-                    type = type.GetElementType();
-
-                var reader = Module.Service.GetTypeReader(type);
-                var typeInfo = type.GetTypeInfo();
-
-                //Detect enums
-                if (reader == null && typeInfo.IsEnum)
-                {
-                    reader = EnumTypeReader.GetReader(type);
-                    Module.Service.AddTypeReader(type, reader);
-                }
-
-                if (reader == null)
-                    throw new InvalidOperationException($"{type.FullName} is not supported as a command parameter, are you missing a TypeReader?");
-
-                bool isRemainder = parameter.GetCustomAttribute<RemainderAttribute>() != null;
-                if (isRemainder && i != parameters.Length - 1)
-                    throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
-
-                string name = parameter.Name;
-                string summary = parameter.GetCustomAttribute<SummaryAttribute>()?.Text;
-                bool isOptional = parameter.IsOptional;
-                object defaultValue = parameter.HasDefaultValue ? parameter.DefaultValue : null;
-
-                paramBuilder.Add(new CommandParameter(parameters[i], name, summary, type, reader, isOptional, isRemainder, isMultiple, defaultValue));
-            }
-            return paramBuilder.ToImmutable();
-        }
-        private Func<CommandContext, object[], IDependencyMap, Task> BuildAction(MethodInfo methodInfo)
-        {
-            if (methodInfo.ReturnType != typeof(Task))
-                throw new InvalidOperationException("Commands must return a non-generic Task.");
-
-            return (context, args, map) =>
-            {
-                var instance = Module.CreateInstance(map);
-                instance.Context = context;
-                try
-                {
-                    return methodInfo.Invoke(instance, args) as Task ?? Task.CompletedTask;
-                }
-                finally
-                {
-                    (instance as IDisposable)?.Dispose();
-                }
-            };
-        }
-
         private object[] GenerateArgs(IEnumerable<object> argList, IEnumerable<object> paramsList)
         {
             int argCount = Parameters.Count;
@@ -264,7 +163,7 @@ namespace Discord.Commands
 
             if (HasVarArgs)
             {
-                var func = _arrayConverters.GetOrAdd(Parameters[Parameters.Count - 1].ElementType, t =>
+                var func = _arrayConverters.GetOrAdd(Parameters[Parameters.Count - 1].ParameterType, t =>
                 {
                     var method = _convertParamsMethod.MakeGenericMethod(t);
                     return (Func<IEnumerable<object>, object>)method.CreateDelegate(typeof(Func<IEnumerable<object>, object>));
@@ -277,8 +176,5 @@ namespace Discord.Commands
 
         private static T[] ConvertParamsList<T>(IEnumerable<object> paramsList)
             => paramsList.Cast<T>().ToArray();
-
-        public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Module.Name}.{Name} ({Text})";
     }
 }
