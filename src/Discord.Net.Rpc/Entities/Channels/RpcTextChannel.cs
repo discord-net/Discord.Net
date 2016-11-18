@@ -39,22 +39,22 @@ namespace Discord.Rpc
 
         //TODO: Use RPC cache
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
-            => ChannelHelper.GetMessageAsync(this, Discord, id, null, options);
+            => ChannelHelper.GetMessageAsync(this, Discord, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
-            => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, null, options);
+            => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, null, options);
+            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
-            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, null, options);
+            => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, options);
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
-            => ChannelHelper.GetPinnedMessagesAsync(this, Discord, null, options);
+            => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, EmbedBuilder embed = null, RequestOptions options = null)
-            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, null, options);
+            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, null, options);
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, null, options);
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);

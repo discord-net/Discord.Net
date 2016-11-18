@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -30,15 +29,13 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
-            : base(discord, id, channel, author, guild)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
+            : base(discord, id, channel, author)
         {
         }
-        internal new static RestUserMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id,
-                RestVirtualMessageChannel.Create(discord, model.ChannelId),
-                RestUser.Create(discord, model.Author.Value), guild);
+            var entity = new RestUserMessage(discord, model.Id, channel, author);
             entity.Update(model);
             return entity;
         }
@@ -106,7 +103,9 @@ namespace Discord.Rest
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, null, _guild, mentions);
+                var guildId = (Channel as IGuildChannel)?.GuildId;
+                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+                _tags = MessageHelper.ParseTags(text, null, guild, mentions);
                 model.Content = text;
             }
         }
