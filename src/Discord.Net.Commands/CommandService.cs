@@ -7,24 +7,26 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Discord.Commands.Builders;
+
 namespace Discord.Commands
 {
     public class CommandService
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(ModuleBase).GetTypeInfo();
-
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _moduleDefs;
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs; 
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
+        private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x.Value);
-        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Value.Commands);
+        public IEnumerable<ModuleInfo> Modules => _typedModuleDefs.Select(x => x.Value);
+        public IEnumerable<CommandInfo> Commands => _typedModuleDefs.SelectMany(x => x.Value.Commands);
 
         public CommandService()
         {
             _moduleLock = new SemaphoreSlim(1, 1);
-            _moduleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
+            _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
+            _moduleDefs = new ConcurrentBag<ModuleInfo>();
             _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
@@ -65,22 +67,40 @@ namespace Discord.Commands
         }
 
         //Modules
+        public async Task<ModuleInfo> BuildModule(Action<ModuleBuilder> buildFunc)
+        {
+            await _moduleLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var builder = new ModuleBuilder();
+                buildFunc(builder);
+
+                var module = builder.Build(this);
+                return LoadModuleInternal(module);
+            }
+            finally
+            {
+                _moduleLock.Release();
+            }
+        }
         public async Task<ModuleInfo> AddModule<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 var typeInfo = typeof(T).GetTypeInfo();
-                if (!_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                    throw new ArgumentException($"Modules must inherit ModuleBase.");
 
-                if (typeInfo.IsAbstract)
-                    throw new InvalidOperationException("Modules must not be abstract.");
-
-                if (_moduleDefs.ContainsKey(typeof(T)))
+                if (_typedModuleDefs.ContainsKey(typeof(T)))
                     throw new ArgumentException($"This module has already been added.");
 
-                return AddModuleInternal(typeInfo);
+                var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
+
+                if (module.Value == default(ModuleInfo))
+                    throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}, did you pass an invalid type?");
+
+                _typedModuleDefs[module.Key] = module.Value;
+                
+                return LoadModuleInternal(module.Value);
             }
             finally
             {
@@ -89,39 +109,36 @@ namespace Discord.Commands
         }
         public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly)
         {
-            var moduleDefs = ImmutableArray.CreateBuilder<ModuleInfo>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                foreach (var type in assembly.ExportedTypes)
+                var types = ModuleClassBuilder.Search(assembly).ToArray();
+                var moduleDefs = ModuleClassBuilder.Build(types, this);
+
+                foreach (var info in moduleDefs)
                 {
-                    if (!_moduleDefs.ContainsKey(type))
-                    {
-                        var typeInfo = type.GetTypeInfo();
-                        if (_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                        {
-                            var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
-                            if (dontAutoLoad == null && !typeInfo.IsAbstract)
-                                moduleDefs.Add(AddModuleInternal(typeInfo));
-                        }
-                    }
+                    _typedModuleDefs[info.Key] = info.Value;
+                    LoadModuleInternal(info.Value);
                 }
-                return moduleDefs.ToImmutable();
+
+                return moduleDefs.Select(x => x.Value).ToImmutableArray();
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo AddModuleInternal(TypeInfo typeInfo)
+        private ModuleInfo LoadModuleInternal(ModuleInfo module)
         {
-            var moduleDef = new ModuleInfo(typeInfo, this);
-            _moduleDefs[typeInfo.AsType()] = moduleDef;
+            _moduleDefs.Add(module);
 
-            foreach (var cmd in moduleDef.Commands)
-                _map.AddCommand(cmd);
+            foreach (var command in module.Commands)
+                _map.AddCommand(command);
 
-            return moduleDef;
+            foreach (var submodule in module.Submodules)
+                LoadModuleInternal(submodule);
+            
+            return module;
         }
 
         public async Task<bool> RemoveModule(ModuleInfo module)
@@ -129,7 +146,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return RemoveModuleInternal(module.Source.BaseType);
+                return RemoveModuleInternal(module);
             }
             finally
             {
@@ -141,24 +158,33 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return RemoveModuleInternal(typeof(T));
+                ModuleInfo module;
+                _typedModuleDefs.TryGetValue(typeof(T), out module);
+                if (module == default(ModuleInfo))
+                    return false;
+                
+                return RemoveModuleInternal(module);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private bool RemoveModuleInternal(Type type)
+        private bool RemoveModuleInternal(ModuleInfo module)
         {
-            ModuleInfo unloadedModule;
-            if (_moduleDefs.TryRemove(type, out unloadedModule))
-            {
-                foreach (var cmd in unloadedModule.Commands)
-                    _map.RemoveCommand(cmd);
-                return true;
-            }
-            else
+            var defsRemove = module;
+            if (!_moduleDefs.TryTake(out defsRemove))
                 return false;
+            
+            foreach (var cmd in module.Commands)
+                _map.RemoveCommand(cmd);
+
+            foreach (var submodule in module.Submodules)
+            {
+                RemoveModuleInternal(submodule);
+            }
+
+            return true;
         }
 
         //Type Readers

@@ -15,7 +15,7 @@ namespace Discord.Commands
         
         public static async Task<ParseResult> ParseArgs(CommandInfo command, CommandContext context, string input, int startPos)
         {
-            CommandParameter curParam = null;
+            ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
             int endPos = input.Length;
             var curPart = ParserPart.None;
