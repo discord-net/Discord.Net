@@ -83,6 +83,15 @@ namespace Discord.Commands.Builders
 
         public ModuleInfo Build(CommandService service)
         {
+            if (aliases.Count == 0)
+                throw new InvalidOperationException("Modules require at least one alias to be registered");
+
+            if (commands.Count == 0 && submodules.Count == 0)
+                throw new InvalidOperationException("Tried to build empty module");
+
+            if (Name == null)
+                Name = aliases[0];
+
             return new ModuleInfo(this, service);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -22,6 +23,8 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
+        public RunMode RunMode { get; set; }
+        public int Priority { get; set; }
         public Func<CommandContext, object[], IDependencyMap, Task> Callback { get; set; }
         public ModuleBuilder Module { get; }
 
@@ -44,6 +47,18 @@ namespace Discord.Commands.Builders
         public CommandBuilder SetRemarks(string remarks)
         {
             Remarks = remarks;
+            return this;
+        }
+
+        public CommandBuilder SetRunMode(RunMode runMode)
+        {
+            RunMode = runMode;
+            return this;
+        }
+
+        public CommandBuilder SetPriority(int priority)
+        {
+            Priority = priority;
             return this;
         }
 
@@ -75,6 +90,28 @@ namespace Discord.Commands.Builders
 
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
+            if (aliases.Count == 0)
+                throw new InvalidOperationException("Commands require at least one alias to be registered");
+
+            if (Callback == null)
+                throw new InvalidOperationException("Commands require a callback to be built");
+
+            if (Name == null)
+                Name = aliases[0];
+
+            if (parameters.Count > 0)
+            {
+                var lastParam = parameters[parameters.Count - 1];
+
+                var firstMultipleParam = parameters.FirstOrDefault(x => x.Multiple);
+                if ((firstMultipleParam != null) && (firstMultipleParam != lastParam))
+                    throw new InvalidOperationException("Only the last parameter in a command may have the Multiple flag.");
+                
+                var firstRemainderParam = parameters.FirstOrDefault(x => x.Remainder);
+                if ((firstRemainderParam != null) && (firstRemainderParam != lastParam))
+                    throw new InvalidOperationException("Only the last parameter in a command may have the Remainder flag.");
+            }
+
             return new CommandInfo(this, info, service);
         }
     }

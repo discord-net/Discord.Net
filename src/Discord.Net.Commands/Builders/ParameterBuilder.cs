@@ -81,8 +81,18 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info, CommandService service)
         {
+            // TODO: should we throw when we don't have a name?
+            if (Name == null)
+                Name = "[unknown parameter]";
+
+            if (ParameterType == null)
+                throw new InvalidOperationException($"Could not build parameter {Name} from command {info.Name} - An invalid parameter type was given");
+
             if (TypeReader == null)
                 TypeReader = service.GetTypeReader(ParameterType);
+
+            if (TypeReader == null)
+                throw new InvalidOperationException($"Could not build parameter {Name} from command {info.Name} - A valid TypeReader could not be found");
 
             return new ParameterInfo(this, info, service);
         }

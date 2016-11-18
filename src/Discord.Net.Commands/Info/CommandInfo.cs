@@ -37,10 +37,14 @@ namespace Discord.Commands
             Summary = builder.Summary;
             Remarks = builder.Remarks;
 
+            RunMode = builder.RunMode;
+            Priority = builder.Priority;
+
             Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => first + " " + second).ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this, service)).ToImmutableArray();
+            HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].Multiple : false;
 
             _action = builder.Callback;
         }

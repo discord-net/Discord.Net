@@ -25,8 +25,8 @@ namespace Discord.Commands
             }
         }
 
-        public static IEnumerable<ModuleInfo> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
-        public static IEnumerable<ModuleInfo> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
+        public static Dictionary<Type, ModuleInfo> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
+        public static Dictionary<Type, ModuleInfo> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
         {
             if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");
@@ -36,22 +36,20 @@ namespace Discord.Commands
 
             var builtTypes = new List<TypeInfo>();
 
-            var result = new List<ModuleInfo>();
+            var result = new Dictionary<Type, ModuleInfo>();
 
             foreach (var typeInfo in topLevelGroups)
             {
                 // this shouldn't be the case; may be safe to remove?
-                if (builtTypes.Contains(typeInfo))
+                if (result.ContainsKey(typeInfo.AsType()))
                     continue;
-
-                builtTypes.Add(typeInfo);
 
                 var module = new ModuleBuilder();
 
                 BuildModule(module, typeInfo, service);
                 BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
 
-                result.Add(module.Build(service));
+                result[typeInfo.AsType()] = module.Build(service);
             }
 
             return result;
@@ -61,15 +59,18 @@ namespace Discord.Commands
         {
             foreach (var typeInfo in subTypes)
             {
+                if (!IsValidModuleDefinition(typeInfo))
+                    continue;
+                
                 if (builtTypes.Contains(typeInfo))
                     continue;
-
-                builtTypes.Add(typeInfo);
                 
                 builder.AddSubmodule((module) => {
                     BuildModule(module, typeInfo, service);
                     BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
                 });
+
+                builtTypes.Add(typeInfo);
             }
         }
 
@@ -89,7 +90,10 @@ namespace Discord.Commands
                 else if (attribute is AliasAttribute)
                     builder.AddAliases((attribute as AliasAttribute).Aliases);
                 else if (attribute is GroupAttribute)
+                {
+                    builder.Name = builder.Name ?? (attribute as GroupAttribute).Prefix;
                     builder.AddAliases((attribute as GroupAttribute).Prefix);
+                }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
@@ -111,8 +115,17 @@ namespace Discord.Commands
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
-                if (attribute is NameAttribute)
+                if (attribute is CommandAttribute)
+                {
+                    var cmdAttr = attribute as CommandAttribute;
+                    builder.AddAliases(cmdAttr.Text);
+                    builder.RunMode = cmdAttr.RunMode;
+                    builder.Name = builder.Name ?? cmdAttr.Text;
+                }
+                else if (attribute is NameAttribute)
                     builder.Name = (attribute as NameAttribute).Text;
+                else if (attribute is PriorityAttribute)
+                    builder.Priority = (attribute as PriorityAttribute).Priority;
                 else if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is RemarksAttribute)
@@ -154,15 +167,15 @@ namespace Discord.Commands
             var attributes = paramInfo.GetCustomAttributes();
             var paramType = paramInfo.ParameterType;
 
+            builder.Name = paramInfo.Name;
+
             builder.Optional = paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.HasDefaultValue ? paramInfo.DefaultValue : null;
 
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
-                if (attribute is NameAttribute)
-                    builder.Name = (attribute as NameAttribute).Text;
-                else if (attribute is SummaryAttribute)
+                if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is ParamArrayAttribute)
                 {
@@ -193,6 +206,7 @@ namespace Discord.Commands
                 }
             }
 
+            builder.ParameterType = paramType;
             builder.TypeReader = reader;
         }
 
@@ -205,7 +219,7 @@ namespace Discord.Commands
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(CommandAttribute)) &&
-                   methodInfo.ReturnType != typeof(Task) &&
+                   methodInfo.ReturnType == typeof(Task) &&
                    !methodInfo.IsStatic &&
                    !methodInfo.IsGenericMethod;
         }

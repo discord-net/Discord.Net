@@ -17,6 +17,7 @@ namespace Discord.Commands
         public IReadOnlyList<string> Aliases { get; }
         public IEnumerable<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<ModuleInfo> Submodules { get; }
 
         internal ModuleInfo(ModuleBuilder builder, CommandService service)
         {
@@ -29,6 +30,8 @@ namespace Discord.Commands
             Aliases = BuildAliases(builder).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service));
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
+
+            Submodules = BuildSubmodules(builder, service).ToImmutableArray();
         }
 
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder)
@@ -59,13 +62,24 @@ namespace Discord.Commands
             return result;
         }
 
+        private static List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
+        {
+            var result = new List<ModuleInfo>();
+
+            foreach (var submodule in parent.Modules)
+            {
+                result.Add(submodule.Build(service));
+            }
+
+            return result;
+        }
+
         private static List<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)
         {
             var result = new List<PreconditionAttribute>();
 
-
             ModuleBuilder parent = builder;
-            while (parent.ParentModule != null)
+            while (parent != null)
             {
                 result.AddRange(parent.Preconditions);
                 parent = parent.ParentModule;
