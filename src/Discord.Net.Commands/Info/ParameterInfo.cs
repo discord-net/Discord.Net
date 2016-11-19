@@ -53,7 +53,7 @@ namespace Discord.Commands
 
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, args[position]).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, args[position], map).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
