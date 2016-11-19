@@ -11,12 +11,12 @@ namespace Discord.Commands
 
         public Type TypeReader { get; }
 
-        public OverrideTypeReaderAttribute(Type overridenType)
+        public OverrideTypeReaderAttribute(Type overridenTypeReader)
         {
-            if (!_typeReaderTypeInfo.IsAssignableFrom(overridenType.GetTypeInfo()))
-                throw new ArgumentException($"{nameof(overridenType)} must inherit from {nameof(TypeReader)}");
+            if (!_typeReaderTypeInfo.IsAssignableFrom(overridenTypeReader.GetTypeInfo()))
+                throw new ArgumentException($"{nameof(overridenTypeReader)} must inherit from {nameof(TypeReader)}");
             
-            TypeReader = overridenType;
+            TypeReader = overridenTypeReader;
         }
     } 
 }
