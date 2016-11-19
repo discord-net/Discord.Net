@@ -182,6 +182,10 @@ namespace Discord.Commands
                 // TODO: C#7 type switch
                 if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
+                else if (attribute is OverrideTypeReaderAttribute)
+                    builder.TypeReader = service.GetTypeReader((attribute as OverrideTypeReaderAttribute).TypeReader);
+                else if (attribute is ParameterPreconditionAttribute)
+                    builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
                 else if (attribute is ParamArrayAttribute)
                 {
                     builder.IsMultiple = true;

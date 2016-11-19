@@ -135,9 +135,26 @@ namespace Discord.Commands
             if (map == null)
                 map = DependencyMap.Empty;
 
+            object[] args = null;
+
             try
             {
-                var args = GenerateArgs(argList, paramList);
+                args = GenerateArgs(argList, paramList);
+            }
+            catch (Exception ex)
+            {
+                return ExecuteResult.FromError(ex);
+            }
+
+            foreach (var parameter in Parameters)
+            {
+                var result = await parameter.CheckPreconditionsAsync(context, args, map).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                    return ExecuteResult.FromError(result);
+            }
+
+            try
+            {
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
