@@ -42,7 +42,7 @@ namespace Discord.Commands
 
             // both command and module provide aliases
             if (module.Aliases.Count > 0 && builder.Aliases.Count > 0)
-                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => first + " " + second).ToImmutableArray();
+                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => second != null ? first + " " + second : first).ToImmutableArray();
             // only module provides aliases
             else if (module.Aliases.Count > 0)
                 Aliases = module.Aliases.ToImmutableArray();

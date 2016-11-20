@@ -118,7 +118,6 @@ namespace Discord.Commands
 
             builder.Name = method.Name;
 
-            var setName = false;
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
@@ -127,12 +126,11 @@ namespace Discord.Commands
                     var cmdAttr = attribute as CommandAttribute;
                     builder.AddAliases(cmdAttr.Text);
                     builder.RunMode = cmdAttr.RunMode;
-                    builder.Name = setName ? builder.Name ?? cmdAttr.Text : cmdAttr.Text ?? builder.Name;
+                    builder.Name = builder.Name ?? cmdAttr.Text;
                 }
                 else if (attribute is NameAttribute)
                 {
                     builder.Name = (attribute as NameAttribute).Text;
-                    setName = true;
                 }
                 else if (attribute is PriorityAttribute)
                     builder.Priority = (attribute as PriorityAttribute).Priority;
@@ -145,6 +143,9 @@ namespace Discord.Commands
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
+
+            if (builder.Name == null)
+                builder.Name = method.Name;
 
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;

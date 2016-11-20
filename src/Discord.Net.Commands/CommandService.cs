@@ -19,8 +19,8 @@ namespace Discord.Commands
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        public IEnumerable<ModuleInfo> Modules => _typedModuleDefs.Select(x => x.Value);
-        public IEnumerable<CommandInfo> Commands => _typedModuleDefs.SelectMany(x => x.Value.Commands);
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
 
         public CommandService()
         {
