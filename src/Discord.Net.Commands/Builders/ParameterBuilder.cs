@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 
 using System.Collections.Generic;
@@ -41,7 +42,11 @@ namespace Discord.Commands.Builders
 
         internal void SetType(Type type)
         {
-            TypeReader = Command.Module.Service.GetTypeReader(type);
+            var readers = Command.Module.Service.GetTypeReaders(type);
+            if (readers == null)
+                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");
+            
+            TypeReader = readers.FirstOrDefault();
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
