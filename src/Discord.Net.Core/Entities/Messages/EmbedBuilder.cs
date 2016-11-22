@@ -16,7 +16,7 @@ namespace Discord
 
         public EmbedBuilder()
         {
-            _model = new Embed {Type = "rich"};
+            _model = new Embed { Type = "rich" };
             _fields = new List<Field>();
         }
 
@@ -213,8 +213,6 @@ namespace Discord
         private Thumbnail _model;
 
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
-        public Optional<int> Height { get { return _model.Height; } set { _model.Height = value; } }
-        public Optional<int> Width { get { return _model.Width; } set { _model.Width = value; } }
 
         public EmbedThumbnailBuilder()
         {
@@ -226,16 +224,6 @@ namespace Discord
             Url = url;
             return this;
         }
-        public EmbedThumbnailBuilder WithHeight(int height)
-        {
-            Height = height;
-            return this;
-        }
-        public EmbedThumbnailBuilder WithWidth(int width)
-        {
-            Width = width;
-            return this;
-        }
 
         internal Thumbnail ToModel() => _model;
     }
@@ -245,8 +233,6 @@ namespace Discord
         private Image _model;
 
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
-        public Optional<int> Height { get { return _model.Height; } set { _model.Height = value; } }
-        public Optional<int> Width { get { return _model.Width; } set { _model.Width = value; } }
 
         public EmbedImageBuilder()
         {
@@ -256,16 +242,6 @@ namespace Discord
         public EmbedImageBuilder WithUrl(string url)
         {
             Url = url;
-            return this;
-        }
-        public EmbedImageBuilder WithHeight(int height)
-        {
-            Height = height;
-            return this;
-        }
-        public EmbedImageBuilder WithWidth(int width)
-        {
-            Width = width;
             return this;
         }
 
