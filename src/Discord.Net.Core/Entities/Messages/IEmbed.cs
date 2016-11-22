@@ -9,6 +9,8 @@ namespace Discord
         string Title { get; }
         string Description { get; }
         Color? Color { get; }
+        EmbedImage? Image { get; }
+        EmbedVideo? Video { get; }
         EmbedAuthor? Author { get; }
         EmbedFooter? Footer { get; }
         EmbedProvider? Provider { get; }
