@@ -13,6 +13,7 @@ namespace Discord.Rest
     public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
     {
         public string Topic { get; private set; }
+        public ulong? LastMessageId { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
@@ -31,6 +32,7 @@ namespace Discord.Rest
             base.Update(model);
 
             Topic = model.Topic.Value;
+            LastMessageId = model.LastMessageId;
         }
 
         public async Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)

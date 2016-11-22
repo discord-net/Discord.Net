@@ -15,6 +15,7 @@ namespace Discord.Rpc
     public class RpcTextChannel : RpcGuildChannel, IRpcMessageChannel, ITextChannel
     {
         public IReadOnlyCollection<RpcMessage> CachedMessages { get; private set; }
+        public ulong? LastMessageId { get { throw new NotSupportedException(); } }
 
         public string Mention => MentionUtils.MentionChannel(Id);
 

@@ -14,6 +14,7 @@ namespace Discord
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, RequestOptions options = null);
 
+        ulong? LastMessageId { get; }
         /// <summary> Gets a message from this message channel with the given id, or null if not found. </summary>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the last N messages from this message channel. </summary>

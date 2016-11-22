@@ -14,6 +14,7 @@ namespace Discord.Rest
     {
         public RestUser CurrentUser { get; private set; }
         public RestUser Recipient { get; private set; }
+        public ulong? LastMessageId { get; private set; }
 
         public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
 
@@ -32,6 +33,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             Recipient.Update(model.Recipients.Value[0]);
+            LastMessageId = model.LastMessageId;
         }
 
         public override async Task UpdateAsync(RequestOptions options = null)

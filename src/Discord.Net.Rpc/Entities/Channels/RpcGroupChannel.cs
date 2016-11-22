@@ -13,6 +13,7 @@ namespace Discord.Rpc
     {
         public IReadOnlyCollection<RpcMessage> CachedMessages { get; private set; }
         public IReadOnlyCollection<RpcVoiceState> VoiceStates { get; private set; }
+        public ulong? LastMessageId { get { throw new NotSupportedException(); } }
 
         internal RpcGroupChannel(DiscordRpcClient discord, ulong id)
             : base(discord, id)
