@@ -5,10 +5,7 @@ namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color
-    {
-        /// <summary> Gets the default user color value. </summary>
-        public static readonly Color Default = new Color(0);
-
+    { 
         /// <summary> Gets the encoded value for this color. </summary>
         public uint RawValue { get; }
 
