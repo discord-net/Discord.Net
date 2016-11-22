@@ -3,7 +3,6 @@
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-
     public struct ColorPresets
     {
         /// <summary> Gets the default user color value. </summary>
