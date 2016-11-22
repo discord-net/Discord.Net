@@ -4,6 +4,8 @@ using Embed = Discord.API.Embed;
 using Field = Discord.API.EmbedField;
 using Author = Discord.API.EmbedAuthor;
 using Footer = Discord.API.EmbedFooter;
+using Thumbnail = Discord.API.EmbedThumbnail;
+using Image = Discord.API.EmbedImage;
 
 namespace Discord
 {
@@ -14,8 +16,7 @@ namespace Discord
 
         public EmbedBuilder()
         {
-            _model = new Embed();
-            _model.Type = "rich";
+            _model = new Embed {Type = "rich"};
             _fields = new List<Field>();
         }
 
@@ -25,6 +26,8 @@ namespace Discord
         public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
+        public EmbedThumbnailBuilder Thumbnail { get; set; }
+        public EmbedImageBuilder Image { get; set; }
 
         public EmbedBuilder WithTitle(string title)
         {
@@ -71,6 +74,30 @@ namespace Discord
             Footer = footer;
             return this;
         }
+        public EmbedBuilder WithThumbnail(EmbedThumbnailBuilder thumbnail)
+        {
+            Thumbnail = thumbnail;
+            return this;
+        }
+        public EmbedBuilder WithThumbnail(Action<EmbedThumbnailBuilder> action)
+        {
+            var thumbnail = new EmbedThumbnailBuilder();
+            action(thumbnail);
+            Thumbnail = thumbnail;
+            return this;
+        }
+        public EmbedBuilder WithImage(EmbedImageBuilder image)
+        {
+            Image = image;
+            return this;
+        }
+        public EmbedBuilder WithImage(Action<EmbedImageBuilder> action)
+        {
+            var image = new EmbedImageBuilder();
+            action(image);
+            Image = image;
+            return this;
+        }
 
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
@@ -84,6 +111,8 @@ namespace Discord
         {
             _model.Author = Author?.ToModel();
             _model.Footer = Footer?.ToModel();
+            _model.Thumbnail = Thumbnail?.ToModel();
+            _model.Image = Image?.ToModel();
             _model.Fields = _fields.ToArray();
             return _model;
         }
@@ -177,5 +206,69 @@ namespace Discord
         }
 
         internal Footer ToModel() => _model;
+    }
+
+    public class EmbedThumbnailBuilder
+    {
+        private Thumbnail _model;
+
+        public string Url { get { return _model.Url; } set { _model.Url = value; } }
+        public Optional<int> Height { get { return _model.Height; } set { _model.Height = value; } }
+        public Optional<int> Width { get { return _model.Width; } set { _model.Width = value; } }
+
+        public EmbedThumbnailBuilder()
+        {
+            _model = new Thumbnail();
+        }
+
+        public EmbedThumbnailBuilder WithUrl(string url)
+        {
+            Url = url;
+            return this;
+        }
+        public EmbedThumbnailBuilder WithHeight(int height)
+        {
+            Height = height;
+            return this;
+        }
+        public EmbedThumbnailBuilder WithWidth(int width)
+        {
+            Width = width;
+            return this;
+        }
+
+        internal Thumbnail ToModel() => _model;
+    }
+
+    public class EmbedImageBuilder
+    {
+        private Image _model;
+
+        public string Url { get { return _model.Url; } set { _model.Url = value; } }
+        public Optional<int> Height { get { return _model.Height; } set { _model.Height = value; } }
+        public Optional<int> Width { get { return _model.Width; } set { _model.Width = value; } }
+
+        public EmbedImageBuilder()
+        {
+            _model = new Image();
+        }
+
+        public EmbedImageBuilder WithUrl(string url)
+        {
+            Url = url;
+            return this;
+        }
+        public EmbedImageBuilder WithHeight(int height)
+        {
+            Height = height;
+            return this;
+        }
+        public EmbedImageBuilder WithWidth(int width)
+        {
+            Width = width;
+            return this;
+        }
+
+        internal Image ToModel() => _model;
     }
 }

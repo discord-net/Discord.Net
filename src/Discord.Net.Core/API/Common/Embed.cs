@@ -19,8 +19,12 @@ namespace Discord.API
         public Optional<EmbedAuthor> Author { get; set; }
         [JsonProperty("footer")]
         public Optional<EmbedFooter> Footer { get; set; }
+        [JsonProperty("video")]
+        public Optional<EmbedVideo> Video { get; set; }
         [JsonProperty("thumbnail")]
         public Optional<EmbedThumbnail> Thumbnail { get; set; }
+        [JsonProperty("image")]
+        public Optional<EmbedImage> Image { get; set; }
         [JsonProperty("provider")]
         public Optional<EmbedProvider> Provider { get; set; }
         [JsonProperty("fields")]
