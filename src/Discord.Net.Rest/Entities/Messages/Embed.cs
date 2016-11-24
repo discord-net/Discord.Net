@@ -14,6 +14,7 @@ namespace Discord
         public string Title { get; }
         public string Type { get; }
         public Color? Color { get; }
+        public DateTimeOffset? Timestamp { get; }
         public EmbedImage? Image { get; }
         public EmbedVideo? Video { get; }
         public EmbedAuthor? Author { get; }
@@ -26,7 +27,8 @@ namespace Discord
             string title, 
             string description, 
             string url, 
-            Color? color, 
+            Color? color,
+            DateTimeOffset? timestamp,
             EmbedImage? image,
             EmbedVideo? video,
             EmbedAuthor? author, 
@@ -40,6 +42,7 @@ namespace Discord
             Description = description;
             Url = url;
             Color = color;
+            Timestamp = timestamp;
             Image = image;
             Video = video;
             Author = author;
@@ -52,13 +55,14 @@ namespace Discord
         {
             return new Embed(model.Type, model.Title, model.Description, model.Url,
                 model.Color.HasValue ? new Color(model.Color.Value) : (Color?)null,
+                model.Timestamp.IsSpecified ? model.Timestamp.Value : (DateTimeOffset?)null,
                 model.Image.IsSpecified ? EmbedImage.Create(model.Image.Value) : (EmbedImage?)null,
                 model.Video.IsSpecified ? EmbedVideo.Create(model.Video.Value) : (EmbedVideo?)null,
                 model.Author.IsSpecified ? EmbedAuthor.Create(model.Author.Value) : (EmbedAuthor?)null,
                 model.Footer.IsSpecified ? EmbedFooter.Create(model.Footer.Value) : (EmbedFooter?)null,
                 model.Provider.IsSpecified ? EmbedProvider.Create(model.Provider.Value) : (EmbedProvider?)null,
                 model.Thumbnail.IsSpecified ? EmbedThumbnail.Create(model.Thumbnail.Value) : (EmbedThumbnail?)null,
-                model.Fields.IsSpecified ? model.Fields.Value.Select(x => EmbedField.Create(x)).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
+                model.Fields.IsSpecified ? model.Fields.Value.Select(EmbedField.Create).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
         }
 
         public override string ToString() => Title;

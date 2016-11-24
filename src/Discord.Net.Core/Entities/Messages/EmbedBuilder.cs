@@ -23,11 +23,11 @@ namespace Discord
         public string Title { get { return _model.Title; }  set { _model.Title = value; } }
         public string Description { get { return _model.Description; } set { _model.Description = value; } }
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
+        public string ThumbnailUrl { get; set; }
+        public string ImageUrl { get; set; }
         public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
-        public EmbedThumbnailBuilder Thumbnail { get; set; }
-        public EmbedImageBuilder Image { get; set; }
 
         public EmbedBuilder WithTitle(string title)
         {
@@ -42,6 +42,16 @@ namespace Discord
         public EmbedBuilder WithUrl(string url)
         {
             Url = url;
+            return this;
+        }
+        public EmbedBuilder WithThumbnailUrl(string thumbnailUrl)
+        {
+            ThumbnailUrl = thumbnailUrl;
+            return this;
+        }
+        public EmbedBuilder WithImageUrl(string imageUrl)
+        {
+            ImageUrl = ImageUrl;
             return this;
         }
         public EmbedBuilder WithColor(Color color)
@@ -74,30 +84,6 @@ namespace Discord
             Footer = footer;
             return this;
         }
-        public EmbedBuilder WithThumbnail(EmbedThumbnailBuilder thumbnail)
-        {
-            Thumbnail = thumbnail;
-            return this;
-        }
-        public EmbedBuilder WithThumbnail(Action<EmbedThumbnailBuilder> action)
-        {
-            var thumbnail = new EmbedThumbnailBuilder();
-            action(thumbnail);
-            Thumbnail = thumbnail;
-            return this;
-        }
-        public EmbedBuilder WithImage(EmbedImageBuilder image)
-        {
-            Image = image;
-            return this;
-        }
-        public EmbedBuilder WithImage(Action<EmbedImageBuilder> action)
-        {
-            var image = new EmbedImageBuilder();
-            action(image);
-            Image = image;
-            return this;
-        }
 
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
@@ -111,8 +97,8 @@ namespace Discord
         {
             _model.Author = Author?.ToModel();
             _model.Footer = Footer?.ToModel();
-            _model.Thumbnail = Thumbnail?.ToModel();
-            _model.Image = Image?.ToModel();
+            _model.Thumbnail = ThumbnailUrl != null ? new Thumbnail { Url = ThumbnailUrl } : null;
+            _model.Image = ImageUrl != null ? new Image { Url = ImageUrl } : null;
             _model.Fields = _fields.ToArray();
             return _model;
         }
@@ -206,45 +192,5 @@ namespace Discord
         }
 
         internal Footer ToModel() => _model;
-    }
-
-    public class EmbedThumbnailBuilder
-    {
-        private Thumbnail _model;
-
-        public string Url { get { return _model.Url; } set { _model.Url = value; } }
-
-        public EmbedThumbnailBuilder()
-        {
-            _model = new Thumbnail();
-        }
-
-        public EmbedThumbnailBuilder WithUrl(string url)
-        {
-            Url = url;
-            return this;
-        }
-
-        internal Thumbnail ToModel() => _model;
-    }
-
-    public class EmbedImageBuilder
-    {
-        private Image _model;
-
-        public string Url { get { return _model.Url; } set { _model.Url = value; } }
-
-        public EmbedImageBuilder()
-        {
-            _model = new Image();
-        }
-
-        public EmbedImageBuilder WithUrl(string url)
-        {
-            Url = url;
-            return this;
-        }
-
-        internal Image ToModel() => _model;
     }
 }
