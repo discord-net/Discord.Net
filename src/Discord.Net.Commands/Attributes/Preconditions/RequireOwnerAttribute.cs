@@ -6,6 +6,10 @@ using Discord;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    /// Require that the command is invoked by the owner of the bot.
+    /// </summary>
+    /// <remarks>This precondition will only work if the bot is a bot account.</remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {
