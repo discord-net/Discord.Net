@@ -20,12 +20,13 @@ namespace Discord
             _fields = new List<Field>();
         }
 
-        public string Title { get { return _model.Title; }  set { _model.Title = value; } }
+        public string Title { get { return _model.Title; } set { _model.Title = value; } }
         public string Description { get { return _model.Description; } set { _model.Description = value; } }
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
         public string ThumbnailUrl { get; set; }
         public string ImageUrl { get; set; }
         public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
+        public DateTimeOffset? Timestamp { get; set; }
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
 
@@ -57,6 +58,16 @@ namespace Discord
         public EmbedBuilder WithColor(Color color)
         {
             Color = color;
+            return this;
+        }
+        public EmbedBuilder WithTimestamp()
+        {
+            Timestamp = DateTimeOffset.UtcNow;
+            return this;
+        }
+        public EmbedBuilder WithTimestamp(DateTimeOffset dateTimeOffset)
+        {
+            Timestamp = dateTimeOffset;
             return this;
         }
 
@@ -97,6 +108,7 @@ namespace Discord
         {
             _model.Author = Author?.ToModel();
             _model.Footer = Footer?.ToModel();
+            _model.Timestamp = Timestamp?.ToUniversalTime();
             _model.Thumbnail = ThumbnailUrl != null ? new Thumbnail { Url = ThumbnailUrl } : null;
             _model.Image = ImageUrl != null ? new Image { Url = ImageUrl } : null;
             _model.Fields = _fields.ToArray();
@@ -106,7 +118,7 @@ namespace Discord
 
     public class EmbedFieldBuilder
     {
-        private Field _model;
+        private readonly Field _model;
 
         public string Name { get { return _model.Name; } set { _model.Name = value; } }
         public string Value { get { return _model.Value; } set { _model.Value = value; } }
@@ -138,7 +150,7 @@ namespace Discord
 
     public class EmbedAuthorBuilder
     {
-        private Author _model;
+        private readonly Author _model;
 
         public string Name { get { return _model.Name; } set { _model.Name = value; } }
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
@@ -170,7 +182,7 @@ namespace Discord
 
     public class EmbedFooterBuilder
     {
-        private Footer _model;
+        private readonly Footer _model;
 
         public string Text { get { return _model.Text; } set { _model.Text = value; } }
         public string IconUrl { get { return _model.IconUrl; } set { _model.IconUrl = value; } }

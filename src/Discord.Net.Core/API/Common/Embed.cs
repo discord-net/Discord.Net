@@ -17,7 +17,7 @@ namespace Discord.API
         [JsonProperty("color")]
         public uint? Color { get; set; }
         [JsonProperty("timestamp")]
-        public Optional<DateTimeOffset> Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
         [JsonProperty("author")]
         public Optional<EmbedAuthor> Author { get; set; }
         [JsonProperty("footer")]
