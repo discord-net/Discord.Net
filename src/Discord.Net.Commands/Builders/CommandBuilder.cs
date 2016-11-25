@@ -17,7 +17,7 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
-        public RunMode RunMode { get; set; }
+        public RunMode? RunMode { get; set; }
         public int Priority { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
