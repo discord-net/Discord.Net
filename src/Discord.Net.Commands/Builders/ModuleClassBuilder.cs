@@ -115,9 +115,7 @@ namespace Discord.Commands
         private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
         {
             var attributes = method.GetCustomAttributes();
-
-            builder.Name = method.Name;
-
+            
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
@@ -129,9 +127,7 @@ namespace Discord.Commands
                     builder.Name = builder.Name ?? cmdAttr.Text;
                 }
                 else if (attribute is NameAttribute)
-                {
                     builder.Name = (attribute as NameAttribute).Text;
-                }
                 else if (attribute is PriorityAttribute)
                     builder.Priority = (attribute as PriorityAttribute).Priority;
                 else if (attribute is SummaryAttribute)
