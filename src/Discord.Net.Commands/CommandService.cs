@@ -14,8 +14,9 @@ namespace Discord.Commands
     public class CommandService
     {
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs; 
-        private readonly ConcurrentDictionary<Type, ConcurrentBag<TypeReader>> _typeReaders;
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
+        private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
@@ -24,7 +25,7 @@ namespace Discord.Commands
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
-        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value, (a, value) => new {a.Key, value}).ToLookup(x => x.Key, x => x.value);
+        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new {y.Key, y.Value})).ToLookup(x => x.Key, x => x.Value);
 
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
@@ -33,41 +34,43 @@ namespace Discord.Commands
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new ConcurrentBag<ModuleInfo>();
             _map = new CommandMap();
-            _typeReaders = new ConcurrentDictionary<Type, ConcurrentBag<TypeReader>>
+            _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
+
+            _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
-                [typeof(bool)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<bool>()},
-                [typeof(char)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<char>()},
-                [typeof(string)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<string>()},
-                [typeof(byte)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<byte>()},
-                [typeof(sbyte)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<sbyte>()},
-                [typeof(ushort)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<ushort>()},
-                [typeof(short)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<short>()},
-                [typeof(uint)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<uint>()},
-                [typeof(int)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<int>()},
-                [typeof(ulong)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<ulong>()},
-                [typeof(long)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<long>()},
-                [typeof(float)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<float>()},
-                [typeof(double)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<double>()},
-                [typeof(decimal)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<decimal>()},
-                [typeof(DateTime)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<DateTime>()},
-                [typeof(DateTimeOffset)] = new ConcurrentBag<TypeReader>{new SimpleTypeReader<DateTimeOffset>()},
+                [typeof(bool)] = new SimpleTypeReader<bool>(),
+                [typeof(char)] = new SimpleTypeReader<char>(),
+                [typeof(string)] = new SimpleTypeReader<string>(),
+                [typeof(byte)] = new SimpleTypeReader<byte>(),
+                [typeof(sbyte)] = new SimpleTypeReader<sbyte>(),
+                [typeof(ushort)] = new SimpleTypeReader<ushort>(),
+                [typeof(short)] = new SimpleTypeReader<short>(),
+                [typeof(uint)] = new SimpleTypeReader<uint>(),
+                [typeof(int)] = new SimpleTypeReader<int>(),
+                [typeof(ulong)] = new SimpleTypeReader<ulong>(),
+                [typeof(long)] = new SimpleTypeReader<long>(),
+                [typeof(float)] = new SimpleTypeReader<float>(),
+                [typeof(double)] = new SimpleTypeReader<double>(),
+                [typeof(decimal)] = new SimpleTypeReader<decimal>(),
+                [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
+                [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
                 
-                [typeof(IMessage)] = new ConcurrentBag<TypeReader>{new MessageTypeReader<IMessage>()},
-                [typeof(IUserMessage)] = new ConcurrentBag<TypeReader>{new MessageTypeReader<IUserMessage>()},
-                [typeof(IChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IChannel>()},
-                [typeof(IDMChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IDMChannel>()},
-                [typeof(IGroupChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IGroupChannel>()},
-                [typeof(IGuildChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IGuildChannel>()},
-                [typeof(IMessageChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IMessageChannel>()},
-                [typeof(IPrivateChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IPrivateChannel>()},
-                [typeof(ITextChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<ITextChannel>()},
-                [typeof(IVoiceChannel)] = new ConcurrentBag<TypeReader>{new ChannelTypeReader<IVoiceChannel>()},
+                [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
+                [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
+                [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
+                [typeof(IDMChannel)] = new ChannelTypeReader<IDMChannel>(),
+                [typeof(IGroupChannel)] = new ChannelTypeReader<IGroupChannel>(),
+                [typeof(IGuildChannel)] = new ChannelTypeReader<IGuildChannel>(),
+                [typeof(IMessageChannel)] = new ChannelTypeReader<IMessageChannel>(),
+                [typeof(IPrivateChannel)] = new ChannelTypeReader<IPrivateChannel>(),
+                [typeof(ITextChannel)] = new ChannelTypeReader<ITextChannel>(),
+                [typeof(IVoiceChannel)] = new ChannelTypeReader<IVoiceChannel>(),
 
-                [typeof(IRole)] = new ConcurrentBag<TypeReader>{new RoleTypeReader<IRole>()},
+                [typeof(IRole)] = new RoleTypeReader<IRole>(),
 
-                [typeof(IUser)] = new ConcurrentBag<TypeReader>{new UserTypeReader<IUser>()},
-                [typeof(IGroupUser)] = new ConcurrentBag<TypeReader>{new UserTypeReader<IGroupUser>()},
-                [typeof(IGuildUser)] = new ConcurrentBag<TypeReader>{new UserTypeReader<IGuildUser>()},
+                [typeof(IUser)] = new UserTypeReader<IUser>(),
+                [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
+                [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
             _caseSensitive = config.CaseSensitiveCommands;
             _defaultRunMode = config.DefaultRunMode;
@@ -197,19 +200,26 @@ namespace Discord.Commands
         //Type Readers
         public void AddTypeReader<T>(TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(typeof(T), x => new ConcurrentBag<TypeReader>());
-            readers.Add(reader);
+            var readers = _typeReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
+            readers[reader.GetType()] = reader;
         }
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(type, x=> new ConcurrentBag<TypeReader>());
-            readers.Add(reader);
+            var readers = _typeReaders.GetOrAdd(type, x=> new ConcurrentDictionary<Type, TypeReader>());
+            readers[reader.GetType()] = reader;
         }
-        internal IEnumerable<TypeReader> GetTypeReaders(Type type)
+        internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
-            ConcurrentBag<TypeReader> definedTypeReaders;
+            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
             if (_typeReaders.TryGetValue(type, out definedTypeReaders))
                 return definedTypeReaders;
+            return null;
+        }
+        internal TypeReader GetDefaultTypeReader(Type type)
+        {
+            TypeReader reader;
+            if (_defaultTypeReaders.TryGetValue(type, out reader))
+                return reader;
             return null;
         }
 

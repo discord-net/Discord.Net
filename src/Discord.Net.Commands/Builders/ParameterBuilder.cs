@@ -46,7 +46,7 @@ namespace Discord.Commands.Builders
             if (readers == null)
                 throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");
             
-            TypeReader = readers.FirstOrDefault();
+            TypeReader = readers.FirstOrDefault().Value;
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);

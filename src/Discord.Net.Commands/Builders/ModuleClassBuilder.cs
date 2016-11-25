@@ -183,9 +183,7 @@ namespace Discord.Commands
                 if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is OverrideTypeReaderAttribute)
-                {
                     builder.TypeReader = GetTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
-                }
                 else if (attribute is ParameterPreconditionAttribute)
                     builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
                 else if (attribute is ParamArrayAttribute)
@@ -204,8 +202,7 @@ namespace Discord.Commands
 
             if (builder.TypeReader == null)
             {
-                var readers = service.GetTypeReaders(paramType);
-                var reader = readers?.FirstOrDefault();
+                var reader = service.GetDefaultTypeReader(paramType);
 
                 if (reader == null)
                 {
@@ -229,20 +226,16 @@ namespace Discord.Commands
         private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType)
         {
             var readers = service.GetTypeReaders(paramType);
+            TypeReader reader = null;
             if (readers != null)
-            {
-                var reader = readers.FirstOrDefault(x => x.GetType() == typeReaderType);
-                if (reader != default(TypeReader))
-                {
+                if (readers.TryGetValue(typeReaderType, out reader))
                     return reader;
-                }
-            }
 
             //could not find any registered type reader: try to create one
-            var typeReader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
-            service.AddTypeReader(paramType, typeReader);
+            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
+            service.AddTypeReader(paramType, reader);
 
-            return typeReader;
+            return reader;
         }
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)
