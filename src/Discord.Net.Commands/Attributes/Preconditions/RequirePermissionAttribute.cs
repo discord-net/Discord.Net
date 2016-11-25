@@ -8,21 +8,36 @@ namespace Discord.Commands
     {
         public GuildPermission? GuildPermission { get; }
         public ChannelPermission? ChannelPermission { get; }
+        public bool Fuzzy { get; set; } // public for `RequirePermission(permission, Fuzzy = false)`
 
         public RequirePermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
+            Fuzzy = true;
         }
         public RequirePermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;
+            Fuzzy = true;
         }
         
         public override Task<PreconditionResult> CheckPermissions(CommandContext context, CommandInfo command, IDependencyMap map)
         {
             var guildUser = context.User as IGuildUser;
+
+            if (guildUser != null)
+            {
+                if (Fuzzy)
+                {
+                    if (guildUser.Id == guildUser.Guild.OwnerId)
+                        return Task.FromResult(PreconditionResult.FromSuccess());
+
+                    if (guildUser.GuildPermissions.Administrator)
+                        return Task.FromResult(PreconditionResult.FromSuccess());
+                }
+            }
 
             if (GuildPermission.HasValue)
             {
