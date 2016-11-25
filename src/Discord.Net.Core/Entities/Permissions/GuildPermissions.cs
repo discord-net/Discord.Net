@@ -11,7 +11,7 @@ namespace Discord
         public static readonly GuildPermissions None = new GuildPermissions();
         /// <summary> Gets a GuildPermissions that grants all permissions. </summary>
         //TODO: C#7 Candidate for binary literals
-        public static readonly GuildPermissions All = new GuildPermissions(Convert.ToUInt64("01111111111100111111110000111111", 2));
+        public static readonly GuildPermissions All = new GuildPermissions(Convert.ToUInt64("01111111111100111111110001111111", 2));
 
         /// <summary> Gets a packed value representing all the permissions in this GuildPermissions. </summary>
         public ulong RawValue { get; }
@@ -28,7 +28,9 @@ namespace Discord
         public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
         /// <summary> If True, a user may adjust guild properties. </summary>
         public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
-
+        
+        /// <summary> If true, a user may add reactions. </summary>
+        public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
         /// <summary> If True, a user may join channels. </summary>
         public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.ReadMessages);
         /// <summary> If True, a user may send messages. </summary>
