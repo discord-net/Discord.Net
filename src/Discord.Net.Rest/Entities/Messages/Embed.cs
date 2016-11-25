@@ -13,8 +13,8 @@ namespace Discord
         public string Url { get; }
         public string Title { get; }
         public string Type { get; }
-        public Color? Color { get; }
         public DateTimeOffset? Timestamp { get; }
+        public Color? Color { get; }
         public EmbedImage? Image { get; }
         public EmbedVideo? Video { get; }
         public EmbedAuthor? Author { get; }
@@ -24,11 +24,11 @@ namespace Discord
         public ImmutableArray<EmbedField> Fields { get; }
 
         internal Embed(string type, 
-            string title, 
-            string description, 
-            string url, 
-            Color? color,
+            string title,
+            string description,
+            string url,
             DateTimeOffset? timestamp,
+            Color? color,
             EmbedImage? image,
             EmbedVideo? video,
             EmbedAuthor? author, 
@@ -53,9 +53,8 @@ namespace Discord
         }
         internal static Embed Create(Model model)
         {
-            return new Embed(model.Type, model.Title, model.Description, model.Url,
-                model.Color.HasValue ? new Color(model.Color.Value) : (Color?)null,
-                model.Timestamp.IsSpecified ? model.Timestamp.Value : (DateTimeOffset?)null,
+            return new Embed(model.Type, model.Title, model.Description, model.Url,model.Timestamp,
+                model.Color.HasValue ? new Color(model.Color.Value) : (Color?)null, 
                 model.Image.IsSpecified ? EmbedImage.Create(model.Image.Value) : (EmbedImage?)null,
                 model.Video.IsSpecified ? EmbedVideo.Create(model.Video.Value) : (EmbedVideo?)null,
                 model.Author.IsSpecified ? EmbedAuthor.Create(model.Author.Value) : (EmbedAuthor?)null,

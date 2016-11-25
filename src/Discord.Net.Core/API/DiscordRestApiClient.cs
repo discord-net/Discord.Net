@@ -49,7 +49,7 @@ namespace Discord.API
         {
             _restClientProvider = restClientProvider;
             _userAgent = userAgent;
-            _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", DateTimeZoneHandling = DateTimeZoneHandling.Utc, ContractResolver = new DiscordContractResolver() };
+            _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
             RequestQueue = requestQueue;
             FetchCurrentUser = true;
 

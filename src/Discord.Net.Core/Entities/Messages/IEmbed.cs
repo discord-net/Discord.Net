@@ -9,8 +9,8 @@ namespace Discord
         string Type { get; }
         string Title { get; }
         string Description { get; }
-        Color? Color { get; }
         DateTimeOffset? Timestamp { get; }
+        Color? Color { get; }
         EmbedImage? Image { get; }
         EmbedVideo? Video { get; }
         EmbedAuthor? Author { get; }

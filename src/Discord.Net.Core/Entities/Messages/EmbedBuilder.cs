@@ -25,8 +25,8 @@ namespace Discord
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
         public string ThumbnailUrl { get; set; }
         public string ImageUrl { get; set; }
-        public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
         public DateTimeOffset? Timestamp { get; set; }
+        public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
 
@@ -55,11 +55,6 @@ namespace Discord
             ImageUrl = ImageUrl;
             return this;
         }
-        public EmbedBuilder WithColor(Color color)
-        {
-            Color = color;
-            return this;
-        }
         public EmbedBuilder WithTimestamp()
         {
             Timestamp = DateTimeOffset.UtcNow;
@@ -68,6 +63,11 @@ namespace Discord
         public EmbedBuilder WithTimestamp(DateTimeOffset dateTimeOffset)
         {
             Timestamp = dateTimeOffset;
+            return this;
+        }
+        public EmbedBuilder WithColor(Color color)
+        {
+            Color = color;
             return this;
         }
 
