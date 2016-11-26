@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using System.Reflection;
 
 using Discord.Commands.Builders;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay("{Name,nq}")]
     public class CommandInfo
     {
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
