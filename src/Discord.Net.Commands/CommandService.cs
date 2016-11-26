@@ -20,6 +20,7 @@ namespace Discord.Commands
         private readonly CommandMap _map;
 
         internal readonly RunMode _defaultRunMode;
+        internal readonly string _nodeSeparator;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -68,6 +69,7 @@ namespace Discord.Commands
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
             _defaultRunMode = config.DefaultRunMode;
+            _nodeSeparator = config.NodeSeparator;
         }
 
         //Modules
