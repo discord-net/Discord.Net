@@ -38,6 +38,7 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private bool _canReconnect;
         private DateTimeOffset? _statusSince;
+        private RestApplication _application;
 
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
@@ -333,8 +334,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public Task<RestApplication> GetApplicationInfoAsync()
-            => ClientHelper.GetApplicationInfoAsync(this);
+        public async Task<RestApplication> GetApplicationInfoAsync()
+        { 
+            return _application ?? (_application = await ClientHelper.GetApplicationInfoAsync(this));
+        }
 
         /// <inheritdoc />
         public SocketGuild GetGuild(ulong id)
