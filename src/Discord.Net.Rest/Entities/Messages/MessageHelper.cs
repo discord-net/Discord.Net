@@ -15,7 +15,12 @@ namespace Discord.Rest
         {
             var args = new ModifyMessageParams();
             func(args);
-            return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyMessageParams
+            {
+                Content = args.Content,
+                Embed = args.Embed.IsSpecified ? args.Embed.Value.Build() : Optional.Create<API.Embed>()
+            };
+            return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task DeleteAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
