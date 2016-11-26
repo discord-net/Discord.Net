@@ -55,7 +55,7 @@ namespace Discord
             ImageUrl = ImageUrl;
             return this;
         }
-        public EmbedBuilder WithTimestamp()
+        public EmbedBuilder WithCurrentTimestamp()
         {
             Timestamp = DateTimeOffset.UtcNow;
             return this;
