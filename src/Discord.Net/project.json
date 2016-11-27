@@ -1,5 +1,5 @@
-{
-  "version": "1.0.0-beta2-*",
+﻿{
+  "version": "1.0.0-*",
   "description": "An aynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.",
   "authors": [ "RogueException" ],
 

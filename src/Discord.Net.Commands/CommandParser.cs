@@ -15,7 +15,7 @@ namespace Discord.Commands
         
         public static async Task<ParseResult> ParseArgs(CommandInfo command, CommandContext context, string input, int startPos)
         {
-            CommandParameter curParam = null;
+            ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
             int endPos = input.Length;
             var curPart = ParserPart.None;
@@ -65,7 +65,9 @@ namespace Discord.Commands
                         return ParseResult.FromError(CommandError.ParseFailed, "There must be at least one character of whitespace between arguments.");
                     else
                     {
-                        curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
+                        if (curParam == null)
+                            curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
+
                         if (curParam != null && curParam.IsRemainder)
                         {
                             argBuilder.Append(c);
@@ -116,11 +118,7 @@ namespace Discord.Commands
                     {
                         paramList.Add(typeReaderResult);
 
-                        if (curPos == endPos)
-                        {
-                            curParam = null;
-                            curPart = ParserPart.None;
-                        }
+                        curPart = ParserPart.None;
                     }
                     else
                     {

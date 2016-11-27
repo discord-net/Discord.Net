@@ -18,7 +18,7 @@ namespace Discord.Commands
                 throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\"");
 
             var constructor = constructors[0];
-            ParameterInfo[] parameters = constructor.GetParameters();
+            System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
 
             return (map) =>
             {

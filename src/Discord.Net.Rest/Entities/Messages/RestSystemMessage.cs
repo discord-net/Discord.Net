@@ -8,15 +8,13 @@ namespace Discord.Rest
     {
         public MessageType Type { get; private set; }
 
-        internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
-            : base(discord, id, channel, author, guild)
+        internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
+            : base(discord, id, channel, author)
         {
         }
-        internal new static RestSystemMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static RestSystemMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestSystemMessage(discord, model.Id, 
-                RestVirtualMessageChannel.Create(discord, model.ChannelId), 
-                RestUser.Create(discord, model.Author.Value), guild);
+            var entity = new RestSystemMessage(discord, model.Id, channel, author);
             entity.Update(model);
             return entity;
         }

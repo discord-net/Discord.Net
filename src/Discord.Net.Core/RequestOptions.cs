@@ -10,7 +10,7 @@
 
         internal bool IgnoreState { get; set; }
         internal string BucketId { get; set; }
-        internal string ClientBucketId { get; set; }
+        internal bool IsClientBucket { get; set; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {
@@ -22,7 +22,7 @@
 
         public RequestOptions()
         {
-            Timeout = 30000;
+            Timeout = DiscordConfig.DefaultRequestTimeout;
         }
 
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;

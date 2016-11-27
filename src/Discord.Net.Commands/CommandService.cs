@@ -7,24 +7,30 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Discord.Commands.Builders;
+
 namespace Discord.Commands
 {
     public class CommandService
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(ModuleBase).GetTypeInfo();
-
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _moduleDefs;
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs; 
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
+        private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x.Value);
-        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Value.Commands);
+        internal readonly bool _caseSensitive;
+        internal readonly RunMode _defaultRunMode;
 
-        public CommandService()
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+
+        public CommandService() : this(new CommandServiceConfig()) { }
+        public CommandService(CommandServiceConfig config)
         {
             _moduleLock = new SemaphoreSlim(1, 1);
-            _moduleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
+            _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
+            _moduleDefs = new ConcurrentBag<ModuleInfo>();
             _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
@@ -62,103 +68,129 @@ namespace Discord.Commands
                 [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
+            _caseSensitive = config.CaseSensitiveCommands;
+            _defaultRunMode = config.DefaultRunMode;
         }
 
         //Modules
-        public async Task<ModuleInfo> AddModule<T>()
+        public async Task<ModuleInfo> CreateModuleAsync(string primaryAlias, Action<ModuleBuilder> buildFunc)
+        {
+            await _moduleLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                var builder = new ModuleBuilder(this, null, primaryAlias);
+                buildFunc(builder);
+
+                var module = builder.Build(this);
+                return LoadModuleInternal(module);
+            }
+            finally
+            {
+                _moduleLock.Release();
+            }
+        }
+        public async Task<ModuleInfo> AddModuleAsync<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 var typeInfo = typeof(T).GetTypeInfo();
-                if (!_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                    throw new ArgumentException($"Modules must inherit ModuleBase.");
 
-                if (typeInfo.IsAbstract)
-                    throw new InvalidOperationException("Modules must not be abstract.");
-
-                if (_moduleDefs.ContainsKey(typeof(T)))
+                if (_typedModuleDefs.ContainsKey(typeof(T)))
                     throw new ArgumentException($"This module has already been added.");
 
-                return AddModuleInternal(typeInfo);
+                var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
+
+                if (module.Value == default(ModuleInfo))
+                    throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}, did you pass an invalid type?");
+
+                _typedModuleDefs[module.Key] = module.Value;
+                
+                return LoadModuleInternal(module.Value);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModules(Assembly assembly)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
         {
-            var moduleDefs = ImmutableArray.CreateBuilder<ModuleInfo>();
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                foreach (var type in assembly.ExportedTypes)
+                var types = ModuleClassBuilder.Search(assembly).ToArray();
+                var moduleDefs = ModuleClassBuilder.Build(types, this);
+
+                foreach (var info in moduleDefs)
                 {
-                    if (!_moduleDefs.ContainsKey(type))
-                    {
-                        var typeInfo = type.GetTypeInfo();
-                        if (_moduleTypeInfo.IsAssignableFrom(typeInfo))
-                        {
-                            var dontAutoLoad = typeInfo.GetCustomAttribute<DontAutoLoadAttribute>();
-                            if (dontAutoLoad == null && !typeInfo.IsAbstract)
-                                moduleDefs.Add(AddModuleInternal(typeInfo));
-                        }
-                    }
+                    _typedModuleDefs[info.Key] = info.Value;
+                    LoadModuleInternal(info.Value);
                 }
-                return moduleDefs.ToImmutable();
+
+                return moduleDefs.Select(x => x.Value).ToImmutableArray();
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo AddModuleInternal(TypeInfo typeInfo)
+        private ModuleInfo LoadModuleInternal(ModuleInfo module)
         {
-            var moduleDef = new ModuleInfo(typeInfo, this);
-            _moduleDefs[typeInfo.AsType()] = moduleDef;
+            _moduleDefs.Add(module);
 
-            foreach (var cmd in moduleDef.Commands)
-                _map.AddCommand(cmd);
+            foreach (var command in module.Commands)
+                _map.AddCommand(command);
 
-            return moduleDef;
+            foreach (var submodule in module.Submodules)
+                LoadModuleInternal(submodule);
+            
+            return module;
         }
 
-        public async Task<bool> RemoveModule(ModuleInfo module)
+        public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return RemoveModuleInternal(module.Source.BaseType);
+                return RemoveModuleInternal(module);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> RemoveModule<T>()
+        public async Task<bool> RemoveModuleAsync<T>()
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                return RemoveModuleInternal(typeof(T));
+                ModuleInfo module;
+                _typedModuleDefs.TryGetValue(typeof(T), out module);
+                if (module == default(ModuleInfo))
+                    return false;
+                
+                return RemoveModuleInternal(module);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        private bool RemoveModuleInternal(Type type)
+        private bool RemoveModuleInternal(ModuleInfo module)
         {
-            ModuleInfo unloadedModule;
-            if (_moduleDefs.TryRemove(type, out unloadedModule))
-            {
-                foreach (var cmd in unloadedModule.Commands)
-                    _map.RemoveCommand(cmd);
-                return true;
-            }
-            else
+            var defsRemove = module;
+            if (!_moduleDefs.TryTake(out defsRemove))
                 return false;
+            
+            foreach (var cmd in module.Commands)
+                _map.RemoveCommand(cmd);
+
+            foreach (var submodule in module.Submodules)
+            {
+                RemoveModuleInternal(submodule);
+            }
+
+            return true;
         }
 
         //Type Readers
@@ -182,7 +214,7 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, int argPos) => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(CommandContext context, string input)
         {
-            string lowerInput = input.ToLowerInvariant();
+            input = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
             
             if (matches.Length > 0)
@@ -191,9 +223,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> Execute(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
-            => Execute(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
-        public async Task<IResult> Execute(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
+        public async Task<IResult> ExecuteAsync(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             dependencyMap = dependencyMap ?? DependencyMap.Empty;
 
@@ -204,7 +236,7 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditions(context, dependencyMap).ConfigureAwait(false);
+                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -213,7 +245,7 @@ namespace Discord.Commands
                         continue;
                 }
 
-                var parseResult = await commands[i].Parse(context, searchResult, preconditionResult).ConfigureAwait(false);
+                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)

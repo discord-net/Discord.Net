@@ -9,11 +9,10 @@ namespace Discord.Rest
 {
     public abstract class RestMessage : RestEntity<ulong>, IMessage, IUpdateable
     {
-        internal readonly IGuild _guild;
         private long _timestampTicks;
 
         public IMessageChannel Channel { get; }
-        public RestUser Author { get; }
+        public IUser Author { get; }
 
         public string Content { get; private set; }
 
@@ -32,19 +31,18 @@ namespace Discord.Rest
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
+        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
             : base(discord, id)
         {
             Channel = channel;
             Author = author;
-            _guild = guild;
         }
-        internal static RestMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal static RestMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
             if (model.Type == MessageType.Default)
-                return RestUserMessage.Create(discord, guild, model);
+                return RestUserMessage.Create(discord, channel, author, model);
             else
-                return RestSystemMessage.Create(discord, guild, model);
+                return RestSystemMessage.Create(discord, channel, author, model);
         }
         internal virtual void Update(Model model)
         {

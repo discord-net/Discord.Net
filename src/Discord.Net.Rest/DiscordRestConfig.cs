@@ -6,7 +6,6 @@ namespace Discord.Rest
     {
         public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
         
-        internal const int RestTimeout = 10000;
         internal const int MessageQueueInterval = 100;
         internal const int WebSocketQueueInterval = 100;
 

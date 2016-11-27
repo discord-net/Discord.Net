@@ -8,6 +8,8 @@ namespace Discord.Rest
 {
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
+        private RestApplication _applicationInfo;
+
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
@@ -21,10 +23,17 @@ namespace Discord.Rest
             base.CurrentUser = RestSelfUser.Create(this, ApiClient.CurrentUser);
             return Task.CompletedTask;
         }
+        protected override Task OnLogoutAsync()
+        {
+            _applicationInfo = null;
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc />
-        public Task<RestApplication> GetApplicationInfoAsync()
-            => ClientHelper.GetApplicationInfoAsync(this);
+        public async Task<RestApplication> GetApplicationInfoAsync()
+        {
+            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this));
+        }
         
         /// <inheritdoc />
         public Task<RestChannel> GetChannelAsync(ulong id)

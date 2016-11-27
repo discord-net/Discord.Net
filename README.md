@@ -1,4 +1,4 @@
-# Discord.Net v1.0.0-beta
+# Discord.Net v1.0.0-beta2
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net) 
 [![MyGet Build Status](https://www.myget.org/BuildSource/Badge/discord-net?identifier=15bf7c42-22dd-4406-93e5-3cafc62bbc85)](https://www.myget.org/)
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTYLhAAW)
@@ -19,20 +19,15 @@ Bleeding edge builds are available using our MyGet feed (`https://www.myget.org/
 ## Compiling
 In order to compile Discord.Net, you require the following:
 
-### Using Visual Studio 2015
-- [VS2015 Update 3](https://www.microsoft.com/net/core#windows)
-- [.Net Core 1.0 VS Plugin](https://www.microsoft.com/net/core#windows)
+### Using Visual Studio
+- [Visual Studio 2017 RC](https://www.microsoft.com/net/core#windowsvs2017)
 
-### Using CLI
-- [.Net Core 1.0 SDK](https://www.microsoft.com/net/core)
+The .NET Core and Docker (Preview) workload is required during Visual Studio installation.
+
+### Using Command Line
+- [.Net Core 1.1 SDK](https://www.microsoft.com/net/download/core)
 
 ## Known Issues
 
-### WebSockets
-The current stable .Net Core websocket package does not support Linux, or pre-Win8.
-
-#### Linux
-Add the latest version of `System.Net.WebSockets.Client` from the .Net Core MyGet feed (`https://dotnet.myget.org/F/dotnet-core/api/v3/index.json`) to your project.
-
-#### Windows 7 and earlier
-There is currently no workaround, track the issue [here](https://github.com/dotnet/corefx/issues/9503).
+### WebSockets (Win7 and earlier)
+.Net Core 1.1 does not support WebSockets on Win7 and earlier. Track the issue [here](https://github.com/dotnet/corefx/issues/9503).

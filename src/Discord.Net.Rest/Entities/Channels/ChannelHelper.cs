@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
+using UserModel = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -43,13 +44,13 @@ namespace Discord.Rest
         }
 
         //Invites
-        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IChannel channel, BaseDiscordClient client,
+        public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuildChannel channel, BaseDiscordClient client,
             RequestOptions options)
         {
             var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
-        public static async Task<RestInviteMetadata> CreateInviteAsync(IChannel channel, BaseDiscordClient client,
+        public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
         {
             var args = new CreateChannelInviteParams { IsTemporary = isTemporary };
@@ -62,17 +63,23 @@ namespace Discord.Rest
         }
 
         //Messages
-        public static async Task<RestMessage> GetMessageAsync(IChannel channel, BaseDiscordClient client, 
-            ulong id, IGuild guild, RequestOptions options)
+        public static async Task<RestMessage> GetMessageAsync(IMessageChannel channel, BaseDiscordClient client, 
+            ulong id, RequestOptions options)
         {
+            var guildId = (channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? await (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).ConfigureAwait(false) : null;
             var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
-            return RestMessage.Create(client, guild, model);
+            var author = GetAuthor(client, guild, model.Author.Value);
+            return RestMessage.Create(client, channel, author, model);
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IChannel channel, BaseDiscordClient client, 
-            ulong? fromMessageId, Direction dir, int limit, IGuild guild, RequestOptions options)
+        public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
+            ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
             if (dir == Direction.Around)
                 throw new NotImplementedException(); //TODO: Impl
+
+            var guildId = (channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
 
             return new PagedAsyncEnumerable<RestMessage>(
                 DiscordConfig.MaxMessagesPerBatch,
@@ -85,8 +92,15 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.RelativeMessageId = info.Position.Value;
+
                     var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
-                    return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray();
+                    var builder = ImmutableArray.CreateBuilder<RestMessage>();
+                    foreach (var model in models)
+                    {
+                        var author = GetAuthor(client, guild, model.Author.Value);
+                        builder.Add(RestMessage.Create(client, channel, author, model));                        
+                    }
+                    return builder.ToImmutable();
                 },
                 nextPage: (info, lastPage) =>
                 {
@@ -102,37 +116,45 @@ namespace Discord.Rest
                 count: limit
             );
         }
-        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IChannel channel, BaseDiscordClient client,
-            IGuild guild, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
+            RequestOptions options)
         {
+            var guildId = (channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? await (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).ConfigureAwait(false) : null;
             var models = await client.ApiClient.GetPinsAsync(channel.Id, options).ConfigureAwait(false);
-            return models.Select(x => RestMessage.Create(client, guild, x)).ToImmutableArray();
+            var builder = ImmutableArray.CreateBuilder<RestMessage>();
+            foreach (var model in models)
+            {
+                var author = GetAuthor(client, guild, model.Author.Value);
+                builder.Add(RestMessage.Create(client, channel, author, model));
+            }
+            return builder.ToImmutable();
         }
 
-        public static async Task<RestUserMessage> SendMessageAsync(IChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, IGuild guild, RequestOptions options)
+        public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
+            string text, bool isTTS, EmbedBuilder embed, RequestOptions options)
         {
-            var args = new CreateMessageParams(text) { IsTTS = isTTS };
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.Build() };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
-            return RestUserMessage.Create(client, guild, model);
+            return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-        public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, IGuild guild, RequestOptions options)
+        public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
+            string filePath, string text, bool isTTS, RequestOptions options)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(channel, client, file, filename, text, isTTS, guild, options).ConfigureAwait(false);
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, options).ConfigureAwait(false);
         }
-        public static async Task<RestUserMessage> SendFileAsync(IChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, IGuild guild, RequestOptions options)
+        public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
+            Stream stream, string filename, string text, bool isTTS, RequestOptions options)
         {
             var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
-            return RestUserMessage.Create(client, guild, model);
+            return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-        public static async Task DeleteMessagesAsync(IChannel channel, BaseDiscordClient client, 
+        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
             IEnumerable<IMessage> messages, RequestOptions options)
         {
             var args = new DeleteMessagesParams(messages.Select(x => x.Id).ToArray());
@@ -216,5 +238,16 @@ namespace Discord.Rest
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client, 
             RequestOptions options)
             => new TypingNotifier(client, channel, options);
+
+        //Helpers
+        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model)
+        {
+            IUser author = null;
+            if (guild != null)
+                author = guild.GetUserAsync(model.Id, CacheMode.CacheOnly).Result;
+            if (author == null)
+                author = RestUser.Create(client, model);
+            return author;
+        }
     }
 }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -32,15 +31,13 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ITag> Tags => _tags;
         public IReadOnlyDictionary<Emoji, int> Reactions => _reactions.ToDictionary(x => x.Emoji, x => x.Count);
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, RestUser author, IGuild guild)
-            : base(discord, id, channel, author, guild)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
+            : base(discord, id, channel, author)
         {
         }
-        internal new static RestUserMessage Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id,
-                RestVirtualMessageChannel.Create(discord, model.ChannelId),
-                RestUser.Create(discord, model.Author.Value), guild);
+            var entity = new RestUserMessage(discord, model.Id, channel, author);
             entity.Update(model);
             return entity;
         }
@@ -122,7 +119,9 @@ namespace Discord.Rest
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, null, _guild, mentions);
+                var guildId = (Channel as IGuildChannel)?.GuildId;
+                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+                _tags = MessageHelper.ParseTags(text, null, guild, mentions);
                 model.Content = text;
             }
         }
@@ -155,9 +154,12 @@ namespace Discord.Rest
         public Task UnpinAsync(RequestOptions options)
             => MessageHelper.UnpinAsync(this, Discord, options);
 
+        public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
+            => MentionUtils.Resolve(this, startIndex, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
         public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
-            => MentionUtils.Resolve(this, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
+            => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
     }

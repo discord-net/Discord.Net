@@ -25,7 +25,7 @@ namespace Discord
                   model.Width.IsSpecified ? model.Width.Value : (int?)null);
         }
 
-        private string DebuggerDisplay => $"{ToString()} ({Url})";
-        public override string ToString() => Width != null && Height != null ? $"{Width}x{Height}" : "0x0";
+        private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
+        public override string ToString() => Url;
     }
 }

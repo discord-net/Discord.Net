@@ -142,7 +142,7 @@ namespace Discord.Rest
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
-            var role = RestRole.Create(client, model);
+            var role = RestRole.Create(client, guild, model);
 
             await role.ModifyAsync(x =>
             {

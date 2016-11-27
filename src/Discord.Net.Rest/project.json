@@ -1,5 +1,5 @@
-{
-  "version": "1.0.0-beta2-*",
+﻿{
+  "version": "1.0.0-*",
   "description": "A core Discord.Net library containing the REST client and models.",
   "authors": [ "RogueException" ],
 
@@ -29,7 +29,7 @@
     "Discord.Net.Core": {
       "target": "project"
     },
-    "System.IO.FileSystem": "4.0.1"
+    "System.IO.FileSystem": "4.3.0"
   },
 
   "frameworks": {

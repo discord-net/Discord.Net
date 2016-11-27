@@ -87,7 +87,7 @@ namespace Discord.Rest
             if (model.Roles != null)
             {
                 for (int i = 0; i < model.Roles.Length; i++)
-                    roles[model.Roles[i].Id] = RestRole.Create(Discord, model.Roles[i]);
+                    roles[model.Roles[i].Id] = RestRole.Create(Discord, this, model.Roles[i]);
             }
             _roles = roles.ToImmutable();
 
