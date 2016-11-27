@@ -30,6 +30,7 @@ namespace Discord.Rpc
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<ulong> MentionedUserIds => MessageHelper.FilterTagsByKey(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        public IReadOnlyDictionary<Emoji, int> Reactions => ImmutableDictionary.Create<Emoji, int>();
 
         internal RpcUserMessage(DiscordRpcClient discord, ulong id, IMessageChannel channel, RpcUser author)
             : base(discord, id, channel, author)
@@ -100,6 +101,22 @@ namespace Discord.Rpc
 
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
+
+        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+        public Task AddReactionAsync(string emoji, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+
+        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+
+        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+        
+        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit, ulong? afterUserId, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
 
         public Task PinAsync(RequestOptions options)
             => MessageHelper.PinAsync(this, Discord, options);

@@ -43,6 +43,7 @@ namespace Discord
                 if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
             }
         }
+        
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
         {

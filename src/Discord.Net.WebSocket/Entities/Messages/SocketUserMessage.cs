@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
+using Discord.API.Gateway;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
@@ -18,6 +20,7 @@ namespace Discord.WebSocket
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
+        private List<SocketReaction> _reactions = new List<SocketReaction>();
         
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
@@ -29,6 +32,7 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
+        public IReadOnlyDictionary<Emoji, int> Reactions => _reactions.GroupBy(r => r.Emoji).ToDictionary(x => x.Key, x => x.Count());
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id, channel, author)
@@ -109,9 +113,38 @@ namespace Discord.WebSocket
                 model.Content = text;
             }
         }
+        internal void AddReaction(SocketReaction reaction)
+        {
+            _reactions.Add(reaction);
+        }
+        internal void RemoveReaction(SocketReaction reaction)
+        {
+            if (_reactions.Contains(reaction))
+                _reactions.Remove(reaction);
+        }
+        internal void ClearReactions()
+        {
+            _reactions.Clear();
+        }
 
         public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
+
+        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+        public Task AddReactionAsync(string emoji, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
+
+        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
+
+        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+
+        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
 
         public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);

@@ -6,7 +6,7 @@ namespace Discord.API
     public class Emoji
     {
         [JsonProperty("id")]
-        public ulong Id { get; set; }
+        public ulong? Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("roles")]

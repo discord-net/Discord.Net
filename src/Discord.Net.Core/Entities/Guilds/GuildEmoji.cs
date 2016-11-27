@@ -24,7 +24,7 @@ namespace Discord
         }
         internal static GuildEmoji Create(Model model)
         {
-            return new GuildEmoji(model.Id, model.Name, model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
+            return new GuildEmoji(model.Id.Value, model.Name, model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
         }
 
         public override string ToString() => Name;

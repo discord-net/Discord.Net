@@ -19,6 +19,11 @@ namespace Discord
             Name = name;
         }
 
+        internal static Emoji FromApi(API.Emoji emoji)
+        {
+            return new Emoji(emoji.Id.GetValueOrDefault(), emoji.Name);
+        }
+
         public static Emoji Parse(string text)
         {
             Emoji result;

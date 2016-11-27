@@ -10,7 +10,7 @@ namespace Discord
         //TODO: C#7 Candidate for binary literals
         private static ChannelPermissions _allDM { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000001011100110000000000", 2));
         private static ChannelPermissions _allVoice { get; } = new ChannelPermissions(Convert.ToUInt64("00010011111100000000000000010001", 2));
-        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000001111111110000010001", 2));
+        private static ChannelPermissions _allText { get; } = new ChannelPermissions(Convert.ToUInt64("00010000000001111111110001010001", 2));
         private static ChannelPermissions _allGroup { get; } = new ChannelPermissions(Convert.ToUInt64("00000000000001111110110000000000", 2));
 
         /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
@@ -35,6 +35,8 @@ namespace Discord
         /// <summary> If True, a user may create, delete and modify this channel. </summary>
         public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannel);
 
+        /// <summary> If true, a user may add reactions. </summary>
+        public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
         /// <summary> If True, a user may join channels. </summary>
         public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
         /// <summary> If True, a user may send messages. </summary>

@@ -1308,6 +1308,84 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "MESSAGE_REACTION_ADD":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
+                                    var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                    if (channel != null)
+                                    {
+                                        SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
+
+                                        if (cachedMsg != null)
+                                        {
+                                            cachedMsg.AddReaction(reaction);
+                                            await _reactionAddedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        await _reactionAddedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                    break;
+                                }
+                            case "MESSAGE_REACTION_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
+                                    var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                    if (channel != null)
+                                    {
+                                        SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
+                                        if (cachedMsg != null)
+                                        {
+                                            cachedMsg.RemoveReaction(reaction);
+                                            await _reactionRemovedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        await _reactionRemovedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+                                    break;
+                                }
+                            case "MESSAGE_REACTION_REMOVE_ALL":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_ALL)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<RemoveAllReactionsEvent>(_serializer);
+                                    var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
+                                    if (channel != null)
+                                    {
+                                        SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        if (cachedMsg != null)
+                                        {
+                                            cachedMsg.ClearReactions();
+                                            await _reactionsClearedEvent.InvokeAsync(data.MessageId, cachedMsg).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        await _reactionsClearedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>());
+                                    }
+                                    else
+                                    {
+                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    break;
+                                }
                             case "MESSAGE_DELETE_BULK":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
