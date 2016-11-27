@@ -101,6 +101,8 @@ namespace Discord.Net.WebSockets
 
             if (_client != null && _client.State == WebSocketState.Open)
             {
+                var token = new CancellationToken();
+                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
                 _client.Dispose();
                 _client = null;
             }
