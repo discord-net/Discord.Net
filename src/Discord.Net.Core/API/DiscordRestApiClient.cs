@@ -505,7 +505,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             if (args.Content.IsSpecified)
             {
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+                if (!args.Embed.IsSpecified)
+                    Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
                 if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
