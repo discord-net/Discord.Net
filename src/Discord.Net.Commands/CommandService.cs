@@ -14,7 +14,7 @@ namespace Discord.Commands
     public class CommandService
     {
         private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs; 
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
@@ -50,7 +50,7 @@ namespace Discord.Commands
                 [typeof(decimal)] = new SimpleTypeReader<decimal>(),
                 [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
                 [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
-                
+                [typeof(TimeSpan)] = new SimpleTypeReader<TimeSpan>(),
                 [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
                 [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
@@ -105,7 +105,7 @@ namespace Discord.Commands
                     throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}, did you pass an invalid type?");
 
                 _typedModuleDefs[module.Key] = module.Value;
-                
+
                 return LoadModuleInternal(module.Value);
             }
             finally
@@ -143,7 +143,7 @@ namespace Discord.Commands
 
             foreach (var submodule in module.Submodules)
                 LoadModuleInternal(submodule);
-            
+
             return module;
         }
 
@@ -168,7 +168,7 @@ namespace Discord.Commands
                 _typedModuleDefs.TryGetValue(typeof(T), out module);
                 if (module == default(ModuleInfo))
                     return false;
-                
+
                 return RemoveModuleInternal(module);
             }
             finally
@@ -181,7 +181,7 @@ namespace Discord.Commands
             var defsRemove = module;
             if (!_moduleDefs.TryTake(out defsRemove))
                 return false;
-            
+
             foreach (var cmd in module.Commands)
                 _map.RemoveCommand(cmd);
 
@@ -216,14 +216,14 @@ namespace Discord.Commands
         {
             input = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
-            
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception) 
+        public Task<IResult> ExecuteAsync(CommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
         public async Task<IResult> ExecuteAsync(CommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
@@ -272,7 +272,7 @@ namespace Discord.Commands
 
                 return await commands[i].Execute(context, parseResult, dependencyMap).ConfigureAwait(false);
             }
-            
+
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
         }
     }
