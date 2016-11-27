@@ -16,7 +16,7 @@ namespace Discord.Commands
         /// Require that the user invoking the command has a specified GuildPermission
         /// </summary>
         /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing or ANDing the permissions together.</param>
+        /// <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
         public RequireUserPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
@@ -25,11 +25,11 @@ namespace Discord.Commands
         /// <summary>
         /// Require that the user invoking the command has a specified ChannelPermission.
         /// </summary>
-        /// <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing or ANDing the permissions together.</param>
+        /// <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
         /// <example>
         /// <code language="c#">
         ///     [Command("permission")]
-        ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory &amp; ChannelPermission.ReadMessages)]
+        ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory | ChannelPermission.ReadMessages)]
         ///     public async Task HasPermission()
         ///     {
         ///         await ReplyAsync("You can read messages and the message history!");

@@ -22,7 +22,7 @@ namespace Discord.Commands
         /// <summary>
         /// Require that the command be invoked in a specified context.
         /// </summary>
-        /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be speicifed by ORing the contexts together.</param>
+        /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
         /// <example>
         /// <code language="c#">
         ///     [Command("private_only")]

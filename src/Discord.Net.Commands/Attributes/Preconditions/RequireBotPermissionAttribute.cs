@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
     /// <summary>
-    /// This attribute requires that the bot has a speicifed permission in the channel a command is invoked in.
+    /// This attribute requires that the bot has a specified permission in the channel a command is invoked in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class RequireBotPermissionAttribute : PreconditionAttribute
@@ -18,7 +16,7 @@ namespace Discord.Commands
         /// Require that the bot account has a specified GuildPermission
         /// </summary>
         /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the bot must have. Multiple permissions can be specified by ORing or ANDing the permissions together.</param>
+        /// <param name="permission">The GuildPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
         public RequireBotPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
@@ -27,7 +25,7 @@ namespace Discord.Commands
         /// <summary>
         /// Require that the bot account has a specified ChannelPermission.
         /// </summary>
-        /// <param name="permission">The ChannelPermission that the bot must have. Multiple permissions can be specified by ORing or ANDing the permissions together.</param>
+        /// <param name="permission">The ChannelPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
         /// <example>
         /// <code language="c#">
         ///     [Command("permission")]
