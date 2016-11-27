@@ -31,7 +31,6 @@ namespace Discord.Commands
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new ConcurrentBag<ModuleInfo>();
-            _map = new CommandMap();
             _typeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
                 [typeof(bool)] = new SimpleTypeReader<bool>(),
@@ -70,6 +69,7 @@ namespace Discord.Commands
             };
             _defaultRunMode = config.DefaultRunMode;
             _nodeSeparator = config.NodeSeparator;
+            _map = new CommandMap(this);
         }
 
         //Modules

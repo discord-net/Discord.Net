@@ -7,9 +7,9 @@ namespace Discord.Commands
         private readonly CommandMapNode _root;
         private static readonly string[] _blankAliases = new[] { "" };
 
-        public CommandMap()
+        public CommandMap(CommandService service)
         {
-            _root = new CommandMapNode("");
+            _root = new CommandMapNode("", service);
         }
 
         public void AddCommand(CommandInfo command)
