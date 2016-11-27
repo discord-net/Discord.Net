@@ -21,8 +21,8 @@ namespace Discord.Commands
 
         internal readonly RunMode _defaultRunMode;
 
-        public IEnumerable<ModuleInfo> Modules => _typedModuleDefs.Select(x => x.Value);
-        public IEnumerable<CommandInfo> Commands => _typedModuleDefs.SelectMany(x => x.Value.Commands);
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
 
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
