@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Rpc
 {
-    public partial class DiscordRpcClient : BaseDiscordClient
+    public partial class DiscordRpcClient : BaseDiscordClient, IDiscordClient
     {
         private readonly Logger _rpcLogger;
         private readonly JsonSerializer _serializer;
@@ -33,7 +33,7 @@ namespace Discord.Rpc
 
         public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
         public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
-        public RestApplication CurrentApplication { get; private set; }
+        public RestApplication ApplicationInfo { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
         public DiscordRpcClient(string clientId, string origin) 
@@ -393,7 +393,7 @@ namespace Discord.Rpc
                                             {
                                                 var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
                                                 CurrentUser = RestSelfUser.Create(this, response.User);
-                                                CurrentApplication = RestApplication.Create(this, response.Application);
+                                                ApplicationInfo = RestApplication.Create(this, response.Application);
                                                 Scopes = response.Scopes;
                                                 TokenExpiresAt = response.Expires;
 
@@ -547,5 +547,8 @@ namespace Discord.Rpc
                 return;
             }
         }
+
+        //IDiscordClient
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync() => Task.FromResult<IApplication>(ApplicationInfo);
     }
 }

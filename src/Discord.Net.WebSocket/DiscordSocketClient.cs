@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private bool _canReconnect;
         private DateTimeOffset? _statusSince;
-        private RestApplication _application;
+        private RestApplication _applicationInfo;
 
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
@@ -124,6 +124,7 @@ namespace Discord.WebSocket
             if (ConnectionState != ConnectionState.Disconnected)
                 await DisconnectInternalAsync(null, false).ConfigureAwait(false);
 
+            _applicationInfo = null;
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
         }
         
@@ -336,7 +337,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public async Task<RestApplication> GetApplicationInfoAsync()
         { 
-            return _application ?? (_application = await ClientHelper.GetApplicationInfoAsync(this));
+            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this));
         }
 
         /// <inheritdoc />
