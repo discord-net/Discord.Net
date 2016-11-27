@@ -32,6 +32,12 @@ namespace Discord
         }
         public Color(float r, float g, float b)
         {
+            if (r <= 0.0f && r >= 1.0f)
+                throw new ArgumentOutOfRangeException(nameof(r), "A float value must be within [0,1]");
+            if (g <= 0.0f || g >= 1.0f)
+                throw new ArgumentOutOfRangeException(nameof(g), "A float value must be within [0,1]");
+            if (b <= 0.0f || b >= 1.0f)
+                throw new ArgumentOutOfRangeException(nameof(b), "A float value must be within [0,1]");
             RawValue =
                 ((uint)(r * 255.0f) << 16) |
                 ((uint)(g * 255.0f) << 8) |
