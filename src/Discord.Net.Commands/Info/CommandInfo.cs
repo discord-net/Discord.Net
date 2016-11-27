@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using System.Reflection;
 
 using Discord.Commands.Builders;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay("{Name,nq}")]
     public class CommandInfo
     {
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
@@ -42,13 +44,13 @@ namespace Discord.Commands
 
             // both command and module provide aliases
             if (module.Aliases.Count > 0 && builder.Aliases.Count > 0)
-                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => second != null ? first + " " + second : first).ToImmutableArray();
+                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => second != null ? first + " " + second : first).Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
             // only module provides aliases
             else if (module.Aliases.Count > 0)
-                Aliases = module.Aliases.ToImmutableArray();
+                Aliases = module.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
             // only command provides aliases
             else if (builder.Aliases.Count > 0)
-                Aliases = builder.Aliases.ToImmutableArray();
+                Aliases = builder.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
             // neither provide aliases
             else
                 throw new InvalidOperationException("Cannot build a command without any aliases");

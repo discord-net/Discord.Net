@@ -19,6 +19,7 @@ namespace Discord.Commands
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
+        internal readonly bool _caseSensitive;
         internal readonly RunMode _defaultRunMode;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
@@ -67,6 +68,7 @@ namespace Discord.Commands
                 [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
+            _caseSensitive = config.CaseSensitiveCommands;
             _defaultRunMode = config.DefaultRunMode;
         }
 
@@ -212,7 +214,7 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, int argPos) => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(CommandContext context, string input)
         {
-            string lowerInput = input.ToLowerInvariant();
+            input = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
             
             if (matches.Length > 0)
