@@ -22,7 +22,7 @@ namespace Discord.Commands
         internal readonly bool _caseSensitive;
         internal readonly RunMode _defaultRunMode;
 
-        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Where(x => !x.IsSubmodule);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
 
         public CommandService() : this(new CommandServiceConfig()) { }
