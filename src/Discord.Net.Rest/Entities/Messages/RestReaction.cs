@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Model = Discord.API.Reaction;
+﻿using Model = Discord.API.Reaction;
 
 namespace Discord
 {
     public class RestReaction : IReaction
     {
-        internal RestReaction(Model model)
-        {
-            Emoji = Emoji.FromApi(model.Emoji);
-            Count = model.Count;
-            Me = model.Me;
-        }
+        public Emoji Emoji { get; }
+        public int Count { get; }
+        public bool Me { get; }
 
-        public Emoji Emoji { get; private set; }
-        public int Count { get; private set; }
-        public bool Me { get; private set; } 
+        internal RestReaction(Emoji emoji, int count, bool me)
+        {
+            Emoji = emoji;
+            Count = count;
+            Me = me;
+        }
+        internal static RestReaction Create(Model model)
+        {
+            return new RestReaction(Emoji.Create(model.Emoji), model.Count, model.Me);
+        }
     }
 }

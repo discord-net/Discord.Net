@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using Model = Discord.API.Emoji;
 
 namespace Discord
 {
@@ -18,8 +19,7 @@ namespace Discord
             Id = id;
             Name = name;
         }
-
-        internal static Emoji FromApi(API.Emoji emoji)
+        internal static Emoji Create(Model emoji)
         {
             return new Emoji(emoji.Id.GetValueOrDefault(), emoji.Name);
         }

@@ -1,28 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Model = Discord.API.Gateway.GatewayReaction;
+﻿using Model = Discord.API.Gateway.Reaction;
 
 namespace Discord.WebSocket
 {
     public class SocketReaction : IReaction
     {
-        internal SocketReaction(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
+        public ulong UserId { get; }
+        public Optional<IUser> User { get; }
+        public ulong MessageId { get; }
+        public Optional<SocketUserMessage> Message { get; }
+        public ISocketMessageChannel Channel { get; }
+        public Emoji Emoji { get; }
+
+        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, Emoji emoji)
         {
             Channel = channel;
+            MessageId = messageId;
             Message = message;
-            MessageId = model.MessageId;
+            UserId = userId;
             User = user;
-            UserId = model.UserId;
-            Emoji = Emoji.FromApi(model.Emoji);
+            Emoji = emoji;
         }
-
-        public ulong UserId { get; private set; }
-        public Optional<IUser> User { get; private set; }
-        public ulong MessageId { get; private set; }
-        public Optional<SocketUserMessage> Message { get; private set; }
-        public ISocketMessageChannel Channel { get; private set; }
-        public Emoji Emoji { get; private set; }
+        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
+        {
+            return new SocketReaction(channel, model.MessageId, message, model.UserId, user, Emoji.Create(model.Emoji));
+        }
     }
 }

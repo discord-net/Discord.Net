@@ -109,7 +109,7 @@ namespace Discord.Rest
                 {
                     var reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        reactions.Add(new RestReaction(value[i]));
+                        reactions.Add(RestReaction.Create(value[i]));
                     _reactions = reactions.ToImmutable();
                 }
                 else

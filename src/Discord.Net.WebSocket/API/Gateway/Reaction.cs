@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class GatewayReaction
+    public class Reaction
     {
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }

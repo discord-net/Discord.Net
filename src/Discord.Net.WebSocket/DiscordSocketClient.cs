@@ -1312,13 +1312,13 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
 
-                                    var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
+                                    var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
-                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
+                                        SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
 
                                         if (cachedMsg != null)
                                         {
@@ -1339,13 +1339,13 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
 
-                                    var data = (payload as JToken).ToObject<GatewayReaction>(_serializer);
+                                    var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
-                                        SocketReaction reaction = new SocketReaction(data, channel, Optional.Create(cachedMsg), Optional.Create(user));
+                                        SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
                                         if (cachedMsg != null)
                                         {
                                             cachedMsg.RemoveReaction(reaction);
