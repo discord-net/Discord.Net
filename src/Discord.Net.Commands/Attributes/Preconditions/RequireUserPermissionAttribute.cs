@@ -29,7 +29,7 @@ namespace Discord.Commands
         /// <example>
         /// <code language="c#">
         ///     [Command("permission")]
-        ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory & ChannelPermission.ReadMessages)]
+        ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory &amp; ChannelPermission.ReadMessages)]
         ///     public async Task HasPermission()
         ///     {
         ///         await ReplyAsync("You can read messages and the message history!");
