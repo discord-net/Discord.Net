@@ -1,12 +1,10 @@
-﻿using Discord.API.Rest;
-using Discord.Rest;
+﻿using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Linq;
-using Discord.API.Gateway;
+using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket

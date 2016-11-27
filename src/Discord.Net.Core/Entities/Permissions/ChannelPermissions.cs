@@ -75,7 +75,8 @@ namespace Discord
         /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
 
-        private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null,
+        private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null, 
+            bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
@@ -85,6 +86,7 @@ namespace Discord
 
             Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannel);
+            Permissions.SetValue(ref value, addReactions, ChannelPermission.AddReactions);
             Permissions.SetValue(ref value, readMessages, ChannelPermission.ReadMessages);
             Permissions.SetValue(ref value, sendMessages, ChannelPermission.SendMessages);
             Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SendTTSMessages);
@@ -106,23 +108,24 @@ namespace Discord
         }
 
         /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
-        public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false,
+        public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false, 
+            bool addReactions = false,
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
             bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
             bool moveMembers = false, bool useVoiceActivation = false, bool managePermissions = false)
-            : this(0, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
-                  embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, 
-                  speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions)
-        { }
+            : this(0, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
+                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, 
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions) { }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
-        public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null,
+        public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null, 
+            bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool useExternalEmojis = false, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null)
-            => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, readMessages, sendMessages, sendTTSMessages, manageMessages,
+            => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, 
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions);
 
