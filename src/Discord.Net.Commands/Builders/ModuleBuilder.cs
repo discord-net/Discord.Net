@@ -14,7 +14,8 @@ namespace Discord.Commands.Builders
         public CommandService Service { get; }
         public ModuleBuilder Parent { get; }
         public string Name { get; set; }
-        public string Summary { get; set; } public string Remarks { get; set; }
+        public string Summary { get; set; }
+        public string Remarks { get; set; }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
