@@ -19,7 +19,7 @@ namespace Discord.Commands
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
         public IReadOnlyList<ModuleInfo> Submodules { get; }
         public ModuleInfo Parent { get; }
-        public bool IsSubmodule => Parent == null;
+        public bool IsSubmodule => Parent != null;
 
         internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
         {
