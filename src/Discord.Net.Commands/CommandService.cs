@@ -19,10 +19,13 @@ namespace Discord.Commands
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        public IEnumerable<ModuleInfo> Modules => _typedModuleDefs.Select(x => x.Value);
-        public IEnumerable<CommandInfo> Commands => _typedModuleDefs.SelectMany(x => x.Value.Commands);
+        internal readonly RunMode _defaultRunMode;
 
-        public CommandService()
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+
+        public CommandService() : this(new CommandServiceConfig()) { }
+        public CommandService(CommandServiceConfig config)
         {
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
@@ -64,6 +67,7 @@ namespace Discord.Commands
                 [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
+            _defaultRunMode = config.DefaultRunMode;
         }
 
         //Modules

@@ -498,14 +498,15 @@ namespace Discord.API
                     break;
             }
         }
-        public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, ModifyMessageParams args, RequestOptions options = null)
+        public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.ModifyMessageParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             Preconditions.NotNull(args, nameof(args));
             if (args.Content.IsSpecified)
             {
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+                if (!args.Embed.IsSpecified)
+                    Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
                 if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }

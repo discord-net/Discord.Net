@@ -115,7 +115,7 @@ namespace Discord.Commands
         private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
         {
             var attributes = method.GetCustomAttributes();
-
+            
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
@@ -139,6 +139,9 @@ namespace Discord.Commands
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
+
+            if (builder.Name == null)
+                builder.Name = method.Name;
 
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;

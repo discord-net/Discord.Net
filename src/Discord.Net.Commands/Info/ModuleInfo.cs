@@ -49,14 +49,20 @@ namespace Discord.Commands
 
             while (builderStack.Count() > 0)
             {
-                ModuleBuilder level = builderStack.Pop(); // get the topmost builder
+                ModuleBuilder level = builderStack.Pop(); //get the topmost builder
                 if (result == null)
-                    result = level.Aliases.ToList(); // create a shallow copy so we don't overwrite the builder unexpectedly
+                {
+                    if (level.Aliases.Count > 0)
+                        result = level.Aliases.ToList(); //create a shallow copy so we don't overwrite the builder unexpectedly
+                }
                 else if (result.Count() > level.Aliases.Count)
                     result = result.Permutate(level.Aliases, (first, second) => first + " " + second);
                 else
                     result = level.Aliases.Permutate(result, (second, first) => first + " " + second);
             }
+
+            if (result == null) //there were no aliases; default to an empty list
+                result = new List<string>();
 
             return result;
         }

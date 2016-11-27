@@ -2,6 +2,7 @@
 {
     public enum RunMode
     {
+        Default,
         Sync,
         Mixed,
         Async
