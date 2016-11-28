@@ -27,6 +27,7 @@ namespace Discord.Commands
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
+            parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
             parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate (string str, out string value)
             {
