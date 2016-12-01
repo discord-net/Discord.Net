@@ -1292,6 +1292,7 @@ namespace Discord.WebSocket
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
                                     }
                                 }
                                 break;
@@ -1340,6 +1341,7 @@ namespace Discord.WebSocket
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
                                     }
                                     break;
                                 }
@@ -1384,6 +1386,7 @@ namespace Discord.WebSocket
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
+                                        return;
                                     }
                                     break;
                                 }
@@ -1648,6 +1651,7 @@ namespace Discord.WebSocket
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
+                return;
             }
         }
 
