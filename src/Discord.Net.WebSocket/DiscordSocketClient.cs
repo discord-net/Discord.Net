@@ -108,11 +108,11 @@ namespace Discord.WebSocket
             {
                 if (ex != null)
                 {
-                    await _gatewayLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
+                    await _gatewayLogger.WarningAsync("Connection Closed", ex).ConfigureAwait(false);
                     await StartReconnectAsync(ex).ConfigureAwait(false);
                 }
                 else
-                    await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
+                    await _gatewayLogger.WarningAsync("Connection Closed").ConfigureAwait(false);
             };
 
             LeftGuild += async g => await _gatewayLogger.InfoAsync($"Left {g.Name}").ConfigureAwait(false);
@@ -408,7 +408,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketUser GetUser(string username, string discriminator)
         {
-            return State.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault();
+            return State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
         }
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
@@ -770,7 +770,7 @@ namespace Discord.WebSocket
                                     if (data.Unavailable == true)
                                     {
                                         type = "GUILD_UNAVAILABLE";
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
 
                                         var guild = State.GetGuild(data.Id);
                                         if (guild != null)
@@ -780,13 +780,13 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_UNAVAILABLE referenced an unknown guild.").ConfigureAwait(false);
+                                            await _gatewayLogger.WarningAsync("GUILD_UNAVAILABLE referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
                                         _downloadUsersFor.TryRemove(data.Id);
                                         var guild = RemoveGuild(data.Id);
@@ -797,7 +797,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                            await _gatewayLogger.WarningAsync("GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -810,7 +810,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    SocketChannel channel = null;
+                                    SocketChannel channel;
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -867,7 +867,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
-                                    SocketChannel channel = null;
+                                    SocketChannel channel;
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     if (data.GuildId.IsSpecified)
                                     {
@@ -1205,9 +1205,8 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketUser user = State.GetUser(data.User.Id);
-                                        if (user == null)
-                                            user = SocketSimpleUser.Create(this, State, data.User);
+                                        SocketUser user = State.GetUser(data.User.Id) ??
+                                            (SocketUser) SocketSimpleUser.Create(this, State, data.User);
                                         await _userUnbannedEvent.InvokeAsync(user, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1234,13 +1233,8 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketUser author;
-                                        if (guild != null)
-                                            author = guild.GetUser(data.Author.Value.Id);
-                                        else
-                                            author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-                                        if (author == null)
-                                            author = SocketSimpleUser.Create(this, State, data.Author.Value);
+                                        var author = (guild != null ? guild.GetUser(data.Author.Value.Id) : (channel as SocketChannel).GetUser(data.Author.Value.Id)) ??
+                                            SocketSimpleUser.Create(this, State, data.Author.Value);
 
                                         if (author != null)
                                         {
@@ -1287,25 +1281,17 @@ namespace Discord.WebSocket
                                         else if (data.Author.IsSpecified)
                                         {
                                             //Edited message isnt in cache, create a detached one
-                                            SocketUser author;
-                                            if (guild != null)
-                                                author = guild.GetUser(data.Author.Value.Id);
-                                            else
-                                                author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-                                            if (author == null)
-                                                author = SocketSimpleUser.Create(this, State, data.Author.Value);
+                                            var author = (guild != null ? guild.GetUser(data.Author.Value.Id) : (channel as SocketChannel).GetUser(data.Author.Value.Id)) ??
+                                                                SocketSimpleUser.Create(this, State, data.Author.Value);
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
-                                        if (before != null)
-                                            await _messageUpdatedEvent.InvokeAsync(before, after).ConfigureAwait(false);
-                                        else
-                                            await _messageUpdatedEvent.InvokeAsync(Optional.Create<SocketMessage>(), after).ConfigureAwait(false);
+                                        var cached = new Cached<SocketMessage>(data.Id, before, channel);
+                                        await _messageUpdatedEvent.InvokeAsync(cached, after).ConfigureAwait(false);
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
                                 }
                                 break;
@@ -1324,15 +1310,13 @@ namespace Discord.WebSocket
                                         }
 
                                         var msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
-                                        if (msg != null)
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, msg).ConfigureAwait(false);
-                                        else
-                                            await _messageDeletedEvent.InvokeAsync(data.Id, Optional.Create<SocketMessage>()).ConfigureAwait(false);
+                                        var cached = new Cached<SocketMessage>(data.Id, msg, channel, isDownloadable: false);
+
+                                        await _messageDeletedEvent.InvokeAsync(cached).ConfigureAwait(false);
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_DELETE referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
                                 }
                                 break;
@@ -1347,19 +1331,15 @@ namespace Discord.WebSocket
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
                                         SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
+                                        var cached = new Cached<SocketUserMessage>(data.MessageId, cachedMsg, channel);
 
-                                        if (cachedMsg != null)
-                                        {
-                                            cachedMsg.AddReaction(reaction);
-                                            await _reactionAddedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
-                                            return;
-                                        }
-                                        await _reactionAddedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
+                                        cachedMsg?.AddReaction(reaction);
+
+                                        await _reactionAddedEvent.InvokeAsync(cached, reaction).ConfigureAwait(false);
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_ADD referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
                                     break;
                                 }
@@ -1374,18 +1354,15 @@ namespace Discord.WebSocket
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
                                         SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        if (cachedMsg != null)
-                                        {
-                                            cachedMsg.RemoveReaction(reaction);
-                                            await _reactionRemovedEvent.InvokeAsync(data.MessageId, cachedMsg, reaction).ConfigureAwait(false);
-                                            return;
-                                        }
-                                        await _reactionRemovedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>(), reaction).ConfigureAwait(false);
+                                        var cached = new Cached<SocketUserMessage>(data.MessageId, cachedMsg, channel);
+
+                                        cachedMsg?.RemoveReaction(reaction);
+
+                                        await _reactionRemovedEvent.InvokeAsync(cached, reaction).ConfigureAwait(false);
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
                                     break;
                                 }
@@ -1398,20 +1375,16 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        if (cachedMsg != null)
-                                        {
-                                            cachedMsg.ClearReactions();
-                                            await _reactionsClearedEvent.InvokeAsync(data.MessageId, cachedMsg).ConfigureAwait(false);
-                                            return;
-                                        }
-                                        await _reactionsClearedEvent.InvokeAsync(data.MessageId, Optional.Create<SocketUserMessage>());
+                                        var cached = new Cached<SocketUserMessage>(data.MessageId, cachedMsg, channel);
+
+                                        cachedMsg?.ClearReactions();
+
+                                        await _reactionsClearedEvent.InvokeAsync(cached);
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
-
                                     break;
                                 }
                             case "MESSAGE_DELETE_BULK":
@@ -1431,16 +1404,13 @@ namespace Discord.WebSocket
                                         foreach (var id in data.Ids)
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
-                                            if (msg != null)
-                                                await _messageDeletedEvent.InvokeAsync(id, msg).ConfigureAwait(false);
-                                            else
-                                                await _messageDeletedEvent.InvokeAsync(id, Optional.Create<SocketMessage>()).ConfigureAwait(false);
+                                            var cached = new Cached<SocketMessage>(id, msg, channel, false);
+                                            await _messageDeletedEvent.InvokeAsync(cached).ConfigureAwait(false);
                                         }
                                     }
                                     else
                                     {
                                         await _gatewayLogger.WarningAsync("MESSAGE_DELETE_BULK referenced an unknown channel.").ConfigureAwait(false);
-                                        return;
                                     }
                                 }
                                 break;
@@ -1678,7 +1648,6 @@ namespace Discord.WebSocket
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                return;
             }
         }
 
