@@ -52,7 +52,7 @@ namespace Discord
         }
         public EmbedBuilder WithImageUrl(string imageUrl)
         {
-            ImageUrl = ImageUrl;
+            ImageUrl = imageUrl;
             return this;
         }
         public EmbedBuilder WithCurrentTimestamp()
