@@ -10,6 +10,6 @@ I don't really have any strict conditions for writing documentation, but just ke
 
 ### Compiling
 
-Documentation is compiled into a static site using [DocFx](dotnet.github.io/docfx/). You **must** install a version of DocFx that supports .NET Core. The latest build of that is [2.1.0-cli-alpha](https://github.com/dotnet/docfx/releases/tag/v2.1.0-cli-alpha).
+Documentation is compiled into a static site using [DocFx](https://dotnet.github.io/docfx/). We currently use version 2.8
 
 After making changes, compile your changes into the static site with `docfx`. You can also view your changes live with `docfx --serve`.

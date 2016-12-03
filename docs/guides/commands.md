@@ -139,7 +139,7 @@ To opt a module out of auto-loading, flag it with
 Invoke [CommandService.AddModulesAsync] to discover modules and 
 install them.
 
-[DontAutoLoadAttribute]: Discord.Commands.DontAutoLoadAttribute
+[DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
 [CommandService.AddModulesAsync]: xref:Discord_Commands_CommandService#AddModulesAsync_System_Reflection_Assembly_
 
 #### Loading Modules Manually
