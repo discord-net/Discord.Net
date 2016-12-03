@@ -2,28 +2,30 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-[Module]
-public class ModuleA
+public class ModuleA : ModuleBase
 {
-    private DiscordSocketClient client;
-    private ISelfUser self;
+    private readonly DatabaseService _database;
 
-    public ModuleA(IDiscordClient c, ISelfUser s)
+    public ModuleA(DatabaseService database)
     {
-        if (!(c is DiscordSocketClient)) throw new InvalidOperationException("This module requires a DiscordSocketClient");
-        client = c as DiscordSocketClient;
-        self = s;
+        _database = database;
+    }
+
+    public async Task ReadFromDb()
+    {
+        var x = _database.getX();
+        await ReplyAsync(x);
     }
 }
 
 public class ModuleB
 {
-    private IDiscordClient client;
-    private CommandService commands;
+    private CommandService _commands;
+    private NotificationService _notification;
     
-    public ModuleB(CommandService c, IDependencyMap m)
+    public ModuleB(CommandService commands, IDependencyMap map)
     {
-        commands = c;
-        client = m.Get<IDiscordClient>();
+        _commands = commands;
+        _notification = map.Get<NotificationService>();
     }
 }

@@ -1,4 +1,4 @@
-// Defining the Precondition
+// (Note: This precondition is obsolete, it is recommended to use the RequireOwnerAttribute that is bundled with Discord.Commands)
 
 // Inherit from PreconditionAttribute
 public class RequireOwnerAttribute : PreconditionAttribute

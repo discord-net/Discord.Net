@@ -23,11 +23,19 @@ You may add the MyGet feed to Visual Studio directly from `https://www.myget.org
 You can also pull the latest source from [GitHub](https://github.com/RogueException/Discord.Net).
 
 >[!WARNING]
->The versions of Discord.Net on NuGet are behind the versions this documentation is written for.
+>The versions of Discord.Net on NuGet are behind the versions this 
+>documentation is written for.
+>You MUST install from MyGet or Source!
 
 ## Async
 
-Discord.Net uses C# tasks extensiely - nearly all operations return one. It is highly reccomended these tasks be awaited whenever possible. To do so requires the calling method to be marked as async, which can be problematic in a console application. An example of how to get around this is provided below.
+Discord.Net uses C# tasks extensiely - nearly all operations return 
+one. 
+
+It is highly reccomended these tasks be awaited whenever possible. 
+To do so requires the calling method to be marked as async, which 
+can be problematic in a console application. An example of how to 
+get around this is provided below.
 
 For more information, go to [MSDN's Async-Await section.](https://msdn.microsoft.com/en-us/library/hh191443.aspx)
 
