@@ -87,7 +87,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        internal ParameterInfo Build(CommandInfo info)
+        internal ParameterInfo Build(OverloadInfo info)
         {
             if (TypeReader == null)
                 throw new InvalidOperationException($"No default TypeReader found, one must be specified");

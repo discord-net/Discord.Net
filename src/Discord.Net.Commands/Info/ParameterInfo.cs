@@ -3,16 +3,19 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class ParameterInfo
     {
         private readonly TypeReader _reader;
+        private readonly OverloadInfo _overload;
 
-        public CommandInfo Command { get; }
+        public CommandInfo Command => _overload.Command;
         public string Name { get; }
         public string Summary { get; }
         public bool IsOptional { get; }
@@ -23,9 +26,9 @@ namespace Discord.Commands
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
 
-        internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
+        internal ParameterInfo(ParameterBuilder builder, OverloadInfo overload, CommandService service)
         {
-            Command = command;
+            _overload = overload;
 
             Name = builder.Name;
             Summary = builder.Summary;
