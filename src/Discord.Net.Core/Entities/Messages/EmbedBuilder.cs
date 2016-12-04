@@ -110,7 +110,7 @@ namespace Discord
             _model.Footer = Footer?.ToModel();
             _model.Timestamp = Timestamp?.ToUniversalTime();
             _model.Thumbnail = ThumbnailUrl != null ? new Thumbnail { Url = ThumbnailUrl } : null;
-            _model.Image = ImageUrl != null ? new Image { Url = ImageUrl } : null;
+            _model.Image = ImageUrl != null ? new ImageEmbed { Url = ImageUrl } : null;
             _model.Fields = _fields.ToArray();
             return _model;
         }
