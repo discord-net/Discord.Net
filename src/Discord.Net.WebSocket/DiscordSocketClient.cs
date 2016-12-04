@@ -1659,7 +1659,7 @@ namespace Discord.WebSocket
                 {
                     if (_heartbeatTime != 0) //Server never responded to our last heartbeat
                     {
-                        if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? false))
+                        if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? true))
                         {
                             await _gatewayLogger.WarningAsync("Server missed last heartbeat").ConfigureAwait(false);
                             await StartReconnectAsync(new Exception("Server missed last heartbeat")).ConfigureAwait(false);
