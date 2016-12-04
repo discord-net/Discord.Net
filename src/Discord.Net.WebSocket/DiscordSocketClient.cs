@@ -1439,15 +1439,12 @@ namespace Discord.WebSocket
                                         }
 
                                         SocketPresence beforePresence;
-                                        SocketGuildUser beforeGuild;
                                         SocketGlobalUser beforeGlobal;
                                         var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
-
                                             beforePresence = user.Presence.Clone();
                                             beforeGlobal = user.GlobalUser.Clone();
-                                            beforeGuild = user.Clone();
                                             user.Update(State, data);
                                         }
                                         else
@@ -1455,19 +1452,14 @@ namespace Discord.WebSocket
                                             beforePresence = new SocketPresence(UserStatus.Offline, null);
                                             user = guild.AddOrUpdateUser(data);
                                             beforeGlobal = user.GlobalUser.Clone();
-                                            beforeGuild = user.Clone();
-                                        }
-
-                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, beforePresence, user.Presence).ConfigureAwait(false);
-                                        if (data.Roles.IsSpecified || data.Nick.IsSpecified)
-                                        {
-                                            await _guildMemberUpdatedEvent.InvokeAsync(beforeGuild, user).ConfigureAwait(false);
                                         }
 
                                         if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
                                         {
                                             await _userUpdatedEvent.InvokeAsync(beforeGlobal, user).ConfigureAwait(false);
+                                            return;
                                         }
+                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, beforePresence, user.Presence).ConfigureAwait(false);
                                     }
                                     else
                                     {
