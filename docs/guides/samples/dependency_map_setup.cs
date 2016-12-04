@@ -11,7 +11,7 @@ public class Commands
         var map = new DependencyMap();
         map.Add(client);
         map.Add(commands);
-        await commands.LoadAssembly(Assembly.GetCurrentAssembly(), map);
+        await commands.AddModulesAsync(Assembly.GetEntryAssembly());
     }
     // In ConfigureServices, we will inject the Dependency Map with 
     // all of the services our client will use.
