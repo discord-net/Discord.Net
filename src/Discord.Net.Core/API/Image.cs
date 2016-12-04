@@ -17,5 +17,10 @@ namespace Discord.API
             Stream = null;
             Hash = hash;
         }
+
+        public static Image Create(Discord.Image image)
+        {
+            return new Image(image.Stream);
+        }
     }
 }

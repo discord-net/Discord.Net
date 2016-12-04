@@ -5,7 +5,7 @@ using Field = Discord.API.EmbedField;
 using Author = Discord.API.EmbedAuthor;
 using Footer = Discord.API.EmbedFooter;
 using Thumbnail = Discord.API.EmbedThumbnail;
-using Image = Discord.API.EmbedImage;
+using ImageEmbed = Discord.API.EmbedImage;
 
 namespace Discord
 {

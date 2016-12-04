@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
+using ImageModel = Discord.API.Image;
 
 namespace Discord.Rest
 {
@@ -12,14 +13,27 @@ namespace Discord.Rest
         {
             var args = new ModifyCurrentUserParams();
             func(args);
-            return await client.ApiClient.ModifySelfAsync(args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyCurrentUserParams
+            {
+                Avatar = args.Avatar.IsSpecified ? ImageModel.Create(args.Avatar.Value) : Optional.Create<ImageModel>(),
+                Username = args.Username
+            };
+            return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<ModifyGuildMemberParams> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
             RequestOptions options)
         {
             var args = new ModifyGuildMemberParams();
             func(args);
-            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildMemberParams
+            {
+                ChannelId = args.ChannelId,
+                Deaf = args.Deaf,
+                Mute = args.Mute,
+                Nickname = args.Nickname,
+                RoleIds = args.RoleIds
+            };
+            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
         }
 

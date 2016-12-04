@@ -61,7 +61,13 @@ namespace Discord.Rest
 
             var args = new ModifyGuildIntegrationParams();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, args).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildIntegrationParams
+            {
+                EnableEmoticons = args.EnableEmoticons,
+                ExpireBehavior = args.ExpireBehavior,
+                ExpireGracePeriod = args.ExpireGracePeriod
+            };
+            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, apiArgs).ConfigureAwait(false);
 
             Update(model);
         }

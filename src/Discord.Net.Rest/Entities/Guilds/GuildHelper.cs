@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EmbedModel = Discord.API.GuildEmbed;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
+using ImageModel = Discord.API.Image;
 
 namespace Discord.Rest
 {
@@ -21,12 +22,24 @@ namespace Discord.Rest
             var args = new ModifyGuildParams();
             func(args);
 
-            if (args.Splash.IsSpecified && guild.SplashId != null)
-                args.Splash = new API.Image(guild.SplashId);
-            if (args.Icon.IsSpecified && guild.IconId != null)
-                args.Icon = new API.Image(guild.IconId);
+            var apiArgs = new API.Rest.ModifyGuildParams
+            {
+                AfkChannelId = args.AfkChannelId,
+                AfkTimeout = args.AfkTimeout,
+                DefaultMessageNotifications = args.DefaultMessageNotifications,
+                Name = args.Name,
+                OwnerId = args.OwnerId,
+                RegionId = args.RegionId,
+                Username = args.Username,
+                VerificationLevel = args.VerificationLevel
+            };
 
-            return await client.ApiClient.ModifyGuildAsync(guild.Id, args, options).ConfigureAwait(false);
+            if (apiArgs.Splash.IsSpecified && guild.SplashId != null)
+                apiArgs.Splash = new ImageModel(guild.SplashId);
+            if (apiArgs.Icon.IsSpecified && guild.IconId != null)
+                apiArgs.Icon = new ImageModel(guild.IconId);
+
+            return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<EmbedModel> ModifyEmbedAsync(IGuild guild, BaseDiscordClient client,
             Action<ModifyGuildEmbedParams> func, RequestOptions options)
@@ -35,17 +48,24 @@ namespace Discord.Rest
 
             var args = new ModifyGuildEmbedParams();
             func(args);
-            return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildEmbedParams
+            {
+                ChannelId = args.ChannelId,
+                Enabled = args.Enabled
+            };
+            return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task ModifyChannelsAsync(IGuild guild, BaseDiscordClient client,
             IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options)
         {
-            await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, args, options).ConfigureAwait(false);
+            var apiArgs = args.Select(x => new API.Rest.ModifyGuildChannelsParams(x.Id, x.Position));
+            await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<IReadOnlyCollection<RoleModel>> ModifyRolesAsync(IGuild guild, BaseDiscordClient client,
             IEnumerable<ModifyGuildRolesParams> args, RequestOptions options)
         {
-            return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, args, options).ConfigureAwait(false);
+            var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id) { Color = x.Color, Hoist = x.Hoist, Name = x.Name, Permissions = x.Permissions, Position = x.Position });
+            return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task LeaveAsync(IGuild guild, BaseDiscordClient client, 
             RequestOptions options)
