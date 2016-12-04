@@ -50,7 +50,7 @@ public class Program
         // rather an object stating if the command executed succesfully)
         var result = await commands.ExecuteAsync(context, argPos, map);
         if (!result.IsSuccess)
-            await msg.Channel.SendMessageAsync(result.ErrorReason);
+            await context.Channel.SendMessageAsync(result.ErrorReason);
 	}
 
 }
