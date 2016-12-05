@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,14 +18,17 @@ namespace Discord.Commands
         public IEnumerable<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
         public IReadOnlyList<ModuleInfo> Submodules { get; }
+        public ModuleInfo Parent { get; }
+        public bool IsSubmodule => Parent != null;
 
-        internal ModuleInfo(ModuleBuilder builder, CommandService service)
+        internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
         {
             Service = service;
 
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
+            Parent = parent;
 
             Aliases = BuildAliases(builder).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service));
@@ -67,13 +71,13 @@ namespace Discord.Commands
             return result;
         }
 
-        private static List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
+        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
         {
             var result = new List<ModuleInfo>();
 
             foreach (var submodule in parent.Modules)
             {
-                result.Add(submodule.Build(service));
+                result.Add(submodule.Build(service, this));
             }
 
             return result;

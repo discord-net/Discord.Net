@@ -97,13 +97,17 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleInfo Build(CommandService service)
+        private ModuleInfo BuildImpl(CommandService service, ModuleInfo parent = null)
         {
             //Default name to first alias
             if (Name == null)
                 Name = _aliases[0];
 
-            return new ModuleInfo(this, service);
+            return new ModuleInfo(this, service, parent);
         }
+
+        public ModuleInfo Build(CommandService service) => BuildImpl(service);
+
+        internal ModuleInfo Build(CommandService service, ModuleInfo parent) => BuildImpl(service, parent);
     }
 }
