@@ -70,21 +70,17 @@ namespace Discord.Rpc
             => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
 
         /// <inheritdoc />
-        public Task ConnectAsync() => ConnectAsync(false);
-        internal async Task ConnectAsync(bool ignoreLoginCheck)
+        public async Task ConnectAsync()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await ConnectInternalAsync(ignoreLoginCheck, false).ConfigureAwait(false);
+                await ConnectInternalAsync(false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ConnectInternalAsync(bool ignoreLoginCheck, bool isReconnecting)
-        {
-            if (!ignoreLoginCheck && LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");
-            
+        private async Task ConnectInternalAsync(bool isReconnecting)
+        {            
             if (!isReconnecting && _reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
                 _reconnectCancelToken.Cancel();
 
@@ -198,7 +194,7 @@ namespace Discord.Rpc
                     try
                     {
                         if (cancelToken.IsCancellationRequested) return;
-                        await ConnectInternalAsync(false, true).ConfigureAwait(false);
+                        await ConnectInternalAsync(true).ConfigureAwait(false);
                         _reconnectTask = null;
                         return;
                     }
@@ -223,7 +219,7 @@ namespace Discord.Rpc
 
         public async Task<string> AuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
-            await ConnectAsync(true).ConfigureAwait(false);
+            await ConnectAsync().ConfigureAwait(false);
             var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken, options).ConfigureAwait(false);
             await DisconnectAsync().ConfigureAwait(false);
             return result.Code;

@@ -214,9 +214,9 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, int argPos) => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(CommandContext context, string input)
         {
-            input = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(input).OrderByDescending(x => x.Priority).ToImmutableArray();
-
+            string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
+            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Priority).ToImmutableArray();
+            
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
