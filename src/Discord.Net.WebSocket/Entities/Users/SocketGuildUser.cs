@@ -88,7 +88,6 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, PresenceModel model)
         {
             base.Update(state, model);
-            GlobalUser.Update(state, model.User);
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
             if (model.Nick.IsSpecified)
