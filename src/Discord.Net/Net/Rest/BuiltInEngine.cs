@@ -65,7 +65,7 @@ namespace Discord.Net.Rest
             using (var request = new HttpRequestMessage(GetMethod(method), _baseUrl + path))
             {
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
-                content.Add(new StreamContent(File.OpenRead(path)), "file", filename);
+                content.Add(new StreamContent(stream), "file", filename);
                 request.Content = content;
                 return await Send(request, cancelToken).ConfigureAwait(false);
             }
