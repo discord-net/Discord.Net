@@ -57,6 +57,7 @@ namespace Discord.WebSocket
         internal ClientState State { get; private set; }
         internal int ConnectionTimeout { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
+        internal bool DownloadUsersOnGuildAvailable { get; private set; }
 
         public new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
@@ -76,6 +77,7 @@ namespace Discord.WebSocket
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
             WebSocketProvider = config.WebSocketProvider;
+            DownloadUsersOnGuildAvailable = config.DownloadUsersOnGuildAvailable;
             ConnectionTimeout = config.ConnectionTimeout;
             State = new ClientState(0, 0);
             
@@ -107,6 +109,15 @@ namespace Discord.WebSocket
             GuildAvailable += async g => await _gatewayLogger.VerboseAsync($"Connected to {g.Name}").ConfigureAwait(false);
             GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
             LatencyUpdated += async (old, val) => await _gatewayLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
+
+            if (DownloadUsersOnGuildAvailable)
+            {
+                GuildAvailable += g =>
+                {
+                    var _ = g.DownloadUsersAsync();
+                    return Task.CompletedTask;
+                };
+            }
 
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();

@@ -28,5 +28,8 @@ namespace Discord.WebSocket
 
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
         public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
+
+        /// <summary> Gets or sets whether or not all users should be downloaded as guilds come available. </summary>
+        public bool DownloadUsersOnGuildAvailable { get; set; } = false;
     }
 }
