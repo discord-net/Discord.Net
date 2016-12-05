@@ -1434,6 +1434,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Presence>(_serializer);
+
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -1448,25 +1449,28 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketPresence before;
+                                        SocketPresence beforePresence;
+                                        SocketGlobalUser beforeGlobal;
                                         var user = guild.GetUser(data.User.Id);
                                         if (user != null)
                                         {
-                                            before = user.Presence.Clone();
+                                            beforePresence = user.Presence.Clone();
+                                            beforeGlobal = user.GlobalUser.Clone();
                                             user.Update(State, data);
                                         }
                                         else
                                         {
-                                            before = new SocketPresence(UserStatus.Offline, null);
+                                            beforePresence = new SocketPresence(UserStatus.Offline, null);
                                             user = guild.AddOrUpdateUser(data);
+                                            beforeGlobal = user.GlobalUser.Clone();
                                         }
 
-                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, before, user.Presence).ConfigureAwait(false);
-                                        if (data.User.Username.IsSpecified || data.Roles.IsSpecified)
+                                        if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
                                         {
-                                            var before2 = user.Clone();
-                                            await _guildMemberUpdatedEvent.InvokeAsync(before2, user).ConfigureAwait(false);
+                                            await _userUpdatedEvent.InvokeAsync(beforeGlobal, user).ConfigureAwait(false);
+                                            return;
                                         }
+                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, beforePresence, user.Presence).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1474,14 +1478,14 @@ namespace Discord.WebSocket
                                         if (channel != null)
                                         {
                                             var user = channel.GetUser(data.User.Id);
-                                            var before = user.Presence.Clone();
+                                            var beforePresence = user.Presence.Clone();
+                                            var before = user.GlobalUser.Clone();
                                             user.Update(State, data);
 
-                                            await _userPresenceUpdatedEvent.InvokeAsync(Optional.Create<SocketGuild>(), user, before, user.Presence).ConfigureAwait(false);
-                                            if (data.User.Username.IsSpecified)
+                                            await _userPresenceUpdatedEvent.InvokeAsync(Optional.Create<SocketGuild>(), user, beforePresence, user.Presence).ConfigureAwait(false);
+                                            if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
                                             {
-                                                var before2 = user.Clone();
-                                                await _userUpdatedEvent.InvokeAsync(before2, user).ConfigureAwait(false);
+                                                await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
                                             }                                            
                                         }
                                     }
