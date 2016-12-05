@@ -20,10 +20,10 @@ namespace Discord.Rest
             func(args);
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
-                Color = args.Color,
+                Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
                 Hoist = args.Hoist,
                 Name = args.Name,
-                Permissions = args.Permissions,
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>(),
                 Position = args.Position
             };
             return await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);

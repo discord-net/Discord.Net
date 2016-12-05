@@ -64,7 +64,14 @@ namespace Discord.Rest
         public static async Task<IReadOnlyCollection<RoleModel>> ModifyRolesAsync(IGuild guild, BaseDiscordClient client,
             IEnumerable<ModifyGuildRolesParams> args, RequestOptions options)
         {
-            var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id) { Color = x.Color, Hoist = x.Hoist, Name = x.Name, Permissions = x.Permissions, Position = x.Position });
+            var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id)
+            {
+                Color = x.Color.IsSpecified ? x.Color.Value.RawValue : Optional.Create<uint>(),
+                Hoist = x.Hoist,
+                Name = x.Name,
+                Permissions = x.Permissions.IsSpecified ? x.Permissions.Value.RawValue : Optional.Create<ulong>(),
+                Position = x.Position
+            });
             return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task LeaveAsync(IGuild guild, BaseDiscordClient client, 
@@ -167,8 +174,8 @@ namespace Discord.Rest
             await role.ModifyAsync(x =>
             {
                 x.Name = name;
-                x.Permissions = (permissions ?? role.Permissions).RawValue;
-                x.Color = (color ?? Color.Default).RawValue;
+                x.Permissions = (permissions ?? role.Permissions);
+                x.Color = (color ?? Color.Default);
                 x.Hoist = isHoisted;
             }, options).ConfigureAwait(false);
 

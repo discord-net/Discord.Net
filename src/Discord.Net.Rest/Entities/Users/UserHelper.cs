@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 using ImageModel = Discord.API.Image;
+using System.Linq;
 
 namespace Discord.Rest
 {
@@ -27,11 +28,11 @@ namespace Discord.Rest
             func(args);
             var apiArgs = new API.Rest.ModifyGuildMemberParams
             {
-                ChannelId = args.ChannelId,
+                ChannelId = args.Channel.IsSpecified ? args.Channel.Value.Id : Optional.Create<ulong>(),
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname,
-                RoleIds = args.RoleIds
+                RoleIds = args.Roles.IsSpecified ? args.Roles.Value.Select(r => r.Id).ToArray() : Optional.Create<ulong[]>(),
             };
             await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
