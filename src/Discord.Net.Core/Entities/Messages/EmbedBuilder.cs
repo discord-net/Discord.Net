@@ -6,6 +6,7 @@ using Author = Discord.API.EmbedAuthor;
 using Footer = Discord.API.EmbedFooter;
 using Thumbnail = Discord.API.EmbedThumbnail;
 using Image = Discord.API.EmbedImage;
+using Video = Discord.API.EmbedVideo;
 
 namespace Discord
 {
@@ -25,6 +26,7 @@ namespace Discord
         public string Url { get { return _model.Url; } set { _model.Url = value; } }
         public string ThumbnailUrl { get; set; }
         public string ImageUrl { get; set; }
+        public string VideoUrl { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public Color? Color { get { return _model.Color.HasValue ? new Color(_model.Color.Value) : (Color?)null; } set { _model.Color = value?.RawValue; } }
         public EmbedAuthorBuilder Author { get; set; }
@@ -55,6 +57,11 @@ namespace Discord
             ImageUrl = imageUrl;
             return this;
         }
+        public EmbedBuilder WithVideoUrl(string videoUrl)
+        {
+            VideoUrl = videoUrl;
+            return this;
+        }    
         public EmbedBuilder WithCurrentTimestamp()
         {
             Timestamp = DateTimeOffset.UtcNow;
@@ -111,6 +118,7 @@ namespace Discord
             _model.Timestamp = Timestamp?.ToUniversalTime();
             _model.Thumbnail = ThumbnailUrl != null ? new Thumbnail { Url = ThumbnailUrl } : null;
             _model.Image = ImageUrl != null ? new Image { Url = ImageUrl } : null;
+            _model.Video = VideoUrl != null ? new Video { Url = VideoUrl } : null;
             _model.Fields = _fields.ToArray();
             return _model;
         }
