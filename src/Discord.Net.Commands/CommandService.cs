@@ -228,7 +228,7 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(input).OrderBy(x => x.Overloads.Average(y => y.Priority)).ToImmutableArray();
+            var matches = _map.GetCommands(searchInput).OrderBy(x => x.Overloads.Average(y => y.Priority)).ToImmutableArray();
 
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);

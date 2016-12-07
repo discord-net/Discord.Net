@@ -110,32 +110,35 @@ namespace Discord.Commands
             {
                 builder.AddCommand((command) =>
                 {
+                    string firstName = null;
+
                     foreach (var method in overloads)
                     {
+                        if (firstName == null)
+                            firstName =  method.Name;
+
                         command.AddOverload((overload) =>
                         {
                             BuildOverload(overload, typeInfo, method, service);
                         });
                     }
 
-                    var defaultOverload = overloads.OrderByDescending(x => x.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0).First();
-
-                    BuildCommand(command, defaultOverload, service);
+                    var allAttributes = overloads.SelectMany(x => x.GetCustomAttributes());
+                    BuildCommand(command, firstName, allAttributes, service);
                 });
             }
         }
 
-        private static void BuildCommand(CommandBuilder builder, MethodInfo method, CommandService service)
-        {
-            var attributes = method.GetCustomAttributes();
-            
+        private static void BuildCommand(CommandBuilder builder, string defaultName, IEnumerable<Attribute> attributes, CommandService service)
+        {   
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
                 if (attribute is CommandAttribute)
                 {
                     var cmdAttr = attribute as CommandAttribute;
-                    builder.AddAliases(cmdAttr.Text);
+                    if (!builder.Aliases.Contains(cmdAttr.Text))
+                        builder.AddAliases(cmdAttr.Text);
                     builder.Name = builder.Name ?? cmdAttr.Text;
                 }
                 else if (attribute is NameAttribute)
@@ -149,7 +152,7 @@ namespace Discord.Commands
             }
 
             if (builder.Name == null)
-                builder.Name = method.Name;
+                builder.Name = defaultName;
         }
 
         private static void BuildOverload(OverloadBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)

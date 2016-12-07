@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using CommandCallback = System.Func<Discord.Commands.CommandContext, object[], Discord.Commands.IDependencyMap, System.Threading.Tasks.Task>;
+
 namespace Discord.Commands.Builders
 {
     public class OverloadBuilder
@@ -12,7 +14,7 @@ namespace Discord.Commands.Builders
         private readonly List<ParameterBuilder> _parameters;
 
         public CommandBuilder Command { get; }
-        internal Func<CommandContext, object[], IDependencyMap, Task> Callback { get; set; }
+        public CommandCallback Callback { get; set; }
 
         public RunMode RunMode { get; set; }
         public int Priority { get; set; }
@@ -37,6 +39,12 @@ namespace Discord.Commands.Builders
         public OverloadBuilder WithPriority(int priority)
         {
             Priority = priority;
+            return this;
+        }
+
+        public OverloadBuilder WithCallback(CommandCallback callback)
+        {
+            Callback = callback;
             return this;
         }
 
