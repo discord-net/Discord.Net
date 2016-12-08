@@ -182,6 +182,10 @@ namespace Discord.Commands
                 // TODO: C#7 type switch
                 if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
+                else if (attribute is OverrideTypeReaderAttribute)
+                    builder.TypeReader = GetTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
+                else if (attribute is ParameterPreconditionAttribute)
+                    builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
                 else if (attribute is ParamArrayAttribute)
                 {
                     builder.IsMultiple = true;
@@ -196,23 +200,42 @@ namespace Discord.Commands
                 }
             }
 
-            var reader = service.GetTypeReader(paramType);
-            if (reader == null)
+            if (builder.TypeReader == null)
             {
-                var paramTypeInfo = paramType.GetTypeInfo();
-                if (paramTypeInfo.IsEnum)
-                {
-                    reader = EnumTypeReader.GetReader(paramType);
-                    service.AddTypeReader(paramType, reader);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"{paramType.FullName} is not supported as a command parameter, are you missing a TypeReader?");
-                }
-            }
+                var reader = service.GetDefaultTypeReader(paramType);
 
-            builder.ParameterType = paramType;
-            builder.TypeReader = reader;
+                if (reader == null)
+                {
+                    var paramTypeInfo = paramType.GetTypeInfo();
+                    if (paramTypeInfo.IsEnum)
+                    {
+                        reader = EnumTypeReader.GetReader(paramType);
+                        service.AddTypeReader(paramType, reader);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"{paramType.FullName} is not supported as a command parameter, are you missing a TypeReader?");
+                    }
+                }
+
+                builder.ParameterType = paramType;
+                builder.TypeReader = reader;
+            }
+        }
+
+        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType)
+        {
+            var readers = service.GetTypeReaders(paramType);
+            TypeReader reader = null;
+            if (readers != null)
+                if (readers.TryGetValue(typeReaderType, out reader))
+                    return reader;
+
+            //could not find any registered type reader: try to create one
+            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
+            service.AddTypeReader(paramType, reader);
+
+            return reader;
         }
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)

@@ -137,7 +137,15 @@ namespace Discord.Commands
 
             try
             {
-                var args = GenerateArgs(argList, paramList);
+                object[] args = GenerateArgs(argList, paramList);
+
+                foreach (var parameter in Parameters)
+                {
+                    var result = await parameter.CheckPreconditionsAsync(context, args, map).ConfigureAwait(false);
+                    if (!result.IsSuccess)
+                        return ExecuteResult.FromError(result);
+                }
+
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync

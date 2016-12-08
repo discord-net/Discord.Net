@@ -1,10 +1,15 @@
 using System;
+using System.Linq;
 using System.Reflection;
+
+using System.Collections.Generic;
 
 namespace Discord.Commands.Builders
 {
     public class ParameterBuilder
     {
+        private readonly List<ParameterPreconditionAttribute> _preconditions; 
+
         public CommandBuilder Command { get; }
         public string Name { get; internal set; }
         public Type ParameterType { get; internal set; }
@@ -16,16 +21,20 @@ namespace Discord.Commands.Builders
         public object DefaultValue { get; set; }
         public string Summary { get; set; }
 
+        public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
+
         //Automatic
         internal ParameterBuilder(CommandBuilder command)
         {
+            _preconditions = new List<ParameterPreconditionAttribute>();
+
             Command = command;
         }
         //User-defined
         internal ParameterBuilder(CommandBuilder command, string name, Type type)
             : this(command)
         {
-            Preconditions.NotNull(name, nameof(name));
+            Discord.Preconditions.NotNull(name, nameof(name));
 
             Name = name;
             SetType(type);
@@ -33,7 +42,11 @@ namespace Discord.Commands.Builders
 
         internal void SetType(Type type)
         {
-            TypeReader = Command.Module.Service.GetTypeReader(type);
+            var readers = Command.Module.Service.GetTypeReaders(type);
+            if (readers == null)
+                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");
+            
+            TypeReader = readers.FirstOrDefault().Value;
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
@@ -49,7 +62,7 @@ namespace Discord.Commands.Builders
         }
         public ParameterBuilder WithDefault(object defaultValue)
         {
-            DefaultValue = defaultValue;            
+            DefaultValue = defaultValue;
             return this;
         }
         public ParameterBuilder WithIsOptional(bool isOptional)
@@ -65,6 +78,12 @@ namespace Discord.Commands.Builders
         public ParameterBuilder WithIsMultiple(bool isMultiple)
         {
             IsMultiple = isMultiple;
+            return this;
+        }
+
+        public ParameterBuilder AddPrecondition(ParameterPreconditionAttribute precondition)
+        {
+            _preconditions.Add(precondition);
             return this;
         }
 

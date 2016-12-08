@@ -15,7 +15,8 @@ namespace Discord.Commands
     {
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
-        private readonly ConcurrentDictionary<Type, TypeReader> _typeReaders;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
+        private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
@@ -24,6 +25,7 @@ namespace Discord.Commands
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new {y.Key, y.Value})).ToLookup(x => x.Key, x => x.Value);
 
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
@@ -32,7 +34,9 @@ namespace Discord.Commands
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new ConcurrentBag<ModuleInfo>();
             _map = new CommandMap();
-            _typeReaders = new ConcurrentDictionary<Type, TypeReader>
+            _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
+
+            _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
                 [typeof(bool)] = new SimpleTypeReader<bool>(),
                 [typeof(char)] = new SimpleTypeReader<char>(),
@@ -50,7 +54,7 @@ namespace Discord.Commands
                 [typeof(decimal)] = new SimpleTypeReader<decimal>(),
                 [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
                 [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
-                [typeof(TimeSpan)] = new SimpleTypeReader<TimeSpan>(),
+                
                 [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
                 [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
@@ -196,16 +200,25 @@ namespace Discord.Commands
         //Type Readers
         public void AddTypeReader<T>(TypeReader reader)
         {
-            _typeReaders[typeof(T)] = reader;
+            var readers = _typeReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
+            readers[reader.GetType()] = reader;
         }
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            _typeReaders[type] = reader;
+            var readers = _typeReaders.GetOrAdd(type, x=> new ConcurrentDictionary<Type, TypeReader>());
+            readers[reader.GetType()] = reader;
         }
-        internal TypeReader GetTypeReader(Type type)
+        internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
+        {
+            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
+            if (_typeReaders.TryGetValue(type, out definedTypeReaders))
+                return definedTypeReaders;
+            return null;
+        }
+        internal TypeReader GetDefaultTypeReader(Type type)
         {
             TypeReader reader;
-            if (_typeReaders.TryGetValue(type, out reader))
+            if (_defaultTypeReaders.TryGetValue(type, out reader))
                 return reader;
             return null;
         }
