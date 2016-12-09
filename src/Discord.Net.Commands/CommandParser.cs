@@ -66,6 +66,7 @@ namespace Discord.Commands
 			int endPosition = startPos;
 			int inputLength = input.Length;
 			bool isEscaped = false;
+			bool isDoubleQuoted = false;
 
 			var expectedArgs = command._parameters;
 			List<string> argList = new List<string>();
@@ -74,7 +75,7 @@ namespace Discord.Commands
 			args = null;
 
 			if (input == "")
-				return CommandErrorType.InvalidInput;
+				 return CommandErrorType.InvalidInput;
 
 			while (endPosition < inputLength)
 			{
@@ -90,7 +91,7 @@ namespace Discord.Commands
 					}
 				}
 
-                char currentChar = input[endPosition++];
+				char currentChar = input[endPosition++];
 				if (isEscaped)
 					isEscaped = false;
 				else if (currentChar == '\\')
@@ -100,35 +101,45 @@ namespace Discord.Commands
 				if (endPosition == startPosition + 1 && isWhitespace) //Has no text yet, and is another whitespace
 				{
 					startPosition = endPosition;
-                    continue;
+					continue;
 				}
 
 				switch (currentPart)
-				{
+				{		
 					case ParserPart.None:
 						if ((!isEscaped && currentChar == '\"'))
 						{
-							currentPart = ParserPart.DoubleQuotedParameter;
-							startPosition = endPosition;
+							if (isDoubleQuoted) //Already marked as double quoted -> reached the end of the quote/argument
+							{
+                                string temp = input.Substring(startPosition + 1, endPosition - startPosition - 2); //-2 to ignore the last double quote
+                                argList.Add(temp);
+                                currentPart = ParserPart.None;
+                                startPosition = endPosition;
+                                isDoubleQuoted = false;
+							}
+                            else
+								currentPart = ParserPart.DoubleQuotedParameter;
 						}
 						else if ((!isEscaped && currentChar == '\''))
 						{
 							currentPart = ParserPart.QuotedParameter;
 							startPosition = endPosition;
 						}
-						else if ((!isEscaped && isWhitespace) || endPosition >= inputLength)
-						{
+						else if ((!isEscaped && isWhitespace && !isDoubleQuoted) || endPosition >= inputLength) //Reached a whitespace in a non double quoted argument or the end of the input
+                        {
 							int length = (isWhitespace ? endPosition - 1 : endPosition) - startPosition;
-                            if (length == 0)
+							if(length == 0) //Just a whitespace
 								startPosition = endPosition;
+							else if(isDoubleQuoted) //Still quoted but end of input
+								return CommandErrorType.InvalidInput;
 							else
-                            {
-                                string temp = input.Substring(startPosition, length);
-                                argList.Add(temp);
-                                currentPart = ParserPart.None;
+							{
+								string temp = input.Substring(startPosition, length);
+								argList.Add(temp);
+								currentPart = ParserPart.None;
 								startPosition = endPosition;
 							}
-						} 
+						}
 						break;
 					case ParserPart.QuotedParameter:
 						if ((!isEscaped && currentChar == '\''))
@@ -140,18 +151,16 @@ namespace Discord.Commands
 						}
 						else if (endPosition >= inputLength)
 							return CommandErrorType.InvalidInput;
-						break;
+					break;
 					case ParserPart.DoubleQuotedParameter:
-						if ((!isEscaped && currentChar == '\"'))
-						{
-							string temp = input.Substring(startPosition, endPosition - startPosition - 1);
-							argList.Add(temp);
+                        if (!isDoubleQuoted)
+                        {
+                            isDoubleQuoted = true;
                             currentPart = ParserPart.None;
-                            startPosition = endPosition;
-						}
-						else if (endPosition >= inputLength)
-							return CommandErrorType.InvalidInput;
-						break;
+                        }
+                        else if (endPosition >= inputLength)
+                            return CommandErrorType.InvalidInput;
+                        break;
 				}
 			}
 
@@ -168,7 +177,7 @@ namespace Discord.Commands
 				{
 					case ParameterType.Required:
 						return CommandErrorType.BadArgCount;
-					case ParameterType.Optional:
+                    case ParameterType.Optional:
 					case ParameterType.Unparsed:
 						argList.Add("");
 						break;
