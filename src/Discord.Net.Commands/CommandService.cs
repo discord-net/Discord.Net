@@ -75,7 +75,6 @@ namespace Discord.Commands
             };
             _caseSensitive = config.CaseSensitiveCommands;
             _defaultRunMode = config.DefaultRunMode;
-
             _splitCharacter = config.CommandSplitCharacter;
         }
 
