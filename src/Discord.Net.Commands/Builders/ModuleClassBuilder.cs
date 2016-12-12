@@ -104,44 +104,71 @@ namespace Discord.Commands
 
             var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
 
-            foreach (var method in validCommands)
+            var groupedCommands = validCommands.GroupBy(x => x.GetCustomAttribute<CommandAttribute>().Text);
+
+            foreach (var overloads in groupedCommands)
             {
-                builder.AddCommand((command) => {
-                    BuildCommand(command, typeInfo, method, service);
+                builder.AddCommand((command) =>
+                {
+                    string firstName = null;
+
+                    foreach (var method in overloads)
+                    {
+                        if (firstName == null)
+                            firstName =  method.Name;
+
+                        command.AddOverload((overload) =>
+                        {
+                            BuildOverload(overload, typeInfo, method, service);
+                        });
+                    }
+
+                    var allAttributes = overloads.SelectMany(x => x.GetCustomAttributes());
+                    BuildCommand(command, firstName, allAttributes, service);
                 });
             }
         }
 
-        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
-        {
-            var attributes = method.GetCustomAttributes();
-            
+        private static void BuildCommand(CommandBuilder builder, string defaultName, IEnumerable<Attribute> attributes, CommandService service)
+        {   
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
                 if (attribute is CommandAttribute)
                 {
                     var cmdAttr = attribute as CommandAttribute;
-                    builder.AddAliases(cmdAttr.Text);
-                    builder.RunMode = cmdAttr.RunMode;
+                    if (!builder.Aliases.Contains(cmdAttr.Text))
+                        builder.AddAliases(cmdAttr.Text);
                     builder.Name = builder.Name ?? cmdAttr.Text;
                 }
                 else if (attribute is NameAttribute)
                     builder.Name = (attribute as NameAttribute).Text;
-                else if (attribute is PriorityAttribute)
-                    builder.Priority = (attribute as PriorityAttribute).Priority;
                 else if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
                     builder.AddAliases((attribute as AliasAttribute).Aliases);
-                else if (attribute is PreconditionAttribute)
-                    builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
             if (builder.Name == null)
-                builder.Name = method.Name;
+                builder.Name = defaultName;
+        }
+
+        private static void BuildOverload(OverloadBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
+        {
+            var attributes = method.GetCustomAttributes();
+
+            foreach (var attribute in attributes)
+            {
+                // TODO: C#7 type switch
+                if (attribute is CommandAttribute)
+                    builder.RunMode = (attribute as CommandAttribute).RunMode;
+                else if (attribute is PriorityAttribute)
+                    builder.Priority = (attribute as PriorityAttribute).Priority;
+                else if (attribute is PreconditionAttribute)
+                    builder.AddPrecondition(attribute as PreconditionAttribute);
+            }
 
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;
@@ -161,7 +188,8 @@ namespace Discord.Commands
                 {
                     return method.Invoke(instance, args) as Task ?? Task.CompletedTask;
                 }
-                finally{
+                finally
+                {
                     (instance as IDisposable)?.Dispose();
                 }
             };

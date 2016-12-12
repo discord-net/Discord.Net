@@ -68,10 +68,10 @@ namespace Discord.Commands.Builders
             _preconditions.Add(precondition);
             return this;
         }
-        public ModuleBuilder AddCommand(string primaryAlias, Func<CommandContext, object[], IDependencyMap, Task> callback, Action<CommandBuilder> createFunc)
+        public ModuleBuilder AddCommand(string primaryAlias, Action<OverloadBuilder> defaultOverloadBuilder, Action<CommandBuilder> createFunc = null)
         {
-            var builder = new CommandBuilder(this, primaryAlias, callback);
-            createFunc(builder);
+            var builder = new CommandBuilder(this, primaryAlias, defaultOverloadBuilder);
+            createFunc?.Invoke(builder);
             _commands.Add(builder);
             return this;
         }

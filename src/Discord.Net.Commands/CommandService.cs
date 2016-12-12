@@ -39,8 +39,8 @@ namespace Discord.Commands
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
             {
                 [typeof(bool)] = new SimpleTypeReader<bool>(),
-                [typeof(char)] = new SimpleTypeReader<char>(),
-                [typeof(string)] = new SimpleTypeReader<string>(),
+                [typeof(char)] = new SimpleTypeReader<char>(0),
+                [typeof(string)] = new SimpleTypeReader<string>(0),
                 [typeof(byte)] = new SimpleTypeReader<byte>(),
                 [typeof(sbyte)] = new SimpleTypeReader<sbyte>(),
                 [typeof(ushort)] = new SimpleTypeReader<ushort>(),
@@ -228,8 +228,8 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Priority).ToImmutableArray();
-            
+            var matches = _map.GetCommands(searchInput).OrderBy(x => x.Overloads.Average(y => y.Priority)).ToImmutableArray();
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
@@ -249,41 +249,67 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
-                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
-                if (!preconditionResult.IsSuccess)
-                {
-                    if (commands.Count == 1)
-                        return preconditionResult;
-                    else
-                        continue;
-                }
+                var command = commands[i];
+                var overloads = command.Overloads.OrderBy(x => x.Priority).ToImmutableArray();
 
-                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
-                if (!parseResult.IsSuccess)
+                PreconditionResult preconditionResult = PreconditionResult.FromSuccess();
+                for (int j = command.Overloads.Count - 1; i >= 0; i--)
                 {
-                    if (parseResult.Error == CommandError.MultipleMatches)
-                    {
-                        IReadOnlyList<TypeReaderValue> argList, paramList;
-                        switch (multiMatchHandling)
-                        {
-                            case MultiMatchHandling.Best:
-                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                                parseResult = ParseResult.FromSuccess(argList, paramList);
-                                break;
-                        }
-                    }
-
-                    if (!parseResult.IsSuccess)
+                    preconditionResult = await overloads[j].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
+                    if (!preconditionResult.IsSuccess)
                     {
                         if (commands.Count == 1)
-                            return parseResult;
+                            return preconditionResult;
                         else
                             continue;
                     }
                 }
 
-                return await commands[i].Execute(context, parseResult, dependencyMap).ConfigureAwait(false);
+                var rawParseResults = new List<ParseResult>();
+                foreach (var overload in overloads)
+                {
+                    rawParseResults.Add(await overload.ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false));
+                }
+
+                //order by average score
+                var orderedParseResults = rawParseResults.OrderBy(
+                    x => !x.IsSuccess ? 0 :
+                         (  x.ArgValues.Count > 0 ?   x.ArgValues.Average(y => y.Values.Max(z => z.Score)) : 0) +
+                         (x.ParamValues.Count > 0 ? x.ParamValues.Average(y => y.Values.Max(z => z.Score)) : 0));
+
+                var parseResults = orderedParseResults.ToImmutableArray();
+
+                for (int j = parseResults.Length - 1; j >= 0; j--)
+                {
+                    var parseResult = parseResults[j];
+                    var overload = parseResult.Overload;
+
+                    if (!parseResult.IsSuccess)
+                    {
+                        if (parseResult.Error == CommandError.MultipleMatches)
+                        {
+                            IReadOnlyList<TypeReaderValue> argList, paramList;
+                            switch (multiMatchHandling)
+                            {
+                                case MultiMatchHandling.Best:
+                                    argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                                    paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                                    parseResult = ParseResult.FromSuccess(parseResult.Overload, argList, paramList);
+                                    break;
+                            }
+                        }
+
+                        if (!parseResult.IsSuccess)
+                        {
+                            if (overloads.Length == 1)
+                                return parseResult;
+                            else
+                                continue;
+                        }
+                    }
+
+                    return await overload.Execute(context, parseResult, dependencyMap).ConfigureAwait(false);
+                }
             }
 
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
