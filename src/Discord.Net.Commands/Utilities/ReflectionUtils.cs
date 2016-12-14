@@ -42,23 +42,23 @@ namespace Discord.Commands
 
                 try
                 {
-                    T type = (T)constructor.Invoke(args);
-                    var fields = type.GetType().GetRuntimeFields().Where(p => p.GetCustomAttribute<InjectAttribute>() != null);
+                    T instance = (T)constructor.Invoke(args);
+                    var fields = instance.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<InjectAttribute>() != null).Where(p => p.CanWrite);
                     foreach (var field in fields)
                     {
                         object arg;
-                        if (map == null || !map.TryGet(field.FieldType, out arg))
+                        if (map == null || !map.TryGet(field.PropertyType, out arg))
                         {
-                            if (field.FieldType == typeof(CommandService))
+                            if (field.PropertyType == typeof(CommandService))
                                 arg = service;
-                            else if (field.FieldType == typeof(IDependencyMap))
+                            else if (field.PropertyType == typeof(IDependencyMap))
                                 arg = map;
                             else
-                                throw new InvalidOperationException($"Failed to inject \"{typeInfo.FullName}\", dependency \"{field.FieldType.FullName}\" was not found.");
+                                throw new InvalidOperationException($"Failed to inject \"{typeInfo.FullName}\", dependency \"{field.PropertyType.FullName}\" was not found.");
                         }
-                        field.SetValue(type, arg);
+                        field.SetValue(instance, arg);
                     }
-                    return type;
+                    return instance;
                 }
                 catch (Exception ex)
                 {

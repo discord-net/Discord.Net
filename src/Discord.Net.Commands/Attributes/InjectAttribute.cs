@@ -2,8 +2,8 @@
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Field)]
-    public class InjectAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class InjectAttribute : Attribute
     {
     }
 }
