@@ -12,7 +12,6 @@ namespace Discord
         /// Create the image with a Stream.
         /// </summary>
         /// <param name="stream">This must be some type of stream with the contents of a file in it.</param>
-        /// <seealso cref="File.OpenRead(string)"/>
         public Image(Stream stream)
         {
             Stream = stream;
