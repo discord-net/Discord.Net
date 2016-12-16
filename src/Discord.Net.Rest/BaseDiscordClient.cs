@@ -86,7 +86,7 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLoginAsync(TokenType tokenType, string token) { return Task.CompletedTask; }
+        protected virtual Task OnLoginAsync(TokenType tokenType, string token) { return Task.Delay(0); }
 
         /// <inheritdoc />
         public async Task LogoutAsync()
@@ -111,7 +111,7 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLogoutAsync() { return Task.CompletedTask; }
+        protected virtual Task OnLogoutAsync() { return Task.Delay(0); }
 
         internal virtual void Dispose(bool disposing)
         {

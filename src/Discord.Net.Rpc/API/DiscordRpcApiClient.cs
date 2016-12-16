@@ -218,9 +218,6 @@ namespace Discord.API
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
             where TResponse : class
         {
-            if (!options.IgnoreState)
-                CheckState();
-
             byte[] bytes = null;
             var guid = Guid.NewGuid();
             payload = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };

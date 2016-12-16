@@ -71,7 +71,7 @@ namespace Discord.Audio
                 e.ErrorContext.Handled = true;
             };
             
-            ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider);
+            ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
 
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
@@ -204,10 +204,8 @@ namespace Discord.Audio
 
                             _heartbeatTime = 0;
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token);
-
-                            var entry = await Dns.GetHostEntryAsync(_url).ConfigureAwait(false);
-
-                            ApiClient.SetUdpEndpoint(new IPEndPoint(entry.AddressList[0], data.Port));
+                            
+                            ApiClient.SetUdpEndpoint(_url, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
                         }
                         break;

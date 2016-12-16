@@ -139,6 +139,7 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
+#if NETSTANDARD1_3
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, RequestOptions options)
         {
@@ -146,6 +147,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, options).ConfigureAwait(false);
         }
+#endif
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, RequestOptions options)
         {

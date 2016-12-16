@@ -32,12 +32,7 @@
   },
 
   "frameworks": {
-    "netstandard1.3": {
-      "imports": [
-        "dotnet5.4",
-        "dnxcore50",
-        "portable-net45+win8"
-      ]
-    }
+    "netstandard1.1": {},
+    "netstandard1.3": {}
   }
 }

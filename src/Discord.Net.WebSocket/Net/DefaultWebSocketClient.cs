@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETSTANDARD1_3
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public class DefaultWebSocketClient : IWebSocketClient
+    internal class DefaultWebSocketClient : IWebSocketClient
     {
         public const int ReceiveChunkSize = 16 * 1024; //16KB
         public const int SendChunkSize = 4 * 1024; //4KB
@@ -19,7 +20,7 @@ namespace Discord.Net.WebSockets
         public event Func<string, Task> TextMessage;
         public event Func<Exception, Task> Closed;
 
-        private readonly SemaphoreSlim _sendLock;
+        private readonly SemaphoreSlim _lock;
         private readonly Dictionary<string, string> _headers;
         private ClientWebSocket _client;
         private Task _task;
@@ -29,7 +30,7 @@ namespace Discord.Net.WebSockets
 
         public DefaultWebSocketClient()
         {
-            _sendLock = new SemaphoreSlim(1, 1);
+            _lock = new SemaphoreSlim(1, 1);
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
@@ -40,7 +41,7 @@ namespace Discord.Net.WebSockets
             if (!_isDisposed)
             {
                 if (disposing)
-                    _client.Dispose();
+                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
                 _isDisposed = true;
             }
         }
@@ -51,14 +52,14 @@ namespace Discord.Net.WebSockets
 
         public async Task ConnectAsync(string host)
         {
-            await _sendLock.WaitAsync().ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await ConnectInternalAsync(host).ConfigureAwait(false);
             }
             finally
             {
-                _sendLock.Release();
+                _lock.Release();
             }
         }
         private async Task ConnectInternalAsync(string host)
@@ -83,27 +84,33 @@ namespace Discord.Net.WebSockets
 
         public async Task DisconnectAsync()
         {
-            await _sendLock.WaitAsync().ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await DisconnectInternalAsync().ConfigureAwait(false);
             }
             finally
             {
-                _sendLock.Release();
+                _lock.Release();
             }
         }
-        private async Task DisconnectInternalAsync()
+        private async Task DisconnectInternalAsync(bool isDisposing = false)
         {
             try { _cancelTokenSource.Cancel(false); } catch { }
 
-            await (_task ?? Task.CompletedTask).ConfigureAwait(false);
+            if (!isDisposing)
+                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
 
             if (_client != null && _client.State == WebSocketState.Open)
             {
                 var token = new CancellationToken();
-                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
-                _client.Dispose();
+                if (!isDisposing)
+                {
+                    try { await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", token); }
+                    catch { }
+                }
+                try { _client.Dispose(); }
+                catch { }
                 _client = null;
             }
         }
@@ -120,7 +127,7 @@ namespace Discord.Net.WebSockets
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
         {
-            await _sendLock.WaitAsync().ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_client == null) return;
@@ -143,7 +150,7 @@ namespace Discord.Net.WebSockets
             }
             finally
             {
-                _sendLock.Release();
+                _lock.Release();
             }
         }
         
@@ -181,11 +188,15 @@ namespace Discord.Net.WebSockets
 
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
+#if NETSTANDARD1_3
                             ArraySegment<byte> streamBuffer;
                             if (stream.TryGetBuffer(out streamBuffer))
                                 result = streamBuffer.Array;
                             else
                                 result = stream.ToArray();
+#else
+                            result = stream.ToArray();
+#endif
                         }
                     }
                     else
@@ -217,3 +228,4 @@ namespace Discord.Net.WebSockets
         }
     }
 }
+#endif

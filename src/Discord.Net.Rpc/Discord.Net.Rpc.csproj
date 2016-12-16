@@ -1,48 +1,40 @@
-﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Description>A core Discord.Net library containing the RPC client and models.</Description>
     <VersionPrefix>1.0.0-beta2</VersionPrefix>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
     <AssemblyName>Discord.Net.Rpc</AssemblyName>
     <PackageTags>discord;discordapp</PackageTags>
     <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dotnet5.4;dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
-    <EmbeddedResource Include="compiler\resources\**\*" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="..\Discord.Net.WebSocket\Net\DefaultWebSocketClient.cs">
+      <Link>Net\DefaultWebSocketClient.cs</Link>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>1.0.0-alpha-20161104-2</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO.Compression">
-      <Version>4.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Net.WebSockets.Client">
-      <Version>4.3.0</Version>
-    </PackageReference>
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup />
-  <PropertyGroup Label="Configuration">
-    <SignAssembly>False</SignAssembly>
-  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Net\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
     <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
     <WarningsAsErrors>true</WarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

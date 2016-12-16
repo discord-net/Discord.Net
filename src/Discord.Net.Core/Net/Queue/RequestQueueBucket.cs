@@ -209,7 +209,7 @@ namespace Discord.Net.Queue
 #endif
                 }
 
-                var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                var now = DateTimeUtils.ToUnixSeconds(DateTimeOffset.UtcNow);
                 DateTimeOffset? resetTick = null;
 
                 //Using X-RateLimit-Remaining causes a race condition

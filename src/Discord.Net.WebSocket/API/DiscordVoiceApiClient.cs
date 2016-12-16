@@ -2,6 +2,7 @@
 using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
@@ -9,8 +10,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,19 +41,27 @@ namespace Discord.Audio
         private readonly IWebSocketClient _webSocketClient;
         private readonly SemaphoreSlim _connectionLock;
         private CancellationTokenSource _connectCancelToken;
-        private UdpClient _udp;
-        private IPEndPoint _udpEndpoint;
-        private Task _udpRecieveTask;
+        private IUdpSocket _udp;
         private bool _isDisposed;
 
         public ulong GuildId { get; }
         public ConnectionState ConnectionState { get; private set; }
 
-        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, JsonSerializer serializer = null)
+        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
-            _udp = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
+            _udp = udpSocketProvider();
+            _udp.ReceivedDatagram += async (data, index, count) =>
+            {
+                if (index != 0)
+                {
+                    var newData = new byte[count];
+                    Buffer.BlockCopy(data, index, newData, 0, count);
+                    data = newData;
+                }
+                await _receivedPacketEvent.InvokeAsync(data).ConfigureAwait(false);
+            };
 
             _webSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
@@ -93,6 +100,7 @@ namespace Discord.Audio
                 if (disposing)
                 {
                     _connectCancelToken?.Dispose();
+                    (_udp as IDisposable)?.Dispose();
                     (_webSocketClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
@@ -111,18 +119,14 @@ namespace Discord.Audio
         }
         public async Task SendAsync(byte[] data, int bytes)
         {
-            if (_udpEndpoint != null)
-            {
-                await _udp.SendAsync(data, bytes, _udpEndpoint).ConfigureAwait(false);                
-                await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
-            }
-
+            await _udp.SendAsync(data, 0, bytes).ConfigureAwait(false);                
+            await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
         }
 
         //WebSocket
         public async Task SendHeartbeatAsync(RequestOptions options = null)
         {
-            await SendAsync(VoiceOpCode.Heartbeat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), options: options).ConfigureAwait(false);
+            await SendAsync(VoiceOpCode.Heartbeat, DateTimeUtils.ToUnixMilliseconds(DateTimeOffset.UtcNow), options: options).ConfigureAwait(false);
         }
         public async Task SendIdentityAsync(ulong userId, string sessionId, string token)
         {
@@ -171,9 +175,13 @@ namespace Discord.Audio
             try
             {
                 _connectCancelToken = new CancellationTokenSource();
-                _webSocketClient.SetCancelToken(_connectCancelToken.Token);
+                var cancelToken = _connectCancelToken.Token;
+
+                _webSocketClient.SetCancelToken(cancelToken);
                 await _webSocketClient.ConnectAsync(url).ConfigureAwait(false);
-                _udpRecieveTask = ReceiveAsync(_connectCancelToken.Token);
+
+                _udp.SetCancelToken(cancelToken);
+                await _udp.StartAsync().ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
             }
@@ -202,8 +210,7 @@ namespace Discord.Audio
             catch { }
 
             //Wait for tasks to complete
-            await _udpRecieveTask.ConfigureAwait(false);
-
+            await _udp.StopAsync().ConfigureAwait(false);
             await _webSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;
@@ -221,22 +228,9 @@ namespace Discord.Audio
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
 
-        public void SetUdpEndpoint(IPEndPoint endpoint)
+        public void SetUdpEndpoint(string host, int port)
         {
-            _udpEndpoint = endpoint;
-        }
-        private async Task ReceiveAsync(CancellationToken cancelToken)
-        {
-            var closeTask = Task.Delay(-1, cancelToken);
-            while (!cancelToken.IsCancellationRequested)
-            {
-                var receiveTask = _udp.ReceiveAsync();
-                var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
-                if (task == closeTask)
-                    break;
-                
-                await _receivedPacketEvent.InvokeAsync(receiveTask.Result.Buffer).ConfigureAwait(false);
-            }
+            _udp.SetDestination(host, port);
         }
 
         //Helpers

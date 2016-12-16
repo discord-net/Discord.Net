@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    public sealed class DefaultRestClient : IRestClient
+    internal sealed class DefaultRestClient : IRestClient
     {
         private const int HR_SECURECHANNELFAILED = -2146233079;
 

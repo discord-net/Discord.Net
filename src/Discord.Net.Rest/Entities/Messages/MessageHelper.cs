@@ -69,7 +69,7 @@ namespace Discord.Rest
 
         public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, ImmutableArray<IUser> userMentions)
         {
-            var tags = new SortedList<int, ITag>();
+            var tags = ImmutableArray.CreateBuilder<ITag>();
             
             int index = 0;
             while (true)
@@ -94,27 +94,27 @@ namespace Discord.Rest
                             break;
                         }
                     }
-                    tags.Add(index, new Tag<IUser>(TagType.UserMention, index, content.Length, id, mentionedUser));
+                    tags.Add(new Tag<IUser>(TagType.UserMention, index, content.Length, id, mentionedUser));
                 }
                 else if (MentionUtils.TryParseChannel(content, out id))
                 {
                     IChannel mentionedChannel = null;
                     if (guild != null)
                         mentionedChannel = guild.GetChannelAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
-                    tags.Add(index, new Tag<IChannel>(TagType.ChannelMention, index, content.Length, id, mentionedChannel));
+                    tags.Add(new Tag<IChannel>(TagType.ChannelMention, index, content.Length, id, mentionedChannel));
                 }
                 else if (MentionUtils.TryParseRole(content, out id))
                 {
                     IRole mentionedRole = null;
                     if (guild != null)
                         mentionedRole = guild.GetRole(id);
-                    tags.Add(index, new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
+                    tags.Add(new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
                 }
                 else
                 {
                     Emoji emoji;
                     if (Emoji.TryParse(content, out emoji))
-                        tags.Add(index, new Tag<Emoji>(TagType.Emoji, index, content.Length, id, emoji));
+                        tags.Add(new Tag<Emoji>(TagType.Emoji, index, content.Length, id, emoji));
                 }
                 index = endIndex + 1;
             }
@@ -125,7 +125,7 @@ namespace Discord.Rest
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
 
-                tags.Add(index, new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                tags.Add(new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
                 index++;
             }
 
@@ -135,11 +135,11 @@ namespace Discord.Rest
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
 
-                tags.Add(index, new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
+                tags.Add(new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
                 index++;
             }
 
-            return tags.Values.ToImmutableArray();
+            return tags.ToImmutable();
         }
         public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
         {

@@ -12,8 +12,10 @@ namespace Discord.WebSocket
 
         /// <summary> Sends a message to this message channel. </summary>
         new Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, EmbedBuilder embed = null, RequestOptions options = null);
+#if NETSTANDARD1_3
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, RequestOptions options = null);
+#endif
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, RequestOptions options = null);
 

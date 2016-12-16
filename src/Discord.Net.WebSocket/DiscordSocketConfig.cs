@@ -1,6 +1,8 @@
 ﻿using Discord.Audio;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
+using System;
 
 namespace Discord.WebSocket
 {
@@ -27,9 +29,30 @@ namespace Discord.WebSocket
         public AudioMode AudioMode { get; set; } = AudioMode.Disabled;
 
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
-        public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
+        public WebSocketProvider WebSocketProvider { get; set; }
+        /// <summary> Gets or sets the provider used to generate new udp sockets. </summary>
+        public UdpSocketProvider UdpSocketProvider { get; set; }
 
         /// <summary> Gets or sets whether or not all users should be downloaded as guilds come available. </summary>
         public bool DownloadUsersOnGuildAvailable { get; set; } = false;
+
+        public DiscordSocketConfig()
+        {
+#if NETSTANDARD1_3
+            WebSocketProvider = () => new DefaultWebSocketClient();
+            UdpSocketProvider = () => new DefaultUdpSocket();
+#else
+            WebSocketProvider = () =>
+            {
+                throw new InvalidOperationException("The default websocket provider is not supported on this platform.\n" +
+                    "You must specify a WebSocketProvider or target a runtime supporting .NET Standard 1.3, such as .NET Framework 4.6+.");
+            };
+            UdpSocketProvider = () =>
+            {
+                throw new InvalidOperationException("The default UDP provider is not supported on this platform.\n" +
+                    "You must specify a UdpSocketProvider or target a runtime supporting .NET Standard 1.3, such as .NET Framework 4.6+.");
+            };
+#endif
+        }
     }
 }

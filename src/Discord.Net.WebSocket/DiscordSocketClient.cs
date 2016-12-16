@@ -4,6 +4,7 @@ using Discord.Audio;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 using Newtonsoft.Json;
@@ -56,6 +57,7 @@ namespace Discord.WebSocket
         internal AudioMode AudioMode { get; private set; }
         internal ClientState State { get; private set; }
         internal int ConnectionTimeout { get; private set; }
+        internal UdpSocketProvider UdpSocketProvider { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool DownloadUsersOnGuildAvailable { get; private set; }
 
@@ -76,6 +78,7 @@ namespace Discord.WebSocket
             MessageCacheSize = config.MessageCacheSize;
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
+            UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
             DownloadUsersOnGuildAvailable = config.DownloadUsersOnGuildAvailable;
             ConnectionTimeout = config.ConnectionTimeout;
@@ -115,7 +118,7 @@ namespace Discord.WebSocket
                 GuildAvailable += g =>
                 {
                     var _ = g.DownloadUsersAsync();
-                    return Task.CompletedTask;
+                    return Task.Delay(0);
                 };
             }
 
@@ -512,7 +515,7 @@ namespace Discord.WebSocket
             await ApiClient.SendStatusUpdateAsync(
                 status,
                 status == UserStatus.AFK,
-                statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
+                statusSince != null ? DateTimeUtils.ToUnixMilliseconds(_statusSince.Value) : (long?)null,
                 gameModel).ConfigureAwait(false);
         }
 

@@ -160,8 +160,8 @@ namespace Discord.API
             LoginState = LoginState.LoggedOut;
         }
 
-        internal virtual Task ConnectInternalAsync() => Task.CompletedTask;
-        internal virtual Task DisconnectInternalAsync() => Task.CompletedTask;
+        internal virtual Task ConnectInternalAsync() => Task.Delay(0);
+        internal virtual Task DisconnectInternalAsync() => Task.Delay(0);
 
         //Core
         internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,

@@ -29,16 +29,14 @@
     "Discord.Net.Core": {
       "target": "project"
     },
-    "System.IO.FileSystem": "4.3.0"
   },
 
   "frameworks": {
+    "netstandard1.1": {},
     "netstandard1.3": {
-      "imports": [
-        "dotnet5.4",
-        "dnxcore50",
-        "portable-net45+win8"
-      ]
+      "dependencies": {
+        "System.IO.FileSystem": "4.3.0"        
+      }
     }
   }
 }

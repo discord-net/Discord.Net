@@ -32,17 +32,15 @@
     "Discord.Net.Rest": {
       "target": "project"
     },
-    "System.IO.Compression": "4.3.0",
-    "System.Net.WebSockets.Client": "4.3.0"
+    "System.IO.Compression": "4.3.0"
   },
 
   "frameworks": {
+    "netstandard1.1": {},
     "netstandard1.3": {
-      "imports": [
-        "dotnet5.4",
-        "dnxcore50",
-        "portable-net45+win8"
-      ]
+      "dependencies": {
+        "System.Net.WebSockets.Client": "4.3.0"        
+      }
     }
   }
 }

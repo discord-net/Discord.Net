@@ -21,12 +21,12 @@ namespace Discord.Rest
         protected override Task OnLoginAsync(TokenType tokenType, string token)
         {
             base.CurrentUser = RestSelfUser.Create(this, ApiClient.CurrentUser);
-            return Task.CompletedTask;
+            return Task.Delay(0);
         }
         protected override Task OnLogoutAsync()
         {
             _applicationInfo = null;
-            return Task.CompletedTask;
+            return Task.Delay(0);
         }
 
         /// <inheritdoc />

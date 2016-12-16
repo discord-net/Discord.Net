@@ -28,8 +28,8 @@ namespace Discord.Commands
         public static Dictionary<Type, ModuleInfo> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
         public static Dictionary<Type, ModuleInfo> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
         {
-            if (!validTypes.Any())
-                throw new InvalidOperationException("Could not find any valid modules from the given selection");
+            /*if (!validTypes.Any())
+                throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
             
             var topLevelGroups = validTypes.Where(x => x.DeclaringType == null);
             var subGroups = validTypes.Intersect(topLevelGroups);
@@ -65,7 +65,8 @@ namespace Discord.Commands
                 if (builtTypes.Contains(typeInfo))
                     continue;
                 
-                builder.AddModule((module) => {
+                builder.AddModule((module) => 
+                {
                     BuildModule(module, typeInfo, service);
                     BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
                 });
@@ -106,7 +107,8 @@ namespace Discord.Commands
 
             foreach (var method in validCommands)
             {
-                builder.AddCommand((command) => {
+                builder.AddCommand((command) => 
+                {
                     BuildCommand(command, typeInfo, method, service);
                 });
             }
@@ -147,21 +149,24 @@ namespace Discord.Commands
             int pos = 0, count = parameters.Length;
             foreach (var paramInfo in parameters)
             {
-                builder.AddParameter((parameter) => {
+                builder.AddParameter((parameter) => 
+                {
                     BuildParameter(parameter, paramInfo, pos++, count, service);
                 });
             }
 
             var createInstance = ReflectionUtils.CreateBuilder<ModuleBase>(typeInfo, service);
 
-            builder.Callback = (ctx, args, map) => {
+            builder.Callback = (ctx, args, map) => 
+            {
                 var instance = createInstance(map);
                 instance.Context = ctx;
                 try
                 {
-                    return method.Invoke(instance, args) as Task ?? Task.CompletedTask;
+                    return method.Invoke(instance, args) as Task ?? Task.Delay(0);
                 }
-                finally{
+                finally
+                {
                     (instance as IDisposable)?.Dispose();
                 }
             };
