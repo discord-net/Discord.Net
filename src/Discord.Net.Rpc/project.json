@@ -3,6 +3,12 @@
   "description": "A core Discord.Net library containing the RPC client and models.",
   "authors": [ "RogueException" ],
 
+  "buildOptions": {
+    "compile": {
+      "includeFiles": [ "../Discord.Net.WebSocket/Net/DefaultWebSocketClient.cs" ]
+    }
+  },
+
   "packOptions": {
     "tags": [ "discord", "discordapp" ],
     "licenseUrl": "http://opensource.org/licenses/MIT",
@@ -11,10 +17,6 @@
       "type": "git",
       "url": "git://github.com/RogueException/Discord.Net"
     }
-  },
-
-  "publishOptions": {
-    "includeFiles": [ "../Discord.Net.WebSocket/Net/DefaultWebSocketClient.cs" ]
   },
 
   "configurations": {
