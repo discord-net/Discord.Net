@@ -43,10 +43,13 @@ namespace Discord.Commands.Builders
         internal void SetType(Type type)
         {
             var readers = Command.Module.Service.GetTypeReaders(type);
-            if (readers == null)
-                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");
-            
-            TypeReader = readers.FirstOrDefault().Value;
+            if (readers != null)
+                TypeReader = readers.FirstOrDefault().Value;
+            else
+                TypeReader = Command.Module.Service.GetDefaultTypeReader(type);
+
+            if (TypeReader == null)
+                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");            
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);

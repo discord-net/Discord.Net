@@ -80,6 +80,13 @@ namespace Discord.Commands.Builders
             _preconditions.Add(precondition);
             return this;
         }
+        public CommandBuilder AddParameter<T>(string name, Action<ParameterBuilder> createFunc)
+        {
+            var param = new ParameterBuilder(this, name, typeof(T));
+            createFunc(param);
+            _parameters.Add(param);
+            return this;
+        }
         public CommandBuilder AddParameter(string name, Type type, Action<ParameterBuilder> createFunc)
         {
             var param = new ParameterBuilder(this, name, type);
