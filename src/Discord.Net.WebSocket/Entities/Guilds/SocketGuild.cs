@@ -84,7 +84,6 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<string> Features => _features;
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
-        public IReadOnlyCollection<SocketVoiceState> VoiceStates => _voiceStates.ToReadOnlyCollection();
 
         internal SocketGuild(DiscordSocketClient client, ulong id)
             : base(client, id)
