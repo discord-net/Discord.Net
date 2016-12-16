@@ -9,6 +9,6 @@ namespace Discord.API.Rest
         [JsonProperty("username")]
         public Optional<string> Username { get; set; }
         [JsonProperty("avatar")]
-        public Optional<Image> Avatar { get; set; }
+        public Optional<Image?> Avatar { get; set; }
     }
 }

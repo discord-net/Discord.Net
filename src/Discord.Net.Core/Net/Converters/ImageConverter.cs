@@ -1,6 +1,7 @@
 ﻿using Discord.API;
 using Newtonsoft.Json;
 using System;
+using Model = Discord.API.Image;
 
 namespace Discord.Net.Converters
 {
@@ -19,7 +20,7 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var image = (Image)value;
+            var image = (Model)value;
 
             if (image.Stream != null)
             {

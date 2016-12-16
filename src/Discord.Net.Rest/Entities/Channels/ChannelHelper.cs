@@ -24,7 +24,12 @@ namespace Discord.Rest
         {
             var args = new ModifyGuildChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildChannelParams
+            {
+                Name = args.Name,
+                Position = args.Position
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
             Action<ModifyTextChannelParams> func, 
@@ -32,7 +37,13 @@ namespace Discord.Rest
         {
             var args = new ModifyTextChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyTextChannelParams
+            {
+                Name = args.Name,
+                Position = args.Position,
+                Topic = args.Topic
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
             Action<ModifyVoiceChannelParams> func, 
@@ -40,7 +51,14 @@ namespace Discord.Rest
         {
             var args = new ModifyVoiceChannelParams();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyVoiceChannelParams
+            {
+                Bitrate = args.Bitrate,
+                Name = args.Name,
+                Position = args.Position,
+                UserLimit = args.UserLimit
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
 
         //Invites

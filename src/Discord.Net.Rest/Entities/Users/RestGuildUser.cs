@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 
@@ -30,7 +31,7 @@ namespace Discord.Rest
             }
         }
         public IReadOnlyCollection<ulong> RoleIds => _roleIds;
-        
+
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         internal RestGuildUser(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -61,21 +62,25 @@ namespace Discord.Rest
                 roles.Add(roleIds[i]);
             _roleIds = roles.ToImmutable();
         }
-        
+
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
         public async Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
-        { 
+        {
             var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)
                 IsDeafened = args.Deaf.Value;
             if (args.Mute.IsSpecified)
                 IsMuted = args.Mute.Value;
-            if (args.RoleIds.IsSpecified)
-                UpdateRoles(args.RoleIds.Value);
+            if (args.Nickname.IsSpecified)
+                Nickname = args.Nickname.Value;
+            if (args.Roles.IsSpecified)
+                UpdateRoles(args.Roles.Value.Select(x => x.Id).ToArray());
+            else if (args.RoleIds.IsSpecified)
+                UpdateRoles(args.RoleIds.Value.ToArray());
         }
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);

@@ -5,7 +5,7 @@ using Field = Discord.API.EmbedField;
 using Author = Discord.API.EmbedAuthor;
 using Footer = Discord.API.EmbedFooter;
 using Thumbnail = Discord.API.EmbedThumbnail;
-using Image = Discord.API.EmbedImage;
+using ImageEmbed = Discord.API.EmbedImage;
 
 namespace Discord
 {
@@ -110,7 +110,7 @@ namespace Discord
             _model.Footer = Footer?.ToModel();
             _model.Timestamp = Timestamp?.ToUniversalTime();
             _model.Thumbnail = ThumbnailUrl != null ? new Thumbnail { Url = ThumbnailUrl } : null;
-            _model.Image = ImageUrl != null ? new Image { Url = ImageUrl } : null;
+            _model.Image = ImageUrl != null ? new ImageEmbed { Url = ImageUrl } : null;
             _model.Fields = _fields.ToArray();
             return _model;
         }
