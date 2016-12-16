@@ -1,0 +1,38 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "An optional WebSocket client provider for Discord.Net using WebSocket4Net.",
+  "authors": [ "RogueException", "foxbot" ],
+
+  "packOptions": {
+    "tags": [ "discord", "discordapp" ],
+    "licenseUrl": "http://opensource.org/licenses/MIT",
+    "projectUrl": "https://github.com/RogueException/Discord.Net",
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/RogueException/Discord.Net"
+    }
+  },
+
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "nowarn": [ "CS1573", "CS1591" ],
+        "optimize": true,
+        "warningsAsErrors": true,
+        "xmlDoc": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "Discord.Net.Core": {
+      "target": "project"
+    },
+    "WebSocket4Net": "0.14.1"
+  },
+
+  "frameworks": {
+    "net45": {}
+  }
+}
