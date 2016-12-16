@@ -37,24 +37,7 @@ namespace Discord.Commands
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
-            {
-                [typeof(bool)] = new SimpleTypeReader<bool>(),
-                [typeof(char)] = new SimpleTypeReader<char>(),
-                [typeof(string)] = new SimpleTypeReader<string>(),
-                [typeof(byte)] = new SimpleTypeReader<byte>(),
-                [typeof(sbyte)] = new SimpleTypeReader<sbyte>(),
-                [typeof(ushort)] = new SimpleTypeReader<ushort>(),
-                [typeof(short)] = new SimpleTypeReader<short>(),
-                [typeof(uint)] = new SimpleTypeReader<uint>(),
-                [typeof(int)] = new SimpleTypeReader<int>(),
-                [typeof(ulong)] = new SimpleTypeReader<ulong>(),
-                [typeof(long)] = new SimpleTypeReader<long>(),
-                [typeof(float)] = new SimpleTypeReader<float>(),
-                [typeof(double)] = new SimpleTypeReader<double>(),
-                [typeof(decimal)] = new SimpleTypeReader<decimal>(),
-                [typeof(DateTime)] = new SimpleTypeReader<DateTime>(),
-                [typeof(DateTimeOffset)] = new SimpleTypeReader<DateTimeOffset>(),
-                
+            {                
                 [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
                 [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
                 [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
@@ -72,6 +55,9 @@ namespace Discord.Commands
                 [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
                 [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
             };
+            foreach (var type in PrimitiveParsers.SupportedTypes)
+                _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
+
             _caseSensitive = config.CaseSensitiveCommands;
             _defaultRunMode = config.DefaultRunMode;
         }

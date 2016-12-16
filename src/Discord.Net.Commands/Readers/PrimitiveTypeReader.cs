@@ -1,12 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    internal class SimpleTypeReader<T> : TypeReader
+    internal static class PrimitiveTypeReader
+    {
+        public static TypeReader Create(Type type)
+        {
+            type = typeof(PrimitiveTypeReader<>).MakeGenericType(type);
+            return Activator.CreateInstance(type) as TypeReader;
+        }
+    }
+
+    internal class PrimitiveTypeReader<T> : TypeReader
     {
         private readonly TryParseDelegate<T> _tryParse;
 
-        public SimpleTypeReader()
+        public PrimitiveTypeReader()
         {
             _tryParse = PrimitiveParsers.Get<T>();
         }
