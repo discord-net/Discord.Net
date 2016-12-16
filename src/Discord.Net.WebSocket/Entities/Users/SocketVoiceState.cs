@@ -8,6 +8,8 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketVoiceState : IVoiceState
     {
+        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false);
+
         [Flags]
         private enum Flags : byte
         {
@@ -30,7 +32,7 @@ namespace Discord.WebSocket
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
 
-        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isSuppressed)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
@@ -40,13 +42,17 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.SelfMuted;
             if (isSelfDeafened)
                 voiceStates |= Flags.SelfDeafened;
+            if (isMuted)
+                voiceStates |= Flags.Muted;
+            if (isDeafened)
+                voiceStates |= Flags.Deafened;
             if (isSuppressed)
                 voiceStates |= Flags.Suppressed;
             _voiceStates = voiceStates;
         }
         internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
         {
-            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Suppress);
+            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
         }
 
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";

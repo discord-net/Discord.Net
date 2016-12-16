@@ -1561,7 +1561,7 @@ namespace Discord.WebSocket
 
                                             if (data.ChannelId != null)
                                             {
-                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? new SocketVoiceState(null, null, false, false, false);
+                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
                                                 after = guild.AddOrUpdateVoiceState(State, data);
                                                 if (data.UserId == CurrentUser.Id)
                                                 {
@@ -1570,7 +1570,7 @@ namespace Discord.WebSocket
                                             }
                                             else
                                             {
-                                                before = guild.RemoveVoiceState(data.UserId) ?? new SocketVoiceState(null, null, false, false, false);
+                                                before = guild.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
                                                 after = SocketVoiceState.Create(null, data);
                                             }
 
@@ -1583,12 +1583,12 @@ namespace Discord.WebSocket
                                             {
                                                 if (data.ChannelId != null)
                                                 {
-                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? new SocketVoiceState(null, null, false, false, false);
+                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
                                                     after = groupChannel.AddOrUpdateVoiceState(State, data);
                                                 }
                                                 else
                                                 {
-                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? new SocketVoiceState(null, null, false, false, false);
+                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
                                                     after = SocketVoiceState.Create(null, data);
                                                 }
                                                 user = groupChannel.GetUser(data.UserId);
