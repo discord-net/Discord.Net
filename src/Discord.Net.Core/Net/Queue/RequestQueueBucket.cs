@@ -1,5 +1,4 @@
-﻿using Discord.Net.Rest;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 #if DEBUG_LIMITS
@@ -88,7 +87,10 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                                 Debug.WriteLine($"[{id}] (!) 502");
 #endif
-                                continue; //Continue
+                                if ((request.Options.RetryMode & RetryMode.Retry502) == 0)
+                                    throw new HttpException(HttpStatusCode.BadGateway, null);
+
+                                continue; //Retry
                             default:
                                 string reason = null;
                                 if (response.Stream != null)
@@ -115,13 +117,28 @@ namespace Discord.Net.Queue
                         return response.Stream;
                     }
                 }
-#if DEBUG_LIMITS
-                catch
+                catch (TimeoutException)
                 {
-                    Debug.WriteLine($"[{id}] Error");
-                    throw;
-                }
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Timeout");
 #endif
+                    if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
+                        throw;
+
+                    await Task.Delay(500);
+                    continue; //Retry
+                }
+                catch (Exception)
+                {
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Error");
+#endif
+                    if ((request.Options.RetryMode & RetryMode.RetryErrors) == 0)
+                        throw;
+
+                    await Task.Delay(500);
+                    continue; //Retry
+                }
                 finally
                 {
                     UpdateRateLimit(id, request, info, lag, false);
@@ -140,7 +157,7 @@ namespace Discord.Net.Queue
 
             while (true)
             {
-                if (DateTimeOffset.UtcNow > request.TimeoutAt || request.CancelToken.IsCancellationRequested)
+                if (DateTimeOffset.UtcNow > request.TimeoutAt || request.Options.CancelToken.IsCancellationRequested)
                 {
                     if (!isRateLimited)
                         throw new TimeoutException();
@@ -162,6 +179,10 @@ namespace Discord.Net.Queue
                         isRateLimited = true;
                         await _queue.RaiseRateLimitTriggered(Id, null).ConfigureAwait(false);
                     }
+
+                    if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
+                        throw new RateLimitedException();
+
                     if (resetAt.HasValue)
                     {
                         if (resetAt > timeoutAt)
@@ -171,7 +192,7 @@ namespace Discord.Net.Queue
                         Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive)");
 #endif
                         if (millis > 0)
-                            await Task.Delay(millis, request.CancelToken).ConfigureAwait(false);
+                            await Task.Delay(millis, request.Options.CancelToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -180,7 +201,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping 500* ms (Pre-emptive)");
 #endif
-                        await Task.Delay(500, request.CancelToken).ConfigureAwait(false);
+                        await Task.Delay(500, request.Options.CancelToken).ConfigureAwait(false);
                     }
                     continue;
                 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+#if DEBUG_LIMITS
 using System.Diagnostics;
+#endif
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -63,7 +65,11 @@ namespace Discord.Net.Queue
 
         public async Task<Stream> SendAsync(RestRequest request)
         {
-            request.CancelToken = _requestCancelToken;
+            if (request.Options.CancelToken.CanBeCanceled)
+                request.Options.CancelToken = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken).Token;
+            else
+                request.Options.CancelToken = _requestCancelToken;
+
             var bucket = GetOrCreateBucket(request.Options.BucketId, request);
             return await bucket.SendAsync(request).ConfigureAwait(false);
         }

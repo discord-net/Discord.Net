@@ -32,26 +32,29 @@ namespace Discord.API
         protected readonly JsonSerializer _serializer;
         protected readonly SemaphoreSlim _stateLock;
         private readonly RestClientProvider _restClientProvider;
-        private readonly string _userAgent;
 
         protected string _authToken;
         protected bool _isDisposed;
         private CancellationTokenSource _loginCancelToken;
         private IRestClient _restClient;
+        private bool _fetchCurrentUser;
+
+        public RetryMode DefaultRetryMode { get; }
+        public string UserAgent { get; }
 
         public LoginState LoginState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
         public User CurrentUser { get; private set; }
         public RequestQueue RequestQueue { get; private set; }
-        internal bool FetchCurrentUser { get; set; }
 
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
+            JsonSerializer serializer = null, RequestQueue requestQueue = null, bool fetchCurrentUser = true)
         {
             _restClientProvider = restClientProvider;
-            _userAgent = userAgent;
+            UserAgent = userAgent;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
             RequestQueue = requestQueue;
-            FetchCurrentUser = true;
+            _fetchCurrentUser = fetchCurrentUser;
 
             _stateLock = new SemaphoreSlim(1, 1);
 
@@ -61,7 +64,7 @@ namespace Discord.API
         {
             _restClient = _restClientProvider(baseUrl);
             _restClient.SetHeader("accept", "*/*");
-            _restClient.SetHeader("user-agent", _userAgent);
+            _restClient.SetHeader("user-agent", UserAgent);
             _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
         }
         internal static string GetPrefixedToken(TokenType tokenType, string token)
@@ -120,8 +123,8 @@ namespace Discord.API
                 _authToken = token;
                 _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
 
-                if (FetchCurrentUser)
-                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true }).ConfigureAwait(false);
+                if (_fetchCurrentUser)
+                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
 
                 LoginState = LoginState.LoggedIn;
             }
@@ -257,6 +260,8 @@ namespace Discord.API
         {
             if (!request.Options.IgnoreState)
                 CheckState();
+            if (request.Options.RetryMode == null)
+                request.Options.RetryMode = DefaultRetryMode;
 
             var stopwatch = Stopwatch.StartNew();
             var responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);

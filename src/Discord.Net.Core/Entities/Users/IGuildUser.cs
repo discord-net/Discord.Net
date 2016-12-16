@@ -12,6 +12,7 @@ namespace Discord
         DateTimeOffset? JoinedAt { get; }
         /// <summary> Gets the nickname for this user. </summary>
         string Nickname { get; }
+        /// <summary> Gets the guild-level permissions for this user. </summary>
         GuildPermissions GuildPermissions { get; }
 
         /// <summary> Gets the guild for this user. </summary>

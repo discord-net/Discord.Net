@@ -19,6 +19,9 @@ namespace Discord
         public const int MaxMessagesPerBatch = 100;
         public const int MaxUsersPerBatch = 1000;
 
+        /// <summary> Gets or sets how a request should act in the case of an error, by default. </summary>
+        public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
+        
         /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
     }

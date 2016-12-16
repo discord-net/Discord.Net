@@ -16,7 +16,7 @@ namespace Discord.Net.Queue
 
         public override async Task<RestResponse> SendAsync()
         {
-            return await Client.SendAsync(Method, Endpoint, MultipartParams, CancelToken, Options.HeaderOnly).ConfigureAwait(false);
+            return await Client.SendAsync(Method, Endpoint, MultipartParams, Options.CancelToken, Options.HeaderOnly).ConfigureAwait(false);
         }
     }
 }

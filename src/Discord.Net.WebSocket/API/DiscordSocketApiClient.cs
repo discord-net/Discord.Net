@@ -32,11 +32,12 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, string userAgent, WebSocketProvider webSocketProvider, JsonSerializer serializer = null, RequestQueue requestQueue = null)
-            : base(restClientProvider, userAgent, serializer, requestQueue)
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, string userAgent, WebSocketProvider webSocketProvider,
+            RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null, RequestQueue requestQueue = null)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer, requestQueue, true)
         {            
             _gatewayClient = webSocketProvider();
-            //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
+            //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
             _gatewayClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))

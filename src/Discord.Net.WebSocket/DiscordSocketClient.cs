@@ -130,7 +130,7 @@ namespace Discord.WebSocket
         
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true}).ConfigureAwait(false);
+            var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
         }
         protected override async Task OnLogoutAsync()
