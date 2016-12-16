@@ -2,7 +2,13 @@
 {
     public class ModifyGuildChannelsParams
     {
+        /// <summary>
+        /// The id of the channel to apply this position to.
+        /// </summary>
         public ulong Id { get; set; }
+        /// <summary>
+        /// The new zero-based position of this channel.
+        /// </summary>
         public int Position { get; set; }
 
         public ModifyGuildChannelsParams(ulong id, int position)

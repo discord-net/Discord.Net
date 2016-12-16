@@ -17,6 +17,7 @@ namespace Discord
         {
             Stream = stream;
         }
+#if NETSTANDARD1_3
         /// <summary>
         /// Create the image from a file path.
         /// </summary>
@@ -28,5 +29,6 @@ namespace Discord
         {
             Stream = File.OpenRead(path);
         }
+#endif
     }
 }

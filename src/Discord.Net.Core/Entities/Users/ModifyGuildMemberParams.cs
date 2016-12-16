@@ -1,4 +1,6 @@
-﻿namespace Discord
+﻿using System.Collections.Generic;
+
+namespace Discord
 {
     /// <summary>
     /// Modify an IGuildUser with the following parameters.
@@ -42,7 +44,15 @@
         /// To add a role to a user: <see cref="GuildUserExtensions.AddRolesAsync(IGuildUser, IRole[])"/>
         /// To remove a role from a user: <see cref="GuildUserExtensions.RemoveRolesAsync(IGuildUser, IRole[])"/>
         /// </remarks>
-        public Optional<IRole[]> Roles { get; set; }
+        public Optional<IEnumerable<IRole>> Roles { get; set; }
+        /// <summary>
+        /// What roles should the user have?
+        /// </summary>
+        /// <remarks>
+        /// To add a role to a user: <see cref="GuildUserExtensions.AddRolesAsync(IGuildUser, IRole[])"/>
+        /// To remove a role from a user: <see cref="GuildUserExtensions.RemoveRolesAsync(IGuildUser, IRole[])"/>
+        /// </remarks>
+        public Optional<IEnumerable<ulong>> RoleIds { get; set; }
         /// <summary>
         /// Move a user to a voice channel.
         /// </summary>

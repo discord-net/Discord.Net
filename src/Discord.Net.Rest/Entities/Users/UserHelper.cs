@@ -16,9 +16,13 @@ namespace Discord.Rest
             func(args);
             var apiArgs = new API.Rest.ModifyCurrentUserParams
             {
-                Avatar = args.Avatar.IsSpecified ? ImageModel.Create(args.Avatar.Value) : Optional.Create<ImageModel>(),
+                Avatar = args.Avatar.IsSpecified ? ImageModel.Create(args.Avatar.Value) : Optional.Create<ImageModel?>(),
                 Username = args.Username
             };
+
+            if (!apiArgs.Avatar.IsSpecified && user.AvatarId != null)
+                apiArgs.Avatar = new ImageModel(user.AvatarId);
+
             return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<ModifyGuildMemberParams> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
@@ -31,9 +35,14 @@ namespace Discord.Rest
                 ChannelId = args.Channel.IsSpecified ? args.Channel.Value.Id : Optional.Create<ulong>(),
                 Deaf = args.Deaf,
                 Mute = args.Mute,
-                Nickname = args.Nickname,
-                RoleIds = args.Roles.IsSpecified ? args.Roles.Value.Select(r => r.Id).ToArray() : Optional.Create<ulong[]>(),
+                Nickname = args.Nickname
             };
+
+            if (args.Roles.IsSpecified)
+                apiArgs.RoleIds = args.Roles.Value.Select(x => x.Id).ToArray();
+            else if (args.RoleIds.IsSpecified)
+                apiArgs.RoleIds = args.RoleIds.Value.ToArray();
+
             await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
         }

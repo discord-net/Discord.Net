@@ -21,6 +21,10 @@
         /// </summary>
         public Optional<string> Name { get; set; }
         /// <summary>
+        /// The region for the Guild's voice connections
+        /// </summary>
+        public Optional<IVoiceRegion> Region { get; set; }
+        /// <summary>
         /// The ID of the region for the Guild's voice connections
         /// </summary>
         public Optional<string> RegionId { get; set; }
@@ -48,9 +52,17 @@
         /// </remarks>
         public Optional<Image?> Splash { get; set; }
         /// <summary>
+        /// The IVoiceChannel where AFK users should be sent.
+        /// </summary>
+        public Optional<IVoiceChannel> AfkChannel { get; set; }
+        /// <summary>
         /// The ID of the IVoiceChannel where AFK users should be sent.
         /// </summary>
         public Optional<ulong?> AfkChannelId { get; set; }
+        /// <summary>
+        /// The owner of this guild.
+        /// </summary>
+        public Optional<IUser> Owner { get; set; }
         /// <summary>
         /// The ID of the owner of this guild.
         /// </summary>
