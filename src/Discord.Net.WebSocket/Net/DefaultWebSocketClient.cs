@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    internal class DefaultWebSocketClient : IWebSocketClient
+    internal class DefaultWebSocketClient : IWebSocketClient, IDisposable
     {
         public const int ReceiveChunkSize = 16 * 1024; //16KB
         public const int SendChunkSize = 4 * 1024; //4KB
