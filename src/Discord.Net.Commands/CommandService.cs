@@ -22,7 +22,6 @@ namespace Discord.Commands
 
         internal readonly bool _caseSensitive;
         internal readonly RunMode _defaultRunMode;
-        internal readonly char _splitCharacter;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -61,7 +60,6 @@ namespace Discord.Commands
 
             _caseSensitive = config.CaseSensitiveCommands;
             _defaultRunMode = config.DefaultRunMode;
-            _splitCharacter = config.CommandSplitCharacter;
         }
 
         //Modules
@@ -131,7 +129,7 @@ namespace Discord.Commands
             _moduleDefs.Add(module);
 
             foreach (var command in module.Commands)
-                _map.AddCommand(command, this);
+                _map.AddCommand(command);
 
             foreach (var submodule in module.Submodules)
                 LoadModuleInternal(submodule);
@@ -175,7 +173,7 @@ namespace Discord.Commands
                 return false;
 
             foreach (var cmd in module.Commands)
-                _map.RemoveCommand(cmd, this);
+                _map.RemoveCommand(cmd);
 
             foreach (var submodule in module.Submodules)
             {
@@ -216,7 +214,7 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(searchInput, this).OrderByDescending(x => x.Priority).ToImmutableArray();
+            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Priority).ToImmutableArray();
             
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);

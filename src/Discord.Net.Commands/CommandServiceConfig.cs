@@ -6,7 +6,5 @@
         public RunMode DefaultRunMode { get; set; } = RunMode.Sync;
         /// <summary> Should commands be case-sensitive? </summary>
         public bool CaseSensitiveCommands { get; set; } = false;
-        /// <summary> The character which splits commands </summary>
-        public char CommandSplitCharacter { get; set; } = ' ';
     }
 }

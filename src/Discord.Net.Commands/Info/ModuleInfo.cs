@@ -30,14 +30,14 @@ namespace Discord.Commands
             Remarks = builder.Remarks;
             Parent = parent;
 
-            Aliases = BuildAliases(builder, service).ToImmutableArray();
+            Aliases = BuildAliases(builder).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service));
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
 
             Submodules = BuildSubmodules(builder, service).ToImmutableArray();
         }
 
-        private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
+        private static IEnumerable<string> BuildAliases(ModuleBuilder builder)
         {
             IEnumerable<string> result = null;
 
@@ -60,9 +60,9 @@ namespace Discord.Commands
                         result = level.Aliases.ToList(); //create a shallow copy so we don't overwrite the builder unexpectedly
                 }
                 else if (result.Count() > level.Aliases.Count)
-                    result = result.Permutate(level.Aliases, (first, second) => first + service._splitCharacter + second);
+                    result = result.Permutate(level.Aliases, (first, second) => first + " " + second);
                 else
-                    result = level.Aliases.Permutate(result, (second, first) => first + service._splitCharacter + second);
+                    result = level.Aliases.Permutate(result, (second, first) => first + " " + second);
             }
 
             if (result == null) //there were no aliases; default to an empty list
