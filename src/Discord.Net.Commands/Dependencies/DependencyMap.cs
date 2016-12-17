@@ -14,14 +14,18 @@ namespace Discord.Commands
             map = new Dictionary<Type, Func<object>>();
         }
 
+        /// <inheritdoc />
         public void Add<T>(T obj) where T : class 
             => AddFactory(() => obj);
+        /// <inheritdoc />
         public void AddTransient<T>() where T : class, new() 
             => AddFactory(() => new T());
+        /// <inheritdoc />
         public void AddTransient<TKey, TImpl>() where TKey : class 
             where TImpl : class, TKey, new() 
             => AddFactory<TKey>(() => new TImpl());
-
+        
+        /// <inheritdoc />
         public void AddFactory<T>(Func<T> factory) where T : class
         {
             var t = typeof(T);
@@ -30,10 +34,12 @@ namespace Discord.Commands
             map.Add(t, factory);
         }
 
+        /// <inheritdoc />
         public T Get<T>()
         {
             return (T)Get(typeof(T));
         }
+        /// <inheritdoc />
         public object Get(Type t)
         {
             object result;
@@ -43,6 +49,7 @@ namespace Discord.Commands
                 return result;
         }
 
+        /// <inheritdoc />
         public bool TryGet<T>(out T result)
         {
             object untypedResult;
@@ -57,6 +64,7 @@ namespace Discord.Commands
                 return false;
             }
         }
+        /// <inheritdoc />
         public bool TryGet(Type t, out object result)
         {
             Func<object> func;
