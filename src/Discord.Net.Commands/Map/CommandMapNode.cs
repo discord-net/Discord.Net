@@ -25,7 +25,7 @@ namespace Discord.Commands
 
         public void AddCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(service, text, index);
+            int nextSegment = NextCommandSegment(service, text, index);
             string name;
 
             lock (_lockObj)
@@ -38,19 +38,19 @@ namespace Discord.Commands
                 }
                 else
                 {
-                    if (nextSpace == -1)
+                    if (nextSegment == -1)
                         name = text.Substring(index);
                     else
-                        name = text.Substring(index, nextSpace - index);
+                        name = text.Substring(index, nextSegment - index);
 
                     var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
-                    nextNode.AddCommand(service, nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                    nextNode.AddCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                 }
             }
         }
         public void RemoveCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(service, text, index);
+            int nextSegment = NextCommandSegment(service, text, index);
             string name;
 
             lock (_lockObj)
@@ -59,15 +59,15 @@ namespace Discord.Commands
                     _commands = _commands.Remove(command);
                 else
                 {
-                    if (nextSpace == -1)
+                    if (nextSegment == -1)
                         name = text.Substring(index);
                     else
-                        name = text.Substring(index, nextSpace - index);
+                        name = text.Substring(index, nextSegment - index);
 
                     CommandMapNode nextNode;
                     if (_nodes.TryGetValue(name, out nextNode))
                     {
-                        nextNode.RemoveCommand(service, nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                        nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                         if (nextNode.IsEmpty)
                             _nodes.TryRemove(name, out nextNode);
                     }
@@ -75,32 +75,35 @@ namespace Discord.Commands
             }
         }
 
-        public IEnumerable<CommandInfo> GetCommands(CommandService service, string text, int index)
+        public IEnumerable<CommandInfo> GetCommands(CommandService service, string text, int index, bool lastLevel = false)
         {
             int nextCommand = NextCommandSegment(service, text, index);
             string name = null;
 
-            //got all command segments or base-level command
+            //got all command segments
             if (nextCommand == -1)
             {
-                var commands = _commands;
-                for (int i = 0; i < commands.Length; i++)
-                    yield return _commands[i];
-
-                //are we a base-level command?
+                //do we have parameters?
                 int nextSpace = NextWhitespace(service, text, index);
-                if (nextSpace != -1)
-                {
+
+                if (nextSpace != -1 && !lastLevel)
                     name = text.Substring(index, nextSpace - index);
-                }
                 else
-                {
                     name = text.Substring(index);
-                }
+
+                lastLevel = true;
+                nextCommand = nextSpace;
             }
             else
             {
                 name = text.Substring(index, nextCommand - index);
+            }
+
+            if (nextCommand == -1 || lastLevel)
+            {
+                var commands = _commands;
+                for (int i = 0; i < commands.Length; i++)
+                    yield return _commands[i];
             }
 
             if (name != null)
@@ -108,7 +111,7 @@ namespace Discord.Commands
                 CommandMapNode nextNode;
                 if (_nodes.TryGetValue(name, out nextNode))
                 {
-                    foreach (var cmd in nextNode.GetCommands(service, text, nextCommand + 1))
+                    foreach (var cmd in nextNode.GetCommands(service, text, nextCommand + 1, lastLevel))
                         yield return cmd;
                 }
             }
