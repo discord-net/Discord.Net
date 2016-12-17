@@ -23,9 +23,9 @@ namespace Discord.Commands
             _commands = ImmutableArray.Create<CommandInfo>();
         }
 
-        public void AddCommand(CommandService service, string text, int index, CommandInfo command)
+        public void AddCommand(string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(service, text, index);
+            int nextSpace = NextWhitespace(text, index);
             string name;
 
             lock (_lockObj)
@@ -44,13 +44,13 @@ namespace Discord.Commands
                         name = text.Substring(index, nextSpace - index);
 
                     var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
-                    nextNode.AddCommand(service, nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                    nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
                 }
             }
         }
-        public void RemoveCommand(CommandService service, string text, int index, CommandInfo command)
+        public void RemoveCommand(string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(service, text, index);
+            int nextSpace = NextWhitespace(text, index);
             string name;
 
             lock (_lockObj)
@@ -67,7 +67,7 @@ namespace Discord.Commands
                     CommandMapNode nextNode;
                     if (_nodes.TryGetValue(name, out nextNode))
                     {
-                        nextNode.RemoveCommand(service, nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                        nextNode.RemoveCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
                         if (nextNode.IsEmpty)
                             _nodes.TryRemove(name, out nextNode);
                     }
@@ -75,57 +75,32 @@ namespace Discord.Commands
             }
         }
 
-        public IEnumerable<CommandInfo> GetCommands(CommandService service, string text, int index)
+        public IEnumerable<CommandInfo> GetCommands(string text, int index)
         {
-            int nextCommand = NextCommandSegment(service, text, index);
-            string name = null;
+            int nextSpace = NextWhitespace(text, index);
+            string name;
 
-            //got all command segments or base-level command
-            if (nextCommand == -1)
+            var commands = _commands;
+            for (int i = 0; i < commands.Length; i++)
+                yield return _commands[i];
+
+            if (text != "")
             {
-                var commands = _commands;
-                for (int i = 0; i < commands.Length; i++)
-                    yield return _commands[i];
-
-                //are we a base-level command?
-                int nextSpace = NextWhitespace(service, text, index);
-                if (nextSpace != -1)
-                {
-                    name = text.Substring(index, nextSpace - index);
-                }
-                else
-                {
+                if (nextSpace == -1)
                     name = text.Substring(index);
-                }
-            }
-            else
-            {
-                name = text.Substring(index, nextCommand - index);
-            }
+                else
+                    name = text.Substring(index, nextSpace - index);
 
-            if (name != null)
-            {
                 CommandMapNode nextNode;
                 if (_nodes.TryGetValue(name, out nextNode))
                 {
-                    foreach (var cmd in nextNode.GetCommands(service, text, nextCommand + 1))
+                    foreach (var cmd in nextNode.GetCommands(nextSpace == -1 ? "" : text, nextSpace + 1))
                         yield return cmd;
                 }
             }
         }
 
-        private static int NextCommandSegment(CommandService service, string text, int startIndex)
-        {
-            int lowest = int.MaxValue;
-
-            int index = text.IndexOf(service._splitCharacter, startIndex);
-            if (index != -1 && index < lowest)
-                lowest = index;
-
-            return (lowest != int.MaxValue) ? lowest : -1;
-        }
-
-        private static int NextWhitespace(CommandService service, string text, int startIndex)
+        private static int NextWhitespace(string text, int startIndex)
         {
             int lowest = int.MaxValue;
             for (int i = 0; i < _whitespaceChars.Length; i++)
@@ -134,7 +109,6 @@ namespace Discord.Commands
                 if (index != -1 && index < lowest)
                     lowest = index;
             }
-
             return (lowest != int.MaxValue) ? lowest : -1;
         }
     }

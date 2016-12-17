@@ -12,20 +12,20 @@ namespace Discord.Commands
             _root = new CommandMapNode("");
         }
 
-        public void AddCommand(CommandInfo command, CommandService service)
+        public void AddCommand(CommandInfo command)
         {
             foreach (string text in GetAliases(command))
-                _root.AddCommand(service, text, 0, command);
+                _root.AddCommand(text, 0, command);
         }
-        public void RemoveCommand(CommandInfo command, CommandService service)
+        public void RemoveCommand(CommandInfo command)
         {
             foreach (string text in GetAliases(command))
-                _root.RemoveCommand(service, text, 0, command);
+                _root.RemoveCommand(text, 0, command);
         }
 
-        public IEnumerable<CommandInfo> GetCommands(string text, CommandService service)
+        public IEnumerable<CommandInfo> GetCommands(string text)
         {
-            return _root.GetCommands(service, text, 0);
+            return _root.GetCommands(text, 0);
         }
 
         private IReadOnlyList<string> GetAliases(CommandInfo command)
