@@ -47,5 +47,12 @@
         /// If this role is the EveryoneRole, this value may not be set.
         /// </remarks>
         public Optional<bool> Hoist { get; set; }
+        /// <summary>
+        /// Whether or not this role can be mentioned.
+        /// </summary>
+        /// <remarks>
+        /// If this role is the EveryoneRole, this value may not be set.
+        /// </remarks>
+        public Optional<bool> Mentionable { get; set; }
     }
 }

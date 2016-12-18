@@ -22,6 +22,7 @@ namespace Discord.Rest
             {
                 Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
                 Hoist = args.Hoist,
+                Mentionable = args.Mentionable,
                 Name = args.Name,
                 Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>(),
                 Position = args.Position
