@@ -39,7 +39,8 @@ namespace Discord.Commands.Builders
         {
             Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
 
-            _aliases = new List<string> { primaryAlias };
+            if (!string.IsNullOrWhiteSpace(primaryAlias))
+                _aliases.Add(primaryAlias);
         }
 
         public ModuleBuilder WithName(string name)

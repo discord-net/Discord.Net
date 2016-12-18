@@ -41,7 +41,9 @@ namespace Discord.Commands.Builders
             Discord.Preconditions.NotNull(callback, nameof(callback));
 
             Callback = callback;
-            _aliases.Add(primaryAlias);
+
+            if (!string.IsNullOrWhiteSpace(primaryAlias))
+                _aliases.Add(primaryAlias);
         }
 
         public CommandBuilder WithName(string name)

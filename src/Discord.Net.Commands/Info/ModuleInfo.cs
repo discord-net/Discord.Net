@@ -15,7 +15,7 @@ namespace Discord.Commands
         public string Remarks { get; }
 
         public IReadOnlyList<string> Aliases { get; }
-        public IEnumerable<CommandInfo> Commands { get; }
+        public IReadOnlyList<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
         public IReadOnlyList<ModuleInfo> Submodules { get; }
         public ModuleInfo Parent { get; }
@@ -31,7 +31,7 @@ namespace Discord.Commands
             Parent = parent;
 
             Aliases = BuildAliases(builder).ToImmutableArray();
-            Commands = builder.Commands.Select(x => x.Build(this, service));
+            Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
 
             Submodules = BuildSubmodules(builder, service).ToImmutableArray();
@@ -68,7 +68,7 @@ namespace Discord.Commands
             if (result == null) //there were no aliases; default to an empty list
                 result = new List<string>();
 
-            return result;
+            return result.Distinct();
         }
 
         private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
