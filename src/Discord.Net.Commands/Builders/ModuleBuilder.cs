@@ -58,7 +58,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleBuilder AddAlias(params string[] aliases)
+        public ModuleBuilder AddAliases(params string[] aliases)
         {
             for (int i = 0; i < aliases.Length; i++)
             {

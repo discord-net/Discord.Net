@@ -89,12 +89,12 @@ namespace Discord.Commands
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
-                    builder.AddAlias((attribute as AliasAttribute).Aliases);
+                    builder.AddAliases((attribute as AliasAttribute).Aliases);
                 else if (attribute is GroupAttribute)
                 {
                     var groupAttr = attribute as GroupAttribute;
                     builder.Name = builder.Name ?? groupAttr.Prefix;
-                    builder.AddAlias(groupAttr.Prefix);
+                    builder.AddAliases(groupAttr.Prefix);
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
