@@ -41,24 +41,19 @@ namespace Discord.Commands
 
             RunMode = (builder.RunMode == RunMode.Default ? service._defaultRunMode : builder.RunMode);
             Priority = builder.Priority;
-
-            // both command and module provide aliases
-            if (module.Aliases.Count > 0 && builder.Aliases.Count > 0)
-            {
-                Aliases = module.Aliases
-                    .Permutate(builder.Aliases, (first, second) => second != null ? first + service._separatorChar + second : first)
-                    .Select(x => service._caseSensitive ? x : x.ToLowerInvariant())
-                    .ToImmutableArray();
-            }
-            // only module provides aliases
-            else if (module.Aliases.Count > 0)
-                Aliases = module.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
-            // only command provides aliases
-            else if (builder.Aliases.Count > 0)
-                Aliases = builder.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
-            // neither provide aliases
-            else
-                throw new InvalidOperationException("Cannot build a command without any aliases");
+            
+            Aliases = module.Aliases
+                .Permutate(builder.Aliases, (first, second) =>
+                {
+                    if (first == "")
+                        return second;
+                    else if (second == "")
+                        return first;
+                    else
+                        return first + service._separatorChar + second;
+                })
+                .Select(x => service._caseSensitive ? x : x.ToLowerInvariant())
+                .ToImmutableArray();
 
             Preconditions = builder.Preconditions.ToImmutableArray();
 

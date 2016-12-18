@@ -72,7 +72,11 @@ namespace Discord.Commands.Builders
 
         public CommandBuilder AddAliases(params string[] aliases)
         {
-            _aliases.AddRange(aliases);
+            for (int i = 0; i < aliases.Length; i++)
+            {
+                if (!_aliases.Contains(aliases[i]))
+                    _aliases.Add(aliases[i]);
+            }
             return this;
         }
         public CommandBuilder AddPrecondition(PreconditionAttribute precondition)

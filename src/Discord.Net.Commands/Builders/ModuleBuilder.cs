@@ -58,9 +58,13 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleBuilder AddAlias(params string[] newAliases)
+        public ModuleBuilder AddAlias(params string[] aliases)
         {
-            _aliases.AddRange(newAliases);
+            for (int i = 0; i < aliases.Length; i++)
+            {
+                if (!_aliases.Contains(aliases[i]))
+                    _aliases.Add(aliases[i]);
+            }
             return this;
         }
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
