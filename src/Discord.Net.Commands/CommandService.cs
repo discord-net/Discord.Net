@@ -21,6 +21,7 @@ namespace Discord.Commands
         private readonly CommandMap _map;
 
         internal readonly bool _caseSensitive;
+        internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
@@ -30,10 +31,14 @@ namespace Discord.Commands
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
         {
+            _caseSensitive = config.CaseSensitiveCommands;
+            _separatorChar = config.SeparatorChar;
+            _defaultRunMode = config.DefaultRunMode;
+
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new ConcurrentBag<ModuleInfo>();
-            _map = new CommandMap();
+            _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
@@ -57,9 +62,6 @@ namespace Discord.Commands
             };
             foreach (var type in PrimitiveParsers.SupportedTypes)
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
-
-            _caseSensitive = config.CaseSensitiveCommands;
-            _defaultRunMode = config.DefaultRunMode;
         }
 
         //Modules
@@ -214,7 +216,7 @@ namespace Discord.Commands
         public SearchResult Search(CommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Priority).ToImmutableArray();
+            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
             
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
@@ -269,7 +271,7 @@ namespace Discord.Commands
                     }
                 }
 
-                return await commands[i].Execute(context, parseResult, dependencyMap).ConfigureAwait(false);
+                return await commands[i].ExecuteAsync(context, parseResult, dependencyMap).ConfigureAwait(false);
             }
 
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");

@@ -44,7 +44,12 @@ namespace Discord.Commands
 
             // both command and module provide aliases
             if (module.Aliases.Count > 0 && builder.Aliases.Count > 0)
-                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => second != null ? first + " " + second : first).Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
+            {
+                Aliases = module.Aliases
+                    .Permutate(builder.Aliases, (first, second) => second != null ? first + service._separatorChar + second : first)
+                    .Select(x => service._caseSensitive ? x : x.ToLowerInvariant())
+                    .ToImmutableArray();
+            }
             // only module provides aliases
             else if (module.Aliases.Count > 0)
                 Aliases = module.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
@@ -84,33 +89,19 @@ namespace Discord.Commands
 
             return PreconditionResult.FromSuccess();
         }
-
-        public async Task<ParseResult> ParseAsync(CommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        
+        public async Task<ParseResult> ParseAsync(CommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
             if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
                 return ParseResult.FromError(preconditionResult.Value);
             
-            string input = searchResult.Text;
-            var matchingAliases = Aliases.Where(alias => input.StartsWith(alias)).ToArray();
-                        
-            string matchingAlias = null;
-            foreach (string alias in matchingAliases)
-            {
-                if (alias.Length > matchingAlias.Length)
-                    matchingAlias = alias;
-            }
-
-            if (matchingAlias == null)
-                return ParseResult.FromError(CommandError.ParseFailed, "Unable to find matching alias");
-
-            input = input.Substring(matchingAlias.Length);
-
+            string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
 
-        public Task<ExecuteResult> Execute(CommandContext context, ParseResult parseResult, IDependencyMap map)
+        public Task<ExecuteResult> ExecuteAsync(CommandContext context, ParseResult parseResult, IDependencyMap map)
         {
             if (!parseResult.IsSuccess)
                 return Task.FromResult(ExecuteResult.FromError(parseResult));

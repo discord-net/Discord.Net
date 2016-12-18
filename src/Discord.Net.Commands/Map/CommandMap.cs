@@ -4,36 +4,30 @@ namespace Discord.Commands
 {
     internal class CommandMap
     {
+        private readonly CommandService _service;
         private readonly CommandMapNode _root;
         private static readonly string[] _blankAliases = new[] { "" };
 
-        public CommandMap()
+        public CommandMap(CommandService service)
         {
+            _service = service;
             _root = new CommandMapNode("");
         }
 
         public void AddCommand(CommandInfo command)
         {
-            foreach (string text in GetAliases(command))
-                _root.AddCommand(text, 0, command);
+            foreach (string text in command.Aliases)
+                _root.AddCommand(_service, text, 0, command);
         }
         public void RemoveCommand(CommandInfo command)
         {
-            foreach (string text in GetAliases(command))
-                _root.RemoveCommand(text, 0, command);
+            foreach (string text in command.Aliases)
+                _root.RemoveCommand(_service, text, 0, command);
         }
 
-        public IEnumerable<CommandInfo> GetCommands(string text)
+        public IEnumerable<CommandMatch> GetCommands(string text)
         {
-            return _root.GetCommands(text, 0);
-        }
-
-        private IReadOnlyList<string> GetAliases(CommandInfo command)
-        {
-            var aliases = command.Aliases;
-            if (aliases.Count == 0)
-                return _blankAliases;
-            return aliases;
+            return _root.GetCommands(_service, text, 0, text != "");
         }
     }
 }
