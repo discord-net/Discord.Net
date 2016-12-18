@@ -93,15 +93,18 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult.Value);
             
             string input = searchResult.Text;
-            var matchingAliases = Aliases.Where(alias => input.StartsWith(alias));
-            
-            string matchingAlias = "";
+            var matchingAliases = Aliases.Where(alias => input.StartsWith(alias)).ToArray();
+                        
+            string matchingAlias = null;
             foreach (string alias in matchingAliases)
             {
                 if (alias.Length > matchingAlias.Length)
                     matchingAlias = alias;
             }
-            
+
+            if (matchingAlias == null)
+                return ParseResult.FromError(CommandError.ParseFailed, "Unable to find matching alias");
+
             input = input.Substring(matchingAlias.Length);
 
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
