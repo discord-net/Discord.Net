@@ -68,7 +68,7 @@ By now, your module should look like this:
 The next step to creating commands, is actually creating commands. 
 
 To create a command, add a method to your module of type `Task`. 
-Typically, you will want to mark his method as `async`, although it is 
+Typically, you will want to mark this method as `async`, although it is 
 not required. 
 
 Adding parameters to a command is done by adding parameters to the 
