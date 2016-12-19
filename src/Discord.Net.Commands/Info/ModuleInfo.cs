@@ -65,8 +65,8 @@ namespace Discord.Commands
                     result = level.Aliases.Permutate(result, (second, first) => first + " " + second);
             }
 
-            if (result == null) //there were no aliases; default to an empty list
-                result = new List<string>();
+            if (result == null) //there were no aliases; default to an empty string alias
+                result = new List<string> { "" };
 
             return result;
         }
