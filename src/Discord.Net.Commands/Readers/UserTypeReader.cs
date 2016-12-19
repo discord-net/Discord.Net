@@ -46,13 +46,13 @@ namespace Discord.Commands
                 ushort discriminator;
                 if (ushort.TryParse(input.Substring(index + 1), out discriminator))
                 {
-                    var channelUser = channelUsers.Where(x => x.DiscriminatorValue == discriminator &&
-                        string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                    AddResult(results, channelUser as T, channelUser.Username == username ? 0.85f : 0.75f);
+                    var channelUser = channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
+                        string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
+                    AddResult(results, channelUser as T, channelUser?.Username == username ? 0.85f : 0.75f);
 
-                    var guildUser = channelUsers.Where(x => x.DiscriminatorValue == discriminator &&
-                        string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                    AddResult(results, guildUser as T, guildUser.Username == username ? 0.80f : 0.70f);
+                    var guildUser = channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
+                        string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
+                    AddResult(results, guildUser as T, guildUser?.Username == username ? 0.80f : 0.70f);
                 }
             }
 
