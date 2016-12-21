@@ -52,6 +52,7 @@ namespace Discord.API
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
+            DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
             RequestQueue = requestQueue;
             _fetchCurrentUser = fetchCurrentUser;
