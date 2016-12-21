@@ -12,6 +12,7 @@ namespace Discord.Rest
     {
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Mention => MentionUtils.MentionChannel(Id);
+        public ulong? LastMessageId { get; private set; }
 
         internal RestVirtualMessageChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)

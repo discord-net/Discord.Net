@@ -16,6 +16,7 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public SocketUser Recipient { get; private set; }
+        public ulong? LastMessageId { get; private set; }
 
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
         public new IReadOnlyCollection<SocketUser> Users => ImmutableArray.Create(Discord.CurrentUser, Recipient);
@@ -36,6 +37,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             Recipient.Update(state, model.Recipients.Value[0]);
+            LastMessageId = model.LastMessageId;
         }
 
         public Task CloseAsync(RequestOptions options = null)

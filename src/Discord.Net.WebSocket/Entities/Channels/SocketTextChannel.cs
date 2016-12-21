@@ -17,6 +17,7 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public string Topic { get; private set; }
+        public ulong? LastMessageId { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
@@ -42,6 +43,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
 
             Topic = model.Topic.Value;
+            LastMessageId = model.LastMessageId;
         }
 
         public Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)

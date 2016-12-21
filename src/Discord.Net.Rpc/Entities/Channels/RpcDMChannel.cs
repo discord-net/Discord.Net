@@ -12,6 +12,7 @@ namespace Discord.Rpc
     public class RpcDMChannel : RpcChannel, IRpcMessageChannel, IRpcPrivateChannel, IDMChannel
     {
         public IReadOnlyCollection<RpcMessage> CachedMessages { get; private set; }
+        public ulong? LastMessageId { get { throw new NotSupportedException(); } }
 
         internal RpcDMChannel(DiscordRpcClient discord, ulong id)
             : base(discord, id)

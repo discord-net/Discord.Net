@@ -23,6 +23,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         public string Name { get; private set; }
+        public ulong? LastMessageId { get; private set; }
 
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
         public new IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
@@ -52,6 +53,8 @@ namespace Discord.WebSocket
 
             if (model.Recipients.IsSpecified)
                 UpdateUsers(state, model.Recipients.Value);
+
+            LastMessageId = model.LastMessageId;
         }
         private void UpdateUsers(ClientState state, UserModel[] models)
         {
