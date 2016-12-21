@@ -36,7 +36,7 @@ namespace Discord.Rest
         }
 
         public static async Task RemoveReactionAsync(IMessage msg, IUser user, Emoji emoji, BaseDiscordClient client, RequestOptions options)
-            => await RemoveReactionAsync(msg, user, $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
+            => await RemoveReactionAsync(msg, user, emoji.Id == 0 ? emoji.Name : $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
         public static async Task RemoveReactionAsync(IMessage msg, IUser user, string emoji, BaseDiscordClient client,
             RequestOptions options)
         {
