@@ -4,12 +4,29 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    /// Contains an entity that may be cached.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity that is cached</typeparam>
+    /// <typeparam name="TId">The type of this entity's ID</typeparam>
     public struct Cacheable<TEntity, TId>
         where TEntity : IEntity<TId>
         where TId : IEquatable<TId>
     {
+        /// <summary>
+        /// Is this entity cached?
+        /// </summary>
         public bool HasValue => !EqualityComparer<TEntity>.Default.Equals(Value, default(TEntity));
+        /// <summary>
+        /// The ID of this entity.
+        /// </summary>
         public ulong Id { get; }
+        /// <summary>
+        /// The entity, if it could be pulled from cache.
+        /// </summary>
+        /// <remarks>
+        /// This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is null.
+        /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
 
@@ -20,11 +37,19 @@ namespace Discord
             DownloadFunc = downloadFunc;
         }
 
+        /// <summary>
+        /// Downloads this entity to cache.
+        /// </summary>
+        /// <returns>An awaitable Task containing the downloaded entity.</returns>
         public async Task<TEntity> DownloadAsync()
         {
             return await DownloadFunc();
         }
 
+        /// <summary>
+        /// Returns the cached entity if it exists; otherwise downloads it.
+        /// </summary>
+        /// <returns>An awaitable Task containing a cached or downloaded entity.</returns>
         public async Task<TEntity> GetOrDownloadAsync() => HasValue ? Value : await DownloadAsync();
     }
 }
