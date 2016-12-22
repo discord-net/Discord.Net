@@ -108,11 +108,11 @@ namespace Discord.WebSocket
             {
                 if (ex != null)
                 {
-                    await _gatewayLogger.WarningAsync("Connection Closed", ex).ConfigureAwait(false);
+                    await _gatewayLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
                     await StartReconnectAsync(ex).ConfigureAwait(false);
                 }
                 else
-                    await _gatewayLogger.WarningAsync("Connection Closed").ConfigureAwait(false);
+                    await _gatewayLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
             };
 
             LeftGuild += async g => await _gatewayLogger.InfoAsync($"Left {g.Name}").ConfigureAwait(false);
@@ -408,7 +408,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketUser GetUser(string username, string discriminator)
         {
-            return State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+            return State.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault();
         }
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
@@ -485,25 +485,25 @@ namespace Discord.WebSocket
             }
         }
 
-        public async Task SetStatusAsync(UserStatus status)
+        public async Task SetStatus(UserStatus status)
         {
             Status = status;
             if (status == UserStatus.AFK)
                 _statusSince = DateTimeOffset.UtcNow;
             else
                 _statusSince = null;
-            await SendStatusAsync().ConfigureAwait(false);
+            await SendStatus().ConfigureAwait(false);
         }
-        public async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public async Task SetGame(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
             if (name != null)
                 Game = new Game(name, streamUrl, streamType);
             else
                 Game = null;
             CurrentUser.Presence = new SocketPresence(Status, Game);
-            await SendStatusAsync().ConfigureAwait(false);
+            await SendStatus().ConfigureAwait(false);
         }
-        private async Task SendStatusAsync()
+        private async Task SendStatus()
         {
             var game = Game;
             var status = Status;
@@ -770,7 +770,7 @@ namespace Discord.WebSocket
                                     if (data.Unavailable == true)
                                     {
                                         type = "GUILD_UNAVAILABLE";
-                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
 
                                         var guild = State.GetGuild(data.Id);
                                         if (guild != null)
@@ -780,13 +780,13 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("GUILD_UNAVAILABLE referenced an unknown guild.").ConfigureAwait(false);
+                                            await _gatewayLogger.WarningAsync($"GUILD_UNAVAILABLE referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
                                         _downloadUsersFor.TryRemove(data.Id);
                                         var guild = RemoveGuild(data.Id);
@@ -797,7 +797,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                            await _gatewayLogger.WarningAsync($"GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -810,7 +810,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
-                                    SocketChannel channel;
+                                    SocketChannel channel = null;
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -867,7 +867,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
-                                    SocketChannel channel;
+                                    SocketChannel channel = null;
                                     var data = (payload as JToken).ToObject<API.Channel>(_serializer);
                                     if (data.GuildId.IsSpecified)
                                     {
