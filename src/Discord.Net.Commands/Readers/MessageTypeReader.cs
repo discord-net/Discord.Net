@@ -6,7 +6,7 @@ namespace Discord.Commands
     internal class MessageTypeReader<T> : TypeReader
         where T : class, IMessage
     {
-        public override async Task<TypeReaderResult> Read(CommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
             ulong id;
 

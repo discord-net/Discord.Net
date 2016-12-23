@@ -41,7 +41,7 @@ namespace Discord.Commands
             _reader = builder.TypeReader;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(CommandContext context, object[] args, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object[] args, IDependencyMap map = null)
         {
             if (map == null)
                 map = DependencyMap.Empty;
@@ -61,7 +61,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(CommandContext context, string input)
+        public async Task<TypeReaderResult> Parse(ICommandContext context, string input)
         {
             return await _reader.Read(context, input).ConfigureAwait(false);
         }

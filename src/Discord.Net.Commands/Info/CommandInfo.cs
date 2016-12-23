@@ -17,7 +17,7 @@ namespace Discord.Commands
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
-        private readonly Func<CommandContext, object[], IDependencyMap, Task> _action;
+        private readonly Func<ICommandContext, object[], IDependencyMap, Task> _action;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -63,7 +63,7 @@ namespace Discord.Commands
             _action = builder.Callback;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(CommandContext context, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
         {
             if (map == null)
                 map = DependencyMap.Empty;
@@ -85,7 +85,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(CommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
@@ -96,7 +96,7 @@ namespace Discord.Commands
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
 
-        public Task<ExecuteResult> ExecuteAsync(CommandContext context, ParseResult parseResult, IDependencyMap map)
+        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
         {
             if (!parseResult.IsSuccess)
                 return Task.FromResult(ExecuteResult.FromError(parseResult));
@@ -119,7 +119,7 @@ namespace Discord.Commands
 
             return ExecuteAsync(context, argList, paramList, map);
         }
-        public async Task<ExecuteResult> ExecuteAsync(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
+        public async Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
         {
             if (map == null)
                 map = DependencyMap.Empty;

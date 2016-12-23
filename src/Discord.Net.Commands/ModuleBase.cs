@@ -1,14 +1,27 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    public abstract class ModuleBase
+    public abstract class ModuleBase : ModuleBase<CommandContext> { }
+
+    public abstract class ModuleBase<T> : IModuleBase
+        where T : class, ICommandContext
     {
-        public CommandContext Context { get; internal set; }
+        public T Context { get; private set; }
 
         protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, EmbedBuilder embed = null, RequestOptions options = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
+        }
+
+        //IModuleBase
+        void IModuleBase.SetContext(ICommandContext context)
+        {
+            var newValue = context as T;
+            if (newValue == null)
+                throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}");
+            Context = newValue;
         }
     }
 }

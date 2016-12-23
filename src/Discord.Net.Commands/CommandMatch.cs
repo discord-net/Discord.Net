@@ -14,13 +14,13 @@ namespace Discord.Commands
             Alias = alias;
         }
 
-        public Task<PreconditionResult> CheckPreconditionsAsync(CommandContext context, IDependencyMap map = null)
+        public Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
             => Command.CheckPreconditionsAsync(context, map);
-        public Task<ParseResult> ParseAsync(CommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public Task<ParseResult> ParseAsync(ICommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
             => Command.ParseAsync(context, Alias.Length, searchResult, preconditionResult);
-        public Task<ExecuteResult> ExecuteAsync(CommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
+        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
             => Command.ExecuteAsync(context, argList, paramList, map);
-        public Task<ExecuteResult> ExecuteAsync(CommandContext context, ParseResult parseResult, IDependencyMap map)
+        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
             => Command.ExecuteAsync(context, parseResult, map);
     }
 }

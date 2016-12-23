@@ -10,7 +10,7 @@ namespace Discord.Commands
 {
     internal static class ModuleClassBuilder
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(ModuleBase).GetTypeInfo();
+        private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         public static IEnumerable<TypeInfo> Search(Assembly assembly)
         {
@@ -155,12 +155,12 @@ namespace Discord.Commands
                 });
             }
 
-            var createInstance = ReflectionUtils.CreateBuilder<ModuleBase>(typeInfo, service);
+            var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
             builder.Callback = (ctx, args, map) => 
             {
                 var instance = createInstance(map);
-                instance.Context = ctx;
+                instance.SetContext(ctx);
                 try
                 {
                     return method.Invoke(instance, args) as Task ?? Task.Delay(0);

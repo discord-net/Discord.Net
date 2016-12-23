@@ -32,7 +32,7 @@ namespace Discord.Rpc
         public override IReadOnlyCollection<ITag> Tags => _tags;
         public IReadOnlyDictionary<Emoji, int> Reactions => ImmutableDictionary.Create<Emoji, int>();
 
-        internal RpcUserMessage(DiscordRpcClient discord, ulong id, IMessageChannel channel, RpcUser author)
+        internal RpcUserMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
             : base(discord, id, channel, author)
         {
         }

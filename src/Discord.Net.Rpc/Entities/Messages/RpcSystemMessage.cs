@@ -9,7 +9,7 @@ namespace Discord.Rpc
     {
         public MessageType Type { get; private set; }
 
-        internal RpcSystemMessage(DiscordRpcClient discord, ulong id, IMessageChannel channel, RpcUser author)
+        internal RpcSystemMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
             : base(discord, id, channel, author)
         {
         }
