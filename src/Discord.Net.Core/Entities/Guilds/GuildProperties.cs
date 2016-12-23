@@ -13,7 +13,7 @@
     /// </code>
     /// </example>
     /// <see cref="IGuild"/>
-    public class ModifyGuildParams
+    public class GuildProperties
     {
         public Optional<string> Username { get; set; }
         /// <summary>

@@ -11,7 +11,7 @@
     /// });
     /// </code>
     /// </example>
-    public class ModifyGuildChannelParams
+    public class GuildChannelProperties
     {
         /// <summary>
         /// Set the channel to this name

@@ -19,10 +19,10 @@ namespace Discord.Rest
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client, 
-            Action<ModifyGuildChannelParams> func, 
+            Action<GuildChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyGuildChannelParams();
+            var args = new GuildChannelProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyGuildChannelParams
             {

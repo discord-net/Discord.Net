@@ -10,10 +10,10 @@ namespace Discord.Rest
 {
     internal static class MessageHelper
     {
-        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<ModifyMessageParams> func,
+        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
         {
-            var args = new ModifyMessageParams();
+            var args = new MessageProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyMessageParams
             {

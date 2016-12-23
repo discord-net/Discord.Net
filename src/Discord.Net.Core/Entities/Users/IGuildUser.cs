@@ -28,6 +28,6 @@ namespace Discord
         /// <summary> Kicks this user from this guild. </summary>
         Task KickAsync(RequestOptions options = null);
         /// <summary> Modifies this user's properties in this guild. </summary>
-        Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
     }
 }

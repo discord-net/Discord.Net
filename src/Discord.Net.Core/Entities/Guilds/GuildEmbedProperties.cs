@@ -3,7 +3,7 @@
     /// <summary>
     /// Modify the widget of an IGuild with the specified parameters
     /// </summary>
-    public class ModifyGuildEmbedParams
+    public class GuildEmbedProperties
     {
         /// <summary>
         /// Should the widget be enabled?

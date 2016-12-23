@@ -46,7 +46,7 @@ namespace Discord.WebSocket
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
             => RoleHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);

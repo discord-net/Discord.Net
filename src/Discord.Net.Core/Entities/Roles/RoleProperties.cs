@@ -13,7 +13,7 @@
     /// </code>
     /// </example>
     /// <seealso cref="IRole"/>
-    public class ModifyGuildRoleParams
+    public class RoleProperties
     {
         /// <summary>
         /// The name of the role

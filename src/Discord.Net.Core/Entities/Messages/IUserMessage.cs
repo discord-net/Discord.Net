@@ -7,7 +7,7 @@ namespace Discord
     public interface IUserMessage : IMessage
     {
         /// <summary> Modifies this message. </summary>
-        Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
         /// <summary> Adds this message to its channel's pinned messages. </summary>
         Task PinAsync(RequestOptions options = null);
         /// <summary> Removes this message from its channel's pinned messages. </summary>

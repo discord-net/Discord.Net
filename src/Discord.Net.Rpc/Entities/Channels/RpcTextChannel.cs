@@ -34,7 +34,7 @@ namespace Discord.Rpc
             CachedMessages = model.Messages.Select(x => RpcMessage.Create(Discord, Id, x)).ToImmutableArray();
         }
 
-        public Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         //TODO: Use RPC cache

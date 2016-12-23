@@ -9,10 +9,10 @@ namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func,
+        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
             RequestOptions options)
         {
-            var args = new ModifyCurrentUserParams();
+            var args = new SelfUserProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyCurrentUserParams
             {
@@ -25,18 +25,22 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<ModifyGuildMemberParams> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
+        public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
             RequestOptions options)
         {
-            var args = new ModifyGuildMemberParams();
+            var args = new GuildUserProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyGuildMemberParams
             {
-                ChannelId = args.Channel.IsSpecified ? args.Channel.Value.Id : Optional.Create<ulong>(),
                 Deaf = args.Deaf,
                 Mute = args.Mute,
                 Nickname = args.Nickname
             };
+
+            if (args.Channel.IsSpecified)
+                apiArgs.ChannelId = args.Channel.Value.Id;
+            else if (args.ChannelId.IsSpecified)
+                apiArgs.ChannelId = args.ChannelId.Value;
 
             if (args.Roles.IsSpecified)
                 apiArgs.RoleIds = args.Roles.Value.Select(x => x.Id).ToArray();

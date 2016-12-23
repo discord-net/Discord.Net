@@ -36,7 +36,7 @@ namespace Discord.Rpc
                 Position = model.Position.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);

@@ -38,7 +38,7 @@ namespace Discord.WebSocket
             UserLimit = model.UserLimit.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         public override SocketGuildUser GetUser(ulong id)

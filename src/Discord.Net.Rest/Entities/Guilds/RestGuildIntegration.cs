@@ -55,11 +55,11 @@ namespace Discord.Rest
         {
             await Discord.ApiClient.DeleteGuildIntegrationAsync(GuildId, Id).ConfigureAwait(false);
         }
-        public async Task ModifyAsync(Action<ModifyGuildIntegrationParams> func)
+        public async Task ModifyAsync(Action<GuildIntegrationProperties> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var args = new ModifyGuildIntegrationParams();
+            var args = new GuildIntegrationProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyGuildIntegrationParams
             {

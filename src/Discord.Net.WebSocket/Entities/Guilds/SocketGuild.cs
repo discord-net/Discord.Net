@@ -53,8 +53,8 @@ namespace Discord.WebSocket
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
-        public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
-        public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, SplashId);
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
         public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
         public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
@@ -252,13 +252,13 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
-        public Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
-        public Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
+        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
-        public Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
+        public Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
             => GuildHelper.ModifyChannelsAsync(this, Discord, args, options);
-        public Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
+        public Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
             => GuildHelper.ModifyRolesAsync(this, Discord, args, options);
 
         public Task LeaveAsync(RequestOptions options = null)

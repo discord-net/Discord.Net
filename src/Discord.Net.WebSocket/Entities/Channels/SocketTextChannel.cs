@@ -44,7 +44,7 @@ namespace Discord.WebSocket
             Topic = model.Topic.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         //Messages

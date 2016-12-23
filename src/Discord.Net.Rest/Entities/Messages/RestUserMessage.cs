@@ -126,7 +126,7 @@ namespace Discord.Rest
             }
         }
 
-        public async Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
+        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options)
         {
             var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

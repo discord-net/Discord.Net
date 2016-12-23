@@ -12,7 +12,7 @@
     /// </code>
     /// </example>
     /// <seealso cref="ISelfUser"/>
-    public class ModifyCurrentUserParams
+    public class SelfUserProperties
     {
         /// <summary>
         /// Your username

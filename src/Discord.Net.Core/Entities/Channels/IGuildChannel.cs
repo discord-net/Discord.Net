@@ -26,7 +26,7 @@ namespace Discord
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
         
         /// <summary> Modifies this guild channel. </summary>
-        Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
 
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
         OverwritePermissions? GetPermissionOverwrite(IRole role);

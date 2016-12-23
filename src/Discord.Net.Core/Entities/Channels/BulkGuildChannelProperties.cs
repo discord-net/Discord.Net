@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public class ModifyGuildChannelsParams
+    public class BulkGuildChannelProperties
     {
         /// <summary>
         /// The id of the channel to apply this position to.
@@ -11,7 +11,7 @@
         /// </summary>
         public int Position { get; set; }
 
-        public ModifyGuildChannelsParams(ulong id, int position)
+        public BulkGuildChannelProperties(ulong id, int position)
         {
             Id = id;
             Position = position;

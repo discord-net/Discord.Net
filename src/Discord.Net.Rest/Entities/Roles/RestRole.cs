@@ -44,7 +44,7 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public async Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
         { 
             var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

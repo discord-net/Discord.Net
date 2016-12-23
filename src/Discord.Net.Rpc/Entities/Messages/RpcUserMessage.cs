@@ -99,7 +99,7 @@ namespace Discord.Rpc
             }
         }
 
-        public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options)
+        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
         public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)

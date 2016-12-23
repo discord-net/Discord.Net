@@ -1,7 +1,7 @@
 ﻿namespace Discord
 {
     /// <inheritdoc />
-    public class ModifyVoiceChannelParams : ModifyGuildChannelParams
+    public class VoiceChannelProperties : GuildChannelProperties
     {
         /// <summary>
         /// The bitrate of the voice connections in this channel. Must be greater than 8000

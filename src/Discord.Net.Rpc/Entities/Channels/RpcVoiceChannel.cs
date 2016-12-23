@@ -38,7 +38,7 @@ namespace Discord.Rpc
             VoiceStates = model.VoiceStates.Select(x => RpcVoiceState.Create(Discord, x)).ToImmutableArray();
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";

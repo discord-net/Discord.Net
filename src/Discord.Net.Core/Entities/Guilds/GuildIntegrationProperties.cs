@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public class ModifyGuildIntegrationParams
+    public class GuildIntegrationProperties
     {
         public Optional<int> ExpireBehavior { get; set; }
         public Optional<int> ExpireGracePeriod { get; set; }

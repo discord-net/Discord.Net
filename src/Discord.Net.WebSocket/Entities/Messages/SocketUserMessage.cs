@@ -125,7 +125,7 @@ namespace Discord.WebSocket
             _reactions.Clear();
         }
 
-        public Task ModifyAsync(Action<ModifyMessageParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
         public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)

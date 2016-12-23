@@ -1,7 +1,7 @@
 ﻿namespace Discord
 {
     /// <inheritdoc />
-    public class ModifyTextChannelParams : ModifyGuildChannelParams
+    public class TextChannelProperties : GuildChannelProperties
     {
         /// <summary>
         /// What the topic of the channel should be set to.

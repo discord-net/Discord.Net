@@ -14,7 +14,7 @@ namespace Discord
     /// </code>
     /// </example>
     /// <seealso cref="IGuildUser"/>
-    public class ModifyGuildMemberParams
+    public class GuildUserProperties
     {
         /// <summary>
         /// Should the user be guild-muted in a voice channel?
@@ -60,5 +60,12 @@ namespace Discord
         /// This user MUST already be in a Voice Channel for this to work.
         /// </remarks>
         public Optional<IVoiceChannel> Channel { get; set; }
+        /// <summary>
+        /// Move a user to a voice channel.
+        /// </summary>
+        /// <remarks>
+        /// This user MUST already be in a Voice Channel for this to work.
+        /// </remarks>
+        public Optional<ulong> ChannelId { get; set; }
     }
 }

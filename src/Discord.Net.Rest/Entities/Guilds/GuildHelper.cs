@@ -15,11 +15,11 @@ namespace Discord.Rest
     {
         //General
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
-            Action<ModifyGuildParams> func, RequestOptions options)
+            Action<GuildProperties> func, RequestOptions options)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var args = new ModifyGuildParams();
+            var args = new GuildProperties();
             func(args);
 
             var apiArgs = new API.Rest.ModifyGuildParams
@@ -57,11 +57,11 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<EmbedModel> ModifyEmbedAsync(IGuild guild, BaseDiscordClient client,
-            Action<ModifyGuildEmbedParams> func, RequestOptions options)
+            Action<GuildEmbedProperties> func, RequestOptions options)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var args = new ModifyGuildEmbedParams();
+            var args = new GuildEmbedProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyGuildEmbedParams
             {
@@ -76,13 +76,13 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task ModifyChannelsAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<GuildChannelsProperties> args, RequestOptions options)
+            IEnumerable<BulkGuildChannelProperties> args, RequestOptions options)
         {
             var apiArgs = args.Select(x => new API.Rest.ModifyGuildChannelsParams(x.Id, x.Position));
             await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<IReadOnlyCollection<RoleModel>> ModifyRolesAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<ModifyGuildRolesParams> args, RequestOptions options)
+            IEnumerable<BulkRoleProperties> args, RequestOptions options)
         {
             var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id)
             {

@@ -102,7 +102,7 @@ namespace Discord.WebSocket
             _roleIds = roles.ToImmutable();
         }
         
-        public Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);

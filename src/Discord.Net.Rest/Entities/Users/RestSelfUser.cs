@@ -43,7 +43,7 @@ namespace Discord.Rest
             Update(model);
         }
 
-        public async Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
         {
             if (Id != Discord.CurrentUser.Id)
                 throw new InvalidOperationException("Unable to modify this object using a different token.");

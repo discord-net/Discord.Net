@@ -68,7 +68,7 @@ namespace Discord.Rest
             var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
         {
             var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)

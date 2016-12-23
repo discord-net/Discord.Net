@@ -20,7 +20,7 @@
     /// });
     /// </code>
     /// </example>
-    public class ModifyMessageParams
+    public class MessageProperties
     {
         /// <summary>
         /// The content of the message
