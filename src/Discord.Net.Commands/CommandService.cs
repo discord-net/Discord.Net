@@ -17,6 +17,7 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
+        private readonly ImmutableList<Tuple<Type, Type>> _entityTypeReaders; //TODO: Candidate for C#7 Tuple
         private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
@@ -41,27 +42,16 @@ namespace Discord.Commands
             _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
-            _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>
-            {                
-                [typeof(IMessage)] = new MessageTypeReader<IMessage>(),
-                [typeof(IUserMessage)] = new MessageTypeReader<IUserMessage>(),
-                [typeof(IChannel)] = new ChannelTypeReader<IChannel>(),
-                [typeof(IDMChannel)] = new ChannelTypeReader<IDMChannel>(),
-                [typeof(IGroupChannel)] = new ChannelTypeReader<IGroupChannel>(),
-                [typeof(IGuildChannel)] = new ChannelTypeReader<IGuildChannel>(),
-                [typeof(IMessageChannel)] = new ChannelTypeReader<IMessageChannel>(),
-                [typeof(IPrivateChannel)] = new ChannelTypeReader<IPrivateChannel>(),
-                [typeof(ITextChannel)] = new ChannelTypeReader<ITextChannel>(),
-                [typeof(IVoiceChannel)] = new ChannelTypeReader<IVoiceChannel>(),
-
-                [typeof(IRole)] = new RoleTypeReader<IRole>(),
-
-                [typeof(IUser)] = new UserTypeReader<IUser>(),
-                [typeof(IGroupUser)] = new UserTypeReader<IGroupUser>(),
-                [typeof(IGuildUser)] = new UserTypeReader<IGuildUser>(),
-            };
+            _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
+
+            var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
+            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
+            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IChannel), typeof(ChannelTypeReader<>)));
+            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IRole), typeof(RoleTypeReader<>)));
+            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IUser), typeof(UserTypeReader<>)));
+            _entityTypeReaders = entityTypeReaders.ToImmutable();
         }
 
         //Modules
@@ -208,11 +198,32 @@ namespace Discord.Commands
             TypeReader reader;
             if (_defaultTypeReaders.TryGetValue(type, out reader))
                 return reader;
+            var typeInfo = type.GetTypeInfo();
+
+            //Is this an enum?
+            if (typeInfo.IsEnum)
+            {
+                reader = EnumTypeReader.GetReader(type);
+                _defaultTypeReaders[type] = reader;
+                return reader;
+            }
+
+            //Is this an entity?
+            for (int i = 0; i < _entityTypeReaders.Count; i++)
+            {
+                if (type == _entityTypeReaders[i].Item1 || typeInfo.ImplementedInterfaces.Contains(_entityTypeReaders[i].Item1))
+                {
+                    reader = Activator.CreateInstance(_entityTypeReaders[i].Item2.MakeGenericType(type)) as TypeReader;
+                    _defaultTypeReaders[type] = reader;
+                    return reader;
+                }
+            }
             return null;
         }
 
         //Execution
-        public SearchResult Search(CommandContext context, int argPos) => Search(context, context.Message.Content.Substring(argPos));
+        public SearchResult Search(CommandContext context, int argPos) 
+            => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(CommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();

@@ -215,20 +215,6 @@ namespace Discord.Commands
                 else
                     reader = service.GetDefaultTypeReader(paramType);
 
-                if (reader == null)
-                {
-                    var paramTypeInfo = paramType.GetTypeInfo();
-                    if (paramTypeInfo.IsEnum)
-                    {
-                        reader = EnumTypeReader.GetReader(paramType);
-                        service.AddTypeReader(paramType, reader);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"{paramType.FullName} is not supported as a command parameter, are you missing a TypeReader?");
-                    }
-                }
-
                 builder.ParameterType = paramType;
                 builder.TypeReader = reader;
             }
@@ -239,10 +225,12 @@ namespace Discord.Commands
             var readers = service.GetTypeReaders(paramType);
             TypeReader reader = null;
             if (readers != null)
+            {
                 if (readers.TryGetValue(typeReaderType, out reader))
                     return reader;
+            }
 
-            //could not find any registered type reader: try to create one
+            //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
             service.AddTypeReader(paramType, reader);
 
