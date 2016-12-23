@@ -13,7 +13,7 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string AvatarUrl => CDN.GetUserAvatarUrl(Id, AvatarId);
+        public string GetAvatarUrl(ushort size) => API.CDN.GetUserAvatarUrl(Id, AvatarId, size);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);

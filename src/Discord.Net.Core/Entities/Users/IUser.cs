@@ -7,7 +7,7 @@ namespace Discord
         /// <summary> Gets the id of this user's avatar. </summary>
         string AvatarId { get; }
         /// <summary> Gets the url to this user's avatar. </summary>
-        string AvatarUrl { get; }
+        string GetAvatarUrl(ushort size = 1024);
         /// <summary> Gets the per-username unique id for this user. </summary>
         string Discriminator { get; }
         /// <summary> Gets the per-username unique id for this user. </summary>
