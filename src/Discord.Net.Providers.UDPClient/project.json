@@ -1,0 +1,37 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "An optional UDP client provider for Discord.Net using System.Net.UdpClient.",
+  "authors": [ "RogueException" ],
+
+  "packOptions": {
+    "tags": [ "discord", "discordapp" ],
+    "licenseUrl": "http://opensource.org/licenses/MIT",
+    "projectUrl": "https://github.com/RogueException/Discord.Net",
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/RogueException/Discord.Net"
+    }
+  },
+
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "nowarn": [ "CS1573", "CS1591" ],
+        "optimize": true,
+        "warningsAsErrors": true,
+        "xmlDoc": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "Discord.Net.Core": {
+      "target": "project"
+    }
+  },
+
+  "frameworks": {
+    "net45": {}
+  }
+}
