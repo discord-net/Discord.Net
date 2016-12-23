@@ -27,9 +27,9 @@ namespace Discord.Rest
                 AfkChannelId = args.AfkChannelId,
                 AfkTimeout = args.AfkTimeout,
                 DefaultMessageNotifications = args.DefaultMessageNotifications,
-                Icon = args.Icon.IsSpecified ? ImageModel.Create(args.Icon.Value) : Optional.Create<ImageModel?>(),
+                Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name,
-                Splash = args.Splash.IsSpecified ? ImageModel.Create(args.Splash.Value) : Optional.Create<ImageModel?>(),
+                Splash = args.Splash.IsSpecified ? args.Splash.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Username = args.Username,
                 VerificationLevel = args.VerificationLevel
             };
@@ -76,7 +76,7 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task ModifyChannelsAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options)
+            IEnumerable<GuildChannelsProperties> args, RequestOptions options)
         {
             var apiArgs = args.Select(x => new API.Rest.ModifyGuildChannelsParams(x.Id, x.Position));
             await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, apiArgs, options).ConfigureAwait(false);

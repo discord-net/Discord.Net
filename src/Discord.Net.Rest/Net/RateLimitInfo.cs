@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.Net
 {
-    public struct RateLimitInfo
+    internal struct RateLimitInfo
     {
         public bool IsGlobal { get; }
         public int? Limit { get; }

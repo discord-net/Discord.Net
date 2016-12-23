@@ -32,10 +32,10 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
-            Action<ModifyTextChannelParams> func, 
+            Action<TextChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyTextChannelParams();
+            var args = new TextChannelProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyTextChannelParams
             {
@@ -46,10 +46,10 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
-            Action<ModifyVoiceChannelParams> func, 
+            Action<VoiceChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyVoiceChannelParams();
+            var args = new VoiceChannelProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyVoiceChannelParams
             {

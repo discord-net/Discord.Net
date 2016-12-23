@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    public class RequestQueue : IDisposable
+    internal class RequestQueue : IDisposable
     {
         public event Func<string, RateLimitInfo?, Task> RateLimitTriggered;
 

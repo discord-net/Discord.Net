@@ -18,7 +18,7 @@ namespace Discord.Rest
         public IUser Owner { get; private set; }
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
-        public string IconUrl => API.CDN.GetApplicationIconUrl(Id, _iconId);
+        public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
             : base(discord, id)

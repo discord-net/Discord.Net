@@ -1,4 +1,3 @@
-using Discord.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,6 @@ namespace Discord
     public interface IDiscordClient : IDisposable
     {
         ConnectionState ConnectionState { get; }
-        DiscordRestApiClient ApiClient { get; }
         ISelfUser CurrentUser { get; }
 
         Task ConnectAsync();

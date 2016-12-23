@@ -69,14 +69,13 @@ namespace Discord.API
         public ConnectionState ConnectionState { get; private set; }
 
         public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, 
-                RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null, RequestQueue requestQueue = null)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, requestQueue, false)
+                RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer, false)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;
             _origin = origin;
-
-            _requestQueue = requestQueue ?? new RequestQueue();
+            
             _requests = new ConcurrentDictionary<Guid, RpcRequest>();
             
             _webSocketClient = webSocketProvider();

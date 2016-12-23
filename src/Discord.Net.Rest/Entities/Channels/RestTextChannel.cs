@@ -33,7 +33,7 @@ namespace Discord.Rest
             Topic = model.Topic.Value;
         }
 
-        public async Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

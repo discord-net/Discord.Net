@@ -16,7 +16,7 @@ namespace Discord.Rest
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, requestQueue: new RequestQueue());
+            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
 
         protected override Task OnLoginAsync(TokenType tokenType, string token)
         {

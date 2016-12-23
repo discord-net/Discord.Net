@@ -67,7 +67,7 @@ namespace Discord.Rpc
         }
 
         private static API.DiscordRpcApiClient CreateApiClient(string clientId, string origin, DiscordRpcConfig config)
-            => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
+            => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider);
 
         /// <inheritdoc />
         public async Task ConnectAsync()

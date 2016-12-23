@@ -21,6 +21,6 @@
         /// <summary>
         /// Your avatar
         /// </summary>
-        public Optional<Image> Avatar { get; set; }
+        public Optional<Image?> Avatar { get; set; }
     }
 }

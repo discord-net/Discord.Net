@@ -41,22 +41,22 @@ namespace Discord.API
 
         public RetryMode DefaultRetryMode { get; }
         public string UserAgent { get; }
+        internal RequestQueue RequestQueue { get; }
 
         public LoginState LoginState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
         public User CurrentUser { get; private set; }
-        public RequestQueue RequestQueue { get; private set; }
 
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
-            JsonSerializer serializer = null, RequestQueue requestQueue = null, bool fetchCurrentUser = true)
+            JsonSerializer serializer = null, bool fetchCurrentUser = true)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
-            RequestQueue = requestQueue;
             _fetchCurrentUser = fetchCurrentUser;
 
+            RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
 
             SetBaseUrl(DiscordConfig.ClientAPIUrl);

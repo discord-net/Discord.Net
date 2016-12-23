@@ -35,8 +35,8 @@ namespace Discord.Rest
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
-        public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
-        public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, SplashId);
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
         public RestRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
@@ -115,7 +115,7 @@ namespace Discord.Rest
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
+        public async Task ModifyChannelsAsync(IEnumerable<GuildChannelsProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
             await GuildHelper.ModifyChannelsAsync(this, Discord, arr, options);

@@ -15,7 +15,7 @@ namespace Discord.Rest
         public GuildPermissions Permissions { get; private set; }
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
-        public string IconUrl => API.CDN.GetGuildIconUrl(Id, _iconId);
+        public string IconUrl => CDN.GetGuildIconUrl(Id, _iconId);
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)
             : base(discord, id)

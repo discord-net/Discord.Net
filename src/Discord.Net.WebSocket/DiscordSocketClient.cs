@@ -126,7 +126,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, config.WebSocketProvider, requestQueue: new RequestQueue());
+            => new API.DiscordSocketApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, config.WebSocketProvider);
         
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
@@ -1773,8 +1773,6 @@ namespace Discord.WebSocket
         }
 
         //IDiscordClient
-        DiscordRestApiClient IDiscordClient.ApiClient => ApiClient;
-
         Task IDiscordClient.ConnectAsync()
             => ConnectAsync();
 

@@ -1,4 +1,4 @@
-﻿namespace Discord.API
+﻿namespace Discord
 {
     public static class CDN
     {

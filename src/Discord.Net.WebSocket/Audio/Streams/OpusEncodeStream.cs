@@ -7,8 +7,7 @@
         
         private readonly OpusEncoder _encoder;
 
-        internal OpusEncodeStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int? bitrate = null, 
-            OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
+        internal OpusEncodeStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int? bitrate = null, int bufferSize = 4000)
             : base(audioClient, secretKey, samplesPerFrame, ssrc, bufferSize)
         {
             _encoder = new OpusEncoder(SampleRate, Channels);

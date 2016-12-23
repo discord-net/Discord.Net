@@ -1,10 +1,10 @@
 ﻿using Discord.Net.WebSockets;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
 using WebSocket4Net;
 using WS4NetSocket = WebSocket4Net.WebSocket;
 

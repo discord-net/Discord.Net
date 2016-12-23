@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26014.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F7F3E124-93C7-4846-AE87-9CE12BD82859}"
-	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net", "src\Discord.Net\Discord.Net.csproj", "{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
@@ -25,6 +20,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.WS4Net", "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj", "{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.API", "src\Discord.Net.API\Discord.Net.API.csproj", "{547261FC-8BA3-40EA-A040-A38ABDAA8D72}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.UDPClient", "src\Discord.Net.Providers.UDPClient\Discord.Net.Providers.UDPClient.csproj", "{ABC9F4B9-2452-4725-B522-754E0A02E282}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,6 +121,30 @@ Global
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x64.Build.0 = Release|x64
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x86.ActiveCfg = Release|x86
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x86.Build.0 = Release|x86
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|x64.ActiveCfg = Debug|x64
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|x64.Build.0 = Debug|x64
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|x86.ActiveCfg = Debug|x86
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Debug|x86.Build.0 = Debug|x86
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|x64.ActiveCfg = Release|x64
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|x64.Build.0 = Release|x64
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|x86.ActiveCfg = Release|x86
+		{547261FC-8BA3-40EA-A040-A38ABDAA8D72}.Release|x86.Build.0 = Release|x86
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x64.ActiveCfg = Debug|x64
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x64.Build.0 = Debug|x64
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x86.ActiveCfg = Debug|x86
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x86.Build.0 = Debug|x86
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x64.ActiveCfg = Release|x64
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x64.Build.0 = Release|x64
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.ActiveCfg = Release|x86
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,7 +152,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BFC6DC28-0351-4573-926A-D4124244C04F} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{5688A353-121E-40A1-8BFA-B17B91FB48FB} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
+		{078DD7E6-943D-4D09-AFC2-D2BA58B76C9C} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
 		{688FD1D8-7F01-4539-B2E9-F473C5D699C7} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7} = {B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}
+		{ABC9F4B9-2452-4725-B522-754E0A02E282} = {B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}
 	EndGlobalSection
 EndGlobal

@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -180,10 +179,9 @@ namespace Discord.Audio
         {
             return new RTPWriteStream(this, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
         }
-        public Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null,
-            OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000)
+        public Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000)
         {
-            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, bitrate, application, bufferSize);
+            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
         }
 
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)

@@ -10,6 +10,7 @@
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
+    <RootNamespace>Discord.Providers.WS4Net</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />

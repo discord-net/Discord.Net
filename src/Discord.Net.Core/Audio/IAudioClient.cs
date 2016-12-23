@@ -18,6 +18,6 @@ namespace Discord.Audio
         Task DisconnectAsync();
 
         Stream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000);
-        Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null, OpusApplication application = OpusApplication.MusicOrMixed, int bufferSize = 4000);
+        Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000);
     }
 }

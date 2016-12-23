@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Model = Discord.API.Image;
 
 namespace Discord
 {
@@ -29,5 +30,10 @@ namespace Discord
             Stream = File.OpenRead(path);
         }
 #endif
+
+        public Model ToModel()
+        {
+            return new Model(Stream);
+        }
     }
 }
