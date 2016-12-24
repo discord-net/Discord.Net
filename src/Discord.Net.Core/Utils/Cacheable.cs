@@ -20,7 +20,7 @@ namespace Discord
         /// <summary>
         /// The ID of this entity.
         /// </summary>
-        public ulong Id { get; }
+        public TId Id { get; }
         /// <summary>
         /// The entity, if it could be pulled from cache.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Discord
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
 
-        internal Cacheable(TEntity value, ulong id, Func<Task<TEntity>> downloadFunc)
+        internal Cacheable(TEntity value, TId id, Func<Task<TEntity>> downloadFunc)
         {
             Value = value;
             Id = id;
