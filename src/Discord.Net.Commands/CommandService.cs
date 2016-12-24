@@ -222,26 +222,28 @@ namespace Discord.Commands
         }
 
         //Execution
-        public SearchResult Search(ICommandContext context, int argPos) 
-            => Search(context, context.Message.Content.Substring(argPos));
-        public SearchResult Search(ICommandContext context, string input)
+        public SearchResult Search(ICommandContext context, int argPos, int maxDifferences = 5)
+            => Search(context, context.Message.Content.Substring(argPos), maxDifferences);
+        public SearchResult Search(ICommandContext context, string input, int maxDifferences = 5)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
-            
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
+            else if (maxDifferences > 0)
+                return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.", _map.GetPartialMatches(searchInput, maxDifferences).ToImmutableArray());
             else
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
-            => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception, int maxDifferences = 5)
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling, maxDifferences);
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception, int maxDifferences = 5)
         {
             dependencyMap = dependencyMap ?? DependencyMap.Empty;
 
-            var searchResult = Search(context, input);
+            var searchResult = Search(context, input, maxDifferences);
             if (!searchResult.IsSuccess)
                 return searchResult;
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Discord.Commands
 {
@@ -28,6 +28,11 @@ namespace Discord.Commands
         public IEnumerable<CommandMatch> GetCommands(string text)
         {
             return _root.GetCommands(_service, text, 0, text != "");
+        }
+
+        public IEnumerable<CommandMatch> GetPartialMatches(string text, int maxDifferences)
+        {
+            return _root.GetPartialMatches(_service, text, maxDifferences, 0, text != "");
         }
     }
 }
