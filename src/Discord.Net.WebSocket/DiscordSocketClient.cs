@@ -1291,10 +1291,9 @@ namespace Discord.WebSocket
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
-                                        if (before != null)
-                                            await _messageUpdatedEvent.InvokeAsync(before, after, channel).ConfigureAwait(false);
-                                        else
-                                            await _messageUpdatedEvent.InvokeAsync(Optional.Create<SocketMessage>(), after, channel).ConfigureAwait(false);
+                                        var cacheableBefore = new Cacheable<SocketMessage, ulong>(before, data.Id, async () => await channel.GetMessageAsync(data.Id) as SocketMessage);
+
+                                        await _messageUpdatedEvent.InvokeAsync(cacheableBefore, after, channel).ConfigureAwait(false);                                        
                                     }
                                     else
                                     {
