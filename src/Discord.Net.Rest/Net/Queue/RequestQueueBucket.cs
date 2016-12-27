@@ -117,7 +117,7 @@ namespace Discord.Net.Queue
                         return response.Stream;
                     }
                 }
-                catch (HttpException) { throw; } //Pass through
+                //catch (HttpException) { throw; } //Pass through
                 catch (TimeoutException)
                 {
 #if DEBUG_LIMITS
@@ -129,7 +129,7 @@ namespace Discord.Net.Queue
                     await Task.Delay(500);
                     continue; //Retry
                 }
-                catch (Exception)
+                /*catch (Exception)
                 {
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Error");
@@ -139,7 +139,7 @@ namespace Discord.Net.Queue
 
                     await Task.Delay(500);
                     continue; //Retry
-                }
+                }*/
                 finally
                 {
                     UpdateRateLimit(id, request, info, lag, false);
