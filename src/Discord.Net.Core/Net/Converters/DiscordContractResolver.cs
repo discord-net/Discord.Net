@@ -22,26 +22,7 @@ namespace Discord.Net.Converters
             var propInfo = member as PropertyInfo;
             if (propInfo != null)
             {
-                JsonConverter converter;
-                Type type = propInfo.PropertyType;
-                Type genericType = type.IsConstructedGenericType ? type.GetGenericTypeDefinition() : null;
-
-                if (genericType == typeof(Optional<>))
-                {
-                    var typeInput = propInfo.DeclaringType;
-                    var innerTypeOutput = type.GenericTypeArguments[0];
-
-                    var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
-                    var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
-                    var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
-                    var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
-                    property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
-
-                    converter = MakeGenericConverter(propInfo, typeof(OptionalConverter<>), innerTypeOutput);
-                }
-                else
-                    converter = GetConverter(propInfo, type);
-
+                var converter = GetConverter(property, propInfo, propInfo.PropertyType, 0);
                 if (converter != null)
                 {
                     property.Converter = converter;
@@ -53,26 +34,38 @@ namespace Discord.Net.Converters
             return property;
         }
 
-        private static JsonConverter GetConverter(PropertyInfo propInfo, Type type, TypeInfo typeInfo = null, int depth = 0)
+        private static JsonConverter GetConverter(JsonProperty property, PropertyInfo propInfo, Type type, int depth)
         {
             if (type.IsArray)
-                return MakeGenericConverter(propInfo, typeof(ArrayConverter<>), type.GetElementType());
+                return MakeGenericConverter(property, propInfo, typeof(ArrayConverter<>), type.GetElementType(), depth);
             if (type.IsConstructedGenericType)
             {
                 Type genericType = type.GetGenericTypeDefinition();
-                if (genericType == typeof(EntityOrId<>))
-                    return MakeGenericConverter(propInfo, typeof(UInt64EntityOrIdConverter<>), type.GenericTypeArguments[0]);
+                if (depth == 0 && genericType == typeof(Optional<>))
+                {
+                    var typeInput = propInfo.DeclaringType;
+                    var innerTypeOutput = type.GenericTypeArguments[0];
+
+                    var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
+                    var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
+                    var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
+                    var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
+                    property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
+
+                    return MakeGenericConverter(property, propInfo, typeof(OptionalConverter<>), innerTypeOutput, depth);
+                }
+                else if (genericType == typeof(Nullable<>))
+                    return MakeGenericConverter(property, propInfo, typeof(NullableConverter<>), type.GenericTypeArguments[0], depth);
+                else if (genericType == typeof(EntityOrId<>))
+                    return MakeGenericConverter(property, propInfo, typeof(UInt64EntityOrIdConverter<>), type.GenericTypeArguments[0], depth);
             }
 
-            bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
-
             //Primitives
+            bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
             if (!hasInt53)
             {
                 if (type == typeof(ulong))
                     return UInt64Converter.Instance;
-                if (type == typeof(ulong?))
-                    return NullableUInt64Converter.Instance;
             }
 
             //Enums
@@ -82,12 +75,11 @@ namespace Discord.Net.Converters
                 return UserStatusConverter.Instance;
 
             //Special
-            if (type == typeof(Image))
-                return ImageConverter.Instance;            
-
-            if (typeInfo == null) typeInfo = type.GetTypeInfo();
+            if (type == typeof(API.Image))
+                return ImageConverter.Instance;
 
             //Entities
+            var typeInfo = type.GetTypeInfo();
             if (typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<ulong>)))
                 return UInt64EntityConverter.Instance;
             if (typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<string>)))
@@ -101,18 +93,11 @@ namespace Discord.Net.Converters
             return (getter as Func<TOwner, Optional<TValue>>)((TOwner)owner).IsSpecified;
         }
 
-        private static JsonConverter MakeGenericConverter(PropertyInfo propInfo, Type converterType, Type innerType)
+        private static JsonConverter MakeGenericConverter(JsonProperty property, PropertyInfo propInfo, Type converterType, Type innerType, int depth)
         {
             var genericType = converterType.MakeGenericType(innerType).GetTypeInfo();
-            //var instanceField = genericType.GetDeclaredField("Instance");
-            //var converter = instanceField.GetValue(null) as JsonConverter;
-            //if (converter == null)
-            //{
-                var innerConverter = GetConverter(propInfo, innerType);
-                var converter = genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
-                //instanceField.SetValue(null, converter);
-            //}
-            return converter;
+            var innerConverter = GetConverter(property, propInfo, innerType, depth + 1);
+            return genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
         }
     }
 }
