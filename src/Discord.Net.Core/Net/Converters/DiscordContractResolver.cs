@@ -28,16 +28,25 @@ namespace Discord.Net.Converters
 
                 if (genericType == typeof(Optional<>))
                 {
-                    var typeInput = propInfo.DeclaringType;
-                    var innerTypeOutput = type.GenericTypeArguments[0];
+                    if (type == typeof(Optional<API.Image?>))
+                    {
+                        converter = ImageConverter.Instance;
+                    }
+                    else
+                    {
+                        var typeInput = propInfo.DeclaringType;
+                        var innerTypeOutput = type.GenericTypeArguments[0];
 
-                    var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
-                    var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
-                    var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
-                    var shouldSerializeDelegate = (Func<object, Delegate, bool>)shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
-                    property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
+                        var getter = typeof(Func<,>).MakeGenericType(typeInput, type);
+                        var getterDelegate = propInfo.GetMethod.CreateDelegate(getter);
+                        var shouldSerialize = _shouldSerialize.MakeGenericMethod(typeInput, innerTypeOutput);
+                        var shouldSerializeDelegate =
+                            (Func<object, Delegate, bool>)
+                            shouldSerialize.CreateDelegate(typeof(Func<object, Delegate, bool>));
+                        property.ShouldSerialize = x => shouldSerializeDelegate(x, getterDelegate);
 
-                    converter = MakeGenericConverter(propInfo, typeof(OptionalConverter<>), innerTypeOutput);
+                        converter = MakeGenericConverter(propInfo, typeof(OptionalConverter<>), innerTypeOutput);
+                    }
                 }
                 else
                     converter = GetConverter(propInfo, type);
