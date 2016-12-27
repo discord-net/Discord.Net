@@ -20,7 +20,7 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var image = (Model)value;
+            var image = ((Optional<Model?>)value).Value.Value;
 
             if (image.Stream != null)
             {
