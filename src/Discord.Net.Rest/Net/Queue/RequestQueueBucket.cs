@@ -117,6 +117,7 @@ namespace Discord.Net.Queue
                         return response.Stream;
                     }
                 }
+                catch (HttpException) { throw; } //Pass through
                 catch (TimeoutException)
                 {
 #if DEBUG_LIMITS
