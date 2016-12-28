@@ -20,6 +20,8 @@ You can install Discord.Net 1.0 from our [MyGet Feed](https://www.myget.org/feed
 
 You may add the MyGet feed to Visual Studio directly from `https://www.myget.org/F/discord-net/api/v3/index.json`.
 
+**You will need to enable Enclude Pre-Releases in Visual Studio to see `Discord.Net.WebSocket`!**
+
 You can also pull the latest source from [GitHub](https://github.com/RogueException/Discord.Net).
 
 >[!WARNING]
