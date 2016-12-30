@@ -9,8 +9,7 @@ namespace Discord.Audio
     internal class BufferedAudioTarget : IAudioTarget, IDisposable
     {
         private static readonly byte[] _silencePacket = new byte[] { 0xF8, 0xFF, 0xFE };
-
-        private double _ticksPerFrame;
+        
         private Task _task;
         private DiscordVoiceAPIClient _client;
         private CancellationTokenSource _cancelTokenSource;
