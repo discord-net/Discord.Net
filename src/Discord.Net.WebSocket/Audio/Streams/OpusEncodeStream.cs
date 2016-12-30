@@ -54,7 +54,7 @@ namespace Discord.Audio
             }
         }
 
-        public override void Flush()
+        /*public override void Flush()
         {
             FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
@@ -68,7 +68,7 @@ namespace Discord.Audio
             catch (Exception) { } //Incomplete frame
             _partialFramePos = 0;
             await base.FlushAsync(cancellationToken).ConfigureAwait(false);
-        }
+        }*/
 
         protected override void Dispose(bool disposing)
         {

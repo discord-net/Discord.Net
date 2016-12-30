@@ -43,9 +43,9 @@ namespace Discord.Audio
         private Task _heartbeatTask;
         private long _heartbeatTime;
         private string _url;
-        private bool _isDisposed;
         private uint _ssrc;
         private byte[] _secretKey;
+        private bool _isDisposed;
 
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
@@ -165,8 +165,9 @@ namespace Discord.Audio
 
             ConnectionState = ConnectionState.Disconnected;
             await _audioLogger.InfoAsync("Disconnected").ConfigureAwait(false);
-
             await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
+
+            await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
 
         public Stream CreateOpusStream(int samplesPerFrame)
@@ -314,10 +315,12 @@ namespace Discord.Audio
 
         internal void Dispose(bool disposing)
         {
-            DisconnectInternalAsync(null).GetAwaiter().GetResult();
-            if (!_isDisposed)
+            if (disposing && !_isDisposed)
+            {
                 _isDisposed = true;
-            ApiClient.Dispose();
+                DisconnectInternalAsync(null).GetAwaiter().GetResult();
+                ApiClient.Dispose();
+            }
         }
         /// <inheritdoc />
         public void Dispose() => Dispose(true);

@@ -479,7 +479,6 @@ namespace Discord.WebSocket
             if (AudioClient != null)
                 await AudioClient.DisconnectAsync().ConfigureAwait(false);
             AudioClient = null;
-            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, null, false, false).ConfigureAwait(false);
         }
         internal async Task FinishConnectAudio(int id, string url, string token)
         {
