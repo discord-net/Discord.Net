@@ -65,6 +65,16 @@ namespace Discord.Audio
             return Task.Delay(0);
         }
 
+        public async Task FlushAsync()
+        {
+            while (true)
+            {
+                if (_queue.Count == 0)
+                    return;
+                await Task.Delay(250).ConfigureAwait(false);
+            }
+        }
+
         protected void Dispose(bool disposing)
         {
             if (disposing)

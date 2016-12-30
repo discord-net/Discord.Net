@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
@@ -25,6 +27,10 @@ namespace Discord.Audio
 
         public override void Write(byte[] buffer, int offset, int count)
         {
+            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
             //Assume threadsafe
             while (count > 0)
             {
@@ -37,7 +43,7 @@ namespace Discord.Audio
                     _partialFramePos = 0;
 
                     int encFrameSize = _encoder.EncodeFrame(_partialFrameBuffer, 0, _frameSize, _buffer, 0);
-                    base.Write(_buffer, 0, encFrameSize);
+                    await base.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -46,6 +52,22 @@ namespace Discord.Audio
                     break;
                 }
             }
+        }
+
+        public override void Flush()
+        {
+            FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override async Task FlushAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                int encFrameSize = _encoder.EncodeFrame(_partialFrameBuffer, 0, _partialFramePos, _buffer, 0);
+                base.Write(_buffer, 0, encFrameSize);
+            }
+            catch (Exception) { } //Incomplete frame
+            _partialFramePos = 0;
+            await base.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         protected override void Dispose(bool disposing)

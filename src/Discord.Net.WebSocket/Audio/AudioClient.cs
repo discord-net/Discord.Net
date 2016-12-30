@@ -314,6 +314,7 @@ namespace Discord.Audio
 
         internal void Dispose(bool disposing)
         {
+            DisconnectInternalAsync(null).GetAwaiter().GetResult();
             if (!_isDisposed)
                 _isDisposed = true;
             ApiClient.Dispose();

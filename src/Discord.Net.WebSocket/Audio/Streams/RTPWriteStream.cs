@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
@@ -34,6 +36,10 @@ namespace Discord.Audio
 
         public override void Write(byte[] buffer, int offset, int count)
         {
+            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
             unchecked
             {
                 if (_nonce[3]++ == byte.MaxValue)
@@ -48,10 +54,17 @@ namespace Discord.Audio
 
             count = SecretBox.Encrypt(buffer, offset, count, _buffer, 12, _nonce, _secretKey);
             Buffer.BlockCopy(_nonce, 0, _buffer, 0, 12); //Copy the RTP header from nonce to buffer
-            _target.SendAsync(_buffer, count + 12).GetAwaiter().GetResult();
+            await _target.SendAsync(_buffer, count + 12).ConfigureAwait(false);
         }
 
-        public override void Flush() { }
+        public override void Flush()
+        {
+            FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override async Task FlushAsync(CancellationToken cancellationToken)
+        {
+            await _target.FlushAsync().ConfigureAwait(false);
+        }
 
         public override long Length { get { throw new NotSupportedException(); } }
         public override long Position
