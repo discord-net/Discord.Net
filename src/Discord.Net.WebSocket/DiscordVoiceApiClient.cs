@@ -18,7 +18,7 @@ namespace Discord.Audio
 {
     public class DiscordVoiceAPIClient
     {
-        public const int MaxBitrate = 128;
+        public const int MaxBitrate = 128 * 1024;
         public const string Mode = "xsalsa20_poly1305";
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
