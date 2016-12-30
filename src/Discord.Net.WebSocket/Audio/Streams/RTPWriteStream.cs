@@ -5,7 +5,7 @@ namespace Discord.Audio
 {
     internal class RTPWriteStream : Stream
     {
-        private readonly AudioClient _audioClient;
+        private readonly IAudioTarget _target;
         private readonly byte[] _nonce, _secretKey;
         private int _samplesPerFrame;
         private uint _ssrc, _timestamp = 0;
@@ -16,9 +16,9 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        internal RTPWriteStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
+        internal RTPWriteStream(IAudioTarget target, byte[] secretKey, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
         {
-            _audioClient = audioClient;
+            _target = target;
             _secretKey = secretKey;
             _samplesPerFrame = samplesPerFrame;
             _ssrc = ssrc;
@@ -48,7 +48,7 @@ namespace Discord.Audio
 
             count = SecretBox.Encrypt(buffer, offset, count, _buffer, 12, _nonce, _secretKey);
             Buffer.BlockCopy(_nonce, 0, _buffer, 0, 12); //Copy the RTP header from nonce to buffer
-            _audioClient.Send(_buffer, count + 12);
+            _target.SendAsync(_buffer, count + 12).GetAwaiter().GetResult();
         }
 
         public override void Flush() { }

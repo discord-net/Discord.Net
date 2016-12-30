@@ -41,6 +41,17 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
+        public async Task<IAudioClient> ConnectAsync()
+        {
+            var audioMode = Discord.AudioMode;
+            if (audioMode == AudioMode.Disabled)
+                throw new InvalidOperationException($"Audio is not enabled on this client, {nameof(DiscordSocketConfig.AudioMode)} in {nameof(DiscordSocketConfig)} must be set.");
+
+            return await Guild.ConnectAudioAsync(Id,
+                (audioMode & AudioMode.Incoming) == 0,
+                (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
+        }
+
         public override SocketGuildUser GetUser(ulong id)
         {
             var user = Guild.GetUser(id);
@@ -51,9 +62,6 @@ namespace Discord.WebSocket
         
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
-
-        //IVoiceChannel
-        Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

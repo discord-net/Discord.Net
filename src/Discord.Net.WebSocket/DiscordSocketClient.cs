@@ -1563,10 +1563,10 @@ namespace Discord.WebSocket
                                             {
                                                 before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
                                                 after = guild.AddOrUpdateVoiceState(State, data);
-                                                if (data.UserId == CurrentUser.Id)
+                                                /*if (data.UserId == CurrentUser.Id)
                                                 {
                                                     var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
-                                                }
+                                                }*/
                                             }
                                             else
                                             {

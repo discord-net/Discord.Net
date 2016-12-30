@@ -39,7 +39,7 @@ namespace Discord.Audio
         private readonly JsonSerializer _serializer;
 
         private TaskCompletionSource<bool> _connectTask;
-        private CancellationTokenSource _cancelToken;
+        private CancellationTokenSource _cancelTokenSource;
         private Task _heartbeatTask;
         private long _heartbeatTime;
         private string _url;
@@ -110,7 +110,7 @@ namespace Discord.Audio
             {
                 _url = url;
                 _connectTask = new TaskCompletionSource<bool>();
-                _cancelToken = new CancellationTokenSource();
+                _cancelTokenSource = new CancellationTokenSource();
 
                 await ApiClient.ConnectAsync("wss://" + url).ConfigureAwait(false);
                 await ApiClient.SendIdentityAsync(userId, sessionId, token).ConfigureAwait(false);
@@ -152,7 +152,7 @@ namespace Discord.Audio
             await _audioLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
 
             //Signal tasks to complete
-            try { _cancelToken.Cancel(); } catch { }
+            try { _cancelTokenSource.Cancel(); } catch { }
 
             //Disconnect from server
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
@@ -169,19 +169,35 @@ namespace Discord.Audio
             await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
         }
 
-        public void Send(byte[] data, int count)
-        {
-            //TODO: Queue these?
-            ApiClient.SendAsync(data, count).ConfigureAwait(false);
-        }
-
         public Stream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000)
         {
-            return new RTPWriteStream(this, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
+            CheckSamplesPerFrame(samplesPerFrame);
+            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
+            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
+        }
+        public Stream CreateDirectOpusStream(int samplesPerFrame, int bufferSize = 4000)
+        {
+            CheckSamplesPerFrame(samplesPerFrame);
+            var target = new DirectAudioTarget(ApiClient);
+            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
         }
         public Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000)
         {
-            return new OpusEncodeStream(this, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
+            CheckSamplesPerFrame(samplesPerFrame);
+            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
+            return new OpusEncodeStream(target, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
+        }
+        public Stream CreateDirectPCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000)
+        {
+            CheckSamplesPerFrame(samplesPerFrame);
+            var target = new DirectAudioTarget(ApiClient);
+            return new OpusEncodeStream(target, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
+        }
+        private void CheckSamplesPerFrame(int samplesPerFrame)
+        {
+            if (samplesPerFrame != 120 && samplesPerFrame != 240 && samplesPerFrame != 480 &&
+                samplesPerFrame != 960 && samplesPerFrame != 1920 && samplesPerFrame != 2880)
+                throw new ArgumentException("Value must be 120, 240, 480, 960, 1920 or 2880", nameof(samplesPerFrame));
         }
 
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
@@ -201,7 +217,7 @@ namespace Discord.Audio
                                 throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
 
                             _heartbeatTime = 0;
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token);
+                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelTokenSource.Token);
                             
                             ApiClient.SetUdpEndpoint(_url, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);

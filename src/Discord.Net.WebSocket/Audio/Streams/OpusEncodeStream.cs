@@ -7,8 +7,8 @@
         
         private readonly OpusEncoder _encoder;
 
-        internal OpusEncodeStream(AudioClient audioClient, byte[] secretKey, int samplesPerFrame, uint ssrc, int? bitrate = null, int bufferSize = 4000)
-            : base(audioClient, secretKey, samplesPerFrame, ssrc, bufferSize)
+        internal OpusEncodeStream(IAudioTarget target, byte[] secretKey, int samplesPerFrame, uint ssrc, int? bitrate = null, int bufferSize = 4000)
+            : base(target, secretKey, samplesPerFrame, ssrc, bufferSize)
         {
             _encoder = new OpusEncoder(SampleRate, Channels);
 

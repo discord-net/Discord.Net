@@ -22,6 +22,7 @@ namespace Discord.Net.Udp
         public DefaultUdpSocket()
         {
             _lock = new SemaphoreSlim(1, 1);
+            _cancelTokenSource = new CancellationTokenSource();
         }
         private void Dispose(bool disposing)
         {
@@ -57,7 +58,7 @@ namespace Discord.Net.Udp
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
 
-            _udp = new UdpClient();
+            _udp = new UdpClient(0);
 
             _task = RunAsync(_cancelToken);
         }

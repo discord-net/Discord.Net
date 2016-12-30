@@ -1,4 +1,5 @@
-﻿using Discord.Rest;
+﻿using Discord.Audio;
+using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -63,6 +64,11 @@ namespace Discord.WebSocket
         
         public Task LeaveAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
+
+        public Task<IAudioClient> ConnectAsync()
+        {
+            throw new NotSupportedException("Voice is not yet supported for group channels.");
+        }
 
         //Messages
         public SocketMessage GetCachedMessage(ulong id)
