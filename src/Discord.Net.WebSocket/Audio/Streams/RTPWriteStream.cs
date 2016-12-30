@@ -16,13 +16,13 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        internal RTPWriteStream(IAudioTarget target, byte[] secretKey, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
+        internal RTPWriteStream(IAudioTarget target, byte[] secretKey, int samplesPerFrame, uint ssrc)
         {
             _target = target;
             _secretKey = secretKey;
             _samplesPerFrame = samplesPerFrame;
             _ssrc = ssrc;
-            _buffer = new byte[bufferSize];
+            _buffer = new byte[4000];
             _nonce = new byte[24];
             _nonce[0] = 0x80;
             _nonce[1] = 0x78;

@@ -169,29 +169,29 @@ namespace Discord.Audio
             await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
         }
 
-        public Stream CreateOpusStream(int samplesPerFrame, int bufferSize = 4000)
+        public Stream CreateOpusStream(int samplesPerFrame)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
-            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
+            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
-        public Stream CreateDirectOpusStream(int samplesPerFrame, int bufferSize = 4000)
+        public Stream CreateDirectOpusStream(int samplesPerFrame)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new DirectAudioTarget(ApiClient);
-            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc, bufferSize = 4000);
+            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
-        public Stream CreatePCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000)
+        public Stream CreatePCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
-            return new OpusEncodeStream(target, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
+            return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
         }
-        public Stream CreateDirectPCMStream(int samplesPerFrame, int? bitrate = null, int bufferSize = 4000)
+        public Stream CreateDirectPCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new DirectAudioTarget(ApiClient);
-            return new OpusEncodeStream(target, _secretKey, samplesPerFrame, _ssrc, bitrate, bufferSize);
+            return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
         }
         private void CheckSamplesPerFrame(int samplesPerFrame)
         {
