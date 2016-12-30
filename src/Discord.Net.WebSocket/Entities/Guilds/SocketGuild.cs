@@ -479,6 +479,7 @@ namespace Discord.WebSocket
             if (AudioClient != null)
                 await AudioClient.DisconnectAsync().ConfigureAwait(false);
             AudioClient = null;
+            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, null, false, false).ConfigureAwait(false);
         }
         internal async Task FinishConnectAudio(int id, string url, string token)
         {
@@ -490,17 +491,23 @@ namespace Discord.WebSocket
                 if (AudioClient == null)
                 {
                     var audioClient = new AudioClient(this, id);
+                    var promise = _audioConnectPromise;
                     audioClient.Disconnected += async ex =>
                     {
                         //If the initial connection hasn't been made yet, reconnecting will lead to deadlocks
-                        if (!_audioConnectPromise.Task.IsCompleted)
+                        if (!promise.Task.IsCompleted)
                         {
                             try { audioClient.Dispose(); } catch { }
                             AudioClient = null;
+                            if (ex != null)
+                                await promise.TrySetExceptionAsync(ex);
+                            else
+                                await promise.TrySetCanceledAsync();
                             return;
                         }
 
-                        await _audioLock.WaitAsync().ConfigureAwait(false);
+                        //TODO: Implement reconnect
+                        /*await _audioLock.WaitAsync().ConfigureAwait(false);
                         try
                         {
                             if (AudioClient == audioClient) //Only reconnect if we're still assigned as this guild's audio client
@@ -527,7 +534,7 @@ namespace Discord.WebSocket
                         finally
                         {
                             _audioLock.Release();
-                        }
+                        }*/
                     };
                     AudioClient = audioClient;
                 }
