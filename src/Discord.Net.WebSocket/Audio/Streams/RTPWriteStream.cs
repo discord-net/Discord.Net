@@ -34,6 +34,12 @@ namespace Discord.Audio
             _nonce[11] = (byte)(_ssrc >> 0);
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            Flush();
+            base.Dispose(disposing);
+        }
+
         public override void Write(byte[] buffer, int offset, int count)
         {
             WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
