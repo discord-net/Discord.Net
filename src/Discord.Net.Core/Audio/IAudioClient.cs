@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    public interface IAudioClient
+    public interface IAudioClient : IDisposable
     {
         event Func<Task> Connected;
         event Func<Exception, Task> Disconnected;
