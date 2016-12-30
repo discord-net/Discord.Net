@@ -18,8 +18,7 @@ namespace Discord.Audio
         internal BufferedAudioTarget(DiscordVoiceAPIClient client, int samplesPerFrame, CancellationToken cancelToken)
         {
             _client = client;
-            double milliseconds = samplesPerFrame / 48.0;
-            double ticksPerFrame = Stopwatch.Frequency / 1000.0 * milliseconds;
+            long ticksPerFrame = samplesPerFrame / 48;
 
             _cancelTokenSource = new CancellationTokenSource();
             cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, cancelToken).Token;
@@ -28,31 +27,26 @@ namespace Discord.Audio
             _task = Run(ticksPerFrame, cancelToken);
         }
 
-        private Task Run(double ticksPerFrame, CancellationToken cancelToken)
+        private Task Run(long ticksPerFrame, CancellationToken cancelToken)
         {
             return Task.Run(async () =>
             {
-                var stopwatch = Stopwatch.StartNew();
-                long lastTick = stopwatch.ElapsedTicks;
-                double ticksPerMilli = Stopwatch.Frequency / 1000.0;
+                long nextTick = Environment.TickCount;
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    long thisTick = stopwatch.ElapsedTicks;
-                    double remaining = ticksPerFrame - (thisTick - lastTick);
-                    if (remaining <= 0)
+                    long tick = Environment.TickCount;
+                    long dist = nextTick - tick;
+                    if (dist <= 0)
                     {
                         byte[] buffer;
                         if (_queue.TryDequeue(out buffer))
                             await _client.SendAsync(buffer, buffer.Length).ConfigureAwait(false);
                         else
                             await _client.SendAsync(_silencePacket, _silencePacket.Length).ConfigureAwait(false);
-                        lastTick = thisTick;
+                        nextTick += ticksPerFrame;
                     }
-                    else if (remaining > 1)
-                    {
-                        int millis = (int)Math.Floor(remaining / ticksPerMilli);
-                        await Task.Delay(millis).ConfigureAwait(false);
-                    }
+                    else if (dist > 1)
+                        await Task.Delay((int)dist).ConfigureAwait(false);
                 }
             });
         }
