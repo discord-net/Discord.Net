@@ -100,6 +100,9 @@ namespace Discord.Commands
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
+            //Check for unspecified info
+            if (builder.Aliases.Count == 0)
+                builder.AddAliases("");
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
