@@ -11,7 +11,6 @@ namespace Discord.Audio
         private readonly byte[] _nonce, _secretKey;
         private int _samplesPerFrame;
         private uint _ssrc, _timestamp = 0;
-        private bool _isDisposed;
 
         protected readonly byte[] _buffer;
 
@@ -33,16 +32,6 @@ namespace Discord.Audio
             _nonce[9] = (byte)(_ssrc >> 16);
             _nonce[10] = (byte)(_ssrc >> 8);
             _nonce[11] = (byte)(_ssrc >> 0);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && !_isDisposed)
-            {
-                _isDisposed = true;
-                Flush();
-            }
-            base.Dispose(disposing);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
