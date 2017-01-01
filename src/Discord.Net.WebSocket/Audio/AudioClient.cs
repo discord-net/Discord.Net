@@ -170,25 +170,25 @@ namespace Discord.Audio
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
 
-        public Stream CreateOpusStream(int samplesPerFrame, int bufferMillis)
+        public AudioOutStream CreateOpusStream(int samplesPerFrame, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _cancelTokenSource.Token);
             return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
-        public Stream CreateDirectOpusStream(int samplesPerFrame)
+        public AudioOutStream CreateDirectOpusStream(int samplesPerFrame)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new DirectAudioTarget(ApiClient);
             return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
-        public Stream CreatePCMStream(int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
+        public AudioOutStream CreatePCMStream(int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _cancelTokenSource.Token);
             return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
         }
-        public Stream CreateDirectPCMStream(int samplesPerFrame, int channels, int? bitrate)
+        public AudioOutStream CreateDirectPCMStream(int samplesPerFrame, int channels, int? bitrate)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new DirectAudioTarget(ApiClient);

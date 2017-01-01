@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
@@ -13,7 +14,9 @@ namespace Discord.Audio
         public Task SendAsync(byte[] buffer, int count)
             => _client.SendAsync(buffer, count);
 
-        public Task FlushAsync()
+        public Task FlushAsync(CancellationToken cancelToken)
+            => Task.Delay(0);
+        public Task ClearAsync(CancellationToken cancelToken)
             => Task.Delay(0);
     }
 }

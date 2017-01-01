@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    internal class RTPWriteStream : Stream
+    internal class RTPWriteStream : AudioOutStream
     {
         private readonly IAudioTarget _target;
         private readonly byte[] _nonce, _secretKey;
@@ -13,10 +13,6 @@ namespace Discord.Audio
         private uint _ssrc, _timestamp = 0;
 
         protected readonly byte[] _buffer;
-
-        public override bool CanRead => false;
-        public override bool CanSeek => false;
-        public override bool CanWrite => true;
 
         internal RTPWriteStream(IAudioTarget target, byte[] secretKey, int samplesPerFrame, uint ssrc)
         {
@@ -40,6 +36,7 @@ namespace Discord.Audio
         }
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             unchecked
             {
                 if (_nonce[3]++ == byte.MaxValue)
@@ -63,7 +60,16 @@ namespace Discord.Audio
         }
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
-            await _target.FlushAsync().ConfigureAwait(false);
+            await _target.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        public override void Clear()
+        {
+            ClearAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override async Task ClearAsync(CancellationToken cancelToken)
+        {
+            await _target.ClearAsync(cancelToken).ConfigureAwait(false);
         }
 
         public override long Length { get { throw new NotSupportedException(); } }

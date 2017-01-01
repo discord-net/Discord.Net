@@ -87,17 +87,25 @@ namespace Discord.Audio
             Buffer.BlockCopy(data, 0, buffer, 0, count);
             _queuedFrames.Enqueue(new Frame(buffer, count));
         }
-
-        public async Task FlushAsync()
+        
+        public async Task FlushAsync(CancellationToken cancelToken)
         {
             while (true)
             {
+                cancelToken.ThrowIfCancellationRequested();
                 if (_queuedFrames.Count == 0)
                     return;
-                await Task.Delay(250).ConfigureAwait(false);
+                await Task.Delay(250, cancelToken).ConfigureAwait(false);
             }
         }
-
+        public Task ClearAsync(CancellationToken cancelToken)
+        {
+            Frame ignored;
+            do
+                cancelToken.ThrowIfCancellationRequested();
+            while (_queuedFrames.TryDequeue(out ignored));
+            return Task.Delay(0);
+        }
         protected void Dispose(bool disposing)
         {
             if (disposing)
