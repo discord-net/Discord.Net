@@ -3,7 +3,6 @@ using Discord.API.Gateway;
 using Discord.Audio;
 using Discord.Logging;
 using Discord.Net.Converters;
-using Discord.Net.Queue;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
@@ -65,6 +64,7 @@ namespace Discord.WebSocket
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
         public IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        public IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
@@ -73,8 +73,8 @@ namespace Discord.WebSocket
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client)
             : base(config, client)
         {
-            ShardId = config.ShardId;
-            TotalShards = config.TotalShards;
+            ShardId = config.ShardId ?? 0;
+            TotalShards = config.TotalShards ?? 1;
             MessageCacheSize = config.MessageCacheSize;
             LargeThreshold = config.LargeThreshold;
             AudioMode = config.AudioMode;
@@ -85,7 +85,7 @@ namespace Discord.WebSocket
             State = new ClientState(0, 0);
             
             _nextAudioId = 1;
-            _gatewayLogger = LogManager.CreateLogger("Gateway");
+            _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : "Shard #" + ShardId);
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -206,7 +206,7 @@ namespace Discord.WebSocket
                 await _connectTask.Task.ConfigureAwait(false);
 
                 await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
-                await SendStatus().ConfigureAwait(false);
+                await SendStatusAsync().ConfigureAwait(false);
 
                 await _gatewayLogger.DebugAsync("Raising Event").ConfigureAwait(false);
                 if (!isReconnecting)
@@ -424,11 +424,7 @@ namespace Discord.WebSocket
         public Task DownloadAllUsersAsync() 
             => DownloadUsersAsync(State.Guilds.Where(x => !x.HasAllMembers));
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
-            => DownloadUsersAsync(guilds.Select(x => x as SocketGuild).Where(x => x != null));
-        public Task DownloadUsersAsync(params IGuild[] guilds)
-            => DownloadUsersAsync(guilds.Select(x => x as SocketGuild).Where(x => x != null));
-        private async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
+        public async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
         {
             var cachedGuilds = guilds.ToImmutableArray();
             if (cachedGuilds.Length == 0) return;
@@ -474,25 +470,25 @@ namespace Discord.WebSocket
             }
         }
 
-        public async Task SetStatus(UserStatus status)
+        public async Task SetStatusAsync(UserStatus status)
         {
             Status = status;
             if (status == UserStatus.AFK)
                 _statusSince = DateTimeOffset.UtcNow;
             else
                 _statusSince = null;
-            await SendStatus().ConfigureAwait(false);
+            await SendStatusAsync().ConfigureAwait(false);
         }
-        public async Task SetGame(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
             if (name != null)
                 Game = new Game(name, streamUrl, streamType);
             else
                 Game = null;
             CurrentUser.Presence = new SocketPresence(Status, Game);
-            await SendStatus().ConfigureAwait(false);
+            await SendStatusAsync().ConfigureAwait(false);
         }
-        private async Task SendStatus()
+        private async Task SendStatusAsync()
         {
             var game = Game;
             var status = Status;
@@ -1803,7 +1799,7 @@ namespace Discord.WebSocket
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
         Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync()
-            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(_voiceRegions.ToReadOnlyCollection());
+            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id)
             => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
     }

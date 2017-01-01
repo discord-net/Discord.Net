@@ -14,9 +14,9 @@ namespace Discord.WebSocket
         public int ConnectionTimeout { get; set; } = 30000;
 
         /// <summary> Gets or sets the id for this shard. Must be less than TotalShards. </summary>
-        public int ShardId { get; set; } = 0;
+        public int? ShardId { get; set; } = null;
         /// <summary> Gets or sets the total number of shards for this application. </summary>
-        public int TotalShards { get; set; } = 1;
+        public int? TotalShards { get; set; } = null;
 
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 0;
@@ -54,5 +54,7 @@ namespace Discord.WebSocket
             };
 #endif
         }
+
+        internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;
     }
 }

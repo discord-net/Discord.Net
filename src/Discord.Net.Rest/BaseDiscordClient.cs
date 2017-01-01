@@ -11,7 +11,7 @@ namespace Discord.Rest
     public abstract class BaseDiscordClient : IDiscordClient
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         public event Func<Task> LoggedIn { add { _loggedInEvent.Add(value); } remove { _loggedInEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedInEvent = new AsyncEvent<Func<Task>>();
@@ -38,7 +38,7 @@ namespace Discord.Rest
             _connectionLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
             _queueLogger = LogManager.CreateLogger("Queue");
-            _isFirstLogin = true;
+            _isFirstLogin = config.DisplayInitialLog;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {

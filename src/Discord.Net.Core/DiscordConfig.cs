@@ -24,5 +24,8 @@ namespace Discord
         
         /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
+
+        /// <summary> Gets or sets whether the initial log entry should be printed. </summary>
+        internal bool DisplayInitialLog { get; set; } = true;
     }
 }

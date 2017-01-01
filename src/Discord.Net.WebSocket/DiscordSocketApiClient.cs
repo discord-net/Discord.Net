@@ -178,6 +178,11 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
         }
+        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
+        }
         public async Task SendIdentifyAsync(int largeThreshold = 100, bool useCompression = true, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
