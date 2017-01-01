@@ -63,9 +63,6 @@ namespace Discord.Audio
                             Frame frame;
                             if (_queuedFrames.TryDequeue(out frame))
                             {
-#if NETSTANDARD1_3
-            Console.WriteLine("Pop");
-#endif
                                 await _client.SendAsync(frame.Buffer, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
@@ -85,9 +82,6 @@ namespace Discord.Audio
         public async Task SendAsync(byte[] data, int count)
         {
             await _queueLock.WaitAsync(-1, _cancelToken).ConfigureAwait(false);
-#if NETSTANDARD1_3
-            Console.WriteLine("Push");
-#endif
             byte[] buffer;
             _bufferPool.TryDequeue(out buffer);
             Buffer.BlockCopy(data, 0, buffer, 0, count);
