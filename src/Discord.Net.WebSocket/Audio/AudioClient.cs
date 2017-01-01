@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    public class AudioClient : IAudioClient, IDisposable
+    internal class AudioClient : IAudioClient, IDisposable
     {
         public event Func<Task> Connected
         {
@@ -74,7 +74,7 @@ namespace Discord.Audio
 
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
-            ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+            //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
             ApiClient.Disconnected += async ex =>
@@ -170,10 +170,10 @@ namespace Discord.Audio
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
 
-        public Stream CreateOpusStream(int samplesPerFrame)
+        public Stream CreateOpusStream(int samplesPerFrame, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
+            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _cancelTokenSource.Token);
             return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
         public Stream CreateDirectOpusStream(int samplesPerFrame)
@@ -182,13 +182,13 @@ namespace Discord.Audio
             var target = new DirectAudioTarget(ApiClient);
             return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
         }
-        public Stream CreatePCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null)
+        public Stream CreatePCMStream(int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, _cancelTokenSource.Token);
+            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _cancelTokenSource.Token);
             return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
         }
-        public Stream CreateDirectPCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null)
+        public Stream CreateDirectPCMStream(int samplesPerFrame, int channels, int? bitrate)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var target = new DirectAudioTarget(ApiClient);

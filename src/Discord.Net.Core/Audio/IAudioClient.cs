@@ -22,7 +22,7 @@ namespace Discord.Audio
         /// </summary>
         /// <param name="samplesPerFrame">Samples per frame. Must be 120, 240, 480, 960, 1920 or 2880, representing 2.5, 5, 10, 20, 40 or 60 milliseconds respectively.</param>
         /// <returns></returns>
-        Stream CreateOpusStream(int samplesPerFrame);
+        Stream CreateOpusStream(int samplesPerFrame, int bufferMillis = 1000);
         /// <summary>
         /// Creates a new outgoing stream accepting Opus-encoded data. This is a direct stream with no internal timer.
         /// </summary>
@@ -35,7 +35,7 @@ namespace Discord.Audio
         /// <param name="samplesPerFrame">Samples per frame. Must be 120, 240, 480, 960, 1920 or 2880, representing 2.5, 5, 10, 20, 40 or 60 milliseconds respectively.</param>
         /// <param name="bitrate"></param>
         /// <returns></returns>
-        Stream CreatePCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null);
+        Stream CreatePCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null, int bufferMillis = 1000);
         /// <summary>
         /// Creates a new direct outgoing stream accepting PCM (raw) data. This is a direct stream with no internal timer.
         /// </summary>
