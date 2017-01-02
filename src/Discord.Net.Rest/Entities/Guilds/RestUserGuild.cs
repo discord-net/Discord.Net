@@ -28,7 +28,7 @@ namespace Discord.Rest
             return entity;
         }
 
-        public void Update(Model model)
+        internal void Update(Model model)
         {
             _iconId = model.Icon;
             IsOwner = model.Owner;

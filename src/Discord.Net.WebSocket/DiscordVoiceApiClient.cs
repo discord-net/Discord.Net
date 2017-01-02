@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    public class DiscordVoiceAPIClient
+    internal class DiscordVoiceAPIClient
     {
         public const int MaxBitrate = 128 * 1024;
         public const string Mode = "xsalsa20_poly1305";

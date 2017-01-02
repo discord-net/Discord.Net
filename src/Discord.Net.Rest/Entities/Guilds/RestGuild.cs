@@ -72,7 +72,7 @@ namespace Discord.Rest
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(GuildEmoji.Create(model.Emojis[i]));
+                    emojis.Add(model.Emojis[i].ToEntity());
                 _emojis = emojis.ToImmutableArray();
             }
             else

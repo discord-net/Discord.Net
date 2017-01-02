@@ -60,7 +60,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool DownloadUsersOnGuildAvailable { get; private set; }
 
-        public new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
         public IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;

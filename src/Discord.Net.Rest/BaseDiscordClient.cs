@@ -23,7 +23,7 @@ namespace Discord.Rest
         private bool _isFirstLogin;
         private bool _isDisposed;
 
-        public API.DiscordRestApiClient ApiClient { get; }
+        internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
         public LoginState LoginState { get; private set; }
         public ISelfUser CurrentUser { get; protected set; }

@@ -33,7 +33,7 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS, EmbedBuilder embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if NETSTANDARD1_3
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options = null)
@@ -90,7 +90,7 @@ namespace Discord.Rest
 #endif
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, options);
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, EmbedBuilder embed, RequestOptions options)
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);

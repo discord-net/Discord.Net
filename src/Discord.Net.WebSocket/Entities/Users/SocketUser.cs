@@ -46,7 +46,7 @@ namespace Discord.WebSocket
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public override string ToString() => $"{Username}#{Discriminator}";
-        internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         //IUser

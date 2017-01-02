@@ -32,6 +32,6 @@
         /// <summary>
         /// The embed the message should display
         /// </summary>
-        public Optional<EmbedBuilder> Embed { get; set; }
+        public Optional<Embed> Embed { get; set; }
     }
 }

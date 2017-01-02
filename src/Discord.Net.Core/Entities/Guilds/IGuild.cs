@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

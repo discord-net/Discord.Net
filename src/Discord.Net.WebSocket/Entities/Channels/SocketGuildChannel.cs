@@ -47,7 +47,7 @@ namespace Discord.WebSocket
             var overwrites = model.PermissionOverwrites.Value;
             var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
-                newOverwrites.Add(new Overwrite(overwrites[i]));
+                newOverwrites.Add(overwrites[i].ToEntity());
             _overwrites = newOverwrites.ToImmutable();
         }
         
@@ -77,12 +77,12 @@ namespace Discord.WebSocket
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = user.Id, TargetType = PermissionTarget.User }));
+            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
         }
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
-            _overwrites.Add(new Overwrite(new API.Overwrite { Allow = perms.AllowValue, Deny = perms.DenyValue, TargetId = role.Id, TargetType = PermissionTarget.Role }));
+            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
         }
         public async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {

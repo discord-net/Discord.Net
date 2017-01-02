@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -55,7 +54,7 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, EmbedBuilder embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if NETSTANDARD1_3
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
@@ -112,7 +111,7 @@ namespace Discord.Rest
 #endif
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options) 
             => await SendFileAsync(stream, filename, text, isTTS, options).ConfigureAwait(false);
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, EmbedBuilder embed, RequestOptions options) 
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options) 
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options) 
             => EnterTypingState(options);

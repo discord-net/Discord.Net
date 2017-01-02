@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
@@ -37,7 +36,7 @@ namespace Discord.Rest
             return entity;
         }
 
-        public void Update(Model model)
+        internal void Update(Model model)
         {
             Name = model.Name;
             Type = model.Type;

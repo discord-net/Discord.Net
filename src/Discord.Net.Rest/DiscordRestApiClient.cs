@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordRestApiClient : IDisposable
+    internal class DiscordRestApiClient : IDisposable
     {
         private static readonly ConcurrentDictionary<string, Func<BucketIds, string>> _bucketIdGenerators = new ConcurrentDictionary<string, Func<BucketIds, string>>();
 
@@ -45,7 +45,9 @@ namespace Discord.API
 
         public LoginState LoginState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
-        public User CurrentUser { get; private set; }
+        internal User CurrentUser { get; private set; }
+
+        public ulong? CurrentUserId => CurrentUser?.Id;
 
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
             JsonSerializer serializer = null, bool fetchCurrentUser = true)

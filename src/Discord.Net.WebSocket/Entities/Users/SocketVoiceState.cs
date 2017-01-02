@@ -56,7 +56,7 @@ namespace Discord.WebSocket
         }
 
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";
-        internal string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
+        private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
         internal SocketVoiceState Clone() => this;
 
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;

@@ -22,7 +22,7 @@ namespace Discord.WebSocket
         internal UserStatus Status => _shards[0].Status;
         internal Game? Game => _shards[0].Game;
 
-        public new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
         public IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
         public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(() => GetPrivateChannelCount());
@@ -150,11 +150,8 @@ namespace Discord.WebSocket
 
         public DiscordSocketClient GetShard(int id)
         {
-            for (int i = 0; i < _shards.Length; i++)
-            {
-                if (_shards[i].ShardId == id)
-                    return _shards[i];
-            }
+            if (_shardIdsToIndex.TryGetValue(id, out id))
+                return _shards[id];
             return null;
         }
         private int GetShardIdFor(ulong guildId)
@@ -162,12 +159,7 @@ namespace Discord.WebSocket
         private int GetShardIdFor(IGuild guild)
             => GetShardIdFor(guild.Id);
         private DiscordSocketClient GetShardFor(ulong guildId)
-        {
-            int id = GetShardIdFor(guildId);
-            if (_shardIdsToIndex.TryGetValue(id, out id))
-                return _shards[id];
-            return null;
-        }
+            => GetShard(GetShardIdFor(guildId));
         private DiscordSocketClient GetShardFor(IGuild guild)
             => GetShardFor(guild.Id);
 

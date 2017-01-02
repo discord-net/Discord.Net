@@ -1,6 +1,4 @@
-﻿using Model = Discord.API.Overwrite;
-
-namespace Discord
+﻿namespace Discord
 {
     public struct Overwrite
     {
@@ -18,8 +16,5 @@ namespace Discord
             TargetType = targetType;
             Permissions = permissions;
         }
-
-        public Overwrite(Model model)
-            : this(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny)) { }
     }
 }

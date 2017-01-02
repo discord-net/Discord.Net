@@ -18,7 +18,7 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.Build() : Optional.Create<API.Embed>()
+                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>()
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }

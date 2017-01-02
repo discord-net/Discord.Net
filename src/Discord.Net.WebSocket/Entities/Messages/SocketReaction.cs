@@ -22,7 +22,7 @@ namespace Discord.WebSocket
         }
         internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
         {
-            return new SocketReaction(channel, model.MessageId, message, model.UserId, user, Emoji.Create(model.Emoji));
+            return new SocketReaction(channel, model.MessageId, message, model.UserId, user, new Emoji(model.Emoji.Id, model.Emoji.Name));
         }
     }
 }

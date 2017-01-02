@@ -16,7 +16,6 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Discord.Net.API\Discord.Net.API.csproj" />
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">

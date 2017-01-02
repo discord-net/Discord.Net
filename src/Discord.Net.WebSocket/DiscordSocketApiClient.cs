@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordSocketApiClient : DiscordRestApiClient
+    internal class DiscordSocketApiClient : DiscordRestApiClient
     {
         public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();

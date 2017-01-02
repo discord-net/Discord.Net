@@ -1,7 +1,6 @@
 ﻿using Discord.API.Rpc;
 using Discord.Logging;
 using Discord.Net.Converters;
-using Discord.Net.Queue;
 using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,7 +30,7 @@ namespace Discord.Rpc
         //From DiscordRpcConfig
         internal int ConnectionTimeout { get; private set; }
 
-        public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
+        internal new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
         public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
         public RestApplication ApplicationInfo { get; private set; }
 
@@ -308,20 +307,67 @@ namespace Discord.Rpc
             var model = await ApiClient.GetVoiceSettingsAsync(options).ConfigureAwait(false);
             return VoiceSettings.Create(model);
         }
-        public async Task SetVoiceSettingsAsync(Action<API.Rpc.VoiceSettings> func, RequestOptions options = null)
+        public async Task SetVoiceSettingsAsync(Action<VoiceProperties> func, RequestOptions options = null)
         {
-            var settings = new API.Rpc.VoiceSettings();
-            settings.Input = new VoiceDeviceSettings();
-            settings.Output = new VoiceDeviceSettings();
-            settings.Mode = new VoiceMode();
+            if (func == null) throw new NullReferenceException(nameof(func));
+
+            var settings = new VoiceProperties();
+            settings.Input = new VoiceDeviceProperties();
+            settings.Output = new VoiceDeviceProperties();
+            settings.Mode = new VoiceModeProperties();
             func(settings);
-            await ApiClient.SetVoiceSettingsAsync(settings, options).ConfigureAwait(false);
+
+            var model = new API.Rpc.VoiceSettings
+            {
+                AutomaticGainControl = settings.AutomaticGainControl,
+                EchoCancellation = settings.EchoCancellation,
+                NoiseSuppression = settings.NoiseSuppression,
+                QualityOfService = settings.QualityOfService,
+                SilenceWarning = settings.SilenceWarning
+            };
+            model.Input = new API.Rpc.VoiceDeviceSettings
+            {
+                DeviceId = settings.Input.DeviceId,
+                Volume = settings.Input.Volume
+            };
+            model.Output = new API.Rpc.VoiceDeviceSettings
+            {
+                DeviceId = settings.Output.DeviceId,
+                Volume = settings.Output.Volume
+            };
+            model.Mode = new API.Rpc.VoiceMode
+            {
+                AutoThreshold = settings.Mode.AutoThreshold,
+                Delay = settings.Mode.Delay,
+                Threshold = settings.Mode.Threshold,
+                Type = settings.Mode.Type
+            };
+
+            if (settings.Input.AvailableDevices.IsSpecified)
+                model.Input.AvailableDevices = settings.Input.AvailableDevices.Value.Select(x => x.ToModel()).ToArray();
+            if (settings.Output.AvailableDevices.IsSpecified)
+                model.Output.AvailableDevices = settings.Output.AvailableDevices.Value.Select(x => x.ToModel()).ToArray();
+            if (settings.Mode.Shortcut.IsSpecified)
+                model.Mode.Shortcut = settings.Mode.Shortcut.Value.Select(x => x.ToModel()).ToArray();
+
+            await ApiClient.SetVoiceSettingsAsync(model, options).ConfigureAwait(false);
         }
-        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<API.Rpc.UserVoiceSettings> func, RequestOptions options = null)
+        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<UserVoiceProperties> func, RequestOptions options = null)
         {
-            var settings = new API.Rpc.UserVoiceSettings();
+            if (func == null) throw new NullReferenceException(nameof(func));
+
+            var settings = new UserVoiceProperties();
             func(settings);
-            await ApiClient.SetUserVoiceSettingsAsync(userId, settings, options).ConfigureAwait(false);
+
+            var model = new API.Rpc.UserVoiceSettings
+            {
+                Mute = settings.Mute,
+                UserId = settings.UserId,
+                Volume = settings.Volume
+            };
+            if (settings.Pan.IsSpecified)
+                model.Pan = settings.Pan.Value.ToModel();
+            await ApiClient.SetUserVoiceSettingsAsync(userId, model, options).ConfigureAwait(false);
         }
 
         private static string GetEventName(RpcGlobalEvent rpcEvent)

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class DiscordRpcApiClient : DiscordRestApiClient, IDisposable
+    internal class DiscordRpcApiClient : DiscordRestApiClient, IDisposable
     {
         private abstract class RpcRequest
         {

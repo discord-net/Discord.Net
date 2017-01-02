@@ -79,7 +79,7 @@ namespace Discord.WebSocket
                 {
                     var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        embeds.Add(Embed.Create(value[i]));
+                        embeds.Add(value[i].ToEntity());
                     _embeds = embeds.ToImmutable();
                 }
                 else

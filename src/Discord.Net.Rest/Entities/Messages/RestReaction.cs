@@ -1,6 +1,6 @@
 ﻿using Model = Discord.API.Reaction;
 
-namespace Discord
+namespace Discord.Rest
 {
     public class RestReaction : IReaction
     {
@@ -16,7 +16,7 @@ namespace Discord
         }
         internal static RestReaction Create(Model model)
         {
-            return new RestReaction(Emoji.Create(model.Emoji), model.Count, model.Me);
+            return new RestReaction(new Emoji(model.Emoji.Id, model.Emoji.Name), model.Count, model.Me);
         }
     }
 }

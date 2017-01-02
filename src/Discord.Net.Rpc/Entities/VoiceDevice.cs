@@ -20,6 +20,6 @@ namespace Discord.Rpc
         }
 
         public override string ToString() => $"{Name}";
-        internal string DebuggerDisplay => $"{Name} ({Id})";
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }
