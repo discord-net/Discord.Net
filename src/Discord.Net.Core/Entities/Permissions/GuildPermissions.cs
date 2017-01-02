@@ -69,7 +69,7 @@ namespace Discord
         public bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.ManageNicknames);
         /// <summary> If True, a user may adjust roles. </summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.ManageRoles);
-        /// <summary> If True, a user may edit the emojis for this guild. </summary>
+        /// <summary> If True, a user may edit the webhooks for this guild. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
         /// <summary> If True, a user may edit the emojis for this guild. </summary>
         public bool ManageEmojis => Permissions.GetValue(RawValue, GuildPermission.ManageEmojis);

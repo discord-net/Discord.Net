@@ -34,7 +34,7 @@
         //ChangeNickname = 26,
         //ManageNicknames = 27,
         ManagePermissions = 28,
-        //ManageWebhooks = 29,
+        ManageWebhooks = 29,
         //ManageEmojis = 30
     }
 }
