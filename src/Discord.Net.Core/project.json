@@ -26,9 +26,6 @@
   },
 
   "dependencies": {
-    "Discord.Net.API": {
-      "target": "project"
-    },
     "Newtonsoft.Json": "9.0.1",
     "System.Collections.Concurrent": "4.3.0",
     "System.Collections.Immutable": "1.3.0",

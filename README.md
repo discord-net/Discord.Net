@@ -17,6 +17,8 @@ The individual components may also be installed from NuGet:
 - [Discord.Net.Rpc](https://www.nuget.org/packages/Discord.Net.Rpc/)
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
+
+The following providers are available for platforms not supporting .NET Standard 1.3:
 - [Discord.Net.Providers.UdpClient](https://www.nuget.org/packages/Discord.Net.Providers.UdpClient/)
 - [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/)
 
