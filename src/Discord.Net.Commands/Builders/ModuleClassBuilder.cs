@@ -122,6 +122,9 @@ namespace Discord.Commands
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
                         break;
+                    default:
+                        builder.AddAttributes(attribute);
+                        break;
                 }
             }
 
@@ -172,6 +175,9 @@ namespace Discord.Commands
                         break;
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
+                        break;
+                    default:
+                        builder.AddAttributes(attribute);
                         break;
                 }
             }
@@ -240,6 +246,8 @@ namespace Discord.Commands
                         builder.IsRemainder = true;
                         break;
                 }
+                else
+                    builder.AddAttributes(attribute);
             }
 
             builder.ParameterType = paramType;
