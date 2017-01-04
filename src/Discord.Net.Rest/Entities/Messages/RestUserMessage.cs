@@ -115,6 +115,8 @@ namespace Discord.Rest
                 else
                     _reactions = ImmutableArray.Create<RestReaction>();
             }
+            else
+                _reactions = ImmutableArray.Create<RestReaction>();
 
             if (model.Content.IsSpecified)
             {
