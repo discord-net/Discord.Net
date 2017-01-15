@@ -40,16 +40,17 @@ namespace Discord.Commands
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
         {
             var result = builder.Aliases.ToList();
-            var builderStack = new Stack<ModuleBuilder>();
+            var builderQueue = new Queue<ModuleBuilder>();
 
             var parent = builder;
             while ((parent = parent.Parent) != null)
-                builderStack.Push(parent);
+                builderQueue.Enqueue(parent);
 
-            while (builderStack.Count > 0)
+            while (builderQueue.Count > 0)
             {
-                var level = builderStack.Pop();
-                result = result.Permutate(level.Aliases, (first, second) =>
+                var level = builderQueue.Dequeue();
+                // permute in reverse because we want to *prefix* our aliases
+                result = level.Aliases.Permutate(result, (first, second) =>
                 {
                     if (first == "")
                         return second;
