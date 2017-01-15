@@ -43,8 +43,12 @@ namespace Discord.Commands
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
-            foreach (var type in PrimitiveParsers.SupportedTypes)
+            foreach (Type type in PrimitiveParsers.SupportedTypes)
+            {
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
+                if (type.GetTypeInfo().IsValueType)
+                    _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type);
+            }
 
             var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
