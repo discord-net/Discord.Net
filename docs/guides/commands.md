@@ -61,7 +61,7 @@ By now, your module should look like this:
 
 [IoC]: https://msdn.microsoft.com/en-us/library/ff921087.aspx
 [Dependency Injection]: https://msdn.microsoft.com/en-us/library/ff921152.aspx
-[ModuleBase]: xref:Discord.Commands.ModuleBase
+[ModuleBase]: xref:Discord.Commands.ModuleBase-1
 
 ### Adding Commands 
 
@@ -117,11 +117,20 @@ property on [ModuleBase]. CommandContext allows you to access the
 message, channel, guild, and user that the command was invoked from, 
 as well as the underlying discord client the command was invoked from. 
 
-You may need to cast these objects to their Socket counterparts (see  
-the terminology section).
+Different types of Contexts may be specified using the generic variant 
+of [ModuleBase]. When using a [SocketCommandContext], for example, 
+the properties on this context will already be Socket entities. You 
+will not need to cast them.
 
 To reply to messages, you may also invoke [ReplyAsync], instead of 
 accessing the channel through the [Context] and sending a message.
+
+[Context]: xref:Discord.Commands.ModuleBase-1#Discord_Commands_ModuleBase_1_Context
+[SocketCommandContext]: Discord.Commands.SocketCommandContext
+
+>![WARNING]
+>Contexts should **NOT** be mixed! You cannot have one module that 
+>uses CommandContext, and another that uses SocketCommandContext.
 
 ### Example Module 
 
