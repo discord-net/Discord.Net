@@ -61,7 +61,7 @@ By now, your module should look like this:
 
 [IoC]: https://msdn.microsoft.com/en-us/library/ff921087.aspx
 [Dependency Injection]: https://msdn.microsoft.com/en-us/library/ff921152.aspx
-[ModuleBase]: xref:Discord.Commands.ModuleBase-1
+[ModuleBase]: xref:Discord.Commands.ModuleBase`1
 
 ### Adding Commands 
 
@@ -125,8 +125,8 @@ will not need to cast them.
 To reply to messages, you may also invoke [ReplyAsync], instead of 
 accessing the channel through the [Context] and sending a message.
 
-[Context]: xref:Discord.Commands.ModuleBase-1#Discord_Commands_ModuleBase_1_Context
-[SocketCommandContext]: Discord.Commands.SocketCommandContext
+[Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
+[SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
 
 >![WARNING]
 >Contexts should **NOT** be mixed! You cannot have one module that 
@@ -149,7 +149,7 @@ Invoke [CommandService.AddModulesAsync] to discover modules and
 install them.
 
 [DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
-[CommandService.AddModulesAsync]: xref:Discord_Commands_CommandService#AddModulesAsync_System_Reflection_Assembly_
+[CommandService.AddModulesAsync]: xref:Discord_Commands_CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_
 
 #### Loading Modules Manually
 

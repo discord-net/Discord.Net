@@ -45,4 +45,6 @@ For more information, go to [MSDN's Async-Await section.](https://msdn.microsoft
 
 >[!NOTE]
 >In previous versions of Discord.Net, you had to hook into the `Ready` and `GuildAvailable` events to determine when your client was ready for use. 
->In 1.0, the [ConnectAsync](xref:Discord.DiscordSocketClient#ConnectAsync) method will automatically wait for the Ready event, and for all guilds to stream. To avoid this, pass `false` into `ConnectAsync`. 
+>In 1.0, the [ConnectAsync] method will automatically wait for the Ready event, and for all guilds to stream. To avoid this, pass `false` into `ConnectAsync`. 
+
+[ConnectAsync]: xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_ConnectAsync_System_Boolean_
