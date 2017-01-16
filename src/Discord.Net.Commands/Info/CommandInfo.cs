@@ -99,13 +99,13 @@ namespace Discord.Commands
         public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
         {
             if (!parseResult.IsSuccess)
-                return Task.FromResult(ExecuteResult.FromError(parseResult));
+                return Task.FromResult(ExecuteResult.FromError(this, parseResult));
 
             var argList = new object[parseResult.ArgValues.Count];
             for (int i = 0; i < parseResult.ArgValues.Count; i++)
             {
                 if (!parseResult.ArgValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
+                    return Task.FromResult(ExecuteResult.FromError(this, parseResult.ArgValues[i]));
                 argList[i] = parseResult.ArgValues[i].Values.First().Value;
             }
             
@@ -113,7 +113,7 @@ namespace Discord.Commands
             for (int i = 0; i < parseResult.ParamValues.Count; i++)
             {
                 if (!parseResult.ParamValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                    return Task.FromResult(ExecuteResult.FromError(this, parseResult.ParamValues[i]));
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
@@ -132,7 +132,7 @@ namespace Discord.Commands
                 {
                     var result = await parameter.CheckPreconditionsAsync(context, args, map).ConfigureAwait(false);
                     if (!result.IsSuccess)
-                        return ExecuteResult.FromError(result);
+                        return ExecuteResult.FromError(this, result);
                 }
 
                 switch (RunMode)
@@ -147,11 +147,11 @@ namespace Discord.Commands
                         var t2 = Task.Run(() => _action(context, args, map));
                         break;
                 }
-                return ExecuteResult.FromSuccess();
+                return ExecuteResult.FromSuccess(this);
             }
             catch (Exception ex)
             {
-                return ExecuteResult.FromError(ex);
+                return ExecuteResult.FromError(this, ex);
             }
         }
 
