@@ -24,10 +24,12 @@ namespace Discord.Commands
 
         public override Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
+            if(input == null)
+                return Task.FromResult(TypeReaderResult.FromSuccess(new Nullable<T>()));
             T value;
             if (_tryParse(input, out value))
                 return Task.FromResult(TypeReaderResult.FromSuccess(new Nullable<T>(value)));
-            return Task.FromResult(TypeReaderResult.FromSuccess(new Nullable<T>()));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Failed to parse {typeof(T).Name}"));
         }
     }
 }
