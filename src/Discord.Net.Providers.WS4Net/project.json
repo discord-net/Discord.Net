@@ -29,10 +29,10 @@
     "Discord.Net.Core": {
       "target": "project"
     },
-    "WebSocket4Net": "0.14.1"
+    "WebSocket4Net": "0.15.0-beta6"
   },
 
   "frameworks": {
-    "net45": {}
+    "netstandard1.3": {}
   }
 }
