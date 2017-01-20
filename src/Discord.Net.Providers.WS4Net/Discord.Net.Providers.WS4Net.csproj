@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>An optional WebSocket client provider for Discord.Net using WebSocket4Net</Description>
     <VersionPrefix>1.0.0-rc</VersionPrefix>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Discord.Net.Providers.WS4Net</AssemblyName>
     <PackageTags>discord;discordapp</PackageTags>
@@ -20,7 +20,7 @@
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WebSocket4Net" Version="0.14.1" />
+    <PackageReference Include="WebSocket4Net" Version="0.15.0-beta6" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>

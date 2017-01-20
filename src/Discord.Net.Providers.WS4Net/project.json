@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.0.0-*",
+  "version": "1.1.0-*",
   "description": "An optional WebSocket client provider for Discord.Net using WebSocket4Net.",
   "authors": [ "RogueException", "foxbot" ],
 
@@ -29,10 +29,10 @@
     "Discord.Net.Core": {
       "target": "project"
     },
-    "WebSocket4Net": "0.14.1"
+    "WebSocket4Net": "0.15.0-beta6"
   },
 
   "frameworks": {
-    "net45": {}
+    "netstandard1.3": {}
   }
 }
