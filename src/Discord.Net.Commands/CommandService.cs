@@ -38,7 +38,7 @@ namespace Discord.Commands
 
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
-            _moduleDefs = new ConcurrentBag<ModuleInfo>();
+            _moduleDefs = new HashSet<ModuleInfo>();
             _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
