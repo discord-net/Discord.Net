@@ -18,9 +18,9 @@ public class Program
             return Task.CompletedTask;
         };
 
-	await _client.LoginAsync(TokenType.Bot, "bot token");
-	await _client.ConnectAsync();
+	 await _client.LoginAsync(TokenType.Bot, "bot token");
+	 await _client.ConnectAsync();
 	    
-	await Task.Delay(-1);
+	 await Task.Delay(-1);
     }
 }
