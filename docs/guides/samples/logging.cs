@@ -9,7 +9,7 @@ public class Program
     
     public async Task Start()
     {
-        _client = new DiscordSocketClient(new DiscordConfig() {
+        _client = new DiscordSocketClient(new DiscordSocketConfig() {
 			LogLevel = LogSeverity.Info
         });
 
