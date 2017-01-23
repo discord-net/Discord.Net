@@ -3,7 +3,6 @@ using Discord.Rest;
 
 public class Program
 {
-    // Note: This is the light client, it only supports REST calls.
     private DiscordSocketClient _client;
     static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
     
