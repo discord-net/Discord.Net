@@ -38,13 +38,13 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
         
         private readonly JsonSerializer _serializer;
-        private readonly IWebSocketClient _webSocketClient;
         private readonly SemaphoreSlim _connectionLock;
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
 
         public ulong GuildId { get; }
+        internal IWebSocketClient WebSocketClient { get; }
         public ConnectionState ConnectionState { get; private set; }
 
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
@@ -63,9 +63,9 @@ namespace Discord.Audio
                 await _receivedPacketEvent.InvokeAsync(data).ConfigureAwait(false);
             };
 
-            _webSocketClient = webSocketProvider();
+            WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
-            _webSocketClient.BinaryMessage += async (data, index, count) =>
+            WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))
                 using (var decompressed = new MemoryStream())
@@ -80,12 +80,12 @@ namespace Discord.Audio
                     }
                 }
             };
-            _webSocketClient.TextMessage += async text =>
+            WebSocketClient.TextMessage += async text =>
             {
                 var msg = JsonConvert.DeserializeObject<SocketFrame>(text);
                 await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
             };
-            _webSocketClient.Closed += async ex =>
+            WebSocketClient.Closed += async ex =>
             {
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
@@ -101,7 +101,7 @@ namespace Discord.Audio
                 {
                     _connectCancelToken?.Dispose();
                     (_udp as IDisposable)?.Dispose();
-                    (_webSocketClient as IDisposable)?.Dispose();
+                    (WebSocketClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -114,7 +114,7 @@ namespace Discord.Audio
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await _webSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
+            await WebSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
         public async Task SendAsync(byte[] data, int bytes)
@@ -177,8 +177,8 @@ namespace Discord.Audio
                 _connectCancelToken = new CancellationTokenSource();
                 var cancelToken = _connectCancelToken.Token;
 
-                _webSocketClient.SetCancelToken(cancelToken);
-                await _webSocketClient.ConnectAsync(url).ConfigureAwait(false);
+                WebSocketClient.SetCancelToken(cancelToken);
+                await WebSocketClient.ConnectAsync(url).ConfigureAwait(false);
 
                 _udp.SetCancelToken(cancelToken);
                 await _udp.StartAsync().ConfigureAwait(false);
@@ -211,7 +211,7 @@ namespace Discord.Audio
 
             //Wait for tasks to complete
             await _udp.StopAsync().ConfigureAwait(false);
-            await _webSocketClient.DisconnectAsync().ConfigureAwait(false);
+            await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;
         }

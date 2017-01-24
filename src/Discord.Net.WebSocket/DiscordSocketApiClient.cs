@@ -26,9 +26,10 @@ namespace Discord.API
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
-        private readonly IWebSocketClient _gatewayClient;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
+        
+        internal IWebSocketClient WebSocketClient { get; }
 
         public ConnectionState ConnectionState { get; private set; }
 
@@ -36,9 +37,9 @@ namespace Discord.API
             RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
             : base(restClientProvider, userAgent, defaultRetryMode, serializer, true)
         {            
-            _gatewayClient = webSocketProvider();
-            //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
-            _gatewayClient.BinaryMessage += async (data, index, count) =>
+            WebSocketClient = webSocketProvider();
+            //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
+            WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))
                 using (var decompressed = new MemoryStream())
@@ -54,7 +55,7 @@ namespace Discord.API
                     }
                 }
             };
-            _gatewayClient.TextMessage += async text =>
+            WebSocketClient.TextMessage += async text =>
             {
                 using (var reader = new StringReader(text))
                 using (var jsonReader = new JsonTextReader(reader))
@@ -63,7 +64,7 @@ namespace Discord.API
                     await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
-            _gatewayClient.Closed += async ex =>
+            WebSocketClient.Closed += async ex =>
             {
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
@@ -76,7 +77,7 @@ namespace Discord.API
                 if (disposing)
                 {
                     _connectCancelToken?.Dispose();
-                    (_gatewayClient as IDisposable)?.Dispose();
+                    (WebSocketClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -95,22 +96,22 @@ namespace Discord.API
         {
             if (LoginState != LoginState.LoggedIn)
                 throw new InvalidOperationException("You must log in before connecting.");
-            if (_gatewayClient == null)
+            if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with websocket support.");
 
             ConnectionState = ConnectionState.Connecting;
             try
             {
                 _connectCancelToken = new CancellationTokenSource();
-                if (_gatewayClient != null)
-                    _gatewayClient.SetCancelToken(_connectCancelToken.Token);
+                if (WebSocketClient != null)
+                    WebSocketClient.SetCancelToken(_connectCancelToken.Token);
 
                 if (_gatewayUrl == null)
                 {
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}";
                 }
-                await _gatewayClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
+                await WebSocketClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
             }
@@ -142,7 +143,7 @@ namespace Discord.API
         }
         internal override async Task DisconnectInternalAsync()
         {
-            if (_gatewayClient == null)
+            if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with websocket support.");
 
             if (ConnectionState == ConnectionState.Disconnected) return;
@@ -151,7 +152,7 @@ namespace Discord.API
             try { _connectCancelToken?.Cancel(false); }
             catch { }
 
-            await _gatewayClient.DisconnectAsync().ConfigureAwait(false);
+            await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;
         }
@@ -168,7 +169,7 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(_gatewayClient, null, bytes, true, options)).ConfigureAwait(false);
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
@@ -192,7 +193,7 @@ namespace Discord.API
             };
             var msg = new IdentifyParams()
             {
-                Token = _authToken,
+                Token = AuthToken,
                 Properties = props,
                 LargeThreshold = largeThreshold,
                 UseCompression = useCompression,
@@ -207,7 +208,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var msg = new ResumeParams()
             {
-                Token = _authToken,
+                Token = AuthToken,
                 SessionId = sessionId,
                 Sequence = lastSeq
             };

@@ -31,12 +31,10 @@ namespace Discord.API
 
         protected readonly JsonSerializer _serializer;
         protected readonly SemaphoreSlim _stateLock;
-        private readonly RestClientProvider _restClientProvider;
+        private readonly RestClientProvider RestClientProvider;
 
-        protected string _authToken;
         protected bool _isDisposed;
         private CancellationTokenSource _loginCancelToken;
-        private IRestClient _restClient;
         private bool _fetchCurrentUser;
 
         public RetryMode DefaultRetryMode { get; }
@@ -45,6 +43,8 @@ namespace Discord.API
 
         public LoginState LoginState { get; private set; }
         public TokenType AuthTokenType { get; private set; }
+        internal string AuthToken { get; private set; }
+        internal IRestClient RestClient { get; private set; }
         internal User CurrentUser { get; private set; }
 
         public ulong? CurrentUserId => CurrentUser?.Id;
@@ -52,7 +52,7 @@ namespace Discord.API
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
             JsonSerializer serializer = null, bool fetchCurrentUser = true)
         {
-            _restClientProvider = restClientProvider;
+            RestClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
@@ -65,10 +65,10 @@ namespace Discord.API
         }
         internal void SetBaseUrl(string baseUrl)
         {
-            _restClient = _restClientProvider(baseUrl);
-            _restClient.SetHeader("accept", "*/*");
-            _restClient.SetHeader("user-agent", UserAgent);
-            _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
+            RestClient = RestClientProvider(baseUrl);
+            RestClient.SetHeader("accept", "*/*");
+            RestClient.SetHeader("user-agent", UserAgent);
+            RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
         }
         internal static string GetPrefixedToken(TokenType tokenType, string token)
         {
@@ -91,7 +91,7 @@ namespace Discord.API
                 if (disposing)
                 {
                     _loginCancelToken?.Dispose();
-                    (_restClient as IDisposable)?.Dispose();
+                    (RestClient as IDisposable)?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -118,13 +118,13 @@ namespace Discord.API
                 _loginCancelToken = new CancellationTokenSource();
 
                 AuthTokenType = TokenType.User;
-                _authToken = null;
+                AuthToken = null;
                 await RequestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
-                _restClient.SetCancelToken(_loginCancelToken.Token);
+                RestClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
-                _authToken = token;
-                _restClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, _authToken));
+                AuthToken = token;
+                RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
 
                 if (_fetchCurrentUser)
                     CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
@@ -160,7 +160,7 @@ namespace Discord.API
             await RequestQueue.ClearAsync().ConfigureAwait(false);
 
             await RequestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
-            _restClient.SetCancelToken(CancellationToken.None);
+            RestClient.SetCancelToken(CancellationToken.None);
 
             CurrentUser = null;
             LoginState = LoginState.LoggedOut;
@@ -181,7 +181,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var request = new RestRequest(_restClient, method, endpoint, options);
+            var request = new RestRequest(RestClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -197,7 +197,7 @@ namespace Discord.API
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
+            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -212,7 +212,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
+            var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -226,7 +226,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var request = new RestRequest(_restClient, method, endpoint, options);
+            var request = new RestRequest(RestClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -241,7 +241,7 @@ namespace Discord.API
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
             var json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(_restClient, method, endpoint, json, options);
+            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -255,7 +255,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var request = new MultipartRestRequest(_restClient, method, endpoint, multipartArgs, options);
+            var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -294,7 +294,7 @@ namespace Discord.API
                 var ids = new BucketIds(channelId: channelId);
                 return await SendAsync<Channel>("GET", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<Channel> GetChannelAsync(ulong guildId, ulong channelId, RequestOptions options = null)
         {
@@ -310,7 +310,7 @@ namespace Discord.API
                     return null;
                 return model;
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<IReadOnlyCollection<Channel>> GetGuildChannelsAsync(ulong guildId, RequestOptions options = null)
         {
@@ -365,8 +365,8 @@ namespace Discord.API
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.GreaterThan(args.Bitrate, 8000, nameof(args.Bitrate));
-            Preconditions.AtLeast(args.UserLimit, 0, nameof(args.Bitrate));
+            Preconditions.AtLeast(args.Bitrate, 8000, nameof(args.Bitrate));
+            Preconditions.AtLeast(args.UserLimit, 0, nameof(args.UserLimit));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
@@ -407,7 +407,7 @@ namespace Discord.API
                 var ids = new BucketIds(channelId: channelId);
                 return await SendAsync<Message>("GET", () => $"channels/{channelId}/messages/{messageId}", ids, options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<IReadOnlyCollection<Message>> GetChannelMessagesAsync(ulong channelId, GetChannelMessagesParams args, RequestOptions options = null)
         {
@@ -676,7 +676,7 @@ namespace Discord.API
                 var ids = new BucketIds(guildId: guildId);
                 return await SendAsync<Guild>("GET", () => $"guilds/{guildId}", ids, options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<Guild> CreateGuildAsync(CreateGuildParams args, RequestOptions options = null)
         {
@@ -779,7 +779,7 @@ namespace Discord.API
                 var ids = new BucketIds(guildId: guildId);
                 return await SendAsync<GuildEmbed>("GET", () => $"guilds/{guildId}/embed", ids, options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<GuildEmbed> ModifyGuildEmbedAsync(ulong guildId, Rest.ModifyGuildEmbedParams args, RequestOptions options = null)
         {
@@ -859,7 +859,7 @@ namespace Discord.API
             {
                 return await SendAsync<Invite>("GET", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<IReadOnlyCollection<InviteMetadata>> GetGuildInvitesAsync(ulong guildId, RequestOptions options = null)
         {
@@ -915,7 +915,7 @@ namespace Discord.API
                 var ids = new BucketIds(guildId: guildId);
                 return await SendAsync<GuildMember>("GET", () => $"guilds/{guildId}/members/{userId}", ids, options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         public async Task<IReadOnlyCollection<GuildMember>> GetGuildMembersAsync(ulong guildId, GetGuildMembersParams args, RequestOptions options = null)
         {
@@ -1032,7 +1032,7 @@ namespace Discord.API
             {
                 return await SendAsync<User>("GET", () => $"users/{userId}", new BucketIds(), options: options).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { return null; }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
 
         //Current User/DMs
