@@ -1,3 +1,7 @@
+//From https://github.com/akavache/Akavache
+//Copyright (c) 2012 GitHub
+//TODO: Remove once netstandard support is added
+
 using Akavache;
 using System;
 using System.Collections.Generic;
