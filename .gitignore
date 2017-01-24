@@ -202,3 +202,4 @@ project.lock.json
 /docs/_build
 *.pyc
 /.editorconfig
+.vscode/
