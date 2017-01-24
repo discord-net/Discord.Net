@@ -5,5 +5,6 @@ if (Test-Path Env:\APPVEYOR_BUILD_NUMBER) {
 }
 
 dotnet restore Discord.Net.sln
-if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
+if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
 dotnet build Discord.Net.sln -c "Release" -p:BuildNumber="$build"
+if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
