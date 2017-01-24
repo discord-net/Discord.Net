@@ -93,12 +93,9 @@ namespace Discord
             {
                 x.Bitrate = 96000;
                 x.Position = 1;
-                x.UserLimit = 8;
             });
             await voice2.ModifyAsync(x =>
             {
-                x.Bitrate = 64000;
-                x.Position = 1;
                 x.UserLimit = null;
             });
             await voice3.ModifyAsync(x =>
@@ -108,16 +105,24 @@ namespace Discord
                 x.UserLimit = 16;
             });
 
-            CheckVoiceChannels(guild, voice1, voice2, voice3);
+            CheckVoiceChannels(voice1, voice2, voice3);
         }
         [Fact]
         public async Task TestVoiceChannels()
         {
-            CheckVoiceChannels(_guild, (await _guild.GetVoiceChannelsAsync()).ToArray());
+            CheckVoiceChannels((await _guild.GetVoiceChannelsAsync()).ToArray());
         }
-        private static void CheckVoiceChannels(RestGuild guild, params RestVoiceChannel[] voiceChannels)
+        private static void CheckVoiceChannels(params RestVoiceChannel[] voiceChannels)
         {
             Assert.Equal(voiceChannels.Length, 3);
+            Assert.All(voiceChannels, x =>
+            {
+                Assert.NotNull(x);
+                Assert.NotEqual(x.Id, 0UL);
+                Assert.NotEqual(x.UserLimit, 0);
+                Assert.True(x.Bitrate > 0);
+                Assert.True(x.Position >= 0);
+            });
 
             var voice1 = voiceChannels.Where(x => x.Name == "voice1").FirstOrDefault();
             var voice2 = voiceChannels.Where(x => x.Name == "voice2").FirstOrDefault();
@@ -126,11 +131,8 @@ namespace Discord
             Assert.NotNull(voice1);
             Assert.Equal(voice1.Bitrate, 96000);
             Assert.Equal(voice1.Position, 1);
-            Assert.Equal(voice1.UserLimit, 8);
 
             Assert.NotNull(voice2);
-            Assert.Equal(voice2.Bitrate, 64000);
-            Assert.Equal(voice2.Position, 1);
             Assert.Equal(voice2.UserLimit, null);
 
             Assert.NotNull(voice3);
