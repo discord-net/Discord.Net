@@ -237,7 +237,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var msg = new AuthenticateParams
             {
-                AccessToken = _authToken
+                AccessToken = AuthToken
             };
             options.IgnoreState = true;
             return await SendRpcAsync<AuthenticateResponse>("AUTHENTICATE", msg, options: options).ConfigureAwait(false);

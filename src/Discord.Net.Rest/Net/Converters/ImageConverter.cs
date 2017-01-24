@@ -1,5 +1,4 @@
-﻿using Discord.API;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using Model = Discord.API.Image;
 

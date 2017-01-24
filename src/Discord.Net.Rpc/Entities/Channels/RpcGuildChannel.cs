@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.API.Rest;
 using Model = Discord.API.Rpc.Channel;
 using Discord.Rest;
 

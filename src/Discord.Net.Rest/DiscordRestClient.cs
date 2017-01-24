@@ -1,5 +1,4 @@
-﻿using Discord.Net.Queue;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
