@@ -10,6 +10,6 @@
         /// <summary>
         /// The maximum number of users that can be present in a channel.
         /// </summary>
-        public Optional<int> UserLimit { get; set; }
+        public Optional<int?> UserLimit { get; set; }
     }
 }

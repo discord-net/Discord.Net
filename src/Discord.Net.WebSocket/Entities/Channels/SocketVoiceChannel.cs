@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ namespace Discord.WebSocket
     public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
     {
         public int Bitrate { get; private set; }
-        public int UserLimit { get; private set; }
+        public int? UserLimit { get; private set; }
 
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
@@ -35,7 +34,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
 
             Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value;
+            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)

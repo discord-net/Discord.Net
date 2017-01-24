@@ -56,7 +56,7 @@ namespace Discord.Rest
                 Bitrate = args.Bitrate,
                 Name = args.Name,
                 Position = args.Position,
-                UserLimit = args.UserLimit
+                UserLimit = args.UserLimit.IsSpecified ? (args.UserLimit.Value ?? 0) : Optional.Create<int>()
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
