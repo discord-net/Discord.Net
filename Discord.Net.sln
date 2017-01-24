@@ -21,9 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.WS4Net", "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj", "{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.API", "src\Discord.Net.API\Discord.Net.API.csproj", "{547261FC-8BA3-40EA-A040-A38ABDAA8D72}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.UDPClient", "src\Discord.Net.Providers.UDPClient\Discord.Net.Providers.UDPClient.csproj", "{ABC9F4B9-2452-4725-B522-754E0A02E282}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.UdpClient", "src\Discord.Net.Providers.UdpClient\Discord.Net.Providers.UdpClient.csproj", "{ABC9F4B9-2452-4725-B522-754E0A02E282}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}"
 EndProject
