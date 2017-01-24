@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.IO;
+using System;
 
 namespace Discord
 {
@@ -12,10 +13,21 @@ namespace Discord
         
         public static TestConfig LoadFile(string path)
         {
-            using (var stream = new FileStream(path, FileMode.Open))
-            using (var reader = new StreamReader(stream))
-            using (var jsonReader = new JsonTextReader(reader))
-                return new JsonSerializer().Deserialize<TestConfig>(jsonReader);
+            if (File.Exists(path))
+            {
+                using (var stream = new FileStream(path, FileMode.Open))
+                using (var reader = new StreamReader(stream))
+                using (var jsonReader = new JsonTextReader(reader))
+                    return new JsonSerializer().Deserialize<TestConfig>(jsonReader);
+            }
+            else
+            {
+                return new TestConfig()
+                {
+                    Token = Environment.GetEnvironmentVariable("DNET_TEST_TOKEN"),
+                    GuildId = ulong.Parse(Environment.GetEnvironmentVariable("DNET_TEST_GUILDID"))
+                };
+            }
         }
     }
 }
