@@ -2,6 +2,8 @@
 //Copyright (c) 2012 GitHub
 //TODO: Remove once netstandard support is added
 
+#pragma warning disable CS0618
+
 using Akavache;
 using System;
 using System.Collections.Generic;
