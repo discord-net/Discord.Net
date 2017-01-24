@@ -54,12 +54,10 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
 #endif
-                TimeSpan lag = default(TimeSpan);
                 RateLimitInfo info = default(RateLimitInfo);
                 try
                 {
                     var response = await request.SendAsync().ConfigureAwait(false);
-                    lag = DateTimeOffset.UtcNow - DateTimeOffset.Parse(response.Headers["Date"]);
                     info = new RateLimitInfo(response.Headers);
 
                     if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
@@ -72,14 +70,14 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                                     Debug.WriteLine($"[{id}] (!) 429 [Global]");
 #endif
-                                    _queue.PauseGlobal(info, lag);
+                                    _queue.PauseGlobal(info);
                                 }
                                 else
                                 {
 #if DEBUG_LIMITS
                                     Debug.WriteLine($"[{id}] (!) 429");
 #endif
-                                    UpdateRateLimit(id, request, info, lag, true);
+                                    UpdateRateLimit(id, request, info, true);
                                 }
                                 await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
                                 continue; //Retry
@@ -92,6 +90,7 @@ namespace Discord.Net.Queue
 
                                 continue; //Retry
                             default:
+                                int? code = null;
                                 string reason = null;
                                 if (response.Stream != null)
                                 {
@@ -101,12 +100,13 @@ namespace Discord.Net.Queue
                                         using (var jsonReader = new JsonTextReader(reader))
                                         {
                                             var json = JToken.Load(jsonReader);
-                                            reason = json.Value<string>("message");
+                                            try { code = json.Value<int>("code"); } catch { };
+                                            try { reason = json.Value<string>("message"); } catch { };
                                         }
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, reason);
+                                throw new HttpException(response.StatusCode, code, reason);
                         }
                     }
                     else
@@ -142,7 +142,7 @@ namespace Discord.Net.Queue
                 }*/
                 finally
                 {
-                    UpdateRateLimit(id, request, info, lag, false);
+                    UpdateRateLimit(id, request, info, false);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
 #endif
@@ -214,7 +214,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, RestRequest request, RateLimitInfo info, TimeSpan lag, bool is429)
+        private void UpdateRateLimit(int id, RestRequest request, RateLimitInfo info, bool is429)
         {
             if (WindowCount == 0)
                 return;
@@ -250,10 +250,10 @@ namespace Discord.Net.Queue
                 }
                 else if (info.Reset.HasValue)
                 {
-                    resetTick = info.Reset.Value.AddSeconds(/*1.0 +*/ lag.TotalSeconds);
+                    resetTick = info.Reset.Value.AddSeconds(info.Lag?.TotalSeconds ?? 1.0);
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {lag.TotalMilliseconds} ms lag)");
+                    Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {info.Lag?.TotalMilliseconds} ms lag)");
 #endif
                 }
                 else if (request.Options.IsClientBucket && request.Options.BucketId != null)

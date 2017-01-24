@@ -91,9 +91,9 @@ namespace Discord.Net.Queue
                 await Task.Delay(millis).ConfigureAwait(false);
             }
         }
-        internal void PauseGlobal(RateLimitInfo info, TimeSpan lag)
+        internal void PauseGlobal(RateLimitInfo info)
         {
-            _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + lag.TotalMilliseconds);
+            _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + (info.Lag?.TotalMilliseconds ?? 0.0));
         }
 
         private RequestBucket GetOrCreateBucket(string id, RestRequest request)
