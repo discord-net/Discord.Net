@@ -2,8 +2,7 @@
   <PropertyGroup>
     <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix Condition="'$(BuildNumber)' == ''">rc-dev</VersionSuffix>
-    <VersionSuffix Condition="'$(BuildNumber)' != ''">rc-$(BuildNumber)</VersionSuffix>
+    <VersionSuffix>dev</VersionSuffix>
     <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Discord.Net.WebSocket</AssemblyName>
