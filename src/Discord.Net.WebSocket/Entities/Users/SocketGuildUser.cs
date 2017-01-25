@@ -79,7 +79,8 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             base.Update(state, model.User);
-            _joinedAtTicks = model.JoinedAt.UtcTicks;
+            if (model.JoinedAt.IsSpecified)
+                _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             UpdateRoles(model.Roles);
