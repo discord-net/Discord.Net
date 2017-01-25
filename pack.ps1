@@ -1,5 +1,5 @@
 if (Test-Path Env:\APPVEYOR_BUILD_NUMBER) {
-    $build = [convert]::ToInt32($env:APPVEYOR_BUILD_NUMBER).ToString("00000")
+    $build = $env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 } else {
     $build = "dev"
 }
