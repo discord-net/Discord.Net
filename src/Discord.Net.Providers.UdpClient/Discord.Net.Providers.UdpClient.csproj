@@ -16,7 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
-    <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />

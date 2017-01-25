@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.UdpCl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Tests", "test\Discord.Net.Tests\Discord.Net.Tests.csproj", "{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,18 @@ Global
 		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x64.Build.0 = Release|x64
 		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.ActiveCfg = Release|x86
 		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.Build.0 = Release|x86
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|x64.ActiveCfg = Debug|x64
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|x64.Build.0 = Debug|x64
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|x86.ActiveCfg = Debug|x86
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|x86.Build.0 = Debug|x86
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x64.ActiveCfg = Release|x64
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x64.Build.0 = Release|x64
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x86.ActiveCfg = Release|x86
+		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

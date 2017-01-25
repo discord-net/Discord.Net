@@ -15,7 +15,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
-    <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Discord.Net.WebSocket\Net\DefaultWebSocketClient.cs">
