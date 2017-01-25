@@ -40,6 +40,7 @@ namespace Discord.WebSocket
         internal virtual void Update(ClientState state, PresenceModel model)
         {
             Presence = SocketPresence.Create(model);
+            Update(state, model.User);
         }
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
