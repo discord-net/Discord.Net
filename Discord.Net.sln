@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26014.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net", "src\Discord.Net\Discord.Net.csproj", "{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Impls", "Impls", "{288C363D-A636-4EAE-9AC1-4698B641B26E}"
@@ -37,18 +35,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|x64.Build.0 = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Debug|x86.Build.0 = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|Any CPU.Build.0 = Release|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|x64.ActiveCfg = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|x64.Build.0 = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|x86.ActiveCfg = Debug|Any CPU
-		{496DB20A-A455-4D01-B6BC-90FE6D7C6B81}.Release|x86.Build.0 = Debug|Any CPU
 		{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}.Debug|x64.ActiveCfg = Debug|x64
