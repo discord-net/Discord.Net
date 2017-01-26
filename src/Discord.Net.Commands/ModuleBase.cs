@@ -8,11 +8,24 @@ namespace Discord.Commands
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
     {
-        public T Context { get; private set; }
+        public T Context
+        {
+            get { return _context; }
+            private set
+            {
+                _context = value;
+                ContextSet();
+            }
+        }
+        private T _context;
 
         protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
+        }
+        
+        protected virtual void ContextSet()
+        {
         }
 
         //IModuleBase
