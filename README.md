@@ -35,7 +35,6 @@ In order to compile Discord.Net, you require the following:
 The .NET Core and Docker (Preview) workload is required during Visual Studio installation.
 
 ### Using Command Line
-- [.NET Core 1.1 Runtime](https://www.microsoft.com/net/download/core)
 - [.NET Core SDK 1.0 RC3](https://github.com/dotnet/core/blob/master/release-notes/rc3-download.md)
 
 ## Known Issues
