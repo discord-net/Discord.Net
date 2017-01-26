@@ -12,7 +12,7 @@
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
-        <group targetFramework="netstandard1.2">
+        <group targetFramework="netstandard1.1">
             <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
             <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
             <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
