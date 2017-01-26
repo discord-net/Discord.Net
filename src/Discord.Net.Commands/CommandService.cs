@@ -18,7 +18,7 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
         private readonly ImmutableList<Tuple<Type, Type>> _entityTypeReaders; //TODO: Candidate for C#7 Tuple
-        private readonly ConcurrentBag<ModuleInfo> _moduleDefs;
+        private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
         internal readonly bool _caseSensitive;
@@ -38,7 +38,7 @@ namespace Discord.Commands
 
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
-            _moduleDefs = new ConcurrentBag<ModuleInfo>();
+            _moduleDefs = new HashSet<ModuleInfo>();
             _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
@@ -160,8 +160,7 @@ namespace Discord.Commands
         }
         private bool RemoveModuleInternal(ModuleInfo module)
         {
-            var defsRemove = module;
-            if (!_moduleDefs.TryTake(out defsRemove))
+            if (!_moduleDefs.Remove(module))
                 return false;
 
             foreach (var cmd in module.Commands)
