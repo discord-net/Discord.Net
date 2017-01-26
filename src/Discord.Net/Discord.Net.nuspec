@@ -12,11 +12,20 @@
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
-        <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
-        <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
-        <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
-        <dependency id="Discord.Net.Rpc" version="1.0.0-rc-$build$" />
-        <dependency id="Discord.Net.Commands" version="1.0.0-rc-$build$" />
+        <group targetFramework="netstandard1.2">
+            <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc-$build$" />
+        </group>
+        <group targetFramework="netstandard1.3">
+            <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc-$build$" />
+        </group>
     </dependencies>
   </metadata>
 </package>
