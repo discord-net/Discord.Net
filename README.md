@@ -1,6 +1,6 @@
 # Discord.Net v1.0.0-rc
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net) 
-[![MyGet Build Status](https://www.myget.org/BuildSource/Badge/discord-net?identifier=15bf7c42-22dd-4406-93e5-3cafc62bbc85)](https://www.myget.org/)
+[![Build status](https://ci.appveyor.com/api/projects/status/5sb7n8a09w9clute/branch/dev?svg=true)](https://ci.appveyor.com/project/RogueException/discord-net/branch/dev)
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTVjAMPx)
 
 An unofficial .NET API Wrapper for the Discord client (http://discordapp.com).
