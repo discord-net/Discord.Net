@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81</PackageTargetFallback>
+    <RootNamespace>Discord</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="**\*.cs" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Discord.Net.Commands/Discord.Net.Commands.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Core/Discord.Net.Core.csproj" />
@@ -13,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Akavache" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170123-02" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="xunit" Version="2.2.0-beta4-build3444" />
