@@ -313,7 +313,7 @@ namespace Discord.WebSocket
 
         private async Task StartReconnectAsync(Exception ex)
         {
-            if ((ex as WebSocketClosedException).CloseCode == 4004) //Bad Token
+            if ((ex as WebSocketClosedException)?.CloseCode == 4004) //Bad Token
             {
                 _canReconnect = false;
                 _connectTask?.TrySetException(ex);
