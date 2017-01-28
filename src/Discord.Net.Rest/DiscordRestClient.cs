@@ -17,10 +17,11 @@ namespace Discord.Rest
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
 
-        protected override Task OnLoginAsync(TokenType tokenType, string token)
+        protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            base.CurrentUser = RestSelfUser.Create(this, ApiClient.CurrentUser);
-            return Task.Delay(0);
+            var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+            ApiClient.CurrentUserId = user.Id;
+            base.CurrentUser = RestSelfUser.Create(this, user);
         }
         protected override Task OnLogoutAsync()
         {

@@ -69,7 +69,7 @@ namespace Discord.API
 
         public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, 
                 RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, false)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;

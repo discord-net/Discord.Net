@@ -64,7 +64,7 @@ namespace Discord.WebSocket
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = config.Clone();
                     newConfig.ShardId = _shardIds[i];
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock);
+                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i]);
                 }
             }
@@ -86,7 +86,7 @@ namespace Discord.WebSocket
                     var newConfig = _baseConfig.Clone();
                     newConfig.ShardId = _shardIds[i];
                     newConfig.TotalShards = _totalShards;
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock);
+                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i]);
                 }
             }

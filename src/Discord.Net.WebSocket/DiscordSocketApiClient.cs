@@ -35,7 +35,7 @@ namespace Discord.API
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, string userAgent, WebSocketProvider webSocketProvider,
             RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, true)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer)
         {            
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)

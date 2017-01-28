@@ -27,6 +27,7 @@ namespace Discord.WebSocket
         private readonly Logger _gatewayLogger;
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionGroupLock;
+        private readonly DiscordSocketClient _parentClient;
 
         private string _sessionId;
         private int _lastSeq;
@@ -71,9 +72,9 @@ namespace Discord.WebSocket
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null) { }
-        internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock) : this(config, CreateApiClient(config), groupLock) { }
-        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock)
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
+        internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
+        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
             : base(config, client)
         {
             ShardId = config.ShardId ?? 0;
@@ -90,6 +91,7 @@ namespace Discord.WebSocket
             _nextAudioId = 1;
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : "Shard #" + ShardId);
             _connectionGroupLock = groupLock;
+            _parentClient = parentClient;
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -134,8 +136,13 @@ namespace Discord.WebSocket
         
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-            _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+            if (_parentClient == null)
+            {
+                var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+                _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+            }
+            else
+                _voiceRegions = _parentClient._voiceRegions;
         }
         protected override async Task OnLogoutAsync()
         {
@@ -603,6 +610,7 @@ namespace Discord.WebSocket
                                         var state = new ClientState(data.Guilds.Length, data.PrivateChannels.Length);
 
                                         var currentUser = SocketSelfUser.Create(this, state, data.User);
+                                        ApiClient.CurrentUserId = currentUser.Id;
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
                                         {

@@ -35,7 +35,6 @@ namespace Discord.API
 
         protected bool _isDisposed;
         private CancellationTokenSource _loginCancelToken;
-        private bool _fetchCurrentUser;
 
         public RetryMode DefaultRetryMode { get; }
         public string UserAgent { get; }
@@ -45,18 +44,15 @@ namespace Discord.API
         public TokenType AuthTokenType { get; private set; }
         internal string AuthToken { get; private set; }
         internal IRestClient RestClient { get; private set; }
-        internal User CurrentUser { get; private set; }
-
-        public ulong? CurrentUserId => CurrentUser?.Id;
+        internal ulong? CurrentUserId { get; set;}
 
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
-            JsonSerializer serializer = null, bool fetchCurrentUser = true)
+            JsonSerializer serializer = null)
         {
             RestClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
-            _fetchCurrentUser = fetchCurrentUser;
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
@@ -126,9 +122,6 @@ namespace Discord.API
                 AuthToken = token;
                 RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
 
-                if (_fetchCurrentUser)
-                    CurrentUser = await GetMyUserAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-
                 LoginState = LoginState.LoggedIn;
             }
             catch (Exception)
@@ -162,7 +155,7 @@ namespace Discord.API
             await RequestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
             RestClient.SetCancelToken(CancellationToken.None);
 
-            CurrentUser = null;
+            CurrentUserId = null;
             LoginState = LoginState.LoggedOut;
         }
 
@@ -949,7 +942,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            bool isCurrentUser = userId == CurrentUser.Id;
+            bool isCurrentUser = userId == CurrentUserId;
 
             if (isCurrentUser && args.Nickname.IsSpecified)
             {

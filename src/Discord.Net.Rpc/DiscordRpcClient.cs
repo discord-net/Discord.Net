@@ -435,6 +435,7 @@ namespace Discord.Rpc
                                             {
                                                 var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
                                                 CurrentUser = RestSelfUser.Create(this, response.User);
+                                                ApiClient.CurrentUserId = CurrentUser.Id;
                                                 ApplicationInfo = RestApplication.Create(this, response.Application);
                                                 Scopes = response.Scopes;
                                                 TokenExpiresAt = response.Expires;
