@@ -551,7 +551,7 @@ namespace Discord.WebSocket
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
                             _heartbeatTime = 0;
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, LogManager.ClientLogger);
+                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, _gatewayLogger);
                         }
                         break;
                     case GatewayOpCode.Heartbeat:
@@ -640,7 +640,7 @@ namespace Discord.WebSocket
                                         await SyncGuildsAsync().ConfigureAwait(false);
 
                                     _lastGuildAvailableTime = Environment.TickCount;
-                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, LogManager.ClientLogger);
+                                    _guildDownloadTask = WaitForGuildsAsync(_cancelToken.Token, _gatewayLogger);
 
                                     await _readyEvent.InvokeAsync().ConfigureAwait(false);
 

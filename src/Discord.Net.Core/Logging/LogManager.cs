@@ -6,7 +6,7 @@ namespace Discord.Logging
     internal class LogManager
     {
         public LogSeverity Level { get; }
-        public Logger ClientLogger { get; }
+        private Logger ClientLogger { get; }
 
         public event Func<LogMessage, Task> Message { add { _messageEvent.Add(value); } remove { _messageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<LogMessage, Task>> _messageEvent = new AsyncEvent<Func<LogMessage, Task>>();
