@@ -26,7 +26,7 @@ namespace Discord.Net.WebSockets
         private Task _task;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
-        private bool _isDisposed;
+        private bool _isDisposed, _isDisconnecting;
 
         public DefaultWebSocketClient()
         {
@@ -98,21 +98,42 @@ namespace Discord.Net.WebSockets
         {
             try { _cancelTokenSource.Cancel(false); } catch { }
 
-            if (!isDisposing)
-                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
-
-            if (_client != null && _client.State == WebSocketState.Open)
+            _isDisconnecting = true;
+            try
             {
-                var token = new CancellationToken();
+                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
+                _task = null;
+            }
+            finally { _isDisconnecting = false; }
+
+            if (_client != null)
+            {
                 if (!isDisposing)
                 {
-                    try { await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", token); }
+                    try { await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", new CancellationToken()); }
                     catch { }
                 }
                 try { _client.Dispose(); }
                 catch { }
+                
                 _client = null;
             }
+        }
+        private async Task OnClosed(Exception ex)
+        {
+            if (_isDisconnecting)
+                return; //Ignore, this disconnect was requested.
+
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectInternalAsync(false);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+            await Closed(ex);
         }
 
         public void SetHeader(string key, string value)
@@ -167,10 +188,7 @@ namespace Discord.Net.WebSockets
                     int resultCount;
                         
                     if (socketResult.MessageType == WebSocketMessageType.Close)
-                    {
-                        var _ = Closed(new WebSocketClosedException((int)socketResult.CloseStatus, socketResult.CloseStatusDescription));
-                        return;
-                    }
+                        throw new WebSocketClosedException((int)socketResult.CloseStatus, socketResult.CloseStatusDescription);
 
                     if (!socketResult.EndOfMessage)
                     {
@@ -217,13 +235,13 @@ namespace Discord.Net.WebSockets
             }
             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
             {
-                var _ = Closed(new Exception("Connection timed out.", ex));
+                var _ = OnClosed(new Exception("Connection timed out.", ex));
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 //This cannot be awaited otherwise we'll deadlock when DiscordApiClient waits for this task to complete.
-                var _ = Closed(ex);
+                var _ = OnClosed(ex);
             }
         }
     }
