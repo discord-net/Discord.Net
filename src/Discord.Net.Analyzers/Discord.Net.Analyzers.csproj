@@ -1,0 +1,32 @@
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(BuildNumber)' == ''">rc-dev</VersionSuffix>
+    <VersionSuffix Condition="'$(BuildNumber)' != ''">rc-$(BuildNumber)</VersionSuffix>
+    <TargetFrameworks>netstandard1.3</TargetFrameworks>
+    <AssemblyName>Discord.Net.Analyzers</AssemblyName>
+    <Authors>RogueException</Authors>
+    <Description>A Discord.Net extension adding compile-time analysis.</Description>
+    <PackageTags>discord;discordapp</PackageTags>
+    <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
+    <RootNamespace>Discord.Analyzers</RootNamespace>
+    <PackageTargetFallback>portable-net45+win81</PackageTargetFallback>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.0.0-rc2">
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>
