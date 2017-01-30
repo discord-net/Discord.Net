@@ -166,10 +166,12 @@ namespace Discord.Commands
                 instance.SetContext(ctx);
                 try
                 {
+                    instance.BeforeExecute();
                     return method.Invoke(instance, args) as Task ?? Task.Delay(0);
                 }
                 finally
                 {
+                    instance.AfterExecute();
                     (instance as IDisposable)?.Dispose();
                 }
             };
