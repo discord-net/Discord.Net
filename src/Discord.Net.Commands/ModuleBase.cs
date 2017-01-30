@@ -15,11 +15,11 @@ namespace Discord.Commands
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
 
-        protected void BeforeExecute()
+        protected virtual void BeforeExecute()
         {
         }
 
-        protected void AfterExecute()
+        protected virtual void AfterExecute()
         {
         }
 
