@@ -34,22 +34,42 @@ namespace Discord.WebSocket
         public UdpSocketProvider UdpSocketProvider { get; set; }
 
         /// <summary> Gets or sets whether or not all users should be downloaded as guilds come available. </summary>
-        public bool DownloadUsersOnGuildAvailable { get; set; } = false;
+        public bool AlwaysDownloadUsers { get; set; } = false;
 
         public DiscordSocketConfig()
         {
 #if NETSTANDARD1_3
-            WebSocketProvider = () => new DefaultWebSocketClient();
-            UdpSocketProvider = () => new DefaultUdpSocket();
+            WebSocketProvider = () => 
+            {
+                try
+                {
+                    return new DefaultWebSocketClient();                    
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    throw new PlatformNotSupportedException("The default websocket provider is not supported on this platform.", ex);
+                }
+            };
+            UdpSocketProvider = () => 
+            {
+                try
+                {
+                    return new DefaultUdpSocket();
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    throw new PlatformNotSupportedException("The default UDP provider is not supported on this platform.", ex);
+                }
+            };
 #else
             WebSocketProvider = () =>
             {
-                throw new InvalidOperationException("The default websocket provider is not supported on this platform.\n" +
+                throw new PlatformNotSupportedException("The default websocket provider is not supported on this platform.\n" +
                     "You must specify a WebSocketProvider or target a runtime supporting .NET Standard 1.3, such as .NET Framework 4.6+.");
             };
             UdpSocketProvider = () =>
             {
-                throw new InvalidOperationException("The default UDP provider is not supported on this platform.\n" +
+                throw new PlatformNotSupportedException("The default UDP provider is not supported on this platform.\n" +
                     "You must specify a UdpSocketProvider or target a runtime supporting .NET Standard 1.3, such as .NET Framework 4.6+.");
             };
 #endif
