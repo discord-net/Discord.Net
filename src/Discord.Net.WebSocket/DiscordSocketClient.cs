@@ -42,6 +42,7 @@ namespace Discord.WebSocket
         private bool _canReconnect;
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
+        private ConcurrentHashSet<ulong> _downloadUsersFor;
 
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
@@ -61,7 +62,7 @@ namespace Discord.WebSocket
         internal int ConnectionTimeout { get; private set; }
         internal UdpSocketProvider UdpSocketProvider { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
-        internal bool DownloadUsersOnGuildAvailable { get; private set; }
+        internal bool AlwaysDownloadUsers { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
@@ -84,9 +85,10 @@ namespace Discord.WebSocket
             AudioMode = config.AudioMode;
             UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
-            DownloadUsersOnGuildAvailable = config.DownloadUsersOnGuildAvailable;
+            AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             ConnectionTimeout = config.ConnectionTimeout;
             State = new ClientState(0, 0);
+            _downloadUsersFor = new ConcurrentHashSet<ulong>();
             
             _nextAudioId = 1;
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : "Shard #" + ShardId);
@@ -119,14 +121,17 @@ namespace Discord.WebSocket
             GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
             LatencyUpdated += async (old, val) => await _gatewayLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
 
-            if (DownloadUsersOnGuildAvailable)
+            GuildAvailable += g =>
             {
-                GuildAvailable += g =>
+                if (ConnectionState == ConnectionState.Connected && (AlwaysDownloadUsers || _downloadUsersFor.ContainsKey(g.Id)))
                 {
-                    var _ = g.DownloadUsersAsync();
-                    return Task.Delay(0);
-                };
-            }
+                    if (!g.HasAllMembers)
+                    {
+                        var _ = g.DownloadUsersAsync();
+                    }
+                }
+                return Task.Delay(0);
+            };
 
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
@@ -151,10 +156,11 @@ namespace Discord.WebSocket
 
             _applicationInfo = null;
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
+            _downloadUsersFor.Clear();
         }
         
         /// <inheritdoc />
-        public async Task ConnectAsync(bool waitForGuilds = true)
+        public async Task ConnectAsync()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
@@ -162,13 +168,6 @@ namespace Discord.WebSocket
                 await ConnectInternalAsync(false).ConfigureAwait(false);
             }
             finally { _connectionLock.Release(); }
-
-            if (waitForGuilds)
-            {
-                var downloadTask = _guildDownloadTask;
-                if (downloadTask != null)
-                    await _guildDownloadTask.ConfigureAwait(false);
-            }
         }
         private async Task ConnectInternalAsync(bool isReconnecting)
         {
@@ -227,6 +226,8 @@ namespace Discord.WebSocket
                     await _gatewayLogger.DebugAsync("Raising Event").ConfigureAwait(false);
                     ConnectionState = ConnectionState.Connected;
                     await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
+
+                    await ProcessUserDownloadsAsync(_downloadUsersFor.Select(x => GetGuild(x)).Where(x => x != null).ToImmutableArray()).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -442,31 +443,23 @@ namespace Discord.WebSocket
             return null;
         }
 
-        /// <summary> Downloads the users list for all large guilds. </summary>
-        public Task DownloadAllUsersAsync() 
-            => DownloadUsersAsync(State.Guilds.Where(x => !x.HasAllMembers));
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
+        public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
+        {
+            foreach (var guild in guilds)
+                _downloadUsersFor.TryAdd(guild.Id);
+
+            if (ConnectionState == ConnectionState.Connected)
+            {
+                //Race condition leads to guilds being requested twice, probably okay
+                await ProcessUserDownloadsAsync(guilds.Select(x => GetGuild(x.Id)).Where(x => x != null)).ConfigureAwait(false);
+            }
+        }
+        private async Task ProcessUserDownloadsAsync(IEnumerable<SocketGuild> guilds)
         {
             var cachedGuilds = guilds.ToImmutableArray();
-            if (cachedGuilds.Length == 0) return;
 
-            //Wait for unsynced guilds to sync first.
-            var unsyncedGuilds = guilds.Select(x => x.SyncPromise).Where(x => !x.IsCompleted).ToImmutableArray();
-            if (unsyncedGuilds.Length > 0)
-                await Task.WhenAll(unsyncedGuilds).ConfigureAwait(false);
-
-            //Download offline members
             const short batchSize = 50;
-
-            if (cachedGuilds.Length == 1)
-            {
-                if (!cachedGuilds[0].HasAllMembers)
-                    await ApiClient.SendRequestMembersAsync(new ulong[] { cachedGuilds[0].Id }).ConfigureAwait(false);
-                await cachedGuilds[0].DownloaderPromise.ConfigureAwait(false);
-                return;
-            }
-
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -795,6 +788,7 @@ namespace Discord.WebSocket
                                     {
                                         await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
+                                        _downloadUsersFor.TryRemove(data.Id);
                                         var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
@@ -1727,6 +1721,12 @@ namespace Discord.WebSocket
             {
                 await logger.ErrorAsync("Heartbeat Errored", ex).ConfigureAwait(false);
             }
+        }
+        public async Task WaitForGuildsAsync()
+        {
+            var downloadTask = _guildDownloadTask;
+            if (downloadTask != null)
+                await _guildDownloadTask.ConfigureAwait(false);
         }
         private async Task WaitForGuildsAsync(CancellationToken cancelToken, Logger logger)
         {

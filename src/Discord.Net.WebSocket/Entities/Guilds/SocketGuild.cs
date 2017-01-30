@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         public SocketTextChannel DefaultChannel => GetTextChannel(Id);
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
-        public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
+        public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;

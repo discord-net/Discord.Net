@@ -112,12 +112,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task ConnectAsync(bool waitForGuilds = true)
+        public async Task ConnectAsync()
         {
             await _connectionLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await ConnectInternalAsync(waitForGuilds).ConfigureAwait(false);
+                await ConnectInternalAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -126,10 +126,10 @@ namespace Discord.WebSocket
             }
             finally { _connectionLock.Release(); }
         }
-        private async Task ConnectInternalAsync(bool waitForGuilds)
+        private async Task ConnectInternalAsync()
         {
             await Task.WhenAll(
-                _shards.Select(x => x.ConnectAsync(waitForGuilds))
+                _shards.Select(x => x.ConnectAsync())
             ).ConfigureAwait(false);
 
             CurrentUser = _shards[0].CurrentUser;   
@@ -253,12 +253,6 @@ namespace Discord.WebSocket
         public RestVoiceRegion GetVoiceRegion(string id)
             => _shards[0].GetVoiceRegion(id);
 
-        /// <summary> Downloads the users list for all large guilds. </summary>
-        public async Task DownloadAllUsersAsync()
-        {
-            for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].DownloadAllUsersAsync().ConfigureAwait(false);
-        }
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
         public async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
         {
