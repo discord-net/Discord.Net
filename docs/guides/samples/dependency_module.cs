@@ -23,9 +23,9 @@ public class ModuleB
     private CommandService _commands;
     private NotificationService _notification;
     
-    public ModuleB(CommandService commands, IDependencyMap map)
+    public ModuleB(CommandService commands, NotificationService notifications)
     {
         _commands = commands;
-        _notification = map.Get<NotificationService>();
+        _notification = notifications;
     }
 }
