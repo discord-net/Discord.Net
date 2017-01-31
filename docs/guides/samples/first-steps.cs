@@ -17,8 +17,8 @@ class Program
     static void Main(string[] args)
     {
         // Call the Program constructor, followed by the 
-        // AsyncMain method and wait until it finishes (which should be never).
-        new Program().AsyncMain().GetAwaiter().GetResult();
+        // MainAsync method and wait until it finishes (which should be never).
+        new Program().MainAsync().GetAwaiter().GetResult();
     }
 
     private Program()
@@ -62,7 +62,7 @@ class Program
         return Task.CompletedTask;
     }
 
-    private async Task AsyncMain()
+    private async Task MainAsync()
     {
         // Subscribe the logging handler.
         _client.Log += Logger;
