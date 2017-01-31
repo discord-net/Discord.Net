@@ -99,7 +99,7 @@ class Program
         var msg = arg as SocketUserMessage;
         if (msg == null) return;
 
-		// Create a number to track where the prefix ends and the command begins
+        // Create a number to track where the prefix ends and the command begins
         int pos = 0;
         // Replace the '!' with whatever character
         // you want to prefix your commands with.
