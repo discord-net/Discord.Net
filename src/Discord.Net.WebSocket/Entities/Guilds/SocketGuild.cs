@@ -515,7 +515,7 @@ namespace Discord.WebSocket
                 {
                     var audioClient = new AudioClient(this, id);
                     var promise = _audioConnectPromise;
-                    audioClient.Disconnected += async ex =>
+                    audioClient.Disconnected += async (client, ex) =>
                     {
                         //If the initial connection hasn't been made yet, reconnecting will lead to deadlocks
                         if (!promise.Task.IsCompleted)
