@@ -210,6 +210,8 @@ namespace Discord.Commands
                 }
             }
 
+            builder.ParameterType = paramType;
+
             if (builder.TypeReader == null)
             {
                 var readers = service.GetTypeReaders(paramType);
@@ -220,7 +222,6 @@ namespace Discord.Commands
                 else
                     reader = service.GetDefaultTypeReader(paramType);
 
-                builder.ParameterType = paramType;
                 builder.TypeReader = reader;
             }
         }
