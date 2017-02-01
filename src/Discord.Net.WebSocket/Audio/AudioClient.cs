@@ -14,18 +14,18 @@ namespace Discord.Audio
 {
     internal class AudioClient : IAudioClient, IDisposable
     {
-        public event Func<Task> Connected
+        public event Func<IAudioClient, Task> Connected
         {
             add { _connectedEvent.Add(value); }
             remove { _connectedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Exception, Task> Disconnected
+        private readonly AsyncEvent<Func<IAudioClient, Task>> _connectedEvent = new AsyncEvent<Func<IAudioClient, Task>>();
+        public event Func<IAudioClient, Exception, Task> Disconnected
         {
             add { _disconnectedEvent.Add(value); }
             remove { _disconnectedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
+        private readonly AsyncEvent<Func<IAudioClient, Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<IAudioClient, Exception, Task>>();
         public event Func<int, int, Task> LatencyUpdated
         {
             add { _latencyUpdatedEvent.Add(value); }
@@ -115,7 +115,7 @@ namespace Discord.Audio
                 await ApiClient.SendIdentityAsync(userId, sessionId, token).ConfigureAwait(false);
                 await _connectTask.Task.ConfigureAwait(false);
 
-                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
+                await _connectedEvent.InvokeAsync(this).ConfigureAwait(false);
                 ConnectionState = ConnectionState.Connected;
                 await _audioLogger.InfoAsync("Connected").ConfigureAwait(false);
             }
@@ -164,7 +164,7 @@ namespace Discord.Audio
 
             ConnectionState = ConnectionState.Disconnected;
             await _audioLogger.InfoAsync("Disconnected").ConfigureAwait(false);
-            await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
+            await _disconnectedEvent.InvokeAsync(this, ex).ConfigureAwait(false);
 
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
@@ -311,6 +311,9 @@ namespace Discord.Audio
             }
             catch (OperationCanceledException) { }
         }
+        
+        /// <inheritdoc />
+        IGuild IAudioClient.Guild => Guild;
 
         internal void Dispose(bool disposing)
         {

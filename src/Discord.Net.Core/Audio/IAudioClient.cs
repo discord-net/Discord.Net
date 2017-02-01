@@ -5,14 +5,16 @@ namespace Discord.Audio
 {
     public interface IAudioClient : IDisposable
     {
-        event Func<Task> Connected;
-        event Func<Exception, Task> Disconnected;
+        event Func<IAudioClient, Task> Connected;
+        event Func<IAudioClient, Exception, Task> Disconnected;
         event Func<int, int, Task> LatencyUpdated;
         
         /// <summary> Gets the current connection state of this client. </summary>
         ConnectionState ConnectionState { get; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         int Latency { get; }
+        /// <summary> Gets the Guild this client is in. </summary>
+        IGuild Guild { get; }
 
         Task DisconnectAsync();
 
