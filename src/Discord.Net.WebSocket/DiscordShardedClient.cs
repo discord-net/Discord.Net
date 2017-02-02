@@ -303,11 +303,11 @@ namespace Discord.WebSocket
             client.ChannelUpdated += (oldChannel, newChannel) => _channelUpdatedEvent.InvokeAsync(oldChannel, newChannel);
 
             client.MessageReceived += (msg) => _messageReceivedEvent.InvokeAsync(msg);
-            client.MessageDeleted += (id, msg) => _messageDeletedEvent.InvokeAsync(id, msg);
-            client.MessageUpdated += (oldMsg, newMsg) => _messageUpdatedEvent.InvokeAsync(oldMsg, newMsg);
-            client.ReactionAdded += (id, msg, reaction) => _reactionAddedEvent.InvokeAsync(id, msg, reaction);
-            client.ReactionRemoved += (id, msg, reaction) => _reactionRemovedEvent.InvokeAsync(id, msg, reaction);
-            client.ReactionsCleared += (id, msg) => _reactionsClearedEvent.InvokeAsync(id, msg);
+            client.MessageDeleted += (cache, channel) => _messageDeletedEvent.InvokeAsync(cache, channel);
+            client.MessageUpdated += (oldMsg, newMsg, channel) => _messageUpdatedEvent.InvokeAsync(oldMsg, newMsg, channel);
+            client.ReactionAdded += (cache, channel, reaction) => _reactionAddedEvent.InvokeAsync(cache, channel, reaction);
+            client.ReactionRemoved += (cache, channel, reaction) => _reactionRemovedEvent.InvokeAsync(cache, channel, reaction);
+            client.ReactionsCleared += (cache, channel) => _reactionsClearedEvent.InvokeAsync(cache, channel);
 
             client.RoleCreated += (role) => _roleCreatedEvent.InvokeAsync(role);
             client.RoleDeleted += (role) => _roleDeletedEvent.InvokeAsync(role);

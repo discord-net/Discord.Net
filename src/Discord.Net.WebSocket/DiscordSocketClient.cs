@@ -485,25 +485,25 @@ namespace Discord.WebSocket
             }
         }
 
-        public async Task SetStatus(UserStatus status)
+        public async Task SetStatusAsync(UserStatus status)
         {
             Status = status;
             if (status == UserStatus.AFK)
                 _statusSince = DateTimeOffset.UtcNow;
             else
                 _statusSince = null;
-            await SendStatus().ConfigureAwait(false);
+            await SendStatusAsync().ConfigureAwait(false);
         }
-        public async Task SetGame(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
             if (name != null)
                 Game = new Game(name, streamUrl, streamType);
             else
                 Game = null;
             CurrentUser.Presence = new SocketPresence(Status, Game);
-            await SendStatus().ConfigureAwait(false);
+            await SendStatusAsync().ConfigureAwait(false);
         }
-        private async Task SendStatus()
+        private async Task SendStatusAsync()
         {
             var game = Game;
             var status = Status;
@@ -1205,8 +1205,9 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketUser user = State.GetUser(data.User.Id) ??
-                                            (SocketUser) SocketSimpleUser.Create(this, State, data.User);
+                                        SocketUser user = State.GetUser(data.User.Id);
+                                        if (user == null)
+                                            user = SocketSimpleUser.Create(this, State, data.User);
                                         await _userUnbannedEvent.InvokeAsync(user, guild).ConfigureAwait(false);
                                     }
                                     else
