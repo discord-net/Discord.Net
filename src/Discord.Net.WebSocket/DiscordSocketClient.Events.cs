@@ -59,36 +59,36 @@ namespace Discord.WebSocket
             remove { _messageReceivedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<SocketMessage, Task>> _messageReceivedEvent = new AsyncEvent<Func<SocketMessage, Task>>();
-        public event Func<Cacheable<SocketMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted
+        public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted
         {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Cacheable<SocketMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<SocketMessage, ulong>, ISocketMessageChannel, Task>>();
-        public event Func<Cacheable<SocketMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated
+        private readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
+        public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated
         {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Cacheable<SocketMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<SocketMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>>();
-        public event Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded
+        private readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>>();
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded
         {
             add { _reactionAddedEvent.Add(value); }
             remove { _reactionAddedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
-        public event Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved
+        private readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved
         {
             add { _reactionRemovedEvent.Add(value); }
             remove { _reactionRemovedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
-        public event Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared
+        private readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared
         {
             add { _reactionsClearedEvent.Add(value); }
             remove { _reactionsClearedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<SocketUserMessage, ulong>, ISocketMessageChannel, Task>>();
+        private readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>>();
 
         //Roles
         public event Func<SocketRole, Task> RoleCreated

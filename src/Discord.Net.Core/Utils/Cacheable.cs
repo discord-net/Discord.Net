@@ -41,6 +41,8 @@ namespace Discord
         /// Downloads this entity to cache.
         /// </summary>
         /// <returns>An awaitable Task containing the downloaded entity.</returns>
+        /// <exception cref="Discord.Net.HttpException">Thrown when used from a user account.</exception>
+        /// <exception cref="NullReferenceException">Thrown when the message is deleted.</exception>
         public async Task<TEntity> DownloadAsync()
         {
             return await DownloadFunc();
@@ -50,6 +52,8 @@ namespace Discord
         /// Returns the cached entity if it exists; otherwise downloads it.
         /// </summary>
         /// <returns>An awaitable Task containing a cached or downloaded entity.</returns>
+        /// <exception cref="Discord.Net.HttpException">Thrown when used from a user account.</exception>
+        /// <exception cref="NullReferenceException">Thrown when the message is deleted and is not in cache.</exception>
         public async Task<TEntity> GetOrDownloadAsync() => HasValue ? Value : await DownloadAsync();
     }
 }
