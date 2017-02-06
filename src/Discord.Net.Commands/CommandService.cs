@@ -254,7 +254,7 @@ namespace Discord.Commands
                 {
                     if (commands.Count == 1)
                         return preconditionResult;
-                    else if (secondOption != null) //we already got our last hope, so we can skip
+                    else if (secondOption != null) //we already got our second option, so we can skip
                         continue;
                 }
                 var parseResult = await commands[i].ParseAsync(context, searchResult).ConfigureAwait(false);
@@ -276,7 +276,7 @@ namespace Discord.Commands
                     {
                         if (commands.Count == 1)
                             return parseResult;
-                        else if (secondOption != null) //we already got our last hope, so we can skip
+                        else if (secondOption != null) //we already got our second option, so we can skip
                             continue;
                     }
                 }
@@ -288,7 +288,7 @@ namespace Discord.Commands
             }
 
             if (secondOption != null)
-                return secondOption;
+                return secondOption.Value;
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
         }
     }
