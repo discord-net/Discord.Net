@@ -250,7 +250,7 @@ namespace Discord.Commands
                 var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
-                    if (commands.Count == 1)
+                    if (i == 1)
                         return preconditionResult;
                     else
                         continue;
