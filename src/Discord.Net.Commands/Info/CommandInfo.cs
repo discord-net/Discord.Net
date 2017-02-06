@@ -85,13 +85,13 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult)
         {
-            if (!searchResult.IsSuccess)
+            if (!searchResult.IsSuccess)                                            // I think this should be removed too. Same reason as below.
                 return ParseResult.FromError(searchResult);
-            if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
-                return ParseResult.FromError(preconditionResult.Value);
-            
+            //if (preconditionResult != null && !preconditionResult.Value.IsSuccess)    Why? It could be our last hope and some preconditions removed it?
+            //    return ParseResult.FromError(preconditionResult.Value);               Parse should parse, not check if the preconditions are okay, this is ExecuteAsync's job.
+
             string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }

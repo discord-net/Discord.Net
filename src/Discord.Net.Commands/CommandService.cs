@@ -245,6 +245,7 @@ namespace Discord.Commands
             if (!searchResult.IsSuccess)
                 return searchResult;
 
+            PreconditionResult? secondOption = null;
             var commands = searchResult.Commands;
             for (int i = commands.Count - 1; i >= 0; i--)
             {
@@ -253,11 +254,10 @@ namespace Discord.Commands
                 {
                     if (commands.Count == 1)
                         return preconditionResult;
-                    else
+                    else if (secondOption != null) //we already got our last hope, so we can skip
                         continue;
                 }
-
-                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
+                var parseResult = await commands[i].ParseAsync(context, searchResult).ConfigureAwait(false);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)
@@ -272,19 +272,23 @@ namespace Discord.Commands
                                 break;
                         }
                     }
-
                     if (!parseResult.IsSuccess)
                     {
                         if (commands.Count == 1)
                             return parseResult;
-                        else
+                        else if (secondOption != null) //we already got our last hope, so we can skip
                             continue;
                     }
                 }
 
-                return await commands[i].ExecuteAsync(context, parseResult, dependencyMap).ConfigureAwait(false);
+                if (parseResult.IsSuccess && preconditionResult.IsSuccess)
+                    return await commands[i].ExecuteAsync(context, parseResult, dependencyMap).ConfigureAwait(false); // Perfect match and highest priority
+                else if (secondOption == null && parseResult.IsSuccess)
+                    secondOption = preconditionResult; // It's a parse match, not perfect, but the highest priority
             }
 
+            if (secondOption != null)
+                return secondOption;
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
         }
     }
