@@ -74,8 +74,12 @@ namespace Discord.Rest
             var args = new CreateChannelInviteParams { IsTemporary = isTemporary };
             if (maxAge.HasValue)
                 args.MaxAge = maxAge.Value;
+            else
+                args.MaxAge = 0;
             if (maxUses.HasValue)
                 args.MaxUses = maxUses.Value;
+            else
+                args.MaxUses = 0;
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
