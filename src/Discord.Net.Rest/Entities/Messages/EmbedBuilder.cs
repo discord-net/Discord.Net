@@ -92,6 +92,11 @@ namespace Discord
             return this;
         }
 
+        public EmbedBuilder AddField(EmbedFieldBuilder field)
+        {
+            _fields.Add(field);
+            return this;
+        }
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
             var field = new EmbedFieldBuilder();
