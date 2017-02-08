@@ -39,8 +39,12 @@ namespace Discord.Rest
         public Task<RestChannel> GetChannelAsync(ulong id)
             => ClientHelper.GetChannelAsync(this, id);
         /// <inheritdoc />
-        public Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
+        public Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync()
             => ClientHelper.GetPrivateChannelsAsync(this);
+        public Task<IReadOnlyCollection<RestDMChannel>> GetDMChannelsAsync()
+            => ClientHelper.GetDMChannelsAsync(this);
+        public Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync()
+            => ClientHelper.GetGroupChannelsAsync(this);
 
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
@@ -97,6 +101,20 @@ namespace Discord.Rest
                 return await GetPrivateChannelsAsync().ConfigureAwait(false);
             else
                 return ImmutableArray.Create<IPrivateChannel>();
+        }
+        async Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetDMChannelsAsync().ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IDMChannel>();
+        }
+        async Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetGroupChannelsAsync().ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IGroupChannel>();
         }
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()

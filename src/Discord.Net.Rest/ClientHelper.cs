@@ -24,10 +24,24 @@ namespace Discord.Rest
                 return RestChannel.Create(client, model);
             return null;
         }
-        public static async Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client)
+        public static async Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
-            return models.Select(x => RestDMChannel.Create(client, x)).ToImmutableArray();
+            return models.Select(x => RestChannel.CreatePrivate(client, x)).ToImmutableArray();
+        }
+        public static async Task<IReadOnlyCollection<RestDMChannel>> GetDMChannelsAsync(BaseDiscordClient client)
+        {
+            var models = await client.ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
+            return models
+                .Where(x => x.Type == ChannelType.DM)
+                .Select(x => RestDMChannel.Create(client, x)).ToImmutableArray();
+        }
+        public static async Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync(BaseDiscordClient client)
+        {
+            var models = await client.ApiClient.GetMyPrivateChannelsAsync().ConfigureAwait(false);
+            return models
+                .Where(x => x.Type == ChannelType.Group)
+                .Select(x => RestGroupChannel.Create(client, x)).ToImmutableArray();
         }
         
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client)

@@ -68,6 +68,10 @@ namespace Discord.WebSocket
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
         public IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        public IReadOnlyCollection<SocketDMChannel> DMChannels 
+            => State.PrivateChannels.Select(x => x as SocketDMChannel).Where(x => x != null).ToImmutableArray();
+        public IReadOnlyCollection<SocketGroupChannel> GroupChannels 
+            => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
@@ -1803,6 +1807,10 @@ namespace Discord.WebSocket
             => Task.FromResult<IChannel>(GetChannel(id));
         Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
+        Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode)
+            => Task.FromResult<IReadOnlyCollection<IDMChannel>>(DMChannels);
+        Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode)
+            => Task.FromResult<IReadOnlyCollection<IGroupChannel>>(GroupChannels);
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
             => await GetConnectionsAsync().ConfigureAwait(false);

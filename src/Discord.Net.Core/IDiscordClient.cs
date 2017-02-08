@@ -17,6 +17,8 @@ namespace Discord
 
         Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 
