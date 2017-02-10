@@ -3,7 +3,7 @@ using System;
 namespace Discord.Commands {
 
   [AttributeUsage(AttributeTargets.Property)]
-  public class InjectAttribute : Attribute {
+  public class DontInjectAttribute : Attribute {
   }
 
 }
