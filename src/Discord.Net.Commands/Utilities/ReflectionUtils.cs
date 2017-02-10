@@ -19,6 +19,7 @@ namespace Discord.Commands
 
             var constructor = constructors[0];
             System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
+            System.Reflection.PropertyInfo[] properties = typeInfo.DeclaredProperties.Where(p => p.CanWrite).ToArray();
 
             return (map) =>
             {
@@ -40,15 +41,33 @@ namespace Discord.Commands
                     args[i] = arg;
                 }
 
+                T obj;
                 try
                 {
-                    return (T)constructor.Invoke(args);
+                    obj = (T)constructor.Invoke(args);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception($"Failed to create \"{typeInfo.FullName}\"", ex);
                 }
+
+                foreach(var property in properties)
+                {
+                    object prop;
+                    if (map == null || !map.TryGet(property.PropertyType, out prop))
+                    {
+                        if (property.PropertyType == typeof(CommandService))
+                            prop = service;
+                        else if (property.PropertyType == typeof(IDependencyMap))
+                            prop = map;
+                        else
+                            throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{property.PropertyType.Name}\" was not found.");
+                    }
+                    property.SetValue(prop, null);
+                }
+                return obj;
             };
         }
+
     }
 }
