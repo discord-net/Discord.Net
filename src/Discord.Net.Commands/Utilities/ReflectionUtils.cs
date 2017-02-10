@@ -19,7 +19,9 @@ namespace Discord.Commands
 
             var constructor = constructors[0];
             System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
-            System.Reflection.PropertyInfo[] properties = typeInfo.DeclaredProperties.Where(p => p.CanWrite).ToArray();
+            System.Reflection.PropertyInfo[] properties = typeInfo.DeclaredProperties
+                  .Where(p => p.CanWrite && p.GetCustomAttribute<InjectAttribute>() != null)
+                  .ToArray();
 
             return (map) =>
             {
