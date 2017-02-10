@@ -6,6 +6,7 @@ public class ModuleA : ModuleBase
 {
     private readonly DatabaseService _database;
 
+    // Dependencies can be injected via the constructor
     public ModuleA(DatabaseService database)
     {
         _database = database;
@@ -20,12 +21,21 @@ public class ModuleA : ModuleBase
 
 public class ModuleB
 {
-    private CommandService _commands;
-    private NotificationService _notification;
-    
+
+    // Public settable properties will be injected
+    public AnnounceService { get; set; }
+
+    // Public properties without setters will not
+    public CommandService Commands { get; }
+
+    // Public properties annotated with [DontInject] will not
+    [DontInject]
+    public NotificationService { get; set; }
+
     public ModuleB(CommandService commands, IDependencyMap map)
     {
-        _commands = commands;
+        Commands = commands;
         _notification = map.Get<NotificationService>();
     }
+
 }
