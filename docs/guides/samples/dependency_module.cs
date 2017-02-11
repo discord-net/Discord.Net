@@ -32,10 +32,9 @@ public class ModuleB
     [DontInject]
     public NotificationService { get; set; }
 
-    public ModuleB(CommandService commands, IDependencyMap map)
+    public ModuleB(CommandService commands)
     {
         Commands = commands;
-        _notification = map.Get<NotificationService>();
     }
 
 }
