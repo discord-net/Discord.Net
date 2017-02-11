@@ -18,12 +18,21 @@ namespace Discord.Commands
         public void Add<T>(T obj) where T : class 
             => AddFactory(() => obj);
         /// <inheritdoc />
+        public bool TryAdd<T>(T obj) where T : class
+            => TryAddFactory(() => obj);
+        /// <inheritdoc />
         public void AddTransient<T>() where T : class, new() 
             => AddFactory(() => new T());
+        /// <inheritdoc />
+        public bool TryAddTransient<T>() where T : class, new()
+            => TryAddFactory(() => new T());
         /// <inheritdoc />
         public void AddTransient<TKey, TImpl>() where TKey : class 
             where TImpl : class, TKey, new() 
             => AddFactory<TKey>(() => new TImpl());
+        public bool TryAddTransient<TKey, TImpl>() where TKey : class
+            where TImpl : class, TKey, new()
+            => TryAddFactory<TKey>(() => new TImpl());
         
         /// <inheritdoc />
         public void AddFactory<T>(Func<T> factory) where T : class
@@ -32,6 +41,15 @@ namespace Discord.Commands
             if (map.ContainsKey(t))
                 throw new InvalidOperationException($"The dependency map already contains \"{t.FullName}\"");
             map.Add(t, factory);
+        }
+        /// <inheritdoc />
+        public bool TryAddFactory<T>(Func<T> factory) where T : class
+        {
+            var t = typeof(T);
+            if (map.ContainsKey(t))
+                return false;
+            map.Add(t, factory);
+            return true;
         }
 
         /// <inheritdoc />
