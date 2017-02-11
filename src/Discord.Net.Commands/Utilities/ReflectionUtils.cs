@@ -65,7 +65,7 @@ namespace Discord.Commands
                         else
                             throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{property.PropertyType.Name}\" was not found.");
                     }
-                    property.SetValue(prop, null);
+                    property.SetValue(obj, prop);
                 }
                 return obj;
             };
