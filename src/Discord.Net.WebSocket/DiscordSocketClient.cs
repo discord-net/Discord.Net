@@ -28,6 +28,7 @@ namespace Discord.WebSocket
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionGroupLock;
         private readonly DiscordSocketClient _parentClient;
+        private readonly ConcurrentQueue<long> _heartbeatTimes;
 
         private string _sessionId;
         private int _lastSeq;
@@ -35,9 +36,8 @@ namespace Discord.WebSocket
         private TaskCompletionSource<bool> _connectTask;
         private CancellationTokenSource _cancelToken, _reconnectCancelToken;
         private Task _heartbeatTask, _guildDownloadTask, _reconnectTask;
-        private long _heartbeatTime;
         private int _unavailableGuilds;
-        private long _lastGuildAvailableTime;
+        private long _lastGuildAvailableTime, _lastMessageTime;
         private int _nextAudioId;
         private bool _canReconnect;
         private DateTimeOffset? _statusSince;
@@ -93,6 +93,7 @@ namespace Discord.WebSocket
             ConnectionTimeout = config.ConnectionTimeout;
             State = new ClientState(0, 0);
             _downloadUsersFor = new ConcurrentHashSet<ulong>();
+            _heartbeatTimes = new ConcurrentQueue<long>();
             
             _nextAudioId = 1;
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : "Shard #" + ShardId);
@@ -291,6 +292,10 @@ namespace Discord.WebSocket
             if (heartbeatTask != null)
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
+
+            long times;
+            while (_heartbeatTimes.TryDequeue(out times)) { }
+            _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
             var guildDownloadTask = _guildDownloadTask;
@@ -538,6 +543,8 @@ namespace Discord.WebSocket
         {
             if (seq != null)
                 _lastSeq = seq.Value;
+            _lastMessageTime = Environment.TickCount;
+            
             try
             {
                 switch (opCode)
@@ -547,7 +554,6 @@ namespace Discord.WebSocket
                             await _gatewayLogger.DebugAsync("Received Hello").ConfigureAwait(false);
                             var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
-                            _heartbeatTime = 0;
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _cancelToken.Token, _gatewayLogger);
                         }
                         break;
@@ -562,12 +568,10 @@ namespace Discord.WebSocket
                         {
                             await _gatewayLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
 
-                            var heartbeatTime = _heartbeatTime;
-                            if (heartbeatTime != 0)
+                            long time;
+                            if (_heartbeatTimes.TryDequeue(out time))
                             {
-                                int latency = (int)(Environment.TickCount - _heartbeatTime);
-                                _heartbeatTime = 0;
-
+                                int latency = (int)(Environment.TickCount - time);
                                 int before = Latency;
                                 Latency = latency;
 
@@ -1693,7 +1697,10 @@ namespace Discord.WebSocket
                 await logger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    if (_heartbeatTime != 0) //Server never responded to our last heartbeat
+                    var now = Environment.TickCount;
+
+                    //Did server respond to our last heartbeat, or are we still receiving messages (long load?)
+                    if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis)
                     {
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? true))
                         {
@@ -1702,7 +1709,7 @@ namespace Discord.WebSocket
                             return;
                         }
                     }
-                    _heartbeatTime = Environment.TickCount;
+                    _heartbeatTimes.Enqueue(now);
 
                     try
                     {
