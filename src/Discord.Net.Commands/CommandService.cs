@@ -35,6 +35,8 @@ namespace Discord.Commands
             _caseSensitive = config.CaseSensitiveCommands;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
+            if (_defaultRunMode == RunMode.Default)
+                throw new InvalidOperationException("The default run mode cannot be set to Default, it must be one of Sync, Mixed, or Async");
 
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
