@@ -168,7 +168,7 @@ IDependencyMap as an argument and extract services yourself.
 
 ### Module Properties
 
-Modules with public settable properties will be have them injected after
+Modules with public settable properties will have them injected after module
 construction.
 
 ### Module Groups
