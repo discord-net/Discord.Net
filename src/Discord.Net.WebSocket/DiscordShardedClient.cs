@@ -70,7 +70,7 @@ namespace Discord.WebSocket
             }
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, config.WebSocketProvider);
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
 
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {

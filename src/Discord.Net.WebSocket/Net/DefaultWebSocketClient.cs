@@ -206,15 +206,11 @@ namespace Discord.Net.WebSockets
 
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
-#if NETSTANDARD1_3
                             ArraySegment<byte> streamBuffer;
                             if (stream.TryGetBuffer(out streamBuffer))
                                 result = streamBuffer.Array;
                             else
                                 result = stream.ToArray();
-#else
-                            result = stream.ToArray();
-#endif
                         }
                     }
                     else

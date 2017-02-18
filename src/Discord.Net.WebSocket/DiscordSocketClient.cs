@@ -142,7 +142,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, config.WebSocketProvider);
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
         
         protected override async Task OnLoginAsync(TokenType tokenType, string token)
         {
@@ -232,7 +232,8 @@ namespace Discord.WebSocket
                     ConnectionState = ConnectionState.Connected;
                     await _gatewayLogger.InfoAsync("Connected").ConfigureAwait(false);
 
-                    await ProcessUserDownloadsAsync(_downloadUsersFor.Select(x => GetGuild(x)).Where(x => x != null).ToImmutableArray()).ConfigureAwait(false);
+                    await ProcessUserDownloadsAsync(_downloadUsersFor.Select(x => GetGuild(x))
+                        .Where(x => x != null).ToImmutableArray()).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
