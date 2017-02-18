@@ -33,10 +33,11 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, string userAgent, WebSocketProvider webSocketProvider,
-            RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
+            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
             : base(restClientProvider, userAgent, defaultRetryMode, serializer)
-        {            
+        {
+            _gatewayUrl = url;
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
             WebSocketClient.BinaryMessage += async (data, index, count) =>
@@ -115,9 +116,9 @@ namespace Discord.API
 
                 ConnectionState = ConnectionState.Connected;
             }
-            catch (Exception)
+            catch
             {
-                _gatewayUrl = null; //Uncache  in case the gateway url changed
+                _gatewayUrl = null; //Uncache in case the gateway url changed
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }

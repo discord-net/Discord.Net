@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Discord.Net.Relay")]
 [assembly: InternalsVisibleTo("Discord.Net.Rest")]
 [assembly: InternalsVisibleTo("Discord.Net.Rpc")]
 [assembly: InternalsVisibleTo("Discord.Net.WebSocket")]
