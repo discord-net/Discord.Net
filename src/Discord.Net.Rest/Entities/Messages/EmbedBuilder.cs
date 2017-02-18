@@ -79,6 +79,17 @@ namespace Discord
             Author = author;
             return this;
         }
+        public EmbedBuilder WithAuthor(string name, string iconUrl = null, string url = null)
+        {
+            var author = new EmbedAuthorBuilder
+            {
+                Name = name,
+                IconUrl = iconUrl,
+                Url = url
+            };
+            Author = author;
+            return this;
+        }
         public EmbedBuilder WithFooter(EmbedFooterBuilder footer)
         {
             Footer = footer;
@@ -88,6 +99,16 @@ namespace Discord
         {
             var footer = new EmbedFooterBuilder();
             action(footer);
+            Footer = footer;
+            return this;
+        }
+        public EmbedBuilder WithFooter(string text, string iconUrl = null)
+        {
+            var footer = new EmbedFooterBuilder
+            {
+                Text = text,
+                IconUrl = iconUrl
+            };
             Footer = footer;
             return this;
         }
@@ -101,6 +122,17 @@ namespace Discord
         {
             var field = new EmbedFieldBuilder();
             action(field);
+            _fields.Add(field);
+            return this;
+        }
+        public EmbedBuilder AddField(string title, string text, bool inline = false)
+        {
+            var field = new EmbedFieldBuilder
+            {
+                Name = title,
+                Value = text,
+                IsInline = inline
+            };
             _fields.Add(field);
             return this;
         }
