@@ -3,7 +3,7 @@
     public static class Format
     {
         // Characters which need escaping
-        private static string[] SensitiveCharacters = { "\\", "*", "_", "~", "`" };
+        private static string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "<", ">" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
