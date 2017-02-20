@@ -4,12 +4,18 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Discord.Commands.Builders;
+using System.Reflection;
 
 namespace Discord.Commands
 {
     public class ParameterInfo
     {
+
+        private static MethodInfo _checkPermissionsMethod = typeof(ParameterPreconditionAttribute)
+            .GetTypeInfo().GetDeclaredMethod("CheckPermissions");
+
         private readonly TypeReader _reader;
+        private readonly MethodInfo _specializedCheckPermissionsMethod;
 
         public CommandInfo Command { get; }
         public string Name { get; }
@@ -38,21 +44,20 @@ namespace Discord.Commands
             Preconditions = builder.Preconditions.ToImmutableArray();
 
             _reader = builder.TypeReader;
+
+            _specializedCheckPermissionsMethod = _checkPermissionsMethod.MakeGenericMethod(Type);
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object[] args, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IDependencyMap map = null)
         {
             if (map == null)
                 map = DependencyMap.Empty;
 
-            int position = 0;
-            for(position = 0; position < Command.Parameters.Count; position++)
-                if (Command.Parameters[position] == this)
-                    break;
-
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, args[position], map).ConfigureAwait(false);
+                object[] parameters = new []{ context, this, arg, map };
+                var resultTask = (_specializedCheckPermissionsMethod.Invoke(precondition, parameters) as Task<PreconditionResult>);
+                var result = await resultTask.ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
