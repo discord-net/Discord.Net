@@ -128,7 +128,7 @@ namespace Discord.Rest
             }
         }
 
-        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options)
+        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
@@ -151,9 +151,9 @@ namespace Discord.Rest
             => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
         
 
-        public Task PinAsync(RequestOptions options)
+        public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);
-        public Task UnpinAsync(RequestOptions options)
+        public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
