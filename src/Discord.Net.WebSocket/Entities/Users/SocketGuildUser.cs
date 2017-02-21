@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
@@ -32,7 +33,7 @@ namespace Discord.WebSocket
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
-        public IReadOnlyCollection<ulong> RoleIds => _roleIds;
+        public IEnumerable<SocketRole> Roles => _roleIds.Select(id => Guild.GetRole(id)).ToReadOnlyCollection(() => _roleIds.Count());
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
@@ -115,7 +116,7 @@ namespace Discord.WebSocket
         //IGuildUser
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
-        IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
+        IReadOnlyCollection<ulong> IGuildUser.RoleIds => _roleIds;
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
