@@ -12,15 +12,17 @@ public class Program
 			LogLevel = LogSeverity.Info
         });
 
-        _client.Log += (message) => 
-        { 
-            Console.WriteLine($"{message.ToString()}");
-            return Task.CompletedTask;
-        };
+        _client.Log += Log;
 
 	 await _client.LoginAsync(TokenType.Bot, "bot token");
 	 await _client.ConnectAsync();
 	    
 	 await Task.Delay(-1);
+    }
+
+    private Task Log(LogMessage message)
+    {
+        Console.WriteLine(message.ToString());
+        return Task.CompletedTask;
     }
 }
