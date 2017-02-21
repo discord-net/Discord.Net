@@ -5,27 +5,59 @@ namespace Discord.Commands
 {
     public class DependencyMap : IDependencyMap
     {
-        private Dictionary<Type, object> map;
+        private Dictionary<Type, Func<object>> map;
 
         public static DependencyMap Empty => new DependencyMap();
 
         public DependencyMap()
         {
-            map = new Dictionary<Type, object>();
+            map = new Dictionary<Type, Func<object>>();
         }
 
-        public void Add<T>(T obj)
+        /// <inheritdoc />
+        public void Add<T>(T obj) where T : class 
+            => AddFactory(() => obj);
+        /// <inheritdoc />
+        public bool TryAdd<T>(T obj) where T : class
+            => TryAddFactory(() => obj);
+        /// <inheritdoc />
+        public void AddTransient<T>() where T : class, new() 
+            => AddFactory(() => new T());
+        /// <inheritdoc />
+        public bool TryAddTransient<T>() where T : class, new()
+            => TryAddFactory(() => new T());
+        /// <inheritdoc />
+        public void AddTransient<TKey, TImpl>() where TKey : class 
+            where TImpl : class, TKey, new() 
+            => AddFactory<TKey>(() => new TImpl());
+        public bool TryAddTransient<TKey, TImpl>() where TKey : class
+            where TImpl : class, TKey, new()
+            => TryAddFactory<TKey>(() => new TImpl());
+        
+        /// <inheritdoc />
+        public void AddFactory<T>(Func<T> factory) where T : class
         {
             var t = typeof(T);
             if (map.ContainsKey(t))
                 throw new InvalidOperationException($"The dependency map already contains \"{t.FullName}\"");
-            map.Add(t, obj);
+            map.Add(t, factory);
+        }
+        /// <inheritdoc />
+        public bool TryAddFactory<T>(Func<T> factory) where T : class
+        {
+            var t = typeof(T);
+            if (map.ContainsKey(t))
+                return false;
+            map.Add(t, factory);
+            return true;
         }
 
+        /// <inheritdoc />
         public T Get<T>()
         {
             return (T)Get(typeof(T));
         }
+        /// <inheritdoc />
         public object Get(Type t)
         {
             object result;
@@ -35,6 +67,7 @@ namespace Discord.Commands
                 return result;
         }
 
+        /// <inheritdoc />
         public bool TryGet<T>(out T result)
         {
             object untypedResult;
@@ -49,9 +82,17 @@ namespace Discord.Commands
                 return false;
             }
         }
+        /// <inheritdoc />
         public bool TryGet(Type t, out object result)
         {
-            return map.TryGetValue(t, out result);
+            Func<object> func;
+            if (map.TryGetValue(t, out func))
+            {
+                result = func();
+                return true;
+            }
+            result = null;
+            return false;
         }
     }
 }

@@ -42,7 +42,8 @@ namespace Discord.Commands
 
                 try
                 {
-                    return (T)constructor.Invoke(args);
+                    T instance = (T)constructor.Invoke(args);
+                    return instance;
                 }
                 catch (Exception ex)
                 {
