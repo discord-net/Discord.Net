@@ -228,6 +228,8 @@ namespace Discord.Commands
         public SearchResult Search(ICommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
+
+            // We sort by Ascending priority here because the collection is looped over backwards later.
             var matches = _map.GetCommands(searchInput).OrderBy(x => x.Command.Priority).ToImmutableArray();
 
             if (matches.Length > 0)
