@@ -1273,7 +1273,8 @@ namespace Discord.WebSocket
 
                                         SocketMessage before = null, after = null;
                                         SocketMessage cachedMsg = channel.GetCachedMessage(data.Id);
-                                        if (cachedMsg != null)
+                                        bool isCached = cachedMsg != null;
+                                        if (isCached)
                                         {
                                             before = cachedMsg.Clone();
                                             cachedMsg.Update(State, data);
@@ -1292,7 +1293,7 @@ namespace Discord.WebSocket
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
-                                        var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, async () => await channel.GetMessageAsync(data.Id));
+                                        var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached , async () => await channel.GetMessageAsync(data.Id));
 
                                         await _messageUpdatedEvent.InvokeAsync(cacheableBefore, after, channel).ConfigureAwait(false);                                        
                                     }
@@ -1318,7 +1319,8 @@ namespace Discord.WebSocket
                                         }
 
                                         var msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
-                                        var cacheable = new Cacheable<IMessage, ulong>(msg, data.Id, async () => await channel.GetMessageAsync(data.Id));
+                                        bool isCached = msg != null;
+                                        var cacheable = new Cacheable<IMessage, ulong>(msg, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id));
 
                                         await _messageDeletedEvent.InvokeAsync(cacheable, channel).ConfigureAwait(false);
                                     }
@@ -1338,9 +1340,10 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
                                         SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
 
                                         cachedMsg?.AddReaction(reaction);
 
@@ -1362,9 +1365,10 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
                                         SocketReaction reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
 
                                         cachedMsg?.RemoveReaction(reaction);
 
@@ -1386,7 +1390,8 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                     {
                                         SocketUserMessage cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        bool isCached = cachedMsg != null;
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
 
                                         cachedMsg?.ClearReactions();
 
@@ -1416,7 +1421,8 @@ namespace Discord.WebSocket
                                         foreach (var id in data.Ids)
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
-                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, async () => await channel.GetMessageAsync(id));
+                                            bool isCached = msg != null;
+                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
                                             await _messageDeletedEvent.InvokeAsync(cacheable, channel).ConfigureAwait(false);
                                         }
                                     }
