@@ -73,7 +73,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<ModuleInfo> AddModuleAsync<T>() where T : ModuleBase
+        public async Task<ModuleInfo> AddModuleAsync<T>() where T : IModuleBase
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -143,7 +143,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> RemoveModuleAsync<T>() where T : ModuleBase
+        public async Task<bool> RemoveModuleAsync<T>() where T : IModuleBase
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
