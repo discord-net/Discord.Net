@@ -27,6 +27,11 @@ class Program
         {
             // How much logging do you want to see?
             LogLevel = LogSeverity.Info,
+            
+            // If you or another service needs to do anything with messages
+            // (eg. checking Reactions), you should probably
+            // set the MessageCacheSize here.
+            //MessageCacheSize = 50,
 
             // If your platform doesn't have native websockets,
             // add Discord.Net.Providers.WS4Net from NuGet,
