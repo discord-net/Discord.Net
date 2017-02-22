@@ -5,7 +5,7 @@ namespace Discord.Commands
 {
     public abstract class ModuleBase : ModuleBase<CommandContext> { }
 
-    public abstract class ModuleBase<T> : IModuleBase
+    public abstract class ModuleBase<T> : IModuleBase, IModuleBase<T>
         where T : class, ICommandContext
     {
         public T Context { get; private set; }
