@@ -72,7 +72,7 @@ namespace Discord.WebSocket
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
 
-        protected override async Task OnLoginAsync(TokenType tokenType, string token)
+        internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             if (_automaticShards)
             {
@@ -95,7 +95,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].LoginAsync(tokenType, token, false);
         }
-        protected override async Task OnLogoutAsync()
+        internal override async Task OnLogoutAsync()
         {
             //Assume threadsafe: already in a connection lock
             for (int i = 0; i < _shards.Length; i++)
@@ -112,42 +112,14 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task ConnectAsync()
+        public async Task StartAsync()
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await ConnectInternalAsync().ConfigureAwait(false);
-            }
-            catch
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-                throw;
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task ConnectInternalAsync()
-        {
-            await Task.WhenAll(
-                _shards.Select(x => x.ConnectAsync())
-            ).ConfigureAwait(false);
-
-            CurrentUser = _shards[0].CurrentUser;   
+            await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
         }
         /// <inheritdoc />
-        public async Task DisconnectAsync()
+        public async Task StopAsync()
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task DisconnectInternalAsync()
-        {
-            for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].DisconnectAsync();
+            await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
         }
 
         public DiscordSocketClient GetShard(int id)
@@ -334,9 +306,6 @@ namespace Discord.WebSocket
         }
 
         //IDiscordClient
-        Task IDiscordClient.ConnectAsync()
-            => ConnectAsync();
-
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 

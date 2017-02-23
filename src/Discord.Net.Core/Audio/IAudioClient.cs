@@ -14,7 +14,7 @@ namespace Discord.Audio
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         int Latency { get; }
 
-        Task DisconnectAsync();
+        Task StopAsync();
 
         /// <summary>
         /// Creates a new outgoing stream accepting Opus-encoded data.

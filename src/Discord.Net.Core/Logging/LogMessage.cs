@@ -19,7 +19,7 @@ namespace Discord
         }
 
         public override string ToString() => ToString(null);
-        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 9)
+        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
         {
             string sourceName = Source;
             string message = Message;
@@ -87,8 +87,11 @@ namespace Discord
             }
             if (exMessage != null)
             {
-                builder.Append(':');
-                builder.AppendLine();
+                if (!string.IsNullOrEmpty(Message))
+                {
+                    builder.Append(':');
+                    builder.AppendLine();
+                }
                 builder.Append(exMessage);
             }
 

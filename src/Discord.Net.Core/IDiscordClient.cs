@@ -10,8 +10,8 @@ namespace Discord
         ConnectionState ConnectionState { get; }
         ISelfUser CurrentUser { get; }
 
-        Task ConnectAsync();
-        Task DisconnectAsync();
+        Task StartAsync();
+        Task StopAsync();
 
         Task<IApplication> GetApplicationInfoAsync();
 

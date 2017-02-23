@@ -28,6 +28,7 @@ namespace Discord.API
 
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
+        private bool _isExplicitUrl;
         
         internal IWebSocketClient WebSocketClient { get; }
 
@@ -38,6 +39,8 @@ namespace Discord.API
             : base(restClientProvider, userAgent, defaultRetryMode, serializer)
         {
             _gatewayUrl = url;
+            if (url != null)
+                _isExplicitUrl = true;
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
             WebSocketClient.BinaryMessage += async (data, index, count) =>
@@ -52,7 +55,8 @@ namespace Discord.API
                     using (var jsonReader = new JsonTextReader(reader))
                     {
                         var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
-                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                        if (msg != null)
+                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
                 }
             };
@@ -62,7 +66,8 @@ namespace Discord.API
                 using (var jsonReader = new JsonTextReader(reader))
                 {
                     var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
-                    await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    if (msg != null)
+                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.Closed += async ex =>
@@ -107,7 +112,7 @@ namespace Discord.API
                 if (WebSocketClient != null)
                     WebSocketClient.SetCancelToken(_connectCancelToken.Token);
 
-                if (_gatewayUrl == null)
+                if (!_isExplicitUrl)
                 {
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}";
@@ -118,7 +123,8 @@ namespace Discord.API
             }
             catch
             {
-                _gatewayUrl = null; //Uncache in case the gateway url changed
+                if (!_isExplicitUrl)
+                    _gatewayUrl = null; //Uncache in case the gateway url changed
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;
             }

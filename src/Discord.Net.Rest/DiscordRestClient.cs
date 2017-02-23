@@ -16,14 +16,19 @@ namespace Discord.Rest
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
+        internal override void Dispose(bool disposing)
+        {
+            if (disposing)
+                ApiClient.Dispose();
+        }
 
-        protected override async Task OnLoginAsync(TokenType tokenType, string token)
+        internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }
-        protected override Task OnLogoutAsync()
+        internal override Task OnLogoutAsync()
         {
             _applicationInfo = null;
             return Task.Delay(0);

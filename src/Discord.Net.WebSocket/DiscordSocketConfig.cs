@@ -9,7 +9,7 @@ namespace Discord.WebSocket
     {
         public const string GatewayEncoding = "json";
 
-        /// <summary> Gets or sets the websocket host to connect to. If null, the client will use the /gateway endpoint.
+        /// <summary> Gets or sets the websocket host to connect to. If null, the client will use the /gateway endpoint. </summary>
         public string GatewayHost { get; set; } = null;
 
         /// <summary> Gets or sets the time, in milliseconds, to wait for a connection to complete before aborting. </summary>

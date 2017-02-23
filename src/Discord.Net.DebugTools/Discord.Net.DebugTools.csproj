@@ -6,7 +6,7 @@
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <AssemblyName>Discord.Net.DebugTools</AssemblyName>
     <Authors>RogueException</Authors>
-    <Description>A Discord.Net extension adding random helper classes for diagnosing issues.</Description>
+    <Description>A Discord.Net extension adding some helper classes for diagnosing issues.</Description>
     <PackageTags>discord;discordapp</PackageTags>
     <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
