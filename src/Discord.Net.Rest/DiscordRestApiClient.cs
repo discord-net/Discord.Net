@@ -484,6 +484,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNull(args.MessageIds, nameof(args.MessageIds));
             Preconditions.AtMost(args.MessageIds.Length, 100, nameof(args.MessageIds.Length));
+            Preconditions.NoMessageOlderThanTwoWeeks(args.MessageIds, nameof(args.MessageIds));
             options = RequestOptions.CreateOrClone(options);
 
             switch (args.MessageIds.Length)
