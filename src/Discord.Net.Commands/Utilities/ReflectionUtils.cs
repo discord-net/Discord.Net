@@ -30,17 +30,7 @@ namespace Discord.Commands
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     var parameter = parameters[i];
-                    object arg;
-                    if (map == null || !map.TryGet(parameter.ParameterType, out arg))
-                    {
-                        if (parameter.ParameterType == typeof(CommandService))
-                            arg = service;
-                        else if (parameter.ParameterType == typeof(IDependencyMap))
-                            arg = map;
-                        else
-                            throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{parameter.ParameterType.Name}\" was not found.");
-                    }
-                    args[i] = arg;
+                    args[i] = GetMember(parameter.ParameterType, map, service, typeInfo);
                 }
 
                 T obj;
@@ -55,21 +45,25 @@ namespace Discord.Commands
 
                 foreach(var property in properties)
                 {
-                    object prop;
-                    if (map == null || !map.TryGet(property.PropertyType, out prop))
-                    {
-                        if (property.PropertyType == typeof(CommandService))
-                            prop = service;
-                        else if (property.PropertyType == typeof(IDependencyMap))
-                            prop = map;
-                        else
-                            throw new InvalidOperationException($"Failed to create \"{typeInfo.FullName}\", dependency \"{property.PropertyType.Name}\" was not found.");
-                    }
-                    property.SetValue(obj, prop);
+                    property.SetValue(obj, GetMember(property.PropertyType, map, service, typeInfo));
                 }
                 return obj;
             };
         }
 
+        internal static object GetMember(Type targetType, IDependencyMap map, CommandService service, TypeInfo baseType)
+        {
+            object arg;
+            if (map == null || !map.TryGet(targetType, out arg))
+            {
+                if (targetType == typeof(CommandService))
+                    arg = service;
+                else if (targetType == typeof(IDependencyMap))
+                    arg = map;
+                else
+                    throw new InvalidOperationException($"Failed to create \"{baseType.FullName}\", dependency \"{targetType.Name}\" was not found.");
+            }
+            return arg;
+        }
     }
 }
