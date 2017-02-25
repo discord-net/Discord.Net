@@ -2,6 +2,7 @@ using Discord.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.Net;
 
 namespace Discord
 {
@@ -39,7 +40,13 @@ namespace Discord
             clientDisconnectHandler(ex =>
             {
                 if (ex != null)
-                    Error(new Exception("WebSocket connection was closed", ex));
+                {
+                    var ex2 = ex as WebSocketClosedException;
+                    if (ex2?.CloseCode == 4006)
+                        CriticalError(new Exception("WebSocket session expired", ex));
+                    else
+                        Error(new Exception("WebSocket connection was closed", ex));
+                }
                 else
                     Error(new Exception("WebSocket connection was closed"));
                 return Task.Delay(0);
@@ -50,7 +57,7 @@ namespace Discord
         {
             await AcquireConnectionLock().ConfigureAwait(false);
             var reconnectCancelToken = new CancellationTokenSource();
-            _reconnectCancelToken = new CancellationTokenSource();
+            _reconnectCancelToken = reconnectCancelToken;
             _task = Task.Run(async () =>
             {
                 try

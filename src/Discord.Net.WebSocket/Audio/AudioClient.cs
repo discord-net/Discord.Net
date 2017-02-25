@@ -59,28 +59,28 @@ namespace Discord.Audio
         internal AudioClient(SocketGuild guild, int id)
         {
             Guild = guild;
+            _audioLogger = Discord.LogManager.CreateLogger($"Audio #{id}");
+
+            ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
+            ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
+            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
+            //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+            ApiClient.ReceivedEvent += ProcessMessageAsync;
+            ApiClient.ReceivedPacket += ProcessPacketAsync;
 
             _stateLock = new SemaphoreSlim(1, 1);
             _connection = new ConnectionManager(_stateLock, _audioLogger, 30000, 
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
+            _connection.Connected += () => _connectedEvent.InvokeAsync();
+            _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
             _heartbeatTimes = new ConcurrentQueue<long>();
-
-            _audioLogger = Discord.LogManager.CreateLogger($"Audio #{id}");
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
             {
                 _audioLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
-            };
-            
-            ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
-
-            ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
-            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
-            //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
-            ApiClient.ReceivedEvent += ProcessMessageAsync;
-            ApiClient.ReceivedPacket += ProcessPacketAsync;
+            };            
 
             LatencyUpdated += async (old, val) => await _audioLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
         }
@@ -98,25 +98,32 @@ namespace Discord.Audio
 
         private async Task OnConnectingAsync()
         {
+            await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
             await ApiClient.ConnectAsync("wss://" + _url).ConfigureAwait(false);
+            await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
             await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);
+
+            //Wait for READY
+            await _connection.WaitAsync().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
-            //Disconnect from server
+            await _audioLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
 
             //Wait for tasks to complete
+            await _audioLogger.DebugAsync("Waiting for heartbeater").ConfigureAwait(false);
             var heartbeatTask = _heartbeatTask;
             if (heartbeatTask != null)
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
-            await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
-
             long time;
             while (_heartbeatTimes.TryDequeue(out time)) { }
             _lastMessageTime = 0;
+
+            await _audioLogger.DebugAsync("Sending Voice State").ConfigureAwait(false);
+            await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
 
         public AudioOutStream CreateOpusStream(int samplesPerFrame, int bufferMillis)

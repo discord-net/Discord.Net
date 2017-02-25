@@ -95,6 +95,8 @@ namespace Discord.WebSocket
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
             _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout, 
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
+            _connection.Connected += () => _connectedEvent.InvokeAsync();
+            _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
             
             _nextAudioId = 1;
             _connectionGroupLock = groupLock;
@@ -173,8 +175,6 @@ namespace Discord.WebSocket
             {
                 await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
-                await _gatewayLogger.DebugAsync("Raising Event").ConfigureAwait(false);
-                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
 
                 if (_sessionId != null)
                 {
@@ -189,7 +189,7 @@ namespace Discord.WebSocket
 
                 //Wait for READY
                 await _connection.WaitAsync().ConfigureAwait(false);
-
+                
                 await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
                 await SendStatusAsync().ConfigureAwait(false);
 

@@ -12,12 +12,12 @@ namespace Discord.Rpc
             remove { _connectedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Exception, bool, Task> Disconnected
+        public event Func<Exception, Task> Disconnected
         {
             add { _disconnectedEvent.Add(value); }
             remove { _disconnectedEvent.Remove(value); }
         }
-        private readonly AsyncEvent<Func<Exception, bool, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, bool, Task>>();
+        private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
         public event Func<Task> Ready
         {
             add { _readyEvent.Add(value); }

@@ -40,6 +40,8 @@ namespace Discord.Rpc
             _rpcLogger = LogManager.CreateLogger("RPC");
             _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout, 
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
+            _connection.Connected += () => _connectedEvent.InvokeAsync();
+            _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>

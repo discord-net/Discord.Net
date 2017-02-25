@@ -19,6 +19,9 @@
     <Compile Include="..\Discord.Net.WebSocket\Net\DefaultWebSocketClient.cs">
       <Link>Net\DefaultWebSocketClient.cs</Link>
     </Compile>
+    <Compile Include="..\Discord.Net.WebSocket\ConnectionManager.cs">
+      <Link>ConnectionManager.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />

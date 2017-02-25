@@ -506,15 +506,16 @@ namespace Discord.WebSocket
         }
         internal async Task FinishConnectAudio(int id, string url, string token)
         {
+            //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                var promise = _audioConnectPromise;
                 if (_audioClient == null)
                 {
                     var audioClient = new AudioClient(this, id);
-                    var promise = _audioConnectPromise;
                     audioClient.Disconnected += async ex =>
                     {
                         if (!promise.Task.IsCompleted)
@@ -532,7 +533,7 @@ namespace Discord.WebSocket
                 }
                 _audioClient.Connected += () => 
                 { 
-                    var _ = _audioConnectPromise.TrySetResultAsync(_audioClient); 
+                    var _ = promise.TrySetResultAsync(_audioClient); 
                     return Task.Delay(0);
                 };
                 await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);                
