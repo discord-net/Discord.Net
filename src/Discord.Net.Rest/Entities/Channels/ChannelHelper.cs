@@ -69,9 +69,9 @@ namespace Discord.Rest
             return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
-            var args = new CreateChannelInviteParams { IsTemporary = isTemporary };
+            var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
             if (maxAge.HasValue)
                 args.MaxAge = maxAge.Value;
             else

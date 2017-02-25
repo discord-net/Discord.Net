@@ -12,5 +12,7 @@ namespace Discord.API.Rest
         public Optional<int> MaxUses { get; set; }
         [JsonProperty("temporary")]
         public Optional<bool> IsTemporary { get; set; }
+        [JsonProperty("unique")]
+        public Optional<bool> IsUnique { get; set; }
     }
 }
