@@ -17,7 +17,7 @@ namespace Discord.Audio.Streams
         private byte[] _partialFrameBuffer;
         private int _partialFramePos;
 
-        internal OpusEncodeStream(AudioOutStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
+        public OpusEncodeStream(AudioOutStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
         {
             _next = next;
             _encoder = new OpusEncoder(SampleRate, channels, bitrate, application);
@@ -26,10 +26,6 @@ namespace Discord.Audio.Streams
             _partialFrameBuffer = new byte[_frameSize];
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
-        }
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             //Assume threadsafe

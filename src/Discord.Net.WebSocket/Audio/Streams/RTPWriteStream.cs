@@ -14,7 +14,7 @@ namespace Discord.Audio.Streams
 
         protected readonly byte[] _buffer;
 
-        internal RTPWriteStream(AudioOutStream next, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
+        public RTPWriteStream(AudioOutStream next, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
         {
             _next = next;
             _samplesPerFrame = samplesPerFrame;
@@ -29,13 +29,10 @@ namespace Discord.Audio.Streams
             _header[11] = (byte)(_ssrc >> 0);
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
-        }
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
             unchecked
             {
                 if (_header[3]++ == byte.MaxValue)

@@ -12,7 +12,7 @@ namespace Discord.Audio.Streams
 
         //protected readonly byte[] _buffer;
 
-        internal SodiumEncryptStream(AudioOutStream next, byte[] secretKey/*, int bufferSize = 4000*/)
+        public SodiumEncryptStream(AudioOutStream next, byte[] secretKey/*, int bufferSize = 4000*/)
         {
             _next = next;
             _secretKey = secretKey;
@@ -20,17 +20,13 @@ namespace Discord.Audio.Streams
             _nonce = new byte[24];
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
-            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
-        }
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+            cancelToken.ThrowIfCancellationRequested();
 
             Buffer.BlockCopy(buffer, offset, _nonce, 0, 12); //Copy nonce from RTP header
             count = SecretBox.Encrypt(buffer, offset + 12, count - 12, buffer, 12, _nonce, _secretKey);
-            await _next.WriteAsync(buffer, 0, count + 12, cancellationToken).ConfigureAwait(false);
+            await _next.WriteAsync(buffer, 0, count + 12, cancelToken).ConfigureAwait(false);
         }
 
         public override async Task FlushAsync(CancellationToken cancelToken)

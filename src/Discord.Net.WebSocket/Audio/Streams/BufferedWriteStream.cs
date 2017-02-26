@@ -34,6 +34,8 @@ namespace Discord.Audio.Streams
         private readonly int _ticksPerFrame, _queueLength;
         private bool _isPreloaded;
 
+        public BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+            : this(next, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
         internal BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128*1024
@@ -55,7 +57,9 @@ namespace Discord.Audio.Streams
 
         private Task Run()
         {
+#if DEBUG
             uint num = 0;
+#endif
             return Task.Run(async () =>
             {
                 try
@@ -92,7 +96,7 @@ namespace Discord.Audio.Streams
                             }
                         }
                         else
-                            await Task.Delay((int)(dist - (limit - 1))).ConfigureAwait(false);
+                            await Task.Delay((int)(dist - (limit - 1))/*, _cancelToken*/).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }

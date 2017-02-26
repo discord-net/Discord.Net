@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
@@ -10,6 +11,16 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
+        public abstract Task<RTPFrame?> ReadFrameAsync(CancellationToken cancelToken);
+
+        public RTPFrame? ReadFrame()
+        {
+            return ReadFrameAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return ReadAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
+        }
         public override void Write(byte[] buffer, int offset, int count)
         {
             WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
