@@ -123,7 +123,7 @@ namespace Discord
         private EmbedField _field;
 
         public string Name { get { return _field.Name; } set { _field.Name = value; } }
-        public string Value { get { return _field.Value; } set { _field.Value = value; } }
+        public object Value { get { return _field.Value; } set { _field.Value = value.ToString(); } }
         public bool IsInline { get { return _field.Inline; } set { _field.Inline = value; } }
 
         public EmbedFieldBuilder()
@@ -136,7 +136,7 @@ namespace Discord
             Name = name;
             return this;
         }
-        public EmbedFieldBuilder WithValue(string value)
+        public EmbedFieldBuilder WithValue(object value)
         {
             Value = value;
             return this;
