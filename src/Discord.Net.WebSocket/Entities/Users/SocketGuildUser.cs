@@ -125,10 +125,10 @@ namespace Discord.WebSocket
             await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
         }
         ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(params IRole[] roles)
+        public Task ModifyRolesAsync(params IRole[] roles)
             => ModifyRolesAsync(roles as IEnumerable<IRole>);
         ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<IRole> roles)
+        public Task ModifyRolesAsync(IEnumerable<IRole> roles)
             => ModifyAsync(x => x.Roles = new Optional<IEnumerable<IRole>>(roles));
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)

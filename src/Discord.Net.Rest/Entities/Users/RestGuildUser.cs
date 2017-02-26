@@ -100,10 +100,10 @@ namespace Discord.Rest
             await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
         }
         ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(params IRole[] roles)
+        public Task ModifyRolesAsync(params IRole[] roles)
             => ModifyRolesAsync(roles as IEnumerable<IRole>);
         ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<IRole> roles)
+        public Task ModifyRolesAsync(IEnumerable<IRole> roles)
             => ModifyAsync(x => x.Roles = new Optional<IEnumerable<IRole>>(roles));
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
