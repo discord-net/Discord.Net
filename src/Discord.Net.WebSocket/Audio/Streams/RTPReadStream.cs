@@ -2,11 +2,13 @@
 using System.Collections.Concurrent;
 using System.IO;
 
-namespace Discord.Audio
+namespace Discord.Audio.Streams
 {
-    internal class RTPReadStream : Stream
+    ///<summary> Reads the payload from an RTP frame </summary>
+    public class RTPReadStream : AudioInStream
     {
         private readonly BlockingCollection<byte[]> _queuedData; //TODO: Replace with max-length ring buffer
+        //private readonly BlockingCollection<RTPFrame> _queuedData; //TODO: Replace with max-length ring buffer
         private readonly AudioClient _audioClient;
         private readonly byte[] _buffer, _nonce, _secretKey;
 
@@ -23,6 +25,12 @@ namespace Discord.Audio
             _nonce = new byte[24];
         }
 
+        /*public RTPFrame ReadFrame()
+        {          
+            var queuedData = _queuedData.Take();
+            Buffer.BlockCopy(queuedData, 0, buffer, offset, Math.Min(queuedData.Length, count));
+            return queuedData.Length;  
+        }*/
         public override int Read(byte[] buffer, int offset, int count)
         {
             var queuedData = _queuedData.Take();
@@ -31,10 +39,8 @@ namespace Discord.Audio
         }
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12);
-            count = SecretBox.Decrypt(buffer, offset, count, _buffer, 0, _nonce, _secretKey);
             var newBuffer = new byte[count];
-            Buffer.BlockCopy(_buffer, 0, newBuffer, 0, count);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 0, count);
             _queuedData.Add(newBuffer);
         }
 

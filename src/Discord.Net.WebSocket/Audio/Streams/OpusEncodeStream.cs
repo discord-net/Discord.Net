@@ -2,27 +2,28 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Audio
+namespace Discord.Audio.Streams
 {
-    internal class OpusEncodeStream : RTPWriteStream
+    ///<summary> Converts PCM to Opus </summary>
+    public class OpusEncodeStream : AudioOutStream
     {
         public const int SampleRate = 48000;
+        
+        private readonly AudioOutStream _next;
+        private readonly OpusEncoder _encoder;
+        private readonly byte[] _buffer;
+
         private int _frameSize;
         private byte[] _partialFrameBuffer;
         private int _partialFramePos;
 
-        private readonly OpusEncoder _encoder;
-
-        internal OpusEncodeStream(IAudioTarget target, byte[] secretKey, int channels, int samplesPerFrame, uint ssrc, int? bitrate = null)
-            : base(target, secretKey, samplesPerFrame, ssrc)
+        internal OpusEncodeStream(AudioOutStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
         {
-            _encoder = new OpusEncoder(SampleRate, channels);
+            _next = next;
+            _encoder = new OpusEncoder(SampleRate, channels, bitrate, application);
             _frameSize = samplesPerFrame * channels * 2;
+            _buffer = new byte[bufferSize];
             _partialFrameBuffer = new byte[_frameSize];
-
-            _encoder.SetForwardErrorCorrection(true);
-            if (bitrate != null)
-                _encoder.SetBitrate(bitrate.Value);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
@@ -43,7 +44,7 @@ namespace Discord.Audio
                     _partialFramePos = 0;
 
                     int encFrameSize = _encoder.EncodeFrame(_partialFrameBuffer, 0, _frameSize, _buffer, 0);
-                    await base.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
+                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -54,10 +55,7 @@ namespace Discord.Audio
             }
         }
 
-        /*public override void Flush()
-        {
-            FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
-        }
+        /*
         public override async Task FlushAsync(CancellationToken cancellationToken)
         {
             try
@@ -69,6 +67,15 @@ namespace Discord.Audio
             _partialFramePos = 0;
             await base.FlushAsync(cancellationToken).ConfigureAwait(false);
         }*/
+
+        public override async Task FlushAsync(CancellationToken cancelToken)
+        {
+            await _next.FlushAsync(cancelToken).ConfigureAwait(false);
+        }
+        public override async Task ClearAsync(CancellationToken cancelToken)
+        {
+            await _next.ClearAsync(cancelToken).ConfigureAwait(false);
+        }
 
         protected override void Dispose(bool disposing)
         {

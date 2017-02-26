@@ -64,7 +64,7 @@ namespace Discord.Audio
             };
 
             WebSocketClient = webSocketProvider();
-            //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
+            //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))
@@ -117,9 +117,9 @@ namespace Discord.Audio
             await WebSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
-        public async Task SendAsync(byte[] data, int bytes)
+        public async Task SendAsync(byte[] data, int offset, int bytes)
         {
-            await _udp.SendAsync(data, 0, bytes).ConfigureAwait(false);                
+            await _udp.SendAsync(data, offset, bytes).ConfigureAwait(false);                
             await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
         }
 
@@ -224,7 +224,7 @@ namespace Discord.Audio
             packet[1] = (byte)(ssrc >> 16);
             packet[2] = (byte)(ssrc >> 8);
             packet[3] = (byte)(ssrc >> 0);
-            await SendAsync(packet, 70).ConfigureAwait(false);
+            await SendAsync(packet, 0, 70).ConfigureAwait(false);
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
 

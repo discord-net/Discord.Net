@@ -1,4 +1,5 @@
 ﻿using Discord.API.Voice;
+using Discord.Audio.Streams;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.WebSocket;
@@ -80,7 +81,7 @@ namespace Discord.Audio
             {
                 _audioLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
-            };            
+            };
 
             LatencyUpdated += async (old, val) => await _audioLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
         }
@@ -129,26 +130,34 @@ namespace Discord.Audio
         public AudioOutStream CreateOpusStream(int samplesPerFrame, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _connection.CancelToken);
-            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
+            var outputStream = new OutputStream(ApiClient);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
+            return new BufferedWriteStream(rtpWriter, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
         }
         public AudioOutStream CreateDirectOpusStream(int samplesPerFrame)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new DirectAudioTarget(ApiClient);
-            return new RTPWriteStream(target, _secretKey, samplesPerFrame, _ssrc);
+            var outputStream = new OutputStream(ApiClient);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            return new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
         }
-        public AudioOutStream CreatePCMStream(int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
+        public AudioOutStream CreatePCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new BufferedAudioTarget(ApiClient, samplesPerFrame, bufferMillis, _connection.CancelToken);
-            return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
+            var outputStream = new OutputStream(ApiClient);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
+            var bufferedStream = new BufferedWriteStream(rtpWriter, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
+            return new OpusEncodeStream(bufferedStream, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
         }
-        public AudioOutStream CreateDirectPCMStream(int samplesPerFrame, int channels, int? bitrate)
+        public AudioOutStream CreateDirectPCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate)
         {
             CheckSamplesPerFrame(samplesPerFrame);
-            var target = new DirectAudioTarget(ApiClient);
-            return new OpusEncodeStream(target, _secretKey, channels, samplesPerFrame, _ssrc, bitrate);
+            var outputStream = new OutputStream(ApiClient);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
+            return new OpusEncodeStream(rtpWriter, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
         }
         private void CheckSamplesPerFrame(int samplesPerFrame)
         {

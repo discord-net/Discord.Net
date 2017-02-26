@@ -34,13 +34,13 @@ namespace Discord.Audio
         /// <param name="samplesPerFrame">Samples per frame. Must be 120, 240, 480, 960, 1920 or 2880, representing 2.5, 5, 10, 20, 40 or 60 milliseconds respectively.</param>
         /// <param name="bitrate"></param>
         /// <returns></returns>
-        AudioOutStream CreatePCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null, int bufferMillis = 1000);
+        AudioOutStream CreatePCMStream(AudioApplication application, int samplesPerFrame, int channels = 2, int? bitrate = null, int bufferMillis = 1000);
         /// <summary>
         /// Creates a new direct outgoing stream accepting PCM (raw) data. This is a direct stream with no internal timer.
         /// </summary>
         /// <param name="samplesPerFrame">Samples per frame. Must be 120, 240, 480, 960, 1920 or 2880, representing 2.5, 5, 10, 20, 40 or 60 milliseconds respectively.</param>
         /// <param name="bitrate"></param>
         /// <returns></returns>
-        AudioOutStream CreateDirectPCMStream(int samplesPerFrame, int channels = 2, int? bitrate = null);
+        AudioOutStream CreateDirectPCMStream(AudioApplication application, int samplesPerFrame, int channels = 2, int? bitrate = null);
     }
 }
