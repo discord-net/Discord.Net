@@ -38,6 +38,10 @@ namespace Discord
         ///<summary> Removes roles from this user in this guild. </summary>
         Task RemoveRolesAsync(IEnumerable<IRole> roles);
         ///<summary> Adds and removes roles from this user in this guild. </summary>
-        Task ChangeRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null);
+        Task ModifyRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null);
+        ///<summary> Replaces roles from this user in this guild. </summary>
+        Task ModifyRolesAsync(params IRole[] roles);
+        ///<summary> Replaces roles from this user in this guild. </summary>
+        Task ModifyRolesAsync(IEnumerable<IRole> roles);
     }
 }

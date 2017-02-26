@@ -108,14 +108,14 @@ namespace Discord.WebSocket
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
         public Task AddRolesAsync(params IRole[] roles)
-            => ChangeRolesAsync(add: roles);
+            => ModifyRolesAsync(add: roles);
         public Task AddRolesAsync(IEnumerable<IRole> roles)
-            => ChangeRolesAsync(add: roles);
+            => ModifyRolesAsync(add: roles);
         public Task RemoveRolesAsync(params IRole[] roles)
-            => ChangeRolesAsync(remove: roles);
+            => ModifyRolesAsync(remove: roles);
         public Task RemoveRolesAsync(IEnumerable<IRole> roles)
-            => ChangeRolesAsync(remove: roles);
-        public async Task ChangeRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null)
+            => ModifyRolesAsync(remove: roles);
+        public async Task ModifyRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null)
         {
             IEnumerable<ulong> roleIds = _roleIds;
             if (remove != null)
@@ -124,6 +124,12 @@ namespace Discord.WebSocket
                 roleIds = roleIds.Concat(add.Select(x => x.Id));
             await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
         }
+        ///<summary> Replaces roles from this user in this guild. </summary>
+        Task ModifyRolesAsync(params IRole[] roles)
+            => ModifyRolesAsync(roles as IEnumerable<IRole>);
+        ///<summary> Replaces roles from this user in this guild. </summary>
+        Task ModifyRolesAsync(IEnumerable<IRole> roles)
+            => ModifyAsync(x => x.Roles = new Optional<IEnumerable<IRole>>(roles));
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
