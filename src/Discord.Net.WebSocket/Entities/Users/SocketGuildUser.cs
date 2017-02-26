@@ -107,6 +107,23 @@ namespace Discord.WebSocket
             => UserHelper.ModifyAsync(this, Discord, func, options);
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
+        public Task AddRolesAsync(params IRole[] roles)
+            => ChangeRolesAsync(add: roles);
+        public Task AddRolesAsync(IEnumerable<IRole> roles)
+            => ChangeRolesAsync(add: roles);
+        public Task RemoveRolesAsync(params IRole[] roles)
+            => ChangeRolesAsync(remove: roles);
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles)
+            => ChangeRolesAsync(remove: roles);
+        public async Task ChangeRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null)
+        {
+            IEnumerable<ulong> roleIds = _roleIds;
+            if (remove != null)
+                roleIds = roleIds.Except(remove.Select(x => x.Id));
+            if (add != null)
+                roleIds = roleIds.Concat(add.Select(x => x.Id));
+            await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
+        }
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));

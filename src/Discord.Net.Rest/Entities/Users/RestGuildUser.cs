@@ -82,6 +82,23 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
+        public Task AddRolesAsync(params IRole[] roles)
+            => ChangeRolesAsync(add: roles);
+        public Task AddRolesAsync(IEnumerable<IRole> roles)
+            => ChangeRolesAsync(add: roles);
+        public Task RemoveRolesAsync(params IRole[] roles)
+            => ChangeRolesAsync(remove: roles);
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles)
+            => ChangeRolesAsync(remove: roles);
+        public async Task ChangeRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null)
+        {
+            IEnumerable<ulong> roleIds = RoleIds;
+            if (remove != null)
+                roleIds = roleIds.Except(remove.Select(x => x.Id));
+            if (add != null)
+                roleIds = roleIds.Concat(add.Select(x => x.Id));
+            await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
+        }
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
 
