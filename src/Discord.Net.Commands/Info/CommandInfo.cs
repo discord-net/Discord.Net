@@ -63,6 +63,9 @@ namespace Discord.Commands
             _action = builder.Callback;
         }
 
+        public TPrecondition GetPrecondition<TPrecondition>() where TPrecondition : PreconditionAttribute =>
+            Preconditions.FirstOrDefault(x => x is TPrecondition) as TPrecondition;
+
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
         {
             if (map == null)
