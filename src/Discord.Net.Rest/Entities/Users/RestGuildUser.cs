@@ -82,29 +82,12 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
-        public Task AddRolesAsync(params IRole[] roles)
-            => ModifyRolesAsync(add: roles);
-        public Task AddRolesAsync(IEnumerable<IRole> roles)
-            => ModifyRolesAsync(add: roles);
-        public Task RemoveRolesAsync(params IRole[] roles)
-            => ModifyRolesAsync(remove: roles);
-        public Task RemoveRolesAsync(IEnumerable<IRole> roles)
-            => ModifyRolesAsync(remove: roles);
-        public async Task ModifyRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null)
-        {
-            IEnumerable<ulong> roleIds = RoleIds;
-            if (remove != null)
-                roleIds = roleIds.Except(remove.Select(x => x.Id));
-            if (add != null)
-                roleIds = roleIds.Concat(add.Select(x => x.Id));
-            await ModifyAsync(x => x.RoleIds = roleIds.ToArray()).ConfigureAwait(false);
-        }
-        ///<summary> Replaces roles from this user in this guild. </summary>
-        public Task ModifyRolesAsync(params IRole[] roles)
-            => ModifyRolesAsync(roles as IEnumerable<IRole>);
-        ///<summary> Replaces roles from this user in this guild. </summary>
-        public Task ModifyRolesAsync(IEnumerable<IRole> roles)
-            => ModifyAsync(x => x.Roles = new Optional<IEnumerable<IRole>>(roles));
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, x => x.RoleIds = new Optional<IEnumerable<ulong>>(_roleIds.Concat(roles.Select(xr => xr.Id))), options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, x => x.RoleIds = new Optional<IEnumerable<ulong>>(_roleIds.Except(roles.Select(xr => xr.Id))), options);
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
 

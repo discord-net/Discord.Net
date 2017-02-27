@@ -29,19 +29,9 @@ namespace Discord
         /// <summary> Modifies this user's properties in this guild. </summary>
         Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
 
-        ///<summary> Adds roles to this user in this guild. </summary>
-        Task AddRolesAsync(params IRole[] roles);
-        ///<summary> Adds roles to this user in this guild. </summary>
-        Task AddRolesAsync(IEnumerable<IRole> roles);
-        ///<summary> Removes roles from this user in this guild. </summary>
-        Task RemoveRolesAsync(params IRole[] roles);
-        ///<summary> Removes roles from this user in this guild. </summary>
-        Task RemoveRolesAsync(IEnumerable<IRole> roles);
-        ///<summary> Adds and removes roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<IRole> add = null, IEnumerable<IRole> remove = null);
-        ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(params IRole[] roles);
-        ///<summary> Replaces roles from this user in this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<IRole> roles);
+        /// <summary> Adds roles to this user in this guild. </summary>
+        Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
+        /// <summary> Removes roles from this user in this guild. </summary>
+        Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
     }
 }
