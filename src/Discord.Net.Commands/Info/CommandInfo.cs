@@ -64,7 +64,7 @@ namespace Discord.Commands
         }
 
         public TPrecondition GetPrecondition<TPrecondition>() where TPrecondition : PreconditionAttribute =>
-            Preconditions.FirstOrDefault(x => x is TPrecondition) as TPrecondition;
+            Preconditions.FirstOrDefault(x => x.GetType() == typeof(TPrecondition)) as TPrecondition;
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
         {
