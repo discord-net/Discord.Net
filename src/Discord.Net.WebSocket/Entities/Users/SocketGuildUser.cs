@@ -109,10 +109,10 @@ namespace Discord.WebSocket
             => UserHelper.KickAsync(this, Discord, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, x => x.RoleIds = new Optional<IEnumerable<ulong>>(_roleIds.Concat(roles.Select(xr => xr.Id))), options);
+            => UserHelper.AddRolesAsync(this, this.Discord, roles, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, x => x.RoleIds = new Optional<IEnumerable<ulong>>(_roleIds.Except(roles.Select(xr => xr.Id))), options);
+            => UserHelper.RemoveRolesAsync(this, this.Discord, roles, options);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
