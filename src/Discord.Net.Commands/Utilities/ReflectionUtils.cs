@@ -60,7 +60,7 @@ namespace Discord.Commands
             {
                 if (targetType == typeof(CommandService))
                     arg = service;
-                else if (_dependencyTypeInfo.IsAssignableFrom(targetType.GetTypeInfo()))
+                else if (targetType == typeof(IDependencyMap) || targetType == map.GetType())
                     arg = map;
                 else
                     throw new InvalidOperationException($"Failed to create \"{baseType.FullName}\", dependency \"{targetType.Name}\" was not found.");
