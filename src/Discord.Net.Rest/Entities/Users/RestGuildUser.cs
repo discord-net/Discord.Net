@@ -84,10 +84,10 @@ namespace Discord.Rest
         }
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, this.Discord, roles, options);
+            => UserHelper.AddRolesAsync(this, Discord, roles, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, this.Discord, roles, options);
+            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
 
