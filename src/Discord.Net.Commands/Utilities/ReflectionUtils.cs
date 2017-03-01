@@ -51,6 +51,8 @@ namespace Discord.Commands
             };
         }
 
+        private static readonly TypeInfo _dependencyTypeInfo = typeof(IDependencyMap).GetTypeInfo();
+
         internal static object GetMember(Type targetType, IDependencyMap map, CommandService service, TypeInfo baseType)
         {
             object arg;
@@ -58,7 +60,7 @@ namespace Discord.Commands
             {
                 if (targetType == typeof(CommandService))
                     arg = service;
-                else if (targetType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDependencyMap)))
+                else if (_dependencyTypeInfo.IsAssignableFrom(targetType.GetTypeInfo()))
                     arg = map;
                 else
                     throw new InvalidOperationException($"Failed to create \"{baseType.FullName}\", dependency \"{targetType.Name}\" was not found.");
