@@ -183,7 +183,7 @@ namespace Discord
         }
 
         // Bulk Delete
-        public static void NoMessageOlderThanTwoWeeks(ulong[] collection, string name)
+        public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
             var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(1209540000)));
             for (var i = 0; i < collection.Length; i++)
