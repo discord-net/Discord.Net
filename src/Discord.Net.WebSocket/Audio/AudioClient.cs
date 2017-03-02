@@ -253,7 +253,7 @@ namespace Discord.Audio
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            //Clean this up when Discord's session patch is live
+            //TODO: Clean this up when Discord's session patch is live
             try
             {
                 await _audioLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
@@ -261,17 +261,15 @@ namespace Discord.Audio
                 {
                     var now = Environment.TickCount;
 
-                    //Did server respond to our last heartbeat, or are we still receiving messages (long load?)
+                    //Did server respond to our last heartbeat?
                     if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis && 
                         ConnectionState == ConnectionState.Connected)
                     {
                         _connection.Error(new Exception("Server missed last heartbeat"));
                         return;
                     }
+
                     _heartbeatTimes.Enqueue(now);
-
-                    await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
-
                     try
                     {
                         await ApiClient.SendHeartbeatAsync().ConfigureAwait(false);

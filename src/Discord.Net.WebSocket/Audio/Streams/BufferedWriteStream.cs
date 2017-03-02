@@ -38,7 +38,7 @@ namespace Discord.Audio.Streams
             : this(next, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
         internal BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
-            //maxFrameSize = 1275 was too limiting at 128*1024
+            //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;
             _ticksPerFrame = samplesPerFrame / 48;
             _logger = logger;
@@ -57,11 +57,11 @@ namespace Discord.Audio.Streams
 
         private Task Run()
         {
-#if DEBUG
-            uint num = 0;
-#endif
             return Task.Run(async () =>
             {
+#if DEBUG
+                uint num = 0;
+#endif
                 try
                 {
                     while (!_isPreloaded && !_cancelToken.IsCancellationRequested)
@@ -70,10 +70,9 @@ namespace Discord.Audio.Streams
                     long nextTick = Environment.TickCount;
                     while (!_cancelToken.IsCancellationRequested)
                     {
-                        const int limit = 1;
                         long tick = Environment.TickCount;
                         long dist = nextTick - tick;
-                        if (dist <= limit)
+                        if (dist <= 0)
                         {
                             Frame frame;
                             if (_queuedFrames.TryDequeue(out frame))
@@ -86,17 +85,20 @@ namespace Discord.Audio.Streams
                                 var _ = _logger.DebugAsync($"{num++}: Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
-                            else if (dist == 0)
+                            else 
                             {
-                                await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
-                                nextTick += _ticksPerFrame;
+                                while ((nextTick - tick) <= 0)
+                                {
+                                    await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
+                                    nextTick += _ticksPerFrame;
+                                }
 #if DEBUG
                                 var _ = _logger.DebugAsync($"{num++}: Buffer underrun");
 #endif
                             }
                         }
                         else
-                            await Task.Delay((int)(dist - (limit - 1))/*, _cancelToken*/).ConfigureAwait(false);
+                            await Task.Delay((int)(dist)/*, _cancelToken*/).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException) { }

@@ -68,9 +68,12 @@ namespace Discord.Audio
             if (result < 0)
                 throw new Exception($"Opus Error: {(OpusError)result}");
 
-            /*result = EncoderCtl(_ptr, OpusCtl.SetBandwidth, 1105);
-            if (result < 0)
-                throw new Exception($"Opus Error: {(OpusError)result}");*/
+            /*if (application == AudioApplication.Music)
+            {
+                result = EncoderCtl(_ptr, OpusCtl.SetBandwidth, 1105);
+                if (result < 0)
+                    throw new Exception($"Opus Error: {(OpusError)result}");
+            }*/
         }
 
         /// <summary> Produces Opus encoded audio from PCM samples. </summary>

@@ -1556,8 +1556,8 @@ namespace Discord.WebSocket
                             return;
                         }
                     }
-                    _heartbeatTimes.Enqueue(now);
 
+                    _heartbeatTimes.Enqueue(now);
                     try
                     {
                         await ApiClient.SendHeartbeatAsync(_lastSeq).ConfigureAwait(false);
