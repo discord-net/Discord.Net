@@ -1,8 +1,8 @@
 namespace Discord
 {
-    internal static class RoleExtensions
+    internal static class RoleUtils
     {
-        internal static int Compare(this IRole left, IRole right)
+        public static int Compare(IRole left, IRole right)
         {
             if (left == null)
                 return -1;

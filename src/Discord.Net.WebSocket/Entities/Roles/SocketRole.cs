@@ -54,8 +54,9 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketRole Clone() => MemberwiseClone() as SocketRole;
 
+        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
+
         //IRole
         IGuild IRole.Guild => Guild;
-        public int CompareTo(IRole role) => this.CompareTo(role);
     }
 }

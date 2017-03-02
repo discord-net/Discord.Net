@@ -51,7 +51,7 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
-        public int CompareTo(IRole role) => this.Compare(role);
+        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
