@@ -1,9 +1,9 @@
-﻿using Discord.API.Rest;
-using Discord.Rest;
+﻿using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
@@ -33,7 +33,7 @@ namespace Discord.WebSocket
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
-        public IReadOnlyCollection<ulong> RoleIds => _roleIds;
+        public IEnumerable<SocketRole> Roles => _roleIds.Select(id => Guild.GetRole(id)).ToReadOnlyCollection(() => _roleIds.Count());
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
@@ -80,7 +80,8 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             base.Update(state, model.User);
-            _joinedAtTicks = model.JoinedAt.UtcTicks;
+            if (model.JoinedAt.IsSpecified)
+                _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             UpdateRoles(model.Roles);
@@ -102,7 +103,7 @@ namespace Discord.WebSocket
             _roleIds = roles.ToImmutable();
         }
         
-        public Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
         public Task KickAsync(RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, options);
@@ -115,7 +116,7 @@ namespace Discord.WebSocket
         //IGuildUser
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
-        IReadOnlyCollection<ulong> IGuildUser.RoleIds => RoleIds;
+        IReadOnlyCollection<ulong> IGuildUser.RoleIds => _roleIds;
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 

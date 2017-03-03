@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Voice
 {
-    public class ReadyEvent
+    internal class ReadyEvent
     {
         [JsonProperty("ssrc")]
         public uint SSRC { get; set; }

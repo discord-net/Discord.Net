@@ -11,19 +11,18 @@ namespace Discord.Rest
     public abstract class BaseDiscordClient : IDiscordClient
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         public event Func<Task> LoggedIn { add { _loggedInEvent.Add(value); } remove { _loggedInEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedInEvent = new AsyncEvent<Func<Task>>();
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
-        internal readonly Logger _restLogger, _queueLogger;
-        internal readonly SemaphoreSlim _connectionLock;
-        private bool _isFirstLogin;
-        private bool _isDisposed;
+        internal readonly Logger _restLogger;
+        private readonly SemaphoreSlim _stateLock;
+        private bool _isFirstLogin, _isDisposed;
 
-        public API.DiscordRestApiClient ApiClient { get; }
+        internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
         public LoginState LoginState { get; private set; }
         public ISelfUser CurrentUser { get; protected set; }
@@ -35,17 +34,16 @@ namespace Discord.Rest
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
 
-            _connectionLock = new SemaphoreSlim(1, 1);
+            _stateLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
-            _queueLogger = LogManager.CreateLogger("Queue");
-            _isFirstLogin = true;
+            _isFirstLogin = config.DisplayInitialLog;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)
-                    await _queueLogger.WarningAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
                 else
-                    await _queueLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
@@ -53,12 +51,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await LoginInternalAsync(tokenType, token).ConfigureAwait(false);
             }
-            finally { _connectionLock.Release(); }
+            finally { _stateLock.Release(); }
         }
         private async Task LoginInternalAsync(TokenType tokenType, string token)
         {
@@ -86,17 +84,17 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLoginAsync(TokenType tokenType, string token) { return Task.CompletedTask; }
+        internal virtual Task OnLoginAsync(TokenType tokenType, string token) { return Task.Delay(0); }
 
         /// <inheritdoc />
         public async Task LogoutAsync()
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
+            await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 await LogoutInternalAsync().ConfigureAwait(false);
             }
-            finally { _connectionLock.Release(); }
+            finally { _stateLock.Release(); }
         }
         private async Task LogoutInternalAsync()
         {
@@ -111,7 +109,7 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-        protected virtual Task OnLogoutAsync() { return Task.CompletedTask; }
+        internal virtual Task OnLogoutAsync() { return Task.Delay(0); }
 
         internal virtual void Dispose(bool disposing)
         {
@@ -139,6 +137,10 @@ namespace Discord.Rest
             => Task.FromResult<IChannel>(null);
         Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(ImmutableArray.Create<IPrivateChannel>());
+        Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode)
+            => Task.FromResult<IReadOnlyCollection<IDMChannel>>(ImmutableArray.Create<IDMChannel>());
+        Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode)
+            => Task.FromResult<IReadOnlyCollection<IGroupChannel>>(ImmutableArray.Create<IGroupChannel>());
 
         Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
             => Task.FromResult<IReadOnlyCollection<IConnection>>(ImmutableArray.Create<IConnection>());
@@ -162,8 +164,9 @@ namespace Discord.Rest
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id)
             => Task.FromResult<IVoiceRegion>(null);
 
-        Task IDiscordClient.ConnectAsync() { throw new NotSupportedException(); }
-        Task IDiscordClient.DisconnectAsync() { throw new NotSupportedException(); }
-
+        Task IDiscordClient.StartAsync()
+            => Task.Delay(0);
+        Task IDiscordClient.StopAsync()
+            => Task.Delay(0);
     }
 }

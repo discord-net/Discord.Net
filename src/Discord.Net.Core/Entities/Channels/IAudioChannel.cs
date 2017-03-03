@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public interface IAudioChannel
+    public interface IAudioChannel : IChannel
     {
     }
 }

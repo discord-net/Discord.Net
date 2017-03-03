@@ -42,7 +42,7 @@ namespace Discord
                 if (obj.Value == null) throw CreateNotNullException(name, msg);
                 if (obj.Value.Trim().Length == 0) throw CreateNotEmptyException(name, msg);
             }
-        }
+        }        
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
         {
@@ -180,6 +180,14 @@ namespace Discord
         {
             if (msg == null) return new ArgumentException($"Value must be less than {value}", name);
             else return new ArgumentException(msg, name);
+        }
+
+        // Bulk Delete
+        public static void YoungerThanTwoWeeks(ulong[] collection, string name)
+        {
+            var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(1209540000)));
+            for (var i = 0; i < collection.Length; i++)
+                if (collection[i] <= minimum) throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks to delete.");
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.API.Rest;
 using Model = Discord.API.Rpc.Channel;
 using Discord.Rest;
 
@@ -36,7 +35,7 @@ namespace Discord.Rpc
                 Position = model.Position.Value;
         }
 
-        public Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
@@ -52,8 +51,8 @@ namespace Discord.Rpc
 
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
-        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = true, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, options).ConfigureAwait(false);
+        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
         public override string ToString() => Name;
 
@@ -69,8 +68,8 @@ namespace Discord.Rpc
 
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
-        async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
-            => await CreateInviteAsync(maxAge, maxUses, isTemporary, options).ConfigureAwait(false);
+        async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
+            => await CreateInviteAsync(maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
         IReadOnlyCollection<Overwrite> IGuildChannel.PermissionOverwrites { get { throw new NotSupportedException(); } }
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)

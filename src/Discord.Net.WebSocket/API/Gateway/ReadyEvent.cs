@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class ReadyEvent
+    internal class ReadyEvent
     {
         public class ReadState
         {

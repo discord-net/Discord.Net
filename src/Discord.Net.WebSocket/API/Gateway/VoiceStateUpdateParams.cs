@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class VoiceStateUpdateParams
+    internal class VoiceStateUpdateParams
     {
         [JsonProperty("self_mute")]
         public bool SelfMute { get; set; }
@@ -13,10 +13,7 @@ namespace Discord.API.Gateway
 
         [JsonProperty("guild_id")]
         public ulong? GuildId { get; set; }
-        public IGuild Guild { set { GuildId = value?.Id; } }
-
         [JsonProperty("channel_id")]
         public ulong? ChannelId { get; set; }
-        public IChannel Channel { set { ChannelId = value?.Id; } }
     }
 }

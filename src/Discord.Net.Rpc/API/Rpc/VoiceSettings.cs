@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class VoiceSettings
+    internal class VoiceSettings
     {
         [JsonProperty("input")]
         public VoiceDeviceSettings Input { get; set; }

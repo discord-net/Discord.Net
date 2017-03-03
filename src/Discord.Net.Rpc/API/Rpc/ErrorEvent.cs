@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class ErrorEvent
+    internal class ErrorEvent
     {
         [JsonProperty("code")]
         public int Code { get; set; }

@@ -17,11 +17,11 @@ namespace Discord.WebSocket
         }
         internal static SocketPresence Create(Model model)
         {
-            return new SocketPresence(model.Status, model.Game != null ? Discord.Game.Create(model.Game) : (Game?)null);
+            return new SocketPresence(model.Status, model.Game != null ? model.Game.ToEntity() : (Game?)null);
         }
 
         public override string ToString() => Status.ToString();
-        internal string DebuggerDisplay => $"{Status}{(Game != null ? $", {Game.Value.Name} ({Game.Value.StreamType})" : "")}";
+        private string DebuggerDisplay => $"{Status}{(Game != null ? $", {Game.Value.Name} ({Game.Value.StreamType})" : "")}";
 
         internal SocketPresence Clone() => this;
     }

@@ -58,9 +58,14 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleBuilder AddAlias(params string[] newAliases)
+        public ModuleBuilder AddAliases(params string[] aliases)
         {
-            _aliases.AddRange(newAliases);
+            for (int i = 0; i < aliases.Length; i++)
+            {
+                var alias = aliases[i] ?? "";
+                if (!_aliases.Contains(alias))
+                    _aliases.Add(alias);
+            }
             return this;
         }
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
@@ -68,7 +73,7 @@ namespace Discord.Commands.Builders
             _preconditions.Add(precondition);
             return this;
         }
-        public ModuleBuilder AddCommand(string primaryAlias, Func<CommandContext, object[], IDependencyMap, Task> callback, Action<CommandBuilder> createFunc)
+        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IDependencyMap, Task> callback, Action<CommandBuilder> createFunc)
         {
             var builder = new CommandBuilder(this, primaryAlias, callback);
             createFunc(builder);
@@ -97,13 +102,17 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleInfo Build(CommandService service)
+        private ModuleInfo BuildImpl(CommandService service, ModuleInfo parent = null)
         {
             //Default name to first alias
             if (Name == null)
                 Name = _aliases[0];
 
-            return new ModuleInfo(this, service);
+            return new ModuleInfo(this, service, parent);
         }
+
+        public ModuleInfo Build(CommandService service) => BuildImpl(service);
+
+        internal ModuleInfo Build(CommandService service, ModuleInfo parent) => BuildImpl(service, parent);
     }
 }

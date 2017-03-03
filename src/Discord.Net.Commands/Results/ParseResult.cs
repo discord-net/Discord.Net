@@ -14,10 +14,10 @@ namespace Discord.Commands
 
         public bool IsSuccess => !Error.HasValue;
 
-        private ParseResult(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValue, CommandError? error, string errorReason)
+        private ParseResult(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValues, CommandError? error, string errorReason)
         {
             ArgValues = argValues;
-            ParamValues = paramValue;
+            ParamValues = paramValues;
             Error = error;
             ErrorReason = errorReason;
         }

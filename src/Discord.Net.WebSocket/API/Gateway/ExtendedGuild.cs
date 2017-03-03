@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.API.Gateway
 {
-    public class ExtendedGuild : Guild
+    internal class ExtendedGuild : Guild
     {
         [JsonProperty("unavailable")]
         public bool? Unavailable { get; set; }

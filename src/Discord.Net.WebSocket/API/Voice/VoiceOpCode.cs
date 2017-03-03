@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS1591
 namespace Discord.API.Voice
 {
-    public enum VoiceOpCode : byte
+    internal enum VoiceOpCode : byte
     {
         /// <summary> C→S - Used to associate a connection with a token. </summary>
         Identify = 0,

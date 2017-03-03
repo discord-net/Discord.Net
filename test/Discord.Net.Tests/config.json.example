@@ -1,14 +1,4 @@
 {
-	"user1": {
-		"email": "user1@example.com",
-		"password": "password123"
-	},
-	"user2": {
-		"email": "user2@example.com",
-		"password": "password456"
-	},
-	"user3": {
-		"email": "user3@example.com",
-		"password": "password789"
-	}
+    "token": "AAA.BBB.CCC",
+    "guild_id": 1234567890
 }

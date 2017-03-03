@@ -19,28 +19,46 @@ namespace Discord.Rest
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client, 
-            Action<ModifyGuildChannelParams> func, 
+            Action<GuildChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyGuildChannelParams();
+            var args = new GuildChannelProperties();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildChannelParams
+            {
+                Name = args.Name,
+                Position = args.Position
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client, 
-            Action<ModifyTextChannelParams> func, 
+            Action<TextChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyTextChannelParams();
+            var args = new TextChannelProperties();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyTextChannelParams
+            {
+                Name = args.Name,
+                Position = args.Position,
+                Topic = args.Topic
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client, 
-            Action<ModifyVoiceChannelParams> func, 
+            Action<VoiceChannelProperties> func, 
             RequestOptions options)
         {
-            var args = new ModifyVoiceChannelParams();
+            var args = new VoiceChannelProperties();
             func(args);
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyVoiceChannelParams
+            {
+                Bitrate = args.Bitrate,
+                Name = args.Name,
+                Position = args.Position,
+                UserLimit = args.UserLimit.IsSpecified ? (args.UserLimit.Value ?? 0) : Optional.Create<int>()
+            };
+            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
 
         //Invites
@@ -51,13 +69,17 @@ namespace Discord.Rest
             return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary, RequestOptions options)
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
-            var args = new CreateChannelInviteParams { IsTemporary = isTemporary };
+            var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
             if (maxAge.HasValue)
                 args.MaxAge = maxAge.Value;
+            else
+                args.MaxAge = 0;
             if (maxUses.HasValue)
                 args.MaxUses = maxUses.Value;
+            else
+                args.MaxUses = 0;
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
@@ -132,13 +154,14 @@ namespace Discord.Rest
         }
 
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, EmbedBuilder embed, RequestOptions options)
+            string text, bool isTTS, Embed embed, RequestOptions options)
         {
-            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.Build() };
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.ToModel() };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
+#if NETSTANDARD1_3
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, RequestOptions options)
         {
@@ -146,6 +169,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, options).ConfigureAwait(false);
         }
+#endif
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, RequestOptions options)
         {

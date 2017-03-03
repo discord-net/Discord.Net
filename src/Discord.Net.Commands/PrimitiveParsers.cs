@@ -8,9 +8,11 @@ namespace Discord.Commands
 
     internal static class PrimitiveParsers
     {
-        private static readonly IReadOnlyDictionary<Type, Delegate> _parsers;
+        private static readonly Lazy<IReadOnlyDictionary<Type, Delegate>> _parsers = new Lazy<IReadOnlyDictionary<Type, Delegate>>(CreateParsers);
 
-        static PrimitiveParsers()
+        public static IEnumerable<Type> SupportedTypes = _parsers.Value.Keys;
+
+        static IReadOnlyDictionary<Type, Delegate> CreateParsers()
         {
             var parserBuilder = ImmutableDictionary.CreateBuilder<Type, Delegate>();
             parserBuilder[typeof(bool)] = (TryParseDelegate<bool>)bool.TryParse;
@@ -27,16 +29,17 @@ namespace Discord.Commands
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
+            parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
             parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate (string str, out string value)
             {
                 value = str;
                 return true;
             };
-            _parsers = parserBuilder.ToImmutable();
+            return parserBuilder.ToImmutable();
         }
 
-        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers[typeof(T)];
-        public static Delegate Get(Type type) => _parsers[type];
+        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers.Value[typeof(T)];
+        public static Delegate Get(Type type) => _parsers.Value[type];
     }
 }

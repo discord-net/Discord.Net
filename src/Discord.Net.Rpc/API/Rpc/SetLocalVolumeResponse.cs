@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class SetLocalVolumeResponse
+    internal class SetLocalVolumeResponse
     {
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }

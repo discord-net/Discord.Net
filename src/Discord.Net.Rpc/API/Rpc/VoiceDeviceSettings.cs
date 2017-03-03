@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class VoiceDeviceSettings
+    internal class VoiceDeviceSettings
     {
         [JsonProperty("device_id")]
         public Optional<string> DeviceId { get; set; }

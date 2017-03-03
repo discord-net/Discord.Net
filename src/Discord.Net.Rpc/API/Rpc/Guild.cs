@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Rpc
 {
-    public class Guild
+    internal class Guild
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }

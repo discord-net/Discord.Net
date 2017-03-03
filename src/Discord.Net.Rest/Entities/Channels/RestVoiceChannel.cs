@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +12,7 @@ namespace Discord.Rest
     public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
     {
         public int Bitrate { get; private set; }
-        public int UserLimit { get; private set; }
+        public int? UserLimit { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -30,10 +29,10 @@ namespace Discord.Rest
             base.Update(model);
 
             Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value;
+            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
-        public async Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);

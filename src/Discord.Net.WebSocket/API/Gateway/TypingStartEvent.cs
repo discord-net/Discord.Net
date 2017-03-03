@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class TypingStartEvent
+    internal class TypingStartEvent
     {
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }

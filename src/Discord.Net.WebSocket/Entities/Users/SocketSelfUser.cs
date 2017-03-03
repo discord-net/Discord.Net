@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Rest;
+﻿using Discord.Rest;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -44,7 +43,7 @@ namespace Discord.WebSocket
                 IsMfaEnabled = model.MfaEnabled.Value;
         }
         
-        public Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
 
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;

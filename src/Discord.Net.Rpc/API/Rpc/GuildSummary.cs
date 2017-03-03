@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class GuildSummary
+    internal class GuildSummary
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }

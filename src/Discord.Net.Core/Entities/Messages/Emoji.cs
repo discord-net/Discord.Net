@@ -1,5 +1,4 @@
-﻿using Discord.API;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -8,12 +7,12 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct Emoji
     {
-        public ulong Id { get; }
+        public ulong? Id { get; }
         public string Name { get; }
 
-        public string Url => CDN.GetEmojiUrl(Id);
+        public string Url => Id != null ? CDN.GetEmojiUrl(Id.Value) : null;
 
-        internal Emoji(ulong id, string name)
+        internal Emoji(ulong? id, string name)
         {
             Id = id;
             Name = name;

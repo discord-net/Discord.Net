@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Rpc
 {
-    public class AuthorizeParams
+    internal class AuthorizeParams
     {
         [JsonProperty("client_id")]
         public string ClientId { get; set; }

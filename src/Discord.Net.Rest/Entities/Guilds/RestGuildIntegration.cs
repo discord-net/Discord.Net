@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
@@ -37,7 +36,7 @@ namespace Discord.Rest
             return entity;
         }
 
-        public void Update(Model model)
+        internal void Update(Model model)
         {
             Name = model.Name;
             Type = model.Type;
@@ -55,13 +54,19 @@ namespace Discord.Rest
         {
             await Discord.ApiClient.DeleteGuildIntegrationAsync(GuildId, Id).ConfigureAwait(false);
         }
-        public async Task ModifyAsync(Action<ModifyGuildIntegrationParams> func)
+        public async Task ModifyAsync(Action<GuildIntegrationProperties> func)
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var args = new ModifyGuildIntegrationParams();
+            var args = new GuildIntegrationProperties();
             func(args);
-            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, args).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildIntegrationParams
+            {
+                EnableEmoticons = args.EnableEmoticons,
+                ExpireBehavior = args.ExpireBehavior,
+                ExpireGracePeriod = args.ExpireGracePeriod
+            };
+            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, apiArgs).ConfigureAwait(false);
 
             Update(model);
         }

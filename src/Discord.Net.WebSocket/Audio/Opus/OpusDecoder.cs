@@ -11,6 +11,8 @@ namespace Discord.Audio
         private static extern void DestroyDecoder(IntPtr decoder);
         [DllImport("opus", EntryPoint = "opus_decode", CallingConvention = CallingConvention.Cdecl)]
         private static extern int Decode(IntPtr st, byte* data, int len, byte* pcm, int max_frame_size, int decode_fec);
+        [DllImport("opus", EntryPoint = "opus_decoder_ctl", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int DecoderCtl(IntPtr st, OpusCtl request, int value);
 
         public OpusDecoder(int samplingRate, int channels)
             : base(samplingRate, channels)

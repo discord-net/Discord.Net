@@ -1,0 +1,30 @@
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(BuildNumber)' == ''">rc-dev</VersionSuffix>
+    <VersionSuffix Condition="'$(BuildNumber)' != ''">rc-$(BuildNumber)</VersionSuffix>
+    <TargetFrameworks>net45</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>Discord.Net.Providers.WS4Net</AssemblyName>
+    <Authors>RogueException</Authors>
+    <Description>An optional WebSocket client provider for Discord.Net using WebSocket4Net</Description>
+    <PackageTags>discord;discordapp</PackageTags>
+    <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
+    <RootNamespace>Discord.Providers.WS4Net</RootNamespace>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WebSocket4Net" Version="0.14.1" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

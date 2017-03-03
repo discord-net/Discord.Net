@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class Channel
+    internal class Channel
     {
         //Shared
         [JsonProperty("id")]

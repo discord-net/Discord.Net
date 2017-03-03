@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class RequestMembersParams
+    internal class RequestMembersParams
     {
         [JsonProperty("query")]
         public string Query { get; set; }

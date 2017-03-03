@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Rpc
 {
-    public class GetChannelsResponse
+    internal class GetChannelsResponse
     {
         [JsonProperty("channels")]
         public IReadOnlyCollection<ChannelSummary> Channels { get; set; }

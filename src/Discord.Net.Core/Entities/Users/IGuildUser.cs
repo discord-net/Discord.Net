@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,6 +11,7 @@ namespace Discord
         DateTimeOffset? JoinedAt { get; }
         /// <summary> Gets the nickname for this user. </summary>
         string Nickname { get; }
+        /// <summary> Gets the guild-level permissions for this user. </summary>
         GuildPermissions GuildPermissions { get; }
 
         /// <summary> Gets the guild for this user. </summary>
@@ -27,6 +27,6 @@ namespace Discord
         /// <summary> Kicks this user from this guild. </summary>
         Task KickAsync(RequestOptions options = null);
         /// <summary> Modifies this user's properties in this guild. </summary>
-        Task ModifyAsync(Action<ModifyGuildMemberParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
     }
 }

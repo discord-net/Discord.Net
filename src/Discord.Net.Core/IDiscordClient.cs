@@ -1,4 +1,3 @@
-using Discord.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,16 +8,17 @@ namespace Discord
     public interface IDiscordClient : IDisposable
     {
         ConnectionState ConnectionState { get; }
-        DiscordRestApiClient ApiClient { get; }
         ISelfUser CurrentUser { get; }
 
-        Task ConnectAsync();
-        Task DisconnectAsync();
+        Task StartAsync();
+        Task StopAsync();
 
         Task<IApplication> GetApplicationInfoAsync();
 
         Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
+        Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload);
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync();
 

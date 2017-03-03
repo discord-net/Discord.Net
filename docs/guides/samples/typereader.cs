@@ -1,3 +1,4 @@
+// Note: This example is obsolete, a boolean type reader is bundled with Discord.Commands
 using Discord;
 using Discord.Commands;
 

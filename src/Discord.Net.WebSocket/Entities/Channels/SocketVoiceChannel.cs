@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ namespace Discord.WebSocket
     public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
     {
         public int Bitrate { get; private set; }
-        public int UserLimit { get; private set; }
+        public int? UserLimit { get; private set; }
 
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
@@ -35,11 +34,22 @@ namespace Discord.WebSocket
             base.Update(state, model);
 
             Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value;
+            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
+
+        public async Task<IAudioClient> ConnectAsync()
+        {
+            var audioMode = Discord.AudioMode;
+            if (audioMode == AudioMode.Disabled)
+                throw new InvalidOperationException($"Audio is not enabled on this client, {nameof(DiscordSocketConfig.AudioMode)} in {nameof(DiscordSocketConfig)} must be set.");
+
+            return await Guild.ConnectAudioAsync(Id,
+                (audioMode & AudioMode.Incoming) == 0,
+                (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
+        }
 
         public override SocketGuildUser GetUser(ulong id)
         {
@@ -51,9 +61,6 @@ namespace Discord.WebSocket
         
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
-
-        //IVoiceChannel
-        Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

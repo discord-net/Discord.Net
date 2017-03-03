@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord.API.Gateway
 {
-    public class MessageDeleteBulkEvent
+    internal class MessageDeleteBulkEvent
     {
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }

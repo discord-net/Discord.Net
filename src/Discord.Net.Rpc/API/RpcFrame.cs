@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.API.Rpc
 {
-    public class RpcFrame
+    internal class RpcFrame
     {
         [JsonProperty("cmd")]
         public string Cmd { get; set; }

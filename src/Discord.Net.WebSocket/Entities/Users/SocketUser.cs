@@ -15,7 +15,7 @@ namespace Discord.WebSocket
         internal abstract SocketGlobalUser GlobalUser { get; }
         internal abstract SocketPresence Presence { get; set; }
 
-        public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, AvatarId);
+        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Png, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
@@ -40,13 +40,14 @@ namespace Discord.WebSocket
         internal virtual void Update(ClientState state, PresenceModel model)
         {
             Presence = SocketPresence.Create(model);
+            Update(state, model.User);
         }
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public override string ToString() => $"{Username}#{Discriminator}";
-        internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         //IUser

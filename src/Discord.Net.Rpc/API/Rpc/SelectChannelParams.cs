@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class SelectChannelParams
+    internal class SelectChannelParams
     {
         [JsonProperty("channel_id")]
         public ulong? ChannelId { get; set; }

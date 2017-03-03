@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class IdentifyParams
+    internal class IdentifyParams
     {
         [JsonProperty("token")]
         public string Token { get; set; }

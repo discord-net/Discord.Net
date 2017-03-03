@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class Pan
+    internal class Pan
     {
         [JsonProperty("left")]
         public float Left { get; set; }

@@ -11,6 +11,7 @@
         //ManageGuild = 5,
 
         //Text
+        AddReactions = 6,
         ReadMessages = 10,
         SendMessages = 11,
         SendTTSMessages = 12,
@@ -33,7 +34,7 @@
         //ChangeNickname = 26,
         //ManageNicknames = 27,
         ManagePermissions = 28,
-        //ManageWebhooks = 29,
+        ManageWebhooks = 29,
         //ManageEmojis = 30
     }
 }

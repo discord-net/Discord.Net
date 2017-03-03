@@ -71,7 +71,7 @@ namespace Discord.Rpc
         }
 
         public override string ToString() => User.ToString();
-        internal string DebuggerDisplay => $"{User} ({_voiceStates})";
+        private string DebuggerDisplay => $"{User} ({_voiceStates})";
 
         string IVoiceState.VoiceSessionId { get { throw new NotSupportedException(); } }
         IVoiceChannel IVoiceState.VoiceChannel { get { throw new NotSupportedException(); } }

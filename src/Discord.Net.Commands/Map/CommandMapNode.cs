@@ -7,7 +7,7 @@ namespace Discord.Commands
 {
     internal class CommandMapNode
     {
-        private static readonly char[] _whitespaceChars = new char[] { ' ', '\r', '\n' };
+        private static readonly char[] _whitespaceChars = new[] { ' ', '\r', '\n' };
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
@@ -23,9 +23,9 @@ namespace Discord.Commands
             _commands = ImmutableArray.Create<CommandInfo>();
         }
 
-        public void AddCommand(string text, int index, CommandInfo command)
+        public void AddCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(text, index);
+            int nextSegment = NextSegment(text, index, service._separatorChar);
             string name;
 
             lock (_lockObj)
@@ -38,19 +38,20 @@ namespace Discord.Commands
                 }
                 else
                 {
-                    if (nextSpace == -1)
+                    if (nextSegment == -1)
                         name = text.Substring(index);
                     else
-                        name = text.Substring(index, nextSpace - index);
+                        name = text.Substring(index, nextSegment - index);
 
-                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(x));
-                    nextNode.AddCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                    string fullName = _name == "" ? name : _name + service._separatorChar + name;
+                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));
+                    nextNode.AddCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                 }
             }
         }
-        public void RemoveCommand(string text, int index, CommandInfo command)
+        public void RemoveCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSpace = NextWhitespace(text, index);
+            int nextSegment = NextSegment(text, index, service._separatorChar);
             string name;
 
             lock (_lockObj)
@@ -59,15 +60,15 @@ namespace Discord.Commands
                     _commands = _commands.Remove(command);
                 else
                 {
-                    if (nextSpace == -1)
+                    if (nextSegment == -1)
                         name = text.Substring(index);
                     else
-                        name = text.Substring(index, nextSpace - index);
+                        name = text.Substring(index, nextSegment - index);
 
                     CommandMapNode nextNode;
                     if (_nodes.TryGetValue(name, out nextNode))
                     {
-                        nextNode.RemoveCommand(nextSpace == -1 ? "" : text, nextSpace + 1, command);
+                        nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                         if (nextNode.IsEmpty)
                             _nodes.TryRemove(name, out nextNode);
                     }
@@ -75,39 +76,58 @@ namespace Discord.Commands
             }
         }
 
-        public IEnumerable<CommandInfo> GetCommands(string text, int index)
+        public IEnumerable<CommandMatch> GetCommands(CommandService service, string text, int index, bool visitChildren = true)
         {
-            int nextSpace = NextWhitespace(text, index);
-            string name;
-
             var commands = _commands;
             for (int i = 0; i < commands.Length; i++)
-                yield return _commands[i];
+                yield return new CommandMatch(_commands[i], _name);
 
-            if (text != "")
+            if (visitChildren)
             {
-                if (nextSpace == -1)
+                string name;
+                CommandMapNode nextNode;
+
+                //Search for next segment
+                int nextSegment = NextSegment(text, index, service._separatorChar);
+                if (nextSegment == -1)
                     name = text.Substring(index);
                 else
-                    name = text.Substring(index, nextSpace - index);
-
-                CommandMapNode nextNode;
+                    name = text.Substring(index, nextSegment - index);
                 if (_nodes.TryGetValue(name, out nextNode))
                 {
-                    foreach (var cmd in nextNode.GetCommands(nextSpace == -1 ? "" : text, nextSpace + 1))
+                    foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, true))
                         yield return cmd;
+                }
+
+                //Check if this is the last command segment before args
+                nextSegment = NextSegment(text, index, _whitespaceChars, service._separatorChar);
+                if (nextSegment != -1)
+                {
+                    name = text.Substring(index, nextSegment - index);
+                    if (_nodes.TryGetValue(name, out nextNode))
+                    {
+                        foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, false))
+                            yield return cmd;
+                    }
                 }
             }
         }
 
-        private static int NextWhitespace(string text, int startIndex)
+        private static int NextSegment(string text, int startIndex, char separator)
+        {
+            return text.IndexOf(separator, startIndex);
+        }
+        private static int NextSegment(string text, int startIndex, char[] separators, char except)
         {
             int lowest = int.MaxValue;
-            for (int i = 0; i < _whitespaceChars.Length; i++)
+            for (int i = 0; i < separators.Length; i++)
             {
-                int index = text.IndexOf(_whitespaceChars[i], startIndex);
-                if (index != -1 && index < lowest)
-                    lowest = index;
+                if (separators[i] != except)
+                {
+                    int index = text.IndexOf(separators[i], startIndex);
+                    if (index != -1 && index < lowest)
+                        lowest = index;
+                }
             }
             return (lowest != int.MaxValue) ? lowest : -1;
         }

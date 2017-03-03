@@ -3,18 +3,26 @@ using Discord.Rest;
 
 public class Program
 {
-    // Note: This is the light client, it only supports REST calls.
-    private DiscordClient _client;
+    private DiscordSocketClient _client;
     static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
     
     public async Task Start()
     {
-        _client = new DiscordClient(new DiscordConfig() {
+        _client = new DiscordSocketClient(new DiscordSocketConfig() {
 			LogLevel = LogSeverity.Info
         });
 
-        _client.Log += (message) => Console.WriteLine($"{message.ToString()}");
+        _client.Log += Log;
 
-        await _client.LoginAsync(TokenType.Bot, "bot token");
+	 await _client.LoginAsync(TokenType.Bot, "bot token");
+	 await _client.ConnectAsync();
+	    
+	 await Task.Delay(-1);
+    }
+
+    private Task Log(LogMessage message)
+    {
+        Console.WriteLine(message.ToString());
+        return Task.CompletedTask;
     }
 }

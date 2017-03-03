@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -14,8 +13,8 @@ namespace Discord.Rpc
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RpcVoiceChannel : RpcGuildChannel, IRpcAudioChannel, IVoiceChannel
     {
-        public int UserLimit { get; private set; }
         public int Bitrate { get; private set; }
+        public int? UserLimit { get; private set; }
         public IReadOnlyCollection<RpcVoiceState> VoiceStates { get; private set; }
 
         internal RpcVoiceChannel(DiscordRpcClient discord, ulong id, ulong guildId)
@@ -32,13 +31,13 @@ namespace Discord.Rpc
         {
             base.Update(model);
             if (model.UserLimit.IsSpecified)
-                UserLimit = model.UserLimit.Value;
+                UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
             if (model.Bitrate.IsSpecified)
                 Bitrate = model.Bitrate.Value;
             VoiceStates = model.VoiceStates.Select(x => RpcVoiceState.Create(Discord, x)).ToImmutableArray();
         }
 
-        public Task ModifyAsync(Action<ModifyVoiceChannelParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";

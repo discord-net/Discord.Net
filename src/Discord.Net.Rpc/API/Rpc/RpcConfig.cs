@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class RpcConfig
+    internal class RpcConfig
     {
         [JsonProperty("cdn_host")]
         public string CdnHost { get; set; }

@@ -15,17 +15,65 @@ namespace Discord.Audio
         private static extern int EncoderCtl(IntPtr st, OpusCtl request, int value);
         
         /// <summary> Gets the coding mode of the encoder. </summary>
-        public OpusApplication Application { get; }
+        public AudioApplication Application { get; }
+        public int BitRate { get;}
 
-        public OpusEncoder(int samplingRate, int channels, OpusApplication application = OpusApplication.MusicOrMixed)
+        public OpusEncoder(int samplingRate, int channels, int bitrate, AudioApplication application)
             : base(samplingRate, channels)
         {
+            if (bitrate < 1 || bitrate > DiscordVoiceAPIClient.MaxBitrate)
+                throw new ArgumentOutOfRangeException(nameof(bitrate));
+
             Application = application;
+            BitRate = bitrate;
+
+            OpusApplication opusApplication;
+            OpusSignal opusSignal;
+            switch (application)
+            {
+                case AudioApplication.Mixed:
+                    opusApplication = OpusApplication.MusicOrMixed;
+                    opusSignal = OpusSignal.Auto;
+                    break;
+                case AudioApplication.Music:
+                    opusApplication = OpusApplication.MusicOrMixed;
+                    opusSignal = OpusSignal.Music;
+                    break;
+                case AudioApplication.Voice:
+                    opusApplication = OpusApplication.Voice;
+                    opusSignal = OpusSignal.Voice;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(application));
+            }
 
             OpusError error;
-            _ptr = CreateEncoder(samplingRate, channels, (int)application, out error);
+            _ptr = CreateEncoder(samplingRate, channels, (int)opusApplication, out error);
             if (error != OpusError.OK)
                 throw new Exception($"Opus Error: {error}");
+
+            var result = EncoderCtl(_ptr, OpusCtl.SetSignal, (int)opusSignal);
+            if (result < 0)
+                throw new Exception($"Opus Error: {(OpusError)result}");
+
+            result = EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, 5); //%%
+            if (result < 0)
+                throw new Exception($"Opus Error: {(OpusError)result}");
+
+            result = EncoderCtl(_ptr, OpusCtl.SetInbandFEC, 1); //True
+            if (result < 0)
+                throw new Exception($"Opus Error: {(OpusError)result}");
+
+            result = EncoderCtl(_ptr, OpusCtl.SetBitrate, bitrate);
+            if (result < 0)
+                throw new Exception($"Opus Error: {(OpusError)result}");
+
+            /*if (application == AudioApplication.Music)
+            {
+                result = EncoderCtl(_ptr, OpusCtl.SetBandwidth, 1105);
+                if (result < 0)
+                    throw new Exception($"Opus Error: {(OpusError)result}");
+            }*/
         }
 
         /// <summary> Produces Opus encoded audio from PCM samples. </summary>
@@ -42,25 +90,6 @@ namespace Discord.Audio
             if (result < 0)
                 throw new Exception($"Opus Error: {(OpusError)result}");
             return result;
-        }
-
-        /// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
-        public void SetForwardErrorCorrection(bool value)
-        {
-            var result = EncoderCtl(_ptr, OpusCtl.SetInbandFECRequest, value ? 1 : 0);
-            if (result < 0)
-                throw new Exception($"Opus Error: {(OpusError)result}");
-        }
-
-        /// <summary> Gets or sets whether Forward Error Correction is enabled. </summary>
-        public void SetBitrate(int value)
-        {
-            if (value < 1 || value > DiscordVoiceAPIClient.MaxBitrate)
-                throw new ArgumentOutOfRangeException(nameof(value));
-
-            var result = EncoderCtl(_ptr, OpusCtl.SetBitrateRequest, value * 1000);
-            if (result < 0)
-                throw new Exception($"Opus Error: {(OpusError)result}");
         }
 
         protected override void Dispose(bool disposing)

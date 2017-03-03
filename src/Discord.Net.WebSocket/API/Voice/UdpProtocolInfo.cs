@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Voice
 {
-    public class UdpProtocolInfo
+    internal class UdpProtocolInfo
     {
         [JsonProperty("address")]
         public string Address { get; set; }

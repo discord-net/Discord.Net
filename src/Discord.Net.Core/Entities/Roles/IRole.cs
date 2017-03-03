@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -25,6 +24,6 @@ namespace Discord
         int Position { get; }
 
         ///// <summary> Modifies this role. </summary>
-        Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null);
     }
 }

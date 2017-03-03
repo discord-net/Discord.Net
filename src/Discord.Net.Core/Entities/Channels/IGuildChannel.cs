@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,12 +20,12 @@ namespace Discord
         /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
         /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
         /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
-        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 1800, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
         /// <summary> Returns a collection of all invites to this channel. </summary>
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
         
         /// <summary> Modifies this guild channel. </summary>
-        Task ModifyAsync(Action<ModifyGuildChannelParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
 
         /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
         OverwritePermissions? GetPermissionOverwrite(IRole role);

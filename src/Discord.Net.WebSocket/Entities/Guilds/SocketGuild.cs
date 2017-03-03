@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
@@ -32,6 +31,7 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
         private ImmutableArray<GuildEmoji> _emojis;
         private ImmutableArray<string> _features;
+        private AudioClient _audioClient;
         internal bool _available;
 
         public string Name { get; private set; }
@@ -42,23 +42,44 @@ namespace Discord.WebSocket
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
         public int MemberCount { get; set; }
         public int DownloadedMemberCount { get; private set; }
-        public AudioClient AudioClient { get; private set; }
 
-        public ulong? AFKChannelId { get; private set; }
-        public ulong? EmbedChannelId { get; private set; }
+        internal ulong? AFKChannelId { get; private set; }
+        internal ulong? EmbedChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
+        public SocketGuildUser Owner => GetUser(OwnerId);
         public string VoiceRegionId { get; private set; }
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
-        public ulong DefaultChannelId => Id;
-        public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
-        public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, SplashId);
-        public bool HasAllMembers => _downloaderPromise.Task.IsCompleted;
+        public SocketTextChannel DefaultChannel => GetTextChannel(Id);
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         public bool IsSynced => _syncPromise.Task.IsCompleted;
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
+        public IAudioClient AudioClient => _audioClient;
+        public SocketVoiceChannel AFKChannel
+        {
+            get
+            {
+                var id = AFKChannelId;
+                return id.HasValue ? GetVoiceChannel(id.Value) : null;
+            }
+        }
+        public SocketVoiceChannel EmbedChannel 
+        {
+            get
+            {
+                var id = EmbedChannelId;
+                return id.HasValue ? GetVoiceChannel(id.Value) : null;
+            }
+        }
+        public IReadOnlyCollection<SocketTextChannel> TextChannels
+            => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
+        public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
+            => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
         public SocketGuildUser CurrentUser
         {
             get
@@ -69,7 +90,6 @@ namespace Discord.WebSocket
                 return null;
             }
         }
-
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
         {
@@ -84,7 +104,6 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<string> Features => _features;
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
-        public IReadOnlyCollection<SocketVoiceState> VoiceStates => _voiceStates.ToReadOnlyCollection();
 
         internal SocketGuild(DiscordSocketClient client, ulong id)
             : base(client, id)
@@ -192,7 +211,7 @@ namespace Discord.WebSocket
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(GuildEmoji.Create(model.Emojis[i]));
+                    emojis.Add(model.Emojis[i].ToEntity());
                 _emojis = emojis.ToImmutable();
             }
             else
@@ -245,7 +264,7 @@ namespace Discord.WebSocket
         {
             var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
-                emojis.Add(GuildEmoji.Create(model.Emojis[i]));
+                emojis.Add(model.Emojis[i].ToEntity());
             _emojis = emojis.ToImmutable();
         }
 
@@ -253,13 +272,13 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
-        public Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
-        public Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
+        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
-        public Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
+        public Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
             => GuildHelper.ModifyChannelsAsync(this, Discord, args, options);
-        public Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
+        public Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
             => GuildHelper.ModifyRolesAsync(this, Discord, args, options);
 
         public Task LeaveAsync(RequestOptions options = null)
@@ -287,6 +306,10 @@ namespace Discord.WebSocket
                 return channel;
             return null;
         }
+        public SocketTextChannel GetTextChannel(ulong id)
+            => GetChannel(id) as SocketTextChannel;
+        public SocketVoiceChannel GetVoiceChannel(ulong id)
+            => GetChannel(id) as SocketVoiceChannel;
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
@@ -422,102 +445,107 @@ namespace Discord.WebSocket
         }
 
         //Audio
-        public async Task DisconnectAudioAsync(AudioClient client = null)
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute)
+        {
+            selfDeaf = false;
+            selfMute = false;
+
+            TaskCompletionSource<AudioClient> promise;
+
+            await _audioLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                promise = new TaskCompletionSource<AudioClient>();
+                _audioConnectPromise = promise;
+                await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
+                throw;
+            }
+            finally
+            {
+                _audioLock.Release();
+            }
+
+            try
+            {
+                var timeoutTask = Task.Delay(15000);
+                if (await Task.WhenAny(promise.Task, timeoutTask) == timeoutTask)
+                    throw new TimeoutException();
+                return await promise.Task.ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                await DisconnectAudioAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
+
+        internal async Task DisconnectAudioAsync()
         {
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectAudioInternalAsync(client).ConfigureAwait(false);
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
             }
             finally
             {
                 _audioLock.Release();
             }
         }
-        private async Task DisconnectAudioInternalAsync(AudioClient client = null)
+        private async Task DisconnectAudioInternalAsync()
         {
-            var oldClient = AudioClient;
-            if (oldClient != null)
-            {
-                if (client == null || oldClient == client)
-                {
-                    _audioConnectPromise?.TrySetCanceledAsync(); //Cancel any previous audio connection
-                    _audioConnectPromise = null;
-                }
-                if (oldClient == client)
-                {
-                    AudioClient = null;
-                    await oldClient.DisconnectAsync().ConfigureAwait(false);
-                }
-            }
+            _audioConnectPromise?.TrySetCanceledAsync(); //Cancel any previous audio connection
+            _audioConnectPromise = null;
+            if (_audioClient != null)
+                await _audioClient.StopAsync().ConfigureAwait(false);
+            _audioClient = null;
         }
         internal async Task FinishConnectAudio(int id, string url, string token)
         {
+            //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (AudioClient == null)
+                var promise = _audioConnectPromise;
+                if (_audioClient == null)
                 {
                     var audioClient = new AudioClient(this, id);
                     audioClient.Disconnected += async ex =>
                     {
-                        await _audioLock.WaitAsync().ConfigureAwait(false);
-                        try
+                        if (!promise.Task.IsCompleted)
                         {
-                            if (AudioClient == audioClient) //Only reconnect if we're still assigned as this guild's audio client
-                            {
-                                if (ex != null)
-                                {
-                                    //Reconnect if we still have channel info.
-                                    //TODO: Is this threadsafe? Could channel data be deleted before we access it?
-                                    var voiceState2 = GetVoiceState(Discord.CurrentUser.Id);
-                                    if (voiceState2.HasValue)
-                                    {
-                                        var voiceChannelId = voiceState2.Value.VoiceChannel?.Id;
-                                        if (voiceChannelId != null)
-                                            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, voiceChannelId, voiceState2.Value.IsSelfDeafened, voiceState2.Value.IsSelfMuted);
-                                    }
-                                }
-                                else
-                                {
-                                    try { AudioClient.Dispose(); } catch { }
-                                    AudioClient = null;
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            _audioLock.Release();
+                            try { audioClient.Dispose(); } catch { }
+                            _audioClient = null;
+                            if (ex != null)
+                                await promise.TrySetExceptionAsync(ex);
+                            else
+                                await promise.TrySetCanceledAsync();
+                            return;
                         }
                     };
-                    AudioClient = audioClient;
+                    _audioClient = audioClient;
                 }
-                await AudioClient.ConnectAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
-                await _audioConnectPromise.TrySetResultAsync(AudioClient).ConfigureAwait(false);
+                _audioClient.Connected += () => 
+                { 
+                    var _ = promise.TrySetResultAsync(_audioClient); 
+                    return Task.Delay(0);
+                };
+                await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);                
             }
             catch (OperationCanceledException)
             {
-                await DisconnectAudioAsync().ConfigureAwait(false);
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 await _audioConnectPromise.SetExceptionAsync(e).ConfigureAwait(false);
-                await DisconnectAudioAsync().ConfigureAwait(false);
-            }
-            finally
-            {
-                _audioLock.Release();
-            }
-        }
-        internal async Task FinishJoinAudioChannel()
-        {
-            await _audioLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                if (AudioClient != null)
-                    await _audioConnectPromise.TrySetResultAsync(AudioClient).ConfigureAwait(false);
+                await DisconnectAudioInternalAsync().ConfigureAwait(false);
             }
             finally
             {
@@ -530,8 +558,11 @@ namespace Discord.WebSocket
         internal SocketGuild Clone() => MemberwiseClone() as SocketGuild;
 
         //IGuild
-        bool IGuild.Available => true;
+        ulong? IGuild.AFKChannelId => AFKChannelId;
         IAudioClient IGuild.AudioClient => null;
+        bool IGuild.Available => true;
+        ulong IGuild.DefaultChannelId => Id;
+        ulong? IGuild.EmbedChannelId => EmbedChannelId;
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
@@ -542,6 +573,20 @@ namespace Discord.WebSocket
             => Task.FromResult<IReadOnlyCollection<IGuildChannel>>(Channels);
         Task<IGuildChannel> IGuild.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(GetChannel(id));
+        Task<IReadOnlyCollection<ITextChannel>> IGuild.GetTextChannelsAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<ITextChannel>>(TextChannels);
+        Task<ITextChannel> IGuild.GetTextChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<ITextChannel>(GetTextChannel(id));
+        Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
+        Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IVoiceChannel>(GetVoiceChannel(id));
+        Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IVoiceChannel>(AFKChannel);
+        Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<ITextChannel>(DefaultChannel);
+        Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IVoiceChannel>(EmbedChannel);
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
@@ -566,6 +611,8 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(GetUser(id));
         Task<IGuildUser> IGuild.GetCurrentUserAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(CurrentUser);
+        Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IGuildUser>(Owner);
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
     }
 }

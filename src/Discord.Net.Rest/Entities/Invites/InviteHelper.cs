@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Model = Discord.API.Invite;
 
 namespace Discord.Rest
 {

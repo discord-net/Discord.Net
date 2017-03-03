@@ -4,7 +4,7 @@ using System;
 
 namespace Discord.API.Rpc
 {
-    public class AuthenticateResponse
+    internal class AuthenticateResponse
     {
         [JsonProperty("application")]
         public Application Application { get; set; }

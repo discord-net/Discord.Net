@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class VoiceMode
+    internal class VoiceMode
     {
         [JsonProperty("type")]
         public Optional<string> Type { get; set; }

@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS1591
 namespace Discord.API.Gateway
 {
-    public enum GatewayOpCode : byte
+    internal enum GatewayOpCode : byte
     {
         /// <summary> C←S - Used to send most events. </summary>
         Dispatch = 0,

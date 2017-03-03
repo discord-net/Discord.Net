@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -53,13 +52,13 @@ namespace Discord
         IReadOnlyCollection<IRole> Roles { get; }
 
         /// <summary> Modifies this guild. </summary>
-        Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null);
         /// <summary> Modifies this guild's embed. </summary>
-        Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null);
+        Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
         /// <summary> Bulk modifies the channels of this guild. </summary>
-        Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null);
+        Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null);
         /// <summary> Bulk modifies the roles of this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null);
+        Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null);
         /// <summary> Leaves this guild. If you are the owner, use Delete instead. </summary>
         Task LeaveAsync(RequestOptions options = null);
 
@@ -78,6 +77,13 @@ namespace Discord
         Task<IReadOnlyCollection<IGuildChannel>> GetChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the channel in this guild with the provided id, or null if not found. </summary>
         Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IVoiceChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Creates a new text channel. </summary>
         Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
         /// <summary> Creates a new voice channel. </summary>
@@ -100,6 +106,8 @@ namespace Discord
         Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the current user for this guild. </summary>
         Task<IGuildUser> GetCurrentUserAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary> Gets the owner of this guild. </summary>
+        Task<IGuildUser> GetOwnerAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Downloads all users for this guild if the current list is incomplete. </summary>
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>

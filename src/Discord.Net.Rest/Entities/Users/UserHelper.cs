@@ -2,24 +2,52 @@
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
+using ImageModel = Discord.API.Image;
+using System.Linq;
 
 namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<ModifyCurrentUserParams> func,
+        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
             RequestOptions options)
         {
-            var args = new ModifyCurrentUserParams();
+            var args = new SelfUserProperties();
             func(args);
-            return await client.ApiClient.ModifySelfAsync(args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyCurrentUserParams
+            {
+                Avatar = args.Avatar.IsSpecified ? args.Avatar.Value?.ToModel() : Optional.Create<ImageModel?>(),
+                Username = args.Username
+            };
+
+            if (!apiArgs.Avatar.IsSpecified && user.AvatarId != null)
+                apiArgs.Avatar = new ImageModel(user.AvatarId);
+
+            return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<ModifyGuildMemberParams> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<ModifyGuildMemberParams> func,
+        public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
             RequestOptions options)
         {
-            var args = new ModifyGuildMemberParams();
+            var args = new GuildUserProperties();
             func(args);
-            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, args, options).ConfigureAwait(false);
+            var apiArgs = new API.Rest.ModifyGuildMemberParams
+            {
+                Deaf = args.Deaf,
+                Mute = args.Mute,
+                Nickname = args.Nickname
+            };
+
+            if (args.Channel.IsSpecified)
+                apiArgs.ChannelId = args.Channel.Value.Id;
+            else if (args.ChannelId.IsSpecified)
+                apiArgs.ChannelId = args.ChannelId.Value;
+
+            if (args.Roles.IsSpecified)
+                apiArgs.RoleIds = args.Roles.Value.Select(x => x.Id).ToArray();
+            else if (args.RoleIds.IsSpecified)
+                apiArgs.RoleIds = args.RoleIds.Value.ToArray();
+
+            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
         }
 

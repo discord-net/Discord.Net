@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Voice
 {
-    public class IdentifyParams
+    internal class IdentifyParams
     {
         [JsonProperty("server_id")]
         public ulong GuildId { get; set; }

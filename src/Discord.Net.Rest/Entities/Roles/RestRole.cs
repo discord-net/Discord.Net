@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
@@ -44,7 +43,7 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public async Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
         { 
             var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
@@ -52,7 +51,7 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
-        public int CompareTo(IRole role) => this.Compare(role);
+        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class RecipientEvent
+    internal class RecipientEvent
     {
         [JsonProperty("user")]
         public User User { get; set; }

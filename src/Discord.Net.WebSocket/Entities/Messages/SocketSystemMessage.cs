@@ -4,7 +4,7 @@ using Model = Discord.API.Message;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    internal class SocketSystemMessage : SocketMessage, ISystemMessage
+    public class SocketSystemMessage : SocketMessage, ISystemMessage
     {
         public MessageType Type { get; private set; }
 

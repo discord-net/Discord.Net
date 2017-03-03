@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Audio;
+﻿using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -35,8 +34,8 @@ namespace Discord.Rest
 
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
-        public string IconUrl => API.CDN.GetGuildIconUrl(Id, IconId);
-        public string SplashUrl => API.CDN.GetGuildSplashUrl(Id, SplashId);
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
         public RestRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
@@ -72,7 +71,7 @@ namespace Discord.Rest
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(GuildEmoji.Create(model.Emojis[i]));
+                    emojis.Add(model.Emojis[i].ToEntity());
                 _emojis = emojis.ToImmutableArray();
             }
             else
@@ -105,22 +104,22 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
 
-        public async Task ModifyAsync(Action<ModifyGuildParams> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyEmbedAsync(Action<ModifyGuildEmbedParams> func, RequestOptions options = null)
+        public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
         { 
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyChannelsAsync(IEnumerable<ModifyGuildChannelsParams> args, RequestOptions options = null)
+        public async Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
             await GuildHelper.ModifyChannelsAsync(this, Discord, arr, options);
         }
-        public async Task ModifyRolesAsync(IEnumerable<ModifyGuildRolesParams> args, RequestOptions options = null)
+        public async Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
         {
             var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options).ConfigureAwait(false);
             foreach (var model in models)
@@ -152,7 +151,53 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestGuildChannel>> GetChannelsAsync(RequestOptions options = null)
             => GuildHelper.GetChannelsAsync(this, Discord, options);
         public Task<RestGuildChannel> GetChannelAsync(ulong id, RequestOptions options = null)
-            => GuildHelper.GetChannelAsync(this, Discord, id, options);
+            => GuildHelper.GetChannelAsync(this, Discord, id, options);            
+        public async Task<RestTextChannel> GetTextChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestTextChannel;
+        }
+        public async Task<IReadOnlyCollection<RestTextChannel>> GetTextChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.Select(x => x as RestTextChannel).Where(x => x != null).ToImmutableArray();
+        }
+        public async Task<RestVoiceChannel> GetVoiceChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestVoiceChannel;
+        }
+        public async Task<IReadOnlyCollection<RestVoiceChannel>> GetVoiceChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.Select(x => x as RestVoiceChannel).Where(x => x != null).ToImmutableArray();
+        }
+
+        public async Task<RestVoiceChannel> GetAFKChannelAsync(RequestOptions options = null)
+        {
+            var afkId = AFKChannelId;
+            if (afkId.HasValue)
+            {
+                var channel = await GuildHelper.GetChannelAsync(this, Discord, afkId.Value, options).ConfigureAwait(false);
+                return channel as RestVoiceChannel;
+            }
+            return null;
+        }
+        public async Task<RestTextChannel> GetDefaultChannelAsync(RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, DefaultChannelId, options).ConfigureAwait(false);
+            return channel as RestTextChannel;
+        }
+        public async Task<RestVoiceChannel> GetEmbedChannelAsync(RequestOptions options = null)
+        {
+            var embedId = EmbedChannelId;
+            if (embedId.HasValue) 
+            {
+                var channel = await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
+                return channel as RestVoiceChannel;
+            }
+            return null;
+        }
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
@@ -192,6 +237,8 @@ namespace Discord.Rest
             => GuildHelper.GetUserAsync(this, Discord, id, options);
         public Task<RestGuildUser> GetCurrentUserAsync(RequestOptions options = null)
             => GuildHelper.GetUserAsync(this, Discord, Discord.CurrentUser.Id, options);
+        public Task<RestGuildUser> GetOwnerAsync(RequestOptions options = null)
+            => GuildHelper.GetUserAsync(this, Discord, OwnerId, options);
 
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
@@ -219,6 +266,55 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IReadOnlyCollection<ITextChannel>> IGuild.GetTextChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetTextChannelsAsync(options).ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<ITextChannel>();
+        }
+        async Task<ITextChannel> IGuild.GetTextChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetTextChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetVoiceChannelsAsync(options).ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IVoiceChannel>();
+        }
+        async Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetVoiceChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetAFKChannelAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetDefaultChannelAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetEmbedChannelAsync(options).ConfigureAwait(false);
             else
                 return null;
         }
@@ -251,6 +347,13 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetCurrentUserAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetOwnerAsync(options).ConfigureAwait(false);
             else
                 return null;
         }

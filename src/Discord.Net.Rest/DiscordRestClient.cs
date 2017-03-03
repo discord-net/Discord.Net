@@ -1,5 +1,4 @@
-﻿using Discord.Net.Queue;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,30 +7,49 @@ namespace Discord.Rest
 {
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
+        private RestApplication _applicationInfo;
+
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, requestQueue: new RequestQueue());
-
-        protected override Task OnLoginAsync(TokenType tokenType, string token)
+            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
+        internal override void Dispose(bool disposing)
         {
-            base.CurrentUser = RestSelfUser.Create(this, ApiClient.CurrentUser);
-            return Task.CompletedTask;
+            if (disposing)
+                ApiClient.Dispose();
+        }
+
+        internal override async Task OnLoginAsync(TokenType tokenType, string token)
+        {
+            var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+            ApiClient.CurrentUserId = user.Id;
+            base.CurrentUser = RestSelfUser.Create(this, user);
+        }
+        internal override Task OnLogoutAsync()
+        {
+            _applicationInfo = null;
+            return Task.Delay(0);
         }
 
         /// <inheritdoc />
-        public Task<RestApplication> GetApplicationInfoAsync()
-            => ClientHelper.GetApplicationInfoAsync(this);
+        public async Task<RestApplication> GetApplicationInfoAsync()
+        {
+            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this));
+        }
         
         /// <inheritdoc />
         public Task<RestChannel> GetChannelAsync(ulong id)
             => ClientHelper.GetChannelAsync(this, id);
         /// <inheritdoc />
-        public Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync()
+        public Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync()
             => ClientHelper.GetPrivateChannelsAsync(this);
+        public Task<IReadOnlyCollection<RestDMChannel>> GetDMChannelsAsync()
+            => ClientHelper.GetDMChannelsAsync(this);
+        public Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync()
+            => ClientHelper.GetGroupChannelsAsync(this);
 
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
@@ -88,6 +106,20 @@ namespace Discord.Rest
                 return await GetPrivateChannelsAsync().ConfigureAwait(false);
             else
                 return ImmutableArray.Create<IPrivateChannel>();
+        }
+        async Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetDMChannelsAsync().ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IDMChannel>();
+        }
+        async Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetGroupChannelsAsync().ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IGroupChannel>();
         }
 
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()

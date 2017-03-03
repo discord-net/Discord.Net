@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class AuthorizeResponse
+    internal class AuthorizeResponse
     {
         [JsonProperty("code")]
         public string Code { get; set; }

@@ -17,7 +17,7 @@ To hook into events, you must be using the @Discord.WebSocket.DiscordSocketClien
 
 Connection Events will be raised when the Connection State of your client changes.
 
-[DiscordSocketClient.Connected](xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_Connected) and [Disconnected](Discord_WebSocket_DiscordSocketClient_Disconnected) are raised when the Gateway Socket connects or disconnects, respectively.
+[DiscordSocketClient.Connected](xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_Connected) and [Disconnected](xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_Disconnected) are raised when the Gateway Socket connects or disconnects, respectively.
 
 >[!WARNING]
 >You should not use DiscordClient.Connected to run code when your client first connects to Discord. The client has not received and parsed the READY event and guild stream yet, and will have an incomplete or empty cache.

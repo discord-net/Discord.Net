@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using Discord.Rest;
+﻿using Discord.Rest;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -46,7 +45,7 @@ namespace Discord.WebSocket
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public Task ModifyAsync(Action<ModifyGuildRoleParams> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
             => RoleHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
@@ -55,8 +54,9 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketRole Clone() => MemberwiseClone() as SocketRole;
 
+        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
+
         //IRole
         IGuild IRole.Guild => Guild;
-        public int CompareTo(IRole role) => this.CompareTo(role);
     }
 }

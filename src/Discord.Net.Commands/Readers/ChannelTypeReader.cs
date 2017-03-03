@@ -9,7 +9,7 @@ namespace Discord.Commands
     internal class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async Task<TypeReaderResult> Read(CommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
             if (context.Guild != null)
             {

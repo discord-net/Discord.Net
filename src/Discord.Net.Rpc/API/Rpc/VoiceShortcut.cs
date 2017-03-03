@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class VoiceShortcut
+    internal class VoiceShortcut
     {
         [JsonProperty("type")]
         public Optional<VoiceShortcutType> Type { get; set; }

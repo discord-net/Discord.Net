@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class GuildMember
+    internal class GuildMember
     {
         [JsonProperty("user")]
         public User User { get; set; }

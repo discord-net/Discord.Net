@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class GetGuildsResponse
+    internal class GetGuildsResponse
     {
         [JsonProperty("guilds")]
         public GuildSummary[] Guilds { get; set; }

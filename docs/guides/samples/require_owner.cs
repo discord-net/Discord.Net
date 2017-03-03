@@ -1,10 +1,10 @@
-// Defining the Precondition
+// (Note: This precondition is obsolete, it is recommended to use the RequireOwnerAttribute that is bundled with Discord.Commands)
 
 // Inherit from PreconditionAttribute
 public class RequireOwnerAttribute : PreconditionAttribute
 {
     // Override the CheckPermissions method
-    public override Task<PreconditionResult> CheckPermissions(CommandContext context, CommandInfo command, IDependencyMap map)
+    public async override Task<PreconditionResult> CheckPermissions(CommandContext context, CommandInfo command, IDependencyMap map)
     {
         // Get the ID of the bot's owner
         var ownerId = (await map.Get<DiscordSocketClient>().GetApplicationInfoAsync()).Owner.Id;

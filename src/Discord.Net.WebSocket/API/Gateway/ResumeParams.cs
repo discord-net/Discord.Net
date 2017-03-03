@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class ResumeParams
+    internal class ResumeParams
     {
         [JsonProperty("token")]
         public string Token { get; set; }

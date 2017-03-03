@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class GuildSubscriptionParams
+    internal class GuildSubscriptionParams
     {
         [JsonProperty("guild_id")]
         public ulong GuildId { get; set; }

@@ -1,7 +1,6 @@
 ﻿using Discord.API.Rpc;
 using Discord.Logging;
 using Discord.Net.Converters;
-using Discord.Net.Queue;
 using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,31 +8,25 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Discord.Rpc
 {
-    public partial class DiscordRpcClient : BaseDiscordClient
+    public partial class DiscordRpcClient : BaseDiscordClient, IDiscordClient
     {
-        private readonly Logger _rpcLogger;
         private readonly JsonSerializer _serializer;
-
-        private TaskCompletionSource<bool> _connectTask;
-        private CancellationTokenSource _cancelToken, _reconnectCancelToken;
-        private Task _reconnectTask;
-        private bool _canReconnect;
+        private readonly ConnectionManager _connection;
+        private readonly Logger _rpcLogger;
+        private readonly SemaphoreSlim _stateLock, _authorizeLock;
 
         public ConnectionState ConnectionState { get; private set; }
         public IReadOnlyCollection<string> Scopes { get; private set; }
         public DateTimeOffset TokenExpiresAt { get; private set; }
 
-        //From DiscordRpcConfig
-        internal int ConnectionTimeout { get; private set; }
-
-        public new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
+        internal new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
         public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
-        public RestApplication CurrentApplication { get; private set; }
+        public RestApplication ApplicationInfo { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
         public DiscordRpcClient(string clientId, string origin) 
@@ -42,8 +35,13 @@ namespace Discord.Rpc
         public DiscordRpcClient(string clientId, string origin, DiscordRpcConfig config)
             : base(config, CreateApiClient(clientId, origin, config))
         {
-            ConnectionTimeout = config.ConnectionTimeout;
+            _stateLock = new SemaphoreSlim(1, 1);
+            _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
+            _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout, 
+                OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
+            _connection.Connected += () => _connectedEvent.InvokeAsync();
+            _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -54,179 +52,50 @@ namespace Discord.Rpc
             
             ApiClient.SentRpcMessage += async opCode => await _rpcLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedRpcEvent += ProcessMessageAsync;
-            ApiClient.Disconnected += async ex =>
-            {
-                if (ex != null)
-                {
-                    await _rpcLogger.WarningAsync($"Connection Closed", ex).ConfigureAwait(false);
-                    await StartReconnectAsync(ex).ConfigureAwait(false);
-                }
-                else
-                    await _rpcLogger.WarningAsync($"Connection Closed").ConfigureAwait(false);
-            };
         }
 
         private static API.DiscordRpcApiClient CreateApiClient(string clientId, string origin, DiscordRpcConfig config)
-            => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, requestQueue: new RequestQueue());
-
-        /// <inheritdoc />
-        public Task ConnectAsync() => ConnectAsync(false);
-        internal async Task ConnectAsync(bool ignoreLoginCheck)
+            => new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider);
+        internal override void Dispose(bool disposing)
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
+            if (disposing)
             {
-                await ConnectInternalAsync(ignoreLoginCheck, false).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task ConnectInternalAsync(bool ignoreLoginCheck, bool isReconnecting)
-        {
-            if (!ignoreLoginCheck && LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");
-            
-            if (!isReconnecting && _reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
-                _reconnectCancelToken.Cancel();
-
-            var state = ConnectionState;
-            if (state == ConnectionState.Connecting || state == ConnectionState.Connected)
-                await DisconnectInternalAsync(null, isReconnecting).ConfigureAwait(false);
-
-            ConnectionState = ConnectionState.Connecting;
-            await _rpcLogger.InfoAsync("Connecting").ConfigureAwait(false);
-            try
-            {
-                var connectTask = new TaskCompletionSource<bool>();
-                _connectTask = connectTask;
-                _cancelToken = new CancellationTokenSource();
-
-                //Abort connection on timeout
-                var _ = Task.Run(async () =>
-                {
-                    await Task.Delay(ConnectionTimeout).ConfigureAwait(false);
-                    connectTask.TrySetException(new TimeoutException());
-                });
-
-                await ApiClient.ConnectAsync().ConfigureAwait(false);
-                await _connectedEvent.InvokeAsync().ConfigureAwait(false);
-
-                await _connectTask.Task.ConfigureAwait(false);
-                if (!isReconnecting)
-                    _canReconnect = true;
-                ConnectionState = ConnectionState.Connected;
-                await _rpcLogger.InfoAsync("Connected").ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                await DisconnectInternalAsync(null, isReconnecting).ConfigureAwait(false);
-                throw;
+                StopAsync().GetAwaiter().GetResult();
+                ApiClient.Dispose();
             }
         }
-        /// <inheritdoc />
-        public async Task DisconnectAsync()
+
+        public Task StartAsync() => _connection.StartAsync();
+        public Task StopAsync() => _connection.StopAsync();
+
+        private async Task OnConnectingAsync()
         {
-            if (_connectTask?.TrySetCanceled() ?? false) return;
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(null, false).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
+            await _rpcLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
+            await ApiClient.ConnectAsync().ConfigureAwait(false);
+
+            await _connection.WaitAsync().ConfigureAwait(false);
         }
-        private async Task DisconnectInternalAsync(Exception ex, bool isReconnecting)
+        private async Task OnDisconnectingAsync(Exception ex)
         {
-            if (!isReconnecting)
-            {
-                _canReconnect = false;
-
-                if (_reconnectCancelToken != null && !_reconnectCancelToken.IsCancellationRequested)
-                    _reconnectCancelToken.Cancel();
-            }
-
-            if (ConnectionState == ConnectionState.Disconnected) return;
-            ConnectionState = ConnectionState.Disconnecting;
-            await _rpcLogger.InfoAsync("Disconnecting").ConfigureAwait(false);
-
-            await _rpcLogger.DebugAsync("Disconnecting - CancelToken").ConfigureAwait(false);
-            //Signal tasks to complete
-            try { _cancelToken.Cancel(); } catch { }
-
-            await _rpcLogger.DebugAsync("Disconnecting - ApiClient").ConfigureAwait(false);
-            //Disconnect from server
+            await _rpcLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
-            
-            ConnectionState = ConnectionState.Disconnected;
-            await _rpcLogger.InfoAsync("Disconnected").ConfigureAwait(false);
-
-            await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
-        }
-
-        private async Task StartReconnectAsync(Exception ex)
-        {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                if (!_canReconnect || _reconnectTask != null) return;
-                _reconnectCancelToken = new CancellationTokenSource();
-                _reconnectTask = ReconnectInternalAsync(ex, _reconnectCancelToken.Token);
-            }
-            finally { _connectionLock.Release(); }
-        }
-        private async Task ReconnectInternalAsync(Exception ex, CancellationToken cancelToken)
-        {
-            if (ex == null)
-            {
-                if (_connectTask?.TrySetCanceled() ?? false) return;
-            }
-            else
-            {
-                if (_connectTask?.TrySetException(ex) ?? false) return;
-            }
-
-            try
-            {
-                Random jitter = new Random();
-                int nextReconnectDelay = 1000;
-                while (true)
-                {
-                    await Task.Delay(nextReconnectDelay, cancelToken).ConfigureAwait(false);
-                    nextReconnectDelay = nextReconnectDelay * 2 + jitter.Next(-250, 250);
-                    if (nextReconnectDelay > 60000)
-                        nextReconnectDelay = 60000;
-
-                    await _connectionLock.WaitAsync().ConfigureAwait(false);
-                    try
-                    {
-                        if (cancelToken.IsCancellationRequested) return;
-                        await ConnectInternalAsync(false, true).ConfigureAwait(false);
-                        _reconnectTask = null;
-                        return;
-                    }
-                    catch (Exception ex2)
-                    {
-                        await _rpcLogger.WarningAsync("Reconnect failed", ex2).ConfigureAwait(false);
-                    }
-                    finally { _connectionLock.Release(); }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                await _connectionLock.WaitAsync().ConfigureAwait(false);
-                try
-                {
-                    await _rpcLogger.DebugAsync("Reconnect cancelled").ConfigureAwait(false);
-                    _reconnectTask = null;
-                }
-                finally { _connectionLock.Release(); }
-            }
         }
 
         public async Task<string> AuthorizeAsync(string[] scopes, string rpcToken = null, RequestOptions options = null)
         {
-            await ConnectAsync(true).ConfigureAwait(false);
-            var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken, options).ConfigureAwait(false);
-            await DisconnectAsync().ConfigureAwait(false);
-            return result.Code;
+            await _authorizeLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await _connection.StartAsync().ConfigureAwait(false);
+                await _connection.WaitAsync().ConfigureAwait(false);
+                var result = await ApiClient.SendAuthorizeAsync(scopes, rpcToken, options).ConfigureAwait(false);
+                await _connection.StopAsync().ConfigureAwait(false);
+                return result.Code;
+            }
+            finally
+            {
+                _authorizeLock.Release();
+            }
         }
 
         public async Task SubscribeGlobal(RpcGlobalEvent evnt, RequestOptions options = null)
@@ -312,20 +181,67 @@ namespace Discord.Rpc
             var model = await ApiClient.GetVoiceSettingsAsync(options).ConfigureAwait(false);
             return VoiceSettings.Create(model);
         }
-        public async Task SetVoiceSettingsAsync(Action<API.Rpc.VoiceSettings> func, RequestOptions options = null)
+        public async Task SetVoiceSettingsAsync(Action<VoiceProperties> func, RequestOptions options = null)
         {
-            var settings = new API.Rpc.VoiceSettings();
-            settings.Input = new VoiceDeviceSettings();
-            settings.Output = new VoiceDeviceSettings();
-            settings.Mode = new VoiceMode();
+            if (func == null) throw new NullReferenceException(nameof(func));
+
+            var settings = new VoiceProperties();
+            settings.Input = new VoiceDeviceProperties();
+            settings.Output = new VoiceDeviceProperties();
+            settings.Mode = new VoiceModeProperties();
             func(settings);
-            await ApiClient.SetVoiceSettingsAsync(settings, options).ConfigureAwait(false);
+
+            var model = new API.Rpc.VoiceSettings
+            {
+                AutomaticGainControl = settings.AutomaticGainControl,
+                EchoCancellation = settings.EchoCancellation,
+                NoiseSuppression = settings.NoiseSuppression,
+                QualityOfService = settings.QualityOfService,
+                SilenceWarning = settings.SilenceWarning
+            };
+            model.Input = new API.Rpc.VoiceDeviceSettings
+            {
+                DeviceId = settings.Input.DeviceId,
+                Volume = settings.Input.Volume
+            };
+            model.Output = new API.Rpc.VoiceDeviceSettings
+            {
+                DeviceId = settings.Output.DeviceId,
+                Volume = settings.Output.Volume
+            };
+            model.Mode = new API.Rpc.VoiceMode
+            {
+                AutoThreshold = settings.Mode.AutoThreshold,
+                Delay = settings.Mode.Delay,
+                Threshold = settings.Mode.Threshold,
+                Type = settings.Mode.Type
+            };
+
+            if (settings.Input.AvailableDevices.IsSpecified)
+                model.Input.AvailableDevices = settings.Input.AvailableDevices.Value.Select(x => x.ToModel()).ToArray();
+            if (settings.Output.AvailableDevices.IsSpecified)
+                model.Output.AvailableDevices = settings.Output.AvailableDevices.Value.Select(x => x.ToModel()).ToArray();
+            if (settings.Mode.Shortcut.IsSpecified)
+                model.Mode.Shortcut = settings.Mode.Shortcut.Value.Select(x => x.ToModel()).ToArray();
+
+            await ApiClient.SetVoiceSettingsAsync(model, options).ConfigureAwait(false);
         }
-        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<API.Rpc.UserVoiceSettings> func, RequestOptions options = null)
+        public async Task SetUserVoiceSettingsAsync(ulong userId, Action<UserVoiceProperties> func, RequestOptions options = null)
         {
-            var settings = new API.Rpc.UserVoiceSettings();
+            if (func == null) throw new NullReferenceException(nameof(func));
+
+            var settings = new UserVoiceProperties();
             func(settings);
-            await ApiClient.SetUserVoiceSettingsAsync(userId, settings, options).ConfigureAwait(false);
+
+            var model = new API.Rpc.UserVoiceSettings
+            {
+                Mute = settings.Mute,
+                UserId = settings.UserId,
+                Volume = settings.Volume
+            };
+            if (settings.Pan.IsSpecified)
+                model.Pan = settings.Pan.Value.ToModel();
+            await ApiClient.SetUserVoiceSettingsAsync(userId, model, options).ConfigureAwait(false);
         }
 
         private static string GetEventName(RpcGlobalEvent rpcEvent)
@@ -393,11 +309,12 @@ namespace Discord.Rpc
                                             {
                                                 var response = await ApiClient.SendAuthenticateAsync(options).ConfigureAwait(false);
                                                 CurrentUser = RestSelfUser.Create(this, response.User);
-                                                CurrentApplication = RestApplication.Create(this, response.Application);
+                                                ApiClient.CurrentUserId = CurrentUser.Id;
+                                                ApplicationInfo = RestApplication.Create(this, response.Application);
                                                 Scopes = response.Scopes;
                                                 TokenExpiresAt = response.Expires;
-
-                                                var __ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                                
+                                                var __ = _connection.CompleteAsync();
                                                 await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
                                             }
                                             catch (Exception ex)
@@ -409,7 +326,7 @@ namespace Discord.Rpc
                                     }
                                     else
                                     {
-                                        var _ = _connectTask.TrySetResultAsync(true); //Signal the .Connect() call to complete
+                                        var _ = _connection.CompleteAsync();
                                         await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
                                     }
                                 }
@@ -547,5 +464,15 @@ namespace Discord.Rpc
                 return;
             }
         }
+
+        //IDiscordClient
+        ConnectionState IDiscordClient.ConnectionState => _connection.State;
+
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync() => Task.FromResult<IApplication>(ApplicationInfo);
+
+        async Task IDiscordClient.StartAsync()
+            => await StartAsync().ConfigureAwait(false);
+        async Task IDiscordClient.StopAsync()
+            => await StopAsync().ConfigureAwait(false);
     }
 }

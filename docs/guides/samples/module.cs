@@ -7,7 +7,7 @@ public class Info : ModuleBase
 {
     // ~say hello -> hello
     [Command("say"), Summary("Echos a message.")]
-    public async Task Say([Unparsed, Summary("The text to echo")] string echo)
+    public async Task Say([Remainder, Summary("The text to echo")] string echo)
     {
         // ReplyAsync is a method on ModuleBase
         await ReplyAsync(echo);

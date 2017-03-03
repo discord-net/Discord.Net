@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Model = Discord.API.Game;
 
 namespace Discord
 {
@@ -18,12 +17,6 @@ namespace Discord
         }
         private Game(string name)
             : this(name, null, StreamType.NotStreaming) { }
-        internal static Game Create(Model model)
-        {
-            return new Game(model.Name, 
-                model.StreamUrl.GetValueOrDefault(null), 
-                model.StreamType.GetValueOrDefault(null) ?? StreamType.NotStreaming);
-        }
 
         public override string ToString() => Name;
         private string DebuggerDisplay => StreamUrl != null ? $"{Name} ({StreamUrl})" : Name;

@@ -1,4 +1,3 @@
-using Discord.API.Rest;
 using System;
 using System.Threading.Tasks;
 
@@ -13,6 +12,6 @@ namespace Discord
         /// <summary> Returns true if this user has enabled MFA on their account. </summary>
         bool IsMfaEnabled { get; }
 
-        Task ModifyAsync(Action<ModifyCurrentUserParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null);
     }
 }

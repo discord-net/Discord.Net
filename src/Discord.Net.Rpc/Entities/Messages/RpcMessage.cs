@@ -33,7 +33,7 @@ namespace Discord.Rpc
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RpcMessage(DiscordRpcClient discord, ulong id, IMessageChannel channel, RpcUser author)
+        internal RpcMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
             : base(discord, id)
         {
             Channel = channel;
@@ -62,7 +62,9 @@ namespace Discord.Rpc
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
-
+        
+        //IMessage
+        IMessageChannel IMessage.Channel => Channel;
         MessageType IMessage.Type => MessageType.Default;
         IUser IMessage.Author => Author;
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;

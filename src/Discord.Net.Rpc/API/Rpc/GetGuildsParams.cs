@@ -2,7 +2,7 @@
 
 namespace Discord.API.Rpc
 {
-    public class GetGuildsParams
+    internal class GetGuildsParams
     {
     }
 }

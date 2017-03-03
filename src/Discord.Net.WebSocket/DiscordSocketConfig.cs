@@ -1,4 +1,5 @@
 ﻿using Discord.Audio;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 
@@ -8,13 +9,16 @@ namespace Discord.WebSocket
     {
         public const string GatewayEncoding = "json";
 
+        /// <summary> Gets or sets the websocket host to connect to. If null, the client will use the /gateway endpoint. </summary>
+        public string GatewayHost { get; set; } = null;
+
         /// <summary> Gets or sets the time, in milliseconds, to wait for a connection to complete before aborting. </summary>
         public int ConnectionTimeout { get; set; } = 30000;
 
         /// <summary> Gets or sets the id for this shard. Must be less than TotalShards. </summary>
-        public int ShardId { get; set; } = 0;
+        public int? ShardId { get; set; } = null;
         /// <summary> Gets or sets the total number of shards for this application. </summary>
-        public int TotalShards { get; set; } = 1;
+        public int? TotalShards { get; set; } = null;
 
         /// <summary> Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero disables the message cache entirely. </summary>
         public int MessageCacheSize { get; set; } = 0;
@@ -27,6 +31,19 @@ namespace Discord.WebSocket
         public AudioMode AudioMode { get; set; } = AudioMode.Disabled;
 
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
-        public WebSocketProvider WebSocketProvider { get; set; } = () => new DefaultWebSocketClient();
+        public WebSocketProvider WebSocketProvider { get; set; }
+        /// <summary> Gets or sets the provider used to generate new udp sockets. </summary>
+        public UdpSocketProvider UdpSocketProvider { get; set; }
+
+        /// <summary> Gets or sets whether or not all users should be downloaded as guilds come available. </summary>
+        public bool AlwaysDownloadUsers { get; set; } = false;
+
+        public DiscordSocketConfig()
+        {
+            WebSocketProvider = DefaultWebSocketProvider.Instance;
+            UdpSocketProvider = DefaultUdpSocketProvider.Instance;
+        }
+
+        internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;
     }
 }

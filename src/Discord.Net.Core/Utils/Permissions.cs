@@ -118,6 +118,7 @@ namespace Discord
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
 
+                //Give/Take Role permissions
                 OverwritePermissions? perms;
                 var roleIds = user.RoleIds;
                 if (roleIds.Count > 0)
@@ -128,15 +129,17 @@ namespace Discord
                         perms = channel.GetPermissionOverwrite(guild.GetRole(roleId));
                         if (perms != null)
                         {
-                            deniedPermissions |= perms.Value.DenyValue;
                             allowedPermissions |= perms.Value.AllowValue;
+                            deniedPermissions |= perms.Value.DenyValue;
                         }
                     }
-                    resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
+                    resolvedPermissions = (resolvedPermissions | allowedPermissions) & ~deniedPermissions;
                 }
+
+                //Give/Take User permissions
                 perms = channel.GetPermissionOverwrite(user);
                 if (perms != null)
-                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
+                    resolvedPermissions = (resolvedPermissions | perms.Value.AllowValue)  & ~perms.Value.DenyValue;
 
                 //TODO: C#7 Typeswitch candidate
                 var textChannel = channel as ITextChannel;

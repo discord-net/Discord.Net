@@ -11,6 +11,7 @@
         ManageGuild = 5,
 
         //Text
+        AddReactions = 6,
         ReadMessages = 10,
         SendMessages = 11,
         SendTTSMessages = 12,

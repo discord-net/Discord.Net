@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Gateway
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class StatusUpdateParams
+    internal class StatusUpdateParams
     {
         [JsonProperty("status")]
         public UserStatus Status { get; set; }

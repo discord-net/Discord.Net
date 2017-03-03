@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class UserVoiceSettings
+    internal class UserVoiceSettings
     {
         [JsonProperty("userId")]
         internal ulong UserId { get; set; }

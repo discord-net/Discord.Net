@@ -10,7 +10,7 @@ namespace Discord.Commands
 {
     internal static class ModuleClassBuilder
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(ModuleBase).GetTypeInfo();
+        private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         public static IEnumerable<TypeInfo> Search(Assembly assembly)
         {
@@ -28,8 +28,8 @@ namespace Discord.Commands
         public static Dictionary<Type, ModuleInfo> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
         public static Dictionary<Type, ModuleInfo> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
         {
-            if (!validTypes.Any())
-                throw new InvalidOperationException("Could not find any valid modules from the given selection");
+            /*if (!validTypes.Any())
+                throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
             
             var topLevelGroups = validTypes.Where(x => x.DeclaringType == null);
             var subGroups = validTypes.Intersect(topLevelGroups);
@@ -65,7 +65,8 @@ namespace Discord.Commands
                 if (builtTypes.Contains(typeInfo))
                     continue;
                 
-                builder.AddModule((module) => {
+                builder.AddModule((module) => 
+                {
                     BuildModule(module, typeInfo, service);
                     BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
                 });
@@ -88,17 +89,20 @@ namespace Discord.Commands
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
-                    builder.AddAlias((attribute as AliasAttribute).Aliases);
+                    builder.AddAliases((attribute as AliasAttribute).Aliases);
                 else if (attribute is GroupAttribute)
                 {
                     var groupAttr = attribute as GroupAttribute;
                     builder.Name = builder.Name ?? groupAttr.Prefix;
-                    builder.AddAlias(groupAttr.Prefix);
+                    builder.AddAliases(groupAttr.Prefix);
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
+            //Check for unspecified info
+            if (builder.Aliases.Count == 0)
+                builder.AddAliases("");
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
@@ -106,7 +110,8 @@ namespace Discord.Commands
 
             foreach (var method in validCommands)
             {
-                builder.AddCommand((command) => {
+                builder.AddCommand((command) => 
+                {
                     BuildCommand(command, typeInfo, method, service);
                 });
             }
@@ -115,7 +120,7 @@ namespace Discord.Commands
         private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
         {
             var attributes = method.GetCustomAttributes();
-
+            
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
@@ -140,25 +145,33 @@ namespace Discord.Commands
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
+            if (builder.Name == null)
+                builder.Name = method.Name;
+
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;
             foreach (var paramInfo in parameters)
             {
-                builder.AddParameter((parameter) => {
+                builder.AddParameter((parameter) => 
+                {
                     BuildParameter(parameter, paramInfo, pos++, count, service);
                 });
             }
 
-            var createInstance = ReflectionUtils.CreateBuilder<ModuleBase>(typeInfo, service);
+            var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
-            builder.Callback = (ctx, args, map) => {
+            builder.Callback = (ctx, args, map) => 
+            {
                 var instance = createInstance(map);
-                instance.Context = ctx;
+                instance.SetContext(ctx);
                 try
                 {
-                    return method.Invoke(instance, args) as Task ?? Task.CompletedTask;
+                    instance.BeforeExecute();
+                    return method.Invoke(instance, args) as Task ?? Task.Delay(0);
                 }
-                finally{
+                finally
+                {
+                    instance.AfterExecute();
                     (instance as IDisposable)?.Dispose();
                 }
             };
@@ -179,6 +192,10 @@ namespace Discord.Commands
                 // TODO: C#7 type switch
                 if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
+                else if (attribute is OverrideTypeReaderAttribute)
+                    builder.TypeReader = GetTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
+                else if (attribute is ParameterPreconditionAttribute)
+                    builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
                 else if (attribute is ParamArrayAttribute)
                 {
                     builder.IsMultiple = true;
@@ -193,23 +210,37 @@ namespace Discord.Commands
                 }
             }
 
-            var reader = service.GetTypeReader(paramType);
-            if (reader == null)
+            builder.ParameterType = paramType;
+
+            if (builder.TypeReader == null)
             {
-                var paramTypeInfo = paramType.GetTypeInfo();
-                if (paramTypeInfo.IsEnum)
-                {
-                    reader = EnumTypeReader.GetReader(paramType);
-                    service.AddTypeReader(paramType, reader);
-                }
+                var readers = service.GetTypeReaders(paramType);
+                TypeReader reader = null;
+
+                if (readers != null)
+                    reader = readers.FirstOrDefault().Value;
                 else
-                {
-                    throw new InvalidOperationException($"{paramType.FullName} is not supported as a command parameter, are you missing a TypeReader?");
-                }
+                    reader = service.GetDefaultTypeReader(paramType);
+
+                builder.TypeReader = reader;
+            }
+        }
+
+        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType)
+        {
+            var readers = service.GetTypeReaders(paramType);
+            TypeReader reader = null;
+            if (readers != null)
+            {
+                if (readers.TryGetValue(typeReaderType, out reader))
+                    return reader;
             }
 
-            builder.ParameterType = paramType;
-            builder.TypeReader = reader;
+            //We dont have a cached type reader, create one
+            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
+            service.AddTypeReader(paramType, reader);
+
+            return reader;
         }
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)

@@ -1,5 +1,4 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -10,6 +9,6 @@ namespace Discord
         string Topic { get; }
 
         /// <summary> Modifies this text channel. </summary>
-        Task ModifyAsync(Action<ModifyTextChannelParams> func, RequestOptions options = null);
+        Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
     }
 }

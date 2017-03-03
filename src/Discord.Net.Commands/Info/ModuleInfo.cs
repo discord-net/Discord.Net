@@ -14,61 +14,61 @@ namespace Discord.Commands
         public string Remarks { get; }
 
         public IReadOnlyList<string> Aliases { get; }
-        public IEnumerable<CommandInfo> Commands { get; }
+        public IReadOnlyList<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
         public IReadOnlyList<ModuleInfo> Submodules { get; }
+        public ModuleInfo Parent { get; }
+        public bool IsSubmodule => Parent != null;
 
-        internal ModuleInfo(ModuleBuilder builder, CommandService service)
+        internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
         {
             Service = service;
 
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
+            Parent = parent;
 
-            Aliases = BuildAliases(builder).ToImmutableArray();
-            Commands = builder.Commands.Select(x => x.Build(this, service));
+            Aliases = BuildAliases(builder, service).ToImmutableArray();
+            Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
 
             Submodules = BuildSubmodules(builder, service).ToImmutableArray();
         }
 
-        private static IEnumerable<string> BuildAliases(ModuleBuilder builder)
+        private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
         {
-            IEnumerable<string> result = null;
+            var result = builder.Aliases.ToList();
+            var builderQueue = new Queue<ModuleBuilder>();
 
-            Stack<ModuleBuilder> builderStack = new Stack<ModuleBuilder>();
-            builderStack.Push(builder);
+            var parent = builder;
+            while ((parent = parent.Parent) != null)
+                builderQueue.Enqueue(parent);
 
-            ModuleBuilder parent = builder.Parent;
-            while (parent != null)
+            while (builderQueue.Count > 0)
             {
-                builderStack.Push(parent);
-                parent = parent.Parent;
-            }
-
-            while (builderStack.Count() > 0)
-            {
-                ModuleBuilder level = builderStack.Pop(); // get the topmost builder
-                if (result == null)
-                    result = level.Aliases.ToList(); // create a shallow copy so we don't overwrite the builder unexpectedly
-                else if (result.Count() > level.Aliases.Count)
-                    result = result.Permutate(level.Aliases, (first, second) => first + " " + second);
-                else
-                    result = level.Aliases.Permutate(result, (second, first) => first + " " + second);
+                var level = builderQueue.Dequeue();
+                // permute in reverse because we want to *prefix* our aliases
+                result = level.Aliases.Permutate(result, (first, second) =>
+                {
+                    if (first == "")
+                        return second;
+                    else if (second == "")
+                        return first;
+                    else
+                        return first + service._separatorChar + second;
+                }).ToList();
             }
 
             return result;
         }
 
-        private static List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
+        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
         {
             var result = new List<ModuleInfo>();
 
             foreach (var submodule in parent.Modules)
-            {
-                result.Add(submodule.Build(service));
-            }
+                result.Add(submodule.Build(service, this));
 
             return result;
         }

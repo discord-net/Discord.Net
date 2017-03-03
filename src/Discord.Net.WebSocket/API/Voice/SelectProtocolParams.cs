@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Voice
 {
-    public class SelectProtocolParams
+    internal class SelectProtocolParams
     {
         [JsonProperty("protocol")]
         public string Protocol { get; set; }

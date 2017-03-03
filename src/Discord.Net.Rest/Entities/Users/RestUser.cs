@@ -13,7 +13,7 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string AvatarUrl => API.CDN.GetUserAvatarUrl(Id, AvatarId);
+        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Png, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
@@ -52,7 +52,7 @@ namespace Discord.Rest
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public override string ToString() => $"{Username}#{Discriminator}";
-        internal string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)

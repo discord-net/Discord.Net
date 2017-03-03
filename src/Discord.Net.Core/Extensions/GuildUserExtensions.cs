@@ -6,7 +6,6 @@ namespace Discord
 {
     public static class GuildUserExtensions
     {
-        //TODO: Should we remove Add/Remove? Encourages race conditions.
         public static Task AddRolesAsync(this IGuildUser user, params IRole[] roles)
             => ChangeRolesAsync(user, add: roles);
         public static Task AddRolesAsync(this IGuildUser user, IEnumerable<IRole> roles)

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Rpc
 {
-    public class ReadyEvent
+    internal class ReadyEvent
     {
         [JsonProperty("v")]
         public int Version { get; set; }

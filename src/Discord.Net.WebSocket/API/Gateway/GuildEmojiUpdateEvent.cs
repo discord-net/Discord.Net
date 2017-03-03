@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class GuildEmojiUpdateEvent
+    internal class GuildEmojiUpdateEvent
     {
         [JsonProperty("guild_id")]
         public ulong GuildId { get; set; }

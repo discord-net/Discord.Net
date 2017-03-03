@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Discord.Net</id>
+    <version>1.0.0-rc-$build$</version>
+    <title>Discord.Net</title>
+    <authors>RogueException</authors>
+    <owners>RogueException</owners>
+    <description>An aynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.</description>
+    <tags>discord;discordapp</tags>
+    <projectUrl>https://github.com/RogueException/Discord.Net</projectUrl>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+        <group targetFramework="netstandard1.1">
+            <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc-$build$" />
+        </group>
+        <group targetFramework="netstandard1.3">
+            <dependency id="Discord.Net.Core" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc-$build$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc-$build$" />
+        </group>
+    </dependencies>
+  </metadata>
+</package>

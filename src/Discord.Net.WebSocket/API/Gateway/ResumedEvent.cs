@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
-    public class ResumedEvent 
+    internal class ResumedEvent 
     { 
         [JsonProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }

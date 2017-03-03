@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API.Voice
 {
-    public class SessionDescriptionEvent
+    internal class SessionDescriptionEvent
     {
         [JsonProperty("secret_key")]
         public byte[] SecretKey { get; set; }
