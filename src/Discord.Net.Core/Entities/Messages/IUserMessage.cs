@@ -14,7 +14,7 @@ namespace Discord
         Task UnpinAsync(RequestOptions options = null);
 
         /// <summary> Returns all reactions included in this message. </summary>
-        IReadOnlyDictionary<Emoji, int> Reactions { get; }
+        IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions { get; }
 
         /// <summary> Adds a reaction to this message. </summary>
         Task AddReactionAsync(Emoji emoji, RequestOptions options = null);
