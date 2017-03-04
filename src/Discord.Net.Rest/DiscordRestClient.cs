@@ -89,6 +89,9 @@ namespace Discord.Rest
         public Task<RestVoiceRegion> GetVoiceRegionAsync(string id)
             => ClientHelper.GetVoiceRegionAsync(this, id);
 
+        public Task<IReadOnlyCollection<RestRelationship>> GetRelationshipsAsync()
+            => ClientHelper.GetRelationshipsAsync(this);
+
         //IDiscordClient
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
             => await GetApplicationInfoAsync().ConfigureAwait(false);

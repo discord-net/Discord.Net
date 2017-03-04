@@ -53,26 +53,18 @@ namespace Discord.Rest
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        
+        public Task AddFriendAsync(RequestOptions options = null)
+            => Discord.ApiClient.AddFriendAsync(Id, options);
+        public Task BlockUserAsync(RequestOptions options = null)
+            => Discord.ApiClient.BlockUserAsync(Id, options);
+        public Task RemoveRelationshipAsync(RequestOptions options = null)
+            => Discord.ApiClient.RemoveRelationshipAsync(Id, options);
 
         //IUser
         Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IDMChannel>(null);
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
-
-        public Task AddFriendAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task BlockUserAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveRelationshipAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
