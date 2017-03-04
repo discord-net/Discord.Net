@@ -31,10 +31,7 @@ namespace Discord
         Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload);
         Task<IUser> GetUserAsync(string username, string discriminator);
 
-        Task<IReadOnlyCollection<Relationship>> GetRelationshipsAsync();
-        Task RemoveRelationshipAsync(ulong userId);
-        Task AddFriendAsync(ulong userId);
-        Task BlockUserAsync(ulong userId);
+        Task<IReadOnlyCollection<IRelationship>> GetRelationshipsAsync();
 
         Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync();
         Task<IVoiceRegion> GetVoiceRegionAsync(string id);

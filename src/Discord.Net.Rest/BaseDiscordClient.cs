@@ -122,10 +122,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public void Dispose() => Dispose(true);
 
-        public Task<IReadOnlyCollection<API.Relationship>> GetRelationshipsAsync() => ApiClient.GetRelationshipsAsync();
-        public Task AddFriendAsync(ulong userId) => ApiClient.AddFriendAsync(userId);
-        public Task BlockUserAsync(ulong userId) => ApiClient.BlockUserAsync(userId);
-        public Task RemoveRelationshipAsync(ulong userId) => ApiClient.RemoveRelationshipAsync(userId);
+        public Task<IReadOnlyCollection<IRelationship>> GetRelationshipsAsync() => ApiClient.GetRelationshipsAsync();
 
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;

@@ -49,5 +49,14 @@ namespace Discord.Rest
             var model = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
+
+        Task IUser.AddFriendAsync(RequestOptions options) =>
+            throw new InvalidOperationException("You can't friend yourself!");
+
+        Task IUser.BlockUserAsync(RequestOptions options) =>
+            throw new InvalidOperationException("You can't block yourself!");
+
+        Task IUser.RemoveRelationshipAsync(RequestOptions options) =>
+            throw new InvalidOperationException("You don't have any relations with yourself!");
     }
 }

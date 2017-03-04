@@ -54,5 +54,20 @@ namespace Discord.Rpc
             => Task.FromResult<IDMChannel>(null);
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
+
+        public Task AddFriendAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task BlockUserAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveRelationshipAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
