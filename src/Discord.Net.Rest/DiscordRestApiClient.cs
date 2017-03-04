@@ -1047,7 +1047,7 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new { value = 2 }, new BucketIds(), options: options).ConfigureAwait(false);
+            await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new { type = 2 }, new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task RemoveRelationshipAsync(ulong userId, RequestOptions options = null)
         {
