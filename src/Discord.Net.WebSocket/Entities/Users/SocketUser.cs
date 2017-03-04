@@ -56,19 +56,13 @@ namespace Discord.WebSocket
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
 
-        public Task AddFriendAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task AddFriendAsync(RequestOptions options = null)
+            => await Discord.ApiClient.AddFriendAsync(Id, options);
 
-        public Task BlockUserAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task BlockUserAsync(RequestOptions options = null)
+            => await Discord.ApiClient.BlockUserAsync(Id, options);
 
-        public Task RemoveRelationshipAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task RemoveRelationshipAsync(RequestOptions options = null)
+            => await Discord.ApiClient.RemoveRelationshipAsync(Id, options);
     }
 }

@@ -1030,10 +1030,10 @@ namespace Discord.API
         }
         
         //Relationships
-        public async Task<IReadOnlyCollection<IRelationship>> GetRelationshipsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Relationship>> GetRelationshipsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<IRelationship>>("GET", () => "users/@me/relationships", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<IReadOnlyCollection<Relationship>>("GET", () => "users/@me/relationships", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task AddFriendAsync(ulong userId, RequestOptions options = null)
         {

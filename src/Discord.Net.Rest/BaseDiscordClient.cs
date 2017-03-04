@@ -121,13 +121,14 @@ namespace Discord.Rest
         }
         /// <inheritdoc />
         public void Dispose() => Dispose(true);
-
-        public Task<IReadOnlyCollection<IRelationship>> GetRelationshipsAsync() => ApiClient.GetRelationshipsAsync();
-
+        
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
-
+        
+        Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync()
+            => Task.FromResult<IReadOnlyCollection<IRelationship>>(null);
+        
         Task<IApplication> IDiscordClient.GetApplicationInfoAsync() { throw new NotSupportedException(); }
 
         Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
