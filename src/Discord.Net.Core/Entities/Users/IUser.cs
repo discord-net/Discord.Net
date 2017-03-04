@@ -21,7 +21,7 @@ namespace Discord
         Task<IDMChannel> GetDMChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
         Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null);
-
+        
         /// <summary> Adds this user as a friend, this will remove a block </summary>
         Task AddFriendAsync(RequestOptions options = null);
         /// <summary> Blocks this user, and removes friend relation </summary>

@@ -39,7 +39,7 @@ namespace Discord.WebSocket
             _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
-            _relations = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)AverageRelationshipsPerUser);
+            _relations = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(AverageRelationshipsPerUser * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 

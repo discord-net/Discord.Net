@@ -1,5 +1,6 @@
 ﻿using Discord.Rest;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
@@ -21,6 +22,7 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionUser(Id);
         public Game? Game => Presence.Game;
         public UserStatus Status => Presence.Status;
+        public RelationshipType Relationship => Discord.Relationships.FirstOrDefault(r => r.User.Id == Id)?.Type ?? RelationshipType.None;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -55,13 +57,11 @@ namespace Discord.WebSocket
             => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
-
+        
         public async Task AddFriendAsync(RequestOptions options = null)
             => await Discord.ApiClient.AddFriendAsync(Id, options);
-
         public async Task BlockUserAsync(RequestOptions options = null)
             => await Discord.ApiClient.BlockUserAsync(Id, options);
-
         public async Task RemoveRelationshipAsync(RequestOptions options = null)
             => await Discord.ApiClient.RemoveRelationshipAsync(Id, options);
     }

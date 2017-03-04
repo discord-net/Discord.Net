@@ -1679,7 +1679,7 @@ namespace Discord.WebSocket
         internal SocketRelationship AddRelationship(Relationship model, ClientState state)
         {
             var relation = SocketRelationship.Create(this, state, model);
-            State.AddRelationship(relation);
+            state.AddRelationship(relation);
             return relation;
         }
         internal SocketRelationship RemoveRelationship(ulong id)
