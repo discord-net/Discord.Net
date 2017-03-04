@@ -272,6 +272,9 @@ namespace Discord.WebSocket
         public Task<RestInvite> GetInviteAsync(string inviteId)
             => ClientHelper.GetInviteAsync(this, inviteId);
         
+        public Task<IReadOnlyCollection<SocketRelationship>> GetRelationshipsAsync()
+            => Task.FromResult(State.Relationships);
+
         /// <inheritdoc />
         public SocketUser GetUser(ulong id)
         {
@@ -1730,5 +1733,8 @@ namespace Discord.WebSocket
             => await StartAsync().ConfigureAwait(false);
         async Task IDiscordClient.StopAsync()
             => await StopAsync().ConfigureAwait(false);
+
+        async Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync()
+            => await GetRelationshipsAsync();
     }
 }

@@ -128,5 +128,11 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetVoiceRegionsAsync().ConfigureAwait(false);
             return models.Select(x => RestVoiceRegion.Create(client, x)).Where(x => x.Id == id).FirstOrDefault();
         }
+
+        public static async Task<IReadOnlyCollection<RestRelationship>> GetRelationshipsAsync(BaseDiscordClient client)
+        {
+            var models = await client.ApiClient.GetRelationshipsAsync().ConfigureAwait(false);
+            return models.Select(r => RestRelationship.Create(client, r)).ToImmutableArray();
+        }
     }
 }

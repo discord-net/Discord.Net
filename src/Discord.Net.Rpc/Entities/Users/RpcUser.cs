@@ -55,19 +55,11 @@ namespace Discord.Rpc
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
 
-        public Task AddFriendAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task BlockUserAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveRelationshipAsync(RequestOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
+        Task IUser.AddFriendAsync(RequestOptions options)
+            => throw new NotSupportedException();
+        Task IUser.BlockUserAsync(RequestOptions options)
+            => throw new NotSupportedException();
+        Task IUser.RemoveRelationshipAsync(RequestOptions options)
+            => throw new NotSupportedException();
     }
 }
