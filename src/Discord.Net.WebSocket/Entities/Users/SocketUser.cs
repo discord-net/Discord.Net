@@ -22,7 +22,7 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionUser(Id);
         public Game? Game => Presence.Game;
         public UserStatus Status => Presence.Status;
-        public RelationshipType Relationship => Discord.Relationships.FirstOrDefault(r => r.User.Id == Id)?.Type ?? RelationshipType.None;
+        public RelationshipType Relationship => Discord.GetRelationship(Id)?.Type ?? RelationshipType.None;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
