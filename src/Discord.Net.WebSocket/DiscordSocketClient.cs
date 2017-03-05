@@ -1679,16 +1679,19 @@ namespace Discord.WebSocket
             return channel;
         }
 
+        internal SocketRelationship GetRelationship(ulong id)
+        {
+            return State.GetRelationship(id);
+        }
         internal SocketRelationship AddRelationship(Relationship model, ClientState state)
         {
             var relation = SocketRelationship.Create(this, state, model);
-            state.AddRelationship(relation);
+            state.AddRelationship(SocketRelationship.Create(this, state, model));
             return relation;
         }
         internal SocketRelationship RemoveRelationship(ulong id)
         {
-            var relation = State.RemoveRelationship(id);
-            return relation;
+            return State.RemoveRelationship(id);
         }
 
         //IDiscordClient
