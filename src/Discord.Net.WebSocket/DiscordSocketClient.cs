@@ -1685,9 +1685,9 @@ namespace Discord.WebSocket
         }
         internal SocketRelationship AddRelationship(Relationship model, ClientState state)
         {
-            var relation = SocketRelationship.Create(this, state, model);
+            var relationship = SocketRelationship.Create(this, state, model);
             state.AddRelationship(SocketRelationship.Create(this, state, model));
-            return relation;
+            return relationship;
         }
         internal SocketRelationship RemoveRelationship(ulong id)
         {

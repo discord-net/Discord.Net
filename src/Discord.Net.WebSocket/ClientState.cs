@@ -16,7 +16,7 @@ namespace Discord.WebSocket
         private readonly ConcurrentDictionary<ulong, SocketDMChannel> _dmChannels;
         private readonly ConcurrentDictionary<ulong, SocketGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
-        private readonly ConcurrentDictionary<ulong, SocketRelationship> _relations;
+        private readonly ConcurrentDictionary<ulong, SocketRelationship> _relationships;
         private readonly ConcurrentHashSet<ulong> _groupChannels;
 
         internal IReadOnlyCollection<SocketChannel> Channels => _channels.ToReadOnlyCollection();
@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
-        internal IReadOnlyCollection<SocketRelationship> Relationships => _relations.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketRelationship> Relationships => _relationships.ToReadOnlyCollection();
 
         internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
             _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
@@ -39,7 +39,7 @@ namespace Discord.WebSocket
             _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
-            _relations = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(AverageRelationshipsPerUser * CollectionMultiplier));
+            _relationships = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(AverageRelationshipsPerUser * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
@@ -133,17 +133,17 @@ namespace Discord.WebSocket
 
         internal SocketRelationship GetRelationship(ulong id)
         {
-            if (_relations.TryGetValue(id, out SocketRelationship value))
+            if (_relationships.TryGetValue(id, out SocketRelationship value))
                 return value;
             return null;
         }
-        internal void AddRelationship(SocketRelationship relation)
+        internal void AddRelationship(SocketRelationship relationship)
         {
-            _relations[relation.User.Id] = relation;
+            _relationships[relationship.User.Id] = relationship;
         }
         internal SocketRelationship RemoveRelationship(ulong id)
         {
-            if (_relations.TryRemove(id, out SocketRelationship value))
+            if (_relationships.TryRemove(id, out SocketRelationship value))
                 return value;
             return null;
         }

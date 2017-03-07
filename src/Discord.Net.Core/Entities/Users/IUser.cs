@@ -24,7 +24,7 @@ namespace Discord
         
         /// <summary> Adds this user as a friend, this will remove a block </summary>
         Task AddFriendAsync(RequestOptions options = null);
-        /// <summary> Blocks this user, and removes friend relation </summary>
+        /// <summary> Blocks this user, and removes the user as a friend </summary>
         Task BlockUserAsync(RequestOptions options = null);
         /// <summary> Removes the relationship of this user </summary>
         Task RemoveRelationshipAsync(RequestOptions options = null);

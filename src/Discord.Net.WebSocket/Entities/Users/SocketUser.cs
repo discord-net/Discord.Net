@@ -1,6 +1,5 @@
 ﻿using Discord.Rest;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
