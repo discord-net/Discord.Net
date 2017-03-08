@@ -50,7 +50,7 @@ namespace Discord.Commands
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
                     AddResult(results, channelUser as T, channelUser?.Username == username ? 0.85f : 0.75f);
 
-                    var guildUser = channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
+                    var guildUser = guildUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
                     AddResult(results, guildUser as T, guildUser?.Username == username ? 0.80f : 0.70f);
                 }
