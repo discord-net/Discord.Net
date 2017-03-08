@@ -60,12 +60,14 @@ namespace Discord.Commands
             {
                 foreach (var channelUser in channelUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f);
-
+                
+                if(context.Guild != null)
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
             }
 
             //By Nickname (0.5-0.6)
+            if(context.Guild != null)
             {
                 foreach (var channelUser in channelUsers.Where(x => string.Equals(input, (x as IGuildUser).Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f);
