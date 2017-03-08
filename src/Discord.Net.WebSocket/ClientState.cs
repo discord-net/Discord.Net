@@ -10,7 +10,6 @@ namespace Discord.WebSocket
         private const double AverageChannelsPerGuild = 10.22; //Source: Googie2149
         private const double AverageUsersPerGuild = 47.78; //Source: Googie2149
         private const double CollectionMultiplier = 1.05; //Add 5% buffer to handle growth
-        private const double AverageRelationshipsPerUser = 30;
 
         private readonly ConcurrentDictionary<ulong, SocketChannel> _channels;
         private readonly ConcurrentDictionary<ulong, SocketDMChannel> _dmChannels;
@@ -39,7 +38,7 @@ namespace Discord.WebSocket
             _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
-            _relationships = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(AverageRelationshipsPerUser * CollectionMultiplier));
+            _relationships = new ConcurrentDictionary<ulong, SocketRelationship>(ConcurrentHashSet.DefaultConcurrencyLevel, 35);
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
         }
 
