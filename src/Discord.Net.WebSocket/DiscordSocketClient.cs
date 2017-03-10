@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
-        public ConnectionState ConnectionState { get; private set; }
+        public ConnectionState ConnectionState => _connection.State;
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public int Latency { get; private set; }
         internal UserStatus Status { get; private set; } = UserStatus.Online;
