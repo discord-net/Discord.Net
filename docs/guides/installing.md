@@ -11,7 +11,7 @@ Optionally, you may compile from source and install yourself.
 
 Currently, Discord.Net targets [.NET Standard] 1.3, and offers support for
 .NET Standard 1.1. If your application will be targeting .NET Standard 1.1,
-please see the [additional steps](#installing-on-.net-standard-1.1).
+please see the [additional steps](#installing-on-.net-standard-11).
 
 Since Discord.Net is built on the .NET Standard, it is also recommended to
 create applications using [.NET Core], though you are not required to. When
@@ -46,11 +46,13 @@ project
 3. Right click on 'Dependencies', and select 'Manage NuGet packages'
 ![Step 3](images/install-vs-deps.png)
 4. In the 'browse' tab, search for 'Discord.Net'
+
 > [!TIP]
-> Don't forget to change your package source if you're installing from the 
-> developer feed.
-> Also make sure to check 'Enable Prereleases' if installing a dev build!
+Don't forget to change your package source if you're installing from the
+developer feed.
+Also make sure to check 'Enable Prereleases' if installing a dev build!
 5. Install the 'Discord.Net' package
+
 ![Step 5](images/install-vs-nuget.png)
 
 ## Using JetBrains Rider

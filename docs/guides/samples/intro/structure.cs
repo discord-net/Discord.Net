@@ -77,7 +77,6 @@ class Program
 
         // Login and connect.
         await _client.LoginAsync(TokenType.Bot, /* <DON'T HARDCODE YOUR TOKEN> */);
-        // Prior to rc-00608 this was ConnectAsync(); 
         await _client.StartAsync();
         
         // Wait infinitely so your bot actually stays connected.
@@ -96,10 +95,10 @@ class Program
         await _commands.AddModuleAsync<SomeModule>();
 
         // Subscribe a handler to see if a message invokes a command.
-        _client.MessageReceived += CmdHandler;
+        _client.MessageReceived += HandleCommandAsync;
     }
 
-    private async Task CmdHandler(SocketMessage arg)
+    private async Task HandleCommandAsync(SocketMessage arg)
     {
         // Bail out if it's a System Message.
         var msg = arg as SocketUserMessage;
