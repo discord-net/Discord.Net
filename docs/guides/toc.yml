@@ -1,4 +1,6 @@
 
+- name: Installing
+  href: installing.md
 - name: Getting Started
   href: intro.md
 - name: Terminology
