@@ -77,7 +77,8 @@ class Program
 
         // Login and connect.
         await _client.LoginAsync(TokenType.Bot, /* <DON'T HARDCODE YOUR TOKEN> */);
-        await _client.ConnectAsync();
+        // Prior to rc-00608 this was ConnectAsync(); 
+        await _client.StartAsync();
         
         // Wait infinitely so your bot actually stays connected.
         await Task.Delay(-1);
