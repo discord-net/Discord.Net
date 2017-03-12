@@ -70,6 +70,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels 
             => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
+        public IReadOnlyCollection<SocketRelationship> Relationships => State.Relationships;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
@@ -270,6 +271,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task<RestInvite> GetInviteAsync(string inviteId)
             => ClientHelper.GetInviteAsync(this, inviteId);
+        
+        public Task<IReadOnlyCollection<SocketRelationship>> GetRelationshipsAsync()
+            => Task.FromResult(State.Relationships);
 
         /// <inheritdoc />
         public SocketUser GetUser(ulong id)
@@ -484,6 +488,8 @@ namespace Discord.WebSocket
                                         }
                                         for (int i = 0; i < data.PrivateChannels.Length; i++)
                                             AddPrivateChannel(data.PrivateChannels[i], state);
+                                        for (int i = 0; i < data.Relationships.Length; i++)
+                                            AddRelationship(data.Relationships[i], state);
 
                                         _sessionId = data.SessionId;
                                         _unavailableGuilds = unavailableGuilds;
@@ -1499,6 +1505,29 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 return;
+                            
+                            //Relationships
+                            case "RELATIONSHIP_ADD":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (RELATIONSHIP_ADD)").ConfigureAwait(false);
+
+                                    var addedModel = (payload as JToken).ToObject<Relationship>(_serializer);
+                                    var before = State.GetRelationship(addedModel.Id);
+                                    var after = AddRelationship(addedModel, State);
+
+                                    await _relationshipAddedEvent.InvokeAsync(before, after);
+                                    return;
+                                }
+                            case "RELATIONSHIP_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (RELATIONSHIP_REMOVE)").ConfigureAwait(false);
+
+                                    var removedModel = (payload as JToken).ToObject<Relationship>(_serializer);
+                                    var removed = RemoveRelationship(removedModel.Id);
+
+                                    await _relationshipRemovedEvent.InvokeAsync(removed);
+                                    return;
+                                }
 
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
@@ -1650,6 +1679,21 @@ namespace Discord.WebSocket
             return channel;
         }
 
+        internal SocketRelationship GetRelationship(ulong id)
+        {
+            return State.GetRelationship(id);
+        }
+        internal SocketRelationship AddRelationship(Relationship model, ClientState state)
+        {
+            var relationship = SocketRelationship.Create(this, state, model);
+            state.AddRelationship(SocketRelationship.Create(this, state, model));
+            return relationship;
+        }
+        internal SocketRelationship RemoveRelationship(ulong id)
+        {
+            return State.RemoveRelationship(id);
+        }
+
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => _connection.State;
 
@@ -1692,5 +1736,8 @@ namespace Discord.WebSocket
             => await StartAsync().ConfigureAwait(false);
         async Task IDiscordClient.StopAsync()
             => await StopAsync().ConfigureAwait(false);
+
+        async Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync()
+            => await GetRelationshipsAsync();
     }
 }

@@ -241,7 +241,7 @@ namespace Discord.API
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
             => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucket, options);
-        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, 
+        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options = options ?? new RequestOptions();
@@ -387,7 +387,7 @@ namespace Discord.API
                     break;
             }
         }
-        
+
         //Channel Messages
         public async Task<Message> GetChannelMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -678,7 +678,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             Preconditions.NotNullOrWhitespace(args.RegionId, nameof(args.RegionId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             return await SendJsonAsync<Guild>("POST", () => "guilds", args, new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<Guild> DeleteGuildAsync(ulong guildId, RequestOptions options = null)
@@ -886,14 +886,14 @@ namespace Discord.API
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             return await SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task AcceptInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             await SendAsync("POST", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
@@ -1027,6 +1027,34 @@ namespace Discord.API
                 return await SendAsync<User>("GET", () => $"users/{userId}", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
+        
+        //Relationships
+        public async Task<IReadOnlyCollection<Relationship>> GetRelationshipsAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<IReadOnlyCollection<Relationship>>("GET", () => "users/@me/relationships", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task AddFriendAsync(ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new object(), new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task BlockUserAsync(ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new { type = 2 }, new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task RemoveRelationshipAsync(ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", () => $"users/@me/relationships/{userId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         //Current User/DMs
@@ -1193,7 +1221,7 @@ namespace Discord.API
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1));
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
                     int? mappedId;
-                    
+
                     mappedId = BucketIds.GetIndex(fieldName);
                     if(!mappedId.HasValue && rightIndex != endIndex && format.Length > rightIndex + 1 && format[rightIndex + 1] == '/') //Ignore the next slash
                         rightIndex++;
