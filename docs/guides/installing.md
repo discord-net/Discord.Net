@@ -51,6 +51,7 @@ project
 Don't forget to change your package source if you're installing from the
 developer feed.
 Also make sure to check 'Enable Prereleases' if installing a dev build!
+
 5. Install the 'Discord.Net' package
 
 ![Step 5](images/install-vs-nuget.png)
@@ -59,7 +60,15 @@ Also make sure to check 'Enable Prereleases' if installing a dev build!
 **todo**
 
 ## Using Visual Studio Code
-**todo**
+
+1. Create a new project for your bot
+2. Add Discord.Net to your .csproj
+
+[!code-xml[Sample .csproj](samples/project.csproj)]
+
+> [!TIP]
+Don't forget to add the package source to a [NuGet.Config file](#configuring-nuget-without-visual-studio) if you're installing from the
+developer feed.
 
 # Compiling from Source
 
@@ -81,7 +90,7 @@ installation.
 
 ## Installing on .NET Standard 1.1
 
-For applications targeting a runtime corresponding with .NET Standard 1.1 or 1.2, 
+For applications targeting a runtime corresponding with .NET Standard 1.1 or 1.2,
 the builtin WebSocket and UDP provider will not work. For applications which
 utilize a WebSocket connection to Discord (WebSocket or RPC), third-party
 provider packages will need to be installed and configured.
