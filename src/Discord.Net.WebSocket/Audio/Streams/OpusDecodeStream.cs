@@ -6,15 +6,17 @@ namespace Discord.Audio.Streams
     ///<summary> Converts Opus to PCM </summary>
     public class OpusDecodeStream : AudioOutStream
     {
+        public const int SampleRate = OpusEncodeStream.SampleRate;
+
         private readonly AudioOutStream _next;
         private readonly byte[] _buffer;
         private readonly OpusDecoder _decoder;
 
-        public OpusDecodeStream(AudioOutStream next, int samplingRate, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
+        public OpusDecodeStream(AudioOutStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
         {
             _next = next;
             _buffer = new byte[bufferSize];
-            _decoder = new OpusDecoder(samplingRate, channels);
+            _decoder = new OpusDecoder(SampleRate, channels);
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)

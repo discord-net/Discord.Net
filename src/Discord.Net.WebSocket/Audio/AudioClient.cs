@@ -17,6 +17,18 @@ namespace Discord.Audio
     //TODO: Add audio reconnecting
     internal class AudioClient : IAudioClient, IDisposable
     {
+        internal struct StreamPair
+        {
+            public AudioInStream Reader;
+            public AudioOutStream Writer;
+
+            public StreamPair(AudioInStream reader, AudioOutStream writer)
+            {
+                Reader = reader;
+                Writer = writer;
+            }
+        }
+
         public event Func<Task> Connected
         {
             add { _connectedEvent.Add(value); }
@@ -41,6 +53,8 @@ namespace Discord.Audio
         private readonly ConnectionManager _connection;
         private readonly SemaphoreSlim _stateLock;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
+        private readonly ConcurrentDictionary<uint, ulong> _ssrcMap;
+        private readonly ConcurrentDictionary<ulong, StreamPair> _streams;
 
         private Task _heartbeatTask;
         private long _lastMessageTime;
@@ -75,6 +89,8 @@ namespace Discord.Audio
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
             _heartbeatTimes = new ConcurrentQueue<long>();
+            _ssrcMap = new ConcurrentDictionary<uint, ulong>();
+            _streams = new ConcurrentDictionary<ulong, StreamPair>();
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -166,6 +182,35 @@ namespace Discord.Audio
                 throw new ArgumentException("Value must be 120, 240, 480, 960, 1920 or 2880", nameof(samplesPerFrame));
         }
 
+        internal void CreateInputStream(ulong userId)
+        {
+            //Assume Thread-safe
+            if (!_streams.ContainsKey(userId))
+            {
+                var readerStream = new InputStream();
+                var writerStream = new OpusDecodeStream(new RTPReadStream(readerStream, _secretKey));
+                _streams.TryAdd(userId, new StreamPair(readerStream, writerStream));
+            }
+        }
+        internal AudioInStream GetInputStream(ulong id)
+        {
+            StreamPair streamPair;
+            if (_streams.TryGetValue(id, out streamPair))
+                return streamPair.Reader;
+            return null;
+        }
+        internal void RemoveInputStream(ulong userId)
+        {
+            _streams.TryRemove(userId, out var ignored);
+        }
+        internal void ClearInputStreams()
+        {
+            foreach (var pair in _streams.Values)
+                pair.Reader.Dispose();
+            _ssrcMap.Clear();
+            _streams.Clear();
+        }
+
         private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
         {
             _lastMessageTime = Environment.TickCount;
@@ -219,6 +264,14 @@ namespace Discord.Audio
                             }
                         }
                         break;
+                    case VoiceOpCode.Speaking:
+                        {
+                            await _audioLogger.DebugAsync("Received Speaking").ConfigureAwait(false);
+
+                            var data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
+                            _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
+                        }
+                        break;
                     default:
                         await _audioLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
                         return;
@@ -234,19 +287,56 @@ namespace Discord.Audio
         {
             if (!_connection.IsCompleted)
             {
-                if (packet.Length == 70)
+                if (packet.Length != 70)
                 {
-                    string ip;
-                    int port;
-                    try
-                    {
-                        ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-                        port = packet[69] | (packet[68] << 8);
-                    }
-                    catch { return; }
-                    
-                    await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
-                    await ApiClient.SendSelectProtocol(ip, port).ConfigureAwait(false);
+                    await _audioLogger.DebugAsync($"Malformed Packet").ConfigureAwait(false);
+                    return;
+                }
+                string ip;
+                int port;
+                try
+                {
+                    ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
+                    port = packet[69] | (packet[68] << 8);
+                }
+                catch (Exception ex)
+                {
+                    await _audioLogger.DebugAsync($"Malformed Packet", ex).ConfigureAwait(false);
+                    return; 
+                }
+                
+                await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
+                await ApiClient.SendSelectProtocol(ip, port).ConfigureAwait(false);
+            }
+            else
+            {
+                uint ssrc;
+                ulong userId;
+                StreamPair pair;
+
+                if (!RTPReadStream.TryReadSsrc(packet, 0, out ssrc))
+                {
+                    await _audioLogger.DebugAsync($"Malformed Frame").ConfigureAwait(false);
+                    return;
+                }
+                if (!_ssrcMap.TryGetValue(ssrc, out userId))
+                {
+                    await _audioLogger.DebugAsync($"Unknown SSRC {ssrc}").ConfigureAwait(false);
+                    return;
+                }
+                if (!_streams.TryGetValue(userId, out pair))
+                {
+                    await _audioLogger.DebugAsync($"Unknown User {userId}").ConfigureAwait(false);
+                    return;
+                }
+                try
+                {
+                    await pair.Writer.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
+                    await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
                 }
             }
         }

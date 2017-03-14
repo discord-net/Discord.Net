@@ -1,4 +1,5 @@
-﻿using Discord.Rest;
+﻿using Discord.Audio;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -37,6 +38,7 @@ namespace Discord.WebSocket
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
+        public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 
         /// <summary> The position of the user within the role hirearchy. </summary>
         /// <remarks> The returned value equal to the position of the highest role the user has, 

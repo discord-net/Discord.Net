@@ -31,11 +31,14 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
+            if (buffer[offset + 0] != 0x80 || buffer[offset + 1] != 0x78)
+                return;
+
             var payload = new byte[count - 12];
             Buffer.BlockCopy(buffer, offset + 12, payload, 0, count - 12);
 
-            ushort seq =  (ushort)((buffer[offset + 3] << 8) |
-                (buffer[offset + 2] << 0));
+            ushort seq =  (ushort)((buffer[offset + 2] << 8) |
+                (buffer[offset + 3] << 0));
 
             uint timestamp = (uint)((buffer[offset + 4] << 24) |
                 (buffer[offset + 5] << 16) |
@@ -44,6 +47,21 @@ namespace Discord.Audio.Streams
 
             _queue.WriteHeader(seq, timestamp);
             await (_next ?? _queue as Stream).WriteAsync(buffer, offset, count, cancelToken).ConfigureAwait(false);
+        }
+
+        public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
+        {
+            if (buffer.Length - offset < 12)
+            {
+                ssrc = 0;
+                return false;
+            }
+
+            ssrc = (uint)((buffer[offset + 8] << 24) |
+                (buffer[offset + 9] << 16) |
+                (buffer[offset + 10] << 16) |
+                (buffer[offset + 11] << 0));
+            return true;
         }
     }
 }

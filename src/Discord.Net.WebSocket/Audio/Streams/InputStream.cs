@@ -12,12 +12,13 @@ namespace Discord.Audio.Streams
         private ushort _nextSeq;
         private uint _nextTimestamp;
         private bool _hasHeader;
+        private bool _isDisposed;
 
-        public override bool CanRead => true;
+        public override bool CanRead => !_isDisposed;
         public override bool CanSeek => false;
-        public override bool CanWrite => true;
+        public override bool CanWrite => false;
 
-        public InputStream(byte[] secretKey)
+        public InputStream()
         {
             _frames = new ConcurrentQueue<RTPFrame>();
         }
@@ -54,10 +55,13 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            if (_frames.Count > 1000)
+            if (_frames.Count > 100) //1-2 seconds
+            {
+                _hasHeader = false;
                 return Task.Delay(0); //Buffer overloaded
-            if (_hasHeader)
-                throw new InvalidOperationException("Received payload with an RTP header");
+            }
+            if (!_hasHeader)
+                throw new InvalidOperationException("Received payload without an RTP header");
             byte[] payload = new byte[count];
             Buffer.BlockCopy(buffer, offset, payload, 0, count);
 
@@ -68,6 +72,11 @@ namespace Discord.Audio.Streams
             ));
             _hasHeader = false;
             return Task.Delay(0);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            _isDisposed = true;
         }
     }
 }

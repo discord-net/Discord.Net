@@ -59,9 +59,6 @@ namespace Discord.Audio.Streams
         {
             return Task.Run(async () =>
             {
-#if DEBUG
-                uint num = 0;
-#endif
                 try
                 {
                     while (!_isPreloaded && !_cancelToken.IsCancellationRequested)
@@ -82,7 +79,7 @@ namespace Discord.Audio.Streams
                                 _queueLock.Release();
                                 nextTick += _ticksPerFrame;
 #if DEBUG
-                                var _ = _logger.DebugAsync($"{num++}: Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
+                                var _ = _logger.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
                             else 
@@ -93,7 +90,7 @@ namespace Discord.Audio.Streams
                                     nextTick += _ticksPerFrame;
                                 }
 #if DEBUG
-                                var _ = _logger.DebugAsync($"{num++}: Buffer underrun");
+                                var _ = _logger.DebugAsync($"Buffer underrun");
 #endif
                             }
                         }

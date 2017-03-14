@@ -1,6 +1,5 @@
 ﻿using Discord.API;
 using Discord.API.Gateway;
-using Discord.Audio;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.Net.Udp;
@@ -54,7 +53,6 @@ namespace Discord.WebSocket
         internal int TotalShards { get; private set; }
         internal int MessageCacheSize { get; private set; }
         internal int LargeThreshold { get; private set; }
-        internal AudioMode AudioMode { get; private set; }
         internal ClientState State { get; private set; }
         internal UdpSocketProvider UdpSocketProvider { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
@@ -82,7 +80,6 @@ namespace Discord.WebSocket
             TotalShards = config.TotalShards ?? 1;
             MessageCacheSize = config.MessageCacheSize;
             LargeThreshold = config.LargeThreshold;
-            AudioMode = config.AudioMode;
             UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
@@ -520,7 +517,7 @@ namespace Discord.WebSocket
 
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                                 }
-                                return;
+                                break;
 
                             //Guilds
                             case "GUILD_CREATE":
@@ -605,7 +602,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
                                 }
-                                return;
+                                break;
                             case "GUILD_SYNC":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SYNC)").ConfigureAwait(false);
@@ -627,7 +624,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
                                 }
-                                return;
+                                break;
                             case "GUILD_DELETE":
                                 {
                                     var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
@@ -1217,8 +1214,8 @@ namespace Discord.WebSocket
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_ADD referenced an unknown channel.").ConfigureAwait(false);
                                         return;
                                     }
-                                    break;
                                 }
+                                break;
                             case "MESSAGE_REACTION_REMOVE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
@@ -1242,8 +1239,8 @@ namespace Discord.WebSocket
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE referenced an unknown channel.").ConfigureAwait(false);
                                         return;
                                     }
-                                    break;
                                 }
+                                break;
                             case "MESSAGE_REACTION_REMOVE_ALL":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_ALL)").ConfigureAwait(false);
@@ -1265,8 +1262,8 @@ namespace Discord.WebSocket
                                         await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
                                         return;
                                     }
-                                    break;
                                 }
+                                break;
                             case "MESSAGE_DELETE_BULK":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
@@ -1447,10 +1444,9 @@ namespace Discord.WebSocket
                                 }
                                 break;
                             case "VOICE_SERVER_UPDATE":
-                                await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
-
-                                if (AudioMode != AudioMode.Disabled)
                                 {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
+
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
@@ -1464,7 +1460,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
                                 }
-                                return;
+                                break;
 
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
@@ -1475,32 +1471,31 @@ namespace Discord.WebSocket
                                 break;
                             case "GUILD_INTEGRATIONS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
-                                return;
+                                break;
                             case "MESSAGE_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
-                                return;
+                                break;
                             case "USER_SETTINGS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (USER_SETTINGS_UPDATE)").ConfigureAwait(false);
-                                return;
+                                break;
                             case "WEBHOOKS_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (WEBHOOKS_UPDATE)").ConfigureAwait(false);
-                                return;
+                                break;
 
                             //Others
                             default:
                                 await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
-                                return;
+                                break;
                         }
                         break;
                     default:
                         await _gatewayLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
-                        return;
+                        break;
                 }
             }
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                return;
             }
         }
 

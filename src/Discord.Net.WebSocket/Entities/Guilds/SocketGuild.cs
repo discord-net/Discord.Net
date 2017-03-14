@@ -426,9 +426,23 @@ namespace Discord.WebSocket
         internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
-            var voiceState = SocketVoiceState.Create(voiceChannel, model);
-            _voiceStates[model.UserId] = voiceState;
-            return voiceState;
+            var before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;
+            var after = SocketVoiceState.Create(voiceChannel, model);
+            _voiceStates[model.UserId] = after;
+
+            if (before.VoiceChannel?.Id != after.VoiceChannel?.Id)
+            {
+                if (model.UserId == CurrentUser.Id)
+                    RepopulateAudioStreams();
+                else
+                {
+                    _audioClient?.RemoveInputStream(model.UserId); //User changed channels, end their stream
+                    if (CurrentUser.VoiceChannel != null && after.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
+                        _audioClient.CreateInputStream(model.UserId);
+                }
+            }
+
+            return after;
         }
         internal SocketVoiceState? GetVoiceState(ulong id)
         {
@@ -446,6 +460,10 @@ namespace Discord.WebSocket
         }
 
         //Audio
+        internal AudioInStream GetAudioStream(ulong userId)
+        {
+            return _audioClient?.GetInputStream(userId);
+        }
         internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute)
         {
             selfDeaf = false;
@@ -531,6 +549,7 @@ namespace Discord.WebSocket
                         }
                     };
                     _audioClient = audioClient;
+                    RepopulateAudioStreams();
                 }
                 _audioClient.Connected += () => 
                 { 
@@ -551,6 +570,22 @@ namespace Discord.WebSocket
             finally
             {
                 _audioLock.Release();
+            }
+        }
+
+        internal void RepopulateAudioStreams()
+        {
+            if (_audioClient != null)
+            {
+                _audioClient.ClearInputStreams(); //We changed channels, end all current streams
+                if (CurrentUser.VoiceChannel != null)
+                {
+                    foreach (var pair in _voiceStates)
+                    {
+                        if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
+                            _audioClient.CreateInputStream(pair.Key);
+                    }
+                }
             }
         }
 
