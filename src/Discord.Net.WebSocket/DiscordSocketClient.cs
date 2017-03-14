@@ -1318,46 +1318,16 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        SocketPresence beforePresence;
-                                        SocketGlobalUser beforeGlobal;
                                         var user = guild.GetUser(data.User.Id);
-                                        if (user != null)
-                                        {
-                                            beforePresence = user.Presence.Clone();
-                                            beforeGlobal = user.GlobalUser.Clone();
-                                            user.Update(State, data);
-                                        }
-                                        else
-                                        {
-                                            beforePresence = new SocketPresence(UserStatus.Offline, null);
-                                            user = guild.AddOrUpdateUser(data);
-                                            beforeGlobal = user.GlobalUser.Clone();
-                                        }
-
-                                        if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
-                                        {
-                                            await _userUpdatedEvent.InvokeAsync(beforeGlobal, user).ConfigureAwait(false);
-                                            return;
-                                        }
-                                        await _userPresenceUpdatedEvent.InvokeAsync(guild, user, beforePresence, user.Presence).ConfigureAwait(false);
+                                        if (user == null)
+                                            guild.AddOrUpdateUser(data);
                                     }
-                                    else
-                                    {
-                                        var channel = State.GetChannel(data.User.Id);
-                                        if (channel != null)
-                                        {
-                                            var user = channel.GetUser(data.User.Id);
-                                            var beforePresence = user.Presence.Clone();
-                                            var before = user.GlobalUser.Clone();
-                                            user.Update(State, data);
 
-                                            await _userPresenceUpdatedEvent.InvokeAsync(Optional.Create<SocketGuild>(), user, beforePresence, user.Presence).ConfigureAwait(false);
-                                            if (data.User.Username.IsSpecified || data.User.Avatar.IsSpecified)
-                                            {
-                                                await _userUpdatedEvent.InvokeAsync(before, user).ConfigureAwait(false);
-                                            }                                            
-                                        }
-                                    }
+                                    var globalUser = State.GetUser(data.User.Id);
+                                    var before = globalUser.Clone();
+                                    globalUser.Update(State, data);
+
+                                    await _userUpdatedEvent.InvokeAsync(before, globalUser).ConfigureAwait(false);
                                 }
                                 break;
                             case "TYPING_START":
