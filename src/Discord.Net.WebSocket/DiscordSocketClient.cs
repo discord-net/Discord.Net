@@ -40,7 +40,6 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
-        private ConcurrentHashSet<ulong> _downloadUsersFor;
 
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
@@ -88,7 +87,6 @@ namespace Discord.WebSocket
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             State = new ClientState(0, 0);
-            _downloadUsersFor = new ConcurrentHashSet<ulong>();
             _heartbeatTimes = new ConcurrentQueue<long>();
 
             _stateLock = new SemaphoreSlim(1, 1);
@@ -120,12 +118,9 @@ namespace Discord.WebSocket
 
             GuildAvailable += g =>
             {
-                if (ConnectionState == ConnectionState.Connected && (AlwaysDownloadUsers || _downloadUsersFor.ContainsKey(g.Id)))
+                if (ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
                 {
-                    if (!g.HasAllMembers)
-                    {
-                        var _ = g.DownloadUsersAsync();
-                    }
+                    var _ = g.DownloadUsersAsync();
                 }
                 return Task.Delay(0);
             };
@@ -159,7 +154,6 @@ namespace Discord.WebSocket
             await StopAsync().ConfigureAwait(false);
             _applicationInfo = null;
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
-            _downloadUsersFor.Clear();
         }
 
         public async Task StartAsync() 
@@ -192,9 +186,6 @@ namespace Discord.WebSocket
                 
                 await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
                 await SendStatusAsync().ConfigureAwait(false);
-
-                await ProcessUserDownloadsAsync(_downloadUsersFor.Select(x => GetGuild(x))
-                    .Where(x => x != null).ToImmutableArray()).ConfigureAwait(false);
             }
             finally 
             {
@@ -317,9 +308,6 @@ namespace Discord.WebSocket
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
         public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
-            foreach (var guild in guilds)
-                _downloadUsersFor.TryAdd(guild.Id);
-
             if (ConnectionState == ConnectionState.Connected)
             {
                 //Race condition leads to guilds being requested twice, probably okay
@@ -664,7 +652,6 @@ namespace Discord.WebSocket
                                     {
                                         await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
-                                        _downloadUsersFor.TryRemove(data.Id);
                                         var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
