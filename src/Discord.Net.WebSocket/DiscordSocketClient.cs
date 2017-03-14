@@ -237,8 +237,8 @@ namespace Discord.WebSocket
             await _gatewayLogger.DebugAsync("Raising virtual GuildUnavailables").ConfigureAwait(false);
             foreach (var guild in State.Guilds)
             {
-                if (guild._available)
-                    await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                if (guild.IsAvailable)
+                    await GuildUnavailableAsync(guild).ConfigureAwait(false);
             }
         }
 
@@ -477,10 +477,10 @@ namespace Discord.WebSocket
                                         {
                                             var model = data.Guilds[i];
                                             var guild = AddGuild(model, state);
-                                            if (!guild._available || ApiClient.AuthTokenType == TokenType.User)
+                                            if (!guild.IsAvailable || ApiClient.AuthTokenType == TokenType.User)
                                                 unavailableGuilds++;
                                             else
-                                                await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                                await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         }
                                         for (int i = 0; i < data.PrivateChannels.Length; i++)
                                             AddPrivateChannel(data.PrivateChannels[i], state);
@@ -526,8 +526,8 @@ namespace Discord.WebSocket
                                     //Notify the client that these guilds are available again
                                     foreach (var guild in State.Guilds)
                                     {
-                                        if (guild._available)
-                                            await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                        if (guild.IsAvailable)
+                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                     }
 
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
@@ -553,7 +553,7 @@ namespace Discord.WebSocket
                                             var unavailableGuilds = _unavailableGuilds;
                                             if (unavailableGuilds != 0)
                                                 _unavailableGuilds = unavailableGuilds - 1;
-                                            await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -630,7 +630,7 @@ namespace Discord.WebSocket
                                         //This is treated as an extension of GUILD_AVAILABLE
                                         _unavailableGuilds--;
                                         _lastGuildAvailableTime = Environment.TickCount;
-                                        await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                        await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         await _guildUpdatedEvent.InvokeAsync(before, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -651,7 +651,7 @@ namespace Discord.WebSocket
                                         var guild = State.GetGuild(data.Id);
                                         if (guild != null)
                                         {
-                                            await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                            await GuildUnavailableAsync(guild).ConfigureAwait(false);
                                             _unavailableGuilds++;
                                         }
                                         else
@@ -668,7 +668,7 @@ namespace Discord.WebSocket
                                         var guild = RemoveGuild(data.Id);
                                         if (guild != null)
                                         {
-                                            await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+                                            await GuildUnavailableAsync(guild).ConfigureAwait(false);
                                             await _leftGuildEvent.InvokeAsync(guild).ConfigureAwait(false);
                                         }
                                         else
@@ -1657,6 +1657,23 @@ namespace Discord.WebSocket
                     recipient.GlobalUser.RemoveRef(this);
             }
             return channel;
+        }
+
+        private async Task GuildAvailableAsync(SocketGuild guild)
+        {
+            if (!guild.IsConnected)
+            {
+                guild.IsConnected = true;
+                await _guildAvailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+            }
+        }
+        private async Task GuildUnavailableAsync(SocketGuild guild)
+        {
+            if (guild.IsConnected)
+            {
+                guild.IsConnected = false;
+                await _guildUnavailableEvent.InvokeAsync(guild).ConfigureAwait(false);
+            }
         }
 
         //IDiscordClient

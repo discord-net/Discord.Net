@@ -32,7 +32,6 @@ namespace Discord.WebSocket
         private ImmutableArray<GuildEmoji> _emojis;
         private ImmutableArray<string> _features;
         private AudioClient _audioClient;
-        internal bool _available;
 
         public string Name { get; private set; }
         public int AFKTimeout { get; private set; }
@@ -40,8 +39,10 @@ namespace Discord.WebSocket
         public VerificationLevel VerificationLevel { get; private set; }
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
-        public int MemberCount { get; set; }
+        public int MemberCount { get; internal set; }
         public int DownloadedMemberCount { get; private set; }
+        internal bool IsAvailable { get; private set; }
+        public bool IsConnected { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
@@ -120,8 +121,8 @@ namespace Discord.WebSocket
         }
         internal void Update(ClientState state, ExtendedModel model)
         {
-            _available = !(model.Unavailable ?? false);
-            if (!_available)
+            IsAvailable = !(model.Unavailable ?? false);
+            if (!IsAvailable)
             {
                 if (_channels == null)
                     _channels = new ConcurrentHashSet<ulong>();
