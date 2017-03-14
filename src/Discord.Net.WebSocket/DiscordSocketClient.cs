@@ -500,12 +500,21 @@ namespace Discord.WebSocket
                                         await SyncGuildsAsync().ConfigureAwait(false);
 
                                     _lastGuildAvailableTime = Environment.TickCount;
-                                    _guildDownloadTask = WaitForGuildsAsync(_connection.CancelToken, _gatewayLogger);
-
-                                    await _readyEvent.InvokeAsync().ConfigureAwait(false);
-
+                                    _guildDownloadTask = WaitForGuildsAsync(_connection.CancelToken, _gatewayLogger)
+                                        .ContinueWith(async x =>
+                                        {
+                                            if (x.IsFaulted)
+                                            {
+                                                _connection.Error(x.Exception);
+                                                return;
+                                            }
+                                            else if (_connection.CancelToken.IsCancellationRequested)
+                                                return;
+                                            
+                                            await _readyEvent.InvokeAsync().ConfigureAwait(false);
+                                            await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
+                                        });
                                     var _ = _connection.CompleteAsync();
-                                    await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
                                 }
                                 break;
                             case "RESUMED":
@@ -1580,12 +1589,12 @@ namespace Discord.WebSocket
                 await _gatewayLogger.ErrorAsync("Heartbeat Errored", ex).ConfigureAwait(false);
             }
         }
-        public async Task WaitForGuildsAsync()
+        /*public async Task WaitForGuildsAsync()
         {
             var downloadTask = _guildDownloadTask;
             if (downloadTask != null)
                 await _guildDownloadTask.ConfigureAwait(false);
-        }
+        }*/
         private async Task WaitForGuildsAsync(CancellationToken cancelToken, Logger logger)
         {
             //Wait for GUILD_AVAILABLEs
