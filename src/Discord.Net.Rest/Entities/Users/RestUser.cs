@@ -18,7 +18,7 @@ namespace Discord.Rest
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
         public virtual Game? Game => null;
-        public virtual UserStatus Status => UserStatus.Unknown;
+        public virtual UserStatus Status => UserStatus.Offline;
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)

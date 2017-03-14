@@ -1323,7 +1323,7 @@ namespace Discord.WebSocket
                                             guild.AddOrUpdateUser(data);
                                     }
 
-                                    var globalUser = State.GetUser(data.User.Id);
+                                    var globalUser = GetOrCreateUser(State, data.User); //TODO: Memory leak, users removed from friends list will never RemoveRef.
                                     var before = globalUser.Clone();
                                     globalUser.Update(State, data);
 

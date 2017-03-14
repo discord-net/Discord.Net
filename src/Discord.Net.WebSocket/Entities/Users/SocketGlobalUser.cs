@@ -47,11 +47,5 @@ namespace Discord.WebSocket
         }
         
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
-
-        //Updates are only ever called from the gateway thread, thus threadsafe
-        internal override void Update(ClientState state, Model model)
-        {
-            base.Update(state, model);
-        }
     }
 }
