@@ -1664,8 +1664,6 @@ namespace Discord.WebSocket
         }
 
         //IDiscordClient
-        ConnectionState IDiscordClient.ConnectionState => _connection.State;
-
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
