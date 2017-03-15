@@ -4,14 +4,15 @@
     {
         public static string GetApplicationIconUrl(ulong appId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}app-icons/{appId}/{iconId}.jpg" : null;
-        public static string GetUserAvatarUrl(ulong userId, string avatarId, ushort size, AvatarFormat format) {
+        public static string GetUserAvatarUrl(ulong userId, string avatarId, ushort size, AvatarFormat format)
+        {
             if (avatarId == null)
                 return null;
-            var base = $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}";
+            var baseUrl = $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}";
             if (format == AvatarFormat.Auto)
-                return base + (avatarId.StartsWith("a_") ? "gif" : "png") + $"?size={size}";
+                return baseUrl + (avatarId.StartsWith("a_") ? "gif" : "png") + $"?size={size}";
             else
-                return base + format.ToString().ToLower() + $"?size={size}";
+                return baseUrl + format.ToString().ToLower() + $"?size={size}";
         }
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
