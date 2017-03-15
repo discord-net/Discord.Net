@@ -2,6 +2,7 @@
 {
     public enum AvatarFormat
     {
+        Auto,
         WebP,
         Png,
         Jpeg,
