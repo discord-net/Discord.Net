@@ -53,7 +53,7 @@ namespace Discord.Rest
         {
             var args = new GetReactionUsersParams();
             func(args);
-            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => u as IUser).Where(u => u != null).ToImmutableArray();
+            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => RestUser.Create(client, u)).ToImmutableArray();
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
