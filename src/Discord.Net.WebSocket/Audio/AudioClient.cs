@@ -332,12 +332,13 @@ namespace Discord.Audio
                 try
                 {
                     await pair.Writer.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
-                    await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
+                    return;
                 }
+                await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
             }
         }
 
