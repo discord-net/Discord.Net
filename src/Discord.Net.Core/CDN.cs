@@ -8,11 +8,9 @@
         {
             if (avatarId == null)
                 return null;
-            var baseUrl = $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}";
             if (format == AvatarFormat.Auto)
-                return baseUrl + (avatarId.StartsWith("a_") ? "gif" : "png") + $"?size={size}";
-            else
-                return baseUrl + format.ToString().ToLower() + $"?size={size}";
+                format = avatarId.StartsWith("a_") ? AvatarFormat.Gif : AvatarFormat.Png;
+            return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{format.ToString().ToLower()}?size={size}";
         }
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
