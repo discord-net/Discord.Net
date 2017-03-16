@@ -120,7 +120,8 @@ namespace Discord.API
 
                 AuthTokenType = tokenType;
                 AuthToken = token;
-                RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
+                if (tokenType != TokenType.Webhook)
+                    RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
 
                 LoginState = LoginState.LoggedIn;
             }
@@ -438,8 +439,8 @@ namespace Discord.API
         }
         public async Task<Message> CreateMessageAsync(ulong channelId, CreateMessageParams args, RequestOptions options = null)
         {
-            Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
             if (!args.Embed.IsSpecified || args.Embed.Value == null)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
@@ -449,6 +450,22 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+        }
+        public async Task CreateWebhookMessageAsync(ulong webhookId, CreateWebhookMessageParams args, RequestOptions options = null)
+        {
+            if (AuthTokenType != TokenType.Webhook)
+                throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
+                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
+
+            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("POST", () => $"webhooks/{webhookId}/{AuthToken}", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         public async Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
@@ -468,6 +485,27 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+        }
+        public async Task UploadWebhookFileAsync(ulong webhookId, UploadWebhookFileParams args, RequestOptions options = null)
+        {
+            if (AuthTokenType != TokenType.Webhook)
+                throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            options = RequestOptions.CreateOrClone(options);
+
+            if (args.Content.GetValueOrDefault(null) == null)
+                args.Content = "";
+            else if (args.Content.IsSpecified)
+            {
+                if (args.Content.Value == null)
+                    args.Content = "";
+                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
+                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            }
+
+            await SendMultipartAsync("POST", () => $"webhooks/{webhookId}/{AuthToken}", args.ToDictionary(), new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         public async Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
