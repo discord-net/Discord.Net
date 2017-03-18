@@ -38,6 +38,10 @@ namespace Discord.Commands
         public void AddFactory<T>(Func<T> factory) where T : class
         {
             var t = typeof(T);
+            if (typeof(T) == typeof(IDependencyMap))
+                throw new InvalidOperationException("IDependencyMap is used internally and cannot be added as a dependency");
+            if (typeof(T) == typeof(CommandService))
+                throw new InvalidOperationException("CommandService is used internally and cannot be added as a dependency");
             if (map.ContainsKey(t))
                 throw new InvalidOperationException($"The dependency map already contains \"{t.FullName}\"");
             map.Add(t, factory);
@@ -48,6 +52,10 @@ namespace Discord.Commands
             var t = typeof(T);
             if (map.ContainsKey(t))
                 return false;
+            if (typeof(T) == typeof(IDependencyMap))
+                throw new InvalidOperationException("IDependencyMap is used internally and cannot be added as a dependency");
+            if (typeof(T) == typeof(CommandService))
+                throw new InvalidOperationException("CommandService is used internally and cannot be added as a dependency");
             map.Add(t, factory);
             return true;
         }
