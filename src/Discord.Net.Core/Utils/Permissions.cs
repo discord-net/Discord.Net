@@ -115,16 +115,21 @@ namespace Discord
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
+                OverwritePermissions? perms;
+
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
 
+                //Give/Take Everyone permissions
+                perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
+                if (perms != null)
+                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
+
                 //Give/Take Role permissions
-                OverwritePermissions? perms;
-                var roleIds = user.RoleIds;
-                if (roleIds.Count > 0)
+                ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
+                foreach (var roleId in user.RoleIds)
                 {
-                    ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
-                    foreach (var roleId in roleIds)
+                    if (roleId != guild.EveryoneRole.Id)
                     {
                         perms = channel.GetPermissionOverwrite(guild.GetRole(roleId));
                         if (perms != null)
@@ -133,8 +138,8 @@ namespace Discord
                             deniedPermissions |= perms.Value.DenyValue;
                         }
                     }
-                    resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
                 }
+                resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
 
                 //Give/Take User permissions
                 perms = channel.GetPermissionOverwrite(user);
