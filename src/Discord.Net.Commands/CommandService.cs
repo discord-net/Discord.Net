@@ -247,7 +247,7 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
-            for (int i = commands.Count - 1; i >= 0; i--)
+            for (int i = 0; i < commands.Count; i++)
             {
                 var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
