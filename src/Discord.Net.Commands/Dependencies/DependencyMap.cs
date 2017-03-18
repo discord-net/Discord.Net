@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Commands
 {
     public class DependencyMap : IDependencyMap
     {
+        private static readonly Type[] _typeBlacklist = new[] {
+            typeof(IDependencyMap),
+            typeof(CommandService)
+        };
+
         private Dictionary<Type, Func<object>> map;
 
         public static DependencyMap Empty => new DependencyMap();
@@ -37,26 +43,18 @@ namespace Discord.Commands
         /// <inheritdoc />
         public void AddFactory<T>(Func<T> factory) where T : class
         {
-            var t = typeof(T);
-            if (typeof(T) == typeof(IDependencyMap))
-                throw new InvalidOperationException("IDependencyMap is used internally and cannot be added as a dependency");
-            if (typeof(T) == typeof(CommandService))
-                throw new InvalidOperationException("CommandService is used internally and cannot be added as a dependency");
-            if (map.ContainsKey(t))
-                throw new InvalidOperationException($"The dependency map already contains \"{t.FullName}\"");
-            map.Add(t, factory);
+            if (!TryAddFactory(factory))
+                throw new InvalidOperationException($"The dependency map already contains \"{typeof(T).FullName}\"");
         }
         /// <inheritdoc />
         public bool TryAddFactory<T>(Func<T> factory) where T : class
         {
-            var t = typeof(T);
-            if (map.ContainsKey(t))
+            var type = typeof(T);
+            if (_typeBlacklist.Contains(type))
+                throw new InvalidOperationException($"{type.FullName} is used internally and cannot be added as a dependency");
+            if (map.ContainsKey(type))
                 return false;
-            if (typeof(T) == typeof(IDependencyMap))
-                throw new InvalidOperationException("IDependencyMap is used internally and cannot be added as a dependency");
-            if (typeof(T) == typeof(CommandService))
-                throw new InvalidOperationException("CommandService is used internally and cannot be added as a dependency");
-            map.Add(t, factory);
+            map.Add(type, factory);
             return true;
         }
 
