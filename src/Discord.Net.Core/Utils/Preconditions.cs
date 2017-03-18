@@ -46,7 +46,7 @@ namespace Discord
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
         {
-            if (msg == null) return new ArgumentException(name, "Argument cannot be blank.");
+            if (msg == null) return new ArgumentException("Argument cannot be blank", name);
             else return new ArgumentException(name, msg);
         }
 
