@@ -9,6 +9,7 @@ namespace Discord
     {
         ConnectionState ConnectionState { get; }
         ISelfUser CurrentUser { get; }
+        TokenType TokenType { get; }
 
         Task StartAsync();
         Task StopAsync();

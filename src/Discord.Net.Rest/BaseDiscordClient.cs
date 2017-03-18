@@ -26,6 +26,7 @@ namespace Discord.Rest
         internal LogManager LogManager { get; }
         public LoginState LoginState { get; private set; }
         public ISelfUser CurrentUser { get; protected set; }
+        public TokenType TokenType => ApiClient.AuthTokenType;
         
         /// <summary> Creates a new REST-only discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
