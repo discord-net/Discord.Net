@@ -137,16 +137,48 @@ namespace Discord.Commands
                         return ExecuteResult.FromError(result);
                 }
 
+                await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        await _action(context, args, map).ConfigureAwait(false);
+                        try
+                        {
+                            await _action(context, args, map).ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex = new CommandException(this, context, ex);
+                            await Module.Service._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+                            throw;
+                        }
+                        await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
                         break;
                     case RunMode.Mixed: //Sync until first await statement
-                        var t1 = _action(context, args, map);
+                        var t1 = _action(context, args, map).ContinueWith(async t =>
+                        {
+                            if (t.IsFaulted)
+                            {
+                                var ex = new CommandException(this, context, t.Exception);
+                                await Module.Service._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+                            }
+                            else
+                                await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
+                        });
                         break;
                     case RunMode.Async: //Always async
-                        var t2 = Task.Run(() => _action(context, args, map));
+                        var t2 = Task.Run(() => 
+                        {
+                            var _ = _action(context, args, map).ContinueWith(async t =>
+                            {
+                                if (t.IsFaulted)
+                                {
+                                    var ex = new CommandException(this, context, t.Exception);
+                                    await Module.Service._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+                                }
+                                else
+                                    await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
+                            });
+                        });
                         break;
                 }
                 return ExecuteResult.FromSuccess();
@@ -189,5 +221,13 @@ namespace Discord.Commands
 
         private static T[] ConvertParamsList<T>(IEnumerable<object> paramsList)
             => paramsList.Cast<T>().ToArray();
+
+        internal string GetLogText(ICommandContext context)
+        {            
+            if (context.Guild != null)
+                return $"\"{Name}\" for {context.User} in {context.Guild}/{context.Channel}";
+            else
+                return $"\"{Name}\" for {context.User} in {context.Channel}";
+        }
     }
 }

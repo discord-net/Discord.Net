@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Discord.Commands.Builders;
+using Discord.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,12 +9,13 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Discord.Commands.Builders;
-
 namespace Discord.Commands
 {
     public class CommandService
     {
+        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
+        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
@@ -24,6 +27,8 @@ namespace Discord.Commands
         internal readonly bool _caseSensitive;
         internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
+        internal readonly Logger _cmdLogger;
+        internal readonly LogManager _logManager;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -36,7 +41,11 @@ namespace Discord.Commands
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
             if (_defaultRunMode == RunMode.Default)
-                throw new InvalidOperationException("The default run mode cannot be set to Default, it must be one of Sync, Mixed, or Async");
+                throw new InvalidOperationException("The default run mode cannot be set to Default.");
+
+            _logManager = new LogManager(config.LogLevel);
+            _logManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
+            _cmdLogger = _logManager.CreateLogger("Command");
 
             _moduleLock = new SemaphoreSlim(1, 1);
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();

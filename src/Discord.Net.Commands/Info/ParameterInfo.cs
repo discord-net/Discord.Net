@@ -1,10 +1,8 @@
+using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-
-using Discord.Commands.Builders;
-using System.Reflection;
 
 namespace Discord.Commands
 {

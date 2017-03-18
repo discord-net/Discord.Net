@@ -22,7 +22,7 @@ namespace Discord
         /// <summary> Gets or sets how a request should act in the case of an error, by default. </summary>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
         
-        /// <summary> Gets or sets the minimum log level severity that will be sent to the LogMessage event. </summary>
+        /// <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
 
         /// <summary> Gets or sets whether the initial log entry should be printed. </summary>
