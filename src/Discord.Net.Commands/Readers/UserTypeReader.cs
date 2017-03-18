@@ -14,7 +14,7 @@ namespace Discord.Commands
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
-            IReadOnlyCollection<IGuildUser> guildUsers = null;
+            IReadOnlyCollection<IGuildUser> guildUsers = ImmutableArray.Create<IGuildUser>();
             ulong id;
 
             if (context.Guild != null)
@@ -50,7 +50,7 @@ namespace Discord.Commands
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
                     AddResult(results, channelUser as T, channelUser?.Username == username ? 0.85f : 0.75f);
 
-                    var guildUser = channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
+                    var guildUser = guildUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
                     AddResult(results, guildUser as T, guildUser?.Username == username ? 0.80f : 0.70f);
                 }
@@ -60,14 +60,14 @@ namespace Discord.Commands
             {
                 foreach (var channelUser in channelUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f);
-
+                
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
             }
 
             //By Nickname (0.5-0.6)
             {
-                foreach (var channelUser in channelUsers.Where(x => string.Equals(input, (x as IGuildUser).Nickname, StringComparison.OrdinalIgnoreCase)))
+                foreach (var channelUser in channelUsers.Where(x => string.Equals(input, (x as IGuildUser)?.Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f);
 
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, (x as IGuildUser).Nickname, StringComparison.OrdinalIgnoreCase)))
