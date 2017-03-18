@@ -128,9 +128,11 @@ namespace Discord.Commands
             {
                 object[] args = GenerateArgs(argList, paramList);
 
-                foreach (var parameter in Parameters)
+                for (int position = 0; position < Parameters.Count; position++)
                 {
-                    var result = await parameter.CheckPreconditionsAsync(context, args, map).ConfigureAwait(false);
+                    var parameter = Parameters[position];
+                    var argument = args[position];
+                    var result = await parameter.CheckPreconditionsAsync(context, argument, map).ConfigureAwait(false);
                     if (!result.IsSuccess)
                         return ExecuteResult.FromError(result);
                 }

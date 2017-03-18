@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 using Discord.Commands.Builders;
+using System.Reflection;
 
 namespace Discord.Commands
 {
@@ -40,19 +41,14 @@ namespace Discord.Commands
             _reader = builder.TypeReader;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object[] args, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IDependencyMap map = null)
         {
             if (map == null)
                 map = DependencyMap.Empty;
 
-            int position = 0;
-            for(position = 0; position < Command.Parameters.Count; position++)
-                if (Command.Parameters[position] == this)
-                    break;
-
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, args[position], map).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, arg, map).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
