@@ -1,5 +1,6 @@
 ﻿using Discord.API.Rest;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 using ImageModel = Discord.API.Image;
@@ -62,6 +63,18 @@ namespace Discord.Rest
         {
             var args = new CreateDMChannelParams(user.Id);
             return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args, options).ConfigureAwait(false));
+        }
+
+        public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        {
+            foreach (var role in roles)
+                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options);
+        }
+
+        public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        {
+            foreach (var role in roles)
+                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options);
         }
     }
 }
