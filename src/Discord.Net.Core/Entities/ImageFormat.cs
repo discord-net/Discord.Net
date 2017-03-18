@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public enum AvatarFormat
+    public enum ImageFormat
     {
         Auto,
         WebP,

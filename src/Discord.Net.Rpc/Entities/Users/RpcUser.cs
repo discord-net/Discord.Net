@@ -14,7 +14,8 @@ namespace Discord.Rpc
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Auto, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) 
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
