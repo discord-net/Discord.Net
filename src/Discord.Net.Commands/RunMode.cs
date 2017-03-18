@@ -4,7 +4,6 @@
     {
         Default,
         Sync,
-        Mixed,
         Async
     }
 }
