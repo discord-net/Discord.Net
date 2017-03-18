@@ -10,12 +10,7 @@ namespace Discord.Commands
 {
     public class ParameterInfo
     {
-
-        private static MethodInfo _checkPermissionsMethod = typeof(ParameterPreconditionAttribute)
-            .GetTypeInfo().GetDeclaredMethod("CheckPermissions");
-
         private readonly TypeReader _reader;
-        private readonly MethodInfo _specializedCheckPermissionsMethod;
 
         public CommandInfo Command { get; }
         public string Name { get; }
@@ -44,8 +39,6 @@ namespace Discord.Commands
             Preconditions = builder.Preconditions.ToImmutableArray();
 
             _reader = builder.TypeReader;
-
-            _specializedCheckPermissionsMethod = _checkPermissionsMethod.MakeGenericMethod(Type);
         }
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IDependencyMap map = null)
@@ -55,9 +48,7 @@ namespace Discord.Commands
 
             foreach (var precondition in Preconditions)
             {
-                object[] parameters = new []{ context, this, arg, map };
-                var resultTask = (_specializedCheckPermissionsMethod.Invoke(precondition, parameters) as Task<PreconditionResult>);
-                var result = await resultTask.ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, arg, map).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
