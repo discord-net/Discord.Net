@@ -15,7 +15,7 @@ namespace Discord.WebSocket
         internal abstract SocketGlobalUser GlobalUser { get; }
         internal abstract SocketPresence Presence { get; set; }
 
-        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Png, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Auto, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);

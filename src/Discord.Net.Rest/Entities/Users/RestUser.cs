@@ -13,7 +13,7 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Png, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Auto, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
@@ -41,7 +41,7 @@ namespace Discord.Rest
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
         }
-        
+
         public virtual async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetUserAsync(Id, options).ConfigureAwait(false);
