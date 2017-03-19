@@ -24,6 +24,7 @@ namespace Discord.Rest
         }
         public static API.Embed ToModel(this Embed entity)
         {
+            if (entity == null) return null;
             var model = new API.Embed
             {
                 Type = entity.Type,
