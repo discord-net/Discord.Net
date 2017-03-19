@@ -12,10 +12,7 @@
         /// <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
 
-        /// <summary> 
-        /// Gets or sets whether RunMode.Sync commands should push exceptions up to the caller. 
-        /// If false or an RunMode.Async command, exceptions are only reported in the Log event. 
-        ///</summary>
+        /// <summary> Gets or sets whether RunMode.Sync commands should push exceptions up to the caller. </summary>
         public bool ThrowOnError { get; set; } = true;
     }
 }

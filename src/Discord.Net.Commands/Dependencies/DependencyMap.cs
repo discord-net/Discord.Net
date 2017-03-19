@@ -50,9 +50,7 @@ namespace Discord.Commands
         public bool TryAddFactory<T>(Func<T> factory) where T : class
         {
             var type = typeof(T);
-            if (_typeBlacklist.Contains(type))
-                throw new InvalidOperationException($"{type.FullName} is used internally and cannot be added as a dependency");
-            if (map.ContainsKey(type))
+            if (_typeBlacklist.Contains(type) || map.ContainsKey(type))
                 return false;
             map.Add(type, factory);
             return true;
