@@ -140,7 +140,7 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        var t1 = ExecuteAsyncInternal(context, args, map);
+                        await ExecuteAsyncInternal(context, args, map).ConfigureAwait(false);
                         break;
                     case RunMode.Async: //Always async
                         var t2 = Task.Run(async () => 
@@ -168,7 +168,8 @@ namespace Discord.Commands
             {
                 ex = new CommandException(this, context, ex);
                 await Module.Service._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
-                throw;
+                if (Module.Service._throwOnError)
+                    throw;
             }
             await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
         }
