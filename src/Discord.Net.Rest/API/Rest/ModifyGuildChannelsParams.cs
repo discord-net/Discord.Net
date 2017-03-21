@@ -7,9 +7,9 @@ namespace Discord.API.Rest
     internal class ModifyGuildChannelsParams
     {
         [JsonProperty("id")]
-        public ulong Id { get; set; }
+        public ulong Id { get; }
         [JsonProperty("position")]
-        public int Position { get; set; }
+        public int Position { get; }
 
         public ModifyGuildChannelsParams(ulong id, int position)
         {

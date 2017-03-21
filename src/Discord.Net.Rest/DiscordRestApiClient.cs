@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1049,7 +1048,6 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Color, 0, nameof(args.Color));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
-            Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
@@ -1061,17 +1059,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var roles = args.ToImmutableArray();
-            switch (roles.Length)
-            {
-                case 0:
-                    return ImmutableArray.Create<Role>();
-                case 1:
-                    return ImmutableArray.Create(await ModifyGuildRoleAsync(guildId, roles[0].Id, roles[0]).ConfigureAwait(false));
-                default:
-                    var ids = new BucketIds(guildId: guildId);
-                    return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
-            }
+            var ids = new BucketIds(guildId: guildId);
+            return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
 
         //Users

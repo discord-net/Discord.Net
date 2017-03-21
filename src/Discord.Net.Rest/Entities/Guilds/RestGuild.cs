@@ -114,14 +114,14 @@ namespace Discord.Rest
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
+        public async Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
-            await GuildHelper.ModifyChannelsAsync(this, Discord, arr, options);
+            await GuildHelper.ReorderChannelsAsync(this, Discord, arr, options);
         }
-        public async Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
+        public async Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
         {
-            var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options).ConfigureAwait(false);
+            var models = await GuildHelper.ReorderRolesAsync(this, Discord, args, options).ConfigureAwait(false);
             foreach (var model in models)
             {
                 var role = GetRole(model.Id);

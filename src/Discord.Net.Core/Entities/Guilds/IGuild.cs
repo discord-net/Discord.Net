@@ -56,9 +56,9 @@ namespace Discord
         /// <summary> Modifies this guild's embed. </summary>
         Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
         /// <summary> Bulk modifies the channels of this guild. </summary>
-        Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null);
+        Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null);
         /// <summary> Bulk modifies the roles of this guild. </summary>
-        Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null);
+        Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null);
         /// <summary> Leaves this guild. If you are the owner, use Delete instead. </summary>
         Task LeaveAsync(RequestOptions options = null);
 

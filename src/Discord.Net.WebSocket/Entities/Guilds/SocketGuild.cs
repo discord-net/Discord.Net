@@ -277,10 +277,10 @@ namespace Discord.WebSocket
             => GuildHelper.ModifyAsync(this, Discord, func, options);
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
-        public Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
-            => GuildHelper.ModifyChannelsAsync(this, Discord, args, options);
-        public Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
-            => GuildHelper.ModifyRolesAsync(this, Discord, args, options);
+        public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
+            => GuildHelper.ReorderChannelsAsync(this, Discord, args, options);
+        public Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
+            => GuildHelper.ReorderRolesAsync(this, Discord, args, options);
 
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);

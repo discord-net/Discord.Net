@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
+using BulkParams = Discord.API.Rest.ModifyGuildRolesParams;
 
 namespace Discord.Rest
 {
@@ -23,10 +24,17 @@ namespace Discord.Rest
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,
-                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>(),
-                Position = args.Position
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>()
             };
-            return await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
+            var model = await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
+
+            if (args.Position.IsSpecified)
+            {
+                var bulkArgs = new[] { new BulkParams(role.Id, args.Position.Value) };
+                await client.ApiClient.ModifyGuildRolesAsync(role.Guild.Id, bulkArgs, options).ConfigureAwait(false);
+                model.Position = args.Position.Value;
+            }
+            return model;
         }
     }
 }
