@@ -83,20 +83,21 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<ModuleInfo> AddModuleAsync<T>()
+        public Task<ModuleInfo> AddModuleAsync<T>() => AddModuleAsync(typeof(T));
+        public async Task<ModuleInfo> AddModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var typeInfo = typeof(T).GetTypeInfo();
+                var typeInfo = type.GetTypeInfo();
 
-                if (_typedModuleDefs.ContainsKey(typeof(T)))
+                if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
                 var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
-                    throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}, did you pass an invalid type?");
+                    throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
 
                 _typedModuleDefs[module.Key] = module.Value;
 
