@@ -193,6 +193,12 @@ namespace Discord
             _reconnectCancelToken?.Cancel();
             Error(ex);
         }
+        public void Reconnect()
+        {
+            _readyPromise.TrySetCanceled();
+            _connectionPromise.TrySetCanceled();
+            _connectionCancelToken?.Cancel();
+        }
         private async Task AcquireConnectionLock()
         {
             while (true)
