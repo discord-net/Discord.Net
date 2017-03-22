@@ -13,7 +13,7 @@ namespace Discord
         public static DateTimeOffset FromSnowflake(ulong value)
             => FromUnixMilliseconds((long)((value >> 22) + 1420070400000UL));
         public static ulong ToSnowflake(DateTimeOffset value)
-            => (ulong)(ToUnixMilliseconds(value) - 1420070400000L) << 22;
+            => ((ulong)ToUnixMilliseconds(value) - 1420070400000UL) << 22;
 
         public static DateTimeOffset FromTicks(long ticks)
             => new DateTimeOffset(ticks, TimeSpan.Zero);
