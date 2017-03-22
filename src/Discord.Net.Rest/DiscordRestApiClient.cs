@@ -494,13 +494,8 @@ namespace Discord.API
 
             if (args.Content.GetValueOrDefault(null) == null)
                 args.Content = "";
-            else if (args.Content.IsSpecified)
-            {
-                if (args.Content.Value == null)
-                    args.Content = "";
-                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
-            }
+            else if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
 
             var ids = new BucketIds(channelId: channelId);
             return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
