@@ -164,8 +164,7 @@ namespace Discord.Commands
             try
             {
                 ModuleInfo module;
-                _typedModuleDefs.TryGetValue(type, out module);
-                if (module == default(ModuleInfo))
+                if (!_typedModuleDefs.TryRemove(type, out module))
                     return false;
 
                 return RemoveModuleInternal(module);

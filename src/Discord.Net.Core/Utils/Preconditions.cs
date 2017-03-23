@@ -185,9 +185,12 @@ namespace Discord
         // Bulk Delete
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
-            var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(1209540000)));
+            var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
-                if (collection[i] <= minimum) throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks to delete.");
+            {
+                if (collection[i] <= minimum) 
+                    throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
+            }
         }
     }
 }
