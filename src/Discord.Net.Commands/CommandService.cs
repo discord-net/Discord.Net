@@ -154,13 +154,17 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> RemoveModuleAsync<T>()
+        public Task<bool> RemoveModuleAsync<T>()
+        {
+            return RemoveModuleAsync(typeof(T));
+        }
+        public async Task<bool> RemoveModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 ModuleInfo module;
-                _typedModuleDefs.TryGetValue(typeof(T), out module);
+                _typedModuleDefs.TryGetValue(type, out module);
                 if (module == default(ModuleInfo))
                     return false;
 
