@@ -154,10 +154,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<bool> RemoveModuleAsync<T>()
-        {
-            return RemoveModuleAsync(typeof(T));
-        }
+        public Task<bool> RemoveModuleAsync<T>() => RemoveModuleAsync(typeof(T));
         public async Task<bool> RemoveModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
