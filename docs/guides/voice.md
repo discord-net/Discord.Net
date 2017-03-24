@@ -7,17 +7,6 @@
 
 ## Installation
 
-To use Audio, you must first configure your [DiscordSocketClient] 
-with Audio support.
-
-In your [DiscordSocketConfig], set `AudioMode` to the appropriate 
-[AudioMode] for your bot. For most bots, you will only need to use 
-`AudioMode.Outgoing`.
-
-[DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
-[DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
-[AudioMode]: xref:Discord.Audio.AudioMode
-
 ### Dependencies
 
 Audio requires two native libraries, `libsodium` and `opus`. 
