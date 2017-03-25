@@ -57,7 +57,7 @@ namespace Discord.Commands
         }
 
         /// <inheritdoc />
-        public T Get<T>()
+        public T Get<T>() where T : class
         {
             return (T)Get(typeof(T));
         }
@@ -72,7 +72,7 @@ namespace Discord.Commands
         }
 
         /// <inheritdoc />
-        public bool TryGet<T>(out T result)
+        public bool TryGet<T>(out T result) where T : class
         {
             object untypedResult;
             if (TryGet(typeof(T), out untypedResult))

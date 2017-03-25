@@ -63,14 +63,14 @@ namespace Discord.Commands
         /// </summary>
         /// <typeparam name="T">The type of service.</typeparam>
         /// <returns>An instance of this service.</returns>
-        T Get<T>();
+        T Get<T>() where T : class;
         /// <summary>
         /// Try to pull an object from the map.
         /// </summary>
         /// <typeparam name="T">The type of service.</typeparam>
         /// <param name="result">The instance of this service.</param>
         /// <returns>Whether or not this object could be found in the map.</returns>
-        bool TryGet<T>(out T result);
+        bool TryGet<T>(out T result) where T : class;
 
         /// <summary>
         /// Pull an object from the map.
