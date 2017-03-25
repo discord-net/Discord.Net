@@ -430,13 +430,13 @@ namespace Discord.WebSocket
             var after = SocketVoiceState.Create(voiceChannel, model);
             _voiceStates[model.UserId] = after;
 
-            if (before.VoiceChannel?.Id != after.VoiceChannel?.Id)
+            if (_audioClient != null && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
             {
                 if (model.UserId == CurrentUser.Id)
                     RepopulateAudioStreams();
                 else
                 {
-                    _audioClient?.RemoveInputStream(model.UserId); //User changed channels, end their stream
+                    _audioClient.RemoveInputStream(model.UserId); //User changed channels, end their stream
                     if (CurrentUser.VoiceChannel != null && after.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
                         _audioClient.CreateInputStream(model.UserId);
                 }
@@ -575,16 +575,13 @@ namespace Discord.WebSocket
 
         internal void RepopulateAudioStreams()
         {
-            if (_audioClient != null)
+            _audioClient.ClearInputStreams(); //We changed channels, end all current streams
+            if (CurrentUser.VoiceChannel != null)
             {
-                _audioClient.ClearInputStreams(); //We changed channels, end all current streams
-                if (CurrentUser.VoiceChannel != null)
+                foreach (var pair in _voiceStates)
                 {
-                    foreach (var pair in _voiceStates)
-                    {
-                        if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
-                            _audioClient.CreateInputStream(pair.Key);
-                    }
+                    if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
+                        _audioClient.CreateInputStream(pair.Key);
                 }
             }
         }
