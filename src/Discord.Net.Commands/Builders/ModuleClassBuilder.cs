@@ -89,20 +89,23 @@ namespace Discord.Commands
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
-                    builder.AddAliases((attribute as AliasAttribute).Aliases);
+                {
+                    var aliasAttr = attribute as AliasAttribute;
+                    builder.AddAliases(aliasAttr.Type, aliasAttr.Aliases);
+                }
                 else if (attribute is GroupAttribute)
                 {
                     var groupAttr = attribute as GroupAttribute;
                     builder.Name = builder.Name ?? groupAttr.Prefix;
-                    builder.AddAliases(groupAttr.Prefix);
+                    builder.AddAliases(AliasType.Relative, groupAttr.Prefix);
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
             //Check for unspecified info
-            if (builder.Aliases.Count == 0)
-                builder.AddAliases("");
+            if (builder.RelativeAliases.Count == 0)
+                builder.AddAliases(AliasType.Relative, "");
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
@@ -127,7 +130,7 @@ namespace Discord.Commands
                 if (attribute is CommandAttribute)
                 {
                     var cmdAttr = attribute as CommandAttribute;
-                    builder.AddAliases(cmdAttr.Text);
+                    builder.AddAliases(AliasType.Relative, cmdAttr.Text);
                     builder.RunMode = cmdAttr.RunMode;
                     builder.Name = builder.Name ?? cmdAttr.Text;
                 }
@@ -140,7 +143,10 @@ namespace Discord.Commands
                 else if (attribute is RemarksAttribute)
                     builder.Remarks = (attribute as RemarksAttribute).Text;
                 else if (attribute is AliasAttribute)
-                    builder.AddAliases((attribute as AliasAttribute).Aliases);
+                {
+                    var aliasAttr = attribute as AliasAttribute;
+                    builder.AddAliases(aliasAttr.Type, aliasAttr.Aliases);
+                }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
             }

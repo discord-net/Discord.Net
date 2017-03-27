@@ -1,9 +1,9 @@
 using System;
 
-namespace Discord.Commands {
-
-  [AttributeUsage(AttributeTargets.Property)]
-  public class DontInjectAttribute : Attribute {
-  }
-
+namespace Discord.Commands 
+{
+    [AttributeUsage(AttributeTargets.Property)]
+    public class DontInjectAttribute : Attribute 
+    {
+    }
 }

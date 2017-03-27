@@ -38,27 +38,32 @@ namespace Discord.Commands
 
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
         {
-            var result = builder.Aliases.ToList();
-            var builderQueue = new Queue<ModuleBuilder>();
+            var result = builder.RelativeAliases.ToList();
+            var builderQueue = new Stack<ModuleBuilder>();
 
             var parent = builder;
             while ((parent = parent.Parent) != null)
-                builderQueue.Enqueue(parent);
+                builderQueue.Push(parent);
 
             while (builderQueue.Count > 0)
             {
-                var level = builderQueue.Dequeue();
+                var level = builderQueue.Pop();
                 // permute in reverse because we want to *prefix* our aliases
-                result = level.Aliases.Permutate(result, (first, second) =>
-                {
-                    if (first == "")
-                        return second;
-                    else if (second == "")
-                        return first;
-                    else
-                        return first + service._separatorChar + second;
-                }).ToList();
+                result = result
+                    .Permutate(level.RelativeAliases, (first, second) =>
+                    {
+                        if (first == "")
+                            return second;
+                        else if (second == "")
+                            return first;
+                        else
+                            return first + service._separatorChar + second;
+                    })
+                    .Concat(level.AbsoluteAliases)
+                    .ToList();
             }
+
+            result = result.Concat(builder.AbsoluteAliases).ToList();
 
             return result;
         }

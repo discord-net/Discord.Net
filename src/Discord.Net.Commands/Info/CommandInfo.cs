@@ -43,7 +43,7 @@ namespace Discord.Commands
             Priority = builder.Priority;
             
             Aliases = module.Aliases
-                .Permutate(builder.Aliases, (first, second) =>
+                .Permutate(builder.RelativeAliases, (first, second) =>
                 {
                     if (first == "")
                         return second;
@@ -52,6 +52,7 @@ namespace Discord.Commands
                     else
                         return first + service._separatorChar + second;
                 })
+                .Concat(builder.AbsoluteAliases)
                 .Select(x => service._caseSensitive ? x : x.ToLowerInvariant())
                 .ToImmutableArray();
 

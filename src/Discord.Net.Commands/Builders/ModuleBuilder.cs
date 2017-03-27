@@ -9,7 +9,7 @@ namespace Discord.Commands.Builders
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
-        private readonly List<string> _aliases;
+        private readonly List<string> _relativeAliases, _absoluteAliases;
 
         public CommandService Service { get; }
         public ModuleBuilder Parent { get; }
@@ -20,7 +20,8 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
-        public IReadOnlyList<string> Aliases => _aliases;
+        public IReadOnlyList<string> RelativeAliases => _relativeAliases;
+        public IReadOnlyList<string> AbsoluteAliases => _absoluteAliases;
 
         //Automatic
         internal ModuleBuilder(CommandService service, ModuleBuilder parent)
@@ -31,7 +32,8 @@ namespace Discord.Commands.Builders
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
             _preconditions = new List<PreconditionAttribute>();
-            _aliases = new List<string>();
+            _relativeAliases = new List<string>();
+            _absoluteAliases = new List<string>();
         }
         //User-defined
         internal ModuleBuilder(CommandService service, ModuleBuilder parent, string primaryAlias)
@@ -39,7 +41,7 @@ namespace Discord.Commands.Builders
         {
             Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
 
-            _aliases = new List<string> { primaryAlias };
+            _relativeAliases = new List<string> { primaryAlias };
         }
 
         public ModuleBuilder WithName(string name)
@@ -58,13 +60,22 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public ModuleBuilder AddAliases(params string[] aliases)
+        public ModuleBuilder AddAliases(AliasType type, params string[] aliases)
         {
             for (int i = 0; i < aliases.Length; i++)
             {
                 var alias = aliases[i] ?? "";
-                if (!_aliases.Contains(alias))
-                    _aliases.Add(alias);
+                switch (type)
+                {
+                    case AliasType.Relative:
+                        if (!_relativeAliases.Contains(alias))
+                            _relativeAliases.Add(alias);
+                        break;
+                    case AliasType.Absolute:
+                        if (!_absoluteAliases.Contains(alias))
+                            _absoluteAliases.Add(alias);
+                        break;
+                }
             }
             return this;
         }
@@ -106,7 +117,7 @@ namespace Discord.Commands.Builders
         {
             //Default name to first alias
             if (Name == null)
-                Name = _aliases[0];
+                Name = _relativeAliases[0];
 
             return new ModuleInfo(this, service, parent);
         }
