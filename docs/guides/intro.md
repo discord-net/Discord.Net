@@ -67,7 +67,7 @@ async main.
 
 [!code-csharp[Async Context](samples/intro/async-context.cs)]
 
-As a result of this, your program will now start, and immidiately
+As a result of this, your program will now start, and immediately
 jump into an async context. This will allow us later on to create a
 connection to Discord, without needing to worry about setting up the
 correct async implementation.
