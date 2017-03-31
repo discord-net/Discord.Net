@@ -423,7 +423,7 @@ namespace Discord.WebSocket
         }
 
         //Voice States
-        internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
+        internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
             var before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;
@@ -433,12 +433,12 @@ namespace Discord.WebSocket
             if (_audioClient != null && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
             {
                 if (model.UserId == CurrentUser.Id)
-                    RepopulateAudioStreams();
+                    await RepopulateAudioStreamsAsync().ConfigureAwait(false);
                 else
                 {
-                    _audioClient.RemoveInputStream(model.UserId); //User changed channels, end their stream
+                    await _audioClient.RemoveInputStreamAsync(model.UserId).ConfigureAwait(false); //User changed channels, end their stream
                     if (CurrentUser.VoiceChannel != null && after.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
-                        _audioClient.CreateInputStream(model.UserId);
+                        await _audioClient.CreateInputStreamAsync(model.UserId).ConfigureAwait(false);
                 }
             }
 
@@ -464,7 +464,7 @@ namespace Discord.WebSocket
         {
             return _audioClient?.GetInputStream(userId);
         }
-        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute)
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, Action<IAudioClient> configAction)
         {
             selfDeaf = false;
             selfMute = false;
@@ -477,6 +477,32 @@ namespace Discord.WebSocket
                 await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 promise = new TaskCompletionSource<AudioClient>();
                 _audioConnectPromise = promise;
+
+                if (_audioClient == null)
+                {
+                    var audioClient = new AudioClient(this, Discord.GetAudioId());
+                    audioClient.Disconnected += async ex =>
+                    {
+                        if (!promise.Task.IsCompleted)
+                        {
+                            try { audioClient.Dispose(); } catch { }
+                            _audioClient = null;
+                            if (ex != null)
+                                await promise.TrySetExceptionAsync(ex);
+                            else
+                                await promise.TrySetCanceledAsync();
+                            return;
+                        }
+                    };
+                    audioClient.Connected += () =>
+                    {
+                        var _ = promise.TrySetResultAsync(_audioClient);
+                        return Task.Delay(0);
+                    };
+                    configAction?.Invoke(audioClient);
+                    _audioClient = audioClient;
+                }
+
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
             }
             catch (Exception)
@@ -523,7 +549,7 @@ namespace Discord.WebSocket
                 await _audioClient.StopAsync().ConfigureAwait(false);
             _audioClient = null;
         }
-        internal async Task FinishConnectAudio(int id, string url, string token)
+        internal async Task FinishConnectAudio(string url, string token)
         {
             //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
@@ -531,31 +557,7 @@ namespace Discord.WebSocket
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var promise = _audioConnectPromise;
-                if (_audioClient == null)
-                {
-                    var audioClient = new AudioClient(this, id);
-                    audioClient.Disconnected += async ex =>
-                    {
-                        if (!promise.Task.IsCompleted)
-                        {
-                            try { audioClient.Dispose(); } catch { }
-                            _audioClient = null;
-                            if (ex != null)
-                                await promise.TrySetExceptionAsync(ex);
-                            else
-                                await promise.TrySetCanceledAsync();
-                            return;
-                        }
-                    };
-                    _audioClient = audioClient;
-                    RepopulateAudioStreams();
-                }
-                _audioClient.Connected += () => 
-                { 
-                    var _ = promise.TrySetResultAsync(_audioClient); 
-                    return Task.Delay(0);
-                };
+                await RepopulateAudioStreamsAsync().ConfigureAwait(false);
                 await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);                
             }
             catch (OperationCanceledException)
@@ -573,15 +575,15 @@ namespace Discord.WebSocket
             }
         }
 
-        internal void RepopulateAudioStreams()
+        internal async Task RepopulateAudioStreamsAsync()
         {
-            _audioClient.ClearInputStreams(); //We changed channels, end all current streams
+            await _audioClient.ClearInputStreamsAsync().ConfigureAwait(false); //We changed channels, end all current streams
             if (CurrentUser.VoiceChannel != null)
             {
                 foreach (var pair in _voiceStates)
                 {
-                    if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
-                        _audioClient.CreateInputStream(pair.Key);
+                    if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id && pair.Key != CurrentUser.Id)
+                        await _audioClient.CreateInputStreamAsync(pair.Key).ConfigureAwait(false);
                 }
             }
         }

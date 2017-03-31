@@ -1414,7 +1414,7 @@ namespace Discord.WebSocket
                                             if (data.ChannelId != null)
                                             {
                                                 before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
-                                                after = guild.AddOrUpdateVoiceState(State, data);
+                                                after = await guild.AddOrUpdateVoiceStateAsync(State, data).ConfigureAwait(false);
                                                 /*if (data.UserId == CurrentUser.Id)
                                                 {
                                                     var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
@@ -1471,7 +1471,7 @@ namespace Discord.WebSocket
                                     if (guild != null)
                                     {
                                         string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
-                                        var _ = guild.FinishConnectAudio(_nextAudioId++, endpoint, data.Token).ConfigureAwait(false);
+                                        var _ = guild.FinishConnectAudio(endpoint, data.Token).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1724,6 +1724,8 @@ namespace Discord.WebSocket
                 await _gatewayLogger.WarningAsync($"A {name} handler has thrown an unhandled exception.", ex).ConfigureAwait(false);
             }
         }
+
+        internal int GetAudioId() => _nextAudioId++;
 
         //IDiscordClient
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)

@@ -47,6 +47,18 @@ namespace Discord.Audio
             remove { _latencyUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
+        public event Func<ulong, AudioInStream, Task> StreamCreated
+        {
+            add { _streamCreated.Add(value); }
+            remove { _streamCreated.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, AudioInStream, Task>> _streamCreated = new AsyncEvent<Func<ulong, AudioInStream, Task>>();
+        public event Func<ulong, Task> StreamDestroyed
+        {
+            add { _streamDestroyed.Add(value); }
+            remove { _streamDestroyed.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<ulong, Task>> _streamDestroyed = new AsyncEvent<Func<ulong, Task>>();
 
         private readonly Logger _audioLogger;
         private readonly JsonSerializer _serializer;
@@ -182,7 +194,7 @@ namespace Discord.Audio
                 throw new ArgumentException("Value must be 120, 240, 480, 960, 1920 or 2880", nameof(samplesPerFrame));
         }
 
-        internal void CreateInputStream(ulong userId)
+        internal async Task CreateInputStreamAsync(ulong userId)
         {
             //Assume Thread-safe
             if (!_streams.ContainsKey(userId))
@@ -190,6 +202,7 @@ namespace Discord.Audio
                 var readerStream = new InputStream();
                 var writerStream = new OpusDecodeStream(new RTPReadStream(readerStream, _secretKey));
                 _streams.TryAdd(userId, new StreamPair(readerStream, writerStream));
+                await _streamCreated.InvokeAsync(userId, readerStream);
             }
         }
         internal AudioInStream GetInputStream(ulong id)
@@ -199,14 +212,18 @@ namespace Discord.Audio
                 return streamPair.Reader;
             return null;
         }
-        internal void RemoveInputStream(ulong userId)
+        internal async Task RemoveInputStreamAsync(ulong userId)
         {
-            _streams.TryRemove(userId, out var ignored);
+            if (_streams.TryRemove(userId, out var ignored))
+                await _streamDestroyed.InvokeAsync(userId).ConfigureAwait(false);
         }
-        internal void ClearInputStreams()
+        internal async Task ClearInputStreamsAsync()
         {
-            foreach (var pair in _streams.Values)
-                pair.Reader.Dispose();
+            foreach (var pair in _streams)
+            {
+                pair.Value.Reader.Dispose();
+                await _streamDestroyed.InvokeAsync(pair.Key).ConfigureAwait(false);
+            }
             _ssrcMap.Clear();
             _streams.Clear();
         }

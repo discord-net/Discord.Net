@@ -212,6 +212,9 @@ namespace Discord.WebSocket
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
 
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+
         //IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));

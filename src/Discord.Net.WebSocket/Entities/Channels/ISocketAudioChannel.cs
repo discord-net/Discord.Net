@@ -5,6 +5,5 @@ namespace Discord.WebSocket
 {
     public interface ISocketAudioChannel : IAudioChannel
     {
-        Task<IAudioClient> ConnectAsync();
     }
 }

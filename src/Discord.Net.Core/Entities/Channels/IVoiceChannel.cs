@@ -1,5 +1,4 @@
-﻿using Discord.Audio;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -13,7 +12,5 @@ namespace Discord
 
         /// <summary> Modifies this voice channel. </summary>
         Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null);
-        /// <summary> Connects to this voice channel. </summary>
-        Task<IAudioClient> ConnectAsync();
     }
 }

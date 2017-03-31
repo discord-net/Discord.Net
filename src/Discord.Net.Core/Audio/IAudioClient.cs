@@ -8,7 +8,9 @@ namespace Discord.Audio
         event Func<Task> Connected;
         event Func<Exception, Task> Disconnected;
         event Func<int, int, Task> LatencyUpdated;
-        
+        event Func<ulong, AudioInStream, Task> StreamCreated;
+        event Func<ulong, Task> StreamDestroyed;
+
         /// <summary> Gets the current connection state of this client. </summary>
         ConnectionState ConnectionState { get; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>

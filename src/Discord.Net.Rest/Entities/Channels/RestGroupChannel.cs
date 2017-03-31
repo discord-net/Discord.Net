@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Audio;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -144,6 +145,9 @@ namespace Discord.Rest
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

@@ -1,4 +1,5 @@
-﻿using Discord.Rest;
+﻿using Discord.Audio;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -111,6 +112,9 @@ namespace Discord.Rpc
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IChannel
         string IChannel.Name { get { throw new NotSupportedException(); } }
