@@ -1045,8 +1045,11 @@ namespace Discord.WebSocket
                                             await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_ADD, guild is not synced yet.").ConfigureAwait(false);
                                             return;
                                         }
-                                        
-                                        await _userBannedEvent.InvokeAsync(SocketSimpleUser.Create(this, State, data.User), guild).ConfigureAwait(false);
+
+                                        SocketUser user = guild.GetUser(data.User.Id);
+                                        if (user == null)
+                                            user = SocketUnknownUser.Create(this, State, data.User);                                        
+                                        await _userBannedEvent.InvokeAsync(user, guild).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1071,7 +1074,7 @@ namespace Discord.WebSocket
 
                                         SocketUser user = State.GetUser(data.User.Id);
                                         if (user == null)
-                                            user = SocketSimpleUser.Create(this, State, data.User);
+                                            user = SocketUnknownUser.Create(this, State, data.User);
                                         await _userUnbannedEvent.InvokeAsync(user, guild).ConfigureAwait(false);
                                     }
                                     else
@@ -1098,8 +1101,16 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        var author = (guild != null ? guild.GetUser(data.Author.Value.Id) : (channel as SocketChannel).GetUser(data.Author.Value.Id)) ??
-                                            SocketSimpleUser.Create(this, State, data.Author.Value);
+                                        SocketUser author;
+                                        if (guild != null)
+                                        {
+                                            if (data.WebhookId.IsSpecified)
+                                                author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
+                                            else
+                                                author = guild.GetUser(data.Author.Value.Id);
+                                        }
+                                        else
+                                            author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
 
                                         if (author != null)
                                         {
@@ -1153,7 +1164,7 @@ namespace Discord.WebSocket
                                             else
                                                 author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
                                             if (author == null)
-                                                author = SocketSimpleUser.Create(this, State, data.Author.Value);
+                                                author = SocketUnknownUser.Create(this, State, data.Author.Value);
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }

@@ -14,7 +14,6 @@ namespace Discord.WebSocket
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ulong? _webhookId;
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
@@ -22,7 +21,6 @@ namespace Discord.WebSocket
         
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
-        public override ulong? WebhookId => _webhookId;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
@@ -32,13 +30,13 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
         public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emoji).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
-        internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
-            : base(discord, id, channel, author)
+        internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
+            : base(discord, id, channel, author, source)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static new SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            var entity = new SocketUserMessage(discord, model.Id, channel, author);
+            var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
             return entity;
         }
@@ -55,8 +53,6 @@ namespace Discord.WebSocket
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.WebhookId.IsSpecified)
-                _webhookId = model.WebhookId.Value;
 
             if (model.Attachments.IsSpecified)
             {
@@ -86,18 +82,18 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
+            IReadOnlyCollection<IUser> mentions = ImmutableArray.Create<SocketUnknownUser>(); //Is passed to ParseTags to get real mention collection
             if (model.UserMentions.IsSpecified)
             {
                 var value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                     {
                         var val = value[i];
                         if (val.Object != null)
-                            newMentions.Add(SocketSimpleUser.Create(Discord, Discord.State, val.Object));
+                            newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
                     }
                     mentions = newMentions.ToImmutable();
                 }

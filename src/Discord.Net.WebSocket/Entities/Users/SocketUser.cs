@@ -12,11 +12,10 @@ namespace Discord.WebSocket
         public abstract string Username { get; internal set; }
         public abstract ushort DiscriminatorValue { get; internal set; }
         public abstract string AvatarId { get; internal set; }
+        public abstract bool IsWebhook { get; }
         internal abstract SocketGlobalUser GlobalUser { get; }
         internal abstract SocketPresence Presence { get; set; }
 
-        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) 
-            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
@@ -46,6 +45,9 @@ namespace Discord.WebSocket
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
+
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

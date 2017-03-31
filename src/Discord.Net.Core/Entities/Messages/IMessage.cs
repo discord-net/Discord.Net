@@ -7,12 +7,12 @@ namespace Discord
     {
         /// <summary> Gets the type of this system message. </summary>
         MessageType Type { get; }
+        /// <summary> Gets the source of this message. </summary>
+        MessageSource Source { get; }
         /// <summary> Returns true if this message was sent as a text-to-speech message. </summary>
         bool IsTTS { get; }
         /// <summary> Returns true if this message was added to its channel's pinned messages. </summary>
         bool IsPinned { get; }
-        /// <summary> Returns true if this message was created using a webhook. </summary>
-        bool IsWebhook { get; }
         /// <summary> Returns the content for this message. </summary>
         string Content { get; }
         /// <summary> Gets the time this message was sent. </summary>
@@ -24,8 +24,6 @@ namespace Discord
         IMessageChannel Channel { get; }
         /// <summary> Gets the author of this message. </summary>
         IUser Author { get; }
-        /// <summary> Gets the id of the webhook used to created this message, if any. </summary>
-        ulong? WebhookId { get; }
 
         /// <summary> Returns all attachments included in this message. </summary>
         IReadOnlyCollection<IAttachment> Attachments { get; }

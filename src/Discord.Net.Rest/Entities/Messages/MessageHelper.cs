@@ -67,7 +67,7 @@ namespace Discord.Rest
             await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
-        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, ImmutableArray<IUser> userMentions)
+        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
             
@@ -155,6 +155,17 @@ namespace Discord.Rest
                 .Select(x => (T)x.Value)
                 .Where(x => x != null)
                 .ToImmutableArray();
+        }
+
+        public static MessageSource GetSource(Model msg)
+        {
+            if (msg.Type != MessageType.Default)
+                return MessageSource.System;
+            else if (msg.WebhookId.IsSpecified)
+                return MessageSource.Webhook;
+            else if (msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true)
+                return MessageSource.Bot;
+            return MessageSource.User;
         }
     }
 }

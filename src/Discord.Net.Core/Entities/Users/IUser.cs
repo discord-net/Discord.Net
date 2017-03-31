@@ -12,8 +12,10 @@ namespace Discord
         string Discriminator { get; }
         /// <summary> Gets the per-username unique id for this user. </summary>
         ushort DiscriminatorValue { get; }
-        /// <summary> Returns true if this user is a bot account. </summary>
+        /// <summary> Returns true if this user is a bot user. </summary>
         bool IsBot { get; }
+        /// <summary> Returns true if this user is a webhook user. </summary>
+        bool IsWebhook { get; }
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
 

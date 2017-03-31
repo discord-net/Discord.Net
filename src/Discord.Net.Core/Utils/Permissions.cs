@@ -86,12 +86,16 @@ namespace Discord
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UnsetBit(ref ulong value, byte bit) => value &= ~(1U << bit);
 
+        public static ChannelPermissions ToChannelPerms(IGuildChannel channel, ulong guildPermissions)
+            => new ChannelPermissions(guildPermissions & ChannelPermissions.All(channel).RawValue);
         public static ulong ResolveGuild(IGuild guild, IGuildUser user)
         {
             ulong resolvedPermissions = 0;
 
             if (user.Id == guild.OwnerId)
                 resolvedPermissions = GuildPermissions.All.RawValue; //Owners always have all permissions
+            else if (user.IsWebhook)
+                resolvedPermissions = GuildPermissions.Webhook.RawValue;
             else
             {
                 foreach (var roleId in user.RoleIds)

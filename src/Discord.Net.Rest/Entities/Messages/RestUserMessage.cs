@@ -13,7 +13,6 @@ namespace Discord.Rest
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ulong? _webhookId;
         private ImmutableArray<Attachment> _attachments;
         private ImmutableArray<Embed> _embeds;
         private ImmutableArray<ITag> _tags;
@@ -21,7 +20,6 @@ namespace Discord.Rest
         
         public override bool IsTTS => _isTTS;
         public override bool IsPinned => _isPinned;
-        public override ulong? WebhookId => _webhookId;
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
@@ -31,13 +29,13 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ITag> Tags => _tags;
         public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emoji, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
-            : base(discord, id, channel, author)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
+            : base(discord, id, channel, author, source)
         {
         }
-        internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
+        internal static new RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id, channel, author);
+            var entity = new RestUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(model);
             return entity;
         }
@@ -54,8 +52,6 @@ namespace Discord.Rest
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.WebhookId.IsSpecified)
-                _webhookId = model.WebhookId.Value;
 
             if (model.Attachments.IsSpecified)
             {

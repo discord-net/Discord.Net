@@ -9,7 +9,7 @@ namespace Discord.WebSocket
         public MessageType Type { get; private set; }
 
         internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
-            : base(discord, id, channel, author)
+            : base(discord, id, channel, author, MessageSource.System)
         {
         }
         internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)

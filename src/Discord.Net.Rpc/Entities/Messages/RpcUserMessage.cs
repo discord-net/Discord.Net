@@ -31,15 +31,16 @@ namespace Discord.Rpc
         public override IReadOnlyCollection<ITag> Tags => _tags;
         public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => ImmutableDictionary.Create<Emoji, ReactionMetadata>();
 
-        internal RpcUserMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
-            : base(discord, id, channel, author)
+        internal RpcUserMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author, MessageSource source)
+            : base(discord, id, channel, author, source)
         {
         }
         internal new static RpcUserMessage Create(DiscordRpcClient discord, ulong channelId, Model model)
         {
             var entity = new RpcUserMessage(discord, model.Id, 
                 RestVirtualMessageChannel.Create(discord, channelId), 
-                RpcUser.Create(discord, model.Author.Value));
+                RpcUser.Create(discord, model.Author.Value, model.WebhookId.ToNullable()),
+                MessageHelper.GetSource(model));
             entity.Update(model);
             return entity;
         }

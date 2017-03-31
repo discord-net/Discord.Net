@@ -11,9 +11,10 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
         public SocketDMChannel DMChannel { get; internal set; }
-
-        internal override SocketGlobalUser GlobalUser => this;
         internal override SocketPresence Presence { get; set; }
+
+        public override bool IsWebhook => false;
+        internal override SocketGlobalUser GlobalUser => this;
 
         private readonly object _lockObj = new object();
         private ushort _references;

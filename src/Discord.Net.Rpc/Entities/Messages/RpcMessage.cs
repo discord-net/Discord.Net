@@ -13,6 +13,7 @@ namespace Discord.Rpc
 
         public IMessageChannel Channel { get; }
         public RpcUser Author { get; }
+        public MessageSource Source { get; }
 
         public string Content { get; private set; }
         public Color AuthorColor { get; private set; }
@@ -33,11 +34,12 @@ namespace Discord.Rpc
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RpcMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
+        internal RpcMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author, MessageSource source)
             : base(discord, id)
         {
             Channel = channel;
             Author = author;
+            Source = source;
         }
         internal static RpcMessage Create(DiscordRpcClient discord, ulong channelId, Model model)
         {

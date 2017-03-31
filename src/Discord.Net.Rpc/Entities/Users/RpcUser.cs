@@ -14,11 +14,10 @@ namespace Discord.Rpc
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) 
-            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
         public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
+        public virtual bool IsWebhook => false;
         public virtual Game? Game => null;
         public virtual UserStatus Status => UserStatus.Offline;
 
@@ -27,8 +26,14 @@ namespace Discord.Rpc
         {
         }
         internal static RpcUser Create(DiscordRpcClient discord, Model model)
+            => Create(discord, model, null);
+        internal static RpcUser Create(DiscordRpcClient discord, Model model, ulong? webhookId)
         {
-            var entity = new RpcUser(discord, model.Id);
+            RpcUser entity;
+            if (webhookId.HasValue)
+                entity = new RpcWebhookUser(discord, model.Id, webhookId.Value);
+            else
+                entity = new RpcUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -46,6 +51,9 @@ namespace Discord.Rpc
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
+
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

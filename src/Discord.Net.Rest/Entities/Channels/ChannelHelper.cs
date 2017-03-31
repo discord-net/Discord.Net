@@ -91,7 +91,7 @@ namespace Discord.Rest
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? await (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).ConfigureAwait(false) : null;
             var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
-            var author = GetAuthor(client, guild, model.Author.Value);
+            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
             return RestMessage.Create(client, channel, author, model);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
@@ -119,7 +119,7 @@ namespace Discord.Rest
                     var builder = ImmutableArray.CreateBuilder<RestMessage>();
                     foreach (var model in models)
                     {
-                        var author = GetAuthor(client, guild, model.Author.Value);
+                        var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
                         builder.Add(RestMessage.Create(client, channel, author, model));                        
                     }
                     return builder.ToImmutable();
@@ -147,7 +147,7 @@ namespace Discord.Rest
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
             foreach (var model in models)
             {
-                var author = GetAuthor(client, guild, model.Author.Value);
+                var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
                 builder.Add(RestMessage.Create(client, channel, author, model));
             }
             return builder.ToImmutable();
@@ -264,13 +264,13 @@ namespace Discord.Rest
             => new TypingNotifier(client, channel, options);
 
         //Helpers
-        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model)
+        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)
         {
             IUser author = null;
             if (guild != null)
                 author = guild.GetUserAsync(model.Id, CacheMode.CacheOnly).Result;
             if (author == null)
-                author = RestUser.Create(client, model);
+                author = RestUser.Create(client, guild, model, webhookId);
             return author;
         }
     }
