@@ -106,6 +106,7 @@ namespace Discord.Net.Rest
                             {
                                 var memoryStream = new MemoryStream();
                                 await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                                memoryStream.Position = 0;
                                 stream = memoryStream;
                             }
                             content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
