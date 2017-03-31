@@ -65,7 +65,7 @@ namespace Discord.WebSocket
                     var newConfig = config.Clone();
                     newConfig.ShardId = _shardIds[i];
                     _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
-                    RegisterEvents(_shards[i]);
+                    RegisterEvents(_shards[i], i == 0);
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace Discord.WebSocket
                     newConfig.ShardId = _shardIds[i];
                     newConfig.TotalShards = _totalShards;
                     _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
-                    RegisterEvents(_shards[i]);
+                    RegisterEvents(_shards[i], i == 0);
                 }
             }
 
@@ -256,7 +256,7 @@ namespace Discord.WebSocket
                 await _shards[i].SetGameAsync(name, streamUrl, streamType).ConfigureAwait(false);
         }
 
-        private void RegisterEvents(DiscordSocketClient client)
+        private void RegisterEvents(DiscordSocketClient client, bool isPrimary)
         {
             client.Log += (msg) => _logEvent.InvokeAsync(msg);
             client.LoggedOut += () =>
@@ -269,6 +269,14 @@ namespace Discord.WebSocket
                 }
                 return Task.Delay(0);
             };
+            if (isPrimary)
+            {
+                client.Ready += () =>
+                {
+                    CurrentUser = client.CurrentUser;
+                    return Task.Delay(0);
+                };
+            }
 
             client.ChannelCreated += (channel) => _channelCreatedEvent.InvokeAsync(channel);
             client.ChannelDestroyed += (channel) => _channelDestroyedEvent.InvokeAsync(channel);
@@ -302,7 +310,7 @@ namespace Discord.WebSocket
             client.CurrentUserUpdated += (oldUser, newUser) => _selfUpdatedEvent.InvokeAsync(oldUser, newUser);
             client.UserIsTyping += (oldUser, newUser) => _userIsTypingEvent.InvokeAsync(oldUser, newUser);
             client.RecipientAdded += (user) => _recipientAddedEvent.InvokeAsync(user);
-            client.RecipientAdded += (user) => _recipientRemovedEvent.InvokeAsync(user);
+            client.RecipientRemoved += (user) => _recipientRemovedEvent.InvokeAsync(user);
         }
 
         //IDiscordClient
