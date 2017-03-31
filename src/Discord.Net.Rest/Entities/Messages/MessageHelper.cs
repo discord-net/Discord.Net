@@ -126,7 +126,8 @@ namespace Discord.Rest
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
 
-                tags.Add(new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                if (!TagOverlaps(tags, index))
+                    tags.Add(new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
                 index++;
             }
 
@@ -136,11 +137,22 @@ namespace Discord.Rest
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
 
-                tags.Add(new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
+                if (!TagOverlaps(tags, index))
+                    tags.Add(new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
                 index++;
             }
 
             return tags.ToImmutable();
+        }
+        private static bool TagOverlaps(IReadOnlyList<ITag> tags, int index)
+        {
+            for (int i = 0; i < tags.Count; i++)
+            {
+                var tag = tags[i];
+                if (index >= tag.Index && index < tag.Index + tag.Length)
+                    return true;
+            }
+            return false;
         }
         public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
         {
