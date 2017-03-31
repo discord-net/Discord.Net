@@ -1087,10 +1087,18 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => "users/@me/channels", new BucketIds(), options: options).ConfigureAwait(false);
         }
-        public async Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(GetGuildSummariesParams args, RequestOptions options = null)
         {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxGuildsPerBatch, nameof(args.Limit));
+            Preconditions.GreaterThan(args.AfterGuildId, 0, nameof(args.AfterGuildId));
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => "users/@me/guilds", new BucketIds(), options: options).ConfigureAwait(false);
+
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            ulong afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
+            
+            return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
         {

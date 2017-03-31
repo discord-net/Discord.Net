@@ -145,7 +145,7 @@ namespace Discord.WebSocket
         public SocketGuild GetGuild(ulong id) => GetShardFor(id).GetGuild(id);
         /// <inheritdoc />
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
-            => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon);
+            => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, new RequestOptions());
 
         /// <inheritdoc />
         public SocketChannel GetChannel(ulong id)
@@ -176,7 +176,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
-            => ClientHelper.GetConnectionsAsync(this);
+            => ClientHelper.GetConnectionsAsync(this, new RequestOptions());
 
         private IEnumerable<SocketGuild> GetGuilds()
         {
@@ -196,7 +196,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task<RestInvite> GetInviteAsync(string inviteId)
-            => ClientHelper.GetInviteAsync(this, inviteId);
+            => ClientHelper.GetInviteAsync(this, inviteId, new RequestOptions());
 
         /// <inheritdoc />
         public SocketUser GetUser(ulong id)
@@ -314,35 +314,35 @@ namespace Discord.WebSocket
         }
 
         //IDiscordClient
-        async Task<IApplication> IDiscordClient.GetApplicationInfoAsync()
+        async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
-        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode)
+        Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IChannel>(GetChannel(id));
-        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode)
+        Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
 
-        async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync()
+        async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync().ConfigureAwait(false);
 
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId)
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => await GetInviteAsync(inviteId).ConfigureAwait(false);
 
-        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode)
+        Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuild>(GetGuild(id));
-        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode)
+        Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
-        async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon)
+        async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
-        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode)
+        Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
-        Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator)
+        Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
-        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync()
+        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
-        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id)
+        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
     }
 }
