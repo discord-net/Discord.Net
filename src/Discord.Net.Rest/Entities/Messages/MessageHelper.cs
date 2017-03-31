@@ -110,11 +110,12 @@ namespace Discord.Rest
                         mentionedRole = guild.GetRole(id);
                     tags.Add(new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
                 }
-                else
+                else if (Emoji.TryParse(content, out var emoji))
+                    tags.Add(new Tag<Emoji>(TagType.Emoji, index, content.Length, emoji.Id ?? 0, emoji));
+                else //Bad Tag
                 {
-                    Emoji emoji;
-                    if (Emoji.TryParse(content, out emoji))
-                        tags.Add(new Tag<Emoji>(TagType.Emoji, index, content.Length, id, emoji));
+                    index = index + 1;
+                    continue;
                 }
                 index = endIndex + 1;
             }
