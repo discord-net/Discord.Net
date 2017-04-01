@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Discord.Audio
 {
     //TODO: Add audio reconnecting
-    internal class AudioClient : IAudioClient, IDisposable
+    internal partial class AudioClient : IAudioClient, IDisposable
     {
         internal struct StreamPair
         {
@@ -28,37 +28,6 @@ namespace Discord.Audio
                 Writer = writer;
             }
         }
-
-        public event Func<Task> Connected
-        {
-            add { _connectedEvent.Add(value); }
-            remove { _connectedEvent.Remove(value); }
-        }
-        private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
-        public event Func<Exception, Task> Disconnected
-        {
-            add { _disconnectedEvent.Add(value); }
-            remove { _disconnectedEvent.Remove(value); }
-        }
-        private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-        public event Func<int, int, Task> LatencyUpdated
-        {
-            add { _latencyUpdatedEvent.Add(value); }
-            remove { _latencyUpdatedEvent.Remove(value); }
-        }
-        private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
-        public event Func<ulong, AudioInStream, Task> StreamCreated
-        {
-            add { _streamCreated.Add(value); }
-            remove { _streamCreated.Remove(value); }
-        }
-        private readonly AsyncEvent<Func<ulong, AudioInStream, Task>> _streamCreated = new AsyncEvent<Func<ulong, AudioInStream, Task>>();
-        public event Func<ulong, Task> StreamDestroyed
-        {
-            add { _streamDestroyed.Add(value); }
-            remove { _streamDestroyed.Remove(value); }
-        }
-        private readonly AsyncEvent<Func<ulong, Task>> _streamDestroyed = new AsyncEvent<Func<ulong, Task>>();
 
         private readonly Logger _audioLogger;
         private readonly JsonSerializer _serializer;
@@ -202,7 +171,7 @@ namespace Discord.Audio
                 var readerStream = new InputStream();
                 var writerStream = new OpusDecodeStream(new RTPReadStream(readerStream, _secretKey));
                 _streams.TryAdd(userId, new StreamPair(readerStream, writerStream));
-                await _streamCreated.InvokeAsync(userId, readerStream);
+                await _streamCreatedEvent.InvokeAsync(userId, readerStream);
             }
         }
         internal AudioInStream GetInputStream(ulong id)
@@ -215,14 +184,14 @@ namespace Discord.Audio
         internal async Task RemoveInputStreamAsync(ulong userId)
         {
             if (_streams.TryRemove(userId, out var ignored))
-                await _streamDestroyed.InvokeAsync(userId).ConfigureAwait(false);
+                await _streamDestroyedEvent.InvokeAsync(userId).ConfigureAwait(false);
         }
         internal async Task ClearInputStreamsAsync()
         {
             foreach (var pair in _streams)
             {
                 pair.Value.Reader.Dispose();
-                await _streamDestroyed.InvokeAsync(pair.Key).ConfigureAwait(false);
+                await _streamDestroyedEvent.InvokeAsync(pair.Key).ConfigureAwait(false);
             }
             _ssrcMap.Clear();
             _streams.Clear();
@@ -287,6 +256,8 @@ namespace Discord.Audio
 
                             var data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
                             _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
+
+                            await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);
                         }
                         break;
                     default:
