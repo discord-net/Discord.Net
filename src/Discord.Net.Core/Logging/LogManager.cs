@@ -19,19 +19,31 @@ namespace Discord.Logging
 
         public async Task LogAsync(LogSeverity severity, string source, Exception ex)
         {
-            if (severity <= Level)
-                await _messageEvent.InvokeAsync(new LogMessage(severity, source, null, ex)).ConfigureAwait(false);
+            try
+            {
+                if (severity <= Level)
+                    await _messageEvent.InvokeAsync(new LogMessage(severity, source, null, ex)).ConfigureAwait(false);
+            }
+            catch { }
         }
         public async Task LogAsync(LogSeverity severity, string source, string message, Exception ex = null)
         {
-            if (severity <= Level)
+            try
+            {
+                if (severity <= Level)
                 await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
+            }
+            catch { }
         }
 #if NETSTANDARD1_3
         public async Task LogAsync(LogSeverity severity, string source, FormattableString message, Exception ex = null)
         {
-            if (severity <= Level)
-                await _messageEvent.InvokeAsync(new LogMessage(severity, source, message.ToString(), ex)).ConfigureAwait(false);
+            try
+            {
+                if (severity <= Level)
+                    await _messageEvent.InvokeAsync(new LogMessage(severity, source, message.ToString(), ex)).ConfigureAwait(false);
+            }
+            catch { }
         }
 #endif
 
