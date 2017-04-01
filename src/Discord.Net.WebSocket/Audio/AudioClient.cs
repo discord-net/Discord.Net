@@ -91,8 +91,10 @@ namespace Discord.Audio
             _token = token;
             await _connection.StartAsync().ConfigureAwait(false);
         }
-        public async Task StopAsync() 
-            => await _connection.StopAsync().ConfigureAwait(false);
+        public async Task StopAsync()
+        { 
+            await _connection.StopAsync().ConfigureAwait(false);
+        }
 
         private async Task OnConnectingAsync()
         {
@@ -119,6 +121,8 @@ namespace Discord.Audio
             long time;
             while (_heartbeatTimes.TryDequeue(out time)) { }
             _lastMessageTime = 0;
+
+            await ClearInputStreamsAsync().ConfigureAwait(false);
 
             await _audioLogger.DebugAsync("Sending Voice State").ConfigureAwait(false);
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
