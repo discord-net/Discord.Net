@@ -98,8 +98,11 @@ namespace Discord.WebSocket
         internal override async Task OnLogoutAsync()
         {
             //Assume threadsafe: already in a connection lock
-            for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].LogoutAsync();
+            if (_shards != null)
+            {
+                for (int i = 0; i < _shards.Length; i++)
+                    await _shards[i].LogoutAsync();
+            }
 
             CurrentUser = null;
             if (_automaticShards)
