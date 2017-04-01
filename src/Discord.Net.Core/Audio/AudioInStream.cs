@@ -11,9 +11,9 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public abstract Task<RTPFrame?> ReadFrameAsync(CancellationToken cancelToken);
+        public abstract Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken);
 
-        public RTPFrame? ReadFrame()
+        public RTPFrame ReadFrame()
         {
             return ReadFrameAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
