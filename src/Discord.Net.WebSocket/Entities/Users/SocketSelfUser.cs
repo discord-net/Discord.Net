@@ -33,16 +33,25 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
-        internal override void Update(ClientState state, Model model)
+        internal override bool Update(ClientState state, Model model)
         {
-            base.Update(state, model);
-
+            bool hasGlobalChanges = base.Update(state, model);
             if (model.Email.IsSpecified)
+            {
                 Email = model.Email.Value;
+                hasGlobalChanges = true;
+            }
             if (model.Verified.IsSpecified)
+            {
                 IsVerified = model.Verified.Value;
+                hasGlobalChanges = true;
+            }
             if (model.MfaEnabled.IsSpecified)
+            {
                 IsMfaEnabled = model.MfaEnabled.Value;
+                hasGlobalChanges = true;
+            }
+            return hasGlobalChanges;
         }
         
         public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)

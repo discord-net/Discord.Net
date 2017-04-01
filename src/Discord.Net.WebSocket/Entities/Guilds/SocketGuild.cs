@@ -163,7 +163,7 @@ namespace Discord.WebSocket
                 {
                     SocketGuildUser member;
                     if (members.TryGetValue(model.Presences[i].User.Id, out member))
-                        member.Update(state, model.Presences[i]);
+                        member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
                 }
@@ -249,7 +249,7 @@ namespace Discord.WebSocket
                 {
                     SocketGuildUser member;
                     if (members.TryGetValue(model.Presences[i].User.Id, out member))
-                        member.Update(state, model.Presences[i]);
+                        member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
                 }
@@ -392,7 +392,7 @@ namespace Discord.WebSocket
         {
             SocketGuildUser member;
             if (_members.TryGetValue(model.User.Id, out member))
-                member.Update(Discord.State, model);
+                member.Update(Discord.State, model, false);
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);

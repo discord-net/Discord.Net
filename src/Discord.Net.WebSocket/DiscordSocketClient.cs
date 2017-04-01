@@ -1336,14 +1336,30 @@ namespace Discord.WebSocket
 
                                         var user = guild.GetUser(data.User.Id);
                                         if (user == null)
-                                            guild.AddOrUpdateUser(data);
+                                            user = guild.AddOrUpdateUser(data);
+                                        else
+                                        {
+                                            var globalBefore = user.GlobalUser.Clone();
+                                            if (user.GlobalUser.Update(State, data.User))
+                                            {
+                                                //Global data was updated, trigger UserUpdated
+                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
+                                            }
+                                        }
+                                        
+                                        var before = user.Clone();
+                                        user.Update(State, data, true);
+                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), before, user).ConfigureAwait(false);
                                     }
-
-                                    var globalUser = GetOrCreateUser(State, data.User); //TODO: Memory leak, users removed from friends list will never RemoveRef.
-                                    var before = globalUser.Clone();
-                                    globalUser.Update(State, data);
-
-                                    await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);
+                                    else
+                                    {
+                                        //TODO: Add as part of friends list update
+                                        /*var globalUser = GetOrCreateUser(State, data.User);
+                                        var before = globalUser.Clone();
+                                        globalUser.Update(State, data.User);
+                                        globalUser.Update(State, data);
+                                        await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);*/
+                                    }
                                 }
                                 break;
                             case "TYPING_START":

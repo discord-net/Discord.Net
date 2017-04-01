@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
-        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        internal override SocketPresence Presence { get; set; }
 
         public override bool IsWebhook => false;
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
@@ -78,7 +78,7 @@ namespace Discord.WebSocket
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
-            entity.Update(state, model);
+            entity.Update(state, model, false);
             return entity;
         }
         internal void Update(ClientState state, Model model)
@@ -88,15 +88,19 @@ namespace Discord.WebSocket
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
-            UpdateRoles(model.Roles);
-        }
-        internal override void Update(ClientState state, PresenceModel model)
-        {
-            base.Update(state, model);
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+        }
+        internal override void Update(ClientState state, PresenceModel model)
+            => Update(state, model, true);
+        internal void Update(ClientState state, PresenceModel model, bool updatePresence)
+        {
+            if (updatePresence)
+                base.Update(state, model);
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Roles.IsSpecified)
+                UpdateRoles(model.Roles.Value);
         }
         private void UpdateRoles(ulong[] roleIds)
         {

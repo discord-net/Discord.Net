@@ -26,21 +26,39 @@ namespace Discord.WebSocket
             : base(discord, id)
         {
         }
-        internal virtual void Update(ClientState state, Model model)
+        internal virtual bool Update(ClientState state, Model model)
         {
-            if (model.Avatar.IsSpecified)
+            bool hasChanges = false;
+            if (model.Avatar.IsSpecified && model.Avatar.Value != AvatarId)
+            {
                 AvatarId = model.Avatar.Value;
+                hasChanges = true;
+            }
             if (model.Discriminator.IsSpecified)
-                DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
-            if (model.Bot.IsSpecified)
+            {
+                var newVal = ushort.Parse(model.Discriminator.Value);
+                if (newVal != DiscriminatorValue)
+                { 
+                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
+                    hasChanges = true;
+                }
+            }
+            if (model.Bot.IsSpecified && model.Bot.Value != IsBot)
+            { 
                 IsBot = model.Bot.Value;
-            if (model.Username.IsSpecified)
+                hasChanges = true;
+            }
+            if (model.Username.IsSpecified && model.Username.Value != Username)
+            { 
                 Username = model.Username.Value;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
         internal virtual void Update(ClientState state, PresenceModel model)
         {
             Presence = SocketPresence.Create(model);
-            Update(state, model.User);
+            //Update(state, model.User);
         }
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)

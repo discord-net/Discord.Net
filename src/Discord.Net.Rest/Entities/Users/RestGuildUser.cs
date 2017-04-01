@@ -50,9 +50,12 @@ namespace Discord.Rest
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
-            IsDeafened = model.Deaf;
-            IsMuted = model.Mute;
-            UpdateRoles(model.Roles);
+            if (model.Deaf.IsSpecified)
+                IsDeafened = model.Deaf.Value;
+            if (model.Mute.IsSpecified)
+                IsMuted = model.Mute.Value;
+            if (model.Roles.IsSpecified)
+                UpdateRoles(model.Roles.Value);
         }
         private void UpdateRoles(ulong[] roleIds)
         {

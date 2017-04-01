@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
-using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -27,18 +26,6 @@ namespace Discord.WebSocket
             var entity = new SocketUnknownUser(discord, model.Id);
             entity.Update(state, model);
             return entity;
-        }
-
-        internal override void Update(ClientState state, PresenceModel model)
-        {
-            if (model.User.Avatar.IsSpecified)
-                AvatarId = model.User.Avatar.Value;
-            if (model.User.Discriminator.IsSpecified)
-                DiscriminatorValue = ushort.Parse(model.User.Discriminator.Value);
-            if (model.User.Bot.IsSpecified)
-                IsBot = model.User.Bot.Value;
-            if (model.User.Username.IsSpecified)
-                Username = model.User.Username.Value;
         }
 
         internal new SocketUnknownUser Clone() => MemberwiseClone() as SocketUnknownUser;
