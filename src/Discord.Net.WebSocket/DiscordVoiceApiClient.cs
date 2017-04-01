@@ -228,9 +228,9 @@ namespace Discord.Audio
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
 
-        public void SetUdpEndpoint(string host, int port)
+        public void SetUdpEndpoint(string ip, int port)
         {
-            _udp.SetDestination(host, port);
+            _udp.SetDestination(ip, port);
         }
 
         //Helpers

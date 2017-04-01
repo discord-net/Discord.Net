@@ -248,7 +248,7 @@ namespace Discord.Audio
 
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
                             
-                            ApiClient.SetUdpEndpoint(_url, data.Port);
+                            ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
                         }
                         break;
@@ -302,7 +302,7 @@ namespace Discord.Audio
         }
         private async Task ProcessPacketAsync(byte[] packet)
         {
-            if (!_connection.IsCompleted)
+            if (_connection.State == ConnectionState.Connecting)
             {
                 if (packet.Length != 70)
                 {
@@ -314,7 +314,7 @@ namespace Discord.Audio
                 try
                 {
                     ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-                    port = packet[69] | (packet[68] << 8);
+                    port = (packet[69] << 8) | packet[68];
                 }
                 catch (Exception ex)
                 {
@@ -325,7 +325,7 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
                 await ApiClient.SendSelectProtocol(ip, port).ConfigureAwait(false);
             }
-            else
+            else if (_connection.State == ConnectionState.Connected)
             {
                 uint ssrc;
                 ulong userId;

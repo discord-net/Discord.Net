@@ -89,10 +89,9 @@ namespace Discord.Net.Udp
             }
         }
 
-        public void SetDestination(string host, int port)
+        public void SetDestination(string ip, int port)
         {
-            var entry = Dns.GetHostEntryAsync(host).GetAwaiter().GetResult();
-            _destination = new IPEndPoint(entry.AddressList[0], port);
+            _destination = new IPEndPoint(IPAddress.Parse(ip), port);
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
