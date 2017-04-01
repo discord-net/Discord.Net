@@ -1,0 +1,20 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <VersionPrefix>1.0.0</VersionPrefix>
+        <VersionSuffix>rc</VersionSuffix>
+        <VersionSuffix Condition="'$(BuildNumber)' == ''">$(VersionSuffix)-dev</VersionSuffix>
+        <VersionSuffix Condition="'$(BuildNumber)' != '' And $(IsTagBuild) != 'true'">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
+        <Authors>RogueException</Authors>
+        <PackageTags>discord;discordapp</PackageTags>
+        <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
+        <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
+        <WarningsAsErrors>true</WarningsAsErrors>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+</Project>

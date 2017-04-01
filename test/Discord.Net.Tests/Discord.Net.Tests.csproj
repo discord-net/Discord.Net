@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="../../Discord.Net.targets" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <RootNamespace>Discord</RootNamespace>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81</PackageTargetFallback>
-    <RootNamespace>Discord</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
@@ -19,6 +20,7 @@
     <PackageReference Include="Akavache" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170123-02" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.Net.Requests" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
     <PackageReference Include="xunit.runner.reporters" Version="2.2.0-beta5-build3474" />
