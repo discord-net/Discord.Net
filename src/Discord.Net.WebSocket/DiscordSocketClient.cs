@@ -1353,12 +1353,17 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        //TODO: Add as part of friends list update
-                                        /*var globalUser = GetOrCreateUser(State, data.User);
+                                        var globalUser = State.GetUser(data.User.Id);
+                                        if (globalUser == null)
+                                        {
+                                            await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                            break;
+                                        }
+
                                         var before = globalUser.Clone();
                                         globalUser.Update(State, data.User);
                                         globalUser.Update(State, data);
-                                        await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);*/
+                                        await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);
                                     }
                                 }
                                 break;
