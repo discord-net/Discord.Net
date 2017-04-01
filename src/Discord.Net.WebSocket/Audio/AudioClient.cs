@@ -47,15 +47,17 @@ namespace Discord.Audio
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public int Latency { get; private set; }
+        public ulong ChannelId { get; internal set; }
 
         private DiscordSocketClient Discord => Guild.Discord;
         public ConnectionState ConnectionState => _connection.State;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        internal AudioClient(SocketGuild guild, int id)
+        internal AudioClient(SocketGuild guild, int clientId, ulong channelId)
         {
             Guild = guild;
-            _audioLogger = Discord.LogManager.CreateLogger($"Audio #{id}");
+            ChannelId = channelId;
+            _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);

@@ -433,7 +433,13 @@ namespace Discord.WebSocket
             if (_audioClient != null && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
             {
                 if (model.UserId == CurrentUser.Id)
-                    await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+                {
+                    if (after.VoiceChannel != null && _audioClient.ChannelId != after.VoiceChannel?.Id)
+                    {
+                        _audioClient.ChannelId = after.VoiceChannel.Id;
+                        await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+                    }
+                }
                 else
                 {
                     await _audioClient.RemoveInputStreamAsync(model.UserId).ConfigureAwait(false); //User changed channels, end their stream
@@ -480,7 +486,7 @@ namespace Discord.WebSocket
 
                 if (_audioClient == null)
                 {
-                    var audioClient = new AudioClient(this, Discord.GetAudioId());
+                    var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
                     audioClient.Disconnected += async ex =>
                     {
                         if (!promise.Task.IsCompleted)
