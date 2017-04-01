@@ -183,15 +183,18 @@ namespace Discord.Audio
         }
         internal async Task RemoveInputStreamAsync(ulong userId)
         {
-            if (_streams.TryRemove(userId, out var ignored))
+            if (_streams.TryRemove(userId, out var pair))
+            {
                 await _streamDestroyedEvent.InvokeAsync(userId).ConfigureAwait(false);
+                pair.Reader.Dispose();
+            }
         }
         internal async Task ClearInputStreamsAsync()
         {
             foreach (var pair in _streams)
             {
-                pair.Value.Reader.Dispose();
                 await _streamDestroyedEvent.InvokeAsync(pair.Key).ConfigureAwait(false);
+                pair.Value.Reader.Dispose();
             }
             _ssrcMap.Clear();
             _streams.Clear();
