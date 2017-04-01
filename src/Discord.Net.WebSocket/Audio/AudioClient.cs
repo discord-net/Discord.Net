@@ -111,7 +111,7 @@ namespace Discord.Audio
                 e.ErrorContext.Handled = true;
             };
 
-            LatencyUpdated += async (old, val) => await _audioLogger.VerboseAsync($"Latency = {val} ms").ConfigureAwait(false);
+            LatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
         }
 
         internal async Task StartAsync(string url, ulong userId, string sessionId, string token) 
