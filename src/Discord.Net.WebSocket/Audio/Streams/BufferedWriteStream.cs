@@ -9,6 +9,8 @@ namespace Discord.Audio.Streams
     ///<summary> Wraps another stream with a timed buffer. </summary>
     public class BufferedWriteStream : AudioOutStream
     {
+        private const int MaxSilenceFrames = 10;
+
         private struct Frame
         {
             public Frame(byte[] buffer, int bytes)
@@ -33,6 +35,7 @@ namespace Discord.Audio.Streams
         private readonly Logger _logger;
         private readonly int _ticksPerFrame, _queueLength;
         private bool _isPreloaded;
+        private int _silenceFrames;
 
         public BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
             : this(next, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
@@ -51,6 +54,7 @@ namespace Discord.Audio.Streams
             for (int i = 0; i < _queueLength; i++)
                 _bufferPool.Enqueue(new byte[maxFrameSize]); 
             _queueLock = new SemaphoreSlim(_queueLength, _queueLength);
+            _silenceFrames = MaxSilenceFrames;
 
             _task = Run();
         }
@@ -78,6 +82,7 @@ namespace Discord.Audio.Streams
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
                                 nextTick += _ticksPerFrame;
+                                _silenceFrames = 0;
 #if DEBUG
                                 var _ = _logger.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
@@ -86,7 +91,8 @@ namespace Discord.Audio.Streams
                             {
                                 while ((nextTick - tick) <= 0)
                                 {
-                                    await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
+                                    if (_silenceFrames++ < MaxSilenceFrames)
+                                        await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
                                 }
 #if DEBUG
