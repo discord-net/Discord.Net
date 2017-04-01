@@ -25,6 +25,8 @@ namespace Discord.Audio.Streams
 
         public override Task<RTPFrame?> ReadFrameAsync(CancellationToken cancelToken)
         {
+            cancelToken.ThrowIfCancellationRequested();
+
             if (_frames.TryDequeue(out var frame))
                 return Task.FromResult<RTPFrame?>(frame);
             return Task.FromResult<RTPFrame?>(null);

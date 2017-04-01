@@ -233,7 +233,7 @@ namespace Discord.WebSocket
                 int id = _shardIds[i];
                 var arr = guilds.Where(x => GetShardIdFor(x) == id).ToArray();
                 if (arr.Length > 0)
-                    await _shards[i].DownloadUsersAsync(arr);
+                    await _shards[i].DownloadUsersAsync(arr).ConfigureAwait(false);
             }
         }
 
