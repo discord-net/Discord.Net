@@ -14,9 +14,9 @@ dotnet pack "src\Discord.Net.Providers.UdpClient\Discord.Net.Providers.UdpClient
 if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
 
 if ($Env:APPVEYOR_REPO_TAG -eq "true") {
-    nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+    nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
 }
 else {
-    nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
+    nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
 }
 if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode) }
