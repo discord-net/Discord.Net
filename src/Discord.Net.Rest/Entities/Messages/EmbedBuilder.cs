@@ -92,6 +92,24 @@ namespace Discord
             return this;
         }
 
+        public EmbedBuilder AddField(string name, object value)
+        {
+            var field = new EmbedFieldBuilder()
+                .WithIsInline(false)
+                .WithName(name)
+                .WithValue(value);
+            _fields.Add(field);
+            return this;
+        }
+        public EmbedBuilder AddInlineField(string name, object value)
+        {
+            var field = new EmbedFieldBuilder()
+                .WithIsInline(true)
+                .WithName(name)
+                .WithValue(value);
+            _fields.Add(field);
+            return this;
+        }
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             _fields.Add(field);
