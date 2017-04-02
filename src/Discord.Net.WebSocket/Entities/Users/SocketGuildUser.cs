@@ -6,7 +6,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.GuildMember;
+using UserModel = Discord.API.User;
+using MemberModel = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
@@ -69,7 +70,14 @@ namespace Discord.WebSocket
             Guild = guild;
             GlobalUser = globalUser;
         }
-        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, Model model)
+        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, UserModel model)
+        {
+            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
+            entity.Update(state, model);
+            entity.UpdateRoles(new ulong[0]);
+            return entity;
+        }
+        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
@@ -81,7 +89,7 @@ namespace Discord.WebSocket
             entity.Update(state, model, false);
             return entity;
         }
-        internal void Update(ClientState state, Model model)
+        internal void Update(ClientState state, MemberModel model)
         {
             base.Update(state, model.User);
             if (model.JoinedAt.IsSpecified)

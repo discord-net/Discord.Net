@@ -16,6 +16,7 @@ using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
+using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
@@ -375,6 +376,19 @@ namespace Discord.WebSocket
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        internal SocketGuildUser AddOrUpdateUser(UserModel model)
+        {
+            SocketGuildUser member;
+            if (_members.TryGetValue(model.Id, out member))
+                member.GlobalUser?.Update(Discord.State, model);
+            else
+            {
+                member = SocketGuildUser.Create(this, Discord.State, model);
+                _members[member.Id] = member;
+                DownloadedMemberCount++;
+            }
+            return member;
+        }
         internal SocketGuildUser AddOrUpdateUser(MemberModel model)
         {
             SocketGuildUser member;

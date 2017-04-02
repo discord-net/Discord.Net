@@ -900,7 +900,7 @@ namespace Discord.WebSocket
                                     var channel = State.GetChannel(data.ChannelId) as SocketGroupChannel;
                                     if (channel != null)
                                     {
-                                        var user = channel.AddUser(data.User);
+                                        var user = channel.GetOrAddUser(data.User);
                                         await TimedInvokeAsync(_recipientAddedEvent, nameof(RecipientAdded), user).ConfigureAwait(false);
                                     }
                                     else
@@ -1109,20 +1109,20 @@ namespace Discord.WebSocket
                                         else
                                             author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
 
-                                        if (author != null)
-                                        {
-                                            var msg = SocketMessage.Create(this, State, author, channel, data);
-                                            SocketChannelHelper.AddMessage(channel, this, msg);
-                                            await TimedInvokeAsync(_messageReceivedEvent, nameof(MessageReceived), msg).ConfigureAwait(false);
-                                        }
-                                        else
+                                        if (author == null)
                                         {
                                             if (guild != null)
-                                                await UnknownGuildUserAsync(type, data.Author.Value.Id, guild.Id).ConfigureAwait(false);
+                                                author = guild.AddOrUpdateUser(data.Author.Value); //User has no guild-specific data
+                                            else if (channel is SocketGroupChannel)
+                                                author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
                                             else
                                                 await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
                                             return;
                                         }
+
+                                        var msg = SocketMessage.Create(this, State, author, channel, data);
+                                        SocketChannelHelper.AddMessage(channel, this, msg);
+                                        await TimedInvokeAsync(_messageReceivedEvent, nameof(MessageReceived), msg).ConfigureAwait(false);
                                     }
                                     else
                                     {

@@ -125,7 +125,7 @@ namespace Discord.WebSocket
                 return user;
             return null;
         }
-        internal SocketGroupUser AddUser(UserModel model)
+        internal SocketGroupUser GetOrAddUser(UserModel model)
         {
             SocketGroupUser user;
             if (_users.TryGetValue(model.Id, out user))
