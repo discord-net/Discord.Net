@@ -69,12 +69,12 @@ namespace Discord.WebSocket
                 return id.HasValue ? GetVoiceChannel(id.Value) : null;
             }
         }
-        public SocketVoiceChannel EmbedChannel 
+        public SocketGuildChannel EmbedChannel 
         {
             get
             {
                 var id = EmbedChannelId;
-                return id.HasValue ? GetVoiceChannel(id.Value) : null;
+                return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
         public IReadOnlyCollection<SocketTextChannel> TextChannels
@@ -627,8 +627,8 @@ namespace Discord.WebSocket
             => Task.FromResult<IVoiceChannel>(AFKChannel);
         Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(DefaultChannel);
-        Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IVoiceChannel>(EmbedChannel);
+        Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IGuildChannel>(EmbedChannel);
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)

@@ -188,14 +188,11 @@ namespace Discord.Rest
             var channel = await GuildHelper.GetChannelAsync(this, Discord, DefaultChannelId, options).ConfigureAwait(false);
             return channel as RestTextChannel;
         }
-        public async Task<RestVoiceChannel> GetEmbedChannelAsync(RequestOptions options = null)
+        public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {
             var embedId = EmbedChannelId;
             if (embedId.HasValue) 
-            {
-                var channel = await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
-                return channel as RestVoiceChannel;
-            }
+                return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
             return null;
         }
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
@@ -311,7 +308,7 @@ namespace Discord.Rest
             else
                 return null;
         }
-        async Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+        async Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetEmbedChannelAsync(options).ConfigureAwait(false);
