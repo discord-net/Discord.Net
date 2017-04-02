@@ -21,8 +21,6 @@ namespace Discord.WebSocket
 {
     public partial class DiscordSocketClient : BaseDiscordClient, IDiscordClient
     {
-        private const int HandlerTimeoutMillis = 3000;
-
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionGroupLock;
@@ -59,7 +57,7 @@ namespace Discord.WebSocket
         internal UdpSocketProvider UdpSocketProvider { get; private set; }
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
-        internal bool EnableHandlerTimeouts { get; private set; }
+        internal int? HandlerTimeout { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
@@ -86,7 +84,7 @@ namespace Discord.WebSocket
             UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
-            EnableHandlerTimeouts = config.EnableHandlerTimeouts;
+            HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             _heartbeatTimes = new ConcurrentQueue<long>();
 
@@ -1671,7 +1669,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync()).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync().ConfigureAwait(false);
@@ -1681,7 +1679,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync(arg)).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync(arg).ConfigureAwait(false);
@@ -1691,7 +1689,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync(arg1, arg2)).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync(arg1, arg2).ConfigureAwait(false);
@@ -1701,7 +1699,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync(arg1, arg2, arg3)).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync(arg1, arg2, arg3).ConfigureAwait(false);
@@ -1711,7 +1709,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync(arg1, arg2, arg3, arg4)).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync(arg1, arg2, arg3, arg4).ConfigureAwait(false);
@@ -1721,7 +1719,7 @@ namespace Discord.WebSocket
         {
             if (eventHandler.HasSubscribers)
             {
-                if (EnableHandlerTimeouts)
+                if (HandlerTimeout.HasValue)
                     await TimeoutWrap(name, () => eventHandler.InvokeAsync(arg1, arg2, arg3, arg4, arg5)).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync(arg1, arg2, arg3, arg4, arg5).ConfigureAwait(false);
@@ -1731,7 +1729,7 @@ namespace Discord.WebSocket
         {
             try
             {
-                var timeoutTask = Task.Delay(HandlerTimeoutMillis);
+                var timeoutTask = Task.Delay(HandlerTimeout.Value);
                 var handlersTask = action();
                 if (await Task.WhenAny(timeoutTask, handlersTask).ConfigureAwait(false) == timeoutTask)
                 {

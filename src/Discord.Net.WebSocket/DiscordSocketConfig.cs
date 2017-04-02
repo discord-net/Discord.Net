@@ -33,8 +33,8 @@ namespace Discord.WebSocket
 
         /// <summary> Gets or sets whether or not all users should be downloaded as guilds come available. </summary>
         public bool AlwaysDownloadUsers { get; set; } = false;
-        /// <summary> Gets or sets whether or not warnings should be logged if an event handler is taking too long to execute. </summary>
-        public bool EnableHandlerTimeouts { get; set; } = true;
+        /// <summary> Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged. Null disables this check. </summary>
+        public int? HandlerTimeout { get; set; } = 3000;
 
         public DiscordSocketConfig()
         {
