@@ -1,5 +1,4 @@
-﻿using Discord.Audio;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Discord.Audio

@@ -550,7 +550,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_AVAILABLE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -567,7 +567,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -587,7 +587,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -606,7 +606,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_EMOJIS_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -628,7 +628,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_SYNC referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -649,7 +649,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_UNAVAILABLE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -665,7 +665,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync($"GUILD_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -688,13 +688,13 @@ namespace Discord.WebSocket
 
                                             if (!guild.IsSynced)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                                 return;
                                             }
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("CHANNEL_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -716,9 +716,10 @@ namespace Discord.WebSocket
                                         var before = channel.Clone();
                                         channel.Update(State, data);
 
-                                        if (!((channel as SocketGuildChannel)?.Guild.IsSynced ?? true))
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (!(guild?.IsSynced ?? true))
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored CHANNEL_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -726,7 +727,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("CHANNEL_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.Id).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -746,13 +747,13 @@ namespace Discord.WebSocket
 
                                             if (!guild.IsSynced)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored CHANNEL_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                                 return;
                                             }
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
                                             return;
                                         }
                                     }
@@ -763,7 +764,7 @@ namespace Discord.WebSocket
                                         await TimedInvokeAsync(_channelDestroyedEvent, nameof(ChannelDestroyed), channel).ConfigureAwait(false);
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("CHANNEL_DELETE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.Id, data.GuildId.GetValueOrDefault(0)).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -783,7 +784,7 @@ namespace Discord.WebSocket
 
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -791,7 +792,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_MEMBER_ADD referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -808,7 +809,7 @@ namespace Discord.WebSocket
 
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -821,18 +822,15 @@ namespace Discord.WebSocket
                                         else
                                         {
                                             if (!guild.HasAllMembers)
-                                            {
-                                                await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_UPDATE, this user has not been downloaded yet.").ConfigureAwait(false);
-                                                return;
-                                            }
-
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                                await IncompleteGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
+                                            else
+                                                await UnknownGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_MEMBER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -850,7 +848,7 @@ namespace Discord.WebSocket
 
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -859,18 +857,15 @@ namespace Discord.WebSocket
                                         else
                                         {
                                             if (!guild.HasAllMembers)
-                                            {
-                                                await _gatewayLogger.DebugAsync("Ignored GUILD_MEMBER_REMOVE, this user has not been downloaded yet.").ConfigureAwait(false);
-                                                return;
-                                            }
-
-                                            await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown user.").ConfigureAwait(false);
+                                                await IncompleteGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
+                                            else
+                                                await UnknownGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_MEMBER_REMOVE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -894,7 +889,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_MEMBERS_CHUNK referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -912,7 +907,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -930,13 +925,13 @@ namespace Discord.WebSocket
                                             await TimedInvokeAsync(_recipientRemovedEvent, nameof(RecipientRemoved), user).ConfigureAwait(false);
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_REMOVE referenced an unknown user.").ConfigureAwait(false);
+                                            await UnknownChannelUserAsync(type, data.User.Id, data.ChannelId).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("CHANNEL_RECIPIENT_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -955,14 +950,14 @@ namespace Discord.WebSocket
 
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
                                         await TimedInvokeAsync(_roleCreatedEvent, nameof(RoleCreated), role).ConfigureAwait(false);
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_ROLE_CREATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -983,7 +978,7 @@ namespace Discord.WebSocket
 
                                             if (!guild.IsSynced)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                                 return;
                                             }
 
@@ -991,13 +986,13 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown role.").ConfigureAwait(false);
+                                            await UnknownRoleAsync(type, data.Role.Id, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_ROLE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1015,7 +1010,7 @@ namespace Discord.WebSocket
                                         {
                                             if (!guild.IsSynced)
                                             {
-                                                await _gatewayLogger.DebugAsync("Ignored GUILD_ROLE_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                                 return;
                                             }
 
@@ -1023,13 +1018,13 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown role.").ConfigureAwait(false);
+                                            await UnknownRoleAsync(type, data.RoleId, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_ROLE_DELETE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1046,7 +1041,7 @@ namespace Discord.WebSocket
                                     {
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_ADD, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1057,7 +1052,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_BAN_ADD referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1072,7 +1067,7 @@ namespace Discord.WebSocket
                                     {
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored GUILD_BAN_REMOVE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1083,7 +1078,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("GUILD_BAN_REMOVE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1101,7 +1096,7 @@ namespace Discord.WebSocket
                                         var guild = (channel as SocketGuildChannel)?.Guild;
                                         if (guild != null && !guild.IsSynced)
                                         { 
-                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_CREATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1124,13 +1119,16 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown user.").ConfigureAwait(false);
+                                            if (guild != null)
+                                                await UnknownGuildUserAsync(type, data.Author.Value.Id, guild.Id).ConfigureAwait(false);
+                                            else
+                                                await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_CREATE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1146,7 +1144,7 @@ namespace Discord.WebSocket
                                         var guild = (channel as SocketGuildChannel)?.Guild;
                                         if (guild != null && !guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1178,7 +1176,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1191,9 +1189,10 @@ namespace Discord.WebSocket
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as SocketGuildChannel)?.Guild.IsSynced ?? true))
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (!(guild?.IsSynced ?? true))
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1205,7 +1204,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_DELETE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1230,7 +1229,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_ADD referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1255,7 +1254,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1278,7 +1277,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_REACTION_REMOVE_ALL referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1291,9 +1290,10 @@ namespace Discord.WebSocket
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as SocketGuildChannel)?.Guild.IsSynced ?? true))
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (!(guild?.IsSynced ?? true))
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored MESSAGE_DELETE_BULK, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1307,7 +1307,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("MESSAGE_DELETE_BULK referenced an unknown channel.").ConfigureAwait(false);
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1325,12 +1325,12 @@ namespace Discord.WebSocket
                                         var guild = State.GetGuild(data.GuildId.Value);
                                         if (guild == null)
                                         {
-                                            await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
-                                            break;
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                            return;
                                         }
                                         if (!guild.IsSynced)
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored PRESENCE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1356,8 +1356,8 @@ namespace Discord.WebSocket
                                         var globalUser = State.GetUser(data.User.Id);
                                         if (globalUser == null)
                                         {
-                                            await _gatewayLogger.WarningAsync("PRESENCE_UPDATE referenced an unknown user.").ConfigureAwait(false);
-                                            break;
+                                            await UnknownGlobalUserAsync(type, data.User.Id).ConfigureAwait(false);
+                                            return;
                                         }
 
                                         var before = globalUser.Clone();
@@ -1375,9 +1375,10 @@ namespace Discord.WebSocket
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
                                     if (channel != null)
                                     {
-                                        if (!((channel as SocketGuildChannel)?.Guild.IsSynced ?? true))
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (!(guild?.IsSynced ?? true))
                                         {
-                                            await _gatewayLogger.DebugAsync("Ignored TYPING_START, guild is not synced yet.").ConfigureAwait(false);
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
 
@@ -1414,73 +1415,71 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.VoiceState>(_serializer);
-                                    if (data.GuildId.HasValue)
+                                    SocketUser user;
+                                    SocketVoiceState before, after;
+                                    if (data.GuildId != null)
                                     {
-                                        SocketUser user;
-                                        SocketVoiceState before, after;
-                                        if (data.GuildId != null)
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        if (guild == null)
                                         {
-                                            var guild = State.GetGuild(data.GuildId.Value);
-                                            if (guild == null)
-                                            {
-                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown guild.").ConfigureAwait(false);
-                                                return;
-                                            }
-                                            else if (!guild.IsSynced)
-                                            {
-                                                await _gatewayLogger.DebugAsync("Ignored VOICE_STATE_UPDATE, guild is not synced yet.").ConfigureAwait(false);
-                                                return;
-                                            }
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        else if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
 
-                                            if (data.ChannelId != null)
+                                        if (data.ChannelId != null)
+                                        {
+                                            before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
+                                            after = await guild.AddOrUpdateVoiceStateAsync(State, data).ConfigureAwait(false);
+                                            /*if (data.UserId == CurrentUser.Id)
                                             {
-                                                before = guild.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
-                                                after = await guild.AddOrUpdateVoiceStateAsync(State, data).ConfigureAwait(false);
-                                                /*if (data.UserId == CurrentUser.Id)
-                                                {
-                                                    var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
-                                                }*/
-                                            }
-                                            else
-                                            {
-                                                before = guild.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
-                                                after = SocketVoiceState.Create(null, data);
-                                            }
-
-                                            user = guild.GetUser(data.UserId);
+                                                var _ = guild.FinishJoinAudioChannel().ConfigureAwait(false);
+                                            }*/
                                         }
                                         else
                                         {
-                                            var groupChannel = State.GetChannel(data.ChannelId.Value) as SocketGroupChannel;
-                                            if (groupChannel != null)
-                                            {
-                                                if (data.ChannelId != null)
-                                                {
-                                                    before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
-                                                    after = groupChannel.AddOrUpdateVoiceState(State, data);
-                                                }
-                                                else
-                                                {
-                                                    before = groupChannel.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
-                                                    after = SocketVoiceState.Create(null, data);
-                                                }
-                                                user = groupChannel.GetUser(data.UserId);
-                                            }
-                                            else
-                                            {
-                                                await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown channel.").ConfigureAwait(false);
-                                                return;
-                                            }
+                                            before = guild.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
+                                            after = SocketVoiceState.Create(null, data);
                                         }
 
-                                        if (user != null)
-                                            await TimedInvokeAsync(_userVoiceStateUpdatedEvent, nameof(UserVoiceStateUpdated), user, before, after).ConfigureAwait(false);
-                                        else
+                                        user = guild.GetUser(data.UserId);
+                                        if (user == null)
                                         {
-                                            await _gatewayLogger.WarningAsync("VOICE_STATE_UPDATE referenced an unknown user.").ConfigureAwait(false);
+                                            await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
+                                    else
+                                    {
+                                        var groupChannel = State.GetChannel(data.ChannelId.Value) as SocketGroupChannel;
+                                        if (groupChannel == null)
+                                        {
+                                            await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
+                                            return;
+                                        }
+                                        if (data.ChannelId != null)
+                                        {
+                                            before = groupChannel.GetVoiceState(data.UserId)?.Clone() ?? SocketVoiceState.Default;
+                                            after = groupChannel.AddOrUpdateVoiceState(State, data);
+                                        }
+                                        else
+                                        {
+                                            before = groupChannel.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
+                                            after = SocketVoiceState.Create(null, data);
+                                        }
+                                        user = groupChannel.GetUser(data.UserId);
+                                        if (user == null)
+                                        {
+                                            await UnknownChannelUserAsync(type, data.UserId, groupChannel.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+                                    }
+
+                                    await TimedInvokeAsync(_userVoiceStateUpdatedEvent, nameof(UserVoiceStateUpdated), user, before, after).ConfigureAwait(false);
                                 }
                                 break;
                             case "VOICE_SERVER_UPDATE":
@@ -1496,7 +1495,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.WarningAsync("VOICE_SERVER_UPDATE referenced an unknown guild.").ConfigureAwait(false);
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
                                 }
@@ -1744,6 +1743,57 @@ namespace Discord.WebSocket
             {
                 await _gatewayLogger.WarningAsync($"A {name} handler has thrown an unhandled exception.", ex).ConfigureAwait(false);
             }
+        }
+
+        private async Task UnknownGlobalUserAsync(string evnt, ulong userId)
+        {
+            var details = $"{evnt} User={userId}";
+            await _gatewayLogger.WarningAsync($"Unknown User ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownChannelUserAsync(string evnt, ulong userId, ulong channelId)
+        {
+            var details = $"{evnt} User={userId} Channel={channelId}";
+            await _gatewayLogger.WarningAsync($"Unknown User ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownGuildUserAsync(string evnt, ulong userId, ulong guildId)
+        {
+            var details = $"{evnt} User={userId} Guild={guildId}";
+            await _gatewayLogger.WarningAsync($"Unknown User ({details}).").ConfigureAwait(false);
+        }
+        private async Task IncompleteGuildUserAsync(string evnt, ulong userId, ulong guildId)
+        {
+            var details = $"{evnt} User={userId} Guild={guildId}";
+            await _gatewayLogger.DebugAsync($"User has not been downloaded ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownChannelAsync(string evnt, ulong channelId)
+        {
+            var details = $"{evnt} Channel={channelId}";
+            await _gatewayLogger.WarningAsync($"Unknown Channel ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownChannelAsync(string evnt, ulong channelId, ulong guildId)
+        {
+            if (guildId == 0)
+            {
+                await UnknownChannelAsync(evnt, channelId).ConfigureAwait(false);
+                return;
+            }
+            var details = $"{evnt} Channel={channelId} Guild={guildId}";
+            await _gatewayLogger.WarningAsync($"Unknown Channel ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownRoleAsync(string evnt, ulong roleId, ulong guildId)
+        {
+            var details = $"{evnt} Role={roleId} Guild={guildId}";
+            await _gatewayLogger.WarningAsync($"Unknown Role ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnknownGuildAsync(string evnt, ulong guildId)
+        {
+            var details = $"{evnt} Guild={guildId}";
+            await _gatewayLogger.WarningAsync($"Unknown Guild ({details}).").ConfigureAwait(false);
+        }
+        private async Task UnsyncedGuildAsync(string evnt, ulong guildId)
+        {
+            var details = $"{evnt} Guild={guildId}";
+            await _gatewayLogger.DebugAsync($"Unsynced Guild ({details}).").ConfigureAwait(false);
         }
 
         internal int GetAudioId() => _nextAudioId++;
