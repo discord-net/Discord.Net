@@ -126,8 +126,9 @@ namespace Discord.Rest
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
 
-                if (!TagOverlaps(tags, index))
-                    tags.Add(new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                var tagIndex = FindIndex(tags, index);
+                if (tagIndex.HasValue)
+                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
                 index++;
             }
 
@@ -137,22 +138,26 @@ namespace Discord.Rest
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
 
-                if (!TagOverlaps(tags, index))
-                    tags.Add(new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
+                var tagIndex = FindIndex(tags, index);
+                if (tagIndex.HasValue)
+                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
                 index++;
             }
 
             return tags.ToImmutable();
         }
-        private static bool TagOverlaps(IReadOnlyList<ITag> tags, int index)
+        private static int? FindIndex(IReadOnlyList<ITag> tags, int index)
         {
-            for (int i = 0; i < tags.Count; i++)
+            int i = 0;
+            for (; i < tags.Count; i++)
             {
                 var tag = tags[i];
-                if (index >= tag.Index && index < tag.Index + tag.Length)
-                    return true;
+                if (index < tag.Index)
+                    break; //Position before this tag
             }
-            return false;
+            if (i > 0 && index < tags[i - 1].Index + tags[i - 1].Length)
+                return null; //Overlaps tag before this
+            return i;
         }
         public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
         {
