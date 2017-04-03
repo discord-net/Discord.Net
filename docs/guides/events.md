@@ -9,7 +9,7 @@ Messages from Discord are exposed via events, and follow a pattern of `Func<[eve
 To hook into events, you must be using the @Discord.WebSocket.DiscordSocketClient, which provides WebSocket capabilities, necessary for receiving events.
 
 >[!NOTE]
->The gateway will wait for all registered handlers of an event to finish before raising the next event. As a result of this, it is reccomended that if you need to perform any heavy work in an event handler, it is done on its own thread or Task.
+>The gateway will wait for all registered handlers of an event to finish before raising the next event. As a result of this, it is recommended that if you need to perform any heavy work in an event handler, it is done on its own thread or Task.
 
 **For further documentation of all events**, it is reccomended to look at the [Events Section](xref:Discord.WebSocket.DiscordSocketClient#events) on the API documentation of @Discord.WebSocket.DiscordSocketClient
 
