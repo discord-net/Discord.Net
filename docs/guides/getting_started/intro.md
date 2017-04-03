@@ -205,7 +205,7 @@ For your reference, you may view the [completed program].
 
 [MessageReceived]: xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_MessageReceived
 [SocketMessage]: xref:Discord.WebSocket.SocketMessage
-[SocketMessageChannel]: xref:Discord.WebSocket.SocketMessageChannel
+[SocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
 [completed program]: samples/intro/complete.cs
 
 # Building a bot with commands

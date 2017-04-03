@@ -1,5 +1,9 @@
 # The Command Service
 
+>[!WARNING]
+>This article is out of date, and has not been rewritten yet.
+Information is not guaranteed to be accurate.
+
 [Discord.Commands](xref:Discord.Commands) provides an Attribute-based
  Command Parser.
 

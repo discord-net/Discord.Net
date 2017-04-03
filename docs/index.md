@@ -3,7 +3,7 @@
 
 Discord.Net is an asynchronous, multiplatform .NET Library used to interface with the [Discord API](https://discordapp.com/).
 
-If this is your first time using Discord.Net, you should refer to the [Intro](guides/intro.md) for tutorials. 
+If this is your first time using Discord.Net, you should refer to the [Intro](guides/getting_started/intro.md) for tutorials. 
 More experienced users might refer to the [API Documentation](api/index.md) for a breakdown of the individuals objects in the library.
 
 For additional resources:

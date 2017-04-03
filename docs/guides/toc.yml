@@ -12,7 +12,16 @@
       href: concepts/logging.md
     - name: Working with Events
       href: concepts/events.md
+    - name: Managing Connections
+      href: concepts/connections.md
     - name: Entities
+      href: concepts/entities.md
 - name: The Command Service
+  items:
+    - name: Command Guide
+      href: commands/commands.md
 - name: Voice
+  items:
+    - name: Voice Guide
+      href: voice/sending-voice.md
 - name: Migrating from 0.9

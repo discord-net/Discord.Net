@@ -5,7 +5,8 @@ title: Sending Voice
 **Information on this page is subject to change!**
 
 >[!WARNING]
->Audio in 1.0 is in progress
+>This article is out of date, and has not been rewritten yet.
+Information is not guaranteed to be accurate.
 
 ## Installing
 
