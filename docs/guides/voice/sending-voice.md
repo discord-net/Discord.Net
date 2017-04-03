@@ -1,24 +1,13 @@
-# Voice
+---
+title: Sending Voice
+---
 
 **Information on this page is subject to change!**
 
 >[!WARNING]
->Audio in 1.0 is incomplete. Most of the below documentation is untested.
+>Audio in 1.0 is in progress
 
-## Installation
-
-To use Audio, you must first configure your [DiscordSocketClient] 
-with Audio support.
-
-In your [DiscordSocketConfig], set `AudioMode` to the appropriate 
-[AudioMode] for your bot. For most bots, you will only need to use 
-`AudioMode.Outgoing`.
-
-[DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
-[DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
-[AudioMode]: xref:Discord.Audio.AudioMode
-
-### Dependencies
+## Installing
 
 Audio requires two native libraries, `libsodium` and `opus`. 
 Both of these libraries must be placed in the runtime directory of your 

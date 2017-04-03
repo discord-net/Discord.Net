@@ -25,6 +25,7 @@ Style consistencies:
 
 * Use a ruler set at 70 characters
 * Links should use long syntax
+* Pages should be short and concise, not broad and long
 
 Example of long link syntax:
 
