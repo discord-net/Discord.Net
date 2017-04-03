@@ -18,6 +18,7 @@
             <dependency id="Discord.Net.WebSocket" version="1.0.0-rc$suffix$" />
             <dependency id="Discord.Net.Rpc" version="1.0.0-rc$suffix$" />
             <dependency id="Discord.Net.Commands" version="1.0.0-rc$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="1.0.0-rc$suffix$" />
         </group>
         <group targetFramework="netstandard1.3">
             <dependency id="Discord.Net.Core" version="1.0.0-rc$suffix$" />
@@ -25,6 +26,7 @@
             <dependency id="Discord.Net.WebSocket" version="1.0.0-rc$suffix$" />
             <dependency id="Discord.Net.Rpc" version="1.0.0-rc$suffix$" />
             <dependency id="Discord.Net.Commands" version="1.0.0-rc$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="1.0.0-rc$suffix$" />
         </group>
     </dependencies>
   </metadata>
