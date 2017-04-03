@@ -8,7 +8,7 @@ namespace Discord.Audio.Streams
     ///<summary> Reads the payload from an RTP frame </summary>
     public class InputStream : AudioInStream
     {
-        private const int MaxFrames = 100;
+        private const int MaxFrames = 100; //1-2 Seconds
 
         private ConcurrentQueue<RTPFrame> _frames;
         private SemaphoreSlim _signal;
@@ -20,6 +20,7 @@ namespace Discord.Audio.Streams
         public override bool CanRead => !_isDisposed;
         public override bool CanSeek => false;
         public override bool CanWrite => false;
+        public override int AvailableFrames => _signal.CurrentCount;
 
         public InputStream()
         {
@@ -27,14 +28,17 @@ namespace Discord.Audio.Streams
             _signal = new SemaphoreSlim(0, MaxFrames);
         }
 
-        public override async Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken)
+        public override bool TryReadFrame(CancellationToken cancelToken, out RTPFrame frame)
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            RTPFrame frame;
-            await _signal.WaitAsync(cancelToken).ConfigureAwait(false);
-            _frames.TryDequeue(out frame);
-            return frame;
+            if (_signal.Wait(0))
+            {
+                _frames.TryDequeue(out frame);
+                return true;
+            }
+            frame = default(RTPFrame);
+            return false;
         }
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
@@ -45,6 +49,15 @@ namespace Discord.Audio.Streams
                 throw new InvalidOperationException("Buffer is too small.");
             Buffer.BlockCopy(frame.Payload, 0, buffer, offset, frame.Payload.Length);
             return frame.Payload.Length;
+        }
+        public override async Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken)
+        {
+            cancelToken.ThrowIfCancellationRequested();
+
+            RTPFrame frame;
+            await _signal.WaitAsync(cancelToken).ConfigureAwait(false);
+            _frames.TryDequeue(out frame);
+            return frame;
         }
 
         public void WriteHeader(ushort seq, uint timestamp)
@@ -59,7 +72,7 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            if (_frames.Count > MaxFrames) //1-2 seconds
+            if (_signal.CurrentCount >= MaxFrames) //1-2 seconds
             {
                 _hasHeader = false;
                 return Task.Delay(0); //Buffer overloaded
