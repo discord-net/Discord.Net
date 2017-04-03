@@ -25,6 +25,7 @@ namespace Discord.Audio.Streams
 
         private static readonly byte[] _silenceFrame = new byte[0];
 
+        private readonly AudioClient _client;
         private readonly AudioOutStream _next;
         private readonly CancellationTokenSource _cancelTokenSource;
         private readonly CancellationToken _cancelToken;
@@ -37,12 +38,13 @@ namespace Discord.Audio.Streams
         private bool _isPreloaded;
         private int _silenceFrames;
 
-        public BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
-            : this(next, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
-        internal BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
+        public BufferedWriteStream(AudioOutStream next, IAudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+            : this(next, client as AudioClient, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
+        internal BufferedWriteStream(AudioOutStream next, AudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;
+            _client = client;
             _ticksPerFrame = samplesPerFrame / 48;
             _logger = logger;
             _queueLength = (bufferMillis + (_ticksPerFrame - 1)) / _ticksPerFrame; //Round up
@@ -78,7 +80,7 @@ namespace Discord.Audio.Streams
                             Frame frame;
                             if (_queuedFrames.TryDequeue(out frame))
                             {
-                                await _next.SetSpeakingAsync(true).ConfigureAwait(false);
+                                await _client.ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
                                 await _next.WriteAsync(frame.Buffer, 0, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
@@ -95,7 +97,7 @@ namespace Discord.Audio.Streams
                                     if (_silenceFrames++ < MaxSilenceFrames)
                                         await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
                                     else
-                                        await _next.SetSpeakingAsync(false).ConfigureAwait(false);
+                                        await _client.ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
                                 }
 #if DEBUG

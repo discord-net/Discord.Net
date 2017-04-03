@@ -136,7 +136,7 @@ namespace Discord.Audio
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
-            return new BufferedWriteStream(rtpWriter, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
+            return new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
         }
         public AudioOutStream CreateDirectOpusStream(int samplesPerFrame)
         {
@@ -151,7 +151,7 @@ namespace Discord.Audio
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
-            var bufferedStream = new BufferedWriteStream(rtpWriter, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
+            var bufferedStream = new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
             return new OpusEncodeStream(bufferedStream, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
         }
         public AudioOutStream CreateDirectPCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate)
