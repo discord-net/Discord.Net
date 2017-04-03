@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
-using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -54,11 +53,6 @@ namespace Discord.WebSocket
                 hasChanges = true;
             }
             return hasChanges;
-        }
-        internal virtual void Update(ClientState state, PresenceModel model)
-        {
-            Presence = SocketPresence.Create(model);
-            //Update(state, model.User);
         }
 
         public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)

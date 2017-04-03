@@ -99,12 +99,13 @@ namespace Discord.WebSocket
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
         }
-        internal override void Update(ClientState state, PresenceModel model)
-            => Update(state, model, true);
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {
             if (updatePresence)
-                base.Update(state, model);
+            {
+                Presence = SocketPresence.Create(model);
+                GlobalUser.Update(state, model);
+            }
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             if (model.Roles.IsSpecified)

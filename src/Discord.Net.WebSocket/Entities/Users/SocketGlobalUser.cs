@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Model = Discord.API.User;
+using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -45,6 +46,11 @@ namespace Discord.WebSocket
                 if (--_references <= 0)
                     discord.RemoveUser(Id);
             }
+        }
+        
+        internal void Update(ClientState state, PresenceModel model)
+        {
+            Presence = SocketPresence.Create(model);
         }
         
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
