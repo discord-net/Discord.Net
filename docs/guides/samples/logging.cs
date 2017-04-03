@@ -1,28 +1,29 @@
 using Discord;
-using Discord.Rest;
+using Discord.WebSocket;
 
 public class Program
 {
-    private DiscordSocketClient _client;
-    static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
-    
-    public async Task Start()
-    {
-        _client = new DiscordSocketClient(new DiscordSocketConfig() {
+	private DiscordSocketClient _client;
+	static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+	
+	public async Task MainAsync()
+	{
+		_client = new DiscordSocketClient(new DiscordSocketConfig
+		{
 			LogLevel = LogSeverity.Info
-        });
+		});
 
-        _client.Log += Log;
+		_client.Log += Log;
 
-	 await _client.LoginAsync(TokenType.Bot, "bot token");
-	 await _client.ConnectAsync();
-	    
-	 await Task.Delay(-1);
-    }
+		await _client.LoginAsync(TokenType.Bot, "bot token");
+		await _client.StartAsync();
+		
+		await Task.Delay(-1);
+	}
 
-    private Task Log(LogMessage message)
-    {
-        Console.WriteLine(message.ToString());
-        return Task.CompletedTask;
-    }
+	private Task Log(LogMessage message)
+	{
+		Console.WriteLine(message.ToString());
+		return Task.CompletedTask;
+	}
 }

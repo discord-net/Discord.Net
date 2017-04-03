@@ -42,7 +42,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "**/images/**",
+          "**/samples/**"
         ],
         "exclude": [
           "obj/**",

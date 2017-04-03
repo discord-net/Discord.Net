@@ -11,7 +11,7 @@ Optionally, you may compile from source and install yourself.
 
 Currently, Discord.Net targets [.NET Standard] 1.3, and offers support for
 .NET Standard 1.1. If your application will be targeting .NET Standard 1.1,
-please see the [additional steps](#installing-on-.net-standard-11).
+please see the [additional steps](#installing-on-net-standard-11).
 
 Since Discord.Net is built on the .NET Standard, it is also recommended to
 create applications using [.NET Core], though you are not required to. When

@@ -34,7 +34,9 @@ through the OAuth2 flow.
 
 1. Open your bot's application on the [Discord Applications Portal]
 2. Retrieve the app's **Client ID**.
+
 ![Step 2](images/intro-client-id.png)
+
 3. Create an OAuth2 authorization URL
 `https://discordapp.com/oauth2/authorize?client_id=<CLIENT ID>&scope=bot`
 4. Open the authorization URL in your browser
@@ -45,6 +47,7 @@ Only servers where you have the `MANAGE_SERVER` permission will be
 present in this list.
 
 6. Click authorize
+
 ![Step 6](images/intro-add-bot.png)
 
 ## Connecting to Discord
@@ -120,7 +123,7 @@ on your bot's application page on the [Discord Applications Portal]).
 
 >[!IMPORTANT]
 Your bot's token can be used to gain total access to your bot, so
-**do __NOT__ share this token with anyone!**. It may behoove you to
+**do __NOT__ share this token with anyone!** It may behoove you to
 store this token in an external file if you plan on distributing the
 source code for your bot.
 
@@ -157,7 +160,7 @@ for how to fix this.
 [TAP]: https://docs.microsoft.com/en-us/dotnet/articles/csharp/async
 [API Documentation]: xref:Discord.Rest.BaseDiscordClient#Discord_Rest_BaseDiscordClient_Log
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
-[installing guide]: installing.md#installing-on-.net-standard-11
+[installing guide]: installing.md#installing-on-net-standard-11
 
 ### Handling a 'ping'
 
