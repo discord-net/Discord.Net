@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Discord.Net.Core</AssemblyName>
     <RootNamespace>Discord</RootNamespace>
-    <Description>A .Net API wrapper and bot framework for Discord.</Description>
+    <Description>The core components for the Discord.Net library.</Description>
     <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
