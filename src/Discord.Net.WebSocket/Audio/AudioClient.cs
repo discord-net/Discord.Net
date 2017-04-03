@@ -239,7 +239,7 @@ namespace Discord.Audio
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
                             _secretKey = data.SecretKey;
-                            await ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
+                            //await ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
 
                             var _ = _connection.CompleteAsync();
                         }

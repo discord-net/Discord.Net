@@ -78,6 +78,7 @@ namespace Discord.Audio.Streams
                             Frame frame;
                             if (_queuedFrames.TryDequeue(out frame))
                             {
+                                await _next.SetSpeakingAsync(true).ConfigureAwait(false);
                                 await _next.WriteAsync(frame.Buffer, 0, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
@@ -93,6 +94,8 @@ namespace Discord.Audio.Streams
                                 {
                                     if (_silenceFrames++ < MaxSilenceFrames)
                                         await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
+                                    else
+                                        await _next.SetSpeakingAsync(false).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
                                 }
 #if DEBUG
