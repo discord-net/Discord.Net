@@ -56,7 +56,7 @@ namespace Discord.API
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
 
-            SetBaseUrl(DiscordConfig.ClientAPIUrl);
+            SetBaseUrl(DiscordConfig.APIUrl);
         }
         internal void SetBaseUrl(string baseUrl)
         {
