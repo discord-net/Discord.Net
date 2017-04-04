@@ -8,11 +8,11 @@ namespace Discord.Audio.Streams
     {
         public const int SampleRate = OpusEncodeStream.SampleRate;
 
-        private readonly AudioOutStream _next;
+        private readonly AudioStream _next;
         private readonly byte[] _buffer;
         private readonly OpusDecoder _decoder;
 
-        public OpusDecodeStream(AudioOutStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
+        public OpusDecodeStream(AudioStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
         {
             _next = next;
             _buffer = new byte[bufferSize];

@@ -26,7 +26,7 @@ namespace Discord.Audio.Streams
         private static readonly byte[] _silenceFrame = new byte[0];
 
         private readonly AudioClient _client;
-        private readonly AudioOutStream _next;
+        private readonly AudioStream _next;
         private readonly CancellationTokenSource _cancelTokenSource;
         private readonly CancellationToken _cancelToken;
         private readonly Task _task;
@@ -38,9 +38,9 @@ namespace Discord.Audio.Streams
         private bool _isPreloaded;
         private int _silenceFrames;
 
-        public BufferedWriteStream(AudioOutStream next, IAudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+        public BufferedWriteStream(AudioStream next, IAudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
             : this(next, client as AudioClient, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
-        internal BufferedWriteStream(AudioOutStream next, AudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
+        internal BufferedWriteStream(AudioStream next, AudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;

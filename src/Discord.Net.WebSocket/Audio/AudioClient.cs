@@ -42,12 +42,12 @@ namespace Discord.Audio
         private string _url, _sessionId, _token;
         private ulong _userId;
         private uint _ssrc;
-        private byte[] _secretKey;
 
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public int Latency { get; private set; }
         public ulong ChannelId { get; internal set; }
+        internal byte[] SecretKey { get; private set; }
 
         private DiscordSocketClient Discord => Guild.Discord;
         public ConnectionState ConnectionState => _connection.State;
@@ -134,7 +134,7 @@ namespace Discord.Audio
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var sodiumEncrypter = new SodiumEncryptStream( outputStream, this);
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
             return new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
         }
@@ -142,14 +142,14 @@ namespace Discord.Audio
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
             return new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
         }
         public AudioOutStream CreatePCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
             var bufferedStream = new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
             return new OpusEncodeStream(bufferedStream, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
@@ -158,7 +158,7 @@ namespace Discord.Audio
         {
             CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, _secretKey);
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
             return new OpusEncodeStream(rtpWriter, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
         }
@@ -175,8 +175,10 @@ namespace Discord.Audio
             if (!_streams.ContainsKey(userId))
             {
                 var readerStream = new InputStream();
-                var writerStream = new OpusDecodeStream(new RTPReadStream(readerStream, _secretKey));
-                _streams.TryAdd(userId, new StreamPair(readerStream, writerStream));
+                var opusDecoder = new OpusDecodeStream(readerStream);
+                var rtpReader = new RTPReadStream(readerStream, opusDecoder);
+                var decryptStream = new SodiumDecryptStream(rtpReader, this);
+                _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
                 await _streamCreatedEvent.InvokeAsync(userId, readerStream);
             }
         }
@@ -238,7 +240,7 @@ namespace Discord.Audio
                             if (data.Mode != DiscordVoiceAPIClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
-                            _secretKey = data.SecretKey;
+                            SecretKey = data.SecretKey;
                             await ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
 
                             var _ = _connection.CompleteAsync();
@@ -335,7 +337,7 @@ namespace Discord.Audio
                     await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
                     return;
                 }
-                await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
+                //await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
             }
         }
 

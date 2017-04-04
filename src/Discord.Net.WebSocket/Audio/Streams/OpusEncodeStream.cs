@@ -9,7 +9,7 @@ namespace Discord.Audio.Streams
     {
         public const int SampleRate = 48000;
         
-        private readonly AudioOutStream _next;
+        private readonly AudioStream _next;
         private readonly OpusEncoder _encoder;
         private readonly byte[] _buffer;
 
@@ -17,7 +17,7 @@ namespace Discord.Audio.Streams
         private byte[] _partialFrameBuffer;
         private int _partialFramePos;
 
-        public OpusEncodeStream(AudioOutStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
+        public OpusEncodeStream(AudioStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
         {
             _next = next;
             _encoder = new OpusEncoder(SampleRate, channels, bitrate, application);

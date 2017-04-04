@@ -7,14 +7,14 @@ namespace Discord.Audio.Streams
     ///<summary> Wraps data in an RTP frame </summary>
     public class RTPWriteStream : AudioOutStream
     {
-        private readonly AudioOutStream _next;
+        private readonly AudioStream _next;
         private readonly byte[] _header;
         private int _samplesPerFrame;
         private uint _ssrc, _timestamp = 0;
 
         protected readonly byte[] _buffer;
 
-        public RTPWriteStream(AudioOutStream next, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
+        public RTPWriteStream(AudioStream next, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
         {
             _next = next;
             _samplesPerFrame = samplesPerFrame;

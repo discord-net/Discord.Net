@@ -9,20 +9,19 @@ namespace Discord.Audio.Streams
     public class RTPReadStream : AudioOutStream
     {
         private readonly InputStream _queue;
-        private readonly AudioOutStream _next;
-        private readonly byte[] _buffer, _nonce, _secretKey;
+        private readonly AudioStream _next;
+        private readonly byte[] _buffer, _nonce;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public RTPReadStream(InputStream queue, byte[] secretKey, int bufferSize = 4000)
-            : this(queue, null, secretKey, bufferSize) { }
-        public RTPReadStream(InputStream queue, AudioOutStream next, byte[] secretKey, int bufferSize = 4000)
+        public RTPReadStream(InputStream queue, int bufferSize = 4000)
+            : this(queue, null, bufferSize) { }
+        public RTPReadStream(InputStream queue, AudioStream next, int bufferSize = 4000)
         {
             _queue = queue;
             _next = next;
-            _secretKey = secretKey;
             _buffer = new byte[bufferSize];
             _nonce = new byte[24];
         }
