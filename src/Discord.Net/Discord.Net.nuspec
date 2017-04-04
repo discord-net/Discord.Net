@@ -13,20 +13,20 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
         <group targetFramework="netstandard1.1">
-            <dependency id="Discord.Net.Core" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Rest" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Commands" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="1.0.0-rc$suffix$" />
+            <dependency id="Discord.Net.Core" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="1.0.0-rc2$suffix$" />
         </group>
         <group targetFramework="netstandard1.3">
-            <dependency id="Discord.Net.Core" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Rest" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Commands" version="1.0.0-rc$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="1.0.0-rc$suffix$" />
+            <dependency id="Discord.Net.Core" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Rest" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Rpc" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Commands" version="1.0.0-rc2$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="1.0.0-rc2$suffix$" />
         </group>
     </dependencies>
   </metadata>
