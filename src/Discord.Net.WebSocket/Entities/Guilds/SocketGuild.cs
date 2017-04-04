@@ -471,11 +471,15 @@ namespace Discord.WebSocket
                 return voiceState;
             return null;
         }
-        internal SocketVoiceState? RemoveVoiceState(ulong id)
+        internal async Task<SocketVoiceState?> RemoveVoiceStateAsync(ulong id)
         {
             SocketVoiceState voiceState;
             if (_voiceStates.TryRemove(id, out voiceState))
+            {
+                if (_audioClient != null)
+                    await _audioClient.RemoveInputStreamAsync(id).ConfigureAwait(false); //User changed channels, end their stream
                 return voiceState;
+            }
             return null;
         }
 

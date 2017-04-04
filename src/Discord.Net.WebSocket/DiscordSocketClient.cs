@@ -1440,7 +1440,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            before = guild.RemoveVoiceState(data.UserId) ?? SocketVoiceState.Default;
+                                            before = await guild.RemoveVoiceStateAsync(data.UserId).ConfigureAwait(false) ?? SocketVoiceState.Default;
                                             after = SocketVoiceState.Create(null, data);
                                         }
 
