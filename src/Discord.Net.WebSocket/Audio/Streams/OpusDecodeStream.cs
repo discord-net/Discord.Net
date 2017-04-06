@@ -12,7 +12,7 @@ namespace Discord.Audio.Streams
         private readonly byte[] _buffer;
         private readonly OpusDecoder _decoder;
 
-        public OpusDecodeStream(AudioStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
+        public OpusDecodeStream(AudioStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 5760 * 4)
         {
             _next = next;
             _buffer = new byte[bufferSize];

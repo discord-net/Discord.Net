@@ -54,7 +54,7 @@ namespace Discord.Audio
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += async (data, index, count) =>
             {
-                if (index != 0)
+                if (index != 0 || count != data.Length)
                 {
                     var newData = new byte[count];
                     Buffer.BlockCopy(data, index, newData, 0, count);
