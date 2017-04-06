@@ -1,13 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Discord.Commands
 {
-    internal class ReflectionUtils
+    internal static class ReflectionUtils
     {
+        private static readonly TypeInfo objectTypeInfo = typeof(object).GetTypeInfo();
+
         internal static T CreateObject<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
             => CreateBuilder<T>(typeInfo, service)(map);
+
+        private static System.Reflection.PropertyInfo[] GetProperties(TypeInfo typeInfo)
+        {
+            var result = new List<System.Reflection.PropertyInfo>();
+            while (typeInfo != objectTypeInfo)
+            {
+                foreach (var prop in typeInfo.DeclaredProperties)
+                {
+                    if (prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null)
+                        result.Add(prop);
+                }
+                typeInfo = typeInfo.BaseType.GetTypeInfo();
+            }
+            return result.ToArray();
+        }
 
         internal static Func<IDependencyMap, T> CreateBuilder<T>(TypeInfo typeInfo, CommandService service)
         {
@@ -19,7 +37,7 @@ namespace Discord.Commands
 
             var constructor = constructors[0];
             System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
-            System.Reflection.PropertyInfo[] properties = typeInfo.DeclaredProperties
+            System.Reflection.PropertyInfo[] properties = GetProperties(typeInfo)
                   .Where(p => p.SetMethod?.IsPublic == true && p.GetCustomAttribute<DontInjectAttribute>() == null)
                   .ToArray();
 
