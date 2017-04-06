@@ -17,6 +17,7 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
+        public string PrimaryAlias { get; set; }
         public RunMode RunMode { get; set; }
         public int Priority { get; set; }
 
@@ -41,6 +42,7 @@ namespace Discord.Commands.Builders
             Discord.Preconditions.NotNull(callback, nameof(callback));
 
             Callback = callback;
+            PrimaryAlias = primaryAlias;
             _aliases.Add(primaryAlias);
         }
 
@@ -111,7 +113,7 @@ namespace Discord.Commands.Builders
         {
             //Default name to first alias
             if (Name == null)
-                Name = _aliases[0];
+                Name = PrimaryAlias;
 
             if (_parameters.Count > 0)
             {
