@@ -545,6 +545,12 @@ namespace Discord.WebSocket
                                             if (unavailableGuilds != 0)
                                                 _unavailableGuilds = unavailableGuilds - 1;
                                             await GuildAvailableAsync(guild).ConfigureAwait(false);
+
+                                            if (guild.DownloadedMemberCount >= guild.MemberCount && !guild.DownloaderPromise.IsCompleted)
+                                            {
+                                                guild.CompleteDownloadUsers();
+                                                await TimedInvokeAsync(_guildMembersDownloadedEvent, nameof(GuildMembersDownloaded), guild).ConfigureAwait(false);
+                                            }
                                         }
                                         else
                                         {
@@ -879,7 +885,7 @@ namespace Discord.WebSocket
                                         foreach (var memberModel in data.Members)
                                             guild.AddOrUpdateUser(memberModel);
 
-                                        if (guild.DownloadedMemberCount >= guild.MemberCount) //Finished downloading for there
+                                        if (guild.DownloadedMemberCount >= guild.MemberCount && !guild.DownloaderPromise.IsCompleted)
                                         {
                                             guild.CompleteDownloadUsers();
                                             await TimedInvokeAsync(_guildMembersDownloadedEvent, nameof(GuildMembersDownloaded), guild).ConfigureAwait(false);

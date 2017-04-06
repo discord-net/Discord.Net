@@ -190,8 +190,8 @@ namespace Discord.WebSocket
             if (Discord.ApiClient.AuthTokenType != TokenType.User)
             {
                 var _ = _syncPromise.TrySetResultAsync(true);
-                if (!model.Large)
-                    _ = _downloaderPromise.TrySetResultAsync(true);
+                /*if (!model.Large)
+                    _ = _downloaderPromise.TrySetResultAsync(true);*/
             }
         }
         internal void Update(ClientState state, Model model)
@@ -258,8 +258,8 @@ namespace Discord.WebSocket
             _members = members;
 
             var _ = _syncPromise.TrySetResultAsync(true);
-            if (!model.Large)
-                _ = _downloaderPromise.TrySetResultAsync(true);
+            /*if (!model.Large)
+                _ = _downloaderPromise.TrySetResultAsync(true);*/
         }
 
         internal void Update(ClientState state, EmojiUpdateModel model)
