@@ -36,7 +36,7 @@ namespace Discord.WebSocket
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
-        public IEnumerable<SocketRole> Roles 
+        public IReadOnlyCollection<SocketRole> Roles 
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
