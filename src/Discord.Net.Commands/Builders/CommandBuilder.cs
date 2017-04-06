@@ -111,7 +111,7 @@ namespace Discord.Commands.Builders
 
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
-            //Default name to first alias
+            //Default name to primary alias
             if (Name == null)
                 Name = PrimaryAlias;
 
