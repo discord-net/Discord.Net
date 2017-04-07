@@ -252,7 +252,7 @@ namespace Discord.Commands
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(CommandAttribute)) &&
-                   methodInfo.ReturnType == typeof(Task) &&
+                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(void)) &&
                    !methodInfo.IsStatic &&
                    !methodInfo.IsGenericMethod;
         }

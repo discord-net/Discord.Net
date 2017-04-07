@@ -1,13 +1,13 @@
+using Discord.Commands.Builders;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using System.Reflection;
-
-using Discord.Commands.Builders;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
@@ -166,10 +166,19 @@ namespace Discord.Commands
             }
             catch (Exception ex)
             {
-                ex = new CommandException(this, context, ex);
-                await Module.Service._cmdLogger.ErrorAsync(ex).ConfigureAwait(false);
+                var originalEx = ex;
+                while (ex is TargetInvocationException) //Happens with void-returning commands
+                    ex = ex.InnerException;
+
+                var wrappedEx = new CommandException(this, context, ex);
+                await Module.Service._cmdLogger.ErrorAsync(wrappedEx).ConfigureAwait(false);
                 if (Module.Service._throwOnError)
-                    throw;
+                {
+                    if (ex == originalEx)
+                        throw;
+                    else
+                        ExceptionDispatchInfo.Capture(ex).Throw();
+                }
             }
             await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
         }
