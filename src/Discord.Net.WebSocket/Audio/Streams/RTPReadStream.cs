@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,9 +32,6 @@ namespace Discord.Audio.Streams
             if (buffer[offset + 0] != 0x80 || buffer[offset + 1] != 0x78)
                 return;
 
-            var payload = new byte[count - 12];
-            Buffer.BlockCopy(buffer, offset + 12, payload, 0, count - 12);
-
             ushort seq =  (ushort)((buffer[offset + 2] << 8) |
                 (buffer[offset + 3] << 0));
 
@@ -45,7 +41,7 @@ namespace Discord.Audio.Streams
                 (buffer[offset + 7] << 0));
 
             _queue.WriteHeader(seq, timestamp);
-            await (_next ?? _queue as Stream).WriteAsync(buffer, offset, count, cancelToken).ConfigureAwait(false);
+            await (_next ?? _queue as Stream).WriteAsync(buffer, offset + 12, count - 12, cancelToken).ConfigureAwait(false);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
