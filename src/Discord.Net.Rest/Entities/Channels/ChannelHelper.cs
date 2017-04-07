@@ -181,8 +181,22 @@ namespace Discord.Rest
         public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
             IEnumerable<IMessage> messages, RequestOptions options)
         {
-            var args = new DeleteMessagesParams(messages.Select(x => x.Id).ToArray());
-            await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+            var msgs = messages.Select(x => x.Id).ToArray();
+            if (msgs.Length < 100)
+            {
+                var args = new DeleteMessagesParams(msgs);
+                await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var batch = new ulong[100];
+                for (int i = 0; i < (msgs.Length + 99) / 100; i++)
+                {
+                    Array.Copy(msgs, i * 100, batch, 0, Math.Min(msgs.Length - (100 * i), 100));
+                    var args = new DeleteMessagesParams(batch);
+                    await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+                }
+            }
         }
 
         //Permission Overwrites
