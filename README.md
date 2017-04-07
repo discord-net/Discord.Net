@@ -16,6 +16,7 @@ The individual components may also be installed from NuGet:
 - [Discord.Net.Rest](https://www.nuget.org/packages/Discord.Net.Rest/)
 - [Discord.Net.Rpc](https://www.nuget.org/packages/Discord.Net.Rpc/)
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
+- [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
 The following providers are available for platforms not supporting .NET Standard 1.3:
@@ -29,13 +30,13 @@ Nightly builds are available through our MyGet feed (`https://www.myget.org/F/di
 In order to compile Discord.Net, you require the following:
 
 ### Using Visual Studio
-- [Visual Studio 2017 RC](https://www.microsoft.com/net/core#windowsvs2017)
-- [.NET Core SDK 1.0 RC3](https://github.com/dotnet/core/blob/master/release-notes/rc3-download.md)
+- [Visual Studio 2017](https://www.microsoft.com/net/core#windowsvs2017)
+- [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
-The .NET Core and Docker (Preview) workload is required during Visual Studio installation.
+The .NET Core workload must be selected during Visual Studio installation.
 
 ### Using Command Line
-- [.NET Core SDK 1.0 RC3](https://github.com/dotnet/core/blob/master/release-notes/rc3-download.md)
+- [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
 ## Known Issues
 
