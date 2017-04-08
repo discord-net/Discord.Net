@@ -8,14 +8,17 @@ namespace Discord.Audio
         event Func<Task> Connected;
         event Func<Exception, Task> Disconnected;
         event Func<int, int, Task> LatencyUpdated;
+        event Func<int, int, Task> UdpLatencyUpdated;
         event Func<ulong, AudioInStream, Task> StreamCreated;
         event Func<ulong, Task> StreamDestroyed;
         event Func<ulong, bool, Task> SpeakingUpdated;
 
         /// <summary> Gets the current connection state of this client. </summary>
         ConnectionState ConnectionState { get; }
-        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
+        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice websocket server. </summary>
         int Latency { get; }
+        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice UDP server. </summary>
+        int UdpLatency { get; }
 
         Task StopAsync();
 
