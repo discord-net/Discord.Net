@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    public abstract class ModuleBase : ModuleBase<CommandContext> { }
+    public abstract class ModuleBase : ModuleBase<ICommandContext> { }
 
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
