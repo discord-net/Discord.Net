@@ -25,9 +25,9 @@ namespace Discord.Audio
             int result = 0;
             fixed (byte* inPtr = input)
             fixed (byte* outPtr = output)
-                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, FrameBytes / SampleBytes, 1);
+                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, FrameSamplesPerChannel, 1);
             CheckError(result);
-            return FrameBytes;
+            return result * SampleBytes;
         }
 
         protected override void Dispose(bool disposing)
