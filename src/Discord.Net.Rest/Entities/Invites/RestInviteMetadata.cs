@@ -29,7 +29,7 @@ namespace Discord.Rest
         internal void Update(Model model)
         {
             base.Update(model);
-            Inviter = RestUser.Create(Discord, model.Inviter);
+            Inviter = model.Inviter != null ? RestUser.Create(Discord, model.Inviter) : null;
             IsRevoked = model.Revoked;
             IsTemporary = model.Temporary;
             MaxAge = model.MaxAge != 0 ? model.MaxAge : (int?)null;
