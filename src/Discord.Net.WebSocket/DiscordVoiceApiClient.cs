@@ -42,6 +42,7 @@ namespace Discord.Audio
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
+        private ulong _nextKeepalive;
 
         public ulong GuildId { get; }
         internal IWebSocketClient WebSocketClient { get; }
@@ -226,6 +227,21 @@ namespace Discord.Audio
             packet[3] = (byte)(ssrc >> 0);
             await SendAsync(packet, 0, 70).ConfigureAwait(false);
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
+        }
+        public async Task<ulong> SendKeepaliveAsync()
+        {
+            var value = _nextKeepalive++;
+            var packet = new byte[8];
+            packet[0] = (byte)(value >> 0);
+            packet[1] = (byte)(value >> 8);
+            packet[2] = (byte)(value >> 16);
+            packet[3] = (byte)(value >> 24);
+            packet[4] = (byte)(value >> 32);
+            packet[5] = (byte)(value >> 40);
+            packet[6] = (byte)(value >> 48);
+            packet[7] = (byte)(value >> 56);
+            await SendAsync(packet, 0, 8).ConfigureAwait(false);
+            return value;
         }
 
         public void SetUdpEndpoint(string ip, int port)

@@ -23,6 +23,12 @@ namespace Discord.Audio
             remove { _latencyUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
+        public event Func<int, int, Task> UdpLatencyUpdated
+        {
+            add { _udpLatencyUpdatedEvent.Add(value); }
+            remove { _udpLatencyUpdatedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<int, int, Task>> _udpLatencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
         public event Func<ulong, AudioInStream, Task> StreamCreated
         {
             add { _streamCreatedEvent.Add(value); }
