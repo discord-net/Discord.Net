@@ -56,7 +56,7 @@ namespace Discord.Audio
             if (result < 0)
                 throw new Exception($"Opus Error: {(OpusError)result}");
 
-            result = EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, 5); //%%
+            result = EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, 30); //%%
             if (result < 0)
                 throw new Exception($"Opus Error: {(OpusError)result}");
 
