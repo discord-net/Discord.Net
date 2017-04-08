@@ -29,8 +29,7 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            if (buffer[offset + 0] != 0x80 || buffer[offset + 1] != 0x78)
-                return;
+            int headerSize = GetHeaderSize(buffer, offset);
 
             ushort seq =  (ushort)((buffer[offset + 2] << 8) |
                 (buffer[offset + 3] << 0));
@@ -41,22 +40,43 @@ namespace Discord.Audio.Streams
                 (buffer[offset + 7] << 0));
 
             _queue.WriteHeader(seq, timestamp);
-            await (_next ?? _queue as Stream).WriteAsync(buffer, offset + 12, count - 12, cancelToken).ConfigureAwait(false);
+            await (_next ?? _queue as Stream).WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken).ConfigureAwait(false);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
         {
+            ssrc = 0;
             if (buffer.Length - offset < 12)
-            {
-                ssrc = 0;
                 return false;
-            }
+                
+            int version = (buffer[offset + 0] & 0b1100_0000) >> 6;
+            if (version != 2)
+                return false;
+            int type = (buffer[offset + 1] & 0b01111_1111);
+            if (type != 120) //Dynamic Discord type
+                return false;
 
             ssrc = (uint)((buffer[offset + 8] << 24) |
                 (buffer[offset + 9] << 16) |
                 (buffer[offset + 10] << 16) |
                 (buffer[offset + 11] << 0));
             return true;
+        }
+
+        public static int GetHeaderSize(byte[] buffer, int offset)
+        {
+            byte headerByte = buffer[offset];
+            bool extension = (headerByte & 0b0001_0000) != 0;
+            int csics = (headerByte & 0b0000_1111) >> 4;
+
+            if (!extension)
+                return 12 + csics * 4;
+
+            int extensionOffset = offset + 12 + (csics * 4);
+            int extensionLength = 
+                (buffer[extensionOffset + 2] << 8) | 
+                (buffer[extensionOffset + 3]);
+            return extensionOffset + 4 + (extensionLength * 4);
         }
     }
 }
