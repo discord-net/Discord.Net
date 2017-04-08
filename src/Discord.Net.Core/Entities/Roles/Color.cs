@@ -28,7 +28,14 @@ namespace Discord
             RawValue =
                 ((uint)r << 16) |
                 ((uint)g << 8) |
-                b;
+                (uint)b;
+        }
+        public Color(int r, int g, int b)
+        {
+            RawValue =
+                ((uint)r << 16) |
+                ((uint)g << 8) |
+                (uint)b;
         }
         public Color(float r, float g, float b)
         {
