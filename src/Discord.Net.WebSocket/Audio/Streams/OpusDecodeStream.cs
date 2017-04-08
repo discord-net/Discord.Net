@@ -9,14 +9,14 @@ namespace Discord.Audio.Streams
         public const int SampleRate = OpusEncodeStream.SampleRate;
 
         private readonly AudioStream _next;
-        private readonly byte[] _buffer;
         private readonly OpusDecoder _decoder;
+        private readonly byte[] _buffer;
 
-        public OpusDecodeStream(AudioStream next, int channels = OpusConverter.MaxChannels, int bufferSize = 5760 * 2 * sizeof(short))
+        public OpusDecodeStream(AudioStream next)
         {
             _next = next;
-            _buffer = new byte[bufferSize];
-            _decoder = new OpusDecoder(SampleRate, channels);
+            _buffer = new byte[OpusConverter.FrameBytes];
+            _decoder = new OpusDecoder();
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)

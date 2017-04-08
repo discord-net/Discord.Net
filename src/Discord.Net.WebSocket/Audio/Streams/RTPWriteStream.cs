@@ -9,15 +9,12 @@ namespace Discord.Audio.Streams
     {
         private readonly AudioStream _next;
         private readonly byte[] _header;
-        private int _samplesPerFrame;
+        protected readonly byte[] _buffer;
         private uint _ssrc, _timestamp = 0;
 
-        protected readonly byte[] _buffer;
-
-        public RTPWriteStream(AudioStream next, int samplesPerFrame, uint ssrc, int bufferSize = 4000)
+        public RTPWriteStream(AudioStream next, uint ssrc, int bufferSize = 4000)
         {
             _next = next;
-            _samplesPerFrame = samplesPerFrame;
             _ssrc = ssrc;
             _buffer = new byte[bufferSize];
             _header = new byte[24];
@@ -38,7 +35,7 @@ namespace Discord.Audio.Streams
                 if (_header[3]++ == byte.MaxValue)
                     _header[2]++;
 
-                _timestamp += (uint)_samplesPerFrame;
+                _timestamp += (uint)OpusEncoder.FrameSamples;
                 _header[4] = (byte)(_timestamp >> 24);
                 _header[5] = (byte)(_timestamp >> 16);
                 _header[6] = (byte)(_timestamp >> 8);

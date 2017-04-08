@@ -38,14 +38,14 @@ namespace Discord.Audio.Streams
         private bool _isPreloaded;
         private int _silenceFrames;
 
-        public BufferedWriteStream(AudioStream next, IAudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
-            : this(next, client as AudioClient, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
-        internal BufferedWriteStream(AudioStream next, AudioClient client, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
+        public BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+            : this(next, client as AudioClient, bufferMillis, cancelToken, null, maxFrameSize) { }
+        internal BufferedWriteStream(AudioStream next, AudioClient client, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;
             _client = client;
-            _ticksPerFrame = samplesPerFrame / 48;
+            _ticksPerFrame = OpusEncoder.FrameSamples / 48;
             _logger = logger;
             _queueLength = (bufferMillis + (_ticksPerFrame - 1)) / _ticksPerFrame; //Round up
 

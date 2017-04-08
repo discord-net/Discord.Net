@@ -139,43 +139,33 @@ namespace Discord.Audio
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Guild.Id, null, false, false).ConfigureAwait(false);
         }
 
-        public AudioOutStream CreateOpusStream(int samplesPerFrame, int bufferMillis)
+        public AudioOutStream CreateOpusStream(int bufferMillis)
         {
-            CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream( outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
-            return new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
+            return new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger);
         }
-        public AudioOutStream CreateDirectOpusStream(int samplesPerFrame)
+        public AudioOutStream CreateDirectOpusStream()
         {
-            CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            return new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
+            return new RTPWriteStream(sodiumEncrypter, _ssrc);
         }
-        public AudioOutStream CreatePCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate, int bufferMillis)
+        public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis)
         {
-            CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
-            var bufferedStream = new BufferedWriteStream(rtpWriter, this, samplesPerFrame, bufferMillis, _connection.CancelToken, _audioLogger);
-            return new OpusEncodeStream(bufferedStream, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
+            var bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger);
+            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application);
         }
-        public AudioOutStream CreateDirectPCMStream(AudioApplication application, int samplesPerFrame, int channels, int? bitrate)
+        public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate)
         {
-            CheckSamplesPerFrame(samplesPerFrame);
             var outputStream = new OutputStream(ApiClient);
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, samplesPerFrame, _ssrc);
-            return new OpusEncodeStream(rtpWriter, channels, samplesPerFrame, bitrate ?? (96 * 1024), application);
-        }
-        private void CheckSamplesPerFrame(int samplesPerFrame)
-        {
-            if (samplesPerFrame != 120 && samplesPerFrame != 240 && samplesPerFrame != 480 &&
-                samplesPerFrame != 960 && samplesPerFrame != 1920 && samplesPerFrame != 2880)
-                throw new ArgumentException("Value must be 120, 240, 480, 960, 1920 or 2880", nameof(samplesPerFrame));
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
+            return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application);
         }
 
         internal async Task CreateInputStreamAsync(ulong userId)

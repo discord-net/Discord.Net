@@ -6,37 +6,22 @@ namespace Discord.Audio
     {
         protected IntPtr _ptr;
 
-        /// <summary> Gets the bit rate of this converter. </summary>
-        public const int BitsPerSample = sizeof(short) * 8;
-        /// <summary> Gets the bytes per sample. </summary>
-        public const int SampleSize = (BitsPerSample / 8) * MaxChannels;
-        /// <summary> Gets the maximum amount of channels this encoder supports. </summary>
-        public const int MaxChannels = 2;
+        public const int SamplingRate = 48000;
+        public const int Channels = 2;
+        public const int FrameMillis = 20;
 
-        /// <summary> Gets the input sampling rate of this converter. </summary>
-        public int SamplingRate { get; }
-        /// <summary> Gets the number of samples per second for this stream. </summary>
-        public int Channels { get; }
+        public const int SampleBytes = sizeof(short) * Channels;
 
-        protected OpusConverter(int samplingRate, int channels)
-        {
-            if (samplingRate != 8000 && samplingRate != 12000 &&
-                samplingRate != 16000 && samplingRate != 24000 &&
-                samplingRate != 48000)
-                throw new ArgumentOutOfRangeException(nameof(samplingRate));
-            if (channels != 1 && channels != 2)
-                throw new ArgumentOutOfRangeException(nameof(channels));
-
-            SamplingRate = samplingRate;
-            Channels = channels;
-        }
+        public const int FrameSamples = SamplingRate / 1000 * FrameMillis;
+        public const int FrameSamplesPerChannel = SamplingRate / 1000 * FrameMillis;
+        public const int FrameBytes = FrameSamples * SampleBytes;
         
-        private bool disposedValue = false; // To detect redundant calls
+        protected bool _isDisposed = false;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
-                disposedValue = true;
+            if (!_isDisposed)
+                _isDisposed = true;
         }
         ~OpusConverter()
         {
@@ -46,6 +31,17 @@ namespace Discord.Audio
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+        
+        protected static void CheckError(int result)
+        {
+            if (result < 0)
+                throw new Exception($"Opus Error: {(OpusError)result}");
+        }
+        protected static void CheckError(OpusError error)
+        {
+            if ((int)error < 0)
+                throw new Exception($"Opus Error: {error}");
         }
     }
 }

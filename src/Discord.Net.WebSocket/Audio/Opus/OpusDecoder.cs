@@ -14,37 +14,29 @@ namespace Discord.Audio
         [DllImport("opus", EntryPoint = "opus_decoder_ctl", CallingConvention = CallingConvention.Cdecl)]
         private static extern int DecoderCtl(IntPtr st, OpusCtl request, int value);
 
-        public OpusDecoder(int samplingRate, int channels)
-            : base(samplingRate, channels)
+        public OpusDecoder()
         {
-            OpusError error;
-            _ptr = CreateDecoder(samplingRate, channels, out error);
-            if (error != OpusError.OK)
-                throw new Exception($"Opus Error: {error}");
+            _ptr = CreateDecoder(SamplingRate, Channels, out var error);
+            CheckError(error);
         }
         
-        /// <summary> Produces PCM samples from Opus-encoded audio. </summary>
-        /// <param name="input">PCM samples to decode.</param>
-        /// <param name="inputOffset">Offset of the frame in input.</param>
-        /// <param name="output">Buffer to store the decoded frame.</param>
         public unsafe int DecodeFrame(byte[] input, int inputOffset, int inputCount, byte[] output, int outputOffset)
         {
             int result = 0;
             fixed (byte* inPtr = input)
             fixed (byte* outPtr = output)
-                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, (output.Length - outputOffset) / SampleSize, 0); //TODO: Enable FEC
-
-            if (result < 0)
-                throw new Exception($"Opus Error: {(OpusError)result}");
-            return result * SampleSize;
+                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, FrameBytes / SampleBytes, 1);
+            CheckError(result);
+            return FrameBytes;
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (_ptr != IntPtr.Zero)
+            if (!_isDisposed)
             {
-                DestroyDecoder(_ptr);
-                _ptr = IntPtr.Zero;
+                if (_ptr != IntPtr.Zero)
+                    DestroyDecoder(_ptr);
+                base.Dispose(disposing);
             }
         }
     }

@@ -12,18 +12,13 @@ namespace Discord.Audio.Streams
         private readonly AudioStream _next;
         private readonly OpusEncoder _encoder;
         private readonly byte[] _buffer;
-
-        private int _frameSize;
-        private byte[] _partialFrameBuffer;
         private int _partialFramePos;
 
-        public OpusEncodeStream(AudioStream next, int channels, int samplesPerFrame, int bitrate, AudioApplication application, int bufferSize = 4000)
+        public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application)
         {
             _next = next;
-            _encoder = new OpusEncoder(SampleRate, channels, bitrate, application);
-            _frameSize = samplesPerFrame * channels * 2;
-            _buffer = new byte[bufferSize];
-            _partialFrameBuffer = new byte[_frameSize];
+            _encoder = new OpusEncoder(bitrate, application);
+            _buffer = new byte[OpusConverter.FrameBytes];
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -31,20 +26,31 @@ namespace Discord.Audio.Streams
             //Assume threadsafe
             while (count > 0)
             {
-                if (_partialFramePos + count >= _frameSize)
+                if (_partialFramePos == 0 && count >= OpusConverter.FrameBytes)
                 {
-                    int partialSize = _frameSize - _partialFramePos;
-                    Buffer.BlockCopy(buffer, offset, _partialFrameBuffer, _partialFramePos, partialSize);
+                    //We have enough data and no partial frames. Pass the buffer directly to the encoder
+                    int encFrameSize = _encoder.EncodeFrame(buffer, offset, _buffer, 0);
+                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
+
+                    offset += OpusConverter.FrameBytes;
+                    count -= OpusConverter.FrameBytes;
+                }
+                else if (_partialFramePos + count >= OpusConverter.FrameBytes)
+                {
+                    //We have enough data to complete a previous partial frame.
+                    int partialSize = OpusConverter.FrameBytes - _partialFramePos;
+                    Buffer.BlockCopy(buffer, offset, _buffer, _partialFramePos, partialSize);
+                    int encFrameSize = _encoder.EncodeFrame(_buffer, 0, _buffer, 0);
+                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
+
                     offset += partialSize;
                     count -= partialSize;
                     _partialFramePos = 0;
-
-                    int encFrameSize = _encoder.EncodeFrame(_partialFrameBuffer, 0, _frameSize, _buffer, 0);
-                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
-                    Buffer.BlockCopy(buffer, offset, _partialFrameBuffer, _partialFramePos, count);
+                    //Not enough data to build a complete frame, store this part for later
+                    Buffer.BlockCopy(buffer, offset, _buffer, _partialFramePos, count);
                     _partialFramePos += count;
                     break;
                 }
