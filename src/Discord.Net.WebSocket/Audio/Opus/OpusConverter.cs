@@ -7,7 +7,7 @@ namespace Discord.Audio
         protected IntPtr _ptr;
 
         /// <summary> Gets the bit rate of this converter. </summary>
-        public const int BitsPerSample = 16;
+        public const int BitsPerSample = sizeof(short) * 8;
         /// <summary> Gets the bytes per sample. </summary>
         public const int SampleSize = (BitsPerSample / 8) * MaxChannels;
         /// <summary> Gets the maximum amount of channels this encoder supports. </summary>
