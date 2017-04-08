@@ -32,7 +32,7 @@ namespace Discord.Audio
             int result = 0;
             fixed (byte* inPtr = input)
             fixed (byte* outPtr = output)
-                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, (output.Length - outputOffset) / SampleSize, 1);
+                result = Decode(_ptr, inPtr + inputOffset, inputCount, outPtr + outputOffset, (output.Length - outputOffset) / SampleSize, 0); //TODO: Enable FEC
 
             if (result < 0)
                 throw new Exception($"Opus Error: {(OpusError)result}");
