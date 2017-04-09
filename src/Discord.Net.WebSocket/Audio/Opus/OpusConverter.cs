@@ -14,7 +14,7 @@ namespace Discord.Audio
 
         public const int FrameSamplesPerChannel = SamplingRate / 1000 * FrameMillis;
         public const int FrameSamples = FrameSamplesPerChannel * Channels;
-        public const int FrameBytes = FrameSamples * SampleBytes;
+        public const int FrameBytes = FrameSamplesPerChannel * SampleBytes;
         
         protected bool _isDisposed = false;
 

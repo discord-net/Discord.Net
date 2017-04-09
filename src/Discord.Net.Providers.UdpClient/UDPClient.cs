@@ -18,6 +18,8 @@ namespace Discord.Net.Providers.UDPClient
         private CancellationToken _cancelToken, _parentToken;
         private Task _task;
         private bool _isDisposed;
+        
+        public ushort Port => (ushort)((_udp?.Client.LocalEndPoint as IPEndPoint)?.Port ?? 0);
 
         public UDPClient()
         {

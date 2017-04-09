@@ -48,6 +48,8 @@ namespace Discord.Audio
         internal IWebSocketClient WebSocketClient { get; }
         public ConnectionState ConnectionState { get; private set; }
 
+        public ushort UdpPort => _udp.Port;
+
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;

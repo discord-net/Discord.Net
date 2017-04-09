@@ -107,6 +107,7 @@ namespace Discord.Audio
         {
             await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
             await ApiClient.ConnectAsync("wss://" + _url).ConfigureAwait(false);
+            await _audioLogger.DebugAsync("Listening on port " + ApiClient.UdpPort).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
             await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);
 
@@ -175,7 +176,8 @@ namespace Discord.Audio
             {
                 var readerStream = new InputStream();
                 var opusDecoder = new OpusDecodeStream(readerStream);
-                var rtpReader = new RTPReadStream(readerStream, opusDecoder);
+                //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
+                var rtpReader = new RTPReadStream(opusDecoder);
                 var decryptStream = new SodiumDecryptStream(rtpReader, this);
                 _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
                 await _streamCreatedEvent.InvokeAsync(userId, readerStream);

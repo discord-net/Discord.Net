@@ -11,6 +11,7 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => false;
 
+        public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) { }
         public override void Write(byte[] buffer, int offset, int count)
         {
             WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();

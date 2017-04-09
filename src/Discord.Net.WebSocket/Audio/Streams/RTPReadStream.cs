@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
@@ -7,7 +6,6 @@ namespace Discord.Audio.Streams
     ///<summary> Reads the payload from an RTP frame </summary>
     public class RTPReadStream : AudioOutStream
     {
-        private readonly InputStream _queue;
         private readonly AudioStream _next;
         private readonly byte[] _buffer, _nonce;
 
@@ -15,11 +13,8 @@ namespace Discord.Audio.Streams
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public RTPReadStream(InputStream queue, int bufferSize = 4000)
-            : this(queue, null, bufferSize) { }
-        public RTPReadStream(InputStream queue, AudioStream next, int bufferSize = 4000)
+        public RTPReadStream(AudioStream next, int bufferSize = 4000)
         {
-            _queue = queue;
             _next = next;
             _buffer = new byte[bufferSize];
             _nonce = new byte[24];
@@ -36,11 +31,11 @@ namespace Discord.Audio.Streams
 
             uint timestamp = (uint)((buffer[offset + 4] << 24) |
                 (buffer[offset + 5] << 16) |
-                (buffer[offset + 6] << 16) |
+                (buffer[offset + 6] << 8) |
                 (buffer[offset + 7] << 0));
 
-            _queue.WriteHeader(seq, timestamp);
-            await (_next ?? _queue as Stream).WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken).ConfigureAwait(false);
+            _next.WriteHeader(seq, timestamp, false);
+            await _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken).ConfigureAwait(false);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
@@ -58,7 +53,7 @@ namespace Discord.Audio.Streams
 
             ssrc = (uint)((buffer[offset + 8] << 24) |
                 (buffer[offset + 9] << 16) |
-                (buffer[offset + 10] << 16) |
+                (buffer[offset + 10] << 8) |
                 (buffer[offset + 11] << 0));
             return true;
         }

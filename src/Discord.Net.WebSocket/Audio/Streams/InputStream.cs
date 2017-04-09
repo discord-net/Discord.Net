@@ -14,6 +14,7 @@ namespace Discord.Audio.Streams
         private SemaphoreSlim _signal;
         private ushort _nextSeq;
         private uint _nextTimestamp;
+        private bool _nextMissed;
         private bool _hasHeader;
         private bool _isDisposed;
 
@@ -60,13 +61,14 @@ namespace Discord.Audio.Streams
             return frame;
         }
 
-        public void WriteHeader(ushort seq, uint timestamp)
+        public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
                 throw new InvalidOperationException("Header received with no payload");
             _hasHeader = true;
             _nextSeq = seq;
             _nextTimestamp = timestamp;
+            _nextMissed = missed;
         }
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
@@ -79,16 +81,17 @@ namespace Discord.Audio.Streams
             }
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header");
+            _hasHeader = false;
             byte[] payload = new byte[count];
             Buffer.BlockCopy(buffer, offset, payload, 0, count);
 
             _frames.Enqueue(new RTPFrame(
                 sequence: _nextSeq,
                 timestamp: _nextTimestamp,
+                missed: _nextMissed,
                 payload: payload
             ));
             _signal.Release();
-            _hasHeader = false;
             return Task.Delay(0);
         }
 
