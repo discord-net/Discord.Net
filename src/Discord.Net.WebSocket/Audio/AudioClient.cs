@@ -44,6 +44,7 @@ namespace Discord.Audio
         private string _url, _sessionId, _token;
         private ulong _userId;
         private uint _ssrc;
+        private bool _isSpeaking;
 
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
@@ -242,6 +243,7 @@ namespace Discord.Audio
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
                             SecretKey = data.SecretKey;
+                            _isSpeaking = false;
                             await ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
                             _keepaliveTask = RunKeepaliveAsync(5000, _connection.CancelToken);
 
@@ -450,6 +452,15 @@ namespace Discord.Audio
             catch (Exception ex)
             {
                 await _audioLogger.ErrorAsync("Keepalive Errored", ex).ConfigureAwait(false);
+            }
+        }
+
+        public async Task SetSpeakingAsync(bool value)
+        {
+            if (_isSpeaking != value)
+            {
+                _isSpeaking = value;
+                await ApiClient.SendSetSpeaking(value).ConfigureAwait(false);
             }
         }
 

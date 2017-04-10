@@ -35,7 +35,7 @@ namespace Discord.Audio.Streams
         private readonly SemaphoreSlim _queueLock;
         private readonly Logger _logger;
         private readonly int _ticksPerFrame, _queueLength;
-        private bool _isPreloaded, _isSpeaking;
+        private bool _isPreloaded;
         private int _silenceFrames;
 
         public BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
@@ -88,11 +88,7 @@ namespace Discord.Audio.Streams
                             Frame frame;
                             if (_queuedFrames.TryDequeue(out frame))
                             {
-                                if (!_isSpeaking)
-                                {
-                                    await _client.ApiClient.SendSetSpeaking(true).ConfigureAwait(false);
-                                    _isSpeaking = true;
-                                }
+                                await _client.SetSpeakingAsync(true).ConfigureAwait(false);
                                 _next.WriteHeader(seq++, timestamp, false);
                                 await _next.WriteAsync(frame.Buffer, 0, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
@@ -113,11 +109,8 @@ namespace Discord.Audio.Streams
                                         _next.WriteHeader(seq++, timestamp, false);
                                         await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
                                     }
-                                    else if (_isSpeaking)
-                                    {
-                                        await _client.ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
-                                        _isSpeaking = false;
-                                    }
+                                    else
+                                        await _client.SetSpeakingAsync(false).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }

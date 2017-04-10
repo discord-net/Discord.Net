@@ -21,6 +21,7 @@ namespace Discord.Audio
         int UdpLatency { get; }
 
         Task StopAsync();
+        Task SetSpeakingAsync(bool value);
 
         /// <summary>Creates a new outgoing stream accepting Opus-encoded data.</summary>
         AudioOutStream CreateOpusStream(int bufferMillis = 1000);
