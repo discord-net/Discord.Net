@@ -65,8 +65,10 @@ namespace Discord
         /// <summary> Gets a collection of all users banned on this guild. </summary>
         Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
         /// <summary> Bans the provided user from this guild and optionally prunes their recent messages. </summary>
+        /// <param name="pruneDays">The number of days to remove messages from this user for - must be between [0, 7]</param>
         Task AddBanAsync(IUser user, int pruneDays = 0, RequestOptions options = null);
         /// <summary> Bans the provided user id from this guild and optionally prunes their recent messages. </summary>
+        /// <param name="pruneDays">The number of days to remove messages from this user for - must be between [0, 7]</param>
         Task AddBanAsync(ulong userId, int pruneDays = 0, RequestOptions options = null);
         /// <summary> Unbans the provided user if it is currently banned. </summary>
         Task RemoveBanAsync(IUser user, RequestOptions options = null);
