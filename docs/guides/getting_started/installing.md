@@ -57,7 +57,18 @@ Also make sure to check 'Enable Prereleases' if installing a dev build!
 ![Step 5](images/install-vs-nuget.png)
 
 ## Using JetBrains Rider
-**todo**
+
+1. Create a new solution for your bot  
+2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for Solution)  
+![Step 2](images/install-rider-nuget-manager.png)
+3. In the 'Packages' tab, search for 'Discord.Net'  
+![Step 3](images/install-rider-search.png)
+
+> [!TIP]
+Make sure to check the 'Prerelease' box if installing a dev build!  
+
+4. Install by adding the package to your project  
+![Step 4](images/install-rider-add.png)
 
 ## Using Visual Studio Code
 
