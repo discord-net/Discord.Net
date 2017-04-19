@@ -19,8 +19,7 @@ namespace Discord.Net.Rest
         private readonly HttpClient _client;
         private readonly string _baseUrl;
         private readonly JsonSerializer _errorDeserializer;
-        private CancellationTokenSource _cancelTokenSource;
-        private CancellationToken _cancelToken, _parentToken;
+        private CancellationToken _cancelToken;
         private bool _isDisposed;
 
         public DefaultRestClient(string baseUrl)
@@ -35,9 +34,7 @@ namespace Discord.Net.Rest
             });
             SetHeader("accept-encoding", "gzip, deflate");
 
-            _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
-            _parentToken = CancellationToken.None;
             _errorDeserializer = new JsonSerializer();
         }
         private void Dispose(bool disposing)
@@ -62,8 +59,7 @@ namespace Discord.Net.Rest
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
-            _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelToken = cancelToken;
         }
 
         public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly)
