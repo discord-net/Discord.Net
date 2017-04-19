@@ -98,6 +98,8 @@ namespace Discord.Commands
                 }
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
+                else
+                    builder.AddAttributes(attribute);
             }
 
             //Check for unspecified info
@@ -143,6 +145,8 @@ namespace Discord.Commands
                     builder.AddAliases((attribute as AliasAttribute).Aliases);
                 else if (attribute is PreconditionAttribute)
                     builder.AddPrecondition(attribute as PreconditionAttribute);
+                else
+                    builder.AddAttributes(attribute);
             }
 
             if (builder.Name == null)

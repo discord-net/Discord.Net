@@ -9,6 +9,7 @@ namespace Discord.Commands.Builders
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
+        private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
 
         public CommandService Service { get; }
@@ -20,6 +21,7 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
 
         //Automatic
@@ -31,6 +33,7 @@ namespace Discord.Commands.Builders
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
             _preconditions = new List<PreconditionAttribute>();
+            _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
         //User-defined
@@ -66,6 +69,11 @@ namespace Discord.Commands.Builders
                 if (!_aliases.Contains(alias))
                     _aliases.Add(alias);
             }
+            return this;
+        }
+        public ModuleBuilder AddAttributes(params Attribute[] attributes)
+        {
+            _attributes.AddRange(attributes);
             return this;
         }
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
