@@ -32,7 +32,7 @@ namespace Discord.Rest
         public string SplashId { get; private set; }
         internal bool Available { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);

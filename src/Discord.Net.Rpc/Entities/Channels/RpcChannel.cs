@@ -8,7 +8,7 @@ namespace Discord.Rpc
     {
         public string Name { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RpcChannel(DiscordRpcClient discord, ulong id)
             : base(discord, id)

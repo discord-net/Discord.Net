@@ -17,7 +17,7 @@ namespace Discord.Rest
 
         public string Content { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
         public virtual DateTimeOffset? EditedTimestamp => null;

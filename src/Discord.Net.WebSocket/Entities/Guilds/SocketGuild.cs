@@ -53,7 +53,7 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public SocketTextChannel DefaultChannel => GetTextChannel(Id);
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);

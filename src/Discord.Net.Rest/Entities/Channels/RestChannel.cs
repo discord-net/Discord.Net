@@ -8,7 +8,7 @@ namespace Discord.Rest
 {
     public abstract class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)

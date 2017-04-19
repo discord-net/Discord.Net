@@ -15,7 +15,7 @@ namespace Discord.WebSocket
         internal abstract SocketGlobalUser GlobalUser { get; }
         internal abstract SocketPresence Presence { get; set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
         public Game? Game => Presence.Game;

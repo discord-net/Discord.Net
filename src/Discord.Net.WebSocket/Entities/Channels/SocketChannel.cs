@@ -10,7 +10,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public IReadOnlyCollection<SocketUser> Users => GetUsersInternal();
 
         internal SocketChannel(DiscordSocketClient discord, ulong id)

@@ -18,7 +18,7 @@ namespace Discord.Rpc
         public string Content { get; private set; }
         public Color AuthorColor { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
         public virtual bool IsBlocked => false;

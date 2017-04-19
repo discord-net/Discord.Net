@@ -185,7 +185,7 @@ namespace Discord
         // Bulk Delete
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
-            var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
+            var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
             {
                 if (collection[i] <= minimum) 

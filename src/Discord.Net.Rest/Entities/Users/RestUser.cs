@@ -13,7 +13,7 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
         public virtual Game? Game => null;
