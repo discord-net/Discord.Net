@@ -193,7 +193,7 @@ namespace Discord.Commands
                 if (attribute is SummaryAttribute)
                     builder.Summary = (attribute as SummaryAttribute).Text;
                 else if (attribute is OverrideTypeReaderAttribute)
-                    builder.TypeReader = GetTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
+                    builder.TypeReader = GetCustomTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
                 else if (attribute is ParameterPreconditionAttribute)
                     builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
                 else if (attribute is ParamArrayAttribute)
@@ -213,22 +213,14 @@ namespace Discord.Commands
             builder.ParameterType = paramType;
 
             if (builder.TypeReader == null)
-            {
-                var readers = service.GetTypeReaders(paramType);
-                TypeReader reader = null;
-
-                if (readers != null)
-                    reader = readers.FirstOrDefault().Value;
-                else
-                    reader = service.GetDefaultTypeReader(paramType);
-
-                builder.TypeReader = reader;
+            { 
+                builder.TypeReader = service.GetTypeReaders(paramType).FirstOrDefault().Value;
             }
         }
 
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType)
+        private static TypeReader GetCustomTypeReader(CommandService service, Type paramType, Type typeReaderType)
         {
-            var readers = service.GetTypeReaders(paramType);
+            var readers = service.GetCustomTypeReaders(paramType);
             TypeReader reader = null;
             if (readers != null)
             {

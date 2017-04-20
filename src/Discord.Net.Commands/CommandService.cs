@@ -18,7 +18,7 @@ namespace Discord.Commands
 
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _customTypeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
         private readonly ImmutableList<Tuple<Type, Type>> _entityTypeReaders; //TODO: Candidate for C#7 Tuple
         private readonly HashSet<ModuleInfo> _moduleDefs;
@@ -32,7 +32,7 @@ namespace Discord.Commands
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
-        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new {y.Key, y.Value})).ToLookup(x => x.Key, x => x.Value);
+        public ILookup<Type, TypeReader> TypeReaders => _customTypeReaders.SelectMany(x => x.Value.Select(y => new {y.Key, y.Value})).ToLookup(x => x.Key, x => x.Value);
 
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
@@ -52,7 +52,7 @@ namespace Discord.Commands
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new HashSet<ModuleInfo>();
             _map = new CommandMap(this);
-            _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
+            _customTypeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
@@ -188,20 +188,31 @@ namespace Discord.Commands
         //Type Readers
         public void AddTypeReader<T>(TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
+            var readers = _customTypeReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
             readers[reader.GetType()] = reader;
         }
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(type, x=> new ConcurrentDictionary<Type, TypeReader>());
+            var readers = _customTypeReaders.GetOrAdd(type, x=> new ConcurrentDictionary<Type, TypeReader>());
             readers[reader.GetType()] = reader;
         }
-        internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
+        internal IDictionary<Type, TypeReader> GetCustomTypeReaders(Type type)
         {
             ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
-            if (_typeReaders.TryGetValue(type, out definedTypeReaders))
+            if (_customTypeReaders.TryGetValue(type, out definedTypeReaders))
                 return definedTypeReaders;
             return null;
+        }
+        public IDictionary<Type, TypeReader> GetTypeReaders(Type type)
+        {
+            var readers = GetCustomTypeReaders(type);
+
+            if (readers == null)
+                readers = new ConcurrentDictionary<Type, TypeReader>();
+
+            readers.Add(type, GetDefaultTypeReader(type));
+
+            return readers;
         }
         internal TypeReader GetDefaultTypeReader(Type type)
         {
