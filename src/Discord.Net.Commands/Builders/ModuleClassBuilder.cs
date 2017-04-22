@@ -160,14 +160,15 @@ namespace Discord.Commands
 
             var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
-            builder.Callback = (ctx, args, map) => 
+            builder.Callback = async (ctx, args, map) => 
             {
                 var instance = createInstance(map);
                 instance.SetContext(ctx);
                 try
                 {
                     instance.BeforeExecute();
-                    return method.Invoke(instance, args) as Task ?? Task.Delay(0);
+                    var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
+                    await task.ConfigureAwait(false);
                 }
                 finally
                 {
