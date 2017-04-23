@@ -11,6 +11,7 @@ namespace Discord.Commands.Builders
         private readonly List<ParameterPreconditionAttribute> _preconditions; 
 
         public CommandBuilder Command { get; }
+        public OverloadBuilder Overload { get; }
         public string Name { get; internal set; }
         public Type ParameterType { get; internal set; }
 
@@ -24,15 +25,16 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
 
         //Automatic
-        internal ParameterBuilder(CommandBuilder command)
+        internal ParameterBuilder(OverloadBuilder overload)
         {
             _preconditions = new List<ParameterPreconditionAttribute>();
 
-            Command = command;
+            Command = overload.Command;
+            Overload = overload;
         }
         //User-defined
-        internal ParameterBuilder(CommandBuilder command, string name, Type type)
-            : this(command)
+        internal ParameterBuilder(OverloadBuilder overload, string name, Type type)
+            : this(overload)
         {
             Discord.Preconditions.NotNull(name, nameof(name));
 
@@ -90,7 +92,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        internal ParameterInfo Build(CommandInfo info)
+        internal ParameterInfo Build(OverloadInfo info)
         {
             if (TypeReader == null)
                 throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");

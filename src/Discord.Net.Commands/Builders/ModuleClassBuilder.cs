@@ -113,45 +113,78 @@ namespace Discord.Commands
 
             var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
 
-            foreach (var method in validCommands)
+            var groupedCommands = validCommands.GroupBy(x => x.GetCustomAttribute<CommandAttribute>().Text);
+            foreach (var overloads in groupedCommands)
             {
                 builder.AddCommand((command) => 
                 {
-                    BuildCommand(command, typeInfo, method, service);
+                    string firstName = null;
+
+                    foreach (var method in overloads)
+                    {
+                        if (firstName == null)
+                            firstName = method.Name;
+
+                        command.AddOverload((overload) =>
+                        {
+                            BuildOverload(overload, typeInfo, method, service);
+                        });
+                    }
+
+                    var allAttributes = overloads.SelectMany(x => x.GetCustomAttributes());
+                    BuildCommand(command, firstName, allAttributes, service);
                 });
             }
         }
 
-        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
+        private static void BuildCommand(CommandBuilder builder, string defaultName, IEnumerable<Attribute> attributes, CommandService service)
         {
-            var attributes = method.GetCustomAttributes();
-            
             foreach (var attribute in attributes)
             {
-                // TODO: C#7 type switch
-                if (attribute is CommandAttribute)
+                switch (attribute)
                 {
-                    var cmdAttr = attribute as CommandAttribute;
-                    builder.AddAliases(cmdAttr.Text);
-                    builder.RunMode = cmdAttr.RunMode;
-                    builder.Name = builder.Name ?? cmdAttr.Text;
+                    case CommandAttribute command:
+                        builder.AddAliases(command.Text);
+                        builder.Name = builder.Name ?? command.Text;
+                        break;
+                    case NameAttribute name:
+                        builder.Name = name.Text;
+                        break;
+                    case SummaryAttribute summary:
+                        builder.Summary = summary.Text;
+                        break;
+                    case RemarksAttribute remarks:
+                        builder.Remarks = remarks.Text;
+                        break;
+                    case AliasAttribute alias:
+                        builder.AddAliases(alias.Aliases);
+                        break;
                 }
-                else if (attribute is NameAttribute)
-                    builder.Name = (attribute as NameAttribute).Text;
-                else if (attribute is PriorityAttribute)
-                    builder.Priority = (attribute as PriorityAttribute).Priority;
-                else if (attribute is SummaryAttribute)
-                    builder.Summary = (attribute as SummaryAttribute).Text;
-                else if (attribute is RemarksAttribute)
-                    builder.Remarks = (attribute as RemarksAttribute).Text;
-                else if (attribute is AliasAttribute)
-                    builder.AddAliases((attribute as AliasAttribute).Aliases);
-                else if (attribute is PreconditionAttribute)
-                    builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
             if (builder.Name == null)
-                builder.Name = method.Name;
+                builder.Name = defaultName;
+        }
+
+        private static void BuildOverload(OverloadBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
+        {
+            var attributes = method.GetCustomAttributes();
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case CommandAttribute command:
+                        builder.RunMode = command.RunMode;
+                        break;
+                    case PriorityAttribute priority:
+                        builder.Priority = priority.Priority;
+                        break;
+                    case PreconditionAttribute precondition:
+                        builder.AddPrecondition(precondition);
+                        break;
+                }
+            }
 
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;
@@ -196,23 +229,29 @@ namespace Discord.Commands
             foreach (var attribute in attributes)
             {
                 // TODO: C#7 type switch
-                if (attribute is SummaryAttribute)
-                    builder.Summary = (attribute as SummaryAttribute).Text;
-                else if (attribute is OverrideTypeReaderAttribute)
-                    builder.TypeReader = GetTypeReader(service, paramType, (attribute as OverrideTypeReaderAttribute).TypeReader);
-                else if (attribute is ParameterPreconditionAttribute)
-                    builder.AddPrecondition(attribute as ParameterPreconditionAttribute);
-                else if (attribute is ParamArrayAttribute)
+                switch (attribute)
                 {
-                    builder.IsMultiple = true;
-                    paramType = paramType.GetElementType();
-                }
-                else if (attribute is RemainderAttribute)
-                {
-                    if (position != count-1)
-                        throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
-                    
-                    builder.IsRemainder = true;
+                    case SummaryAttribute summary:
+                        builder.Summary = summary.Text;
+                        break;
+                    case OverrideTypeReaderAttribute typeReader:
+                        builder.TypeReader = GetTypeReader(service, paramType, typeReader.TypeReader);
+                        break;
+                    case ParameterPreconditionAttribute precondition:
+                        builder.AddPrecondition(precondition);
+                        break;
+                    case ParamArrayAttribute paramArray:
+                        if (position != count - 1)
+                            throw new InvalidOperationException("Params parameters must be the last parameter in a command.");
+                        builder.IsMultiple = true;
+                        paramType = paramType.GetElementType();
+                        break;
+                    case RemainderAttribute remainder:
+                        if (position != count - 1)
+                            throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
+
+                        builder.IsRemainder = true;
+                        break;
                 }
             }
 

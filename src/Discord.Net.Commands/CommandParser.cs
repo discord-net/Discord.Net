@@ -13,7 +13,7 @@ namespace Discord.Commands
             QuotedParameter
         }
         
-        public static async Task<ParseResult> ParseArgs(CommandInfo command, ICommandContext context, string input, int startPos)
+        public static async Task<ParseResult> ParseArgs(OverloadInfo overload, ICommandContext context, string input, int startPos)
         {
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
@@ -66,7 +66,7 @@ namespace Discord.Commands
                     else
                     {
                         if (curParam == null)
-                            curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
+                            curParam = overload.Parameters.Count > argList.Count ? overload.Parameters[argList.Count] : null;
 
                         if (curParam != null && curParam.IsRemainder)
                         {
@@ -145,9 +145,9 @@ namespace Discord.Commands
                 return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete");
             
             //Add missing optionals
-            for (int i = argList.Count; i < command.Parameters.Count; i++)
+            for (int i = argList.Count; i < overload.Parameters.Count; i++)
             {
-                var param = command.Parameters[i];
+                var param = overload.Parameters[i];
                 if (param.IsMultiple)
                     continue;
                 if (!param.IsOptional)
@@ -155,7 +155,7 @@ namespace Discord.Commands
                 argList.Add(TypeReaderResult.FromSuccess(param.DefaultValue));
             }
             
-            return ParseResult.FromSuccess(argList.ToImmutable(), paramList.ToImmutable());
+            return ParseResult.FromSuccess(overload, argList.ToImmutable(), paramList.ToImmutable());
         }
     }
 }

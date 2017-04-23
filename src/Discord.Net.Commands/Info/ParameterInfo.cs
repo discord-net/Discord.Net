@@ -12,6 +12,7 @@ namespace Discord.Commands
         private readonly TypeReader _reader;
 
         public CommandInfo Command { get; }
+        public OverloadInfo Overload { get; }
         public string Name { get; }
         public string Summary { get; }
         public bool IsOptional { get; }
@@ -22,9 +23,10 @@ namespace Discord.Commands
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
 
-        internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
+        internal ParameterInfo(ParameterBuilder builder, OverloadInfo overload, CommandService service)
         {
-            Command = command;
+            Command = overload.Command;
+            Overload = overload;
 
             Name = builder.Name;
             Summary = builder.Summary;

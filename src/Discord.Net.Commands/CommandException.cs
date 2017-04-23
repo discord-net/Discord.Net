@@ -5,12 +5,14 @@ namespace Discord.Commands
     public class CommandException : Exception
     {
         public CommandInfo Command { get; }
+        public OverloadInfo Overload { get; }
         public ICommandContext Context { get; }
 
-        public CommandException(CommandInfo command, ICommandContext context, Exception ex)
-            : base($"Error occurred executing {command.GetLogText(context)}.", ex)
+        public CommandException(OverloadInfo overload, ICommandContext context, Exception ex)
+            : base($"Error occurred executing {overload.GetLogText(context)}.", ex)
         {
-            Command = command;
+            Overload = overload;
+            Command = overload.Command;
             Context = context;
         }
     }
