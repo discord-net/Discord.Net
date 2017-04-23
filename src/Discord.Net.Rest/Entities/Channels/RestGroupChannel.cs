@@ -60,8 +60,7 @@ namespace Discord.Rest
 
         public RestUser GetUser(ulong id)
         {
-            RestGroupUser user;
-            if (_users.TryGetValue(id, out user))
+            if (_users.TryGetValue(id, out RestGroupUser user))
                 return user;
             return null;
         }

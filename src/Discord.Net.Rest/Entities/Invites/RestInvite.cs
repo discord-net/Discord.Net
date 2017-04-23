@@ -58,8 +58,7 @@ namespace Discord.Rest
             {
                 if (Guild != null)
                     return Guild;
-                var guildChannel = Channel as IGuildChannel;
-                if (guildChannel != null)
+                if (Channel is IGuildChannel guildChannel)
                     return guildChannel.Guild; //If it fails, it'll still return this exception
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }

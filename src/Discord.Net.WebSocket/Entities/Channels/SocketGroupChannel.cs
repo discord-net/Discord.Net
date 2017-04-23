@@ -120,15 +120,13 @@ namespace Discord.WebSocket
         //Users
         public new SocketGroupUser GetUser(ulong id)
         {
-            SocketGroupUser user;
-            if (_users.TryGetValue(id, out user))
+            if (_users.TryGetValue(id, out SocketGroupUser user))
                 return user;
             return null;
         }
         internal SocketGroupUser GetOrAddUser(UserModel model)
         {
-            SocketGroupUser user;
-            if (_users.TryGetValue(model.Id, out user))
+            if (_users.TryGetValue(model.Id, out SocketGroupUser user))
                 return user as SocketGroupUser;
             else
             {
@@ -139,8 +137,7 @@ namespace Discord.WebSocket
         }
         internal SocketGroupUser RemoveUser(ulong id)
         {
-            SocketGroupUser user;
-            if (_users.TryRemove(id, out user))
+            if (_users.TryRemove(id, out SocketGroupUser user))
             {
                 user.GlobalUser.RemoveRef(Discord);
                 return user as SocketGroupUser;
@@ -158,15 +155,13 @@ namespace Discord.WebSocket
         }
         internal SocketVoiceState? GetVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryGetValue(id, out voiceState))
+            if (_voiceStates.TryGetValue(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }
         internal SocketVoiceState? RemoveVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryRemove(id, out voiceState))
+            if (_voiceStates.TryRemove(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }

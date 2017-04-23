@@ -80,8 +80,7 @@ namespace Discord.Rest
                 if (endIndex == -1) break;
                 string content = text.Substring(index, endIndex - index + 1);
 
-                ulong id;
-                if (MentionUtils.TryParseUser(content, out id))
+                if (MentionUtils.TryParseUser(content, out ulong id))
                 {
                     IUser mentionedUser = null;
                     foreach (var mention in userMentions)

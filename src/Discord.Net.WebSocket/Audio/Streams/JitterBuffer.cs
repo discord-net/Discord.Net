@@ -94,8 +94,7 @@ namespace Discord.Audio.Streams
                             continue;
                         }
 
-                        Frame frame;
-                        if (_queuedFrames.TryPeek(out frame))
+                        if (_queuedFrames.TryPeek(out Frame frame))
                         {
                             silenceFrames = 0;
                             uint distance = (uint)(frame.Timestamp - _timestamp);
@@ -201,7 +200,6 @@ namespace Discord.Audio.Streams
                 return; //This is an old frame, ignore
             }
 
-            byte[] buffer;
             if (!await _queueLock.WaitAsync(0).ConfigureAwait(false))
             {
 #if DEBUG
@@ -209,7 +207,7 @@ namespace Discord.Audio.Streams
 #endif
                 return;
             }
-            _bufferPool.TryDequeue(out buffer);
+            _bufferPool.TryDequeue(out byte[] buffer);
 
             Buffer.BlockCopy(data, offset, buffer, 0, count);
 #if DEBUG
@@ -239,10 +237,9 @@ namespace Discord.Audio.Streams
         }
         public override Task ClearAsync(CancellationToken cancelToken)
         {
-            Frame ignored;
             do
                 cancelToken.ThrowIfCancellationRequested();
-            while (_queuedFrames.TryDequeue(out ignored));
+            while (_queuedFrames.TryDequeue(out Frame ignored));
             return Task.Delay(0);
         }
     }

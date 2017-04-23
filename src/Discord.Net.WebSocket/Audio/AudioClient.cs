@@ -131,8 +131,7 @@ namespace Discord.Audio
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
 
-            long time;
-            while (_heartbeatTimes.TryDequeue(out time)) { }
+            while (_heartbeatTimes.TryDequeue(out long time)) { }
             _lastMessageTime = 0;
 
             await ClearInputStreamsAsync().ConfigureAwait(false);
@@ -186,8 +185,7 @@ namespace Discord.Audio
         }
         internal AudioInStream GetInputStream(ulong id)
         {
-            StreamPair streamPair;
-            if (_streams.TryGetValue(id, out streamPair))
+            if (_streams.TryGetValue(id, out StreamPair streamPair))
                 return streamPair.Reader;
             return null;
         }
@@ -254,8 +252,7 @@ namespace Discord.Audio
                         {
                             await _audioLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
 
-                            long time;
-                            if (_heartbeatTimes.TryDequeue(out time))
+                            if (_heartbeatTimes.TryDequeue(out long time))
                             {
                                 int latency = (int)(Environment.TickCount - time);
                                 int before = Latency;

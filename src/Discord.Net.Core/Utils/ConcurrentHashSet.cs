@@ -239,10 +239,8 @@ namespace Discord
         {
             while (true)
             {
-                int bucketNo, lockNo;
-
                 Tables tables = _tables;
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, tables._buckets.Length, tables._locks.Length);
+                GetBucketAndLockNo(hashcode, out int bucketNo, out int lockNo, tables._buckets.Length, tables._locks.Length);
 
                 bool resizeDesired = false;
                 bool lockTaken = false;
@@ -292,9 +290,7 @@ namespace Discord
             while (true)
             {
                 Tables tables = _tables;
-
-                int bucketNo, lockNo;
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, tables._buckets.Length, tables._locks.Length);
+                GetBucketAndLockNo(hashcode, out int bucketNo, out int lockNo, tables._buckets.Length, tables._locks.Length);
 
                 lock (tables._locks[lockNo])
                 {
@@ -426,8 +422,7 @@ namespace Discord
                     while (current != null)
                     {
                         Node next = current._next;
-                        int newBucketNo, newLockNo;
-                        GetBucketAndLockNo(current._hashcode, out newBucketNo, out newLockNo, newBuckets.Length, newLocks.Length);
+                        GetBucketAndLockNo(current._hashcode, out int newBucketNo, out int newLockNo, newBuckets.Length, newLocks.Length);
 
                         newBuckets[newBucketNo] = new Node(current._value, current._hashcode, newBuckets[newBucketNo]);
 

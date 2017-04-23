@@ -55,9 +55,8 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            RTPFrame frame;
             await _signal.WaitAsync(cancelToken).ConfigureAwait(false);
-            _frames.TryDequeue(out frame);
+            _frames.TryDequeue(out RTPFrame frame);
             return frame;
         }
 

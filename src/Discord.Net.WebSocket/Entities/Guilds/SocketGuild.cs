@@ -82,16 +82,7 @@ namespace Discord.WebSocket
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
-        public SocketGuildUser CurrentUser
-        {
-            get
-            {
-                SocketGuildUser member;
-                if (_members.TryGetValue(Discord.CurrentUser.Id, out member))
-                    return member;
-                return null;
-            }
-        }
+        public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
         {
@@ -162,8 +153,7 @@ namespace Discord.WebSocket
 
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
-                    SocketGuildUser member;
-                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
+                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
                         member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
@@ -248,8 +238,7 @@ namespace Discord.WebSocket
 
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
-                    SocketGuildUser member;
-                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
+                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
                         member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
@@ -343,8 +332,7 @@ namespace Discord.WebSocket
         //Roles
         public SocketRole GetRole(ulong id)
         {
-            SocketRole value;
-            if (_roles.TryGetValue(id, out value))
+            if (_roles.TryGetValue(id, out SocketRole value))
                 return value;
             return null;
         }
@@ -359,8 +347,7 @@ namespace Discord.WebSocket
         }
         internal SocketRole RemoveRole(ulong id)
         {
-            SocketRole role;
-            if (_roles.TryRemove(id, out role))
+            if (_roles.TryRemove(id, out SocketRole role))
                 return role;
             return null;
         }
@@ -368,8 +355,7 @@ namespace Discord.WebSocket
         //Users
         public SocketGuildUser GetUser(ulong id)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(id, out member))
+            if (_members.TryGetValue(id, out SocketGuildUser member))
                 return member;
             return null;
         }
@@ -378,8 +364,7 @@ namespace Discord.WebSocket
 
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(model.Id, out member))
+            if (_members.TryGetValue(model.Id, out SocketGuildUser member))
                 member.GlobalUser?.Update(Discord.State, model);
             else
             {
@@ -391,8 +376,7 @@ namespace Discord.WebSocket
         }
         internal SocketGuildUser AddOrUpdateUser(MemberModel model)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(model.User.Id, out member))
+            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
                 member.Update(Discord.State, model);
             else
             {
@@ -404,8 +388,7 @@ namespace Discord.WebSocket
         }
         internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(model.User.Id, out member))
+            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
                 member.Update(Discord.State, model, false);
             else
             {
@@ -417,8 +400,7 @@ namespace Discord.WebSocket
         }
         internal SocketGuildUser RemoveUser(ulong id)
         {
-            SocketGuildUser member;
-            if (_members.TryRemove(id, out member))
+            if (_members.TryRemove(id, out SocketGuildUser member))
             {
                 DownloadedMemberCount--;
                 member.GlobalUser.RemoveRef(Discord);
@@ -466,15 +448,13 @@ namespace Discord.WebSocket
         }
         internal SocketVoiceState? GetVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryGetValue(id, out voiceState))
+            if (_voiceStates.TryGetValue(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }
         internal async Task<SocketVoiceState?> RemoveVoiceStateAsync(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryRemove(id, out voiceState))
+            if (_voiceStates.TryRemove(id, out SocketVoiceState voiceState))
             {
                 if (_audioClient != null)
                     await _audioClient.RemoveInputStreamAsync(id).ConfigureAwait(false); //User changed channels, end their stream

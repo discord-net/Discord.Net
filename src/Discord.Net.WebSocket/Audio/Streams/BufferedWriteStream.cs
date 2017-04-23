@@ -85,8 +85,7 @@ namespace Discord.Audio.Streams
                         long dist = nextTick - tick;
                         if (dist <= 0)
                         {
-                            Frame frame;
-                            if (_queuedFrames.TryDequeue(out frame))
+                            if (_queuedFrames.TryDequeue(out Frame frame))
                             {
                                 await _client.SetSpeakingAsync(true).ConfigureAwait(false);
                                 _next.WriteHeader(seq++, timestamp, false);
@@ -100,7 +99,7 @@ namespace Discord.Audio.Streams
                                 var _ = _logger?.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
-                            else 
+                            else
                             {
                                 while ((nextTick - tick) <= 0)
                                 {
@@ -135,8 +134,7 @@ namespace Discord.Audio.Streams
                 cancelToken = _cancelToken;
 
             await _queueLock.WaitAsync(-1, cancelToken).ConfigureAwait(false);
-            byte[] buffer;
-            if (!_bufferPool.TryDequeue(out buffer))
+            if (!_bufferPool.TryDequeue(out byte[] buffer))
             {
 #if DEBUG
                 var _ = _logger?.DebugAsync($"Buffer overflow"); //Should never happen because of the queueLock
@@ -166,10 +164,9 @@ namespace Discord.Audio.Streams
         }
         public override Task ClearAsync(CancellationToken cancelToken)
         {
-            Frame ignored;
             do
                 cancelToken.ThrowIfCancellationRequested();
-            while (_queuedFrames.TryDequeue(out ignored));
+            while (_queuedFrames.TryDequeue(out Frame ignored));
             return Task.Delay(0);
         }
     }

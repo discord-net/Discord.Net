@@ -20,8 +20,7 @@ namespace Discord
 
         public static Emoji Parse(string text)
         {
-            Emoji result;
-            if (TryParse(text, out result))
+            if (TryParse(text, out Emoji result))
                 return result;
             throw new ArgumentException("Invalid emoji format", nameof(text));
         }
@@ -35,8 +34,7 @@ namespace Discord
                 if (splitIndex == -1)
                     return false;
 
-                ulong id;
-                if (!ulong.TryParse(text.Substring(splitIndex + 1, text.Length - splitIndex - 2), NumberStyles.None, CultureInfo.InvariantCulture, out id))
+                if (!ulong.TryParse(text.Substring(splitIndex + 1, text.Length - splitIndex - 2), NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
                     return false;
 
                 string name = text.Substring(2, splitIndex - 2);

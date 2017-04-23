@@ -213,8 +213,7 @@ namespace Discord.Rest
         //Roles
         public RestRole GetRole(ulong id)
         {
-            RestRole value;
-            if (_roles.TryGetValue(id, out value))
+            if (_roles.TryGetValue(id, out RestRole value))
                 return value;
             return null;
         }
