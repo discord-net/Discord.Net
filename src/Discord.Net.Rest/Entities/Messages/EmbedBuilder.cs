@@ -24,7 +24,16 @@ namespace Discord
 
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
-        public List<EmbedFieldBuilder> Fields { get; set; }
+        private List<EmbedFieldBuilder> _fields;
+        public List<EmbedFieldBuilder> Fields
+        {
+            get => _fields;
+            set
+            {
+                if (value != null) _fields = value;
+                else throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(value));
+            }
+        }
 
         public EmbedBuilder WithTitle(string title)
         {
