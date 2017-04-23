@@ -83,7 +83,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<ModuleInfo> AddModuleAsync<T>()
+        public async Task<ModuleInfo> AddModuleAsync<T>() where T : IModuleBase<ICommandContext>
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -96,7 +96,7 @@ namespace Discord.Commands
                 var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
-                    throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}, did you pass an invalid type?");
+                    throw new InvalidOperationException($"Could not build the module {typeof(T).FullName}");
 
                 _typedModuleDefs[module.Key] = module.Value;
 
@@ -153,7 +153,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<bool> RemoveModuleAsync<T>()
+        public async Task<bool> RemoveModuleAsync<T>() where T : IModuleBase<ICommandContext>
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
