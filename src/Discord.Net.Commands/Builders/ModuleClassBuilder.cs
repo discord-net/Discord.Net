@@ -81,23 +81,28 @@ namespace Discord.Commands
 
             foreach (var attribute in attributes)
             {
-                // TODO: C#7 type switch
-                if (attribute is NameAttribute)
-                    builder.Name = (attribute as NameAttribute).Text;
-                else if (attribute is SummaryAttribute)
-                    builder.Summary = (attribute as SummaryAttribute).Text;
-                else if (attribute is RemarksAttribute)
-                    builder.Remarks = (attribute as RemarksAttribute).Text;
-                else if (attribute is AliasAttribute)
-                    builder.AddAliases((attribute as AliasAttribute).Aliases);
-                else if (attribute is GroupAttribute)
+                switch (attribute)
                 {
-                    var groupAttr = attribute as GroupAttribute;
-                    builder.Name = builder.Name ?? groupAttr.Prefix;
-                    builder.AddAliases(groupAttr.Prefix);
+                    case NameAttribute name:
+                        builder.Name = name.Text;
+                        break;
+                    case SummaryAttribute summary:
+                        builder.Summary = summary.Text;
+                        break;
+                    case RemarksAttribute remarks:
+                        builder.Remarks = remarks.Text;
+                        break;
+                    case AliasAttribute alias:
+                        builder.AddAliases(alias.Aliases);
+                        break;
+                    case GroupAttribute group:
+                        builder.Name = builder.Name ?? group.Prefix;
+                        builder.AddAliases(group.Prefix);
+                        break;
+                    case PreconditionAttribute precondition:
+                        builder.AddPrecondition(precondition);
+                        break;
                 }
-                else if (attribute is PreconditionAttribute)
-                    builder.AddPrecondition(attribute as PreconditionAttribute);
             }
 
             //Check for unspecified info

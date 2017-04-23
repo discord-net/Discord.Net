@@ -150,9 +150,7 @@ namespace Discord
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions  & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
-                //TODO: C#7 Typeswitch candidate
-                var textChannel = channel as ITextChannel;
-                if (textChannel != null)
+                if (channel is ITextChannel textChannel)
                 {
                     if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
                     {

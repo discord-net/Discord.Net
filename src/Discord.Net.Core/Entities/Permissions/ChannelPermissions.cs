@@ -20,13 +20,14 @@ namespace Discord
         /// <summary> Gets a ChannelPermissions that grants all permissions for a given channelType. </summary>
         public static ChannelPermissions All(IChannel channel)
         {
-            //TODO: C#7 Candidate for typeswitch
-            if (channel is ITextChannel) return Text;
-            if (channel is IVoiceChannel) return Voice;
-            if (channel is IDMChannel) return DM;
-            if (channel is IGroupChannel) return Group;
-
-            throw new ArgumentException("Unknown channel type", nameof(channel));
+            switch (channel)
+            {
+                case ITextChannel _: return Text;
+                case IVoiceChannel _: return Voice;
+                case IDMChannel _: return DM;
+                case IGroupChannel _: return Group;
+                default: throw new ArgumentException("Unknown channel type", nameof(channel));
+            }
         }
 
         /// <summary> Gets a packed value representing all the permissions in this ChannelPermissions. </summary>

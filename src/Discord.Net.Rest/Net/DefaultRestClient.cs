@@ -87,29 +87,26 @@ namespace Discord.Net.Rest
                 {
                     foreach (var p in multipartParams)
                     {
-                        //TODO: C#7 Typeswitch candidate
-                        var stringValue = p.Value as string;
-                        if (stringValue != null) { content.Add(new StringContent(stringValue), p.Key); continue; }
-                        var byteArrayValue = p.Value as byte[];
-                        if (byteArrayValue != null) { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
-                        var streamValue = p.Value as Stream;
-                        if (streamValue != null) { content.Add(new StreamContent(streamValue), p.Key); continue; }
-                        if (p.Value is MultipartFile)
+                        switch (p.Value)
                         {
-                            var fileValue = (MultipartFile)p.Value;
-                            var stream = fileValue.Stream;
-                            if (!stream.CanSeek)
+                            case string stringValue: { content.Add(new StringContent(stringValue), p.Key); continue; }
+                            case byte[] byteArrayValue: { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
+                            case Stream streamValue: { content.Add(new StreamContent(streamValue), p.Key); continue; }
+                            case MultipartFile fileValue:
                             {
-                                var memoryStream = new MemoryStream();
-                                await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                                memoryStream.Position = 0;
-                                stream = memoryStream;
+                                var stream = fileValue.Stream;
+                                if (!stream.CanSeek)
+                                {
+                                    var memoryStream = new MemoryStream();
+                                    await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                                    memoryStream.Position = 0;
+                                    stream = memoryStream;
+                                }
+                                content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
+                                continue;
                             }
-                            content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
-                            continue;
+                            default: throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
                         }
-
-                        throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
                     }
                 }
                 restRequest.Content = content;
