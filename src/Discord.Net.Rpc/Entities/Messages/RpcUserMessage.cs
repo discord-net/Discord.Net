@@ -29,7 +29,7 @@ namespace Discord.Rpc
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<ulong> MentionedUserIds => MessageHelper.FilterTagsByKey(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
-        public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => ImmutableDictionary.Create<Emoji, ReactionMetadata>();
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => ImmutableDictionary.Create<IEmote, ReactionMetadata>();
 
         internal RpcUserMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -102,16 +102,10 @@ namespace Discord.Rpc
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
-        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-        public Task AddReactionAsync(string emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-
-        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
         

@@ -2,6 +2,6 @@
 {
     public interface IReaction
     {
-        Emoji Emoji { get; }
+        IEmote Emote { get; }
     }
 }

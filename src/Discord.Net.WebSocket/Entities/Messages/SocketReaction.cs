@@ -9,20 +9,25 @@ namespace Discord.WebSocket
         public ulong MessageId { get; }
         public Optional<SocketUserMessage> Message { get; }
         public ISocketMessageChannel Channel { get; }
-        public Emoji Emoji { get; }
+        public IEmote Emote { get; }
 
-        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, Emoji emoji)
+        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
         {
             Channel = channel;
             MessageId = messageId;
             Message = message;
             UserId = userId;
             User = user;
-            Emoji = emoji;
+            Emote = emoji;
         }
         internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
         {
-            return new SocketReaction(channel, model.MessageId, message, model.UserId, user, new Emoji(model.Emoji.Id, model.Emoji.Name));
+            IEmote emote;
+            if (model.Emoji.Id.HasValue)
+                emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name);
+            else
+                emote = new Emoji(model.Emoji.Name);
+            return new SocketReaction(channel, model.MessageId, message, model.UserId, user, emote);
         }
     }
 }

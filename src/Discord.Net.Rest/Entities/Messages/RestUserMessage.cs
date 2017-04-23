@@ -27,7 +27,7 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         public override IReadOnlyCollection<ITag> Tags => _tags;
-        public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emoji, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -130,21 +130,15 @@ namespace Discord.Rest
             Update(model);
         }
 
-        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-        public Task AddReactionAsync(string emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-
-        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
         
         public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
+            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId ?? Optional.Create<ulong>(); }, Discord, options);
         
 
         public Task PinAsync(RequestOptions options = null)

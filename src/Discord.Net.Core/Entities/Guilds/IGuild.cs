@@ -45,7 +45,7 @@ namespace Discord
         /// <summary> Gets the built-in role containing all users in this guild. </summary>
         IRole EveryoneRole { get; }
         /// <summary> Gets a collection of all custom emojis for this guild. </summary>
-        IReadOnlyCollection<GuildEmoji> Emojis { get; }
+        IReadOnlyCollection<GuildEmote> Emotes { get; }
         /// <summary> Gets a collection of all extra features added to this guild. </summary>
         IReadOnlyCollection<string> Features { get; }
         /// <summary> Gets a collection of all roles in this guild. </summary>

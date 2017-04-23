@@ -28,19 +28,14 @@ namespace Discord.Rest
             await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task AddReactionAsync(IMessage msg, Emoji emoji, BaseDiscordClient client, RequestOptions options)
-            => await AddReactionAsync(msg, $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
-        public static async Task AddReactionAsync(IMessage msg, string emoji, BaseDiscordClient client, RequestOptions options)
+        public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emoji, options).ConfigureAwait(false);
+            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, Emoji emoji, BaseDiscordClient client, RequestOptions options)
-            => await RemoveReactionAsync(msg, user, emoji.Id == null ? emoji.Name : $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, string emoji, BaseDiscordClient client,
-            RequestOptions options)
+        public static async Task RemoveReactionAsync(IMessage msg, IUser user, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
@@ -109,8 +104,8 @@ namespace Discord.Rest
                         mentionedRole = guild.GetRole(id);
                     tags.Add(new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
                 }
-                else if (Emoji.TryParse(content, out var emoji))
-                    tags.Add(new Tag<Emoji>(TagType.Emoji, index, content.Length, emoji.Id ?? 0, emoji));
+                else if (Emote.TryParse(content, out var emoji))
+                    tags.Add(new Tag<Emote>(TagType.Emoji, index, content.Length, emoji.Id, emoji));
                 else //Bad Tag
                 {
                     index = index + 1;

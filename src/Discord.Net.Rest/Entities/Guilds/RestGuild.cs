@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Model = Discord.API.Guild;
-using EmbedModel = Discord.API.GuildEmbed;
 using System.Linq;
+using System.Threading.Tasks;
+using EmbedModel = Discord.API.GuildEmbed;
+using Model = Discord.API.Guild;
 
 namespace Discord.Rest
 {
@@ -14,7 +14,7 @@ namespace Discord.Rest
     public class RestGuild : RestEntity<ulong>, IGuild, IUpdateable
     {
         private ImmutableDictionary<ulong, RestRole> _roles;
-        private ImmutableArray<GuildEmoji> _emojis;
+        private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<string> _features;
 
         public string Name { get; private set; }
@@ -39,7 +39,7 @@ namespace Discord.Rest
 
         public RestRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
-        public IReadOnlyCollection<GuildEmoji> Emojis => _emojis;
+        public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         public IReadOnlyCollection<string> Features => _features;
 
         internal RestGuild(BaseDiscordClient client, ulong id)
@@ -69,13 +69,13 @@ namespace Discord.Rest
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
+                var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(model.Emojis[i].ToEntity());
-                _emojis = emojis.ToImmutableArray();
+                    emotes.Add(model.Emojis[i].ToEntity());
+                _emotes = emotes.ToImmutableArray();
             }
             else
-                _emojis = ImmutableArray.Create<GuildEmoji>();
+                _emotes = ImmutableArray.Create<GuildEmote>();
 
             if (model.Features != null)
                 _features = model.Features.ToImmutableArray();

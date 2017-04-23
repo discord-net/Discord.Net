@@ -28,7 +28,7 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
-        public IReadOnlyDictionary<Emoji, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emoji).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -124,16 +124,10 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
-        public Task AddReactionAsync(Emoji emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-        public Task AddReactionAsync(string emoji, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emoji, Discord, options);
-
-        public Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-        public Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emoji, Discord, options);
-
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
 
