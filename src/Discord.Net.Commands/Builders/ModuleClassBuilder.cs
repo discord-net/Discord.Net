@@ -243,7 +243,7 @@ namespace Discord.Commands
             }
 
             //We dont have a cached type reader, create one
-            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, DependencyMap.Empty);
+            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, EmptyServiceProvider.Instance);
             service.AddTypeReader(paramType, reader);
 
             return reader;
