@@ -69,17 +69,15 @@ namespace Discord.Commands
             };
         }
 
-        private static readonly TypeInfo _dependencyTypeInfo = typeof(IDependencyMap).GetTypeInfo();
-
         internal static object GetMember(Type targetType, IDependencyMap map, CommandService service, TypeInfo baseType)
         {
             object arg;
-            if (map == null || !map.TryGet(targetType, out arg))
+            if (targetType == typeof(IDependencyMap) || targetType == map.GetType())
+                arg = map;
+            else if (map == null || !map.TryGet(targetType, out arg))
             {
                 if (targetType == typeof(CommandService))
                     arg = service;
-                else if (targetType == typeof(IDependencyMap) || targetType == map.GetType())
-                    arg = map;
                 else
                     throw new InvalidOperationException($"Failed to create \"{baseType.FullName}\", dependency \"{targetType.Name}\" was not found.");
             }
