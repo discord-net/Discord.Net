@@ -355,11 +355,12 @@ namespace Discord.WebSocket
                 Game = new Game(name, streamUrl, streamType);
             else
                 Game = null;
-            CurrentUser.Presence = new SocketPresence(Status, Game);
             await SendStatusAsync().ConfigureAwait(false);
         }
         private async Task SendStatusAsync()
         {
+            if (ConnectionState != ConnectionState.Connected)
+                throw new InvalidOperationException("Presence data cannot be sent while the client is disconnected.");
             var game = Game;
             var status = Status;
             var statusSince = _statusSince;
