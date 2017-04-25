@@ -359,8 +359,8 @@ namespace Discord.WebSocket
         }
         private async Task SendStatusAsync()
         {
-            if (ConnectionState != ConnectionState.Connected)
-                throw new InvalidOperationException("Presence data cannot be sent while the client is disconnected.");
+            if (CurrentUser == null)
+                throw new InvalidOperationException("Presence data cannot be sent before the client has logged in.");
             var game = Game;
             var status = Status;
             var statusSince = _statusSince;
