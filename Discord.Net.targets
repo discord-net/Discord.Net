@@ -8,7 +8,6 @@
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
-        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' == ''">dev</VersionSuffix>

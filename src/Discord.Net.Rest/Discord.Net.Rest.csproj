@@ -9,7 +9,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-  </ItemGroup>
 </Project>
