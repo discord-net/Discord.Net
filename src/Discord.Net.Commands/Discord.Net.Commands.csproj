@@ -4,7 +4,7 @@
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <RootNamespace>Discord.Commands</RootNamespace>
     <Description>A Discord.Net extension adding support for bot commands.</Description>
-    <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
