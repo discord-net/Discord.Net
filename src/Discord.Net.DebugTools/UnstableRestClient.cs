@@ -121,8 +121,8 @@ namespace Discord.Net.Rest
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
             if (!UnstableCheck())
-                return;
-                
+                throw new TimeoutException();
+
             cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken).Token;
             HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
             
