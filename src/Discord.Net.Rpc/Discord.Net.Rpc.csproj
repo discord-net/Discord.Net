@@ -4,7 +4,7 @@
     <AssemblyName>Discord.Net.Rpc</AssemblyName>
     <RootNamespace>Discord.Rpc</RootNamespace>
     <Description>A core Discord.Net library containing the RPC client and models.</Description>
-    <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Discord.Net.WebSocket\Net\DefaultWebSocketClient.cs">

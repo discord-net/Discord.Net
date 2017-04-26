@@ -163,7 +163,7 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, RequestOptions options)
         {

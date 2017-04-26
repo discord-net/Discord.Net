@@ -59,7 +59,7 @@ namespace Discord.Webhook
             await ApiClient.CreateWebhookMessageAsync(_webhookId, args, options).ConfigureAwait(false);
         }
 
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public async Task SendFileAsync(string filePath, string text, bool isTTS = false, 
             string username = null, string avatarUrl = null, RequestOptions options = null)
         {

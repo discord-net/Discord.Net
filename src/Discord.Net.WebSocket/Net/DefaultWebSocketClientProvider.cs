@@ -4,7 +4,7 @@ namespace Discord.Net.WebSockets
 {
     public static class DefaultWebSocketProvider
     {
-#if NETSTANDARD1_3
+#if DEFAULTWEBSOCKET
         public static readonly WebSocketProvider Instance = () => 
         {
             try

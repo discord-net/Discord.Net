@@ -17,6 +17,12 @@
         <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">$(BuildNumber)</VersionSuffix>
         <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'net45' ">
+        <DefineConstants>$(DefineConstants);FILESYSTEM;DEFAULTUDPCLIENT;DEFAULTWEBSOCKET</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+        <DefineConstants>$(DefineConstants);FORMATSTR;UNIXTIME;MSTRYBUFFER;UDPDISPOSE</DefineConstants>
+    </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
         <WarningsAsErrors>true</WarningsAsErrors>

@@ -20,7 +20,7 @@ namespace Discord.Logging
             => _manager.LogAsync(severity, Name, exception);
         public Task LogAsync(LogSeverity severity, string message, Exception exception = null)
             => _manager.LogAsync(severity, Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task LogAsync(LogSeverity severity, FormattableString message, Exception exception = null)
             => _manager.LogAsync(severity, Name, message, exception);
 #endif
@@ -29,7 +29,7 @@ namespace Discord.Logging
             => _manager.ErrorAsync(Name, exception);
         public Task ErrorAsync(string message, Exception exception = null)
             => _manager.ErrorAsync(Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task ErrorAsync(FormattableString message, Exception exception = null)
             => _manager.ErrorAsync(Name, message, exception);
 #endif
@@ -38,7 +38,7 @@ namespace Discord.Logging
             => _manager.WarningAsync(Name, exception);
         public Task WarningAsync(string message, Exception exception = null)
             => _manager.WarningAsync(Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task WarningAsync(FormattableString message, Exception exception = null)
             => _manager.WarningAsync(Name, message, exception);
 #endif
@@ -47,7 +47,7 @@ namespace Discord.Logging
             => _manager.InfoAsync(Name, exception);
         public Task InfoAsync(string message, Exception exception = null)
             => _manager.InfoAsync(Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task InfoAsync(FormattableString message, Exception exception = null)
             => _manager.InfoAsync(Name, message, exception);
 #endif
@@ -56,7 +56,7 @@ namespace Discord.Logging
             => _manager.VerboseAsync(Name, exception);
         public Task VerboseAsync(string message, Exception exception = null)
             => _manager.VerboseAsync(Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task VerboseAsync(FormattableString message, Exception exception = null)
             => _manager.VerboseAsync(Name, message, exception);
 #endif
@@ -65,7 +65,7 @@ namespace Discord.Logging
             => _manager.DebugAsync(Name, exception);
         public Task DebugAsync(string message, Exception exception = null)
             => _manager.DebugAsync(Name, message, exception);
-#if NETSTANDARD1_3
+#if FORMATSTR
         public Task DebugAsync(FormattableString message, Exception exception = null)
             => _manager.DebugAsync(Name, message, exception);
 #endif

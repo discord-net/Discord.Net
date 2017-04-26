@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_3
+﻿#if DEFAULTUDPCLIENT
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -85,7 +85,11 @@ namespace Discord.Net.Udp
 
             if (_udp != null)
             {
+#if UDPDISPOSE
                 try { _udp.Dispose(); }
+#else
+                try { _udp.Close(); }
+#endif
                 catch { }
                 _udp = null;
             }
