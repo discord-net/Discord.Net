@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,13 +12,16 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Rest
 {
-    internal sealed class DefaultRestClient : IRestClient, IDisposable
+    internal sealed class UnstableRestClient : IRestClient, IDisposable
     {
+        private const double FailureRate = 0.10; //10%
+
         private const int HR_SECURECHANNELFAILED = -2146233079;
 
         private readonly HttpClient _client;
         private readonly string _baseUrl;
         private readonly JsonSerializer _errorDeserializer;
+        private readonly Random _rand;
         private CancellationToken _cancelToken;
         private bool _isDisposed;
 
@@ -36,6 +39,7 @@ namespace Discord.Net.Rest
 
             _cancelToken = CancellationToken.None;
             _errorDeserializer = new JsonSerializer();
+            _rand = new Random();
         }
         private void Dispose(bool disposing)
         {
@@ -116,6 +120,9 @@ namespace Discord.Net.Rest
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
+            if (!UnstableCheck())
+                return;
+                
             cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken).Token;
             HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
             
@@ -137,6 +144,11 @@ namespace Discord.Net.Rest
                 case "PUT": return HttpMethod.Put;
                 default: throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}");
             }
+        }
+
+        private bool UnstableCheck()
+        {
+            return _rand.NextDouble() > FailureRate;
         }
     }
 }
