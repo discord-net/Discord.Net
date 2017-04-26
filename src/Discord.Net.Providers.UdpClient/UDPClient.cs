@@ -24,6 +24,7 @@ namespace Discord.Net.Providers.UDPClient
         public UDPClient()
         {
             _lock = new SemaphoreSlim(1, 1);
+            _cancelTokenSource = new CancellationTokenSource();
         }
         private void Dispose(bool disposing)
         {
