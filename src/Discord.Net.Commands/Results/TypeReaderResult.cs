@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct TypeReaderValue
+    public class TypeReaderValue
     {
         public object Value { get; }
         public float Score { get; }

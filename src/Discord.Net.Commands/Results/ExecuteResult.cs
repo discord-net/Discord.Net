@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct ExecuteResult : IResult
+    public class ExecuteResult : IResult
     {
         public Exception Exception { get; }
 
