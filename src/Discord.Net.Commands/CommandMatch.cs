@@ -16,7 +16,7 @@ namespace Discord.Commands
 
         public Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
             => Command.CheckPreconditionsAsync(context, map);
-        public Task<ParseResult> ParseAsync(ICommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public Task<ParseResult> ParseAsync(ICommandContext context, SearchResult searchResult, PreconditionResult preconditionResult = null)
             => Command.ParseAsync(context, Alias.Length, searchResult, preconditionResult);
         public Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
             => Command.ExecuteAsync(context, argList, paramList, map);

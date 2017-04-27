@@ -85,12 +85,12 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
-            if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
-                return ParseResult.FromError(preconditionResult.Value);
+            if (preconditionResult != null && !preconditionResult.IsSuccess)
+                return ParseResult.FromError(preconditionResult);
             
             string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
