@@ -293,6 +293,6 @@ namespace Discord.Rest
         public static bool IsNsfw(IChannel channel) =>
             IsNsfw(channel.Name);
         public static bool IsNsfw(string channelName) =>
-            channelName.StartsWith("nsfw");
+            channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }
 }
