@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct ParseResult : IResult
+    public class ParseResult : IResult
     {
         public IReadOnlyList<TypeReaderResult> ArgValues { get; }
         public IReadOnlyList<TypeReaderResult> ParamValues { get; }

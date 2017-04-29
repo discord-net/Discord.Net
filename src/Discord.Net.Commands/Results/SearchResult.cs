@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct SearchResult : IResult
+    public class SearchResult : IResult
     {
         public string Text { get; }
         public IReadOnlyList<CommandMatch> Commands { get; }

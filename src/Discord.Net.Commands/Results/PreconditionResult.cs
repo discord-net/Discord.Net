@@ -3,7 +3,7 @@
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct PreconditionResult : IResult
+    public class PreconditionResult : IResult
     {
         public CommandError? Error { get; }
         public string ErrorReason { get; }
