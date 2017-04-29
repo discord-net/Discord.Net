@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Discord.WebSocket
 
         //IChannel
         string IChannel.Name => null;
-        bool IChannel.Nsfw => NsfwUtils.IsNsfw(this);
+        bool IChannel.IsNsfw => ChannelHelper.IsNsfw(this);
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden

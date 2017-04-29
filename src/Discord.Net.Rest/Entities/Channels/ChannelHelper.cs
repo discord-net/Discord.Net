@@ -289,5 +289,10 @@ namespace Discord.Rest
                 author = RestUser.Create(client, guild, model, webhookId);
             return author;
         }
+
+        public static bool IsNsfw(IChannel channel) =>
+            IsNsfw(channel.Name);
+        public static bool IsNsfw(string channelName) =>
+            channelName.StartsWith("nsfw");
     }
 }

@@ -11,7 +11,7 @@ namespace Discord.Commands
     {
         public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
-            if (context.Channel.Nsfw)
+            if (context.Channel.IsNsfw)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
                 return Task.FromResult(PreconditionResult.FromError("This command may only be invoked in an NSFW channel."));

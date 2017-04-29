@@ -97,7 +97,7 @@ namespace Discord.Rest
 
         //IChannel
         string IChannel.Name { get { throw new NotSupportedException(); } }
-        bool IChannel.Nsfw { get { throw new NotSupportedException(); } }
+        bool IChannel.IsNsfw { get { throw new NotSupportedException(); } }
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             throw new NotSupportedException();
