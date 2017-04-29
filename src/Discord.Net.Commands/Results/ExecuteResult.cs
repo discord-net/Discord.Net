@@ -6,6 +6,9 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class ExecuteResult : IResult
     {
+        private static readonly ExecuteResult _success = new ExecuteResult(null, null, null);
+        public static ExecuteResult Success => _success;
+
         public Exception Exception { get; }
 
         public CommandError? Error { get; }
@@ -20,14 +23,10 @@ namespace Discord.Commands
             ErrorReason = errorReason;
         }
 
-        public static ExecuteResult FromSuccess()
-            => new ExecuteResult(null, null, null);
         public static ExecuteResult FromError(CommandError error, string reason)
             => new ExecuteResult(null, error, reason);
         public static ExecuteResult FromError(Exception ex)
             => new ExecuteResult(ex, CommandError.Exception, ex.Message);
-        public static ExecuteResult FromError(IResult result)
-            => new ExecuteResult(null, result.Error, result.ErrorReason);
         
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

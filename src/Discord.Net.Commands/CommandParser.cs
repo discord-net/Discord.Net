@@ -112,7 +112,7 @@ namespace Discord.Commands
 
                     var typeReaderResult = await curParam.Parse(context, argString).ConfigureAwait(false);
                     if (!typeReaderResult.IsSuccess && typeReaderResult.Error != CommandError.MultipleMatches)
-                        return ParseResult.FromError(typeReaderResult);
+                        return ParseResult.FromTypeReaderResult(typeReaderResult);
 
                     if (curParam.IsMultiple)
                     {
@@ -135,7 +135,7 @@ namespace Discord.Commands
             {
                 var typeReaderResult = await curParam.Parse(context, argBuilder.ToString()).ConfigureAwait(false);
                 if (!typeReaderResult.IsSuccess)
-                    return ParseResult.FromError(typeReaderResult);
+                    return ParseResult.FromTypeReaderResult(typeReaderResult);
                 argList.Add(typeReaderResult);
             }
 

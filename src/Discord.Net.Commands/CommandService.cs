@@ -261,13 +261,13 @@ namespace Discord.Commands
                 var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
-                    if (commands.Count == 1)
+                    if (i == commands.Count)
                         return preconditionResult;
                     else
                         continue;
                 }
 
-                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
+                var parseResult = await commands[i].ParseAsync(context, searchResult).ConfigureAwait(false);
                 if (!parseResult.IsSuccess)
                 {
                     if (parseResult.Error == CommandError.MultipleMatches)
@@ -285,7 +285,7 @@ namespace Discord.Commands
 
                     if (!parseResult.IsSuccess)
                     {
-                        if (commands.Count == 1)
+                        if (i == commands.Count)
                             return parseResult;
                         else
                             continue;

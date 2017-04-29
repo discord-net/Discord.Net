@@ -26,8 +26,6 @@ namespace Discord.Commands
             => new SearchResult(text, commands, null, null);
         public static SearchResult FromError(CommandError error, string reason)
             => new SearchResult(null, null, error, reason);
-        public static SearchResult FromError(IResult result)
-            => new SearchResult(null, null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? $"Success ({Commands.Count} Results)" : $"{Error}: {ErrorReason}";

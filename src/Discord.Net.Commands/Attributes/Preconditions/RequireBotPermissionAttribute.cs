@@ -67,7 +67,7 @@ namespace Discord.Commands
                     return PreconditionResult.FromError($"Command requires channel permission {ChannelPermission.Value}");
             }
 
-            return PreconditionResult.FromSuccess();
+            return PreconditionResult.Success;
         }
     }
 }

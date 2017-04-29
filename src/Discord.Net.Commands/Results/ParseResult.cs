@@ -53,7 +53,8 @@ namespace Discord.Commands
 
         public static ParseResult FromError(CommandError error, string reason)
             => new ParseResult(null, null, error, reason);
-        public static ParseResult FromError(IResult result)
+
+        internal static ParseResult FromTypeReaderResult(TypeReaderResult result)
             => new ParseResult(null, null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

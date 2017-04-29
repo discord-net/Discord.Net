@@ -82,30 +82,21 @@ namespace Discord.Commands
                     return result;
             }
 
-            return PreconditionResult.FromSuccess();
+            return PreconditionResult.Success;
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, string input)
         {
-            if (!searchResult.IsSuccess)
-                return ParseResult.FromError(searchResult);
-            if (preconditionResult != null && !preconditionResult.IsSuccess)
-                return ParseResult.FromError(preconditionResult);
-            
-            string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
         }
 
-        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
+        public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
         {
-            if (!parseResult.IsSuccess)
-                return Task.FromResult(ExecuteResult.FromError(parseResult));
-
             var argList = new object[parseResult.ArgValues.Count];
             for (int i = 0; i < parseResult.ArgValues.Count; i++)
             {
                 if (!parseResult.ArgValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
+                    return Task.FromResult(parseResult.ArgValues[i] as IResult);
                 argList[i] = parseResult.ArgValues[i].Values.First().Value;
             }
             
@@ -113,13 +104,13 @@ namespace Discord.Commands
             for (int i = 0; i < parseResult.ParamValues.Count; i++)
             {
                 if (!parseResult.ParamValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                    return Task.FromResult(parseResult.ParamValues[i] as IResult);
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
             return ExecuteAsync(context, argList, paramList, map);
         }
-        public async Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
         {
             if (map == null)
                 map = DependencyMap.Empty;
@@ -134,7 +125,7 @@ namespace Discord.Commands
                     var argument = args[position];
                     var result = await parameter.CheckPreconditionsAsync(context, argument, map).ConfigureAwait(false);
                     if (!result.IsSuccess)
-                        return ExecuteResult.FromError(result);
+                        return result;
                 }
 
                 switch (RunMode)
@@ -149,7 +140,7 @@ namespace Discord.Commands
                         });
                         break;
                 }
-                return ExecuteResult.FromSuccess();
+                return ExecuteResult.Success;
             }
             catch (Exception ex)
             {

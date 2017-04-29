@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class TypeReaderValue
+    public struct TypeReaderValue
     {
         public object Value { get; }
         public float Score { get; }
@@ -40,14 +40,13 @@ namespace Discord.Commands
 
         public static TypeReaderResult FromSuccess(object value)
             => new TypeReaderResult(ImmutableArray.Create(new TypeReaderValue(value, 1.0f)), null, null);
-        public static TypeReaderResult FromSuccess(TypeReaderValue value)
+        public static TypeReaderResult FromSingleSuccess(TypeReaderValue value)
             => new TypeReaderResult(ImmutableArray.Create(value), null, null);
-        public static TypeReaderResult FromSuccess(IReadOnlyCollection<TypeReaderValue> values)
+        public static TypeReaderResult FromMultipleSuccess(IReadOnlyCollection<TypeReaderValue> values)
             => new TypeReaderResult(values, null, null);
+
         public static TypeReaderResult FromError(CommandError error, string reason)
             => new TypeReaderResult(null, error, reason);
-        public static TypeReaderResult FromError(IResult result)
-            => new TypeReaderResult(null, result.Error, result.ErrorReason);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
         private string DebuggerDisplay => IsSuccess ? $"Success ({string.Join(", ", Values)})" : $"{Error}: {ErrorReason}";

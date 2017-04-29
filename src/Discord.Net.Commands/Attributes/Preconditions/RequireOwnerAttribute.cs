@@ -18,11 +18,11 @@ namespace Discord.Commands
                     var application = await context.Client.GetApplicationInfoAsync();
                     if (context.User.Id != application.Owner.Id)
                         return PreconditionResult.FromError("Command can only be run by the owner of the bot");
-                    return PreconditionResult.FromSuccess();
+                    return PreconditionResult.Success;
                 case TokenType.User:
                     if (context.User.Id != context.Client.CurrentUser.Id)
                         return PreconditionResult.FromError("Command can only be run by the owner of the bot");
-                    return PreconditionResult.FromSuccess();
+                    return PreconditionResult.Success;
                 default:
                     return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");                    
             }

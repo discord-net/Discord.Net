@@ -51,7 +51,7 @@ namespace Discord.Commands
                     return result;
             }
 
-            return PreconditionResult.FromSuccess();
+            return PreconditionResult.Success;
         }
 
         public async Task<TypeReaderResult> Parse(ICommandContext context, string input)

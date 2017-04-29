@@ -75,7 +75,7 @@ namespace Discord.Commands
             }
 
             if (results.Count > 0)
-                return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
+                return TypeReaderResult.FromMultipleSuccess(results.Values.ToReadOnlyCollection());
             return TypeReaderResult.FromError(CommandError.ObjectNotFound, "User not found.");
         }
 
