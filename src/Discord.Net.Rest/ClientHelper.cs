@@ -150,7 +150,7 @@ namespace Discord.Rest
             string id, RequestOptions options)
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync(options).ConfigureAwait(false);
-            return models.Select(x => RestVoiceRegion.Create(client, x)).Where(x => x.Id == id).FirstOrDefault();
+            return models.Select(x => RestVoiceRegion.Create(client, x)).FirstOrDefault(x => x.Id == id);
         }
     }
 }
