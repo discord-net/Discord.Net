@@ -25,3 +25,6 @@
     - name: Voice Guide
       href: voice/sending-voice.md
 - name: Migrating from 0.9
+  items:
+    - name: Migration Guide
+      href: migrating/migrating.md
