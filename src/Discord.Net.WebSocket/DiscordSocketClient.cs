@@ -267,7 +267,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketUser GetUser(string username, string discriminator)
         {
-            return State.Users.Where(x => x.Discriminator == discriminator && x.Username == username).FirstOrDefault();
+            return State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
         }
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
