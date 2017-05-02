@@ -14,14 +14,13 @@ Our stable builds available from NuGet through the Discord.Net metapackage:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 
 The individual components may also be installed from NuGet:
+- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 - [Discord.Net.Rest](https://www.nuget.org/packages/Discord.Net.Rest/)
 - [Discord.Net.Rpc](https://www.nuget.org/packages/Discord.Net.Rpc/)
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
 - [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
-- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 
-The following providers are available for platforms not supporting .NET Standard 1.3:
-- [Discord.Net.Providers.UdpClient](https://www.nuget.org/packages/Discord.Net.Providers.UdpClient/)
+The following provider is available for platforms not supporting .NET Standard 1.3:
 - [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/)
 
 ### Unstable (MyGet)
