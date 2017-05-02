@@ -1,4 +1,7 @@
 version: build-{build}
+branches:
+  only:
+  - dev
 image: Visual Studio 2017
 
 nuget:
