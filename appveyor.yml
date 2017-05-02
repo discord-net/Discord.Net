@@ -49,7 +49,7 @@ deploy:
 - provider: NuGet
   server: https://www.myget.org/F/discord-net/api/v2/package
   api_key:
-    secure: NXnHY/67S0xRiIrKrbX/2NTbdobRfD7R8KGpCvalqaYM9z14xSCWluhE5+y3lVcv
+    secure: Jl7BXeUjRnkVHDMBuUWSXcEOkrli1PBleW2IiLyUs5j63UNUNp1hcjaUJRujx9lz
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
   artifact: MyGet
   on:
