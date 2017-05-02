@@ -22,6 +22,7 @@ init:
 build_script:
 - ps: appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet build Discord.Net.sln -c "Release" /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+after_build:
 - ps: dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
@@ -35,21 +36,19 @@ build_script:
     } else {
       nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
     }
+- ps: Get-ChildItem artifacts\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+
 test_script:
 - ps: >-
     if ($APPVEYOR_PULL_REQUEST_NUMBER -ne "") {
       dotnet test test/Discord.Net.Tests/Discord.Net.Tests.csproj -c "Release" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
     }
 
-artifacts:
-- path: artifacts/*.nupkg
-  name: MyGet
 deploy:
 - provider: NuGet
   server: https://www.myget.org/F/discord-net/api/v2/package
   api_key:
     secure: Jl7BXeUjRnkVHDMBuUWSXcEOkrli1PBleW2IiLyUs5j63UNUNp1hcjaUJRujx9lz
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
-  artifact: MyGet
   on:
     branch: dev
