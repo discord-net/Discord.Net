@@ -26,7 +26,6 @@ build_script:
 - ps: dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Providers.UdpClient\Discord.Net.Providers.UdpClient.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: >-
     if ($Env:APPVEYOR_REPO_TAG -eq "true") {
       nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
