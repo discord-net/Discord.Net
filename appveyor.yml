@@ -52,3 +52,10 @@ deploy:
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
   on:
     branch: dev
+- provider: NuGet
+  server: https://www.myget.org/F/rogueexception/api/v2/package
+  api_key:
+    secure: D+vW2O2LBf/iJb4f+q8fkyIW2VdIYIGxSYLWNrOD4BHlDBZQlJipDbNarWjUr2Kn
+  symbol_server: https://www.myget.org/F/rogueexception/symbols/api/v2/package
+  on:
+    branch: dev
