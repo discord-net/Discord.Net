@@ -15,8 +15,11 @@ Discord.Net is an unofficial .NET API Wrapper for the [Discord client](http://di
 Example Bots:
 
 [Foxbot Example C# Bot 1.0](https://github.com/420foxbot/DiscordExampleBot)
+
 [Foxbot Example VB.Net Bot 1.0](https://github.com/420foxbot/DiscordExampleBot.VB)
+
 [Aux Example C# Bot 1.0](https://github.com/Aux/Dogey)
+
 [Aux Example C# Bot 0.9.6](https://github.com/Aux/Discord.Net-Example/tree/0.9)
 
 
