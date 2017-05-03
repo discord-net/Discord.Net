@@ -271,12 +271,9 @@ namespace Discord.WebSocket
         }
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
-            return state.GetOrAddUser(model.Id, x =>
-            {
-                var user = SocketGlobalUser.Create(this, state, model);
-                user.GlobalUser.AddRef();
-                return user;
-            });
+            var user = state.GetOrAddUser(model.Id, x => SocketGlobalUser.Create(this, state, model));
+            user.GlobalUser.AddRef();
+            return user;
         }
         internal SocketGlobalUser GetOrCreateSelfUser(ClientState state, Discord.API.User model)
         {
@@ -1328,7 +1325,13 @@ namespace Discord.WebSocket
 
                                         var user = guild.GetUser(data.User.Id);
                                         if (user == null)
+                                        {
+                                            if (data.Status == UserStatus.Offline)
+                                            {
+                                                return;
+                                            }
                                             user = guild.AddOrUpdateUser(data);
+                                        }
                                         else
                                         {
                                             var globalBefore = user.GlobalUser.Clone();
