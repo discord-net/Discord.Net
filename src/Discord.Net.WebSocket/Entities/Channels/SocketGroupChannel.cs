@@ -131,6 +131,7 @@ namespace Discord.WebSocket
             else
             {
                 var privateUser = SocketGroupUser.Create(this, Discord.State, model);
+                privateUser.GlobalUser.AddRef();
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
             }

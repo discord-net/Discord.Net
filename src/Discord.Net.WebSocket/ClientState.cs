@@ -55,26 +55,28 @@ namespace Discord.WebSocket
         {
             _channels[channel.Id] = channel;
 
-            if (channel is SocketDMChannel dmChannel)
-                _dmChannels[dmChannel.Recipient.Id] = dmChannel;
-            else
+            switch (channel)
             {
-                if (channel is SocketGroupChannel groupChannel)
+                case SocketDMChannel dmChannel:
+                    _dmChannels[dmChannel.Recipient.Id] = dmChannel;
+                    break;
+                case SocketGroupChannel groupChannel:
                     _groupChannels.TryAdd(groupChannel.Id);
+                    break;
             }
         }
         internal SocketChannel RemoveChannel(ulong id)
         {
             if (_channels.TryRemove(id, out SocketChannel channel))
             {
-                if (channel is SocketDMChannel dmChannel)
+                switch (channel)
                 {
-                    _dmChannels.TryRemove(dmChannel.Recipient.Id, out SocketDMChannel ignored);
-                }
-                else
-                {
-                    if (channel is SocketGroupChannel groupChannel)
+                    case SocketDMChannel dmChannel:
+                        _dmChannels.TryRemove(dmChannel.Recipient.Id, out var ignored);
+                        break;
+                    case SocketGroupChannel groupChannel:
                         _groupChannels.TryRemove(id);
+                        break;
                 }
                 return channel;
             }
