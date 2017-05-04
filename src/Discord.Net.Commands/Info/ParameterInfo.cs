@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -39,14 +40,13 @@ namespace Discord.Commands
             _reader = builder.TypeReader;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IServiceProvider services = null)
         {
-            if (map == null)
-                map = DependencyMap.Empty;
+            services = EmptyServiceProvider.Instance;
 
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, arg, map).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, arg, services).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }

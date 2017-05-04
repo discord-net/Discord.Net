@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -247,11 +248,11 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
-            => ExecuteAsync(context, context.Message.Content.Substring(argPos), dependencyMap, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IDependencyMap dependencyMap = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
-            dependencyMap = dependencyMap ?? DependencyMap.Empty;
+            services = services ?? EmptyServiceProvider.Instance;
 
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
@@ -260,7 +261,7 @@ namespace Discord.Commands
             var commands = searchResult.Commands;
             for (int i = 0; i < commands.Count; i++)
             {
-                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, dependencyMap).ConfigureAwait(false);
+                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, services).ConfigureAwait(false);
                 if (!preconditionResult.IsSuccess)
                 {
                     if (commands.Count == 1)
@@ -294,10 +295,19 @@ namespace Discord.Commands
                     }
                 }
 
-                return await commands[i].ExecuteAsync(context, parseResult, dependencyMap).ConfigureAwait(false);
+                return await commands[i].ExecuteAsync(context, parseResult, services).ConfigureAwait(false);
             }
 
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
+        }
+
+        public ServiceCollection CreateServiceCollection()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<CommandService>(this);
+            serviceCollection.AddSingleton<IServiceCollection>(serviceCollection);
+            serviceCollection.AddSingleton<ServiceCollection>(serviceCollection);
+            return serviceCollection;
         }
     }
 }

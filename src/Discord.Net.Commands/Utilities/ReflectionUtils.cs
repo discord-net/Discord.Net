@@ -2,88 +2,79 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
     internal static class ReflectionUtils
     {
-        private static readonly TypeInfo objectTypeInfo = typeof(object).GetTypeInfo();
+        private static readonly TypeInfo _objectTypeInfo = typeof(object).GetTypeInfo();
 
-        internal static T CreateObject<T>(TypeInfo typeInfo, CommandService service, IDependencyMap map = null)
-            => CreateBuilder<T>(typeInfo, service)(map);
+        internal static T CreateObject<T>(TypeInfo typeInfo, CommandService commands, IServiceProvider services = null)
+            => CreateBuilder<T>(typeInfo, commands)(services);
+        internal static Func<IServiceProvider, T> CreateBuilder<T>(TypeInfo typeInfo, CommandService commands)
+        {
+            var constructor = GetConstructor(typeInfo);
+            var parameters = constructor.GetParameters();
+            var properties = GetProperties(typeInfo);
 
-        private static System.Reflection.PropertyInfo[] GetProperties(TypeInfo typeInfo)
+            return (services) =>
+            {
+                var args = new object[parameters.Length];
+                for (int i = 0; i < parameters.Length; i++)
+                    args[i] = GetMember(commands, services, parameters[i].ParameterType, typeInfo);
+                var obj = InvokeConstructor<T>(constructor, args, typeInfo);
+
+                foreach(var property in properties)
+                    property.SetValue(obj, GetMember(commands, services, property.PropertyType, typeInfo));
+                return obj;
+            };
+        }
+        private static T InvokeConstructor<T>(ConstructorInfo constructor, object[] args, TypeInfo ownerType)
+        {
+            try
+            {
+                return (T)constructor.Invoke(args);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create \"{ownerType.FullName}\"", ex);
+            }
+        }
+
+        private static ConstructorInfo GetConstructor(TypeInfo ownerType)
+        {
+            var constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
+            if (constructors.Length == 0)
+                throw new InvalidOperationException($"No constructor found for \"{ownerType.FullName}\"");
+            else if (constructors.Length > 1)
+                throw new InvalidOperationException($"Multiple constructors found for \"{ownerType.FullName}\"");
+            return constructors[0];
+        }
+        private static System.Reflection.PropertyInfo[] GetProperties(TypeInfo ownerType)
         {
             var result = new List<System.Reflection.PropertyInfo>();
-            while (typeInfo != objectTypeInfo)
+            while (ownerType != _objectTypeInfo)
             {
-                foreach (var prop in typeInfo.DeclaredProperties)
+                foreach (var prop in ownerType.DeclaredProperties)
                 {
                     if (prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null)
                         result.Add(prop);
                 }
-                typeInfo = typeInfo.BaseType.GetTypeInfo();
+                ownerType = ownerType.BaseType.GetTypeInfo();
             }
             return result.ToArray();
         }
-
-        internal static Func<IDependencyMap, T> CreateBuilder<T>(TypeInfo typeInfo, CommandService service)
+        private static object GetMember(CommandService commands, IServiceProvider services, Type memberType, TypeInfo ownerType)
         {
-            var constructors = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
-            if (constructors.Length == 0)
-                throw new InvalidOperationException($"No constructor found for \"{typeInfo.FullName}\"");
-            else if (constructors.Length > 1)
-                throw new InvalidOperationException($"Multiple constructors found for \"{typeInfo.FullName}\"");
-
-            var constructor = constructors[0];
-            System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
-            System.Reflection.PropertyInfo[] properties = GetProperties(typeInfo)
-                  .Where(p => p.SetMethod?.IsPublic == true && p.GetCustomAttribute<DontInjectAttribute>() == null)
-                  .ToArray();
-
-            return (map) =>
-            {
-                object[] args = new object[parameters.Length];
-
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    args[i] = GetMember(parameter.ParameterType, map, service, typeInfo);
-                }
-
-                T obj;
-                try
-                {
-                    obj = (T)constructor.Invoke(args);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Failed to create \"{typeInfo.FullName}\"", ex);
-                }
-
-                foreach(var property in properties)
-                {
-                    property.SetValue(obj, GetMember(property.PropertyType, map, service, typeInfo));
-                }
-                return obj;
-            };
-        }
-
-        private static readonly TypeInfo _dependencyTypeInfo = typeof(IDependencyMap).GetTypeInfo();
-
-        internal static object GetMember(Type targetType, IDependencyMap map, CommandService service, TypeInfo baseType)
-        {
-            object arg;
-            if (map == null || !map.TryGet(targetType, out arg))
-            {
-                if (targetType == typeof(CommandService))
-                    arg = service;
-                else if (targetType == typeof(IDependencyMap) || targetType == map.GetType())
-                    arg = map;
-                else
-                    throw new InvalidOperationException($"Failed to create \"{baseType.FullName}\", dependency \"{targetType.Name}\" was not found.");
-            }
-            return arg;
+            if (memberType == typeof(CommandService))
+                return commands;
+            if (memberType == typeof(IServiceProvider) || memberType == services.GetType())
+                return services;
+            var service = services?.GetService(memberType);
+            if (service != null)
+                return service;
+            throw new InvalidOperationException($"Failed to create \"{ownerType.FullName}\", dependency \"{memberType.Name}\" was not found.");
         }
     }
 }
