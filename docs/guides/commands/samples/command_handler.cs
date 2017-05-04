@@ -24,7 +24,7 @@ public class Program
         await InstallCommands();
 
         await client.LoginAsync(TokenType.Bot, token);
-        await client.ConnectAsync();
+        await client.StartAsync();
 
         await Task.Delay(-1);
     }
