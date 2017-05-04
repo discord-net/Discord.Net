@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 
 using Model = Discord.API.Rpc.Channel;
 
@@ -7,6 +8,7 @@ namespace Discord.Rpc
     public class RpcChannel : RpcEntity<ulong>
     {
         public string Name { get; private set; }
+        public bool IsNsfw => ChannelHelper.IsNsfw(Name);
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
