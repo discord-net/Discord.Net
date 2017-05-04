@@ -40,7 +40,7 @@ after_build:
 
 test_script:
 - ps: >-
-    if ($APPVEYOR_PULL_REQUEST_NUMBER -ne "") {
+    if ($APPVEYOR_PULL_REQUEST_NUMBER -eq "") {
       dotnet test test/Discord.Net.Tests/Discord.Net.Tests.csproj -c "Release" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
     }
 
