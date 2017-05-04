@@ -1328,7 +1328,13 @@ namespace Discord.WebSocket
 
                                         var user = guild.GetUser(data.User.Id);
                                         if (user == null)
+                                        {
+                                            if (data.Status == UserStatus.Offline)
+                                            {
+                                                return;
+                                            }
                                             user = guild.AddOrUpdateUser(data);
+                                        }
                                         else
                                         {
                                             var globalBefore = user.GlobalUser.Clone();
