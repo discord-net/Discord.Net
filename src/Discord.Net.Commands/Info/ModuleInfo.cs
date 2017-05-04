@@ -20,6 +20,9 @@ namespace Discord.Commands
         public ModuleInfo Parent { get; }
         public bool IsSubmodule => Parent != null;
 
+        public IEnumerable<TPrecondition> GetPreconditions<TPrecondition>() where TPrecondition : PreconditionAttribute =>
+            Preconditions.Where(x => x.GetType() == typeof(TPrecondition)).Cast<TPrecondition>();
+
         internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
         {
             Service = service;
