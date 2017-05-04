@@ -7,12 +7,11 @@ namespace Discord
     public class EmbedBuilder
     {
         private readonly Embed _embed;
-        private readonly List<EmbedFieldBuilder> _fields;
 
         public EmbedBuilder()
         {
             _embed = new Embed("rich");
-            _fields = new List<EmbedFieldBuilder>();
+            Fields = new List<EmbedFieldBuilder>();
         }
 
         public string Title { get { return _embed.Title; } set { _embed.Title = value; } }
@@ -25,6 +24,16 @@ namespace Discord
 
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
+        private List<EmbedFieldBuilder> _fields;
+        public List<EmbedFieldBuilder> Fields
+        {
+            get => _fields;
+            set
+            {
+                if (value != null) _fields = value;
+                else throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(value));
+            }
+        }
 
         public EmbedBuilder WithTitle(string title)
         {
@@ -98,7 +107,7 @@ namespace Discord
                 .WithIsInline(false)
                 .WithName(name)
                 .WithValue(value);
-            _fields.Add(field);
+            Fields.Add(field);
             return this;
         }
         public EmbedBuilder AddInlineField(string name, object value)
@@ -107,19 +116,19 @@ namespace Discord
                 .WithIsInline(true)
                 .WithName(name)
                 .WithValue(value);
-            _fields.Add(field);
+            Fields.Add(field);
             return this;
         }
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
-            _fields.Add(field);
+            Fields.Add(field);
             return this;
         }
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
             var field = new EmbedFieldBuilder();
             action(field);
-            _fields.Add(field);
+            Fields.Add(field);
             return this;
         }
 
@@ -127,9 +136,9 @@ namespace Discord
         {
             _embed.Footer = Footer?.Build();
             _embed.Author = Author?.Build();
-            var fields = ImmutableArray.CreateBuilder<EmbedField>(_fields.Count);
-            for (int i = 0; i < _fields.Count; i++)
-                fields.Add(_fields[i].Build());
+            var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
+            for (int i = 0; i < Fields.Count; i++)
+                fields.Add(Fields[i].Build());
             _embed.Fields = fields.ToImmutable();
             return _embed;
         }

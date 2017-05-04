@@ -35,9 +35,6 @@ you to easily navigate to an entity's parent or children. As explained
 above, you will sometimes need to cast to a more detailed version of
 an entity to navigate to its parent.
 
-All socket entities have a `Discord` property, which will allow you
-to access the parent `DiscordSocketClient`. 
-
 ### Accessing Entities
 
 The most basic forms of entities, `SocketGuild`, `SocketUser`, and
