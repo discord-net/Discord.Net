@@ -24,8 +24,8 @@ namespace Discord.Commands
 
         public static SearchResult FromSuccess(string text, IReadOnlyList<CommandMatch> commands)
             => new SearchResult(text, commands, null, null);
-        public static SearchResult FromError(CommandError error, string reason)
-            => new SearchResult(null, null, error, reason);
+        public static SearchResult FromError(CommandError error, string reason, IReadOnlyList<CommandMatch> suggestions = null)
+            => new SearchResult(null, suggestions, error, reason);
         public static SearchResult FromError(IResult result)
             => new SearchResult(null, null, result.Error, result.ErrorReason);
 
