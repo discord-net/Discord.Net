@@ -1,4 +1,6 @@
-﻿namespace Discord.Commands
+﻿using System;
+
+namespace Discord.Commands
 {
     public static class MessageExtensions
     {
@@ -12,10 +14,10 @@
             }
             return false;
         }
-        public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos)
+        public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos, StringComparison comparisonType = StringComparison.Ordinal)
         {
             var text = msg.Content;
-            if (text.StartsWith(str))
+            if (text.StartsWith(str, comparisonType))
             {
                 argPos = str.Length;
                 return true;
