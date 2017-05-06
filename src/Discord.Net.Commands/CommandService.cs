@@ -300,14 +300,5 @@ namespace Discord.Commands
 
             return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
         }
-
-        public ServiceCollection CreateServiceCollection()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<CommandService>(this);
-            serviceCollection.AddSingleton<IServiceCollection>(serviceCollection);
-            serviceCollection.AddSingleton<ServiceCollection>(serviceCollection);
-            return serviceCollection;
-        }
     }
 }
