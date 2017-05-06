@@ -73,7 +73,9 @@ namespace Discord.Rest
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id).ToArray(), options);
+        public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
