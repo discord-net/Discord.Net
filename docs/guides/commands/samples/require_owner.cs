@@ -2,16 +2,18 @@
 
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 // Inherit from PreconditionAttribute
 public class RequireOwnerAttribute : PreconditionAttribute
 {
     // Override the CheckPermissions method
-    public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
+    public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
     {
         // Get the ID of the bot's owner
-        var ownerId = (await map.Get<DiscordSocketClient>().GetApplicationInfoAsync()).Owner.Id;
+        var ownerId = (await services.GetService<DiscordSocketClient>().GetApplicationInfoAsync()).Owner.Id;
         // If this command was executed by that user, return a success
         if (context.User.Id == ownerId)
             return PreconditionResult.FromSuccess();
