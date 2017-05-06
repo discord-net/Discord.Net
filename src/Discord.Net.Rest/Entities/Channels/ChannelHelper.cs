@@ -178,12 +178,12 @@ namespace Discord.Rest
             var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
-        }     
+        }
 
-        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
-            IEnumerable<ulong> messageIds, RequestOptions options)
+        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
+            IEnumerable<IMessage> messages, RequestOptions options)
         {
-            var msgs = messageIds.ToArray();
+            var msgs = messages.Select(x => x.Id).ToArray();
             if (msgs.Length < 100)
             {
                 var args = new DeleteMessagesParams(msgs);
