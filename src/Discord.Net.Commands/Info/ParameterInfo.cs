@@ -42,7 +42,7 @@ namespace Discord.Commands
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IServiceProvider services = null)
         {
-            services = EmptyServiceProvider.Instance;
+            services = services ?? EmptyServiceProvider.Instance;
 
             foreach (var precondition in Preconditions)
             {
