@@ -126,6 +126,8 @@ namespace Discord.WebSocket
                     _emojis = ImmutableArray.Create<Emoji>();
                 if (Features == null)
                     _features = ImmutableArray.Create<string>();*/
+                _syncPromise = new TaskCompletionSource<bool>();
+                _downloaderPromise = new TaskCompletionSource<bool>();
                 return;
             }
 
