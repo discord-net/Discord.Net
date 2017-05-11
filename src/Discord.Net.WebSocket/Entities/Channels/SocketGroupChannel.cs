@@ -105,7 +105,7 @@ namespace Discord.WebSocket
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id).ToArray(), options);
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id), options);
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
