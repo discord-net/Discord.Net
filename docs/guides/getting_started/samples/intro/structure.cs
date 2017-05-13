@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -9,8 +10,8 @@ class Program
 {
     private readonly DiscordSocketClient _client;
     
-    // Keep the CommandService and IDependencyMap around for use with commands.
-    private readonly IDependencyMap _map = new DependencyMap();
+    // Keep the CommandService and IServiceCollection around for use with commands.
+    private readonly IServiceCollection _map = new ServiceCollection();
     private readonly CommandService _commands = new CommandService();
 
     // Program entry point
@@ -78,21 +79,28 @@ class Program
         // Login and connect.
         await _client.LoginAsync(TokenType.Bot, /* <DON'T HARDCODE YOUR TOKEN> */);
         await _client.StartAsync();
-        
+
         // Wait infinitely so your bot actually stays connected.
         await Task.Delay(-1);
     }
 
+    private IServiceProvider _services;
+    
     private async Task InitCommands()
     {
         // Repeat this for all the service classes
         // and other dependencies that your commands might need.
-        _map.Add(new SomeServiceClass());
+        _map.AddSingleton(new SomeServiceClass());
 
         // Either search the program and add all Module classes that can be found:
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
         await _commands.AddModuleAsync<SomeModule>();
+
+        // When all your required services are in the collection, build the container.
+        // Tip: There's an overload taking in a 'validateScopes' bool to make sure
+        // you haven't made any mistakes in your dependency graph.
+        _services = _map.BuildServiceProvider();
 
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
@@ -110,14 +118,14 @@ class Program
         // you want to prefix your commands with.
         // Uncomment the second half if you also want
         // commands to be invoked by mentioning the bot instead.
-        if (msg.HasCharPrefix('!', ref pos) /* || msg.HasMentionPrefix(msg.Discord.CurrentUser, ref pos) */)
+        if (msg.HasCharPrefix('!', ref pos) /* || msg.HasMentionPrefix(_client.CurrentUser, ref pos) */)
         {
             // Create a Command Context
-            var context = new SocketCommandContext(msg.Discord, msg);
+            var context = new SocketCommandContext(_client, msg);
             
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed succesfully).
-            var result = await _commands.ExecuteAsync(context, pos, _map);
+            var result = await _commands.ExecuteAsync(context, pos, _services);
 
             // Uncomment the following lines if you want the bot
             // to send a message if it failed (not advised for most situations).
