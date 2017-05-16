@@ -74,6 +74,8 @@ namespace Discord
                         if (!_source._nextPage(_info, data))
                             _info.Remaining = 0;
                     }
+
+                    _currentPageEnumerator.MoveNext();
                 }
 
                 return true;
